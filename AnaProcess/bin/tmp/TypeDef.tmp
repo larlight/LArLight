@@ -1,0 +1,14 @@
+//
+// type-def file for ROOT
+//
+
+#ifndef PACKAGE_NAME_TYPEDEF_HH
+#define PACKAGE_NAME_TYPEDEF_HH
+
+// Header files included here
+#include "Package_Name.hh"
+
+// Class forward declaration here
+class Package_Name;
+
+#endif
