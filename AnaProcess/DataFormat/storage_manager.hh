@@ -67,6 +67,9 @@ public:
   //void set_in_filename(std::string name) {_in_fname=name;};
   void add_in_filename(std::string name) {_in_fnames.push_back(name);};
 
+  /// Setter for input file's TDirectory name
+  void set_in_rootdir(std::string name){_name_tdirectory=name;};
+
   /// Setter for output filename
   void set_out_filename(std::string name) {_out_fname=name;};
 
@@ -170,6 +173,7 @@ private:
   /// I/O filename
   std::string _out_fname;
   std::vector<std::string> _in_fnames;
+  std::string _name_tdirectory;
 
   /// TTree name
   const std::string _treename;

@@ -1,0 +1,5 @@
+#!/bin/sh
+
+g++ example.cc -o example.exe -L${ROOTSYS}/lib  `root-config --libs` -L${ANA_PROC_DIR}/lib -lBase -lDataFormat -I. ` root-config --cflags` -I${ANA_PROC_DIR}/Base -I${ANA_PROC_DIR}/DataFormat
+
+

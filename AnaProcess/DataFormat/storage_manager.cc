@@ -11,6 +11,7 @@ storage_manager::storage_manager(storage_manager::MODE mode)
   //_event_wf=0;
   _fout=0;
   _out_fname="";
+  _name_tdirectory="";
   _status=INIT;
 
   reset();
@@ -209,9 +210,15 @@ bool storage_manager::prepare_tree(){
 
     if(_mode!=WRITE && _read_data_array[i]) {
 
-      _in_ch[i]=new TChain(Form("%s_tree",DATA::DATA_TREE_NAME[(DATA::DATA_TYPE)i].c_str()),
-			   Form("%s Tree",DATA::DATA_TREE_NAME[(DATA::DATA_TYPE)i].c_str()));
+      std::string tree_name(Form("%s_tree",DATA::DATA_TREE_NAME[(DATA::DATA_TYPE)i].c_str()));
 
+      if(_name_tdirectory.size()>0)
+	_in_ch[i]=new TChain(Form("%s/%s",_name_tdirectory.c_str(),tree_name.c_str()),
+			     Form("%s Tree",DATA::DATA_TREE_NAME[(DATA::DATA_TYPE)i].c_str()));
+      else
+	_in_ch[i]=new TChain(tree_name.c_str(),
+			     Form("%s Tree",DATA::DATA_TREE_NAME[(DATA::DATA_TYPE)i].c_str()));
+      
       for(size_t j=0; j<_in_fnames.size(); ++j)
 
 	_in_ch[i]->AddFile(_in_fnames[j].c_str());

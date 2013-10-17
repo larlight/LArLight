@@ -25,5 +25,3 @@ CXXFLAGS +=  `root-config --cflags`
 # call the common GNUmakefile
 include $(ANA_PROC_DIR)/Makefile/GNUmakefile.CORE
 
-
-

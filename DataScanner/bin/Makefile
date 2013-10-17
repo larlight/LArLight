@@ -13,9 +13,9 @@ LDFLAGS += -L$(LIBDIR) -lBase -lDataFormat
 
 # Add your program below with a space after the previous one.
 # This makefile compiles all binaries specified below.
-PROGRAMS = simple_write simple_read
+PROGRAMS = example
 
-all:		$(PROGRAMS)
+bin:	$(PROGRAMS)
 	@rm -rf *.dSYM
 clean:	
 	rm -f $(PROGRAMS)
