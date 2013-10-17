@@ -47,11 +47,11 @@ public:
   void set_event_id (int id ) { fEventID      = id;  };
 
   /// run number getter
-  inline const int run      () const { return fRunNumber;    };
+  int run      () const { return fRunNumber;    };
   /// sub-run number getter
-  inline const int subrun   () const { return fSubRunNumber; };
+  int subrun   () const { return fSubRunNumber; };
   /// event-id getter
-  inline const int event_id () const { return fEventID;      };
+  int event_id () const { return fEventID;      };
   
 private:
 

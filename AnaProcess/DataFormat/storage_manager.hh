@@ -19,7 +19,7 @@
 #include "data_base.hh"
 #include "larlight_base.hh"
 #include "track.hh"
-
+#include "mctruth.hh"
 
 /**
    \class storage_manager

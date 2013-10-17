@@ -58,10 +58,13 @@ namespace DATA{
   enum DATA_TYPE{
     Event=0,
     UserInfo,           ///< dynamic data container
+    MCTruth,            ///< MCTruth
     FIFOChannel,        ///< FIFOChannel
     Wire,               ///< Wire
     Hit,                ///< Hit
     Track,              ///< Track
+    Bezier,             ///< Track (Bezier)
+    Kalman3DSPS,        ///< Track (Kalman3DSPS)
     Shower,             ///< Shower
     Cluster,            ///< Cluster
     Calorimetry,        ///< Calorimetry
@@ -71,11 +74,14 @@ namespace DATA{
   /// Define tree name
   const std::string DATA_TREE_NAME[DATA_TYPE_MAX] = {
     "event",
-    "user_info",
-    "fifo_channel",
+    "user",
+    "mc",
+    "pmt",
     "wire",
     "hit",
     "track",
+    "bezier",
+    "kalman3dsps",
     "shower",
     "cluster",
     "calorimetry"

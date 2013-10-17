@@ -15,7 +15,8 @@ track::track() : data_base(),
 
 
 //########################################
-track::track(const track& original) :   fID(original.fID),
+track::track(const track& original) :   data_base(original),
+					fID(original.fID),
 					fXYZ(original.fXYZ),
 					fDir(original.fDir),
 					fCov(original.fCov),

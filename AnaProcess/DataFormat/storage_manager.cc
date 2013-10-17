@@ -285,8 +285,15 @@ void storage_manager::create_data_ptr(DATA::DATA_TYPE type){
   if(_ptr_data_array[type]) return;
 
   switch(type){
+    // Type to be stored as event_track object
   case DATA::Track:
+  case DATA::Bezier:
+  case DATA::Kalman3DSPS:
     _ptr_data_array[type]=(data_base*)(new event_track);
+    break;
+    // Type to be stored as event_mc object
+  case DATA::MCTruth:
+    _ptr_data_array[type]=(data_base*)(new event_mc);
     break;
   case DATA::Event:
   case DATA::UserInfo:

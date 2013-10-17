@@ -8,9 +8,13 @@
 // Header files included here
 #include "user_info.hh"
 #include "track.hh"
+#include "mctruth.hh"
 #include "storage_manager.hh"
 // Class forward declaration here
 class data_base;
+
+class mctruth;
+class event_mc;
 
 class user_info;
 class user_collection;

@@ -67,21 +67,21 @@ public:
   void append(std::string key, bool value);        
 
   /// checker for an existence of a double variable key
-  inline const bool exist_double (std::string key) const { return _d_map.find(key)!=_d_map.end(); };
+  inline bool exist_double (std::string key) const { return _d_map.find(key)!=_d_map.end(); };
   /// checker for an existence of a string variable key
-  inline const bool exist_string (std::string key) const { return _s_map.find(key)!=_s_map.end(); };
+  inline bool exist_string (std::string key) const { return _s_map.find(key)!=_s_map.end(); };
   /// checker for an existence of a int variable key
-  inline const bool exist_int    (std::string key) const { return _i_map.find(key)!=_i_map.end(); };
+  inline bool exist_int    (std::string key) const { return _i_map.find(key)!=_i_map.end(); };
   /// checker for an existence of a bool variable key
-  inline const bool exist_bool   (std::string key) const { return _b_map.find(key)!=_b_map.end(); };
+  inline bool exist_bool   (std::string key) const { return _b_map.find(key)!=_b_map.end(); };
   /// checker for an existence of a double array
-  inline const bool exist_darray (std::string key) const { return _darray_map.find(key)!=_darray_map.end(); };
+  inline bool exist_darray (std::string key) const { return _darray_map.find(key)!=_darray_map.end(); };
   /// checker for an existence of a string array
-  inline const bool exist_sarray (std::string key) const { return _sarray_map.find(key)!=_sarray_map.end(); };
+  inline bool exist_sarray (std::string key) const { return _sarray_map.find(key)!=_sarray_map.end(); };
   /// checker for an existence of a int array
-  inline const bool exist_iarray (std::string key) const { return _iarray_map.find(key)!=_iarray_map.end(); };
+  inline bool exist_iarray (std::string key) const { return _iarray_map.find(key)!=_iarray_map.end(); };
   /// checker for an existence of a bool array
-  inline const bool exist_barray (std::string key) const { return _barray_map.find(key)!=_barray_map.end(); };
+  inline bool exist_barray (std::string key) const { return _barray_map.find(key)!=_barray_map.end(); };
 
   /// getter for a single double variable
   double      get_double (std::string key) const;  

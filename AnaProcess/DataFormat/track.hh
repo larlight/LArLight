@@ -36,15 +36,15 @@ public:
   /// Default destructor
   virtual ~track(){};
   
-  inline int             track_id      ()               const { return fID;                  }
-  inline const size_t    n_point       ()               const { return fDir.size();          }
-  inline const size_t    n_covariance  ()               const { return fCov.size();          }
-  inline const size_t    n_momentum    ()               const { return fFitMomentum.size();  }
-  inline const size_t    n_dQdx        ()               const { return fdQdx.size();         }
+  inline int       track_id      ()               const { return fID;                  }
+  inline size_t    n_point       ()               const { return fDir.size();          }
+  inline size_t    n_covariance  ()               const { return fCov.size();          }
+  inline size_t    n_momentum    ()               const { return fFitMomentum.size();  }
+  inline size_t    n_dQdx        ()               const { return fdQdx.size();         }
 
   inline const TVector3& direction_at  (unsigned int p) const { return fDir.at(p);           }
   inline const TVector3& vertex_at     (unsigned int p) const { return fXYZ.at(p);           }
-  inline const double    momentum_at   (unsigned int p) const { return fFitMomentum.at(p);   }
+  inline       double    momentum_at   (unsigned int p) const { return fFitMomentum.at(p);   }
   inline const TMatrixD& covariance_at (unsigned int p) const { return fCov.at(p);           }
 
   inline void set_track_id   (const int id)     { fID = id;                  };
