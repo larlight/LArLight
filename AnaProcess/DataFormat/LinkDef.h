@@ -11,8 +11,8 @@
 
 #pragma link C++ class data_base+;
 
-#pragma link C++ class mctruth+;
-#pragma link C++ class std::vector<mctruth>+;
+#pragma link C++ class part_mc+;
+#pragma link C++ class std::vector<part_mc>+;
 #pragma link C++ class event_mc+;
 
 #pragma link C++ class track+;

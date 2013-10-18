@@ -51,7 +51,7 @@ namespace MSG{
   ///< Prefix of message
 }
 
-
+/// Defines constants for data structure definition (system utility)
 namespace DATA{
 
   /// Define identifier for a data container class to be loaded through storage_manager::get_data()
@@ -92,6 +92,7 @@ namespace DATA{
 
 }
 
+/// Defines constants for PMT related electronics
 namespace PMT{
 
   /// PMT discriminator type
@@ -103,6 +104,19 @@ namespace PMT{
     BEAM_WIN,      ///< discriminator for beam window (forced N samples read-out)
     DISC_MAX
   };
+}
+
+/// Defines constants for MC truth information
+namespace MC{
+
+  /// MC generator type
+  typedef enum _ev_origin{
+    kUnknown,           ///< ???
+    kBeamNeutrino,      ///< Beam neutrinos
+    kCosmicRay,         ///< Cosmic rays
+    kSuperNovaNeutrino, ///< Supernova neutrinos
+    kSingleParticle     ///< single particles thrown at the detector
+  } Origin_t;
 }
 
 #endif

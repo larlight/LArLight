@@ -13,7 +13,7 @@
 // Class forward declaration here
 class data_base;
 
-class mctruth;
+class part_mc;
 class event_mc;
 
 class user_info;

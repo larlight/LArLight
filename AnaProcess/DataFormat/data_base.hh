@@ -14,6 +14,7 @@
 #ifndef DATA_BASE_HH
 #define DATA_BASE_HH
 
+#include "constants.hh"
 #include <vector>
 #include <limits>
 #include <TObject.h>
