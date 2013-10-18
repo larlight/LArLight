@@ -19,9 +19,13 @@
 #pragma link C++ class std::vector<track>+;
 #pragma link C++ class event_track+;
 
+#pragma link C++ class spacepoint+;
+#pragma link C++ class std::vector<spacepoint>+;
+#pragma link C++ class event_sps+;
+
 #pragma link C++ class user_info+;
 #pragma link C++ class std::vector<user_info>+;
-#pragma link C++ class user_collection+;
+#pragma link C++ class event_user+;
 
 #pragma link C++ class storage_manager+;
 

@@ -24,23 +24,25 @@
 class cluster : public data_base {
 
 public:
-  
+
   /// Default constructor
-  cluster() : data_base(){};
+  cluster() : data_base() {};
 
   /// Default destructor
   virtual ~cluster(){};
 
-  inline double                Charge()        const { return fTotalCharge;   }
-  inline double                dTdW()          const { return fdTdW;          }
-  inline double                dQdW()          const { return fdQdW;          }
-  inline double                SigmadTdW()     const { return fSigmadTdW;     }
-  inline double                SigmadQdW()     const { return fSigmadQdW;     }
-  inline std::vector<double>   StartPos()      const { return fStartPos;      }
-  inline std::vector<double>   EndPos()        const { return fEndPos;        }
-  inline std::vector<double>   SigmaStartPos() const { return fSigmaStartPos; }
-  inline std::vector<double>   SigmaEndPos()   const { return fSigmaEndPos;   }
-  inline int                   ID()            const { return fID;            }
+  inline double       Charge()    const { return fTotalCharge;   }
+  inline double       dTdW()      const { return fdTdW;          }
+  inline double       dQdW()      const { return fdQdW;          }
+  inline double       SigmadTdW() const { return fSigmadTdW;     }
+  inline double       SigmadQdW() const { return fSigmadQdW;     }
+  inline int          ID()        const { return fID;            }
+  inline GEO::View_t  View()      const { return fView;          }
+
+  inline const std::vector<double>& StartPos()      const { return fStartPos;      }
+  inline const std::vector<double>& EndPos()        const { return fEndPos;        }
+  inline const std::vector<double>& SigmaStartPos() const { return fSigmaStartPos; }
+  inline const std::vector<double>& SigmaEndPos()   const { return fSigmaEndPos;   }
 
   virtual void clear_data(){
     fTotalCharge = -1;
@@ -50,6 +52,7 @@ public:
     fSigmaStartPos.clear();
     fSigmaEndPos.clear();
     fID = -1;
+    fView = GEO::kUnknown;
   }
 
 private:
@@ -64,6 +67,7 @@ private:
   std::vector<double>        fSigmaStartPos;  ///< start of cluster in (wire, tdc) plane
   std::vector<double>        fSigmaEndPos;    ///< start of cluster in (wire, tdc) plane
   int                        fID;             ///< cluster's ID
+  GEO::View_t                fView;           ///< View associated w/ this cluster
 
   ////////////////////////
   ClassDef(cluster,1)

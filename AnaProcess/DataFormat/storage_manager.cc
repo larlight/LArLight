@@ -302,8 +302,14 @@ void storage_manager::create_data_ptr(DATA::DATA_TYPE type){
   case DATA::MCTruth:
     _ptr_data_array[type]=(data_base*)(new event_mc);
     break;
-  case DATA::Event:
+  case DATA::SpacePoint:
+    _ptr_data_array[type]=(data_base*)(new event_sps);
+    break;
   case DATA::UserInfo:
+    _ptr_data_array[type]=(data_base*)(new event_user);
+    break;
+  case DATA::Event:
+  case DATA::Seed:
   case DATA::FIFOChannel:
   case DATA::Shower:
   case DATA::Calorimetry:

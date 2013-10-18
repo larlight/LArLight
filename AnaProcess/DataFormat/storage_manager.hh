@@ -20,6 +20,8 @@
 #include "larlight_base.hh"
 #include "track.hh"
 #include "mctruth.hh"
+#include "user_info.hh"
+#include "spacepoint.hh"
 
 /**
    \class storage_manager

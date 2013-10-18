@@ -9,6 +9,7 @@
 #include "user_info.hh"
 #include "track.hh"
 #include "mctruth.hh"
+#include "spacepoint.hh"
 #include "storage_manager.hh"
 // Class forward declaration here
 class data_base;
@@ -16,8 +17,11 @@ class data_base;
 class part_mc;
 class event_mc;
 
+class spacepoint;
+class event_sps;
+
 class user_info;
-class user_collection;
+class event_user;
 
 class track;
 class event_track;

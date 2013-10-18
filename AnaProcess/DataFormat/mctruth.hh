@@ -17,6 +17,7 @@
 
 #include "data_base.hh"
 #include <map>
+#include <set>
 #include <TVector3.h>
 /**
    \class part_mc
@@ -25,16 +26,20 @@
 class part_mc : public data_base {
 
 public:
+
+  /// Default constructor w/o arguments set to private (not-to-be-used)
+  part_mc(){clear_data();};
   
   /// Default constructor requires pdgid, track & parent id
-  part_mc(int pdgid, int track, int parent);
+  part_mc(int pdgid, int track, int parent, std::string process);
 
   /// Copy constructor
   part_mc(const part_mc& original) : data_base     (original),
 				     fStepTime     (original.fStepTime),
 				     fStepVertex   (original.fStepVertex),
 				     fStepMomentum (original.fStepMomentum),
-				     fStepProcess  (original.fStepProcess),
+				     //fStepProcess  (original.fStepProcess),
+				     fProcess      (original.fProcess),
 				     fDaughters    (original.fDaughters),
 				     fParentID     (original.fParentID),
 				     fTrackID      (original.fTrackID),
@@ -49,23 +54,22 @@ public:
 
   /// Appender of a particle track
   void add_track(double x,  double y,  double z,  double t,
-		 double px, double py, double pz, 
-		 std::string process);
+		 double px, double py, double pz);
 
   /// Appender of a particle's daughter
-  void add_daughter(int id, int track_id=-1);
+  //void add_daughter(int id, int track_id=-1);
+  void add_daughter(int track_id){fDaughters.insert(track_id);};
 
 private:
-
-  /// Default constructor w/o arguments set to private (not-to-be-used)
-  part_mc(){clear_data();};
 
   std::vector<double>      fStepTime;     ///< time at each step
   std::vector<TVector3>    fStepVertex;   ///< vertex at each step
   std::vector<TVector3>    fStepMomentum; ///< momentum at each step
-  std::vector<std::string> fStepProcess;  ///< process name at each step
+  //std::vector<std::string> fStepProcess;  ///< process name at each step
+  std::string              fProcess;      ///< process name for creation
   /// A list of daughters (daughter's particle id, which is unique, & step number)
-  std::map<int, int>       fDaughters;
+  std::set<int>            fDaughters;
+  //std::map<int, int>       fDaughters;
  
   int fParentID; ///< Parent's track id
   int fTrackID;  ///< Unique tracking ID per particle

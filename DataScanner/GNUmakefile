@@ -17,6 +17,7 @@ include SoftRelTools/arch_spec_nutools.mk
 override CPPFLAGS += -I$(ANA_PROC_DIR)/DataFromat
 override CPPFLAGS += -I$(ANA_PROC_DIR)/Base
 override CPPFLAGS += -I$(LARSOFT)/include
+override CPPFLAGS += -I$(NUTOOLS_INC)
 
 # This line you may have to change: If you require a library in addition
 # to those listed, you'd add "-l<library-name>" to the end of this line.

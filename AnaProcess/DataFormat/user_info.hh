@@ -127,36 +127,42 @@ protected:
 
 
 /**
- \class user_collection 
+ \class event_user
  A collection storage class of multiple user_info.
  This is what created per-event if user specified to store user's information in an event loop.
  If a user just needs one user_info, it may be an array of length 1.
 */
-class user_collection : public std::vector<user_info>,
-			public data_base {
+class event_user : public data_base {
   
 public:
 
   /// Default constructor
-  user_collection() : data_base() {clear_data();};
+  event_user() : data_base() {clear_data();};
 
   /// Default copy constructor
-  user_collection(const user_collection& original)
-    : std::vector<user_info>(original),
-      data_base(original)
+  event_user(const event_user& original)
+    : data_base(original),
+      fUserInfo_v(original.fUserInfo_v)
   {};
 
+  /// Appender of a user info
+  void add_user_info(user_info info) {fUserInfo_v.push_back(info);};
+  
+  /// Getter of user info array
+  inline const std::vector<user_info>& user_info_array(){return fUserInfo_v;};
+
   /// Method to clear currently held data contents in the buffer
-  virtual void clear_data(){clear();};
+  virtual void clear_data(){data_base::clear_data(); fUserInfo_v.clear();};
 
   /// Default destructor
-  ~user_collection(){};
-
+  ~event_user(){};
 
 private:
 
+  std::vector<user_info> fUserInfo_v;
+
   ////////////////////////
-  ClassDef(user_collection,1)
+  ClassDef(event_user,1)
   ////////////////////////
 };
 

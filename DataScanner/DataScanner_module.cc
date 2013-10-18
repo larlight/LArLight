@@ -5,6 +5,8 @@
 // LArSoft includes
 #include "Geometry/Geometry.h"
 #include "RecoBase/Track.h"
+#include "RecoBase/SpacePoint.h"
+#include "SimulationBase/MCTruth.h"
 
 // ART includes.
 #include "art/Framework/Core/EDAnalyzer.h"
@@ -32,6 +34,9 @@ namespace larlight {
     void analyze (const art::Event&); 
 
   private:
+
+    /// Function to read & store spacepoints
+    void ReadSPS(const art::Event& evt, const std::string mod_name, event_sps* data_ptr);
 
     /// Function to read & store Tracking information
     void ReadTrack(const art::Event& evt, const std::string mod_name, event_track* data_ptr);
@@ -83,6 +88,7 @@ namespace larlight {
     _mod_names[DATA::Bezier]      = pset.get<std::string>("fModName_Bezier");
     _mod_names[DATA::Kalman3DSPS] = pset.get<std::string>("fModName_Kalman3DSPS");
     _mod_names[DATA::MCTruth]     = pset.get<std::string>("fModName_MCTruth");
+    _mod_names[DATA::SpacePoint]  = pset.get<std::string>("fModName_SpacePoint");
 
     // Next we make TTree & storage data class objects for those data types specified in fcl files.
     art::ServiceHandle<art::TFileService> fileService;    
@@ -106,9 +112,13 @@ namespace larlight {
 	case DATA::Bezier:
 	  _data_ptr[i]=(data_base*)(new event_track);
 	  break;
+	case DATA::SpacePoint:
+	  _data_ptr[i]=(data_base*)(new event_sps);
+	  break;
 	case DATA::Event:
 	case DATA::UserInfo:
 	case DATA::FIFOChannel:
+	case DATA::Seed:
 	case DATA::Shower:
 	case DATA::Calorimetry:
 	case DATA::Wire:
@@ -165,7 +175,12 @@ namespace larlight {
       case DATA::MCTruth:
 	ReadMCTruth(evt, _mod_names[i], (event_mc*)(_data_ptr[i]));
 	break;
+ 	// Data type to be stored in event_sps class
+      case DATA::SpacePoint:
+	ReadSPS(evt,_mod_names[i], (event_sps*)(_data_ptr[i]));
+	break;
       case DATA::Event:
+      case DATA::Seed:
       case DATA::UserInfo:
       case DATA::FIFOChannel:
       case DATA::Shower:
@@ -183,10 +198,61 @@ namespace larlight {
   }
 
   //#######################################################################################################
+  void DataScanner::ReadSPS(const art::Event& evt, const std::string mod_name, event_sps* data_ptr){
+  //#######################################################################################################
+
+    art::Handle< std::vector<recob::SpacePoint > > spsArray;
+    evt.getByLabel(mod_name,spsArray);
+
+    for(size_t i=0; i<spsArray->size(); ++i){
+
+      art::Ptr<recob::SpacePoint> sps_ptr(spsArray,i);
+      
+      spacepoint sps_light(sps_ptr->ID(),
+			   sps_ptr->XYZ()[0],    sps_ptr->XYZ()[1],    sps_ptr->XYZ()[2],
+			   sps_ptr->ErrXYZ()[0], sps_ptr->ErrXYZ()[1], sps_ptr->ErrXYZ()[2],
+			   sps_ptr->Chisq());
+      data_ptr->add_sps(sps_light);
+
+    }
+
+  }
+
+  //#######################################################################################################
   void DataScanner::ReadMCTruth(const art::Event& evt, const std::string mod_name, event_mc* data_ptr){
   //#######################################################################################################
-    // EMPTY ... place holder
 
+    art::Handle< std::vector< simb::MCTruth > > mciArray;
+    evt.getByLabel(mod_name,mciArray);
+
+    for(size_t i=0; i < mciArray->size(); ++i){
+
+      if(i>0) {
+	mf::LogError("DataScanner")<<" Detected multiple MCTruth! The structure does not support this...";
+	break;
+      }
+
+      art::Ptr<simb::MCTruth> mci_ptr(mciArray,i);
+
+      data_ptr->set_gen_code( (MC::Origin_t) mci_ptr->Origin() );
+
+      for(size_t j=0; j < (size_t)(mci_ptr->NParticles()); ++j){
+	
+	const simb::MCParticle part(mci_ptr->GetParticle(j));
+	part_mc part_light(part.PdgCode(), part.TrackId(), part.Mother(), part.Process());
+
+	for(size_t k=0; k<part.NumberTrajectoryPoints(); k++)
+
+	  part_light.add_track(part.Vx(k), part.Vy(k), part.Vz(k), part.T(k),
+			       part.Px(k), part.Py(k), part.Pz(k));
+	
+	for(size_t k=0; k<(size_t)(part.NumberDaughters()); k++)
+	  
+	  part_light.add_daughter(part.Daughter(k));
+	
+	data_ptr->add_part(part_light);
+      }
+    }
   }
 
 

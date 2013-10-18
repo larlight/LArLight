@@ -62,11 +62,13 @@ namespace DATA{
     FIFOChannel,        ///< FIFOChannel
     Wire,               ///< Wire
     Hit,                ///< Hit
+    Cluster,            ///< Cluster
+    Seed,               ///< Seed
+    SpacePoint,         ///< Spacepoints
     Track,              ///< Track
     Bezier,             ///< Track (Bezier)
     Kalman3DSPS,        ///< Track (Kalman3DSPS)
     Shower,             ///< Shower
-    Cluster,            ///< Cluster
     Calorimetry,        ///< Calorimetry
     DATA_TYPE_MAX
   };
@@ -79,11 +81,13 @@ namespace DATA{
     "pmt",
     "wire",
     "hit",
+    "cluster",
+    "seed",
+    "sps",
     "track",
     "bezier",
     "kalman3dsps",
     "shower",
-    "cluster",
     "calorimetry"
   };
 
@@ -110,13 +114,27 @@ namespace PMT{
 namespace MC{
 
   /// MC generator type
-  typedef enum _ev_origin{
+  enum Origin_t{
     kUnknown,           ///< ???
     kBeamNeutrino,      ///< Beam neutrinos
     kCosmicRay,         ///< Cosmic rays
     kSuperNovaNeutrino, ///< Supernova neutrinos
     kSingleParticle     ///< single particles thrown at the detector
-  } Origin_t;
+  };
+}
+
+/// Defines constants for geometry
+namespace GEO{
+
+  /// Enumerate the possible plane projections
+  enum View_t {
+    kU,       ///< planes which measure U
+    kV,       ///< planes which measure V
+    kW,       ///< soon to be deprecated, planes which measure W (third view for Bo, MicroBooNE, etc)
+    kZ=kW,    ///< planes which measure Z direction (ie wires are vertical)
+    k3D,      ///< 3 dimensional objects, potentially hits, clusters, prongs, etc
+    kUnknown  ///< unknown view
+  };
 }
 
 #endif

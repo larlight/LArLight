@@ -15,14 +15,14 @@ void event_mc::clear_data()
 }
 
 //######################################################
-part_mc::part_mc(int pdgid, int track, int parent) : data_base()
+part_mc::part_mc(int pdgid, int track, int parent, std::string process) 
+  : data_base(),
+    fProcess(process),
+    fParentID(parent),
+    fTrackID(track),
+    fPDGID(pdgid)
 //######################################################
-{
-  clear_data();
-  fPDGID    = pdgid;
-  fTrackID  = track;
-  fParentID = parent;
-}
+{}
 
 //######################################################
 void part_mc::clear_data()
@@ -32,11 +32,22 @@ void part_mc::clear_data()
   fStepTime.clear();
   fStepVertex.clear();
   fStepMomentum.clear();
-  fStepProcess.clear();
+  //fStepProcess.clear();
   fDaughters.clear();
+  fProcess  = "DEFAULG";
   fParentID = -11;
   fTrackID  = -11;
   fPDGID    = -11;
+}
+
+//######################################################
+void part_mc::add_track(double x,  double y,  double z,  double t,
+			double px, double py, double pz)
+//######################################################
+{
+  fStepTime.push_back(t);
+  fStepVertex.push_back(TVector3(x,y,z));
+  fStepMomentum.push_back(TVector3(px,py,pz));
 }
 
 #endif
