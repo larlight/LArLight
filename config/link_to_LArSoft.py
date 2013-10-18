@@ -1,8 +1,8 @@
 import os,sys,commands
 
 make_link   = False;
-target_link = "%s/DataReader" % sys.argv[1]
-source_link = "%s/DataReader" % os.environ['MAKE_TOP_DIR']
+target_link = "%s/DataScanner" % sys.argv[1]
+source_link = "%s/DataScanner" % os.environ['MAKE_TOP_DIR']
 if os.path.islink(target_link):
     current_link=commands.getoutput("ls -l %s" % target_link)
     current_link=current_link.split(None)[len(current_link.split(None))-1]
@@ -35,10 +35,11 @@ elif os.path.isdir(target_link):
     print "in place where we need to make a softlink!"
     print "BE AWARE!"
 else:
-    print "WARNING:"
-    print "Attempting to make a soft-link: %s" % target_link
-    print "But a physical directory already exists. Aborting this step."
-    print
+    make_link=True
+#    print "WARNING:"
+#    print "Attempting to make a soft-link: %s" % target_link
+#    print "But a physical directory already exists. Aborting this step."
+#    print
 
 if make_link:
     os.system("ln -s %s %s" % (source_link,target_link))
