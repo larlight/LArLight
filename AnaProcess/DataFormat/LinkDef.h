@@ -10,6 +10,7 @@
 #pragma link off all functions;
 
 #pragma link C++ class data_base+;
+#pragma link C++ class std::vector<TVector3>+;
 
 #pragma link C++ class part_mc+;
 #pragma link C++ class std::vector<part_mc>+;

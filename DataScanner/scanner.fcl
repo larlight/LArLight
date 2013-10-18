@@ -7,7 +7,7 @@ standard_ana:
     module_type:            "DataScanner"
     fModName_Bezier:        ""
     fModName_Kalman3DSPS:   "trackkal"
-    fModName_MCTruth:       "generator"
+    fModName_MCTruth:       "largeant:generator"
     fModName_SpacePoint:    "spacepointfinder"
 }
 

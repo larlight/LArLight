@@ -60,6 +60,24 @@ public:
   //void add_daughter(int id, int track_id=-1);
   void add_daughter(int track_id){fDaughters.insert(track_id);};
 
+  /// Getter for PDGID
+  inline int pdg_id()    const { return fPDGID;    };
+
+  /// Getter for Track ID
+  inline int track_id()  const { return fTrackID;  };
+
+  /// Getter for Parent ID
+  inline int parent_id() const { return fParentID; };
+
+  /// Getter for step vertex
+  inline const std::vector<TVector3>& step_vertex()   const { return fStepVertex;   };
+
+  /// Getter for step time
+  inline const std::vector<double>&   step_time()     const { return fStepTime;     };
+
+  /// Getter for step momentum
+  inline const std::vector<TVector3>& step_momentum() const { return fStepMomentum; };
+
 private:
 
   std::vector<double>      fStepTime;     ///< time at each step
@@ -76,7 +94,7 @@ private:
   int fPDGID;    ///< Particle ID code
 
   ////////////////////////
-  ClassDef(part_mc,3)
+  ClassDef(part_mc,4)
   ////////////////////////
 
 };

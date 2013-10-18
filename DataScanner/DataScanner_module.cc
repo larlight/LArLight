@@ -44,9 +44,15 @@ namespace larlight {
     /// Function to read & store MCTruth information
     void ReadMCTruth(const art::Event& evt, const std::string mod_name, event_mc* data_ptr);
 
-    std::vector<TTree*>      _trees;     ///< output data holder TTree
-    std::vector<std::string> _mod_names; ///< input data production module names
-    std::vector<data_base*>  _data_ptr;  ///< output data holder class object pointers
+    /// Function to read & store MCTruth information
+    void ReadMCPartArray(const art::Event& evt, const std::string mod_name, event_mc* data_ptr);
+
+    /// Utility function to parse module name string
+    void ParseModuleName(std::vector<std::string> &mod_names, std::string name);
+    
+    std::vector<TTree*>                    _trees;     ///< output data holder TTree
+    std::vector<std::vector<std::string> > _mod_names; ///< input data production module names input from FCL file
+    std::vector<data_base*>                _data_ptr;  ///< output data holder class object pointers
   };
 
 } 
@@ -69,7 +75,9 @@ namespace larlight {
 #include "art/Framework/Principal/Handle.h"
 #include "art/Persistency/Common/Ptr.h"
 #include "art/Persistency/Common/PtrVector.h"
+#include "art/Framework/Services/Registry/ActivityRegistry.h"
 #include "art/Framework/Services/Registry/ServiceHandle.h"
+#include "art/Framework/Services/Registry/ServiceMacros.h"
 #include "art/Framework/Services/Optional/TFileService.h"
 #include "art/Framework/Services/Optional/TFileDirectory.h"
 #include "messagefacility/MessageLogger/MessageLogger.h"
@@ -79,16 +87,20 @@ namespace larlight {
 
   //#######################################################################################################
   DataScanner::DataScanner(fhicl::ParameterSet const& pset) : _trees(DATA::DATA_TYPE_MAX,0), 
-							      _mod_names(DATA::DATA_TYPE_MAX,""),
 							      _data_ptr(DATA::DATA_TYPE_MAX,0)
   //#######################################################################################################
   {
+    // Initialize module name container
+    for(size_t i=0; i<(size_t)(DATA::DATA_TYPE_MAX); i++)
+      
+      _mod_names.push_back(std::vector<std::string>());
+
     // Obtain module names for input data
     // If a user set an empty string for these params, they are ignored for processing.
-    _mod_names[DATA::Bezier]      = pset.get<std::string>("fModName_Bezier");
-    _mod_names[DATA::Kalman3DSPS] = pset.get<std::string>("fModName_Kalman3DSPS");
-    _mod_names[DATA::MCTruth]     = pset.get<std::string>("fModName_MCTruth");
-    _mod_names[DATA::SpacePoint]  = pset.get<std::string>("fModName_SpacePoint");
+    ParseModuleName(_mod_names[DATA::Bezier],      pset.get<std::string>("fModName_Bezier"));
+    ParseModuleName(_mod_names[DATA::Kalman3DSPS], pset.get<std::string>("fModName_Kalman3DSPS"));
+    ParseModuleName(_mod_names[DATA::MCTruth],     pset.get<std::string>("fModName_MCTruth"));
+    ParseModuleName(_mod_names[DATA::SpacePoint],  pset.get<std::string>("fModName_SpacePoint"));
 
     // Next we make TTree & storage data class objects for those data types specified in fcl files.
     art::ServiceHandle<art::TFileService> fileService;    
@@ -139,6 +151,27 @@ namespace larlight {
   }
 
   //#######################################################################################################
+  void DataScanner::ParseModuleName(std::vector<std::string> &mod_names, std::string name) 
+  //#######################################################################################################
+  {
+    while(1){
+
+      size_t pos = name.find(":");
+
+      if(pos>=name.size()) break;
+
+      mod_names.push_back(std::string(name.substr(0,pos)));
+
+      name = name.substr(pos+1);
+      
+    }
+
+    if(name.size()) mod_names.push_back(name);
+
+  }
+
+
+  //#######################################################################################################
   void DataScanner::beginJob()
   //#######################################################################################################
   {}
@@ -169,15 +202,20 @@ namespace larlight {
       case DATA::Track:
       case DATA::Kalman3DSPS:
       case DATA::Bezier:
-	ReadTrack(evt, _mod_names[i], (event_track*)(_data_ptr[i]));
+	for(size_t j=0; j<_mod_names[i].size(); ++j)
+	  ReadTrack(evt, _mod_names[i][j], (event_track*)(_data_ptr[i]));
 	break;
 	// Data type to be stored in event_mc class
       case DATA::MCTruth:
-	ReadMCTruth(evt, _mod_names[i], (event_mc*)(_data_ptr[i]));
+	for(size_t j=0; j<_mod_names[i].size(); ++j){
+	  ReadMCTruth     (evt, _mod_names[i][j], (event_mc*)(_data_ptr[i]));
+	  ReadMCPartArray (evt, _mod_names[i][j], (event_mc*)(_data_ptr[i]));
+	}
 	break;
  	// Data type to be stored in event_sps class
       case DATA::SpacePoint:
-	ReadSPS(evt,_mod_names[i], (event_sps*)(_data_ptr[i]));
+	for(size_t j=0; j<_mod_names[i].size(); ++j)
+	  ReadSPS(evt,_mod_names[i][j], (event_sps*)(_data_ptr[i]));
 	break;
       case DATA::Event:
       case DATA::Seed:
@@ -201,12 +239,20 @@ namespace larlight {
   void DataScanner::ReadSPS(const art::Event& evt, const std::string mod_name, event_sps* data_ptr){
   //#######################################################################################################
 
-    art::Handle< std::vector<recob::SpacePoint > > spsArray;
-    evt.getByLabel(mod_name,spsArray);
+    std::vector<const recob::SpacePoint* > spsArray;
+    try {
 
-    for(size_t i=0; i<spsArray->size(); ++i){
+      evt.getView(mod_name,spsArray);
 
-      art::Ptr<recob::SpacePoint> sps_ptr(spsArray,i);
+    }catch (art::Exception const& e) {
+
+      if (e.categoryCode() != art::errors::ProductNotFound ) throw;
+
+    }
+
+    for(size_t i=0; i<spsArray.size(); ++i){
+
+      const recob::SpacePoint* sps_ptr(spsArray.at(i));
       
       spacepoint sps_light(sps_ptr->ID(),
 			   sps_ptr->XYZ()[0],    sps_ptr->XYZ()[1],    sps_ptr->XYZ()[2],
@@ -219,20 +265,65 @@ namespace larlight {
   }
 
   //#######################################################################################################
+  void DataScanner::ReadMCPartArray(const art::Event& evt, const std::string mod_name, event_mc* data_ptr){
+  //#######################################################################################################
+    
+    std::vector<const simb::MCParticle*> mciArray;
+
+    try {
+
+      evt.getView(mod_name,mciArray);
+
+    }catch (art::Exception const& e) {
+
+      if (e.categoryCode() != art::errors::ProductNotFound ) throw;
+
+    }
+    
+    for(size_t i=0; i < mciArray.size(); i++){
+
+      const simb::MCParticle* part(mciArray.at(i));
+
+      part_mc part_light(part->PdgCode(), part->TrackId(), part->Mother(), part->Process());
+      
+      for(size_t k=0; k<part->NumberTrajectoryPoints(); k++)
+	
+	part_light.add_track(part->Vx(k), part->Vy(k), part->Vz(k), part->T(k),
+			     part->Px(k), part->Py(k), part->Pz(k));
+      
+      for(size_t k=0; k<(size_t)(part->NumberDaughters()); k++)
+	
+	part_light.add_daughter(part->Daughter(k));
+      
+      data_ptr->add_part(part_light);
+      
+    }
+  }
+
+  //#######################################################################################################
   void DataScanner::ReadMCTruth(const art::Event& evt, const std::string mod_name, event_mc* data_ptr){
   //#######################################################################################################
 
-    art::Handle< std::vector< simb::MCTruth > > mciArray;
-    evt.getByLabel(mod_name,mciArray);
+    std::vector<const simb::MCTruth*> mciArray;
 
-    for(size_t i=0; i < mciArray->size(); ++i){
+    try {
+
+      evt.getView(mod_name,mciArray);
+
+    }catch (art::Exception const& e) {
+
+      if (e.categoryCode() != art::errors::ProductNotFound ) throw;
+
+    }
+
+    for(size_t i=0; i < mciArray.size(); ++i){
 
       if(i>0) {
 	mf::LogError("DataScanner")<<" Detected multiple MCTruth! The structure does not support this...";
 	break;
       }
 
-      art::Ptr<simb::MCTruth> mci_ptr(mciArray,i);
+      const simb::MCTruth* mci_ptr(mciArray.at(i));
 
       data_ptr->set_gen_code( (MC::Origin_t) mci_ptr->Origin() );
 
@@ -260,14 +351,22 @@ namespace larlight {
   void DataScanner::ReadTrack(const art::Event& evt, const std::string mod_name, event_track* data_ptr){
   //#######################################################################################################
 
-    // Obtain recob::Track object produced by the specified module name (mod_name)
-    art::Handle< std::vector< recob::Track > > track_handle;
-    evt.getByLabel(mod_name, track_handle);
+    std::vector<const recob::Track*> trackArray;
 
-    for(size_t i=0; i < track_handle->size(); ++i){
+    try {
+
+      evt.getView(mod_name,trackArray);
+
+    }catch (art::Exception const& e) {
+
+      if (e.categoryCode() != art::errors::ProductNotFound ) throw;
+
+    }
+
+    for(size_t i=0; i < trackArray.size(); ++i){
 
       // Obtain recob::Track object pointer
-      art::Ptr<recob::Track> track_ptr(track_handle,i);
+      const recob::Track* track_ptr(trackArray.at(i));
 
       // Prepare storage track object
       track track_light;
