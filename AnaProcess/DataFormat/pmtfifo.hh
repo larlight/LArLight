@@ -77,7 +77,7 @@ public:
 
   inline void add_fifo(const pmtfifo fifo) {fFIFO_v.push_back(fifo);};
 
-  const std::vector<pmtfifo>& fifo_array() const {return fFIFO_v;};
+  const std::vector<pmtfifo>& GetFIFOCollection() const {return fFIFO_v;};
 
 protected:
 
@@ -86,7 +86,7 @@ protected:
 private:
 
   ////////////////////////
-  ClassDef(event_pmt,1)
+  ClassDef(event_pmt,2)
   ////////////////////////
 
 };

@@ -149,7 +149,7 @@ public:
   void add_user_info(user_info info) {fUserInfo_v.push_back(info);};
   
   /// Getter of user info array
-  inline const std::vector<user_info>& user_info_array(){return fUserInfo_v;};
+  inline const std::vector<user_info>& GetUserInfoCollection(){return fUserInfo_v;};
 
   /// Method to clear currently held data contents in the buffer
   virtual void clear_data(){data_base::clear_data(); fUserInfo_v.clear();};
@@ -162,7 +162,7 @@ private:
   std::vector<user_info> fUserInfo_v;
 
   ////////////////////////
-  ClassDef(event_user,1)
+  ClassDef(event_user,2)
   ////////////////////////
 };
 

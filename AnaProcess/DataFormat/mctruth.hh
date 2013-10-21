@@ -138,7 +138,7 @@ public:
   //inline const nu_mc& nu_mc() {return fMCNeutrino;};
   
   /// Getter for particle list
-  inline const std::vector<part_mc>& part_array() const {return fPartList;};
+  inline const std::vector<part_mc>& GetParticleCollection() const {return fPartList;};
 
   /// Getter for generator id
   inline MC::Origin_t gen_code() const {return fOrigin;};
@@ -154,7 +154,7 @@ private:
   //bool                 fNeutrinoSet; ///< flag for whether the neutrino information has been set
   
   ////////////////////////
-  ClassDef(event_mc,2)
+  ClassDef(event_mc,3)
   ////////////////////////
 
 };
