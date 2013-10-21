@@ -25,8 +25,8 @@ bool TrackViewer::initialize()
   if(_c1) {delete _c1; _c1=0;};
   if(_p1) {delete _p1; _p1=0;};
 
-  _c1 = new TCanvas("_c1","",600,500);
-  _p1 = new TPad("_p1","",0.01, 0.01, 0.99, 0.99);
+  _c1 = new TCanvas("_cTrackViewer","",600,500);
+  _p1 = new TPad("_pTrackViewer","",0.01, 0.01, 0.99, 0.99);
 
   _c1->Draw();
   _p1->Draw();
