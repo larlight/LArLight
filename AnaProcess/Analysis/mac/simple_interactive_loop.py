@@ -19,12 +19,6 @@ my_proc.set_io_mode(storage_manager.READ)
 #my_proc.set_io_mode(storage_manager.WRITE)
 #my_proc.set_io_mode(storage_manager.BOTH)
 
-# Specify what data to read
-my_proc.set_data_to_read(DATA.Kalman3DSPS)
-my_proc.set_data_to_read(DATA.SpacePoint)
-my_proc.set_data_to_read(DATA.FIFOChannel)
-my_proc.set_data_to_read(DATA.MCTruth)
-
 # Set input root file: this is decoder output root file.
 # This time, we use a sample file prepared.
 my_proc.add_input_file("larlight.root")
@@ -33,14 +27,15 @@ my_proc.add_input_file("larlight.root")
 # analysis module can store anything such as histograms, your own TTree, etc.
 my_proc.set_ana_output_file("myout.root")
 
+# Add analysis unit to process
 my_proc.add_process(TrackViewer())
 
+# Set TDirectory name in the ROOT file where TTrees can be found
+# If no TDirectory, comment out.
 storage_manager.get().set_in_rootdir("scanner")
 
-while 1:
+while my_proc.process_event():
     
-    my_proc.process_event()
-
     sys.stdin.readline()
 
 # done!

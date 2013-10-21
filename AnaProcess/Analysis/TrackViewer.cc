@@ -3,7 +3,9 @@
 
 #include "TrackViewer.hh"
 
+//################################################################
 TrackViewer::TrackViewer() : ana_base(), _hRecoTrack_v()
+//################################################################
 {
   // Class name
   _name = "TrackViewer";
@@ -15,8 +17,10 @@ TrackViewer::TrackViewer() : ana_base(), _hRecoTrack_v()
   _hMCStep  = 0;
 }
 
-bool TrackViewer::initialize() {
-
+//################################################################
+bool TrackViewer::initialize()
+//################################################################
+{
   // Make canvas & pad
   if(_c1) {delete _c1; _c1=0;};
   if(_p1) {delete _p1; _p1=0;};
@@ -30,7 +34,16 @@ bool TrackViewer::initialize() {
   return true;
 }
 
-bool TrackViewer::analyze(storage_manager* storage) {
+//################################################################
+bool TrackViewer::analyze(storage_manager* storage)
+//################################################################
+{
+  
+  // Clean up histograms if they already exist (from previous event)
+  if(_hMCStep)  {delete _hMCStep;  _hMCStep  = 0;};
+  if(_hRecoSPS) {delete _hRecoSPS; _hRecoSPS = 0;};
+  for(auto h : _hRecoTrack_v) {delete h; h=0;};
+  _hRecoTrack_v.clear();
 
   //
   // Obtain event-wise data object pointers
@@ -54,6 +67,19 @@ bool TrackViewer::analyze(storage_manager* storage) {
 
     ev_kalsps->get_axis_range(xmax, xmin, ymax, ymin, zmax, zmin);
 
+  //if(ev_mc)
+
+  //ev_mc->get_axis_range(xmax, xmin, ymax, ymin, zmax, zmin);
+
+  // Proceed only if minimum/maximum are set to some values other than the defaults
+  if(xmax == -1) {
+
+    print(MSG::WARNING,__FUNCTION__,
+	  "Did not find any reconstructed spacepoint or track. Skipping this event...");
+
+    return true;
+  }
+
   //
   // Make & fill vertex histograms
   //
@@ -62,8 +88,6 @@ bool TrackViewer::analyze(storage_manager* storage) {
   if(ev_sps) {
     
     const std::vector<spacepoint> sps_v = ev_sps->GetSPSCollection();
-
-    if(_hRecoSPS) delete _hRecoSPS;
 
     _hRecoSPS = Prepare3DHisto("_hRecoSPS", xmin, xmax, ymin, ymax, zmin, zmax);
 
@@ -80,13 +104,7 @@ bool TrackViewer::analyze(storage_manager* storage) {
 
     const std::vector<track> track_v = ev_kalsps->GetTrackCollection();
 
-    for(auto h : _hRecoTrack_v)
-
-      delete h;
-
-    _hRecoTrack_v.clear();
-
-    for(auto trk : track_v){
+    for(auto const& trk : track_v){
       
       TH3D* h=0;
       h=Prepare3DHisto(Form("_hKalman3DSPS_%03d",(int)(_hRecoTrack_v.size())),
@@ -113,23 +131,22 @@ bool TrackViewer::analyze(storage_manager* storage) {
 
     const std::vector<part_mc> part_v = ev_mc->GetParticleCollection();
 
-    for(auto part : part_v){
+    for(auto const& part : part_v){
 
-      if(part.parent_id() != -1)
+      // Only care about a primary particle
+      if(part.track_id() != 1)
 
 	continue;
 
       const std::vector<TVector3> vertex_v = part.step_vertex();
 
-      if(_hMCStep) delete _hMCStep;
-
       _hMCStep = Prepare3DHisto("_hMCStep",
 				xmin,xmax,ymin,ymax,zmin,zmax);
       
-      for(auto vtx : vertex_v)
+      for(auto const& vtx : vertex_v) 
 	
 	_hMCStep->Fill(vtx[0],vtx[1],vtx[2]);
-      
+
       _hMCStep->SetMarkerStyle(20);
       _hMCStep->SetMarkerColor(kCyan);
       break; // Only make 1 histogram
@@ -137,40 +154,88 @@ bool TrackViewer::analyze(storage_manager* storage) {
   }
 
   // Draw histograms
+  DrawCanvas();
+
+  return true;
+};
+
+//################################################################
+void TrackViewer::DrawCanvas()
+//################################################################
+{
+
   _p1->cd();
   bool first_draw = true;
-  if(_hRecoSPS) {
-    _hRecoSPS->Draw();
-    first_draw=false;
-  }
-  for(auto h : _hRecoTrack_v) {
-    
-    if(first_draw) {h->Draw(); first_draw=false;}
-    else h->Draw("sames");
 
-  }
+  // 
+  // Drawing order is from the histogram with many points => less points
+  // otherwise it would be hard to see histograms with less points!
+  // This means we draw MC, SpacePoint, then Track
+  //
+
   if(_hMCStep){
+
+    print(MSG::NORMAL,__FUNCTION__,Form("Drawing %d MC trajectory points...",(int)(_hMCStep->GetEntries())));
     
-    if(first_draw) {_hMCStep->Draw(); first_draw=false;}
+    if(first_draw) {
+
+      _hMCStep->Draw(); 
+
+      first_draw=false;
+
+    }
+
     else _hMCStep->Draw("sames");
 
   }
 
+  if(_hRecoSPS) {
+
+    print(MSG::NORMAL,__FUNCTION__,"Drawing space points...");
+
+    if(first_draw) {
+
+      _hRecoSPS->Draw();
+
+      first_draw=false;
+
+    }
+
+    else _hRecoSPS->Draw("sames");
+
+  }
+
+  if(_hRecoTrack_v.size())
+
+    print(MSG::NORMAL,__FUNCTION__,Form("Drawing %zu reco tracks...",_hRecoTrack_v.size()));
+
+  for(auto h : _hRecoTrack_v) {
+    
+    if(first_draw) {
+      h->Draw(); 
+      first_draw=false;
+    }
+    else h->Draw("sames");
+  }
+
+  // Update canvas if anything is drawn otherwise clear
   if(first_draw) _p1->Clear();
+  else{
+    _c1->Modified();
+    _c1->Update();
+    _p1->Modified();
+    _p1->Update();
+    _p1->Draw();
+  }
 
-  _c1->Modified();
-  _c1->Update();
-  _p1->Modified();
-  _p1->Update();
-  _p1->Draw();
-
-  return true;
 }
 
+//################################################################
 TH3D* TrackViewer::Prepare3DHisto(std::string name, 
 				  double xmin, double xmax,
 				  double ymin, double ymax,
 				  double zmin, double zmax)
+//################################################################
 {
 
   TH3D* h=0;

@@ -54,6 +54,9 @@ public:
 		       double ymin, double ymax,
 		       double zmin, double zmax);
 
+  /// A method to draw currently created histograms (which are made by analyze() function)
+  void DrawCanvas();
+
 protected:
   /// Main canvas
   TCanvas* _c1;
