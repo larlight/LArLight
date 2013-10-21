@@ -22,6 +22,7 @@
 #include "mctruth.hh"
 #include "user_info.hh"
 #include "spacepoint.hh"
+#include "pmtfifo.hh"
 
 /**
    \class storage_manager

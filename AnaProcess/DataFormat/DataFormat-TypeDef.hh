@@ -14,6 +14,9 @@
 // Class forward declaration here
 class data_base;
 
+class pmtfifo;
+class event_pmt;
+
 class part_mc;
 class event_mc;
 

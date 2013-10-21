@@ -7,6 +7,8 @@
 #include "RecoBase/Track.h"
 #include "RecoBase/SpacePoint.h"
 #include "SimulationBase/MCTruth.h"
+#include "OpticalDetectorData/FIFOChannel.h"
+#include "OpticalDetectorData/OpticalTypes.h"
 
 // ART includes.
 #include "art/Framework/Core/EDAnalyzer.h"
@@ -34,6 +36,9 @@ namespace larlight {
     void analyze (const art::Event&); 
 
   private:
+
+    /// Function to read & store spacepoints
+    void ReadPMT(const art::Event& evt, const std::string mod_name, event_pmt* data_ptr);
 
     /// Function to read & store spacepoints
     void ReadSPS(const art::Event& evt, const std::string mod_name, event_sps* data_ptr);
@@ -97,10 +102,11 @@ namespace larlight {
 
     // Obtain module names for input data
     // If a user set an empty string for these params, they are ignored for processing.
-    ParseModuleName(_mod_names[DATA::Bezier],      pset.get<std::string>("fModName_Bezier"));
-    ParseModuleName(_mod_names[DATA::Kalman3DSPS], pset.get<std::string>("fModName_Kalman3DSPS"));
-    ParseModuleName(_mod_names[DATA::MCTruth],     pset.get<std::string>("fModName_MCTruth"));
-    ParseModuleName(_mod_names[DATA::SpacePoint],  pset.get<std::string>("fModName_SpacePoint"));
+    ParseModuleName ( _mod_names[DATA::Bezier],      pset.get<std::string>("fModName_Bezier")      );
+    ParseModuleName ( _mod_names[DATA::Kalman3DSPS], pset.get<std::string>("fModName_Kalman3DSPS") );
+    ParseModuleName ( _mod_names[DATA::MCTruth],     pset.get<std::string>("fModName_MCTruth")     );
+    ParseModuleName ( _mod_names[DATA::SpacePoint],  pset.get<std::string>("fModName_SpacePoint")  );
+    ParseModuleName ( _mod_names[DATA::FIFOChannel], pset.get<std::string>("fModName_FIFOChannel") );
 
     // Next we make TTree & storage data class objects for those data types specified in fcl files.
     art::ServiceHandle<art::TFileService> fileService;    
@@ -127,9 +133,10 @@ namespace larlight {
 	case DATA::SpacePoint:
 	  _data_ptr[i]=(data_base*)(new event_sps);
 	  break;
+	case DATA::FIFOChannel:
+	  _data_ptr[i]=(data_base*)(new event_pmt);
 	case DATA::Event:
 	case DATA::UserInfo:
-	case DATA::FIFOChannel:
 	case DATA::Seed:
 	case DATA::Shower:
 	case DATA::Calorimetry:
@@ -198,29 +205,37 @@ namespace larlight {
       // Handle different kind of data (class wise)
       DATA::DATA_TYPE type = (DATA::DATA_TYPE)i;
       switch(type){
-	// Data types to be stored in event_track class
+
       case DATA::Track:
       case DATA::Kalman3DSPS:
       case DATA::Bezier:
+	// Data types to be stored in event_track class
 	for(size_t j=0; j<_mod_names[i].size(); ++j)
 	  ReadTrack(evt, _mod_names[i][j], (event_track*)(_data_ptr[i]));
 	break;
-	// Data type to be stored in event_mc class
+
       case DATA::MCTruth:
+	// Data type to be stored in event_mc class
 	for(size_t j=0; j<_mod_names[i].size(); ++j){
 	  ReadMCTruth     (evt, _mod_names[i][j], (event_mc*)(_data_ptr[i]));
 	  ReadMCPartArray (evt, _mod_names[i][j], (event_mc*)(_data_ptr[i]));
 	}
 	break;
- 	// Data type to be stored in event_sps class
+
       case DATA::SpacePoint:
+ 	// Data type to be stored in event_sps class
 	for(size_t j=0; j<_mod_names[i].size(); ++j)
 	  ReadSPS(evt,_mod_names[i][j], (event_sps*)(_data_ptr[i]));
+	break;
+
+      case DATA::FIFOChannel:
+	// Data type to be stored in event_pmt class
+	for(size_t j=0; j<_mod_names[i].size(); ++j)
+	  ReadPMT(evt,_mod_names[i][j], (event_pmt*)(_data_ptr[i]));
 	break;
       case DATA::Event:
       case DATA::Seed:
       case DATA::UserInfo:
-      case DATA::FIFOChannel:
       case DATA::Shower:
       case DATA::Calorimetry:
       case DATA::Wire:
@@ -234,6 +249,57 @@ namespace larlight {
     }
 
   }
+
+  //#######################################################################################################
+  void DataScanner::ReadPMT(const art::Event& evt, const std::string mod_name, event_pmt* data_ptr){
+  //#######################################################################################################
+    
+    std::vector<const optdata::FIFOChannel*> pmtArray;
+    try{
+
+      evt.getView(mod_name,pmtArray);
+
+    }catch (art::Exception const& e) {
+
+      if (e.categoryCode() != art::errors::ProductNotFound ) throw;
+
+    }
+
+    for(size_t i=0; i<pmtArray.size(); ++i) {
+
+      const optdata::FIFOChannel* fifo_ptr(pmtArray.at(i));
+
+      optdata::Optical_Category_t cat(fifo_ptr->Category());
+      PMT::DISCRIMINATOR disc_id = PMT::DISC_MAX;
+      switch(cat){
+      case optdata::kFEMCosmicHighGain:
+      case optdata::kFEMCosmicLowGain:
+      case optdata::kCosmicPMTTrigger:
+	disc_id = PMT::COSMIC_DISC;
+	break;
+      case optdata::kFEMBeamHighGain:
+      case optdata::kFEMBeamLowGain:
+      case optdata::kBeamPMTTrigger:
+	disc_id = PMT::BEAM_DISC;
+	break;
+      case optdata::kUndefined:
+      case optdata::kHighGain:
+      case optdata::kLowGain:
+      default:
+	disc_id = PMT::DISC_MAX;
+      }
+
+      pmtfifo fifo_light(fifo_ptr->ChannelNumber(),
+			 fifo_ptr->Frame(),
+			 fifo_ptr->TimeSlice(),
+			 disc_id,
+			 *fifo_ptr);
+      
+      data_ptr->add_fifo(fifo_light);
+    }
+    
+  }
+
 
   //#######################################################################################################
   void DataScanner::ReadSPS(const art::Event& evt, const std::string mod_name, event_sps* data_ptr){

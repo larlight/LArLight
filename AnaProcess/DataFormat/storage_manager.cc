@@ -308,9 +308,11 @@ void storage_manager::create_data_ptr(DATA::DATA_TYPE type){
   case DATA::UserInfo:
     _ptr_data_array[type]=(data_base*)(new event_user);
     break;
+  case DATA::FIFOChannel:
+    _ptr_data_array[type]=(data_base*)(new event_pmt);
+    break;
   case DATA::Event:
   case DATA::Seed:
-  case DATA::FIFOChannel:
   case DATA::Shower:
   case DATA::Calorimetry:
   case DATA::Wire:

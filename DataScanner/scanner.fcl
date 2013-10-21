@@ -9,6 +9,7 @@ standard_ana:
     fModName_Kalman3DSPS:   "trackkal"
     fModName_MCTruth:       "largeant:generator"
     fModName_SpacePoint:    "spacepointfinder"
+    fModName_FIFOChannel:   "optreadout"
 }
 
 services:

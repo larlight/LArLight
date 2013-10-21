@@ -12,6 +12,10 @@
 #pragma link C++ class data_base+;
 #pragma link C++ class std::vector<TVector3>+;
 
+#pragma link C++ class pmtfifo+;
+#pragma link C++ class std::vector<pmtfifo>+;
+#pragma link C++ class event_pmt;
+
 #pragma link C++ class part_mc+;
 #pragma link C++ class std::vector<part_mc>+;
 #pragma link C++ class event_mc+;
