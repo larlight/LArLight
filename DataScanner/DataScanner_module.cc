@@ -4,7 +4,10 @@
 
 // LArSoft includes
 #include "Geometry/Geometry.h"
+#include "RecoBase/Wire.h"
+#include "RecoBase/Hit.h"
 #include "RecoBase/Track.h"
+#include "RecoBase/Cluster.h"
 #include "RecoBase/SpacePoint.h"
 #include "SimulationBase/MCTruth.h"
 #include "OpticalDetectorData/FIFOChannel.h"
@@ -37,6 +40,15 @@ namespace larlight {
 
   private:
 
+    /// Function to read & store calibrated wire data
+    void ReadWire(const art::Event& evt, const std::string mod_name, event_wire* data_ptr);
+
+    /// Function to read & store reconstructed hit data
+    void ReadHit(const art::Event& evt, const std::string mod_name, event_hit* data_ptr);
+
+    /// Function to read & store reconstructed hit data
+    void ReadCluster(const art::Event& evt, const std::string mod_name, event_cluster* data_ptr);
+
     /// Function to read & store spacepoints
     void ReadPMT(const art::Event& evt, const std::string mod_name, event_pmt* data_ptr);
 
@@ -54,7 +66,7 @@ namespace larlight {
 
     /// Utility function to parse module name string
     void ParseModuleName(std::vector<std::string> &mod_names, std::string name);
-    
+
     std::vector<TTree*>                    _trees;     ///< output data holder TTree
     std::vector<std::vector<std::string> > _mod_names; ///< input data production module names input from FCL file
     std::vector<data_base*>                _data_ptr;  ///< output data holder class object pointers
@@ -102,21 +114,29 @@ namespace larlight {
 
     // Obtain module names for input data
     // If a user set an empty string for these params, they are ignored for processing.
-    ParseModuleName ( _mod_names[DATA::Bezier],      pset.get<std::string>("fModName_Bezier")      );
-    ParseModuleName ( _mod_names[DATA::Kalman3DSPS], pset.get<std::string>("fModName_Kalman3DSPS") );
-    ParseModuleName ( _mod_names[DATA::MCTruth],     pset.get<std::string>("fModName_MCTruth")     );
-    ParseModuleName ( _mod_names[DATA::SpacePoint],  pset.get<std::string>("fModName_SpacePoint")  );
-    ParseModuleName ( _mod_names[DATA::FIFOChannel], pset.get<std::string>("fModName_FIFOChannel") );
+    ParseModuleName ( _mod_names[DATA::Bezier],         pset.get<std::string>("fModName_Bezier")         );
+    ParseModuleName ( _mod_names[DATA::Kalman3DSPS],    pset.get<std::string>("fModName_Kalman3DSPS")    );
+    ParseModuleName ( _mod_names[DATA::MCTruth],        pset.get<std::string>("fModName_MCTruth")        );
+    ParseModuleName ( _mod_names[DATA::SpacePoint],     pset.get<std::string>("fModName_SpacePoint")     );
+    ParseModuleName ( _mod_names[DATA::FIFOChannel],    pset.get<std::string>("fModName_FIFOChannel")    );
+    ParseModuleName ( _mod_names[DATA::Wire],           pset.get<std::string>("fModName_CalData")        );
+    ParseModuleName ( _mod_names[DATA::CrawlerHit],     pset.get<std::string>("fModName_CrawlerHit")     );
+    ParseModuleName ( _mod_names[DATA::GausHit],        pset.get<std::string>("fModName_GausHit")        );
+    ParseModuleName ( _mod_names[DATA::APAHit],         pset.get<std::string>("fModName_APAHit")         );
+    ParseModuleName ( _mod_names[DATA::FFTHit],         pset.get<std::string>("fModName_FFTHit")         );
+    ParseModuleName ( _mod_names[DATA::CrawlerCluster], pset.get<std::string>("fModName_CrawlerCluster") );
+    ParseModuleName ( _mod_names[DATA::DBCluster],      pset.get<std::string>("fModName_DBCluster")      );
+    ParseModuleName ( _mod_names[DATA::FuzzyCluster],   pset.get<std::string>("fModName_FuzzyCluster")   );
+    ParseModuleName ( _mod_names[DATA::HoughCluster],   pset.get<std::string>("fModName_HoughCluster")   );
+    // Next we make storage data class objects for those data types specified in fcl files.
+    art::ServiceHandle<art::TFileService>  fileService;
 
-    // Next we make TTree & storage data class objects for those data types specified in fcl files.
-    art::ServiceHandle<art::TFileService> fileService;    
     for(size_t i=0; i<(int)(DATA::DATA_TYPE_MAX); i++){
 
       DATA::DATA_TYPE type = (DATA::DATA_TYPE)i;
       
       // Check if a user provided an input module name for this data type.
       if(_mod_names[i].size()){
-
 	// Create TTree
 	_trees[i] = fileService->make<TTree>(Form("%s_tree",DATA::DATA_TREE_NAME[i].c_str()),"");
 
@@ -135,23 +155,38 @@ namespace larlight {
 	  break;
 	case DATA::FIFOChannel:
 	  _data_ptr[i]=(data_base*)(new event_pmt);
+	  break;
+	case DATA::Hit:
+	case DATA::CrawlerHit:
+	case DATA::GausHit:
+	case DATA::APAHit:
+	case DATA::FFTHit:
+	  _data_ptr[i]=(data_base*)(new event_hit);
+	  break;
+	case DATA::Wire:
+	  _data_ptr[i]=(data_base*)(new event_wire);
+	  break;
+	case DATA::Cluster:
+	case DATA::CrawlerCluster:
+	case DATA::DBCluster:
+	case DATA::FuzzyCluster:
+	case DATA::HoughCluster:
+	  _data_ptr[i]=(data_base*)(new event_cluster);
+	  break;
 	case DATA::Event:
 	case DATA::UserInfo:
 	case DATA::Seed:
 	case DATA::Shower:
 	case DATA::Calorimetry:
-	case DATA::Wire:
-	case DATA::Hit:
-	case DATA::Cluster:
 	case DATA::DATA_TYPE_MAX:
 	  mf::LogError("DataScanner")<<Form("Data type %d not supported!",type);
 	  break;
 	}
+
 	// Set TTree branch to the created data class object's address
 	_trees[i]->Branch(Form("%s_branch",DATA::DATA_TREE_NAME[i].c_str()),
 			  _data_ptr[i]->GetName(),
 			  &(_data_ptr[i]));
-	
       }
     }
 
@@ -190,7 +225,7 @@ namespace larlight {
     // Loop over data type. We check whether or not to fill each data type
     for(size_t i=0; i<(size_t)(DATA::DATA_TYPE_MAX); i++){
       
-      // If TTree pointer is not set, we don't have to fill this data type
+      // If data pointer is not set, we don't have to fill this data type
       if(!(_trees[i])) continue;
       
       // Reset data
@@ -233,14 +268,38 @@ namespace larlight {
 	for(size_t j=0; j<_mod_names[i].size(); ++j)
 	  ReadPMT(evt,_mod_names[i][j], (event_pmt*)(_data_ptr[i]));
 	break;
+
+      case DATA::Wire:
+	// Data type to be stored in event_wire class
+	for(size_t j=0; j<_mod_names[i].size(); ++j)
+	  ReadWire(evt,_mod_names[i][j],(event_wire*)(_data_ptr[i]));
+	break;
+
+      case DATA::Hit:
+      case DATA::CrawlerHit:
+      case DATA::GausHit:
+      case DATA::APAHit:
+      case DATA::FFTHit:
+	// Data type to be stored in event_wire class
+	for(size_t j=0; j<_mod_names[i].size(); ++j)
+	  ReadHit(evt,_mod_names[i][j],(event_hit*)(_data_ptr[i]));
+	break;
+
+      case DATA::Cluster:
+      case DATA::DBCluster:
+      case DATA::FuzzyCluster:
+      case DATA::HoughCluster:
+      case DATA::CrawlerCluster:
+	// Data type to be stored in event_cluster class
+	for(size_t j=0; j<_mod_names[i].size(); ++j)
+	  ReadCluster(evt,_mod_names[i][j],(event_cluster*)(_data_ptr[i]));
+	break;
+
       case DATA::Event:
       case DATA::Seed:
       case DATA::UserInfo:
       case DATA::Shower:
       case DATA::Calorimetry:
-      case DATA::Wire:
-      case DATA::Hit:
-      case DATA::Cluster:
       case DATA::DATA_TYPE_MAX:
 	break;
       }
@@ -248,6 +307,111 @@ namespace larlight {
       _trees[i]->Fill();
     }
 
+  }
+
+  //#######################################################################################################
+  void DataScanner::ReadWire(const art::Event& evt, const std::string mod_name, event_wire* data_ptr){
+  //#######################################################################################################
+
+    std::vector<const recob::Wire*> wireArray;
+    try{
+
+      evt.getView(mod_name,wireArray);
+
+    }catch (art::Exception const& e) {
+
+      if (e.categoryCode() != art::errors::ProductNotFound ) throw;
+
+    }
+
+    for(size_t i=0; i<wireArray.size(); i++){
+
+      const recob::Wire* wire_ptr(wireArray.at(i));
+
+      wire wire_light(wire_ptr->Signal(),
+		      wire_ptr->Channel(),
+		      (GEO::View_t)(wire_ptr->View()),
+		      (GEO::SigType_t)(wire_ptr->SignalType()));
+      
+      data_ptr->add_wire(wire_light);
+
+    }
+
+  }
+
+  //#######################################################################################################
+  void DataScanner::ReadHit(const art::Event& evt, const std::string mod_name, event_hit* data_ptr){
+  //#######################################################################################################
+
+    std::vector<const recob::Hit*> hitArray;
+    try{
+
+      evt.getView(mod_name,hitArray);
+
+    }catch (art::Exception const& e) {
+
+      if (e.categoryCode() != art::errors::ProductNotFound ) throw;
+
+    }
+
+    for(size_t i=0; i<hitArray.size(); i++){
+      
+      const recob::Hit* hit_ptr(hitArray.at(i));
+
+      hit hit_light;
+      hit_light.set_waveform(hit_ptr->fHitSignal);
+      hit_light.set_times(hit_ptr->StartTime(),
+			  hit_ptr->PeakTime(),
+			  hit_ptr->EndTime());
+      hit_light.set_times_err(hit_ptr->SigmaStartTime(),
+			      hit_ptr->SigmaPeakTime(),
+			      hit_ptr->SigmaEndTime());
+      hit_light.set_charge(hit_ptr->Charge(),hit_ptr->Charge(true));
+      hit_light.set_charge_err(hit_ptr->SigmaCharge(),hit_ptr->SigmaCharge(true));
+      hit_light.set_multiplicity(hit_ptr->Multiplicity());
+      hit_light.set_channel(hit_ptr->Channel());
+      hit_light.set_fit_goodness(hit_ptr->GoodnessOfFit());
+      hit_light.set_view((GEO::View_t)(hit_ptr->View()));
+      hit_light.set_sigtype((GEO::SigType_t)(hit_ptr->SignalType()));
+
+      data_ptr->add_hit(hit_light);
+    }
+  }
+
+  //#######################################################################################################
+  void DataScanner::ReadCluster(const art::Event& evt, const std::string mod_name, event_cluster* data_ptr){
+  //#######################################################################################################
+
+    std::vector<const recob::Cluster*> clusterArray;
+    try{
+
+      evt.getView(mod_name,clusterArray);
+
+    }catch (art::Exception const& e) {
+
+      if (e.categoryCode() != art::errors::ProductNotFound ) throw;
+
+    }
+
+    for(size_t i=0; i<clusterArray.size(); ++i) {
+
+      const recob::Cluster* cluster_ptr(clusterArray.at(i));
+      
+      cluster cluster_light;
+      cluster_light.set_charge(cluster_ptr->Charge());
+      cluster_light.set_dtdw(cluster_ptr->dTdW());
+      cluster_light.set_dqdw(cluster_ptr->dQdW());
+      cluster_light.set_dtdw_err(cluster_ptr->SigmadTdW());
+      cluster_light.set_dqdw_err(cluster_ptr->SigmadQdW());
+      cluster_light.set_id(cluster_ptr->ID());
+      cluster_light.set_view((GEO::View_t)(cluster_ptr->View()));
+      cluster_light.set_start_vtx(cluster_ptr->StartPos());
+      cluster_light.set_end_vtx(cluster_ptr->EndPos());
+      cluster_light.set_start_vtx_err(cluster_ptr->SigmaStartPos());
+      cluster_light.set_end_vtx_err(cluster_ptr->SigmaEndPos());
+
+      data_ptr->add_cluster(cluster_light);
+    }
   }
 
   //#######################################################################################################

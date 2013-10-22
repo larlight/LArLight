@@ -2,15 +2,47 @@
 
 process_name: DataReader
 
-standard_ana:
+# DataScanner default parameter settings
+standard_datascanner:
 {
-    module_type:            "DataScanner"
-    fModName_Bezier:        ""
-    fModName_Kalman3DSPS:   "trackkal"
-    fModName_MCTruth:       "largeant:generator"
-    fModName_SpacePoint:    "spacepointfinder"
-    fModName_FIFOChannel:   "optreadout"
+    module_type:             "DataScanner"
+    fModName_MCTruth:        "largeant:generator"
+    fModName_FIFOChannel:    "optreadout"
+    fModName_CalData:        "caldata"
+    fModName_CrawlerHit:     ""
+    fModName_GausHit:        "gaushit"
+    fModName_APAHit:         "apahit"
+    fModName_FFTHit:         "ffthit"
+    fModName_CrawlerCluster: ""
+    fModName_DBCluster:      "dbscan"
+    fModName_FuzzyCluster:   "fuzzy"
+    fModName_HoughCluster:   "hough"
+    fModName_Bezier:         ""
+    fModName_SpacePoint:     "spacepointfinder"
+    fModName_Kalman3DSPS:    "trackkal"
 }
+
+# TIP: 
+#      (*) The largest data in size is Wire (caldata) ... expect roughly 12 MB / event!
+#      (*) The data that takes longest time for I/O is Hit ... expect roughly 1 s / event I/O time OMG!
+#
+# Disable reading for such data products AND those not in the input file will speed up the process.
+# This is not necessary, but doing so will improve code performance a little bit.
+#
+#standard_datascanner.fModName_MCTruth:        ""
+#standard_datascanner.fModName_FIFOChannel:    ""
+standard_datascanner.fModName_CalData:        ""
+#standard_datascanner.fModName_FFTHit:         ""
+standard_datascanner.fModName_CrawlerHit:     ""
+standard_datascanner.fModName_APAHit:         ""
+standard_datascanner.fModName_GausHit:        ""
+standard_datascanner.fModName_CrawlerCluster: ""
+#standard_datascanner.fModName_DBCluster:      ""
+standard_datascanner.fModName_FuzzyCluster:   ""
+standard_datascanner.fModName_HoughCluster:   ""
+standard_datascanner.fModName_Bezier:         ""
+#standard_datascanner.fModName_SpacePoint:     ""
+#standard_datascanner.fModName_Kalman3DSPS:    ""
 
 services:
 {
@@ -36,7 +68,7 @@ physics:
 
  analyzers:
  {
-   scanner: @local::standard_ana
+   scanner: @local::standard_datascanner
  }
 
  analyzeIt: [ scanner ]

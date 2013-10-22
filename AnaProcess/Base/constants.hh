@@ -62,7 +62,15 @@ namespace DATA{
     FIFOChannel,        ///< FIFOChannel
     Wire,               ///< Wire
     Hit,                ///< Hit
+    CrawlerHit,         ///< ClusterCrawler Hit algo
+    GausHit,            ///< Gaus Hit algo
+    APAHit,             ///< APA Hit algo
+    FFTHit,             ///< FFT Hit algo
     Cluster,            ///< Cluster
+    FuzzyCluster,       ///< Fuzzy Cluster
+    DBCluster,          ///< DBCluster
+    CrawlerCluster,     ///< Crawler
+    HoughCluster,       ///< Hough
     Seed,               ///< Seed
     SpacePoint,         ///< Spacepoints
     Track,              ///< Track
@@ -81,7 +89,15 @@ namespace DATA{
     "pmt",
     "wire",
     "hit",
+    "crawlerhit",
+    "gaushit",
+    "apahit",
+    "ffthit",
     "cluster",
+    "fuzzycluster",
+    "dbcluster",
+    "crawlercluster",
+    "houghcluster",
     "seed",
     "sps",
     "track",
@@ -135,6 +151,14 @@ namespace GEO{
     k3D,      ///< 3 dimensional objects, potentially hits, clusters, prongs, etc
     kUnknown  ///< unknown view
   };
+
+  /// Enumerate the possible signal types
+  enum SigType_t {
+    kInduction,   ///< signal from induction planes
+    kCollection,  ///< signal from collection planes
+    kMysteryType  ///< who knows?
+  };
+
 }
 
 #endif

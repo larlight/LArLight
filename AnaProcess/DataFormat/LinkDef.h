@@ -20,6 +20,18 @@
 #pragma link C++ class std::vector<part_mc>+;
 #pragma link C++ class event_mc+;
 
+#pragma link C++ class wire+;
+#pragma link C++ class std::vector<wire>+;
+#pragma link C++ class event_wire+;
+
+#pragma link C++ class hit+;
+#pragma link C++ class std::vector<hit>+;
+#pragma link C++ class event_hit+;
+
+#pragma link C++ class cluster+;
+#pragma link C++ class std::vector<cluster>+;
+#pragma link C++ class event_cluster+;
+
 #pragma link C++ class track+;
 #pragma link C++ class std::vector<track>+;
 #pragma link C++ class event_track+;

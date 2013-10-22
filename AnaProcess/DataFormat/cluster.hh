@@ -31,6 +31,18 @@ public:
   /// Default destructor
   virtual ~cluster(){};
 
+  void set_charge   (double q)      { fTotalCharge = q; };
+  void set_dtdw     (double v)      { fdTdW=v; };
+  void set_dqdw     (double v)      { fdQdW=v; };
+  void set_dtdw_err (double v)      { fSigmadTdW=v; };
+  void set_dqdw_err (double v)      { fSigmadQdW=v; };
+  void set_id       (int i)         { fID = i; };
+  void set_view     (GEO::View_t v) { fView=v; };
+  void set_start_vtx     (const std::vector<double> vtx) { fStartPos=vtx;      };
+  void set_end_vtx       (const std::vector<double> vtx) { fEndPos=vtx;        };
+  void set_start_vtx_err (const std::vector<double> vtx) { fSigmaStartPos=vtx; };
+  void set_end_vtx_err   (const std::vector<double> vtx) { fSigmaEndPos=vtx;   };
+
   inline double       Charge()    const { return fTotalCharge;   }
   inline double       dTdW()      const { return fdTdW;          }
   inline double       dQdW()      const { return fdQdW;          }
@@ -79,31 +91,37 @@ private:
  \class cluster_collection 
  A collection storage class of multiple clusters.
 */
-class cluster_collection : public std::vector<cluster>,
-			   public data_base {
-  
+class event_cluster : public data_base {
+
 public:
 
   /// Default constructor
-  cluster_collection() : data_base() {clear_data();};
+  event_cluster() : data_base(),fCluster_v() {clear_data();};
 
   /// Default copy constructor
-  cluster_collection(const cluster_collection& original)
-    : std::vector<cluster>(original),
-      data_base(original)
+  event_cluster(const event_cluster& original)
+    : data_base(original), fCluster_v(original.fCluster_v)
   {};
-
+  
   /// Method to clear currently held data contents in the buffer
-  virtual void clear_data(){clear();};
+  virtual void clear_data(){data_base::clear_data(); fCluster_v.clear();};
+  
+  /// Method to add a cluster
+  void add_cluster(const cluster c){fCluster_v.push_back(c);};
+
+  /// Getter
+  const std::vector<cluster>& GetClusterCollection() const {return fCluster_v;};
 
   /// Default destructor
-  ~cluster_collection(){};
+  ~event_cluster(){};
 
 
 private:
 
+  std::vector<cluster> fCluster_v;
+
   ////////////////////////
-  ClassDef(cluster_collection,1)
+  ClassDef(event_cluster,1)
   ////////////////////////
 };
 

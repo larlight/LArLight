@@ -23,6 +23,9 @@
 #include "user_info.hh"
 #include "spacepoint.hh"
 #include "pmtfifo.hh"
+#include "wire.hh"
+#include "hit.hh"
+#include "cluster.hh"
 
 /**
    \class storage_manager
