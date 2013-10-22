@@ -34,16 +34,19 @@ lib/$(SHLIB): $(OBJECTS) $(DICT).o
 # rule for making symlink in $(ANA_PROC_DIR)/lib
 $(ANA_PROC_DIR)/lib/$(SHLIB): lib/$(SHLIB)
 	@echo '<< installing $(SHLIB) >>'
+ifeq ($(SRT_LOCAL),0)
 	@mkdir -p $(ANA_PROC_DIR)/lib
 	@ln -sf $(PWD)/lib/$(SHLIB) $(ANA_PROC_DIR)/lib
-
+else 
+	@ln -sf $(PWD)/lib/$(SHLIB) $(SRT_LOCAL)/lib/$(SRT_SUBDIR)
+endif
 
 # if ROOTMAP defined, define rule for making it
 ifdef ROOTMAP
 $(ROOTMAP): $(ANA_PROC_DIR)/lib/$(SHLIB)
 	@echo "<< Making rootmaps >>"
 	@cd $(ANA_PROC_DIR)/lib && ./make_rootmap.sh
-	@rm $(ANA_PROC_DIR)/lib/*.temp
+	@rm -f $(ANA_PROC_DIR)/lib/*.temp
 endif
 
 ###################################################
