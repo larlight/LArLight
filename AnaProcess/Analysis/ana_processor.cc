@@ -13,14 +13,15 @@ ana_processor::ana_processor(){
 }
 
 void ana_processor::set_verbosity(MSG::Level level){
-  set_verbosity(level);
+
+  larlight_base::set_verbosity(level);
   if(_storage)
     _storage->set_verbosity(level);
-  for(std::vector<ana_base*>::const_iterator iter(_analyzers.begin());
-      iter!=_analyzers.end();
-      ++iter){
-    (*iter)->set_verbosity(level);
-  }
+  
+  for(auto ana : _analyzers)
+    
+    ana->set_verbosity(level);
+
 }
 
 void ana_processor::reset(){

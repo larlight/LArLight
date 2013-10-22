@@ -37,7 +37,7 @@ public:
   virtual ~larlight_base(){};
 
   /// Setter for the verbosity level 
-  void set_verbosity(MSG::Level level);
+  virtual void set_verbosity(MSG::Level level);
 
   /// Getter for the verbosity level
   inline MSG::Level get_verbosity() const {return _verbosity_level;};

@@ -75,8 +75,8 @@ void storage_manager::reset()
   _in_fnames.clear();
 
   for(size_t i=0; i<DATA::DATA_TYPE_MAX; ++i) {
-    _read_data_array[i]=false;
-    _write_data_array[i]=false;
+    _read_data_array[i]=true;   // Attempt to read in all data by default
+    _write_data_array[i]=false; // Attemp to write no data by default 
     _in_ch[i]=0;
     _out_ch[i]=0;
     _ptr_data_array[i]=0;
@@ -223,7 +223,10 @@ bool storage_manager::prepare_tree(){
 
 	_in_ch[i]->AddFile(_in_fnames[j].c_str());
 
+      // Ignore ROOT error message due to not finding a TTree 
+      gErrorIgnoreLevel = kBreak;
       nevents_array[i]=_in_ch[i]->GetEntries();
+      gErrorIgnoreLevel = kWarning;
       
       if(nevents_array[i]) { 
 
@@ -233,9 +236,12 @@ bool storage_manager::prepare_tree(){
 
 	if(!_nevents) _nevents = nevents_array[i];
 
+	if(_mode==BOTH) _write_data_array[i]=true;
+
       }else{
 	delete _in_ch[i];
 	_in_ch[i]=0;
+	if(_mode==BOTH) _write_data_array[i]=false;
       }
     }
 

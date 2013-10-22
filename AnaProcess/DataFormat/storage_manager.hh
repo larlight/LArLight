@@ -62,10 +62,6 @@ public:
   void set_data_to_read(DATA::DATA_TYPE type,bool read=true)
   {_read_data_array[type]=read;};
 
-  /// Setter to specify a certain data class to be written in the output.
-  void set_data_to_write(DATA::DATA_TYPE type,bool write=true)
-  {_write_data_array[type]=write;};
-
   /// Setter for I/O mode.
   void set_io_mode(MODE mode)         {_mode=mode;};
 

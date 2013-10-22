@@ -138,13 +138,29 @@ public:
   //inline const nu_mc& nu_mc() {return fMCNeutrino;};
   
   /// Getter for particle list
-  inline const std::vector<part_mc>& part_array() const {return fPartList;};
+  inline const std::vector<part_mc>& GetParticleCollection() const {return fPartList;};
 
   /// Getter for generator id
   inline MC::Origin_t gen_code() const {return fOrigin;};
 
   /// Getter for a boolean to suggest if neutrinos were generated or not
   //inline const bool nu_info_set() {return fNeutrinoSet;};
+
+  /**
+     A utility function to obtain maximum & minimum of spacepoints' vertex along the specified axis.
+     NOTE: the initial max/min values matter. It only modifies max/min if it finds values that is 
+     above/below those initial values.
+  */
+  void get_axis_range (double &max, double &min, const int axis) const;
+
+  /**
+     A utility function to obtain maximum & minimum of spacepoints' vertex along all axis.
+     NOTE: the initial max/min values matter. It only modifies max/min if it finds values that is
+     above/below those initial values.
+  */
+  void get_axis_range (double &xmax, double &xmin,
+		       double &ymax, double &ymin,
+		       double &zmax, double &zmin) const;  
 
 private:
   
@@ -154,7 +170,7 @@ private:
   //bool                 fNeutrinoSet; ///< flag for whether the neutrino information has been set
   
   ////////////////////////
-  ClassDef(event_mc,2)
+  ClassDef(event_mc,3)
   ////////////////////////
 
 };

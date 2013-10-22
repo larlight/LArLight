@@ -66,10 +66,6 @@ public:
   void set_data_to_read(DATA::DATA_TYPE type,bool read=true)
   {_storage->set_data_to_read(type,read);};
 
-  /// Setter to specify a certain data class to be write in output
-  void set_data_to_write(DATA::DATA_TYPE type,bool write=true)
-  {_storage->set_data_to_write(type,write);};
-  
   /// Getter of running analysis status
   bool get_ana_status(ana_base* ptr) const;
   

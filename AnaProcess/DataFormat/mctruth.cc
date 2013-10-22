@@ -50,4 +50,55 @@ void part_mc::add_track(double x,  double y,  double z,  double t,
   fStepMomentum.push_back(TVector3(px,py,pz));
 }
 
+//######################################################
+void event_mc::get_axis_range (double &max, double &min, const int axis) const
+//######################################################
+{
+
+  if(axis < 0 || axis>2) {
+
+    Message::get()->send(MSG::ERROR,__FUNCTION__,Form("Invalid axis index: %d",axis));
+    
+    return;
+
+  }
+
+  for(auto const& part : fPartList) {
+
+    const std::vector<TVector3> vtx_v = part.step_vertex();
+
+    for(auto const& vtx : vtx_v) {
+
+      if(vtx[axis] > max) max = vtx[axis];
+      if(vtx[axis] < min) min = vtx[axis];
+
+    }
+  }
+}
+
+//######################################################
+void event_mc::get_axis_range (double &xmax, double &xmin,
+		       double &ymax, double &ymin,
+		       double &zmax, double &zmin) const
+//######################################################
+{
+
+  for(auto const& part : fPartList) {
+
+    const std::vector<TVector3> vtx_v = part.step_vertex();
+
+    for(auto const& vtx : vtx_v) {
+
+      if(vtx[0] > xmax) xmax = vtx[0];
+      if(vtx[0] < xmin) xmin = vtx[0];
+      if(vtx[1] > ymax) ymax = vtx[1];
+      if(vtx[1] < ymin) ymin = vtx[1];
+      if(vtx[2] > zmax) zmax = vtx[2];
+      if(vtx[2] < zmin) zmin = vtx[2];
+
+    }
+  }
+
+}
+
 #endif
