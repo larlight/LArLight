@@ -27,11 +27,15 @@ else
 	echo Failed to set up ROOTSYS. Contact kazuhiro@nevis.columbia.edu
 	echo
     else
-	export LD_LIBRARY_PATH=$ANA_PROC_DIR/lib:$LD_LIBRARY_PATH
-	export DYLD_LIBRARY_PATH=$ANA_PROC_DIR/lib:$DYLD_LIBRARY_PATH
-	export PYTHONPATH=$PYTHONPATH:$ROOTSYS/lib
 	if [[ ${SRT_LOCAL} ]]; then
 	    python $MAKE_TOP_DIR/config/link_to_LArSoft.py $SRT_LOCAL
+	    export ANA_PROC_LIBDIR=$SRT_LOCAL/lib/$SRT_SUBDIR
+	else
+	    export ANA_PROC_LIBDIR=$ANA_PROC_DIR/lib
 	fi
+	export LD_LIBRARY_PATH=$ANA_PROC_LIBDIR:$LD_LIBRARY_PATH
+	export DYLD_LIBRARY_PATH=$ANA_PROC_LIBDIR:$DYLD_LIBRARY_PATH
+	export PYTHONPATH=$PYTHONPATH:$ROOTSYS/lib
+
     fi
 fi
