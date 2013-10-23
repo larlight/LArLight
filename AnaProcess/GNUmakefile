@@ -48,8 +48,8 @@ all:
 #
 clean:
 	@for i in $(SUBDIRS); do ( echo "" && echo "Cleaning $$i..." && cd $$i && $(MAKE) clean ) || exit $$?; done
-	@rm -f $(ANA_PROC_DIR)/lib/lib*.so
-	@rm -f $(ANA_PROC_DIR)/lib/lib*.rootmap
+	@rm -f $(ANA_PROC_LIBDIR)/lib*.so
+	@rm -f $(ANA_PROC_LIBDIR)/lib*.rootmap
 
 #####################################################################################
 #
