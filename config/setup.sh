@@ -30,6 +30,7 @@ else
 	if [[ ${SRT_LOCAL} ]]; then
 	    python $MAKE_TOP_DIR/config/link_to_LArSoft.py $SRT_LOCAL
 	    export ANA_PROC_LIBDIR=$SRT_LOCAL/lib/$SRT_SUBDIR
+	    ln -s $ANA_PROC_DIR/lib/make_rootmap.sh $ANA_PROC_LIBDIR/
 	else
 	    export ANA_PROC_LIBDIR=$ANA_PROC_DIR/lib
 	fi
