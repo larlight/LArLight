@@ -27,16 +27,24 @@ else
 	echo Failed to set up ROOTSYS. Contact kazuhiro@nevis.columbia.edu
 	echo
     else
-	if [[ ${SRT_LOCAL} ]]; then
-	    python $MAKE_TOP_DIR/config/link_to_LArSoft.py $SRT_LOCAL
-	    export ANA_PROC_LIBDIR=$SRT_LOCAL/lib/$SRT_SUBDIR
-	    ln -s $ANA_PROC_DIR/lib/make_rootmap.sh $ANA_PROC_LIBDIR/
-	else
+	export LAR_MODULE_DIR=$MAKE_TOP_DIR/LArModule
+	if [[ -z ${SRT_LOCAL} ]]; then
 	    export ANA_PROC_LIBDIR=$ANA_PROC_DIR/lib
+	else
+	    export ANA_PROC_LIBDIR=$SRT_LOCAL/lib/$SRT_SUBDIR
+	    python $MAKE_TOP_DIR/config/srtlocal_clean_link.py
+	    python $MAKE_TOP_DIR/config/srtlocal_make_link.py
+	    python $MAKE_TOP_DIR/config/make_link.py $ANA_PROC_DIR  $MAKE_TOP_DIR/LArModule/DataScanner/AnaProcess
+	    python $MAKE_TOP_DIR/config/make_link.py $ANA_PROC_DIR/lib/make_rootmap.sh $ANA_PROC_LIBDIR/make_rootmap.sh
 	fi
+	python $MAKE_TOP_DIR/config/gen_topmakefile.py
 	export LD_LIBRARY_PATH=$ANA_PROC_LIBDIR:$LD_LIBRARY_PATH
 	export DYLD_LIBRARY_PATH=$ANA_PROC_LIBDIR:$DYLD_LIBRARY_PATH
 	export PYTHONPATH=$PYTHONPATH:$ROOTSYS/lib
-
+	echo
+	echo "Finish configuration. To build, type:"
+	echo "> cd $MAKE_TOP_DIR"
+	echo "> make"
+	echo
     fi
 fi

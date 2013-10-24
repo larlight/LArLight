@@ -1,0 +1,79 @@
+
+#ifndef MYMODNAME_H
+#define MYMODNAME_H
+
+// LArSoft includes
+#include "Geometry/Geometry.h"
+
+// ART includes.
+#include "art/Framework/Core/EDAnalyzer.h"
+
+namespace mymodname {
+ 
+  class MyModName : public art::EDAnalyzer{
+  public:
+ 
+    MyModName(const fhicl::ParameterSet&);
+    virtual ~MyModName();
+
+    void beginJob();
+
+    void analyze (const art::Event&); 
+
+  private:
+
+  };
+
+} 
+
+#endif//  MYMODNAME_H
+
+// MyModName.cc
+
+// Framework includes
+#include "art/Framework/Core/ModuleMacros.h"
+
+namespace mymodname {
+  DEFINE_ART_MODULE(MyModName);
+}
+
+// Framework includes
+#include "fhiclcpp/ParameterSet.h"
+#include "art/Framework/Services/Registry/ActivityRegistry.h"
+#include "art/Framework/Services/Registry/ServiceHandle.h"
+#include "art/Framework/Services/Registry/ServiceMacros.h"
+#include "art/Framework/Services/Optional/TFileDirectory.h"
+#include "art/Framework/Services/Optional/TFileService.h"
+#include "art/Framework/Principal/Event.h"
+#include "art/Framework/Principal/Handle.h"
+
+#include "art/Persistency/Common/Ptr.h"
+#include "art/Persistency/Common/PtrVector.h"
+#include "messagefacility/MessageLogger/MessageLogger.h"
+
+
+namespace mymodname {
+
+  //-----------------------------------------------------------------------
+  // Constructor
+  MyModName::MyModName(fhicl::ParameterSet const& pset)
+  {
+    
+  }
+
+  //-----------------------------------------------------------------------
+  // Destructor
+  MyModName::~MyModName(){};
+   
+  //-----------------------------------------------------------------------
+  void MyModName::beginJob(){};
+   
+
+  //-----------------------------------------------------------------------
+  void MyModName::analyze(const art::Event& evt) 
+  {
+    
+  }
+} // namespace opdet
+
+

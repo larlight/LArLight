@@ -4,14 +4,9 @@
 #include "larlight_base.hh"
 
 //#####################################################
-larlight_base::larlight_base() : _name("larlight_base")
+void larlight_base::set_verbosity(MSG::Level level)
 //#####################################################
 {
-  set_verbosity(MSG::NORMAL);
-}
-
-//#####################################################
-void larlight_base::set_verbosity(MSG::Level level){
 
   _verbosity_level=level;
 
