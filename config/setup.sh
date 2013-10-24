@@ -30,11 +30,10 @@ else
 	if [[ -z ${SRT_LOCAL} ]]; then
 	    export ANA_PROC_LIBDIR=$ANA_PROC_DIR/lib
 	else
-	    python $MAKE_TOP_DIR/config/link_to_LArSoft.py $SRT_LOCAL
 	    export ANA_PROC_LIBDIR=$SRT_LOCAL/lib/$SRT_SUBDIR
-	    mkdir -p $ANA_PROC_LIBDIR
-	    ln -sf $ANA_PROC_DIR/lib/make_rootmap.sh $ANA_PROC_LIBDIR/
-	    ln -sf $ANA_PROC_DIR $MAKE_TOP_DIR/DataScanner/
+	    python $MAKE_TOP_DIR/config/make_link.py $MAKE_TOP_DIR/DataScanner $SRT_LOCAL/DataScanner
+	    python $MAKE_TOP_DIR/config/make_link.py $ANA_PROC_DIR  $MAKE_TOP_DIR/DataScanner/AnaProcess
+	    python $MAKE_TOP_DIR/config/make_link.py $ANA_PROC_DIR/lib/make_rootmap.sh $ANA_PROC_LIBDIR/make_rootmap.sh
 	fi
 	export LD_LIBRARY_PATH=$ANA_PROC_LIBDIR:$LD_LIBRARY_PATH
 	export DYLD_LIBRARY_PATH=$ANA_PROC_LIBDIR:$DYLD_LIBRARY_PATH
