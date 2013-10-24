@@ -31,13 +31,18 @@ else
 	    export ANA_PROC_LIBDIR=$ANA_PROC_DIR/lib
 	else
 	    export ANA_PROC_LIBDIR=$SRT_LOCAL/lib/$SRT_SUBDIR
-	    python $MAKE_TOP_DIR/config/make_link.py $MAKE_TOP_DIR/DataScanner $SRT_LOCAL/DataScanner
+	    python $MAKE_TOP_DIR/config/srtlocal_clean_link.py
+	    python $MAKE_TOP_DIR/config/srtlocal_make_link.py
 	    python $MAKE_TOP_DIR/config/make_link.py $ANA_PROC_DIR  $MAKE_TOP_DIR/DataScanner/AnaProcess
 	    python $MAKE_TOP_DIR/config/make_link.py $ANA_PROC_DIR/lib/make_rootmap.sh $ANA_PROC_LIBDIR/make_rootmap.sh
 	fi
+	python $MAKE_TOP_DIR/config/gen_topmakefile.py
 	export LD_LIBRARY_PATH=$ANA_PROC_LIBDIR:$LD_LIBRARY_PATH
 	export DYLD_LIBRARY_PATH=$ANA_PROC_LIBDIR:$DYLD_LIBRARY_PATH
 	export PYTHONPATH=$PYTHONPATH:$ROOTSYS/lib
-
+	echo
+	echo "Finish configuration. Type:"
+	echo "> make"
+	echo
     fi
 fi
