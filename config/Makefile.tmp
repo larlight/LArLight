@@ -23,11 +23,17 @@ ERROR_MESSAGE := $(error Your source code detected in current dir, but MAKE_TOP_
 endif
 export MAKE_TOP_DIR
 
-LAR_PACKAGES := LAR_COMPILE
+LAR_PACKAGES :=  LAR_MODULE
 
-all:
+all: base lar
+
+clean: baseclean larclean
+
+base:
 	@echo "Start building AnaProcess"
 	@make --directory=$(ANA_PROC_DIR)
+
+lar:
 ifdef SRT_LOCAL
 	@echo
 	@echo "Start building LArSoft components"
@@ -36,9 +42,11 @@ endif
 	@echo
 	@echo "Exiting"
 
-clean:
+baseclean:
 	@echo "Cleaning AnaProcess"
 	@make clean --directory=$(ANA_PROC_DIR)
+
+larclean:
 ifdef SRT_LOCAL
 	@echo
 	@echo "Cleaning LArSoft components"

@@ -31,9 +31,10 @@ else
 	    export ANA_PROC_LIBDIR=$ANA_PROC_DIR/lib
 	else
 	    export ANA_PROC_LIBDIR=$SRT_LOCAL/lib/$SRT_SUBDIR
+	    export LAR_MODULE_DIR=$MAKE_TOP_DIR/LArModule
 	    python $MAKE_TOP_DIR/config/srtlocal_clean_link.py
 	    python $MAKE_TOP_DIR/config/srtlocal_make_link.py
-	    python $MAKE_TOP_DIR/config/make_link.py $ANA_PROC_DIR  $MAKE_TOP_DIR/DataScanner/AnaProcess
+	    python $MAKE_TOP_DIR/config/make_link.py $ANA_PROC_DIR  $MAKE_TOP_DIR/LArModule/DataScanner/AnaProcess
 	    python $MAKE_TOP_DIR/config/make_link.py $ANA_PROC_DIR/lib/make_rootmap.sh $ANA_PROC_LIBDIR/make_rootmap.sh
 	fi
 	python $MAKE_TOP_DIR/config/gen_topmakefile.py
