@@ -28,7 +28,8 @@ class larlight_base {
 public:
 
   /// Default constructor
-  larlight_base();
+  larlight_base() : _name("larlight_base")
+  {set_verbosity(MSG::NORMAL);}
   
   /// Default copy constructor
   larlight_base(const larlight_base &original) : _name(original._name){};

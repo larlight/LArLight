@@ -1,7 +1,7 @@
 import os,sys,commands
 
 # check if SRT_LOCAL & LAR_MODULE are defined. If not, nothing to do.
-if not 'SRT_LOCAL' in os.environ or not 'LAR_MODULE_DIR' in os.environ:
+if not 'SRT_LOCAL' in os.environ or not 'LAR_MODULE' in os.environ:
     print 'ahoaho'
     sys.exit(1)
 

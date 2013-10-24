@@ -17,7 +17,7 @@
 
 #include "data_base.hh"
 /**
-   \class hit
+   \class wire
    LArSoft Wire class equivalent data container
 */
 class wire : public data_base {

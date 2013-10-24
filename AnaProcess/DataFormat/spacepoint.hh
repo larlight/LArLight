@@ -20,8 +20,8 @@
 #include "TMatrixD.h"
 
 /**
-   \class track
-   LArSoft Track class equivalent data container
+   \class spacepoint
+   LArSoft SpacePoint class equivalent data container
 */
 class spacepoint : public data_base {
 
@@ -96,8 +96,8 @@ private:
 };
 
 /**
- \class event_track 
- A collection storage class of multiple tracks.
+ \class event_sps
+ A collection storage class of multiple spacepoints
 */
 class event_sps : public data_base {
   
@@ -117,10 +117,10 @@ public:
   /// Method to clear currently held data contents in the buffer
   virtual void clear_data(){data_base::clear_data(); fSpacePoint_v.clear();};
   
-  /// Method to add a track
+  /// Method to add a spacepoint
   inline void  add_sps(const spacepoint pt)                { fSpacePoint_v.push_back(pt); };
 
-  /// Method to get an array of tracks
+  /// Method to get an array of spacepoints
   inline const std::vector<spacepoint>& GetSPSCollection() { return fSpacePoint_v;        };
 
   /**

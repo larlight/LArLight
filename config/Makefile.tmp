@@ -23,7 +23,7 @@ ERROR_MESSAGE := $(error Your source code detected in current dir, but MAKE_TOP_
 endif
 export MAKE_TOP_DIR
 
-LAR_PACKAGES :=  LAR_MODULE
+LAR_PACKAGES := LAR_MODULE
 
 all: base lar
 
@@ -54,3 +54,18 @@ ifdef SRT_LOCAL
 endif
 	@echo 
 	@echo "Exiting"
+
+
+#####################################################################################
+#
+# DOCUMENTATION...
+#
+doxygen:
+	@echo 'dOxygenising your code...'
+	@doxygen $(MAKE_TOP_DIR)/doc/doxygenMyProject.script
+
+doxygen+:
+	@echo 'dOxygenising MyProject + local-ROOT...'
+	@doxygen $(MAKE_TOP_DIR)/doc/doxygenMyProject+.script
+#
+#####################################################################################

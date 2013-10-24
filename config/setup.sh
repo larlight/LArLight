@@ -27,11 +27,11 @@ else
 	echo Failed to set up ROOTSYS. Contact kazuhiro@nevis.columbia.edu
 	echo
     else
+	export LAR_MODULE_DIR=$MAKE_TOP_DIR/LArModule
 	if [[ -z ${SRT_LOCAL} ]]; then
 	    export ANA_PROC_LIBDIR=$ANA_PROC_DIR/lib
 	else
 	    export ANA_PROC_LIBDIR=$SRT_LOCAL/lib/$SRT_SUBDIR
-	    export LAR_MODULE_DIR=$MAKE_TOP_DIR/LArModule
 	    python $MAKE_TOP_DIR/config/srtlocal_clean_link.py
 	    python $MAKE_TOP_DIR/config/srtlocal_make_link.py
 	    python $MAKE_TOP_DIR/config/make_link.py $ANA_PROC_DIR  $MAKE_TOP_DIR/LArModule/DataScanner/AnaProcess

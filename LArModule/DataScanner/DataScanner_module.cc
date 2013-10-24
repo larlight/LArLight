@@ -1,4 +1,16 @@
+/**
+ * \file DataScanner_module.cc
+ *
+ * \ingroup DataScanner
+ * 
+ * \brief Class definition file of DataScanner
+ *
+ * @author Kazu - Nevis 2013
+ */
 
+/** \addtogroup DataScanner
+
+@{*/
 #ifndef DataScanner_H
 #define DataScanner_H
 
@@ -21,7 +33,11 @@
 #include <AnaProcess/DataFormat/DataFormat-TypeDef.hh>
 
 namespace larlight {
- 
+
+  /**
+     \class DataScanner
+     DataScanner module to copy LArSoft data contents into LArLight data formatted file
+  */ 
   class DataScanner : public art::EDAnalyzer{
 
   public:
@@ -638,6 +654,6 @@ namespace larlight {
     // Done
   }
 
-} // namespace opdet
+} // namespace 
 
-
+/** @} */ // end of doxygen group

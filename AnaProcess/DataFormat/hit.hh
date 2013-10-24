@@ -115,10 +115,10 @@ public:
   /// Method to clear currently held data contents in the buffer
   virtual void clear_data(){data_base::clear_data(); fHit_v.clear();};
   
-  /// Method to add a track
+  /// Method to add a hit
   inline void  add_hit(const hit h) {fHit_v.push_back(h);};
 
-  /// Method to get an array of tracks
+  /// Method to get an array of hit
   inline const std::vector<hit>& GetHitCollection() { return fHit_v; };
 
 private:
