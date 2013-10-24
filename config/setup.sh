@@ -42,7 +42,8 @@ else
 	export DYLD_LIBRARY_PATH=$ANA_PROC_LIBDIR:$DYLD_LIBRARY_PATH
 	export PYTHONPATH=$PYTHONPATH:$ROOTSYS/lib
 	echo
-	echo "Finish configuration. Type:"
+	echo "Finish configuration. To build, type:"
+	echo "> cd $MAKE_TOP_DIR"
 	echo "> make"
 	echo
     fi
