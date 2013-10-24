@@ -7,7 +7,8 @@ if not 'SRT_LOCAL' in os.environ or not 'MAKE_TOP_DIR' in os.environ:
 # clean up symlink under $SRT_LOCAL if they point to anything under $MAKE_TOP_DIR
 dirs = []
 dirs.append(os.environ['SRT_LOCAL'])
-dirs.append('%s/lib/%s' % (os.environ['SRT_LOCAL'],os.environ['SRT_SUBDIR']))
+if os.path.isdir('%s/lib/%s' % (os.environ['SRT_LOCAL'],os.environ['SRT_SUBDIR'])):
+    dirs.append('%s/lib/%s' % (os.environ['SRT_LOCAL'],os.environ['SRT_SUBDIR']))
 symlinks=[]
 for dir in dirs:
     symlinks += ['%s/%s' % (dir,x) for x in os.listdir(dir) if os.path.islink('%s/%s' % (dir,x))]

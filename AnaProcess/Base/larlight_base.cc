@@ -4,7 +4,7 @@
 #include "larlight_base.hh"
 
 //#####################################################
-virtual void larlight_base::set_verbosity(MSG::Level level)
+void larlight_base::set_verbosity(MSG::Level level)
 //#####################################################
 {
 

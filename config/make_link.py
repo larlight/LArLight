@@ -12,7 +12,7 @@ if os.path.islink(target_link):
     if not current_link == source_link:
         print "Found already existing link %s\n    => %s" % (target_link,current_link)
         print
-        print "Can we replace it to: %s\n    => %s" % (target_link,current_link)
+        print "Can we replace it to: %s\n    => %s" % (target_link,source_link)
         user_input=''
         while not user_input in ['y','n']:
             if user_input:
