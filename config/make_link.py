@@ -12,27 +12,13 @@ if os.path.islink(target_link):
     if not current_link == source_link:
         print "Found already existing link %s\n    => %s" % (target_link,current_link)
         print
-        print "Can we replace it to: %s\n    => %s" % (target_link,source_link)
-        user_input=''
-        while not user_input in ['y','n']:
-            if user_input:
-                print 'Invalid input: %s' % user_input
-            sys.stdout.write("[y/n]:")
-            sys.stdout.flush()
-            user_input = sys.stdin.read().rstrip('\n')
-
-        if user_input == 'y':
-            os.system('rm %s' % target_link)
-            if os.path.islink(target_link):
-                print 'ERROR:'
-                print 'Failed to replace a link %s' % target_link
-                print 'BE AWARE!'
-            else:
-                make_link=True
-        else:
-            print 'INFO:'
-            print 'Intentionally keeping a softlink NOT POINTING TO THIS INSTALLATION!'
+        os.system('rm %s' % target_link)
+        if os.path.islink(target_link):
+            print 'ERROR:'
+            print 'Failed to replace a link %s' % target_link
             print 'BE AWARE!'
+        else:
+            make_link=True
 
 elif target_link.find("/")>=0:
     # Check if the target parent directory exists or not
