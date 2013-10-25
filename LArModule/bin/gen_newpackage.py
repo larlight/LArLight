@@ -14,6 +14,8 @@ source_dir='%s/bin/tmp' % os.environ['LAR_MODULE_DIR']
 if not os.path.exists(target_dir):
    try:
       os.makedirs(target_dir)
+      if os.path.isdir(os.environ['SRT_LOCAL']):
+         os.system('ln -sf %s %s/' % (target_dir,os.environ['SRT_LOCAL']))
    except OSError:
       sys.stderr.write('Failed to create a dir: %s\n' % target_dir)
       sys.stderr.write('Maybe lacking a permission?\n\n')
@@ -26,10 +28,12 @@ else:
 in_makefile='%s/GNUmakefile.tmp' % source_dir
 in_source='%s/cc.tmp' % source_dir
 in_fcl='%s/fcl.tmp' % source_dir
+in_mod_fcl='%s/config_fcl.tmp' % source_dir
 
 src_list = { in_makefile : '%s/GNUmakefile'   % target_dir,
              in_source   : '%s/%s_module.cc'  % (target_dir,name),
-             in_fcl      : '%s/%s.fcl'        % (target_dir,name) }
+             in_fcl      : '%s/%s.fcl'        % (target_dir,name.lower()),
+             in_mod_fcl  : '%s/%smodules.fcl' % (target_dir,name.lower())}
 for src in src_list.keys():
    contents=open(src,'r').read()
    contents=contents.replace('MYMODNAME',name.upper())

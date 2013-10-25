@@ -1,3 +1,14 @@
+/**
+ * \file MyModName_module.cc
+ * \ingroup MyModName
+ *
+ * \brief Class definition file of MyModName
+ * @author SHELL_USER_NAME
+ *
+*/
+
+/** \addtogroup MyModName
+@{*/
 
 #ifndef MYMODNAME_H
 #define MYMODNAME_H
@@ -5,19 +16,41 @@
 // LArSoft includes
 #include "Geometry/Geometry.h"
 
-// ART includes.
+// Framework includes.
 #include "art/Framework/Core/EDAnalyzer.h"
+#include "art/Framework/Core/ModuleMacros.h"
+#include "fhiclcpp/ParameterSet.h"
+#include "art/Framework/Services/Registry/ActivityRegistry.h"
+#include "art/Framework/Services/Registry/ServiceHandle.h"
+#include "art/Framework/Services/Registry/ServiceMacros.h"
+#include "art/Framework/Services/Optional/TFileDirectory.h"
+#include "art/Framework/Services/Optional/TFileService.h"
+#include "art/Framework/Principal/Event.h"
+#include "art/Framework/Principal/Handle.h"
+#include "art/Persistency/Common/Ptr.h"
+#include "art/Persistency/Common/PtrVector.h"
+#include "messagefacility/MessageLogger/MessageLogger.h"
 
 namespace mymodname {
+
+  /**
+     \class MyModName
+     MyModName module ... documentation to be added by SHELL_USER_NAME
+  */ 
  
   class MyModName : public art::EDAnalyzer{
   public:
  
+    /// Default constructor
     MyModName(const fhicl::ParameterSet&);
+
+    /// Default destructor
     virtual ~MyModName();
 
+    /// Method to be called before the event loop
     void beginJob();
 
+    /// Method to be called event-by-event
     void analyze (const art::Event&); 
 
   private:
@@ -30,27 +63,9 @@ namespace mymodname {
 
 // MyModName.cc
 
-// Framework includes
-#include "art/Framework/Core/ModuleMacros.h"
-
 namespace mymodname {
   DEFINE_ART_MODULE(MyModName);
 }
-
-// Framework includes
-#include "fhiclcpp/ParameterSet.h"
-#include "art/Framework/Services/Registry/ActivityRegistry.h"
-#include "art/Framework/Services/Registry/ServiceHandle.h"
-#include "art/Framework/Services/Registry/ServiceMacros.h"
-#include "art/Framework/Services/Optional/TFileDirectory.h"
-#include "art/Framework/Services/Optional/TFileService.h"
-#include "art/Framework/Principal/Event.h"
-#include "art/Framework/Principal/Handle.h"
-
-#include "art/Persistency/Common/Ptr.h"
-#include "art/Persistency/Common/PtrVector.h"
-#include "messagefacility/MessageLogger/MessageLogger.h"
-
 
 namespace mymodname {
 
@@ -74,6 +89,6 @@ namespace mymodname {
   {
     
   }
-} // namespace opdet
+} // namespace mymodname
 
-
+/** @} */ // end of doxygen group

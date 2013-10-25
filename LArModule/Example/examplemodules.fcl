@@ -1,0 +1,8 @@
+# This fcl file defines analysis modules in this package
+
+standard_anapmt:
+{
+    module_type:            "AnaPMT"
+    ModuleName_PMT:         "optreadout"
+}
+

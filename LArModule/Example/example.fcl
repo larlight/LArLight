@@ -1,9 +1,8 @@
-# Example driver fcl file to run analysis modules in MyModName package.
+# This is an example fcl file to run analysis modules in this package.
 
 #include "job/services.fcl"
-#include "MyModName/mymodnamemodules.fcl"
-
-process_name: MyModName
+#include "examplemodules.fcl"
+process_name: Example
 
 services:
 {
@@ -29,10 +28,10 @@ physics:
 
  analyzers:
  {
-   mymodname: @local::standard_mymodname
+    anapmt: @local::standard_anapmt
  }
 
- analyzeIt: [ mymodname ]
+ analyzeIt: [ anapmt ]
 
  end_paths:     [ analyzeIt ]
 }

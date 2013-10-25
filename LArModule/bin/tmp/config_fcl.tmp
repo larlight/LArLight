@@ -1,0 +1,8 @@
+# Define default setting of analysis modules in MyModName package
+
+standard_mymodname:
+{
+    module_type:            "MyModName"
+}
+
+

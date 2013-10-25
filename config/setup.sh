@@ -5,6 +5,10 @@ if [[ -z $MAKE_TOP_DIR ]]; then
     echo You have to set this first.
 else 
     export ANA_PROC_DIR=$MAKE_TOP_DIR/AnaProcess
+    if [[ -z $ANA_PROC_MODULE ]]; then
+	export ANA_PROC_MODULE="Analysis"
+    fi
+    ANA_PROC_MODULE="Base DataFormat ${ANA_PROC_MODULE}" 
     if [[ -z $ROOTSYS ]]; then
 	case `uname -n` in
 	    (*nevis.columbia.edu)
@@ -37,13 +41,14 @@ else
 	    python $MAKE_TOP_DIR/config/make_link.py $ANA_PROC_DIR  $MAKE_TOP_DIR/LArModule/DataScanner/AnaProcess
 	    python $MAKE_TOP_DIR/config/make_link.py $ANA_PROC_DIR/lib/make_rootmap.sh $ANA_PROC_LIBDIR/make_rootmap.sh
 	fi
+	python $MAKE_TOP_DIR/config/gen_anamakefile.py
 	python $MAKE_TOP_DIR/config/gen_topmakefile.py
 	export LD_LIBRARY_PATH=$ANA_PROC_LIBDIR:$LD_LIBRARY_PATH
 	export DYLD_LIBRARY_PATH=$ANA_PROC_LIBDIR:$DYLD_LIBRARY_PATH
 	export PYTHONPATH=$PYTHONPATH:$ROOTSYS/lib
 	echo
 	echo "Finish configuration. To build, type:"
-	echo "> cd $MAKE_TOP_DIR"
+	echo "> cd \$MAKE_TOP_DIR"
 	echo "> make"
 	echo
     fi
