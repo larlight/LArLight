@@ -6,9 +6,8 @@ if [[ -z $MAKE_TOP_DIR ]]; then
 else 
     export ANA_PROC_DIR=$MAKE_TOP_DIR/AnaProcess
     if [[ -z $ANA_PROC_MODULE ]]; then
-	export ANA_PROC_MODULE="Analysis"
+	export ANA_PROC_MODULE="Base DataFormat Analysis"
     fi
-    ANA_PROC_MODULE="Base DataFormat ${ANA_PROC_MODULE}" 
     if [[ -z $ROOTSYS ]]; then
 	case `uname -n` in
 	    (*nevis.columbia.edu)
