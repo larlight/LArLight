@@ -10,5 +10,6 @@
 #pragma link off all functions;
 
 #pragma link C++ class KalekoAna+;
+#pragma link C++ class UtilFunctions+;
 
 #endif

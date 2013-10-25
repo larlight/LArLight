@@ -14,9 +14,19 @@
 #ifndef KALEKOANA_HH
 #define KALEKOANA_HH
 
+
 #include <iostream>
+#include <TSystem.h>
 #include <TH1.h>
 #include <TGraph.h>
+#include <TVector3.h>
+#include <TMath.h>
+
+#include <storage_manager.hh>
+#include <constants.hh>
+#include "KalekoUtilFunc.hh"
+
+
 
 /**
    \class KalekoAna
@@ -37,15 +47,9 @@ public:
   /// Also create a histogram of track ThetaYZ values
   int EventLoop(std::string filename, const int MCTheta, const int max_evts, const int n_bins_histo);
 
-  /// Function to generate window efficiency histograms
-  TGraph* GenWindowEfficiencyGraph(const int max_window_radius);
-
-  /// Function to get pointer to private histograms
-
+  /// Functions to get pointer to private histograms
   TH1D* GetRecoTrackAngleHist() {return RecoTrackAngleHist;}
-
   TH1D* GetMCTrackAngleHist() {return MCTrackAngleHist;}
-
   TH1D* GetNRecoTracksHist() {return NRecoTracksHist;}
 
 private:
@@ -62,6 +66,7 @@ private:
  
   /// Number reconstructed tracks per event histogram
   TH1D *NRecoTracksHist;
+  
 };
 
 #endif

@@ -1,13 +1,5 @@
 #include "KalekoAna.hh"
 
-#include <TSystem.h>
-#include <TVector3.h>
-#include <TH1.h>
-#include <TGraph.h>
-#include <TMath.h>
-#include <storage_manager.hh>
-#include <constants.hh>
-
 
 KalekoAna::KalekoAna(){
   //
@@ -63,6 +55,9 @@ int KalekoAna::EventLoop(std::string filename, const int MCTheta, const int max_
   if(!my_storage.is_ready_io()) {
     std::cerr << "I/O preparation failed!" << std::endl;
   }
+
+  //Set the plotting style (commented, doing this from run macro at the moment
+  //  UtilFunctions::set_style();
 
   //Initialize the histograms with bins and such
   InitializeHistograms(MCTheta, n_bins_histo);
@@ -123,41 +118,6 @@ int KalekoAna::EventLoop(std::string filename, const int MCTheta, const int max_
   
   my_storage.close();
   return 1;
-}
-
-TGraph* KalekoAna::GenWindowEfficiencyGraph(const int max_window_radius){
-
-  TGraph *WindowEfficiencyGraph = new TGraph();
-
-  TH1D* myRecoTrackAngleHist = GetRecoTrackAngleHist();
-
-  int center_bin = GetMCTrackAngleHist()->GetMaximumBin();
-  int total_evts = GetMCTrackAngleHist()->GetEntries();
-  double radians_per_bin = GetMCTrackAngleHist()->GetBinWidth(center_bin);
-
-  double window_integral, window_efficiency = -1;
-  
-  int pt_ctr = 0;
-  for (int window_width = max_window_radius;
-       window_width > 0;
-       --window_width){
-
-    window_integral = myRecoTrackAngleHist->
-      Integral(center_bin-window_width,
-	       center_bin+window_width);
-    
-    window_efficiency = (double)window_integral/(double)total_evts;
-
-    WindowEfficiencyGraph->
-      SetPoint(pt_ctr, 
-	       (double)window_width*radians_per_bin,
-	       window_efficiency);    
-
-    pt_ctr++;
-  }
-
-  return WindowEfficiencyGraph;
- 
 }
  
 void KalekoAna::InitializeHistograms(const int MCTheta, const int n_bins_histo){

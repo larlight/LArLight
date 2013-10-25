@@ -7,8 +7,10 @@
 
 // Header files included here
 #include "KalekoAna.hh"
+#include "KalekoUtilFunc.hh"
 
 // Class forward declaration here
 class KalekoAna;
+class UtilFunctions;
 
 #endif
