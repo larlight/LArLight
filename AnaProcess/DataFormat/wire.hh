@@ -29,7 +29,7 @@ public:
 
   /// Alternative constructor
   wire(const std::vector<float> wf,
-	     const uint32_t ch,
+	     const UInt_t ch,
 	     const GEO::View_t view,
 	     const GEO::SigType_t sig) 
     : data_base(), 
@@ -55,7 +55,7 @@ public:
   /// Setter for an waveform
   void set_signal(const std::vector<float> wf) { fSignal=wf; };
   /// Setter for a channel number
-  void set_channel(uint32_t    ch)   { fChannel = ch;   };
+  void set_channel(UInt_t    ch)   { fChannel = ch;   };
   /// Setter for view type
   void set_view   (GEO::View_t v)    { fView = v;       };
   /// Setter for signal type
@@ -69,14 +69,14 @@ public:
   /// Getter for signal type
   GEO::SigType_t             SignalType() const { return fSignalType;    };
   /// Getter for channel number
-  uint32_t                   Channel()    const { return fChannel;       };
+  UInt_t                   Channel()    const { return fChannel;       };
 
 protected:
 
   std::vector<float>      fSignal;     ///< the calibrated signal waveform
   GEO::View_t             fView;       ///< view corresponding to the plane of this wire
   GEO::SigType_t          fSignalType; ///< signal type of the plane for this wire
-  uint32_t                fChannel;    ///< channel number
+  UInt_t                fChannel;    ///< channel number
 
 private:
 

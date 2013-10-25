@@ -46,7 +46,7 @@ public:
   void set_charge_err(double q, double q_max)
   {fSigmaCharge=q; fSigmaMaxCharge=q_max;};
   void set_multiplicity(int m){ fMultiplicity=m;};
-  void set_channel (uint32_t ch){ fChannel=ch;};
+  void set_channel (UInt_t ch){ fChannel=ch;};
   void set_fit_goodness(double v){ fGoodnessOfFit = v;};
   void set_view(GEO::View_t v){ fView = v;};
   void set_sigtype(GEO::SigType_t t) {fSignalType=t;};
@@ -60,7 +60,7 @@ public:
   double          SigmaEndTime()              const { return fSigmaEndTime;   };
   double          SigmaPeakTime()             const { return fSigmaPeakTime;  };
   int             Multiplicity()              const { return fMultiplicity;   };
-  uint32_t        Channel()                   const { return fChannel;        };
+  UInt_t        Channel()                   const { return fChannel;        };
   double          Charge(bool max=false)      const { return ( max ? fMaxCharge : fCharge);};
   double          SigmaCharge(bool max=false) const { return ( max ? fSigmaMaxCharge : fSigmaCharge ); };
   double          GoodnessOfFit()             const { return fGoodnessOfFit;  };
@@ -84,7 +84,7 @@ protected:
   double                  fGoodnessOfFit;  ///< how well do we believe we know this hit?
   GEO::View_t             fView;           ///< view for the plane of the hit
   GEO::SigType_t          fSignalType;     ///< signal type for the plane of the hit
-  uint32_t                fChannel;        ///< channel number
+  UInt_t                fChannel;        ///< channel number
 
 private:
 

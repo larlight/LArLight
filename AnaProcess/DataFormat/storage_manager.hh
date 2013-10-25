@@ -103,7 +103,7 @@ public:
   bool next_event(); 
 
   /// Move to the TTree entry with the provided index number
-  bool go_to(uint32_t index);
+  bool go_to(UInt_t index);
 
   /// Close I/O file. 
   bool close(); 
@@ -122,16 +122,16 @@ public:
   { if(me) delete me;};
 
   /// Getter for a number of events in the file.
-  inline uint32_t get_entries() const {return _nevents;};
+  inline UInt_t get_entries() const {return _nevents;};
 
   /// Getter for a TTree index
-  inline uint32_t get_index()   const {return _index;};
+  inline UInt_t get_index()   const {return _index;};
 
   /// Getter for a counter of read-out events
-  inline uint32_t get_entries_read() const {return _nevents_read;};
+  inline UInt_t get_entries_read() const {return _nevents_read;};
 
   /// Getter for a counter of written-out events
-  inline uint32_t get_entires_written() const {return _nevents_written;};
+  inline UInt_t get_entires_written() const {return _nevents_written;};
   
 private:
 
@@ -152,10 +152,10 @@ private:
   bool prepare_tree();
 
   /// tree index marker
-  uint32_t _index;
+  UInt_t _index;
 
   /// number of events read/written
-  uint32_t _nevents, _nevents_read, _nevents_written;
+  UInt_t _nevents, _nevents_read, _nevents_written;
 
   /// status control stamp
   STATUS _status;

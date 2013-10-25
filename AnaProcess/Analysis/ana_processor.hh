@@ -70,10 +70,10 @@ public:
   bool get_ana_status(ana_base* ptr) const;
   
   /// A method to run a batch process 
-  bool run(uint32_t start_index=0, uint32_t nevents=0);
+  bool run(UInt_t start_index=0, UInt_t nevents=0);
 
   /// A method to process just one event.
-  bool process_event(uint32_t index=0);
+  bool process_event(UInt_t index=0);
 
   /// A method to append analysis class instance. Returns index number.
   size_t add_process(ana_base* ana){_analyzers.push_back(ana); return _analyzers.size()-1;};
@@ -99,8 +99,8 @@ private:
   std::map<ana_base*,bool> _ana_status; ///< A map of analysis module status
 
   PROCESS_FLAG _process;       ///< Processing status flag
-  uint32_t _nevents;           ///< Number of events being processed
-  uint32_t _index;             ///< Index of currently processing event
+  UInt_t _nevents;           ///< Number of events being processed
+  UInt_t _index;             ///< Index of currently processing event
   std::string _ofile_name;     ///< Output file name
   TFile*   _fout;              ///< Output file pointer
   storage_manager* _storage;   ///< Storage manager pointer

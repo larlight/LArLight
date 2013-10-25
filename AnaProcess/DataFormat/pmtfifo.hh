@@ -9,9 +9,9 @@ public:
 
   pmtfifo() : data_base(), fWaveform() {clear_data();};
 
-  pmtfifo(uint16_t ch, int32_t frame, int32_t sample, 
+  pmtfifo(UShort_t ch, int32_t frame, int32_t sample, 
 	  PMT::DISCRIMINATOR disc,
-	  const std::vector<uint16_t> wf) : data_base(), 
+	  const std::vector<UShort_t> wf) : data_base(), 
 					    fWaveform(wf),
 					    fCh(ch),
 					    fFrame(frame),
@@ -29,17 +29,17 @@ public:
 
   void clear_data();
 
-  inline void append_adc(const uint16_t adc){fWaveform.push_back(adc);};
+  inline void append_adc(const UShort_t adc){fWaveform.push_back(adc);};
   
-  inline void set_waveform(const std::vector<uint16_t> wf){fWaveform=wf;};
+  inline void set_waveform(const std::vector<UShort_t> wf){fWaveform=wf;};
 
-  const std::vector<uint16_t>& waveform() const {return fWaveform;};
+  const std::vector<UShort_t>& waveform() const {return fWaveform;};
 
-  uint16_t channel() const {return fCh;};
+  UShort_t channel() const {return fCh;};
 
-  uint32_t frame()   const {return fFrame;};
+  UInt_t frame()   const {return fFrame;};
 
-  uint32_t sample()  const {return fSample;};
+  UInt_t sample()  const {return fSample;};
 
   PMT::DISCRIMINATOR disc_id() const {return fDiscID;};
 
@@ -47,10 +47,10 @@ public:
 
 protected:
 
-  std::vector<uint16_t> fWaveform;
-  uint16_t fCh;
-  uint32_t fFrame;
-  uint32_t fSample;
+  std::vector<UShort_t> fWaveform;
+  UShort_t fCh;
+  UInt_t fFrame;
+  UInt_t fSample;
   PMT::DISCRIMINATOR fDiscID;
 
 private:
