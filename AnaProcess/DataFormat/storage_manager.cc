@@ -335,7 +335,7 @@ void storage_manager::create_data_ptr(DATA::DATA_TYPE type){
   case DATA::Seed:
   case DATA::Shower:
   case DATA::Calorimetry:
-
+  case DATA::Event:
     /*
   case DATA::PMT_WF_COLLECTION:
     _ptr_data_array[type] = (data_base*)(new pmt_wf_collection());

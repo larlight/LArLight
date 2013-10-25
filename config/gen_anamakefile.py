@@ -25,11 +25,11 @@ else:
             print ("\033[95m" + package + "\033[0m")
             valid_packages += ' %s' % package
         else:
-            not_found.append(package)
+            not_found.append("\033[91m" + package + "\033[0m")
 
     if not_found:
         print
-        print 'Packages not found:'
+        print ('\033[93m' + 'Packages not found:' + '\033[0m')
         for x in not_found:
             print x
     makefile=makefile.replace('ANA_PROC_MODULE',valid_packages)

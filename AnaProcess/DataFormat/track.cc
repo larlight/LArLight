@@ -58,7 +58,8 @@ void event_track::get_axis_range(double &max, double &min, const int axis) const
       const TVector3 vtx = trk.vertex_at(i);
 
       if(vtx[axis] > max) max = vtx[axis];
-      
+
+      if(vtx[axis] < min) min = vtx[axis];
     }
   }
 
