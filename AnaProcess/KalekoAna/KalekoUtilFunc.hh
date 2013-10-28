@@ -1,5 +1,23 @@
+/**
+ * \file KalekoUtilFunc.hh
+ *
+ * \ingroup KalekoAna
+ * 
+ * \brief Class def header for a class UtilFunctions
+ *
+ * @author davidkaleko
+ */
+
+/** \addtogroup KalekoAna
+
+    @{*/
+
+
+
 #ifndef KALEKOUTILFUNC_HH
 #define KALEKOUTILFUNC_HH
+
+#include <iostream>
 
 #include <TCanvas.h>
 #include <TLine.h>
@@ -35,3 +53,4 @@ public:
 };
 
 #endif
+/** @} */ // end of doxygen group 

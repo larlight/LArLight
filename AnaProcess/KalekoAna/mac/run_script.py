@@ -8,7 +8,7 @@ n_bins_histo = 100
 
 in_path = "/Users/davidkaleko/Desktop/input_files_LArLight/"
 in_fname = ["v3_ang0_dsout_reduced.root","v3_ang30_dsout_reduced.root","v3_ang45_dsout_reduced.root","v3_ang60_dsout_reduced.root","v3_ang90_dsout_reduced.root"]
-out_dir = os.environ.get('MAKE_TOP_DIR')+"/AnaProcess/KalekoAna/mac/output_plots")
+out_dir = os.environ.get('MAKE_TOP_DIR')+"/AnaProcess/KalekoAna/mac/output_plots"
 in_angles = [ 0, 30, 45, 60, 90 ]
 colors = [ kOrange, kBlue, kGreen, kBlack, kMagenta ]
 recohist_array = []
