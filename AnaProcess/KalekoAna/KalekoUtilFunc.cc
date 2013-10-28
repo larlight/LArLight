@@ -100,10 +100,10 @@ TGraphAsymmErrors* UtilFunctions::GenWindowEfficiencyGraph(TH1D* myRecoTrackAngl
       SetPointError(pt_ctr,
 		    0,
 		    0,
-		    lowerlimit,
-		    upperlimit);
+		    window_efficiency-lowerlimit,
+		    upperlimit-window_efficiency);
 
-    std::cout<< Form("window_width = %f radians, efficiency = %f, with uncertainties (upper,lower)=(%f,%f)",(double)window_width*radians_per_bin,window_efficiency,upperlimit,lowerlimit)<<std::endl;
+    //    std::cout<< Form("window_width = %f radians, efficiency = %f, with uncertainties (upper,lower)=(%f,%f)",(double)window_width*radians_per_bin,window_efficiency,upperlimit,lowerlimit)<<std::endl;
 
     pt_ctr++;
   }
