@@ -39,6 +39,52 @@ void track::clear_data()
 }
 
 //############################################################################
+void track::get_axis_range(double &max, double &min, const int axis) const
+//############################################################################
+{
+
+  if(axis < 0 || axis>2) {
+
+    Message::get()->send(MSG::ERROR,__FUNCTION__,Form("Invalid axis index: %d",axis));
+    
+    return;
+
+  }
+
+  for(const auto &vtx : fXYZ) {
+    
+    if(vtx[axis] > max) max = vtx[axis];
+
+    if(vtx[axis] < min) min = vtx[axis];
+
+  }
+
+  return;
+}
+
+//############################################################################
+void track::get_axis_range(double &xmax, double &xmin,
+			   double &ymax, double &ymin,
+			   double &zmax, double &zmin) const
+//############################################################################
+{
+
+  for(const auto &vtx : fXYZ) {
+
+    if(vtx[0] > xmax) xmax = vtx[0];
+    if(vtx[0] < xmin) xmin = vtx[0];
+    if(vtx[1] > ymax) ymax = vtx[1];
+    if(vtx[1] < ymin) ymin = vtx[1];
+    if(vtx[2] > zmax) zmax = vtx[2];
+    if(vtx[2] < zmin) zmin = vtx[2];
+    
+  }
+
+  return;
+}
+
+
+//############################################################################
 void event_track::get_axis_range(double &max, double &min, const int axis) const
 //############################################################################
 {
@@ -51,21 +97,12 @@ void event_track::get_axis_range(double &max, double &min, const int axis) const
 
   }
 
-  for(auto trk : fTrack_v) {
+  for(auto trk : fTrack_v)
 
-    for(size_t i=0; i<trk.n_point(); i++) {
-
-      const TVector3 vtx = trk.vertex_at(i);
-
-      if(vtx[axis] > max) max = vtx[axis];
-
-      if(vtx[axis] < min) min = vtx[axis];
-    }
-  }
+    trk.get_axis_range(max,min,axis);
 
   return;
 }
-
 
 //############################################################################
 void event_track::get_axis_range(double &xmax, double &xmin,
@@ -74,21 +111,9 @@ void event_track::get_axis_range(double &xmax, double &xmin,
 //############################################################################
 {
 
-  for(auto trk : fTrack_v) {
+  for(auto trk : fTrack_v)
 
-    for(size_t i=0; i<trk.n_point(); i++) {
-
-      const TVector3 vtx = trk.vertex_at(i);
-
-      if(vtx[0] > xmax) xmax = vtx[0];
-      if(vtx[0] < xmin) xmin = vtx[0];
-      if(vtx[1] > ymax) ymax = vtx[1];
-      if(vtx[1] < ymin) ymin = vtx[1];
-      if(vtx[2] > zmax) zmax = vtx[2];
-      if(vtx[2] < zmin) zmin = vtx[2];
-      
-    }
-  }
+    trk.get_axis_range(xmax,xmin,ymax,ymin,zmax,zmin);
 
   return;
 }

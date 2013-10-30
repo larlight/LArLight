@@ -55,6 +55,23 @@ public:
 
   virtual void clear_data();
 
+  /**
+     A utility function to obtain maximum & minimum of spacepoints' vertex along the specified axis.
+     NOTE: the initial max/min values matter. It only modifies max/min if it finds values that is 
+     above/below those initial values.
+  */
+  void get_axis_range (double &max, double &min, const int axis) const;
+
+  /**
+     A utility function to obtain maximum & minimum of spacepoints' vertex along all axis.
+     NOTE: the initial max/min values matter. It only modifies max/min if it finds values that is
+     above/below those initial values.
+  */
+  void get_axis_range (double &xmax, double &xmin,
+		       double &ymax, double &ymin,
+		       double &zmax, double &zmin) const;  
+
+
 protected:
 
   /// track's ID
