@@ -17,7 +17,7 @@ standard_datascanner:
     fModName_DBCluster:      "dbscan"
     fModName_FuzzyCluster:   "fuzzy"
     fModName_HoughCluster:   "hough"
-    fModName_Bezier:         ""
+    fModName_Bezier:         "bezier"
     fModName_SpacePoint:     "spacepointfinder"
     fModName_Kalman3DSPS:    "trackkal"
 }
@@ -29,6 +29,9 @@ standard_datascanner:
 # Disable reading for such data products AND those not in the input file will speed up the process.
 # This is not necessary, but doing so will improve code performance a little bit.
 #
+# To disable reading of a product, manually set its module name to "" (I.E. uncomment the
+# appropriate line below)
+
 #standard_datascanner.fModName_MCTruth:        ""
 #standard_datascanner.fModName_FIFOChannel:    ""
 standard_datascanner.fModName_CalData:        ""
