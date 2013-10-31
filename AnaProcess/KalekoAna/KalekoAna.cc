@@ -3,13 +3,15 @@
 
 KalekoAna::KalekoAna(){
   //
-  // Constructor, clears histograms
+  // Constructor, clears histograms, clears tree
   //
 
   RecoTrackAngleHist = 0;
   MCTrackAngleHist = 0;
+  MCTrackBoxAngleHist = 0;
   NRecoTracksHist = 0;
-  
+  DataTree = 0;
+
 };
 
 
@@ -56,91 +58,236 @@ int KalekoAna::EventLoop(std::string filename, const int MCTheta, const int max_
     std::cerr << "I/O preparation failed!" << std::endl;
   }
 
-  //Set the plotting style (commented, doing this from run macro at the moment
-  //  UtilFunctions::set_style();
+  //Prepare the data tree
+  PrepareDataTree();
 
-  //Initialize the histograms with bins and such
-  InitializeHistograms(MCTheta, n_bins_histo);
-
-  //
-  // Let's loop over our events
-  //
-
-  int evt_counter = 0;
-  while(my_storage.next_event() && (evt_counter < max_evts || max_evts == -1)){
-
-    double mctheta_i = -1;
-
-    //MC stuff
-    event_mc* my_event_mc = (event_mc*)(my_storage.get_data(DATA::MCTruth));
-
-    if(!my_event_mc) continue;
-
-    else{
-
-      const std::vector<part_mc> my_part_mc(my_event_mc->GetParticleCollection());
-      
-      mctheta_i = my_part_mc.at(0).step_momentum().at(0).Theta();
-
-      //Fill MCTheta histo
-      MCTrackAngleHist->Fill(mctheta_i);
-
-    }
-
-    //Reco stuff
-    event_track* my_event_track = (event_track*)(my_storage.get_data(DATA::Kalman3DSPS));
-
-    if(!my_event_track) continue;
-
-    else{
-      
-      const std::vector<track> my_track(my_event_track->GetTrackCollection());
-      std::cout << Form("Found %zu tracks for event %d...",
-			my_track.size(),
-      			my_event_track->event_id())
-      		<< std::endl;
-      
-      //studying the # of reconstructed tracks per event
-      NRecoTracksHist->Fill((int)my_track.size());
-
-      for(size_t i=0; i<my_track.size(); i++){
-	
-	// Fill angular distribution histo
-	RecoTrackAngleHist->Fill(my_track.at(0).direction_at(0).Theta());
-
-      }
-    }
-
-
-    if( max_evts != -1 ) evt_counter++;
-
-  } // end loop over events
+  //Initialize a few variables
+  //  max_mydMCBoxTheta = min_mydMCBoxTheta = -1.;
+  max_mydRecoTrackAngle = min_mydRecoTrackAngle = -1.;
+  max_nRecoTracks = -1;
   
+  // Loop over our events  
+  int evt_counter = 0;
+  
+  while(my_storage.next_event() && (evt_counter < max_evts || max_evts == -1)){
+    
+    double track_xmin = 0, track_xmax = 0,
+      track_ymin = 0, track_ymax = 0,
+      track_zmin = 0, track_zmax = 0;
+    //one tracklength per reconstructed track
+    std::vector<double> crude_reco_tracklengths;
+    //length of mc track within reco box
+    std::vector<double> crude_MC_tracklengths;
+    
+    
+
+    //Reconstructed objects stuff
+    event_track* my_event_track = (event_track*)(my_storage.get_data(fDataType));
+    if(!my_event_track){
+      std::cout<<"DID NOT FIND SPECIFIED DATA PRODUCT!"<<std::endl;
+      break;
+    }
+    else{    
+            
+      //MC stuff
+      event_mc* my_event_mc = (event_mc*)(my_storage.get_data(DATA::MCTruth));
+      
+      //only loop over this event if mc object and track reco object exists
+      //note, it still enters loop even if the reco object is an empty vector
+      //(IE no tracks were reconstructed). This is good.
+      if(!my_event_track || !my_event_mc) continue;
+      
+      else{
+	
+	const std::vector<track> my_track(my_event_track->GetTrackCollection());
+	const std::vector<part_mc> my_part_mc(my_event_mc->GetParticleCollection());
+
+	//reset the vectors that are going into my tree
+	mydRecoTrackAngle.clear();
+	mydMCBoxTheta.clear();
+		
+	//initialize track lengths to zero before each track
+	crude_reco_tracklengths.clear();
+	crude_MC_tracklengths.clear();
+	
+	//finding max # of reconstructed tracks for histogram boundaries
+	if(max_nRecoTracks < (int)my_track.size()) max_nRecoTracks = (int)my_track.size();
+
+	//one of the DataTree variables
+	myMCTheta = (double)MCTheta;
+
+	//loop over all of the reconstructed tracks in the event
+	for(size_t i=0; i<my_track.size(); i++){
+	  
+	  //initial guess for ranges, will be altered by get_axis_range()
+	  track_xmin = track_xmax = my_track.at(i).vertex_at(0).X();
+	  track_ymin = track_ymax = my_track.at(i).vertex_at(0).Y();
+	  track_zmin = track_zmax = my_track.at(i).vertex_at(0).Z();
+	  //updates the track_xmin, etc variables to be true mins and maxes
+	  //(min and max for this reconstructed track)
+	  my_track.at(i).get_axis_range(track_xmax, track_xmin,
+					track_ymax, track_ymin,
+					track_zmax, track_zmin);
+	  
+	  
+	  double tmplength = 0;
+	  //for each track, loop over the reconstructed points in it
+	  for(size_t j=0; j < my_track.at(i).n_point()-1; j++){
+	    tmplength += 
+	      (my_track.at(i).vertex_at(j) - my_track.at(i).vertex_at(j+1)).Mag();
+	  }//end loop over points in individual track
+	  crude_reco_tracklengths.push_back(tmplength);
+	  
+
+	  //now loop over the mc points and calculate a MC tracklength that
+	  //is inside of this track's "box"
+	  //loop over each MC step the parent particle takes
+	  bool HaventFilledHistoYet = true;
+	  
+	  double dMCBoxTheta_i = -99.;
+	  
+	  tmplength = 0;
+	  for(size_t j=0; j < my_part_mc.at(0).step_vertex().size()-1; j++){
+	    TVector3 vtx_j = my_part_mc.at(0).step_vertex().at(j);	
+	    TVector3 vtx_jp1 = my_part_mc.at(0).step_vertex().at(j+1);
+	    
+	    //if the current vertex point is inside of the box
+	    if(vtx_j.X() > track_xmin && vtx_j.X() < track_xmax &&
+	       vtx_j.Y() > track_ymin && vtx_j.Y() < track_ymax &&
+	       vtx_j.Z() > track_zmin && vtx_j.Z() < track_zmax){
+	      
+	      tmplength += ( vtx_jp1 - vtx_j ).Mag();
+	      //only store the angle for the "first" point inside the box
+	      //(safe to assume I'm looping from start to finish?)
+	      if(HaventFilledHistoYet){
+		dMCBoxTheta_i = (vtx_jp1-vtx_j).Theta() * UtilFunctions().DegreesPerRadian - MCTheta;
+		mydMCBoxTheta.push_back(dMCBoxTheta_i);
+		HaventFilledHistoYet=false;
+	      }
+	      
+	    } //end if step vertex is inside of reconstructed track's box limits
+	  } // end looping over each step the parent particle takes
+	  crude_MC_tracklengths.push_back(tmplength);
+
+
+	  //do i want to plot difference from the muon-generated angle?
+	  //	  double dRecoTrackAngle_i = (my_track.at(i).direction_at(0).Theta()
+	  //				      * UtilFunctions().DegreesPerRadian ) - MCTheta;
+	    
+	  //or, difference from the angle of muon as it enters the reconstructed "box"?
+	  double dRecoTrackAngle_i = (my_track.at(i).direction_at(0).Theta()
+				      * UtilFunctions().DegreesPerRadian ) - (dMCBoxTheta_i+MCTheta);
+
+	  //one of the DataTree variables
+       	  mydRecoTrackAngle.push_back( dRecoTrackAngle_i );
+
+	  //check to see if I need to re-define max and min histogram range
+	  if(max_mydRecoTrackAngle == -1 || max_mydRecoTrackAngle < dRecoTrackAngle_i)
+	    max_mydRecoTrackAngle = dRecoTrackAngle_i;
+
+	  if(min_mydRecoTrackAngle == -1 || min_mydRecoTrackAngle > dRecoTrackAngle_i)
+	    min_mydRecoTrackAngle = dRecoTrackAngle_i;
+
+
+
+	}//end loop over each reconstructed track
+	
+      } // end else
+      
+      if( max_evts != -1 ) evt_counter++;
+      
+      /*      
+      std::cout<<Form("tracklengths: ");
+      for(size_t jason = 0; jason < crude_MC_tracklengths.size(); jason++)
+	std::cout<<Form("MC = %f, ",crude_MC_tracklengths[jason]);
+      for(size_t david = 0; david < crude_reco_tracklengths.size(); david++)
+	std::cout<<Form("reco = %f, ",crude_reco_tracklengths[david]);
+      std::cout<<std::endl;
+      */
+   
+      //Fill DataTree
+      DataTree->Fill();
+    }      
+      
+  } // end loop over events to make ttree
+
+
+  //Initialize the histograms with max/min bins from first event loop
+  InitializeHistograms(MCTheta, n_bins_histo);
+  
+  //Loop over DataTree and make histograms
+  LoopOverTree();
+
   my_storage.close();
+
   return 1;
-}
- 
+
+} //end EventLoop function
+
 void KalekoAna::InitializeHistograms(const int MCTheta, const int n_bins_histo){
+
   char hname[500];
   char htitle[500];
 
-  // Initialize RecoTrackAngleHist
+  // Initialize RecoTrackangleHist with range determined from first event loop
   sprintf(hname,"RecoTrackAngleHist_MCTheta%d",MCTheta);
-  sprintf(htitle,"Kalman3DSPS Single Muon Recon Track ThetaYZ: MCTheta = %d",MCTheta);
+  sprintf(htitle,"Muon Reco Track [ThetaYZ - MCTheta]: MCTheta = %d",MCTheta);
   RecoTrackAngleHist = new TH1D(hname,htitle,
-				n_bins_histo, 0, TMath::Pi());
-  //    RecoTrackAngleHist->Reset();
+				n_bins_histo, min_mydRecoTrackAngle, max_mydRecoTrackAngle);
+  
 
   // Initialize MCTrackAngleHist with same bins, etc  
   sprintf(hname,"MCTrackAngleHist_MCTheta%d",MCTheta);
-  sprintf(htitle,"MC Single Muon Track ThetaYZ: MCTheta = %d",MCTheta);
+  sprintf(htitle,"MC Muon Track ThetaYZ - MCTheta: MCTheta = %d",MCTheta);
   MCTrackAngleHist = new TH1D(hname,htitle,
-			      n_bins_histo, 0, TMath::Pi());
-  
+			      n_bins_histo, min_mydRecoTrackAngle, max_mydRecoTrackAngle);
+
+  // MCTrackBoxAngleHist (using initial MC angle from points inside of reconstructed track boundaries)
+  sprintf(hname,"MCTrackBoxAngleHist_MCTheta%d",MCTheta);
+  sprintf(htitle,"MC Muon Track ThetaYZ - MCTheta [inside Reco Track Limits]: MCTheta = %d",MCTheta);
+  MCTrackBoxAngleHist = new TH1D(hname,htitle,
+  				 n_bins_histo, min_mydRecoTrackAngle, max_mydRecoTrackAngle);
+
+
   // Initialize NRecoTracksHist
   sprintf(hname,"NRecoTracksHist_MCTheta%d",MCTheta);
-  sprintf(htitle,"Number Kalman3DSPS Reconstructed Tracks per Event: MCTheta = %d",MCTheta);
+  sprintf(htitle,"Number Reconstructed Tracks per Event: MCTheta = %d",MCTheta);
   NRecoTracksHist = new TH1D(hname,htitle,
-			     5,-0.5,4.5);
+			     max_nRecoTracks,-0.5,(double)max_nRecoTracks-0.5);
 
+}
+
+void KalekoAna::PrepareDataTree(){
+
+  DataTree = new TTree();
+  DataTree->Branch("myMCTheta", &myMCTheta, "myMCTheta/D");
+  DataTree->Branch("mydMCBoxTheta","std::vector<double>",&mydMCBoxTheta);
+  DataTree->Branch("mydRecoTrackAngle","std::vector<double>",&mydRecoTrackAngle);
+
+}
+
+void KalekoAna::LoopOverTree(){
+
+  //loop over data tree I created in the main event loop and make histograms from its contents
+  for(int ientry=0; ientry<DataTree->GetEntries(); ++ientry){
+
+    DataTree->GetEntry(ientry);
+  
+    NRecoTracksHist->Fill((int)mydRecoTrackAngle.size());
+    
+    for(std::vector<double>::iterator iter = mydRecoTrackAngle.begin();
+    	iter != mydRecoTrackAngle.end();
+    	++iter)
+      RecoTrackAngleHist->Fill(*iter);
+     
+    //filling this with zero... since I centered it at zero...
+    MCTrackAngleHist->Fill(myMCTheta - myMCTheta);
+ 
+    for(std::vector<double>::iterator iter = mydMCBoxTheta.begin();
+    	iter != mydMCBoxTheta.end();
+    	++iter)
+      MCTrackBoxAngleHist->Fill(*iter); 
+
+  }
+ 
 }
