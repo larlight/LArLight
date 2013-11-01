@@ -43,6 +43,7 @@ while my_proc.process_event():
     hMC   = my_ana.GetHisto_MC()
     hSPS  = my_ana.GetHisto_SPS()
     vReco = my_ana.GetHisto_Reco()
+    vData = my_ana.GetData_Reco()
 
     first_draw=True
 
@@ -60,7 +61,8 @@ while my_proc.process_event():
     print "Entry %d ... found %d spacepoints & %d reco-ed track" % (ctr,hSPS.GetEntries(),vReco.size())
 
     for x in xrange(vReco.size()):
-        print "Plotting track %d (hit return to move onto the next one)" % (x+1)
+        print "Plotting track %d " % vData[x].track_id()
+        print "Number of points: %d" % vData[x].n_point()
         vReco[x].Draw("BOX sames")
         c.Update()
 

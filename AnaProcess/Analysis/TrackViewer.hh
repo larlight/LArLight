@@ -63,6 +63,9 @@ public:
   /// Getter for Track histogram vector
   const std::vector<TH3D*>  GetHisto_Reco () const {return _hRecoTrack_v;};
 
+  /// Getter for track data object vector
+  const std::vector<track>  GetData_Reco  () const {return _track_v;};
+
 protected:
   /// Main canvas
   TCanvas* _c1;
@@ -74,6 +77,8 @@ protected:
   TH3D*    _hMCStep;
   /// Histogram array for Reconstructed tracks' trajectory points 
   std::vector<TH3D*> _hRecoTrack_v;
+  /// track data product vector
+  std::vector<track> _track_v;
 
 };
 

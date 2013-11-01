@@ -4,7 +4,7 @@
 #include "TrackViewer.hh"
 
 //################################################################
-TrackViewer::TrackViewer() : ana_base(), _hRecoTrack_v()
+TrackViewer::TrackViewer() : ana_base(), _hRecoTrack_v(), _track_v()
 //################################################################
 {
   // Class name
@@ -33,6 +33,7 @@ bool TrackViewer::analyze(storage_manager* storage)
   if(_hRecoSPS) {delete _hRecoSPS; _hRecoSPS = 0;};
   for(auto h : _hRecoTrack_v) {delete h; h=0;};
   _hRecoTrack_v.clear();
+  _track_v.clear();
 
   //
   // Obtain event-wise data object pointers
@@ -106,11 +107,15 @@ bool TrackViewer::analyze(storage_manager* storage)
 
 	h->Fill(vtx[2],vtx[0],vtx[1]);
 
+	_track_v.push_back(track(trk));
+
       }
 
       h->SetMarkerStyle(22);
       h->SetMarkerColor(kRed);
       _hRecoTrack_v.push_back(h);
+
+
 
     }
     
