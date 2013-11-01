@@ -15,7 +15,9 @@ void UtilFunctions::set_style(){
   gStyle->SetStatH(0.10);
   gStyle->SetOptFit(1);
   gStyle->SetOptDate(0);
-  gStyle->SetOptStat(111110);
+  //no name of hist, yes entries, mean, rms (right to left)
+  //add 111110 also includes overflow and underflow
+  gStyle->SetOptStat(1110);
 
   // Canvas
   gStyle->SetCanvasDefW(600);
@@ -40,9 +42,14 @@ void UtilFunctions::set_style(){
   gStyle->SetLabelSize(0.04,"xy");
   gStyle->SetLabelOffset(0.01,"xy");
   gStyle->SetTitleFont(22,"xyz");
-  gStyle->SetTitleSize(0.04,"xy");
-  gStyle->SetTitleOffset(1.2,"x");
-  gStyle->SetTitleOffset(1.5,"y");
+  gStyle->SetTitleSize(0.05,"xy");
+  //center the title
+  gStyle->SetTitleX(0.5);
+  gStyle->SetTitleAlign(23);
+
+  //note, to center axis titles you need to do hist.GetXaxis().CenterTitle()
+  //  gStyle->SetTitleOffset(1.2,"x");
+  //  gStyle->SetTitleOffset(1.5,"y");
   
   // Gradient Color
   const Int_t NRGBs = 5;
@@ -57,7 +64,7 @@ void UtilFunctions::set_style(){
 }
 
 
-TGraphAsymmErrors* UtilFunctions::GenWindowEfficiencyGraph(TH1D* myRecoTrackAngleHist, double efficiency_denominator, int center_bin, int max_window_binradius, double errorbar_CL){
+TGraphAsymmErrors* UtilFunctions::GenWindowEfficiencyGraph(TH1D* myRecoTrackAngleHist, double efficiency_denominator, int center_bin, double errorbar_CL){
 
   TGraphAsymmErrors *WindowEfficiencyGraph = new TGraphAsymmErrors();
   char graph_name[500];
@@ -68,21 +75,21 @@ TGraphAsymmErrors* UtilFunctions::GenWindowEfficiencyGraph(TH1D* myRecoTrackAngl
   TEfficiency *pEff = new TEfficiency();
   pEff->SetStatisticOption(TEfficiency::kFFC);
 
-  double radians_per_bin = myRecoTrackAngleHist->GetBinWidth(center_bin);
+  double degrees_per_bin = myRecoTrackAngleHist->GetBinWidth(center_bin);
 
   double window_integral, window_efficiency, upperlimit, lowerlimit = -1;
   
   int pt_ctr = 0;
-  for (int window_width = max_window_binradius;
-       window_width > 0;
-       --window_width){
+  bool ReachedMaxWindowSize = false;
+  int window_width = 1;
+  while(!ReachedMaxWindowSize){
 
     window_integral = myRecoTrackAngleHist->
       Integral(center_bin-window_width,
 	       center_bin+window_width);
     
     window_efficiency = (double)window_integral/(double)efficiency_denominator;
-    
+   
     lowerlimit = pEff->FeldmanCousins(efficiency_denominator,
 				      window_integral,
 				      errorbar_CL,
@@ -93,7 +100,7 @@ TGraphAsymmErrors* UtilFunctions::GenWindowEfficiencyGraph(TH1D* myRecoTrackAngl
 				      true);
     WindowEfficiencyGraph->
       SetPoint(pt_ctr, 
-	       (double)window_width*radians_per_bin,
+	       (double)window_width*degrees_per_bin,
 	       window_efficiency);   
 
     WindowEfficiencyGraph->
@@ -103,9 +110,15 @@ TGraphAsymmErrors* UtilFunctions::GenWindowEfficiencyGraph(TH1D* myRecoTrackAngl
 		    window_efficiency-lowerlimit,
 		    upperlimit-window_efficiency);
 
-    //    std::cout<< Form("window_width = %f radians, efficiency = %f, with uncertainties (upper,lower)=(%f,%f)",(double)window_width*radians_per_bin,window_efficiency,upperlimit,lowerlimit)<<std::endl;
+    //    std::cout<< Form("window_width = %f radians, efficiency = %f, with uncertainties (upper,lower)=(%f,%f)",(double)window_width*degrees_per_bin,window_efficiency,upperlimit,lowerlimit)<<std::endl;
 
+
+    //make the window one bin wider
+    window_width += 1;
     pt_ctr++;
+    std::cout<<"GenWindow: efficiency = "<<window_efficiency<<", ptr counter now = "<<pt_ctr<<"and myRecoTrackAngleHist.GetEntries() = "<<myRecoTrackAngleHist->GetEntries()<<std::endl;
+
+    if(window_efficiency > 0.90 || pt_ctr > myRecoTrackAngleHist->GetEntries() ) ReachedMaxWindowSize = true;
   }
 
   return WindowEfficiencyGraph;

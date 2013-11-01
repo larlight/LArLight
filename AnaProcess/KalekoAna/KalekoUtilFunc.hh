@@ -48,7 +48,12 @@ public:
   static void set_style();
 
   /// Function to generate window efficiency histograms
-  TGraphAsymmErrors* GenWindowEfficiencyGraph(TH1D* input_histo, double efficiency_denominator, int center_bin, int max_window_binradius, double errorbar_CL);
+  TGraphAsymmErrors* GenWindowEfficiencyGraph(TH1D* input_histo, double efficiency_denominator, int center_bin, double errorbar_CL);
+
+
+  /// Some utility constants
+  double DegreesPerRadian = 57.2957795;
+  double RadiansPerDegree = 0.01745329;
 
 };
 
