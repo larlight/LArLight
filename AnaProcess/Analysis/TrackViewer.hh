@@ -54,8 +54,14 @@ public:
 		       double ymin, double ymax,
 		       double zmin, double zmax);
 
-  /// A method to draw currently created histograms (which are made by analyze() function)
-  void DrawCanvas();
+  /// Getter for spacepoint histogram
+  const TH3D* GetHisto_SPS  () const {return _hRecoSPS;};
+
+  /// Getter for MC points
+  const TH3D* GetHisto_MC   () const {return _hMCStep;};
+
+  /// Getter for Track histogram vector
+  const std::vector<TH3D*>  GetHisto_Reco () const {return _hRecoTrack_v;};
 
 protected:
   /// Main canvas

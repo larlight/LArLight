@@ -13,6 +13,7 @@
 #pragma link C++ class std::vector<ana_base*>+;
 #pragma link C++ class ana_processor+;
 #pragma link C++ class TrackViewer+;
+#pragma link C++ class std::vector<TH3D*>+;
 //ADD_NEW_CLASS ... do not change this line
 #endif
 
