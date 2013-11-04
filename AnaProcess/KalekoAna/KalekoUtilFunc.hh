@@ -32,14 +32,18 @@
 #include <TGraphAsymmErrors.h>
 #include <TH1.h>
 #include <TEfficiency.h>
-
+#include <TVector3.h>
 
 class UtilFunctions {
 
 public:
 
   /// The usual constructor
-  UtilFunctions(){};
+  UtilFunctions(){
+    /// Some utility constants
+    DegreesPerRadian=57.2957795;
+    RadiansPerDegree=0.01745329;
+  };
   
   /// The usual destructor
   ~UtilFunctions(){};
@@ -50,10 +54,16 @@ public:
   /// Function to generate window efficiency histograms
   TGraphAsymmErrors* GenWindowEfficiencyGraph(TH1D* input_histo, double efficiency_denominator, int center_bin, double errorbar_CL);
 
+  /// Function to check whether a point is inside of the detector volume
+  bool IsInDetectorVolume(TVector3 xyzpoint);
 
-  /// Some utility constants
-  double DegreesPerRadian = 57.2957795;
-  double RadiansPerDegree = 0.01745329;
+  /// Function to turn a vector of pairs into a TGraph, each pair is (x,y)
+  TGraph* MakeGraphFromVectorOfPairs(std::vector< std::pair<double,double> > &myvecofpairs, TGraph* mygraph);
+
+  /// Some utility constants, initialized in constructor
+  double DegreesPerRadian;
+  double RadiansPerDegree;
+
 
 };
 

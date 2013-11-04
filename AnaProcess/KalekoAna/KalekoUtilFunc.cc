@@ -116,15 +116,40 @@ TGraphAsymmErrors* UtilFunctions::GenWindowEfficiencyGraph(TH1D* myRecoTrackAngl
     //make the window one bin wider
     window_width += 1;
     pt_ctr++;
-    std::cout<<"GenWindow: efficiency = "<<window_efficiency<<", ptr counter now = "<<pt_ctr<<"and myRecoTrackAngleHist.GetEntries() = "<<myRecoTrackAngleHist->GetEntries()<<std::endl;
+    //    std::cout<<"GenWindow: efficiency = "<<window_efficiency<<", ptr counter now = "<<pt_ctr<<"and myRecoTrackAngleHist.GetEntries() = "<<myRecoTrackAngleHist->GetEntries()<<std::endl;
 
-    if(window_efficiency > 0.90 || pt_ctr > myRecoTrackAngleHist->GetEntries() ) ReachedMaxWindowSize = true;
+    if(window_efficiency > 0.99 || pt_ctr > myRecoTrackAngleHist->GetNbinsX() ) ReachedMaxWindowSize = true;
   }
 
   return WindowEfficiencyGraph;
  
 }
 
+bool UtilFunctions::IsInDetectorVolume(TVector3 xyzpoint){
+  //tpc is x = 0 to 260, y = 0 to 256, z = 0 to 1200
+  double det_xmin = 0;  double det_xmax = 260;
+  double det_ymin = -128;  double det_ymax = 128;
+  double det_zmin = 0;  double det_zmax = 1200;
 
+  if ( xyzpoint.X() > det_xmin && xyzpoint.X() < det_xmax &&
+       xyzpoint.Y() > det_ymin && xyzpoint.Y() < det_ymax &&
+       xyzpoint.Z() > det_zmin && xyzpoint.Z() < det_zmax   )
+    return true;
+  else
+    return false;
 
+}
+
+TGraph* UtilFunctions::MakeGraphFromVectorOfPairs(std::vector<std::pair<double,double>> &myvecofpairs, TGraph* mygraph){
+
+  int counter = 0;
+  for(std::vector<std::pair<double,double>>::iterator iter = myvecofpairs.begin();
+      iter != myvecofpairs.end();
+      ++iter){
+    mygraph->SetPoint(counter,iter->first,iter->second);
+    counter++;
+  }
+
+  return mygraph;
+}
 #endif

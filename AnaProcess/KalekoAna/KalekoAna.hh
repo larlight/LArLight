@@ -56,7 +56,6 @@ public:
   TH1D* GetMCTrackAngleHist()           {return MCTrackAngleHist;}
   TH1D* GetMCTrackBoxAngleHist()        {return MCTrackBoxAngleHist;}
   TH1D* GetNRecoTracksHist()            {return NRecoTracksHist;}
-
   TTree* GetDataTree()                  {return DataTree;}
 
 private:
@@ -82,7 +81,7 @@ private:
  
   /// Number reconstructed tracks per event histogram
   TH1D *NRecoTracksHist;
-  
+
   /// TTree that I fill in the first event loop, then I'll draw histos w/ TTree::Draw (fastest)
   TTree *DataTree;
 
@@ -95,6 +94,10 @@ private:
   /// The first-step thetaYZ for the reconstructed track
   /// vector because there can be multiple reconstructed tracks in one event
   std::vector<double> mydRecoTrackAngle;
+
+
+  /// for each muon, pair of (Energy,dE/dx)
+  std::vector< std::pair<double,double> > E_dEdx_pair;
 
   ///max and min difference in angles b/t reco and MC, over ALL tracks in all events
   ///to be used to set range of histograms
