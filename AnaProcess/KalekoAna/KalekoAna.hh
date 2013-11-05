@@ -104,6 +104,7 @@ private:
   //  double max_mydMCBoxTheta,     min_mydMCBoxTheta;
   double max_mydRecoTrackAngle, min_mydRecoTrackAngle;
   int max_nRecoTracks;
+  int nRecoTracks;
 
 };
 
