@@ -76,6 +76,7 @@ int KalekoAna::EventLoop(std::string filename, const int MCTheta, const int max_
   
   while(my_storage.next_event() && (evt_counter < max_evts || max_evts == -1)){
     
+    if(evt_counter%100==0) std::cout<<"Event counter = "<<evt_counter<<std::endl;
     
     double track_xmin = 0, track_xmax = 0,
       track_ymin = 0, track_ymax = 0,
