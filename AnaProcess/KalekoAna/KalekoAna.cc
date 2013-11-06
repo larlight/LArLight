@@ -65,10 +65,12 @@ int KalekoAna::EventLoop(std::string filename, const int MCTheta, const int max_
   //  max_mydMCBoxTheta = min_mydMCBoxTheta = -1.;
   max_mydRecoTrackAngle = min_mydRecoTrackAngle = -1.;
   max_nRecoTracks = -1;
-
   nRecoTracks = -1;
-
-
+  double track_xmin = 0, track_xmax = 0,
+    track_ymin = 0, track_ymax = 0,
+    track_zmin = 0, track_zmax = 0;
+  
+  //count how many times there are no MC points inside of a reconstructed "box"
   int badboxcounter = 0;
 
   // Loop over our events  
@@ -77,16 +79,20 @@ int KalekoAna::EventLoop(std::string filename, const int MCTheta, const int max_
   while(my_storage.next_event() && (evt_counter < max_evts || max_evts == -1)){
     
     if(evt_counter%100==0) std::cout<<"Event counter = "<<evt_counter<<std::endl;
+    //std::cout<<"Event counter = "<<evt_counter<<std::endl;
     
-    double track_xmin = 0, track_xmax = 0,
-      track_ymin = 0, track_ymax = 0,
-      track_zmin = 0, track_zmax = 0;
-    //one tracklength per reconstructed track
-    std::vector<double> crude_reco_tracklengths;
-    //length of mc track (not just within reco box)
-    std::vector<double> crude_MC_tracklengths;
+
+    //reset the vectors that are going into my tree
+    mydRecoTrackAngle.clear();
+    myRecoTrackAngle.clear();
+    myAverageRecoTrackAngle.clear();
+    mydMCBoxTheta.clear();
+    E_dEdx_pair.clear();
     
-    
+    //initialize track lengths to zero before each track
+    crude_reco_tracklengths.clear();
+    crude_MC_tracklengths.clear();
+    straightline_reco_tracklengths.clear();
     
     //Reconstructed objects stuff ... fDataType doesn't work now, idfk why... think it's a problem w/ root on my laptop
     //    event_track* my_event_track = (event_track*)(my_storage.get_data(fDataType));
@@ -98,11 +104,10 @@ int KalekoAna::EventLoop(std::string filename, const int MCTheta, const int max_
     }
     
     else{    
-      //      std::cout<<"evt = "<<my_event_track->event_id()<<std::endl;            
       //MC stuff
       event_mc* my_event_mc = (event_mc*)(my_storage.get_data(DATA::MCTruth));
       
-      //only loop over this event if mc object and track reco object exists
+      //only loop over this event if mc object AND track reco object exists
       //note, it still enters loop even if the reco object is an empty vector
       //(IE no tracks were reconstructed). This is good.
       if(!my_event_track || !my_event_mc) continue;
@@ -111,19 +116,11 @@ int KalekoAna::EventLoop(std::string filename, const int MCTheta, const int max_
 	
 	const std::vector<track> my_track(my_event_track->GetTrackCollection());
 	const std::vector<part_mc> my_part_mc(my_event_mc->GetParticleCollection());
-	
-	//reset the vectors that are going into my tree
-	mydRecoTrackAngle.clear();
-	mydMCBoxTheta.clear();
-	E_dEdx_pair.clear();
-	
-	//initialize track lengths to zero before each track
-	crude_reco_tracklengths.clear();
-	crude_MC_tracklengths.clear();
-	
-	//finding max # of reconstructed tracks for histogram boundaries
+		
+	//finding max # of reconstructed tracks (over all events) for histogram boundaries
 	if(max_nRecoTracks < (int)my_track.size()) max_nRecoTracks = (int)my_track.size();
-	//one of the DataTree variables
+
+	//some of the DataTree variables
 	myMCTheta = (double)MCTheta;
 	nRecoTracks = (int)my_track.size();
 
@@ -140,7 +137,6 @@ int KalekoAna::EventLoop(std::string filename, const int MCTheta, const int max_
 					track_ymax, track_ymin,
 					track_zmax, track_zmin);
 	  
-	  
 	  //	  std::cout<<"in this track there were "<<my_track.at(i).n_point()<<" reco points, and "<<my_part_mc.at(0).step_vertex().size()<<" MC points."<<std::endl;	  
 	  
 	  double tmplength = 0;
@@ -154,9 +150,12 @@ int KalekoAna::EventLoop(std::string filename, const int MCTheta, const int max_
 	      (my_track.at(i).vertex_at(j) - my_track.at(i).vertex_at(j+1)).Mag();
 	  }//end loop over points in individual track
 	  crude_reco_tracklengths.push_back(tmplength);
-	  
-	  
-	  //now loop over the mc points and calculate a MC tracklength
+	  double straightline_reco_tkln = (my_track.at(i).vertex_at(0)-
+					   my_track.at(i).vertex_at(my_track.at(i).n_point()-1)).Mag();
+	  straightline_reco_tracklengths.push_back( straightline_reco_tkln );
+	  //	  std::cout<<"straight line reco track length = "<< straightline_reco_tkln << std::endl;
+	  //	  std::cout<<"crude reco track length = "<< tmplength << std::endl;
+	  //now loop over the MC points and calculate a MC tracklength
 	  //loop over each MC step the parent particle takes
 	  bool HaventFilledHistoYet = true;
 	  
@@ -176,10 +175,9 @@ int KalekoAna::EventLoop(std::string filename, const int MCTheta, const int max_
 	    TVector3 mom_jp1 = my_part_mc.at(0).step_momentum().at(j+1);
 	    
 	    //only add to MC tracklength, calculate dedx, etc
-	    //only if muon is within the world volume
-	    if(UtilFunctions().IsInDetectorVolume(vtx_j)){
+	    //only if both points j and j+1 of muon are within the detector volume
+	    if( UtilFunctions().IsInDetectorVolume(vtx_j) && UtilFunctions().IsInDetectorVolume(vtx_jp1) ){
 	      tmplength += ( vtx_jp1 - vtx_j ).Mag();
-	      
 	      
 	      //	    std::cout<<Form("MC Point: (%f,%f,%f)\n",vtx_j.X(),vtx_j.Y(),vtx_j.Z());
 	      //	    std::cout<<Form("MC momentum: (%f,%f,%f)\n",mom_j.X(),mom_j.Y(),mom_j.Z());
@@ -206,21 +204,26 @@ int KalekoAna::EventLoop(std::string filename, const int MCTheta, const int max_
 	      } //end if step vertex is inside of reconstructed track's box limits
 	    }//end requirement of muon being inside the detector volume
 	  } // end looping over each step the parent particle takes
-	  
-	  
-	  
 	  crude_MC_tracklengths.push_back(tmplength);
-	  
-	  
+	  //	  std::cout<<"meanwhile, MC tracklength is calculated as "<<tmplength<<std::endl;
+
 	  //do i want to plot difference from the muon-generated angle?
-	  //	  double dRecoTrackAngle_i = (my_track.at(i).direction_at(0).Theta()
+	  //double dRecoTrackAngle_i = (my_track.at(i).direction_at(0).Theta()
 	  //* UtilFunctions().DegreesPerRadian ) - MCTheta;
 	  
 	  //or, difference from the angle of muon as it enters the reconstructed "box"?
 	  double dRecoTrackAngle_i = (my_track.at(i).direction_at(0).Theta()
 				      * UtilFunctions().DegreesPerRadian ) - (dMCBoxTheta_i+MCTheta);
-	  
-	  //one of the DataTree variables
+	  myRecoTrackAngle.push_back(my_track.at(i).direction_at(0).Theta() * UtilFunctions().DegreesPerRadian);
+
+	  //temp: calculate average reco track angle and push it back
+	  double avgang=0;
+	  for(size_t j=0; j<my_track.at(i).n_point()-1; j++)
+	    avgang+=my_track.at(i).direction_at(j).Theta();
+	  avgang/=(my_track.at(i).n_point()-1);
+	  myAverageRecoTrackAngle.push_back(avgang*UtilFunctions().DegreesPerRadian);
+
+
 	  //if there are no MC points inside of the reconstructed box, then
 	  //dRecoTrackAngle_i is something like 9999 (it's initialized value)
 	  //for now, only push_back if dRecoTrackAngle_i is within [-180,180]
@@ -237,7 +240,7 @@ int KalekoAna::EventLoop(std::string filename, const int MCTheta, const int max_
 	      max_mydRecoTrackAngle = dRecoTrackAngle_i;
 	    
 	    if(min_mydRecoTrackAngle == -1 || min_mydRecoTrackAngle > dRecoTrackAngle_i)
-	    min_mydRecoTrackAngle = dRecoTrackAngle_i;
+	      min_mydRecoTrackAngle = dRecoTrackAngle_i;
 	  
 	  }//end if dRecoTrackAngle is reasonable, between -180 and 180
 	  else
@@ -326,6 +329,11 @@ void KalekoAna::PrepareDataTree(){
   DataTree->Branch("myMCTheta", &myMCTheta, "myMCTheta/D");
   DataTree->Branch("mydMCBoxTheta","std::vector<double>",&mydMCBoxTheta);
   DataTree->Branch("mydRecoTrackAngle","std::vector<double>",&mydRecoTrackAngle);
+  DataTree->Branch("myRecoTrackAngle","std::vector<double>",&myRecoTrackAngle);
+  DataTree->Branch("myAverageRecoTrackAngle","std::vector<double>",&myAverageRecoTrackAngle);
+  DataTree->Branch("crude_reco_tracklengths","std::vector<double>",&crude_reco_tracklengths);
+  DataTree->Branch("crude_MC_tracklengths","std::vector<double>",&crude_MC_tracklengths);
+  DataTree->Branch("straightline_reco_tracklengths","std::vector<double>",&straightline_reco_tracklengths);
   DataTree->Branch("E_dEdx_pair","std::vector<std::pair<double,double>>",&E_dEdx_pair);
 
 }

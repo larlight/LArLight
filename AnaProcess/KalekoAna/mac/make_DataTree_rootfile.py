@@ -6,18 +6,27 @@ gSystem.Load("libKalekoAna")
 
 reco_type = "Kalman3DSPS" # "Bezier" or "Kalman3DSPS"
 
-max_evts = -1
+max_evts = 3000
 
-in_path = os.environ.get('MAKE_TOP_DIR')+"/kaleko_input_files_LArLight/"
-in_fname = [ "v3_ang0_dsout_reduced_%s.root" % reco_type,
-             "v3_ang30_dsout_reduced_%s.root" % reco_type,
-             "v3_ang45_dsout_reduced_%s.root" % reco_type,
-             "v3_ang60_dsout_reduced_%s.root" % reco_type,
-             "v3_ang90_dsout_reduced_%s.root" % reco_type]
+#in_path = os.environ.get('MAKE_TOP_DIR')+"/kaleko_input_files_LArLight/"
+in_path = "/a/data/morningside/kaleko"+"/kaleko_input_files_LArLight/"
+
+in_fname = [ "v4_ang0_dsout_reduced_%s.root" % reco_type,
+             "v4_ang10_dsout_reduced_%s.root" % reco_type,
+             "v4_ang20_dsout_reduced_%s.root" % reco_type,
+             "v4_ang30_dsout_reduced_%s.root" % reco_type,
+             "v4_ang40_dsout_reduced_%s.root" % reco_type,
+             "v4_ang50_dsout_reduced_%s.root" % reco_type,
+             "v4_ang60_dsout_reduced_%s.root" % reco_type,
+             "v4_ang70_dsout_reduced_%s.root" % reco_type,
+             "v4_ang80_dsout_reduced_%s.root" % reco_type,
+             "v4_ang90_dsout_reduced_%s.root" % reco_type ]
+
 out_dir = os.environ.get('MAKE_TOP_DIR')+\
-          "/AnaProcess/KalekoAna/mac/output_datatree/v3"
+          "/AnaProcess/KalekoAna/mac/output_datatree/v4"
 
-in_angles = [ 0, 30, 45, 60, 90 ]
+in_angles = [ 0, 10, 20, 30, 40, 50, 60, 70, 80, 90 ]
+
 n_bins_histo = 100
 
 
@@ -36,9 +45,9 @@ for x in xrange(len(in_fname)):
     
     t = mykal.GetDataTree()
     t.SetName("tree")
-    f = TFile("%s/DataTree_v3_ang%s.root" % (out_dir,in_angles[x]),"RECREATE")
+    f = TFile("%s/DataTree_v4_ang%s.root" % (out_dir,in_angles[x]),"RECREATE")
     t.Write()
     f.Close()
 
-print 'Hit enter to exit.'
-sys.stdin.readline()
+#print 'Hit enter to exit.'
+#sys.stdin.readline()

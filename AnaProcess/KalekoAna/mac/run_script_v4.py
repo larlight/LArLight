@@ -9,30 +9,36 @@ gSystem.Load("libKalekoAna")
 
 reco_type = "Kalman3DSPS" # "Bezier" or "Kalman3DSPS"
 
-max_evts = 1000
+max_evts = 3000
 n_bins_histo = 100
 
 
 #in_path = os.environ.get('MAKE_TOP_DIR')+"/kaleko_input_files_LArLight/"
 in_path = "/a/data/morningside/kaleko"+"/kaleko_input_files_LArLight/"
-in_fname = [ "v3_ang0_dsout_reduced_%s.root" % reco_type,
-             "v3_ang30_dsout_reduced_%s.root" % reco_type,
-             "v3_ang45_dsout_reduced_%s.root" % reco_type,
-             "v3_ang60_dsout_reduced_%s.root" % reco_type,
-             "v3_ang90_dsout_reduced_%s.root" % reco_type ]
+#in_fname = [ "v4_ang0_dsout_reduced_%s.root" % reco_type,
+#             "v4_ang10_dsout_reduced_%s.root" % reco_type,
+#             "v4_ang20_dsout_reduced_%s.root" % reco_type,
+#             "v4_ang30_dsout_reduced_%s.root" % reco_type,
+#             "v4_ang40_dsout_reduced_%s.root" % reco_type,
+#             "v4_ang50_dsout_reduced_%s.root" % reco_type,
+#             "v4_ang60_dsout_reduced_%s.root" % reco_type,
+#             "v4_ang70_dsout_reduced_%s.root" % reco_type,
+#             "v4_ang80_dsout_reduced_%s.root" % reco_type,
+#             "v4_ang90_dsout_reduced_%s.root" % reco_type ]
+in_fname = [ "v4_ang60_dsout_reduced_Kalman3DSPS.root" ]
 
 out_dir = os.environ.get('MAKE_TOP_DIR')+\
-          "/AnaProcess/KalekoAna/mac/output_plots/v3_%s" % reco_type
+          "/AnaProcess/KalekoAna/mac/output_plots/v4_%s" % reco_type
 
-in_angles = [ 0, 30, 45, 60, 90 ]
-
+#in_angles = [ 0, 10, 20, 30, 40, 50, 60, 70, 80, 90 ]
+in_angles = [ 60 ]
 
 recohist_array = []; mchist_array = []; graph_array = []; nreco_array = []
 
 
 def plot_shit():
     
-    f = TFile("%s/histos_v3_%s.root" % (out_dir,reco_type),"RECREATE")
+    f = TFile("%s/histos_v4_%s.root" % (out_dir,reco_type),"RECREATE")
 
     canvas = TCanvas("canvas","My canvas!",100,250,1000,400)
     canvas.Divide(2)
