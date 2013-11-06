@@ -93,8 +93,24 @@ private:
   std::vector<double> mydMCBoxTheta;
   /// The first-step thetaYZ for the reconstructed track
   /// vector because there can be multiple reconstructed tracks in one event
+  /// MINUS the MC track angle (d stands for difference)
   std::vector<double> mydRecoTrackAngle;
 
+  ///The actual reco track angle, just adding to tree for debugging
+  std::vector<double> myRecoTrackAngle;
+  
+  std::vector<double> myAverageRecoTrackAngle;
+
+
+  ///length of the reco track, adding together distances b/t consecutive points
+  std::vector<double> crude_reco_tracklengths;
+  
+  ///length of the MC track portion inside the detector, adding dist b/t consec points
+  ///doesn't have to be a vector, each element is the same length
+  std::vector<double> crude_MC_tracklengths;
+
+  /// track length estimate based on dist b/t first and last reconstructed point
+  std::vector<double> straightline_reco_tracklengths;
 
   /// for each muon, pair of (Energy,dE/dx)
   std::vector< std::pair<double,double> > E_dEdx_pair;
