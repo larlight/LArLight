@@ -43,10 +43,10 @@ public :
 
     return _me;
 
-  }
+  };
 
   /// Retrieve a specified connection
-  const ProcessDBI* GetConnection(size_t key) const ;
+  ProcessDBI* GetConnection(size_t key) const;
 
   /// Open (if not) & retrieve DBI connection instance
   size_t OpenConnection(std::string host,unsigned int port=0,std::string db="",std::string user="",std::string passwd="");

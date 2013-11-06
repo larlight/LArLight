@@ -4,6 +4,11 @@
 
 ProcessDBIManager* ProcessDBIManager::_me = 0;
 
+ProcessDBI* ProcessDBIManager::GetConnection(size_t key) const
+{
+  return ( key < _conn_v.size() ? _conn_v.at(key) : 0 );
+}
+
 /// Open (if not) & retrieve DBI connection instance
 size_t ProcessDBIManager::OpenConnection(std::string host,
 					 unsigned int port,

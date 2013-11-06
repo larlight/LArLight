@@ -169,7 +169,7 @@ size_t ProcessDBI::Query(std::string cmd)
   return (size_t)(_res_v.size()-1);
 }
 
-const TSQLStatement* ProcessDBI::FetchRow(size_t index)
+TSQLStatement* ProcessDBI::FetchRow(size_t index)
 {
 
   if(!IsValidResult(index)) return 0;
@@ -184,7 +184,7 @@ const TSQLStatement* ProcessDBI::FetchRow(size_t index)
 
 }
 
-const TSQLStatement* ProcessDBI::GetRow(size_t index) const
+TSQLStatement* ProcessDBI::GetRow(size_t index) const
 {
   
   if(!IsValidResult(index)) return 0;
