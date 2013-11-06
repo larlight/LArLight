@@ -9,7 +9,7 @@ gSystem.Load("libKalekoAna")
 
 reco_type = "Kalman3DSPS" # "Bezier" or "Kalman3DSPS"
 
-max_evts = 100
+max_evts = 1000
 n_bins_histo = 100
 
 
@@ -18,11 +18,13 @@ in_fname = [ "v3_ang0_dsout_reduced_%s.root" % reco_type,
              "v3_ang30_dsout_reduced_%s.root" % reco_type,
              "v3_ang45_dsout_reduced_%s.root" % reco_type,
              "v3_ang60_dsout_reduced_%s.root" % reco_type,
-             "v3_ang90_dsout_reduced_%s.root" % reco_type]
+             "v3_ang90_dsout_reduced_%s.root" % reco_type ]
+
 out_dir = os.environ.get('MAKE_TOP_DIR')+\
           "/AnaProcess/KalekoAna/mac/output_plots/v3_%s" % reco_type
 
 in_angles = [ 0, 30, 45, 60, 90 ]
+
 
 recohist_array = []; mchist_array = []; graph_array = []; nreco_array = []
 
@@ -121,13 +123,13 @@ def main():
 
     mykal=KalekoAna()
     
-    if reco_type == "Kalman3DSPS":
-        mykal.set_data_type(DATA.Kalman3DSPS)
-    elif reco_type == "Bezier":
-        mykal.set_data_type(DATA.Bezier)
-    else:
-        print "You fucked something up! Pick Kalman3DSPS or Bezier data type!"
-        return
+#    if reco_type == "Kalman3DSPS":
+#        mykal.set_data_type(DATA.Kalman3DSPS)
+#    elif reco_type == "Bezier":
+#        mykal.set_data_type(DATA.Bezier)
+#    else:
+#        print "You fucked something up! Pick Kalman3DSPS or Bezier data type!"
+#        return
 
     for x in xrange(len(in_fname)):
 

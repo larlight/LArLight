@@ -16,62 +16,67 @@ KalekoAna::KalekoAna(){
 
 
 int KalekoAna::EventLoop(std::string filename, const int MCTheta, const int max_evts, const int n_bins_histo){
-
+  
   //
   // A simple routine to read a data file and perform an event loop.
   // This is a test routine for storage_manager class which interacts
   // decoder output root file. 
   //
-
+  
   storage_manager my_storage;
-
+  
   // If you wish, change the message level to DEBUG.
- 
+  
   my_storage.set_verbosity(MSG::DEBUG);
   
   // Step 0: Set I/O mode: we are reading in, so "READ"
   my_storage.set_io_mode(storage_manager::READ);
-
+  
   // Step 0.5: Specify data type to readout 
   // this is actually redundant, all set to "true" by default, 
   // better to set ones you don't want to false
   // DATA:: types found in $MAKE_TOP_DIR/AnaProcess/Base/constants.hh
   //  my_storage.set_data_to_read(DATA::Kalman3DSPS);
-
+  
   // Step 1: Add input file from user input
   my_storage.add_in_filename(filename);
-
+  
   // Step 1.5 make sure you're looking in the "scanner" directory
   my_storage.set_in_rootdir("scanner");
-
+  
   // Step 2: Open a file.
   my_storage.open();
-
+  
   // Step 3: Check if a file is opened.
   if(!my_storage.is_open()) {
     std::cerr << "File open failed!" << std::endl;
     return 0;
   }
-
+  
   // Step 4: Check if it's ready to perform I/O
   if(!my_storage.is_ready_io()) {
     std::cerr << "I/O preparation failed!" << std::endl;
   }
-
+  
   //Prepare the data tree
   PrepareDataTree();
-
+  
   //Initialize a few variables
   //  max_mydMCBoxTheta = min_mydMCBoxTheta = -1.;
   max_mydRecoTrackAngle = min_mydRecoTrackAngle = -1.;
   max_nRecoTracks = -1;
-  
+
+  nRecoTracks = -1;
+
+
+  int badboxcounter = 0;
+
   // Loop over our events  
   int evt_counter = 0;
   
   while(my_storage.next_event() && (evt_counter < max_evts || max_evts == -1)){
-
-
+    
+    
     double track_xmin = 0, track_xmax = 0,
       track_ymin = 0, track_ymax = 0,
       track_zmin = 0, track_zmax = 0;
@@ -81,18 +86,18 @@ int KalekoAna::EventLoop(std::string filename, const int MCTheta, const int max_
     std::vector<double> crude_MC_tracklengths;
     
     
-
-    //Reconstructed objects stuff ... fDataType doesn't work now, idfk why
+    
+    //Reconstructed objects stuff ... fDataType doesn't work now, idfk why... think it's a problem w/ root on my laptop
     //    event_track* my_event_track = (event_track*)(my_storage.get_data(fDataType));
     event_track* my_event_track = (event_track*)(my_storage.get_data(DATA::Kalman3DSPS));
-
+    
     if(!my_event_track){
       std::cout<<"DID NOT FIND SPECIFIED DATA PRODUCT!"<<std::endl;
       break;
     }
-
+    
     else{    
-      std::cout<<"evt = "<<my_event_track->event_id()<<std::endl;            
+      //      std::cout<<"evt = "<<my_event_track->event_id()<<std::endl;            
       //MC stuff
       event_mc* my_event_mc = (event_mc*)(my_storage.get_data(DATA::MCTruth));
       
@@ -105,12 +110,12 @@ int KalekoAna::EventLoop(std::string filename, const int MCTheta, const int max_
 	
 	const std::vector<track> my_track(my_event_track->GetTrackCollection());
 	const std::vector<part_mc> my_part_mc(my_event_mc->GetParticleCollection());
-
+	
 	//reset the vectors that are going into my tree
 	mydRecoTrackAngle.clear();
 	mydMCBoxTheta.clear();
 	E_dEdx_pair.clear();
-
+	
 	//initialize track lengths to zero before each track
 	crude_reco_tracklengths.clear();
 	crude_MC_tracklengths.clear();
@@ -119,6 +124,7 @@ int KalekoAna::EventLoop(std::string filename, const int MCTheta, const int max_
 	if(max_nRecoTracks < (int)my_track.size()) max_nRecoTracks = (int)my_track.size();
 	//one of the DataTree variables
 	myMCTheta = (double)MCTheta;
+	nRecoTracks = (int)my_track.size();
 
 	//loop over all of the reconstructed tracks in the event
 	for(size_t i=0; i<my_track.size(); i++){
@@ -132,9 +138,9 @@ int KalekoAna::EventLoop(std::string filename, const int MCTheta, const int max_
 	  my_track.at(i).get_axis_range(track_xmax, track_xmin,
 					track_ymax, track_ymin,
 					track_zmax, track_zmin);
-
-
-	  std::cout<<"in this track there were "<<my_track.at(i).n_point()<<" reco points, and "<<my_part_mc.at(0).step_vertex().size()<<" MC points."<<std::endl;	  
+	  
+	  
+	  //	  std::cout<<"in this track there were "<<my_track.at(i).n_point()<<" reco points, and "<<my_part_mc.at(0).step_vertex().size()<<" MC points."<<std::endl;	  
 	  
 	  double tmplength = 0;
 	  //for each track, loop over the reconstructed points in it
@@ -147,97 +153,112 @@ int KalekoAna::EventLoop(std::string filename, const int MCTheta, const int max_
 	      (my_track.at(i).vertex_at(j) - my_track.at(i).vertex_at(j+1)).Mag();
 	  }//end loop over points in individual track
 	  crude_reco_tracklengths.push_back(tmplength);
-
-
+	  
+	  
 	  //now loop over the mc points and calculate a MC tracklength
 	  //loop over each MC step the parent particle takes
 	  bool HaventFilledHistoYet = true;
 	  
-	  double dMCBoxTheta_i = -99.;
+	  //initialize this to something huge so it doesn't mimic something real
+	  //if there is a bug in the code or something
+	  double dMCBoxTheta_i = -9999.;
 	  
 	  double energy_lost = -1.;
 	  double step_length = -1.;
 	  double de_dx = -1.;
-
+	  
 	  tmplength = 0;
 	  for(size_t j=0; j < my_part_mc.at(0).step_vertex().size()-1; j++){
 	    TVector3 vtx_j = my_part_mc.at(0).step_vertex().at(j);	
 	    TVector3 vtx_jp1 = my_part_mc.at(0).step_vertex().at(j+1);
 	    TVector3 mom_j = my_part_mc.at(0).step_momentum().at(j);
 	    TVector3 mom_jp1 = my_part_mc.at(0).step_momentum().at(j+1);
-
-	    //only add to MC tracklength if it's within the world volume
-	    if(UtilFunctions().IsInDetectorVolume(vtx_j))
+	    
+	    //only add to MC tracklength, calculate dedx, etc
+	    //only if muon is within the world volume
+	    if(UtilFunctions().IsInDetectorVolume(vtx_j)){
 	      tmplength += ( vtx_jp1 - vtx_j ).Mag();
-	    
-	    
-	    //	    std::cout<<Form("MC Point: (%f,%f,%f)\n",vtx_j.X(),vtx_j.Y(),vtx_j.Z());
-	    //	    std::cout<<Form("MC momentum: (%f,%f,%f)\n",mom_j.X(),mom_j.Y(),mom_j.Z());
-
-	    energy_lost = mom_jp1.Mag() - mom_j.Mag();
-	    step_length = (vtx_jp1 - vtx_j).Mag();
-	    de_dx = -energy_lost/step_length;
-	    
-	    E_dEdx_pair.push_back(std::make_pair(mom_jp1.Mag(),de_dx));
-
-	    //if the current vertex point is inside of the box
-	    if(vtx_j.X() > track_xmin && vtx_j.X() < track_xmax &&
-	       vtx_j.Y() > track_ymin && vtx_j.Y() < track_ymax &&
-	       vtx_j.Z() > track_zmin && vtx_j.Z() < track_zmax){
-
-	      //only store the angle for the "first" point inside the box
-	      //(safe to assume I'm looping from start to finish?)
-	      if(HaventFilledHistoYet){
-		dMCBoxTheta_i = (vtx_jp1-vtx_j).Theta() * UtilFunctions().DegreesPerRadian - MCTheta;
-		mydMCBoxTheta.push_back(dMCBoxTheta_i);
-		HaventFilledHistoYet=false;
-	      }
 	      
-	    } //end if step vertex is inside of reconstructed track's box limits
+	      
+	      //	    std::cout<<Form("MC Point: (%f,%f,%f)\n",vtx_j.X(),vtx_j.Y(),vtx_j.Z());
+	      //	    std::cout<<Form("MC momentum: (%f,%f,%f)\n",mom_j.X(),mom_j.Y(),mom_j.Z());
+	      
+	      energy_lost = mom_jp1.Mag() - mom_j.Mag();
+	      step_length = (vtx_jp1 - vtx_j).Mag();
+	      de_dx = -energy_lost/step_length;
+	      
+	      E_dEdx_pair.push_back(std::make_pair(mom_jp1.Mag(),de_dx));
+	      
+	      //if the current MC point is inside of the "reconstructed" box
+	      if(vtx_j.X() > track_xmin && vtx_j.X() < track_xmax &&
+		 vtx_j.Y() > track_ymin && vtx_j.Y() < track_ymax &&
+		 vtx_j.Z() > track_zmin && vtx_j.Z() < track_zmax){
+		
+		//only store the angle for the "first" point inside the box
+		//(safe to assume I'm looping from start to finish?)
+		if(HaventFilledHistoYet){
+		  dMCBoxTheta_i = (mom_j.Theta() * UtilFunctions().DegreesPerRadian) - MCTheta;
+		  mydMCBoxTheta.push_back(dMCBoxTheta_i);
+		  HaventFilledHistoYet=false;
+		}
+		
+	      } //end if step vertex is inside of reconstructed track's box limits
+	    }//end requirement of muon being inside the detector volume
 	  } // end looping over each step the parent particle takes
-
-
-
-	  crude_MC_tracklengths.push_back(tmplength);
-
-
-	  //do i want to plot difference from the muon-generated angle?
-	  double dRecoTrackAngle_i = (my_track.at(i).direction_at(0).Theta()
-				      * UtilFunctions().DegreesPerRadian ) - MCTheta;
-	    
-	  //or, difference from the angle of muon as it enters the reconstructed "box"?
-	  //	  double dRecoTrackAngle_i = (my_track.at(i).direction_at(0).Theta()
-	  //				      * UtilFunctions().DegreesPerRadian ) - (dMCBoxTheta_i+MCTheta);
-
-	  //one of the DataTree variables
-       	  mydRecoTrackAngle.push_back( dRecoTrackAngle_i );
-
-	  //check to see if I need to re-define max and min histogram range
-	  if(max_mydRecoTrackAngle == -1 || max_mydRecoTrackAngle < dRecoTrackAngle_i)
-	    max_mydRecoTrackAngle = dRecoTrackAngle_i;
-
-	  if(min_mydRecoTrackAngle == -1 || min_mydRecoTrackAngle > dRecoTrackAngle_i)
-	    min_mydRecoTrackAngle = dRecoTrackAngle_i;
-
-
 	  
+	  
+	  
+	  crude_MC_tracklengths.push_back(tmplength);
+	  
+	  
+	  //do i want to plot difference from the muon-generated angle?
+	  //	  double dRecoTrackAngle_i = (my_track.at(i).direction_at(0).Theta()
+	  //* UtilFunctions().DegreesPerRadian ) - MCTheta;
+	  
+	  //or, difference from the angle of muon as it enters the reconstructed "box"?
+	  double dRecoTrackAngle_i = (my_track.at(i).direction_at(0).Theta()
+				      * UtilFunctions().DegreesPerRadian ) - (dMCBoxTheta_i+MCTheta);
+	  
+	  //one of the DataTree variables
+	  //if there are no MC points inside of the reconstructed box, then
+	  //dRecoTrackAngle_i is something like 9999 (it's initialized value)
+	  //for now, only push_back if dRecoTrackAngle_i is within [-180,180]
+	  //should fix this for real later... not sure how though?
+	  //this effect is maximized at 0 and 90 degree generated tracks, because
+	  //even if the track is reconstructed well, the "box" is very long and skinny
+	  //(tall and skinny, for 90), so it is less likely any MC points will fall
+	  //inside of the box
+	  if(dRecoTrackAngle_i > -181 && dRecoTrackAngle_i < 181){
+	    mydRecoTrackAngle.push_back( dRecoTrackAngle_i );
+	    
+	    //check to see if I need to re-define max and min histogram range
+	    if(max_mydRecoTrackAngle == -1 || max_mydRecoTrackAngle < dRecoTrackAngle_i)
+	      max_mydRecoTrackAngle = dRecoTrackAngle_i;
+	    
+	    if(min_mydRecoTrackAngle == -1 || min_mydRecoTrackAngle > dRecoTrackAngle_i)
+	    min_mydRecoTrackAngle = dRecoTrackAngle_i;
+	  
+	  }//end if dRecoTrackAngle is reasonable, between -180 and 180
+	  else
+	    badboxcounter++;
+
 	}//end loop over each reconstructed track
 	
       } // end else
       
       if( max_evts != -1 ) evt_counter++;
       
-
+      /*
       if((int)crude_reco_tracklengths.size() > 1) {
 	std::cout << Form("%d tracks. Angle = %d, evt = %d",(int)crude_reco_tracklengths.size(),MCTheta,my_event_track->event_id())<<std::endl;
 	std::cout<<Form("tracklengths: ");
 	for(size_t jason = 0; jason < crude_MC_tracklengths.size(); jason++)
-	  std::cout<<Form("MC = %f, ",crude_MC_tracklengths[jason]);
+	std::cout<<Form("MC = %f, ",crude_MC_tracklengths[jason]);
 	for(size_t david = 0; david < crude_reco_tracklengths.size(); david++)
 	  std::cout<<Form("reco = %f, ",crude_reco_tracklengths[david]);
 	std::cout<<std::endl;
       }
-   
+      */
       //Fill DataTree
       DataTree->Fill();
     }      
@@ -250,6 +271,8 @@ int KalekoAna::EventLoop(std::string filename, const int MCTheta, const int max_
   
   //Loop over DataTree and make histograms
   LoopOverTree();
+
+  std::cout<<"badboxcounter = "<<badboxcounter<<std::endl;
 
   my_storage.close();
 
@@ -298,6 +321,7 @@ void KalekoAna::InitializeHistograms(const int MCTheta, const int n_bins_histo){
 void KalekoAna::PrepareDataTree(){
 
   DataTree = new TTree();
+  DataTree->Branch("nRecoTracks", &nRecoTracks, "nRecoTracks/I");
   DataTree->Branch("myMCTheta", &myMCTheta, "myMCTheta/D");
   DataTree->Branch("mydMCBoxTheta","std::vector<double>",&mydMCBoxTheta);
   DataTree->Branch("mydRecoTrackAngle","std::vector<double>",&mydRecoTrackAngle);
@@ -306,28 +330,30 @@ void KalekoAna::PrepareDataTree(){
 }
 
 void KalekoAna::LoopOverTree(){
-
+  
   //loop over data tree I created in the main event loop and make histograms from its contents
   for(int ientry=0; ientry<DataTree->GetEntries(); ++ientry){
-
-    DataTree->GetEntry(ientry);
-  
-    NRecoTracksHist->Fill((int)mydRecoTrackAngle.size());
     
-    for(std::vector<double>::iterator iter = mydRecoTrackAngle.begin();
-    	iter != mydRecoTrackAngle.end();
-    	++iter)
-      RecoTrackAngleHist->Fill(*iter);
-     
-    //filling this with zero... since I centered it at zero...
-    MCTrackAngleHist->Fill(myMCTheta - myMCTheta);
- 
-    for(std::vector<double>::iterator iter = mydMCBoxTheta.begin();
-    	iter != mydMCBoxTheta.end();
-    	++iter)
-      MCTrackBoxAngleHist->Fill(*iter); 
+    DataTree->GetEntry(ientry);
+    NRecoTracksHist->Fill(nRecoTracks);
 
-  }
+    //temp
+    if(nRecoTracks == 1){
+
+      for(std::vector<double>::iterator iter = mydRecoTrackAngle.begin();
+	  iter != mydRecoTrackAngle.end();
+	  ++iter)
+	RecoTrackAngleHist->Fill(*iter);
 
 
-}
+      //filling this with zero... since I centered it at zero...
+      MCTrackAngleHist->Fill(myMCTheta - myMCTheta);
+      
+      for(std::vector<double>::iterator iter = mydMCBoxTheta.begin();
+	  iter != mydMCBoxTheta.end();
+	  ++iter)
+	MCTrackBoxAngleHist->Fill(*iter); 
+    }//end temp
+
+  } // end for-loop over tree entries
+}//end LoopOverTree()
