@@ -87,10 +87,10 @@ public:
   {  return IsValidKey(index) ? (bool)(_res_v.at(index)) : false; };
 
   /// A method to fetch a new row from the query result
-  const TSQLStatement* FetchRow(size_t index);
+  TSQLStatement* FetchRow(size_t index);
 
   /// A method to get a row from the query result
-  const TSQLStatement* GetRow(size_t index) const;
+  TSQLStatement* GetRow(size_t index) const;
 
   /// A method to get the number of affected row count by the previous query.
   int GetRowCount(size_t index) const;

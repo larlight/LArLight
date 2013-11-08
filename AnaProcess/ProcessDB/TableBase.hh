@@ -27,16 +27,25 @@ class TableBase {
 public:
 
   /// Default constructor
-  TableBase() {Initialize();};
+  TableBase(std::string name);
 
   /// Default destructor
   virtual ~TableBase(){};  
 
   /// Table name getter
-  virtual std::string GetTableName(bool with_db=true) const;
+  virtual std::string GetTableName(bool with_db=false) const;
+
+  /// A method to query database
+  size_t Query(std::string cmd) const;
+
+  /// A method to query & dump result
+  void QueryAndDump(std::string cmd) const;
 
   /// Table existence query
-  bool ExistTable() const;
+  bool ExistTable(std::string name="") const;
+
+  /// Table creation query
+  bool CreateTable() const;
 
   /// Open (if not) & retrieve DBI connection instance
   bool Connect(std::string host,unsigned int port=0,std::string db="",std::string user="",std::string passwd="");
@@ -45,10 +54,12 @@ public:
   bool SetConnKey(size_t key);
 
   /// A function to reset all
-  void Initialize();
+  virtual void Initialize();
 
 protected:
   
+  inline ProcessDBI* GetConnection() const;
+
   std::string _db;         ///< database name ... stored to return table name w/ databse
   std::string _tablename;  ///< bare table name
   size_t _conn_key;        ///< a connection key to retrieve ProcessDBI pointer through ProcessDBIManager::GetConnection function
