@@ -10,13 +10,14 @@ ProcessDBI* ProcessDBIManager::GetConnection(size_t key) const
 }
 
 /// Open (if not) & retrieve DBI connection instance
-size_t ProcessDBIManager::OpenConnection(std::string host,
-					 unsigned int port,
-					 std::string db,
-					 std::string user,
-					 std::string passwd)					 
+size_t ProcessDBIManager::Connect(DB::DB_t     type,
+				  std::string  host,
+				  unsigned int port,
+				  std::string  db,
+				  std::string  user,
+				  std::string  passwd)
 {
-  size_t key = ProcessDBI::INVALID_KEY;
+  size_t key = DB::INVALID_KEY;
   std::string server(Form("%s:%d/%s",host.c_str(),port,db.c_str()));
   if(_conn_key.find(server)!=_conn_key.end())
     
@@ -27,7 +28,7 @@ size_t ProcessDBIManager::OpenConnection(std::string host,
   if (GetConnection(key)) return key;
   
   ProcessDBI* conn = new ProcessDBI;
-  if(conn->Connect(host, port, db, user, passwd)) {
+  if(conn->Connect(type, host, port, db, user, passwd)) {
     
     _conn_v.push_back(conn);
 
@@ -49,7 +50,7 @@ size_t ProcessDBIManager::OpenConnection(std::string host,
 
 
 /// Close (if not) the specified connection 
-void ProcessDBIManager::CloseConnection(size_t key)
+void ProcessDBIManager::Disconnect(size_t key)
 {
   ProcessDBI* conn = (ProcessDBI*)(GetConnection(key));
   if(conn) {
@@ -60,11 +61,11 @@ void ProcessDBIManager::CloseConnection(size_t key)
 }
 
 /// Close all connections
-void ProcessDBIManager::CloseAllConnection()
+void ProcessDBIManager::DisconnectAll()
 {
   for(size_t index=0; index<_conn_v.size(); ++index)
     
-    CloseConnection(index);
+    Disconnect(index);
 }
 
 #endif
