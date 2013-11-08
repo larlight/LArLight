@@ -89,33 +89,37 @@ public:
   Short_t    Channel()   const { return _ch;     };
 
   /// Validity range start time getter
-  TTimeStamp TimeStart() const { return _tstart;  };
+  const TDatime&   TimeStart() const { return _tstart; };
 
   /// Validity range end time getter
-  TTimeStamp TimeEnd()   const { return _tend;   };
+  const TDatime&   TimeEnd()   const { return _tend;   };
 
   /// Reference getter
-  TString    Reference() const { return _ref;    };
+  const TString&   Reference() const { return _ref;    };
+
+  /// Log time getter
+  const TDatime&   LogTime()   const { return _tlog;   };
 
 protected:
 
   size_t _res_key;    ///< A key to access query result
 
-  TTimeStamp _tstart; ///< validity range start time variable holder
-  TTimeStamp _tend;   ///< validity range end time variable holder
-  Double_t _mean;     ///< QC mean value holder
-  Double_t _sigma;    ///< QC sigma value holder
-  Int_t    _run;      ///< run number holder
-  Int_t    _subrun;   ///< sub run number holder
-  Short_t  _ch;       ///< channel number holder
-  TString  _ref;      ///< reference holder
+  TDatime  _tstart; ///< validity range start time variable holder
+  TDatime  _tend;   ///< validity range end time variable holder
+  TDatime  _tlog;   ///< Log time stamp variable holder
+  Double_t _mean;   ///< QC mean value holder
+  Double_t _sigma;  ///< QC sigma value holder
+  Int_t    _run;    ///< run number holder
+  Int_t    _subrun; ///< sub run number holder
+  Short_t  _ch;     ///< channel number holder
+  TString  _ref;    ///< reference holder
 
   //
   // Cut range value holders
   //
 
   /// Query loads entries with start & ent time within the set range in this variable IFF SET BY USER.
-  std::pair<TTimeStamp,TTimeStamp> _cut_time;
+  std::pair<TDatime,TDatime> _cut_time;
 
   /// Query loads entries with mean value within the set range in this variable IFF SET BY USER.
   std::pair<Double_t,Double_t> _cut_mean;

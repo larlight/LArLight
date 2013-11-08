@@ -6,7 +6,6 @@
 TableBase::TableBase()
 {
   _tablename="TableBase";
-  _table_def="";
   Initialize();
 }
 
@@ -22,7 +21,9 @@ bool TableBase::CreateTable() const
 
   if(_conn_key==DB::INVALID_KEY) return false;
 
-  std::string query = Form("CREATE TABLE %s (%s) IF NOT EXISTS",GetTableName().c_str(),_table_def.c_str());
+  std::string query = Form("CREATE TABLE IF NOT EXISTS %s (%s)",
+			   GetTableName().c_str(),
+			   GetTableDef(GetConnection()->ServerType()).c_str());
 
   return GetConnection()->Exec(query.c_str());
 

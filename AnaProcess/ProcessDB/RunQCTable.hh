@@ -31,8 +31,14 @@ public:
   /// Default destructor
   virtual ~RunQCTable(){};
 
+  /// Method to return table definition string
+  virtual const std::string GetTableDef(DB::DB_t type) const;
+
   /// Method to initialize the instance
   virtual void Initialize();
+
+  /// Method to fill an entry in the table
+  bool Fill(QC::MonKey_t type, Int_t run, Int_t subrun, Double_t mean, Double_t sigma, std::string ref) const;
 
   /// Method to load the next result row (call after QCTable::Load)
   virtual bool Fetch();

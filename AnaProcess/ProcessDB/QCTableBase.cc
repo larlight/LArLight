@@ -6,7 +6,6 @@
 QCTableBase::QCTableBase() : TableBase() 
 {
   _tablename="QCTableBase"; 
-  _table_def=""; 
   Initialize(); 
 };
 
@@ -25,8 +24,8 @@ void QCTableBase::Initialize()
 
 void QCTableBase::InitializeCuts()
 {
-  _cut_time.first   = TTimeStamp(2000,1,1,0,0,0);
-  _cut_time.second  = TTimeStamp(2000,1,1,0,0,0);
+  _cut_time.first   = TDatime(2000,1,1,0,0,0);
+  _cut_time.second  = TDatime(2000,1,1,0,0,0);
   _cut_mean.first   = _cut_mean.second   = 0;
   _cut_sigma.first  = _cut_sigma.second  = 0;
   _cut_run.first    = _cut_run.second    = 0;
@@ -59,14 +58,14 @@ bool QCTableBase::Load(QC::MonKey_t type, size_t limit)
   std::string condition = Form("%s=%d",QC::kQCFieldName[QC::kMonKey].c_str(),type);
   
   /// Apply time cut if set
-  if(_cut_time.first.GetSec() != _cut_time.second.GetSec())
+  if(_cut_time.first.Get() != _cut_time.second.Get())
 
     condition = Form("%s AND ('%s'<%s AND %s <'%s')",
 		     condition.c_str(),
-		     _cut_time.first.AsString("s"),
+		     _cut_time.first.AsSQLString(),
 		     QC::kQCFieldName[QC::kTimeBegin].c_str(),
 		     QC::kQCFieldName[QC::kTimeEnd].c_str(),
-		     _cut_time.second.AsString("s"));
+		     _cut_time.second.AsSQLString());
   
   /// Apply mean value cut if set
   if(_cut_mean.first!=_cut_mean.second)

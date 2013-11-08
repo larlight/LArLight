@@ -15,7 +15,7 @@
 #ifndef TABLEBASE_HH
 #define TABLEBASE_HH
 
-#include <TTimeStamp.h>
+#include <TDatime.h>
 #include "ProcessDBIManager.hh"
 
 /**
@@ -62,6 +62,9 @@ public:
   /// A function to reset all
   virtual void Initialize();
 
+  /// A function to return table definition string
+  virtual const std::string GetTableDef(DB::DB_t type) const = 0;
+  
 protected:
 
   /// Internal getter function for connection handle
@@ -70,7 +73,6 @@ protected:
 
   std::string _db;         ///< database name ... stored to return table name w/ databse
   std::string _tablename;  ///< bare table name
-  std::string _table_def;  ///< bare table definition string
   size_t _conn_key;        ///< a connection key to retrieve ProcessDBI pointer through ProcessDBIManager::GetConnection function
 
 };

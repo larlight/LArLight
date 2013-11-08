@@ -5,7 +5,7 @@
 
 ProcessDBI::ProcessDBI() : _res_v() 
 {
-  _type   = DB::PostgreSQL;
+  _type   = DB::kPostgreSQL;
   _conn   = 0; 
   _ntrial = 1;
   _download_res = true;
@@ -23,14 +23,11 @@ bool ProcessDBI::Connect(DB::DB_t     type,
 
   std::string server="";
   switch(type){
-  case DB::MySQL:
+  case DB::kMySQL:
     server="mysql://";
     break;
-  case DB::PostgreSQL:
+  case DB::kPostgreSQL:
     server="pgsql://";
-    break;
-  case DB::Oracle:
-    server="oracle://";
     break;
   }
 

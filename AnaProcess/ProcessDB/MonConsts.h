@@ -10,24 +10,8 @@ namespace DB {
 
   /// Database server type
   enum DB_t {
-    MySQL=0,
-    PostgreSQL,
-    Oracle
-  };
-
-  /* 
-     Data type ... THIS METHOD LIMITS AVAILABLE TYPES ... but probably OK for physicists usage...
-     Note: we do not support "unsigned" as it is not supported in PostgreSQL and I am designing
-           this package to be able to use between two server types.
-  */
-  enum DataType_t {
-    SMALLINT=0, ///< 2 byte signed integer
-    INT,        ///< 4 byte signed integer
-    LONG,       ///< 8 byte signed integer
-    FLOAT,      ///< 4 byte floating point
-    DOUBLE,     ///< 8 byte floating point
-    TIMESTAMP,  ///< Time stamp (8byte)
-    DATATYPEMAX ///< Counter for # of data types
+    kMySQL=0,
+    kPostgreSQL
   };
 
 };
