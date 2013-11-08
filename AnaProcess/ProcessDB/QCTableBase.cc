@@ -26,15 +26,6 @@ void QCTableBase::InitializeCuts()
   _cut_ref = "";
 }
 
-bool QCTableBase::DropTable() const 
-{
-
-  if(_conn_key==DB::INVALID_KEY) return false;
-
-  return GetConnection()->Exec(Form("DROP TABLE %s IF EXISTS",GetTableName().c_str()));
-
-}
-
 void QCTableBase::ClearValues()
 {
   _mean = _sigma  = 0;

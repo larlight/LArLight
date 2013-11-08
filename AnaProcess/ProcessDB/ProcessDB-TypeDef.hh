@@ -9,12 +9,12 @@
 #include "MonConsts.h"
 #include "ProcessDBI.hh"
 #include "ProcessDBIManager.hh"
-#include "TableBase.hh"
-#include "QCTableBase.hh"
+#include "RunQCTable.hh"
+#include "TimeQCTable.hh"
 
 // Class forward declaration here
 class ProcessDBI;
 class ProcessDBIManager;
-class TableBase;
-class QCTableBase;
+class RunQCTable;
+class TimeQCTable;
 #endif

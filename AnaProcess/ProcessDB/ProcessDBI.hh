@@ -14,11 +14,12 @@
 #ifndef PROCESSDBI_HH
 #define PROCESSDBI_HH
 
-#include <string>
+
 #include <iostream>
 #include <TSystem.h>
 #include <TSQLServer.h>
 #include <TSQLStatement.h>
+#include "MonConsts.h"
 
 /**
    \class ProcessDBI
@@ -29,31 +30,28 @@
    This class is meant to be used by a custom table class which should be a useful interface for users.
 */
 class ProcessDBI{
-  
-public:
-
-  /// Server type enum, can include more.
-  enum TYPE_SQL_SERVER{MYSQL=0,    ///< MySQL
-		       POSTGRESQL, ///< PostgreSQL
-		       ORACLE      ///< Oracle
-  };
-
-  /// Default value for an invalid "key" used to identify TSQLStatement return from a query
-  static const unsigned short INVALID_KEY=0xffff;
 
 public:
 
   /// Default constructor ... by default the type is set to PostgreSQL for uboone
-  ProcessDBI(TYPE_SQL_SERVER type=POSTGRESQL);
+  ProcessDBI();
   
   /// Default destructor
   virtual ~ProcessDBI(){};
+
+  /// Getter for SQL db type
+  DB::DB_t ServerType() const {return _type;};
 
   /// Flag to download query result to a local memory
   void StoreResult(bool store=true) {_download_res=store;};
 
   /// A method to connect to the server
-  bool Connect(std::string host,unsigned int port=0,std::string db="",std::string user="",std::string passwd="");
+  bool Connect(DB::DB_t type,
+	       std::string host,
+	       unsigned int port=0,
+	       std::string db="",
+	       std::string user="",
+	       std::string passwd="");
 
   /// A method to reconnect using previously provided connection information in ProcessDBI::Connect method
   bool Reconnect();
@@ -106,12 +104,12 @@ public:
 
 private:
 
-  TSQLServer*     _conn;   ///< SQL connection instance
-  TYPE_SQL_SERVER _type;   ///< Type of SQL server
-  unsigned short  _ntrial; ///< Number of trial to establish a connection upon Reconnect() call
-  std::string     _server; ///< Connection server (host+port+db) info stored upon Connect() call
-  std::string     _user;   ///< Connection user name stored upon Connect() call
-  std::string     _passwd; ///< Connection password stored upon Connect() call
+  TSQLServer*    _conn;   ///< SQL connection instance
+  DB::DB_t       _type;   ///< Type of SQL server
+  unsigned short _ntrial; ///< Number of trial to establish a connection upon Reconnect() call
+  std::string    _server; ///< Connection server (host+port+db) info stored upon Connect() call
+  std::string    _user;   ///< Connection user name stored upon Connect() call
+  std::string    _passwd; ///< Connection password stored upon Connect() call
   bool      _download_res; ///< Store query result locally upon success 
   /// Vector of TSQLStatement pointer created upon a successful Query() function call
   std::vector<TSQLStatement*> _res_v; 

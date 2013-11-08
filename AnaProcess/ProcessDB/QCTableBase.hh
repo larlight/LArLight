@@ -33,7 +33,7 @@ class QCTableBase : public TableBase {
 public:
 
   /// Default constructor
-  QCTableBase() : TableBase("QCTableBase") { Initialize(); };
+  QCTableBase(std::string name) : TableBase(name) { Initialize(); };
 
   /// Default destructor
   virtual ~QCTableBase(){};
@@ -46,12 +46,6 @@ public:
 
   /// Method to initialize range cut values
   virtual void InitializeCuts();
-
-  /// Method to create a table if not exists yet ... TO BE IMPLEMENTED BY DAUGHTERS
-  virtual bool CreateTable() const = 0;
-
-  /// Method to remove a table
-  virtual bool DropTable() const;
 
   /// Method to clear query result
   virtual void ClearResult();
