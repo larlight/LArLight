@@ -28,6 +28,8 @@
 #pragma link C++ class std::vector<hit>+;
 #pragma link C++ class event_hit+;
 
+#pragma link C++ class std::vector<TVector3>+;
+#pragma link C++ class std::vector<TMatrixD>+;
 #pragma link C++ class cluster+;
 #pragma link C++ class std::vector<cluster>+;
 #pragma link C++ class event_cluster+;
