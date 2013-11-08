@@ -107,15 +107,13 @@ bool TrackViewer::analyze(storage_manager* storage)
 
 	h->Fill(vtx[2],vtx[0],vtx[1]);
 
-	_track_v.push_back(track(trk));
-
       }
 
       h->SetMarkerStyle(22);
       h->SetMarkerColor(kRed);
       _hRecoTrack_v.push_back(h);
 
-
+      _track_v.push_back(track(trk));
 
     }
     
