@@ -69,10 +69,6 @@ namespace QC {
     "LogTime"
   };
 
-
-
-
-
 };
 
 #endif

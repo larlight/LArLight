@@ -33,7 +33,7 @@ class QCTableBase : public TableBase {
 public:
 
   /// Default constructor
-  QCTableBase(std::string name) : TableBase(name) { Initialize(); };
+  QCTableBase();
 
   /// Default destructor
   virtual ~QCTableBase(){};

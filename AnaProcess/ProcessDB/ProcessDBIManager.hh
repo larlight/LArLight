@@ -17,7 +17,6 @@
 #include <map>
 #include <ProcessDBI.hh>
 
-
 /**
    \class ProcessDBIManager
    This class manages connections established to the database server using ProcessDBI.

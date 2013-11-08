@@ -11,10 +11,12 @@
 #include "ProcessDBIManager.hh"
 #include "RunQCTable.hh"
 #include "TimeQCTable.hh"
+#include "ChQCTable.hh"
 
 // Class forward declaration here
 class ProcessDBI;
 class ProcessDBIManager;
 class RunQCTable;
 class TimeQCTable;
+class ChQCTable;
 #endif

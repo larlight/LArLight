@@ -28,16 +28,16 @@ class TableBase {
 public:
 
   /// Default constructor
-  TableBase(std::string name);
+  TableBase();
 
   /// Default destructor
   virtual ~TableBase(){};  
 
   /// Method to create a table if not exists yet ... TO BE IMPLEMENTED BY DAUGHTERS
-  virtual bool CreateTable() const = 0;
+  bool CreateTable() const;
 
   /// Method to remove a table
-  virtual bool DropTable() const;
+  bool DropTable() const;
 
   /// Table name getter
   virtual std::string GetTableName(bool with_db=false) const;
@@ -70,6 +70,7 @@ protected:
 
   std::string _db;         ///< database name ... stored to return table name w/ databse
   std::string _tablename;  ///< bare table name
+  std::string _table_def;  ///< bare table definition string
   size_t _conn_key;        ///< a connection key to retrieve ProcessDBI pointer through ProcessDBIManager::GetConnection function
 
 };

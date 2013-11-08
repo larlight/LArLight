@@ -3,8 +3,17 @@
 
 #include "QCTableBase.hh"
 
+QCTableBase::QCTableBase() : TableBase() 
+{
+  _tablename="QCTableBase"; 
+  _table_def=""; 
+  Initialize(); 
+};
+
 void QCTableBase::Initialize()
 {
+
+  TableBase::Initialize();
 
   _res_key = DB::INVALID_KEY;
 

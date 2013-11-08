@@ -3,9 +3,10 @@
 
 #include "TableBase.hh"
 
-TableBase::TableBase(std::string name)
+TableBase::TableBase()
 {
-  _tablename=name;
+  _tablename="TableBase";
+  _table_def="";
   Initialize();
 }
 
@@ -14,6 +15,17 @@ std::string TableBase::GetTableName(bool with_db) const
   if(_conn_key==DB::INVALID_KEY) return "";
   if(with_db) return Form("%s.%s",_db.c_str(),_tablename.c_str());
   else return _tablename.c_str();
+}
+
+bool TableBase::CreateTable() const
+{
+
+  if(_conn_key==DB::INVALID_KEY) return false;
+
+  std::string query = Form("CREATE TABLE %s (%s) IF NOT EXISTS",GetTableName().c_str(),_table_def.c_str());
+
+  return GetConnection()->Exec(query.c_str());
+
 }
 
 bool TableBase::DropTable() const 

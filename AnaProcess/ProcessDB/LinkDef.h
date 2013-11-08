@@ -16,5 +16,6 @@
 #pragma link C++ class TableBase+;
 #pragma link C++ class RunQCTable+;
 #pragma link C++ class TimeQCTable+;
+#pragma link C++ class ChQCTable+;
 //#pragma link C++ class QCTableBase+;
 #endif

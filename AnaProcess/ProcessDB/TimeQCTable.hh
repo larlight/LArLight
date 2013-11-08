@@ -26,7 +26,7 @@ class TimeQCTable : public QCTableBase {
 public:
 
   /// Default constructor
-  TimeQCTable() : QCTableBase("TimeQCTable") { Initialize(); };
+  TimeQCTable();
 
   /// Default destructor
   virtual ~TimeQCTable(){};
@@ -34,11 +34,8 @@ public:
   /// Method to initialize the instance
   virtual void Initialize();
 
-  /// Method to create a table if not exists yet ... TO BE IMPLEMENTED BY DAUGHTERS
-  virtual bool CreateTable() const = 0;
-
-  /// Method to load the next result row (call after QCTable::Load) ... TO BE IMPLEMENTED BY DAUGHTERS
-  virtual bool Fetch()=0;
+  /// Method to load the next result row (call after QCTable::Load)
+  virtual bool Fetch();
 
   //
   // Setter for cut values ... implement run and sub-run cut
