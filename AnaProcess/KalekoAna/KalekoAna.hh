@@ -101,6 +101,7 @@ private:
   
   std::vector<double> myAverageRecoTrackAngle;
 
+  std::vector<double> myRecoStartingZ;
 
   ///length of the reco track, adding together distances b/t consecutive points
   std::vector<double> crude_reco_tracklengths;
@@ -115,6 +116,8 @@ private:
   /// for each muon, pair of (Energy,dE/dx)
   std::vector< std::pair<double,double> > E_dEdx_pair;
 
+  std::vector<int> nTrackPoints;
+
   ///max and min difference in angles b/t reco and MC, over ALL tracks in all events
   ///to be used to set range of histograms
   //  double max_mydMCBoxTheta,     min_mydMCBoxTheta;
@@ -122,6 +125,10 @@ private:
   int max_nRecoTracks;
   int nRecoTracks;
 
+  int myEventNumber;
+
+  int nSpacePoints;
+  
 };
 
 #endif

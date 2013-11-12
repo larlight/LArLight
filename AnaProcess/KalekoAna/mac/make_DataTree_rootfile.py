@@ -11,21 +11,22 @@ max_evts = 3000
 #in_path = os.environ.get('MAKE_TOP_DIR')+"/kaleko_input_files_LArLight/"
 in_path = "/a/data/morningside/kaleko"+"/kaleko_input_files_LArLight/"
 
-in_fname = [ "v4_ang0_dsout_reduced_%s.root" % reco_type,
-             "v4_ang10_dsout_reduced_%s.root" % reco_type,
-             "v4_ang20_dsout_reduced_%s.root" % reco_type,
-             "v4_ang30_dsout_reduced_%s.root" % reco_type,
-             "v4_ang40_dsout_reduced_%s.root" % reco_type,
-             "v4_ang50_dsout_reduced_%s.root" % reco_type,
-             "v4_ang60_dsout_reduced_%s.root" % reco_type,
-             "v4_ang70_dsout_reduced_%s.root" % reco_type,
-             "v4_ang80_dsout_reduced_%s.root" % reco_type,
-             "v4_ang90_dsout_reduced_%s.root" % reco_type ]
-
+#in_fname = [ "v4_ang0_dsout_reduced_%s.root" % reco_type,
+#             "v4_ang10_dsout_reduced_%s.root" % reco_type,
+#             "v4_ang20_dsout_reduced_%s.root" % reco_type,
+#             "v4_ang30_dsout_reduced_%s.root" % reco_type,
+#             "v4_ang40_dsout_reduced_%s.root" % reco_type,
+#             "v4_ang50_dsout_reduced_%s.root" % reco_type,
+#             "v4_ang60_dsout_reduced_%s.root" % reco_type,
+#             "v4_ang70_dsout_reduced_%s.root" % reco_type,
+#             "v4_ang80_dsout_reduced_%s.root" % reco_type,
+#             "v4_ang90_dsout_reduced_%s.root" % reco_type ]
+in_fname = ["v4_ang60_dsout_reduced_Kalman3DSPS.root"]
 out_dir = os.environ.get('MAKE_TOP_DIR')+\
           "/AnaProcess/KalekoAna/mac/output_datatree/v4"
 
-in_angles = [ 0, 10, 20, 30, 40, 50, 60, 70, 80, 90 ]
+#in_angles = [ 0, 10, 20, 30, 40, 50, 60, 70, 80, 90 ]
+in_angles = [ 60 ]
 
 n_bins_histo = 100
 

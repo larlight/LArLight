@@ -152,4 +152,31 @@ TGraph* UtilFunctions::MakeGraphFromVectorOfPairs(std::vector<std::pair<double,d
 
   return mygraph;
 }
+
+
+double UtilFunctions::CalculateWeightedAvgTheta(const track t){
+  //function to calculate weighted average angle through a reconstructed track
+  //the "weight" is the length between the two points. weight longer stepsizes more heavily
+
+  //initialize our angle
+  double angle = 0;
+
+  double sum_of_weights = 0;
+  double weight = 0;
+
+  //loop over points in the track
+  for(int point = 0; point < (int)t.n_point()-1; ++point){
+    weight = ( t.vertex_at(point+1) - t.vertex_at(point) ).Mag();
+    angle += ( t.vertex_at(point+1) - t.vertex_at(point) ).Theta() * weight;
+    sum_of_weights += weight;
+  }//end loop over points in the track
+  
+  angle /= sum_of_weights;
+
+  return angle;
+}
+
+
+
 #endif
+

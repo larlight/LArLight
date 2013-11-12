@@ -80,13 +80,15 @@ int KalekoAna::EventLoop(std::string filename, const int MCTheta, const int max_
     
     if(evt_counter%100==0) std::cout<<"Event counter = "<<evt_counter<<std::endl;
     //std::cout<<"Event counter = "<<evt_counter<<std::endl;
-    
+
 
     //reset the vectors that are going into my tree
     mydRecoTrackAngle.clear();
     myRecoTrackAngle.clear();
     myAverageRecoTrackAngle.clear();
+    myRecoStartingZ.clear();
     mydMCBoxTheta.clear();
+    nTrackPoints.clear();
     E_dEdx_pair.clear();
     
     //initialize track lengths to zero before each track
@@ -104,6 +106,11 @@ int KalekoAna::EventLoop(std::string filename, const int MCTheta, const int max_
     }
     
     else{    
+      myEventNumber = my_event_track->event_id();
+     
+      //spacepoint stuff
+      event_sps* my_event_sps = (event_sps*)(my_storage.get_data(DATA::SpacePoint));
+
       //MC stuff
       event_mc* my_event_mc = (event_mc*)(my_storage.get_data(DATA::MCTruth));
       
@@ -116,17 +123,22 @@ int KalekoAna::EventLoop(std::string filename, const int MCTheta, const int max_
 	
 	const std::vector<track> my_track(my_event_track->GetTrackCollection());
 	const std::vector<part_mc> my_part_mc(my_event_mc->GetParticleCollection());
-		
+	const std::vector<spacepoint> my_sps(my_event_sps->GetSPSCollection());
+
+	nSpacePoints = (int)my_sps.size();
+
 	//finding max # of reconstructed tracks (over all events) for histogram boundaries
 	if(max_nRecoTracks < (int)my_track.size()) max_nRecoTracks = (int)my_track.size();
 
 	//some of the DataTree variables
 	myMCTheta = (double)MCTheta;
 	nRecoTracks = (int)my_track.size();
-
+      
 	//loop over all of the reconstructed tracks in the event
 	for(size_t i=0; i<my_track.size(); i++){
 	  
+	  nTrackPoints.push_back( (int)my_track.at(i).n_point() );
+  
 	  //initial guess for ranges, will be altered by get_axis_range()
 	  track_xmin = track_xmax = my_track.at(i).vertex_at(0).X();
 	  track_ymin = track_ymax = my_track.at(i).vertex_at(0).Y();
@@ -207,14 +219,25 @@ int KalekoAna::EventLoop(std::string filename, const int MCTheta, const int max_
 	  crude_MC_tracklengths.push_back(tmplength);
 	  //	  std::cout<<"meanwhile, MC tracklength is calculated as "<<tmplength<<std::endl;
 
+	  //if you want to look at reco track angle b/t first two points...
+	  //	  myRecoTrackAngle.push_back(my_track.at(i).direction_at(0).Theta() * UtilFunctions().DegreesPerRadian);
+	  //if you want to look @ length-weighted average reco track angle
+	  myRecoTrackAngle.push_back( UtilFunctions().CalculateWeightedAvgTheta( my_track.at(i) ) 
+				      * UtilFunctions().DegreesPerRadian );
+	  myRecoStartingZ.push_back(my_track.at(i).vertex_at(0).Z());
+
 	  //do i want to plot difference from the muon-generated angle?
 	  //double dRecoTrackAngle_i = (my_track.at(i).direction_at(0).Theta()
 	  //* UtilFunctions().DegreesPerRadian ) - MCTheta;
 	  
 	  //or, difference from the angle of muon as it enters the reconstructed "box"?
-	  double dRecoTrackAngle_i = (my_track.at(i).direction_at(0).Theta()
-				      * UtilFunctions().DegreesPerRadian ) - (dMCBoxTheta_i+MCTheta);
-	  myRecoTrackAngle.push_back(my_track.at(i).direction_at(0).Theta() * UtilFunctions().DegreesPerRadian);
+	  //	  double dRecoTrackAngle_i = (my_track.at(i).direction_at(0).Theta()
+	  //				      * UtilFunctions().DegreesPerRadian ) - (dMCBoxTheta_i+MCTheta);
+
+
+	  //and, do i want to look at weighted average track angle? or direction from first point? this is weighted:
+	  double dRecoTrackAngle_i = (UtilFunctions().CalculateWeightedAvgTheta( my_track.at(i) ) 
+				      * UtilFunctions().DegreesPerRadian) - MCTheta;
 
 	  //temp: calculate average reco track angle and push it back
 	  double avgang=0;
@@ -325,15 +348,19 @@ void KalekoAna::InitializeHistograms(const int MCTheta, const int n_bins_histo){
 void KalekoAna::PrepareDataTree(){
 
   DataTree = new TTree();
+  DataTree->Branch("myEventNumber", &myEventNumber, "myEventNumber/I");
   DataTree->Branch("nRecoTracks", &nRecoTracks, "nRecoTracks/I");
+  DataTree->Branch("nSpacePoints",&nSpacePoints, "nSpacePoints/I");
   DataTree->Branch("myMCTheta", &myMCTheta, "myMCTheta/D");
   DataTree->Branch("mydMCBoxTheta","std::vector<double>",&mydMCBoxTheta);
   DataTree->Branch("mydRecoTrackAngle","std::vector<double>",&mydRecoTrackAngle);
   DataTree->Branch("myRecoTrackAngle","std::vector<double>",&myRecoTrackAngle);
+  DataTree->Branch("myRecoStartingZ","std::vector<double>",&myRecoStartingZ);
   DataTree->Branch("myAverageRecoTrackAngle","std::vector<double>",&myAverageRecoTrackAngle);
   DataTree->Branch("crude_reco_tracklengths","std::vector<double>",&crude_reco_tracklengths);
   DataTree->Branch("crude_MC_tracklengths","std::vector<double>",&crude_MC_tracklengths);
   DataTree->Branch("straightline_reco_tracklengths","std::vector<double>",&straightline_reco_tracklengths);
+  DataTree->Branch("nTrackPoints","std::vector<int>",&nTrackPoints);
   DataTree->Branch("E_dEdx_pair","std::vector<std::pair<double,double>>",&E_dEdx_pair);
 
 }

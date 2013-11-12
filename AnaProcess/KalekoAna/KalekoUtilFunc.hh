@@ -19,6 +19,8 @@
 
 #include <iostream>
 
+#include <track.hh>
+
 #include <TCanvas.h>
 #include <TLine.h>
 #include <TPad.h>
@@ -60,6 +62,8 @@ public:
   /// Function to turn a vector of pairs into a TGraph, each pair is (x,y)
   TGraph* MakeGraphFromVectorOfPairs(std::vector< std::pair<double,double> > &myvecofpairs, TGraph* mygraph);
 
+  double CalculateWeightedAvgTheta(const track t);
+  
   /// Some utility constants, initialized in constructor
   double DegreesPerRadian;
   double RadiansPerDegree;
