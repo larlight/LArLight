@@ -17,7 +17,6 @@
 #include <map>
 #include <ProcessDBI.hh>
 
-
 /**
    \class ProcessDBIManager
    This class manages connections established to the database server using ProcessDBI.
@@ -49,13 +48,18 @@ public :
   ProcessDBI* GetConnection(size_t key) const;
 
   /// Open (if not) & retrieve DBI connection instance
-  size_t OpenConnection(std::string host,unsigned int port=0,std::string db="",std::string user="",std::string passwd="");
-
+  size_t Connect(DB::DB_t     type,
+		 std::string  host,
+		 unsigned int port=0,
+		 std::string  db="",
+		 std::string  user="",
+		 std::string  passwd="");
+  
   /// Close (if not) the specified connection 
-  void CloseConnection(size_t key);
+  void Disconnect(size_t key);
 
   /// Close all connections
-  void CloseAllConnection();
+  void DisconnectAll();
 
 private:
 

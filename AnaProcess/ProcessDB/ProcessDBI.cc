@@ -3,33 +3,31 @@
 
 #include "ProcessDBI.hh"
 
-ProcessDBI::ProcessDBI(TYPE_SQL_SERVER type) : _res_v() 
+ProcessDBI::ProcessDBI() : _res_v() 
 {
-  _type   = type; 
+  _type   = DB::kPostgreSQL;
   _conn   = 0; 
   _ntrial = 1;
   _download_res = true;
 };
 
-bool ProcessDBI::Connect(std::string host,
+bool ProcessDBI::Connect(DB::DB_t     type,
+			 std::string  host,
 			 unsigned int port,
-			 std::string db,
-			 std::string user,
-			 std::string passwd)
+			 std::string  db,
+			 std::string  user,
+			 std::string  passwd)
 {
 
   if(_conn) Disconnect();
 
   std::string server="";
-  switch(_type){
-  case MYSQL:
+  switch(type){
+  case DB::kMySQL:
     server="mysql://";
     break;
-  case POSTGRESQL:
+  case DB::kPostgreSQL:
     server="pgsql://";
-    break;
-  case ORACLE:
-    server="oracle://";
     break;
   }
 
@@ -44,6 +42,7 @@ bool ProcessDBI::Connect(std::string host,
 
   server = Form("%s/%s",server.c_str(),db.c_str());
 
+  _type   = type;
   _server = server;
   _user   = user;
   _passwd = passwd;
@@ -140,13 +139,13 @@ bool ProcessDBI::Exec(std::string cmd)
 size_t ProcessDBI::Query(std::string cmd)
 {
   
-  if(!_conn) return INVALID_KEY;
+  if(!_conn) return DB::INVALID_KEY;
 
-  else if (!IsConnected()) return INVALID_KEY;
+  else if (!IsConnected()) return DB::INVALID_KEY;
 
   TSQLStatement* res = (TSQLStatement*)(_conn->Statement(cmd.c_str()));
 
-  if(!res) return INVALID_KEY;
+  if(!res) return DB::INVALID_KEY;
 
   res->Process();
 
@@ -159,7 +158,7 @@ size_t ProcessDBI::Query(std::string cmd)
       << Form("Error MSG  : %s",res->GetErrorMsg())  << std::endl
       << std::endl;
     
-    return INVALID_KEY;
+    return DB::INVALID_KEY;
   }
 
   if(_download_res) res->StoreResult();
