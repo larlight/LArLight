@@ -1,13 +1,13 @@
-#
-# Example PyROOT script to run analysis module, ana_base.
-# The usage is same for inherited analysis class instance.
-#
-
 # Load libraries
-import os, ROOT, sys
-from ROOT import gSystem
-gSystem.Load("libAnalysis")
+import sys, os
+try:
+    import ROOT
+except AttributeError:
+    import ROOT
+from ROOT import *
 gSystem.Load("libKalekoAna")
+gSystem.Load("libAnalysis")
+
 
 # Now import ana_processor & your class. For this example, ana_base.
 from ROOT import *
@@ -41,6 +41,7 @@ ctr=0
 c=TCanvas("c","",600,500)
 
 while my_proc.process_event():
+    totalptctr = 0
 
     hMC   = my_ana.GetHisto_MC()
     hSPS  = my_ana.GetHisto_SPS()
@@ -49,9 +50,14 @@ while my_proc.process_event():
     vData = my_ana.GetData_Reco()
 
 
-    hMC_xy = hMC.Project3D("xy")
-    hSPS_xy = hSPS.Project3D("xy")
+    hMC_zx = hMC.Project3D("zx")
+    hMC_zx.SetLineColor(kGreen+3)
+    hSPS_zx = hSPS.Project3D("zx")
+    hSPS_zx.SetLineColor(kBlue-9)
     
+    vReco_zx = []; myline_zx = [];
+    for x in xrange(vReco.size()):
+        vReco_zx.append(vReco[x].Project3D("zx"))
 
     first_draw=True
 
@@ -63,32 +69,38 @@ while my_proc.process_event():
         #if you want to look at a weighted average angle (weighted by distance b/t points)...
         #reco_theta = UtilFunctions().CalculateWeightedAvgTheta(vData.at(x)) * UtilFunctions().DegreesPerRadian;
         
-        print "processing ctr_evt %d. reco_theta = %f. # tracks in evt = %d" % (ctr,reco_theta,vData.size())
-        
+        print "Entry %d ... found %d spacepoints & %d reco-ed track" % (ctr,hSPS.GetEntries(),vReco.size())
+
         if reco_theta < 95 and reco_theta > 85:
             print "reco_theta is bt 85 and 95"
         
-            if hSPS_xy:
-                hSPS_xy.Draw("BOX")
+        if hSPS_zx:
+            if first_draw:
+                hSPS_zx.Draw("BOX")
                 first_draw=False
             
-            if hMC_xy:
-                if first_draw: 
-                    hMC_xy.Draw("BOX")
-                else:
-                    hMC_xy.Draw("BOX sames")
+        if hMC_zx:
+            if first_draw: 
+                hMC_zx.Draw("BOX")
+            else:
+                hMC_zx.Draw("BOX sames")
                 
-            print
-            print "Entry %d ... found %d spacepoints & %d reco-ed track" % (ctr,hSPS.GetEntries(),vReco.size())
-                        
-            for x in xrange(vReco.size()):
-                print "Plotting track %d " % vData[x].track_id()
-                print "Number of points: %d" % vData[x].n_point()
-                vReco[x].Project3D("xy").Draw("BOX sames")
-                c.Update()
+        print "Plotting track %d. Number of track points: %d. reco_theta = %f degrees." % (vData[x].track_id(),vData[x].n_point(),reco_theta)
 
-            sys.stdin.readline()
+        vReco_zx[x].SetLineColor(kRed)
+        vReco_zx[x].Draw("BOX sames")
 
+        for pt in xrange(vData[x].n_point()-1):
+            myline_zx.append(TLine(vData.at(x).vertex_at(pt).Z(),vData.at(x).vertex_at(pt).Y(),vData.at(x).vertex_at(pt+1).Z(),vData.at(x).vertex_at(pt+1).Y()))
+                
+            myline_zx[totalptctr].SetLineWidth(2)
+            myline_zx[totalptctr].SetLineColor(kMagenta)
+            myline_zx[totalptctr].Draw("sames")
+            totalptctr+=1
+                
+            c.Update()
+                
+        sys.stdin.readline()
 
     print "continuing to next evt..."
     ctr+=1
