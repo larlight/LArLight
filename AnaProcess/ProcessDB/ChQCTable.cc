@@ -12,35 +12,35 @@ ChQCTable::ChQCTable() : RunQCTable()
 const std::string ChQCTable::GetTableDef(DB::DB_t type) const
 {
 
-  std::string table_def = Form("%s SMALLINT NOT NULL,",QC::kQCFieldName[QC::kMonKey].c_str());
-  table_def += Form("%s INT NOT NULL,",QC::kQCFieldName[QC::kRun].c_str());
-  table_def += Form("%s INT NOT NULL,",QC::kQCFieldName[QC::kSubRun].c_str());
-  table_def += Form("%s SMALLINT NOT NULL,",QC::kQCFieldName[QC::kChannel].c_str());
+  std::string table_def = Form("%s SMALLINT NOT NULL,",QCDB::kQCFieldName[QCDB::kMonKey].c_str());
+  table_def += Form("%s INT NOT NULL,",QCDB::kQCFieldName[QCDB::kRun].c_str());
+  table_def += Form("%s INT NOT NULL,",QCDB::kQCFieldName[QCDB::kSubRun].c_str());
+  table_def += Form("%s SMALLINT NOT NULL,",QCDB::kQCFieldName[QCDB::kChannel].c_str());
   switch(type){
   case DB::kMySQL:
-    table_def += Form("%s DOUBLE NOT NULL,",QC::kQCFieldName[QC::kMean].c_str());
-    table_def += Form("%s DOUBLE NOT NULL,",QC::kQCFieldName[QC::kSigma].c_str());
+    table_def += Form("%s DOUBLE NOT NULL,",QCDB::kQCFieldName[QCDB::kMean].c_str());
+    table_def += Form("%s DOUBLE NOT NULL,",QCDB::kQCFieldName[QCDB::kSigma].c_str());
     break;
   case DB::kPostgreSQL:
-    table_def += Form("%s DOUBLE PRECISION NOT NULL,",QC::kQCFieldName[QC::kMean].c_str());
-    table_def += Form("%s DOUBLE PRECISION NOT NULL,",QC::kQCFieldName[QC::kSigma].c_str());
+    table_def += Form("%s DOUBLE PRECISION NOT NULL,",QCDB::kQCFieldName[QCDB::kMean].c_str());
+    table_def += Form("%s DOUBLE PRECISION NOT NULL,",QCDB::kQCFieldName[QCDB::kSigma].c_str());
     break;
   }
-  table_def += Form("%s VARCHAR(100) NOT NULL,",QC::kQCFieldName[QC::kReference].c_str());
-  table_def += Form("%s TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,",QC::kQCFieldName[QC::kLogTime].c_str());
-  table_def += Form("KEY %s, KEY %s, KEY %s, KEY %s, PRIMARY KEY (%s, %s, %s, %s)",
-		    QC::kQCFieldName[QC::kMonKey].c_str(),
-		    QC::kQCFieldName[QC::kRun].c_str(),
-		    QC::kQCFieldName[QC::kSubRun].c_str(),
-		    QC::kQCFieldName[QC::kChannel].c_str(),
-		    QC::kQCFieldName[QC::kMonKey].c_str(),
-		    QC::kQCFieldName[QC::kRun].c_str(),
-		    QC::kQCFieldName[QC::kSubRun].c_str(),
-		    QC::kQCFieldName[QC::kChannel].c_str());
+  table_def += Form("%s VARCHAR(100) NOT NULL,",QCDB::kQCFieldName[QCDB::kReference].c_str());
+  table_def += Form("%s TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,",QCDB::kQCFieldName[QCDB::kLogTime].c_str());
+  table_def += Form("KEY (%s), KEY (%s), KEY (%s), KEY (%s), PRIMARY KEY (%s, %s, %s, %s)",
+		    QCDB::kQCFieldName[QCDB::kMonKey].c_str(),
+		    QCDB::kQCFieldName[QCDB::kRun].c_str(),
+		    QCDB::kQCFieldName[QCDB::kSubRun].c_str(),
+		    QCDB::kQCFieldName[QCDB::kChannel].c_str(),
+		    QCDB::kQCFieldName[QCDB::kMonKey].c_str(),
+		    QCDB::kQCFieldName[QCDB::kRun].c_str(),
+		    QCDB::kQCFieldName[QCDB::kSubRun].c_str(),
+		    QCDB::kQCFieldName[QCDB::kChannel].c_str());
   return table_def;
 }
 
-bool ChQCTable::Fill(QC::MonKey_t type, Int_t run, Int_t subrun, Short_t ch, Double_t mean, Double_t sigma, std::string ref) const
+bool ChQCTable::Fill(QCDB::MonKey_t type, Int_t run, Int_t subrun, Short_t ch, Double_t mean, Double_t sigma, std::string ref) const
 {
   if(!GetConnection()) {
     
@@ -51,13 +51,13 @@ bool ChQCTable::Fill(QC::MonKey_t type, Int_t run, Int_t subrun, Short_t ch, Dou
   
   std::string query = Form("INSERT INTO %s (%s,%s,%s,%s,%s,%s,%s)",
 			   GetTableName().c_str(),
-			   QC::kQCFieldName[QC::kMonKey].c_str(),
-			   QC::kQCFieldName[QC::kRun].c_str(),
-			   QC::kQCFieldName[QC::kSubRun].c_str(),
-			   QC::kQCFieldName[QC::kChannel].c_str(),
-			   QC::kQCFieldName[QC::kMean].c_str(),
-			   QC::kQCFieldName[QC::kSigma].c_str(),
-			   QC::kQCFieldName[QC::kReference].c_str());
+			   QCDB::kQCFieldName[QCDB::kMonKey].c_str(),
+			   QCDB::kQCFieldName[QCDB::kRun].c_str(),
+			   QCDB::kQCFieldName[QCDB::kSubRun].c_str(),
+			   QCDB::kQCFieldName[QCDB::kChannel].c_str(),
+			   QCDB::kQCFieldName[QCDB::kMean].c_str(),
+			   QCDB::kQCFieldName[QCDB::kSigma].c_str(),
+			   QCDB::kQCFieldName[QCDB::kReference].c_str());
   query += Form(" Values (%d, %d, %d, %d, %g, %g, '%s')",
 		type,
 		run,

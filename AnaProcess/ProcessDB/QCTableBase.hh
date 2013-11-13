@@ -51,7 +51,7 @@ public:
   virtual void ClearResult();
 
   /// Method to load ALL variables from the database applying cuts if set by users
-  virtual bool Load(QC::MonKey_t type, size_t limit=0);
+  virtual bool Load(QCDB::MonKey_t type, size_t limit=0);
 
   /// Method to load the next result row (call after QCTable::Load) ... TO BE IMPLEMENTED BY DAUGHTERS
   virtual bool Fetch()=0;
