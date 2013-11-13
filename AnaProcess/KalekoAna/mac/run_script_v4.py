@@ -25,13 +25,13 @@ in_path = "/a/data/morningside/kaleko"+"/kaleko_input_files_LArLight/"
 #             "v4_ang70_dsout_reduced_%s.root" % reco_type,
 #             "v4_ang80_dsout_reduced_%s.root" % reco_type,
 #             "v4_ang90_dsout_reduced_%s.root" % reco_type ]
-in_fname = [ "v4_ang60_dsout_reduced_Kalman3DSPS.root" ]
+in_fname = [ "v4_ang90_dsout_reduced_Kalman3DSPS.root" ]
 
 out_dir = os.environ.get('MAKE_TOP_DIR')+\
           "/AnaProcess/KalekoAna/mac/output_plots/v4_%s" % reco_type
 
 #in_angles = [ 0, 10, 20, 30, 40, 50, 60, 70, 80, 90 ]
-in_angles = [ 60 ]
+in_angles = [ 90 ]
 
 recohist_array = []; mchist_array = []; graph_array = []; nreco_array = []
 
