@@ -132,6 +132,7 @@ namespace larlight {
     // If a user set an empty string for these params, they are ignored for processing.
     ParseModuleName ( _mod_names[DATA::Bezier],         pset.get<std::string>("fModName_Bezier")         );
     ParseModuleName ( _mod_names[DATA::Kalman3DSPS],    pset.get<std::string>("fModName_Kalman3DSPS")    );
+    ParseModuleName ( _mod_names[DATA::Kalman3DHit],    pset.get<std::string>("fModName_Kalman3DHit")    );
     ParseModuleName ( _mod_names[DATA::MCTruth],        pset.get<std::string>("fModName_MCTruth")        );
     ParseModuleName ( _mod_names[DATA::SpacePoint],     pset.get<std::string>("fModName_SpacePoint")     );
     ParseModuleName ( _mod_names[DATA::FIFOChannel],    pset.get<std::string>("fModName_FIFOChannel")    );
@@ -163,6 +164,7 @@ namespace larlight {
 	  break;
 	case DATA::Track:
 	case DATA::Kalman3DSPS:
+	case DATA::Kalman3DHit:
 	case DATA::Bezier:
 	  _data_ptr[i]=(data_base*)(new event_track);
 	  break;
@@ -259,6 +261,7 @@ namespace larlight {
 
       case DATA::Track:
       case DATA::Kalman3DSPS:
+      case DATA::Kalman3DHit:
       case DATA::Bezier:
 	// Data types to be stored in event_track class
 	for(size_t j=0; j<_mod_names[i].size(); ++j)

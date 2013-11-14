@@ -300,6 +300,7 @@ void storage_manager::create_data_ptr(DATA::DATA_TYPE type){
   switch(type){
   case DATA::Track:
   case DATA::Bezier:
+  case DATA::Kalman3DHit:
   case DATA::Kalman3DSPS:
     _ptr_data_array[type]=(data_base*)(new event_track);
     break;
