@@ -50,12 +50,12 @@ void QCTableBase::ClearResult()
   }
 }
 
-bool QCTableBase::Load(QC::MonKey_t type, size_t limit)
+bool QCTableBase::Load(QCDB::MonKey_t type, size_t limit)
 {
 
   if(_conn_key==DB::INVALID_KEY) return false;
 
-  std::string condition = Form("%s=%d",QC::kQCFieldName[QC::kMonKey].c_str(),type);
+  std::string condition = Form("%s=%d",QCDB::kQCFieldName[QCDB::kMonKey].c_str(),type);
   
   /// Apply time cut if set
   if(_cut_time.first.Get() != _cut_time.second.Get())
@@ -63,8 +63,8 @@ bool QCTableBase::Load(QC::MonKey_t type, size_t limit)
     condition = Form("%s AND ('%s'<%s AND %s <'%s')",
 		     condition.c_str(),
 		     _cut_time.first.AsSQLString(),
-		     QC::kQCFieldName[QC::kTimeBegin].c_str(),
-		     QC::kQCFieldName[QC::kTimeEnd].c_str(),
+		     QCDB::kQCFieldName[QCDB::kTimeBegin].c_str(),
+		     QCDB::kQCFieldName[QCDB::kTimeEnd].c_str(),
 		     _cut_time.second.AsSQLString());
   
   /// Apply mean value cut if set
@@ -73,8 +73,8 @@ bool QCTableBase::Load(QC::MonKey_t type, size_t limit)
     condition = Form("%s AND %g < %s AND %s < %g", 
 		     condition.c_str(),
 		     _cut_mean.first,
-		     QC::kQCFieldName[QC::kMean].c_str(),
-		     QC::kQCFieldName[QC::kMean].c_str(),
+		     QCDB::kQCFieldName[QCDB::kMean].c_str(),
+		     QCDB::kQCFieldName[QCDB::kMean].c_str(),
 		     _cut_mean.second);
 
   /// Apply sigma value cut if set
@@ -83,8 +83,8 @@ bool QCTableBase::Load(QC::MonKey_t type, size_t limit)
     condition = Form("%s AND %g < %s AND %s < %g", 
 		     condition.c_str(),
 		     _cut_sigma.first,
-		     QC::kQCFieldName[QC::kSigma].c_str(),
-		     QC::kQCFieldName[QC::kSigma].c_str(),
+		     QCDB::kQCFieldName[QCDB::kSigma].c_str(),
+		     QCDB::kQCFieldName[QCDB::kSigma].c_str(),
 		     _cut_sigma.second);
 
   /// Apply run number cut if set
@@ -93,8 +93,8 @@ bool QCTableBase::Load(QC::MonKey_t type, size_t limit)
     condition = Form("%s AND %d < %s AND %s < %d", 
 		     condition.c_str(),
 		     _cut_run.first,
-		     QC::kQCFieldName[QC::kRun].c_str(),
-		     QC::kQCFieldName[QC::kRun].c_str(),
+		     QCDB::kQCFieldName[QCDB::kRun].c_str(),
+		     QCDB::kQCFieldName[QCDB::kRun].c_str(),
 		     _cut_run.second);
 
   /// Apply subrun number cut if set
@@ -103,8 +103,8 @@ bool QCTableBase::Load(QC::MonKey_t type, size_t limit)
     condition = Form("%s AND %d < %s AND %s < %d", 
 		     condition.c_str(),
 		     _cut_subrun.first,
-		     QC::kQCFieldName[QC::kSubRun].c_str(),
-		     QC::kQCFieldName[QC::kSubRun].c_str(),
+		     QCDB::kQCFieldName[QCDB::kSubRun].c_str(),
+		     QCDB::kQCFieldName[QCDB::kSubRun].c_str(),
 		     _cut_subrun.second);
 
   /// Apply channel number cut if set
@@ -113,14 +113,14 @@ bool QCTableBase::Load(QC::MonKey_t type, size_t limit)
     condition = Form("%s AND %d < %s AND %s < %d", 
 		     condition.c_str(),
 		     _cut_ch.first,
-		     QC::kQCFieldName[QC::kChannel].c_str(),
-		     QC::kQCFieldName[QC::kChannel].c_str(),
+		     QCDB::kQCFieldName[QCDB::kChannel].c_str(),
+		     QCDB::kQCFieldName[QCDB::kChannel].c_str(),
 		     _cut_ch.second);
 
   std::string query = Form("SELECT * FROM %s WHERE %s ORDER BY %s",
 			   GetTableName().c_str(),
 			   condition.c_str(),
-			   QC::kQCFieldName[QC::kLogTime].c_str());
+			   QCDB::kQCFieldName[QCDB::kLogTime].c_str());
   if(limit)
     query = Form("%s LIMIT %zu", query.c_str(), limit);
 
