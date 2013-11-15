@@ -40,7 +40,7 @@ $(ANA_PROC_LIBDIR)/$(SHLIB): lib/$(SHLIB)
 ifdef ROOTMAP
 $(ROOTMAP): $(ANA_PROC_LIBDIR)/$(SHLIB)
 	@echo "<< Making rootmaps >>"
-	@cd $(ANA_PROC_LIBDIR) && ./make_rootmap.sh
+	@cd $(ANA_PROC_LIBDIR) && ./anaproc_rootmap.sh
 	@rm -f $(ANA_PROC_LIBDIR)/*.temp
 endif
 
