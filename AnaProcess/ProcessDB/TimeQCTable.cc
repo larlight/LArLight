@@ -11,32 +11,32 @@ TimeQCTable::TimeQCTable() : QCTableBase()
 
 const std::string TimeQCTable::GetTableDef(DB::DB_t type) const
 {
-  std::string table_def = Form("%s SMALLINT NOT NULL,",QC::kQCFieldName[QC::kMonKey].c_str());
-  table_def += Form("%s TIMESTAMP NOT NULL,",QC::kQCFieldName[QC::kTimeBegin].c_str());
-  table_def += Form("%s TIMESTAMP NULL,",QC::kQCFieldName[QC::kTimeEnd].c_str());
+  std::string table_def = Form("%s SMALLINT NOT NULL,",QCDB::kQCFieldName[QCDB::kMonKey].c_str());
+  table_def += Form("%s TIMESTAMP NOT NULL,",QCDB::kQCFieldName[QCDB::kTimeBegin].c_str());
+  table_def += Form("%s TIMESTAMP NULL,",QCDB::kQCFieldName[QCDB::kTimeEnd].c_str());
   switch(type){
   case DB::kMySQL:
-    table_def += Form("%s DOUBLE NOT NULL,",QC::kQCFieldName[QC::kMean].c_str());
-    table_def += Form("%s DOUBLE NOT NULL,",QC::kQCFieldName[QC::kSigma].c_str());
+    table_def += Form("%s DOUBLE NOT NULL,",QCDB::kQCFieldName[QCDB::kMean].c_str());
+    table_def += Form("%s DOUBLE NOT NULL,",QCDB::kQCFieldName[QCDB::kSigma].c_str());
     break;
   case DB::kPostgreSQL:
-    table_def += Form("%s DOUBLE PRECISION NOT NULL,",QC::kQCFieldName[QC::kMean].c_str());
-    table_def += Form("%s DOUBLE PRECISION NOT NULL,",QC::kQCFieldName[QC::kSigma].c_str());
+    table_def += Form("%s DOUBLE PRECISION NOT NULL,",QCDB::kQCFieldName[QCDB::kMean].c_str());
+    table_def += Form("%s DOUBLE PRECISION NOT NULL,",QCDB::kQCFieldName[QCDB::kSigma].c_str());
     break;
   }
-  table_def += Form("%s VARCHAR(100) NOT NULL,",QC::kQCFieldName[QC::kReference].c_str());
-  table_def += Form("%s TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,",QC::kQCFieldName[QC::kLogTime].c_str());
-  table_def += Form("KEY %s, KEY %s, KEY %s, PRIMARY KEY (%s, %s, %s)",
-		    QC::kQCFieldName[QC::kMonKey].c_str(),
-		    QC::kQCFieldName[QC::kTimeBegin].c_str(),
-		    QC::kQCFieldName[QC::kTimeEnd].c_str(),
-		    QC::kQCFieldName[QC::kMonKey].c_str(),
-		    QC::kQCFieldName[QC::kTimeBegin].c_str(),
-		    QC::kQCFieldName[QC::kTimeEnd].c_str());
+  table_def += Form("%s VARCHAR(100) NOT NULL,",QCDB::kQCFieldName[QCDB::kReference].c_str());
+  table_def += Form("%s TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,",QCDB::kQCFieldName[QCDB::kLogTime].c_str());
+  table_def += Form("KEY (%s), KEY (%s), KEY (%s), PRIMARY KEY (%s, %s, %s)",
+		    QCDB::kQCFieldName[QCDB::kMonKey].c_str(),
+		    QCDB::kQCFieldName[QCDB::kTimeBegin].c_str(),
+		    QCDB::kQCFieldName[QCDB::kTimeEnd].c_str(),
+		    QCDB::kQCFieldName[QCDB::kMonKey].c_str(),
+		    QCDB::kQCFieldName[QCDB::kTimeBegin].c_str(),
+		    QCDB::kQCFieldName[QCDB::kTimeEnd].c_str());
   return table_def;
 }
 
-bool TimeQCTable::Fill(QC::MonKey_t type, TDatime tstart, TDatime tend, Double_t mean, Double_t sigma, std::string ref) const
+bool TimeQCTable::Fill(QCDB::MonKey_t type, TDatime tstart, TDatime tend, Double_t mean, Double_t sigma, std::string ref) const
 {
   if(!GetConnection()) {
 
@@ -47,18 +47,18 @@ bool TimeQCTable::Fill(QC::MonKey_t type, TDatime tstart, TDatime tend, Double_t
 
   // For TimeQCTable, we need to check if any existing entry has a time range overlap
   std::string query = Form("SELECT %s, %s FROM %s WHERE %s=%d AND (('%s' < %s AND %s < '%s') OR ('%s' < %s AND %s < '%s')) LIMIT 1",
-			   QC::kQCFieldName[QC::kTimeBegin].c_str(),
-			   QC::kQCFieldName[QC::kTimeEnd].c_str(),
+			   QCDB::kQCFieldName[QCDB::kTimeBegin].c_str(),
+			   QCDB::kQCFieldName[QCDB::kTimeEnd].c_str(),
 			   GetTableName().c_str(),
-			   QC::kQCFieldName[QC::kMonKey].c_str(),
+			   QCDB::kQCFieldName[QCDB::kMonKey].c_str(),
 			   type,
 			   tstart.AsSQLString(),
-			   QC::kQCFieldName[QC::kTimeBegin].c_str(),
-			   QC::kQCFieldName[QC::kTimeBegin].c_str(),
+			   QCDB::kQCFieldName[QCDB::kTimeBegin].c_str(),
+			   QCDB::kQCFieldName[QCDB::kTimeBegin].c_str(),
 			   tend.AsSQLString(),
 			   tstart.AsSQLString(),
-			   QC::kQCFieldName[QC::kTimeEnd].c_str(),
-			   QC::kQCFieldName[QC::kTimeEnd].c_str(),
+			   QCDB::kQCFieldName[QCDB::kTimeEnd].c_str(),
+			   QCDB::kQCFieldName[QCDB::kTimeEnd].c_str(),
 			   tend.AsSQLString());
 
   size_t key = GetConnection()->Query(query);
@@ -76,12 +76,12 @@ bool TimeQCTable::Fill(QC::MonKey_t type, TDatime tstart, TDatime tend, Double_t
 
   query = Form("INSERT INTO %s (%s,%s,%s,%s,%s,%s)",
 	       GetTableName().c_str(),
-	       QC::kQCFieldName[QC::kMonKey].c_str(),
-	       QC::kQCFieldName[QC::kTimeBegin].c_str(),
-	       QC::kQCFieldName[QC::kTimeEnd].c_str(),
-	       QC::kQCFieldName[QC::kMean].c_str(),
-	       QC::kQCFieldName[QC::kSigma].c_str(),
-	       QC::kQCFieldName[QC::kReference].c_str());
+	       QCDB::kQCFieldName[QCDB::kMonKey].c_str(),
+	       QCDB::kQCFieldName[QCDB::kTimeBegin].c_str(),
+	       QCDB::kQCFieldName[QCDB::kTimeEnd].c_str(),
+	       QCDB::kQCFieldName[QCDB::kMean].c_str(),
+	       QCDB::kQCFieldName[QCDB::kSigma].c_str(),
+	       QCDB::kQCFieldName[QCDB::kReference].c_str());
 
   query += Form(" Values (%d, '%s', '%s', %g, %g, '%s')",
 		type,

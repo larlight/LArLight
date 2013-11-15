@@ -76,6 +76,7 @@ namespace DATA{
     Track,              ///< Track
     Bezier,             ///< Track (Bezier)
     Kalman3DSPS,        ///< Track (Kalman3DSPS)
+    Kalman3DHit,        ///< Track (Kalman3DHit)
     Shower,             ///< Shower
     Calorimetry,        ///< Calorimetry
     DATA_TYPE_MAX
@@ -103,6 +104,7 @@ namespace DATA{
     "track",
     "bezier",
     "kalman3dsps",
+    "kalman3dhit",
     "shower",
     "calorimetry"
   };

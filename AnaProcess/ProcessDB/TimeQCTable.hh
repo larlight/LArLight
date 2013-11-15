@@ -38,7 +38,7 @@ public:
   virtual void Initialize();
 
   /// Method to insert an entry to the database
-  bool Fill(QC::MonKey_t type, TDatime tstart, TDatime tend, Double_t mean, Double_t sigma, std::string ref) const;
+  bool Fill(QCDB::MonKey_t type, TDatime tstart, TDatime tend, Double_t mean, Double_t sigma, std::string ref) const;
 
   /// Method to load the next result row (call after QCTable::Load)
   virtual bool Fetch();
