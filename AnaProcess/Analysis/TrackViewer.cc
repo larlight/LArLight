@@ -39,7 +39,7 @@ bool TrackViewer::analyze(storage_manager* storage)
   // Obtain event-wise data object pointers
   //
   event_sps*   ev_sps    = (event_sps*)   ( storage->get_data(DATA::SpacePoint)  );
-  event_track* ev_kalsps = (event_track*) ( storage->get_data(DATA::Kalman3DSPS) );
+  event_track* ev_track = (event_track*)  ( storage->get_data(fDataType) );
   event_mc*    ev_mc     = (event_mc*)    ( storage->get_data(DATA::MCTruth)     );
 
   // Define utility variables to hold max/min of each axis range
@@ -53,9 +53,9 @@ bool TrackViewer::analyze(storage_manager* storage)
 
     ev_sps->get_axis_range(xmax, xmin, ymax, ymin, zmax, zmin);
 
-  if(ev_kalsps)
+  if(ev_track)
 
-    ev_kalsps->get_axis_range(xmax, xmin, ymax, ymin, zmax, zmin);
+    ev_track->get_axis_range(xmax, xmin, ymax, ymin, zmax, zmin);
 
   //if(ev_mc)
 
@@ -91,14 +91,14 @@ bool TrackViewer::analyze(storage_manager* storage)
   }
 
   // Tracks
-  if(ev_kalsps) {
+  if(ev_track) {
 
-    const std::vector<track> track_v = ev_kalsps->GetTrackCollection();
+    const std::vector<track> track_v = ev_track->GetTrackCollection();
 
     for(auto const& trk : track_v){
       
       TH3D* h=0;
-      h=Prepare3DHisto(Form("_hKalman3DSPS_%03d",(int)(_hRecoTrack_v.size())),
+      h=Prepare3DHisto(Form("_h%s_%03d",fDataType,(int)(_hRecoTrack_v.size())),
 		       zmin,zmax,xmin,xmax,ymin,ymax);
 
       for(size_t i=0; i<trk.n_point(); i++) {

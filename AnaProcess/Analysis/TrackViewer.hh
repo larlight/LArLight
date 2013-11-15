@@ -48,6 +48,10 @@ public:
   */
   virtual bool finalize();
 
+  /// Set the track type to plot
+  DATA::DATA_TYPE fDataType;
+  void set_data_type(DATA::DATA_TYPE type) { fDataType = type;};
+
   /// A utility function to (re)create Th3D histogram of a specified boundary & name
   TH3D* Prepare3DHisto(std::string name, 
 		       double xmin, double xmax,
