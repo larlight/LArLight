@@ -4,9 +4,16 @@ if [[ -z $MAKE_TOP_DIR ]]; then
     echo \$MAKE_TOP_DIR not set! 
     echo You have to set this first.
 else 
-    export ANA_PROC_DIR=$MAKE_TOP_DIR/AnaProcess
+    if [[ -z $ANA_PROC_DIR ]]; then
+	export ANA_PROC_DIR=$MAKE_TOP_DIR/AnaProcess
+    else
+	export ANA_PROC_DIR=$MAKE_TOP_DIR/$ANA_PROC_DIR
+    fi
     if [[ -z $ANA_PROC_MODULE ]]; then
 	export ANA_PROC_MODULE="Base DataFormat Analysis"
+    fi
+    if [[ -z $SIMPLE_TREE_MODULE ]]; then
+	export SIMPLE_TREE_MODULE="Base"
     fi
     if [[ -z $ROOTSYS ]]; then
 	case `uname -n` in
@@ -37,8 +44,9 @@ else
 	    export ANA_PROC_LIBDIR=$SRT_LOCAL/lib/$SRT_SUBDIR
 	    python $MAKE_TOP_DIR/config/srtlocal_clean_link.py
 	    python $MAKE_TOP_DIR/config/srtlocal_make_link.py
+	    rm -f $MAKE_TOP_DIR/LArModule/DataScanner/AnaProcess
 	    python $MAKE_TOP_DIR/config/make_link.py $ANA_PROC_DIR  $MAKE_TOP_DIR/LArModule/DataScanner/AnaProcess
-	    python $MAKE_TOP_DIR/config/make_link.py $ANA_PROC_DIR/lib/make_rootmap.sh $ANA_PROC_LIBDIR/make_rootmap.sh
+	    python $MAKE_TOP_DIR/config/make_link.py $ANA_PROC_DIR/lib/anaproc_rootmap.sh $ANA_PROC_LIBDIR/anaproc_rootmap.sh
 	fi
 	python $MAKE_TOP_DIR/config/gen_anamakefile.py
 	python $MAKE_TOP_DIR/config/gen_topmakefile.py

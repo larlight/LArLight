@@ -28,6 +28,7 @@ LAR_PACKAGES :=LAR_MODULE
 all:
 	@echo "Start building AnaProcess"
 	@make --directory=$(ANA_PROC_DIR)
+	@echo 
 ifdef SRT_LOCAL
 	@echo
 	@echo "Start building LArSoft components"
@@ -53,10 +54,10 @@ endif
 #
 doxygen:
 	@echo 'dOxygenising your code...'
-	@doxygen $(MAKE_TOP_DIR)/doc/doxygenMyProject.script
+	@doxygen $(ANA_PROC_DIR)/doc/doxygenMyProject.script
 
 doxygen+:
 	@echo 'dOxygenising MyProject + local-ROOT...'
-	@doxygen $(MAKE_TOP_DIR)/doc/doxygenMyProject+.script
+	@doxygen $(ANA_PROC_DIR)/doc/doxygenMyProject+.script
 #
 #####################################################################################
