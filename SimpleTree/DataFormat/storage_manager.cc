@@ -297,18 +297,21 @@ void storage_manager::create_data_ptr(DATA::DATA_TYPE type){
   case DATA::Kalman3DHit:
   case DATA::Kalman3DSPS:
     _ptr_data_array[type]=(data_base*)(new track(type));
-    //_ptr_data_array[type]=(data_base*)(new data_base);
     break;
-  case DATA::MCTruth:
   case DATA::SpacePoint:
-  case DATA::UserInfo:
-  case DATA::FIFOChannel:
-  case DATA::Wire:
+    _ptr_data_array[type]=(data_base*)(new sps(type));
+    break;
   case DATA::Hit:
   case DATA::CrawlerHit:
   case DATA::GausHit:
   case DATA::APAHit:
   case DATA::FFTHit:
+    _ptr_data_array[type]=(data_base*)(new hit(type));
+    break;
+  case DATA::MCTruth:
+  case DATA::UserInfo:
+  case DATA::FIFOChannel:
+  case DATA::Wire:
   case DATA::Cluster:
   case DATA::CrawlerCluster:
   case DATA::DBCluster:

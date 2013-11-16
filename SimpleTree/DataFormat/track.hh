@@ -26,12 +26,18 @@ class track : public data_base {
 public:
  
   /// Maximum track this class can hold
-  static const size_t kMaxTrack = 1000;
+  static const size_t kMaxTrack = 300;
+  
+  /// Maximum trajectory points this class can hold
+  static const size_t kMaxTrackVtx = 10000;
 
 public:
-  
+
   /// Default constructor
-  track(DATA::DATA_TYPE type=DATA::DATA_TYPE_MAX);
+  track(DATA::DATA_TYPE type=DATA::Track);
+
+  /// Default destructor
+  virtual ~track(){};
 
   /// Implementation of event-wise track data clear method
   virtual void clear_event();
@@ -73,6 +79,27 @@ public:
   void mom(int i, double v)      { _mom[i]=v;      };
   void len(int i, double v)      { _len[i]=v;      };
 
+
+  //--- Added member getters ---//
+  const void npoints()    const { return _npoints;  };
+  const void vtxId(int i) const { return _vtxId[i]; };
+  const void vtxx(int i)  const { return _vtxx[i];  };
+  const void vtxy(int i)  const { return _vtxy[i];  };
+  const void vtxz(int i)  const { return _vtxz[i];  };
+  const void momx(int i)  const { return _momx[i];  };
+  const void momy(int i)  const { return _momy[i];  };
+  const void momz(int i)  const { return _momz[i];  };
+
+  //--- Added member setters ---//
+  void npoints(int i)        { _npoints = i; };
+  void vtxId(int i, int v)   { _vtxId[i]=v;  };
+  void vtxx(int i, double v) { _vtxx[i]=v;   };
+  void vtxy(int i, double v) { _vtxy[i]=v;   };
+  void vtxz(int i, double v) { _vtxz[i]=v;   };
+  void momx(int i, double v) { _momx[i]=v;   };
+  void momy(int i, double v) { _momy[i]=v;   };
+  void momz(int i, double v) { _momz[i]=v;   };
+
 protected:
 
   int    _ntracks;              ///< Number of tracks
@@ -91,6 +118,18 @@ protected:
   double _theta_yz[kMaxTrack];  ///< Theta on YZ plane
   double _mom[kMaxTrack];       ///< Total momentum
   double _len[kMaxTrack];       ///< Track length 
+
+  /**
+     - Trajectory points?
+  */
+  int    _npoints;             ///< Number of trajectory points (for all tracks)
+  int    _vtxId[kMaxTrackVtx]; ///< Array of associated track ID
+  double _vtxx[kMaxTrackVtx];  ///< X coordinate of trajectory points
+  double _vtxy[kMaxTrackVtx];  ///< Y coordinate of trajectory points
+  double _vtxz[kMaxTrackVtx];  ///< Z coordinate of trajectory points
+  double _momx[kMaxTrackVtx];  ///< X component of momentum at this point
+  double _momy[kMaxTrackVtx];  ///< Y component of momentum at this point
+  double _momz[kMaxTrackVtx];  ///< Z component of momentum at this point
 
 };
 

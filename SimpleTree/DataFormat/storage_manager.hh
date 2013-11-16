@@ -22,6 +22,8 @@
 #include "fmwk_base.hh"
 #include "data_base.hh"
 #include "track.hh"
+#include "spacepoint.hh"
+#include "hit.hh"
 /*
 #include "mctruth.hh"
 #include "user_info.hh"

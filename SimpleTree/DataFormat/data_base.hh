@@ -32,7 +32,7 @@ class data_base : public fmwk_base{
 public:
 
   /// Default constructor
-  data_base();
+  data_base(DATA::DATA_TYPE type=DATA::DATA_TYPE_MAX);
 
   /// Default destructor
   virtual ~data_base(){};

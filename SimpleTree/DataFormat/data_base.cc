@@ -3,10 +3,10 @@
 
 #include "data_base.hh"
 
-data_base::data_base() : fmwk_base()
+data_base::data_base(DATA::DATA_TYPE type) : fmwk_base()
 {
-  _name  = "data_base";
-  _type  = DATA::DATA_TYPE_MAX;
+  _name  = DATA::DATA_TREE_NAME[type];
+  _type  = type;
   initialize();
 }
 
