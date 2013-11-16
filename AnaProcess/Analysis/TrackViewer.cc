@@ -98,7 +98,7 @@ bool TrackViewer::analyze(storage_manager* storage)
     for(auto const& trk : track_v){
       
       TH3D* h=0;
-      h=Prepare3DHisto(Form("_h%s_%03d",fDataType,(int)(_hRecoTrack_v.size())),
+      h=Prepare3DHisto(Form("_hRecoTrack_%03d",(int)(_hRecoTrack_v.size())),
 		       zmin,zmax,xmin,xmax,ymin,ymax);
 
       for(size_t i=0; i<trk.n_point(); i++) {

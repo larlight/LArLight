@@ -33,7 +33,7 @@ my_proc.set_ana_output_file("myout.root")
 # Add analysis unit to process
 my_ana = TrackViewer()
 #my_ana.set_data_type(storage_manager.get().get_data(DATA.Kalman3DSPS))
-my_ana.set_data_type("Kalman3DSPS")
+my_ana.set_data_type(DATA.Bezier)
 my_proc.add_process(my_ana)
 
 # Set TDirectory name in the ROOT file where TTrees can be found
