@@ -10,8 +10,7 @@
 #pragma link off all functions;
 
 #pragma link C++ namespace MSG;
-#pragma link C++ namespace DATA;
 
 #pragma link C++ class Message+;
-#pragma link C++ class fmwk_base+;
+#pragma link C++ class FrameworkBase+;
 #endif

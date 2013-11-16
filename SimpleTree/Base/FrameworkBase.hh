@@ -1,9 +1,9 @@
 /**
- * \file fmwk_base.hh
+ * \file FrameworkBase.hh
  *
  * \ingroup SimpleTreeBase
  * 
- * \brief Class definition file of fmwk_base
+ * \brief Class definition file of FrameworkBase
  *
  * @author Kazu - Nevis 2013
  */
@@ -12,30 +12,29 @@
 
     @{*/
 
-#ifndef FMWK_BASE_HH
-#define FMWK_BASE_HH
+#ifndef FRAMEWORKBASE_HH
+#define FRAMEWORKBASE_HH
 
-#include "types.hh"
-#include "constants.hh"
-#include "messenger.hh"
+#include "BasicConstants.hh"
+#include "Message.hh"
 
 /**
- \class fmwk_base
+ \class FrameworkBase
  Very base class of all everything else defined in this framework.
 */
-class fmwk_base {
+class FrameworkBase {
 
 public:
 
   /// Default constructor
-  fmwk_base() : _name("fmwk_base")
+  FrameworkBase() : _name("FrameworkBase")
   {set_verbosity(MSG::NORMAL);}
   
   /// Default copy constructor
-  fmwk_base(const fmwk_base &original) : _name(original._name){};
+  FrameworkBase(const FrameworkBase &original) : _name(original._name){};
 
   /// Default destructor
-  virtual ~fmwk_base(){};
+  virtual ~FrameworkBase(){};
 
   /// Setter for the verbosity level 
   virtual void set_verbosity(MSG::Level level);

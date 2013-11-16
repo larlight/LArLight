@@ -1,10 +1,10 @@
-#ifndef LARLIGHT_BASE_CC
-#define LARLIGHT_BASE_CC
+#ifndef FRAMEWORKBAE_CC
+#define FRAMEWORKBASE_CC
 
-#include "fmwk_base.hh"
+#include "FrameworkBase.hh"
 
 //#####################################################
-void fmwk_base::set_verbosity(MSG::Level level)
+void FrameworkBase::set_verbosity(MSG::Level level)
 //#####################################################
 {
 

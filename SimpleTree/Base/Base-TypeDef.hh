@@ -6,11 +6,10 @@
 #define SIMPLETREEBASE_TYPEDEF_HH
 
 // Header files included here
-#include "types.hh"
-#include "constants.hh"
-#include "messenger.hh"
-#include "fmwk_base.hh"
+#include "BasicConstants.hh"
+#include "Message.hh"
+#include "FrameworkBase.hh"
 // Class forward declaration here
 class Message;
-class fmwk_base;
+class FrameworkBase;
 #endif

@@ -1,7 +1,7 @@
-#ifndef MESSENGER_CC
-#define MESSENGER_CC
+#ifndef MESSAGE_CC
+#define MESSAGE_CC
 
-#include "messenger.hh"
+#include "Message.hh"
 
 Message* Message::me = 0;
 

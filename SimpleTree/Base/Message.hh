@@ -1,5 +1,5 @@
 /**
- * \file messenger.hh
+ * \file Message.hh
  *
  * \ingroup Base
  * 
@@ -13,12 +13,12 @@
     @{*/
 
 
-#ifndef MESSENGER_HH
-#define MESSENGER_HH
+#ifndef MESSAGE_HH
+#define MESSAGE_HH
 
 #include <cstdio>
 #include <iostream>
-#include "constants.hh"
+#include "BasicConstants.hh"
 
 /**
    \class Message
