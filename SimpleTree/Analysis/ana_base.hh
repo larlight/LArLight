@@ -16,7 +16,7 @@
 #define ANA_BASE_HH
 
 #include <TFile.h>
-#include "fmwk_base.hh"
+#include "FrameworkBase.hh"
 #include "DataFormat-TypeDef.hh"
 
 /**
@@ -24,12 +24,12 @@
    A base class for analysis modules to be operated with event_waveform
    data class instance. 
  */
-class ana_base : public fmwk_base{
+class ana_base : public FrameworkBase{
 
 public:
 
   /// Default constructor
-  ana_base() : fmwk_base() { _name="ana_base"; _fout=0;};
+  ana_base() : FrameworkBase() { _name="ana_base"; _fout=0;};
 
   /// Default destructor
   virtual ~ana_base(){};

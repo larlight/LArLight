@@ -25,7 +25,7 @@
    modules. This class process data by applying loaded analysis modules in
    consecutive order.
  */
-class ana_processor : public fmwk_base{
+class ana_processor : public FrameworkBase{
 
 public:
 

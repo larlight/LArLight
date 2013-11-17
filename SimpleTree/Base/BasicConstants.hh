@@ -12,8 +12,8 @@
 
     @{*/
 
-#ifndef CONSTANTS_HH
-#define CONSTANTS_HH
+#ifndef BASICCONSTANTS_HH
+#define BASICCONSTANTS_HH
 #include <TROOT.h>
 #include <string>
 

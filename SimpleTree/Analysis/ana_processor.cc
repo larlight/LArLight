@@ -14,7 +14,7 @@ ana_processor::ana_processor(){
 
 void ana_processor::set_verbosity(MSG::Level level){
 
-  fmwk_base::set_verbosity(level);
+  FrameworkBase::set_verbosity(level);
   if(_storage)
     _storage->set_verbosity(level);
   
