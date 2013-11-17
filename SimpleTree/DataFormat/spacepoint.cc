@@ -3,15 +3,19 @@
 
 #include "spacepoint.hh"
 
+//#####################################################################
 sps::sps(DATA::DATA_TYPE type) : data_base(type)
+//#####################################################################
 {
   initialize();
 }
 
+//#####################################################################
 void sps::add_spacepoint(UShort_t spsID, 
 			 Float_t x,  Float_t y,  Float_t z,
 			 Float_t ex, Float_t ey, Float_t ez,
 			 Float_t chi2)
+//#####################################################################
 {
   _spsID[_no_sps] = spsID;
   _vtxx[_no_sps]  = x;
@@ -24,8 +28,9 @@ void sps::add_spacepoint(UShort_t spsID,
   _no_sps++;
 }
 
-
+//#####################################################################
 void sps::clear_event(bool all)
+//#####################################################################
 {
   // Clear data_base variables
   data_base::clear_event(all);
@@ -48,7 +53,9 @@ void sps::clear_event(bool all)
 
 }
 
+//#####################################################################
 void sps::set_address(TTree* t)
+//#####################################################################
 {
 
   //Set address of the data_base variables

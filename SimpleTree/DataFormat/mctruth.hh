@@ -19,7 +19,7 @@
 
 /**
    \class mctruth
-   Simplified version of MCParticle data container
+   LArSoft MCTruth information container
 */
 class mctruth : public data_base {
 
@@ -68,7 +68,7 @@ public:
 
 protected:
 
-  UChar_t  _no_part;                          ///< Number of primary particles
+  UShort_t _no_part;                          ///< Number of primary particles
   Int_t    _pdgid[DATA::kMaxPrimaries];       ///< PDGID of a primary
   Int_t    _status_code[DATA::kMaxPrimaries]; ///< Status code of a primary... WHAT IS STATUS CODE??
   Int_t    _gen_trackID[DATA::kMaxPrimaries]; ///< Generation track ID of a primary ... (NOT G4 TRACK ID)

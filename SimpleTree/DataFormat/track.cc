@@ -3,7 +3,9 @@
 
 #include "track.hh"
 
+//#####################################################################
 track::track(DATA::DATA_TYPE type) : data_base(type)
+//#####################################################################
 {
   if(type!=DATA::Bezier && 
      type!=DATA::Kalman3DSPS &&
@@ -19,12 +21,13 @@ track::track(DATA::DATA_TYPE type) : data_base(type)
   initialize();
 }
 
-
+//###########################################################################################
 void track::add_track(UShort_t trackID, 
 		      Float_t  startx, Float_t  starty,   Float_t  startz,   Float_t  startd,
 		      Float_t  endx,   Float_t  endy,     Float_t  endz,     Float_t  endd,
 		      Float_t  theta,  Float_t  theta_xz, Float_t  theta_yz, 
 		      Double_t mom,    Double_t len)
+//###########################################################################################
 {
   _trackID[_no_tracks]  = trackID;
   _startx[_no_tracks]   = startx;
@@ -43,9 +46,11 @@ void track::add_track(UShort_t trackID,
   _no_tracks++;
 }
 
+//#####################################################################
 void track::add_trajectory(UShort_t vtxID, 
 			   Float_t x,  Float_t y,  Float_t z,
 			   Double_t px, Double_t py, Double_t pz)
+//#####################################################################
 {
   _vtxID[_no_points] = vtxID;
   _vtxx[_no_points]  = x;
@@ -57,7 +62,9 @@ void track::add_trajectory(UShort_t vtxID,
   _no_points++;
 }
 
+//#####################################################################
 void track::clear_event(bool all)
+//#####################################################################
 {
   // Clear data_base data
   data_base::clear_event(all);
@@ -102,7 +109,9 @@ void track::clear_event(bool all)
 
 }
 
+//#####################################################################
 void track::set_address(TTree* t)
+//#####################################################################
 {
   // base class address set
   data_base::set_address(t);

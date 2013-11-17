@@ -3,7 +3,10 @@
 
 #include "mctruth.hh"
 
-mctruth::mctruth(DATA::DATA_TYPE type) : data_base(type){
+//#####################################################################
+mctruth::mctruth(DATA::DATA_TYPE type) : data_base(type)
+//#####################################################################
+{
 
   if(type!=DATA::CRY_MCTruth &&
      type!=DATA::GENIE_MCTruth &&
@@ -18,8 +21,9 @@ mctruth::mctruth(DATA::DATA_TYPE type) : data_base(type){
   initialize();
 }
 
-/// Implementation of event-wise track data clear method
+//#####################################################################
 void mctruth::clear_event(bool all)
+//#####################################################################
 {
   // Clear data_base variables
   data_base::clear_event(all);
@@ -47,12 +51,13 @@ void mctruth::clear_event(bool all)
   _no_part = 0;
 }
 
-/// Method to add a primary particle
+//###################################################################################
 void mctruth::add_primary(Int_t pdgid, Int_t trackID, Int_t status_code, 
 			  Int_t ndaughter, Int_t mother,
 			  Float_t x, Float_t y, Float_t z,
 			  Double_t mass, Double_t en,
 			  Double_t mom,  Double_t momx, Double_t momy, Double_t momz)
+//###################################################################################
 {
   _pdgid[_no_part]       = pdgid;
   _gen_trackID[_no_part] = trackID;
@@ -71,8 +76,9 @@ void mctruth::add_primary(Int_t pdgid, Int_t trackID, Int_t status_code,
   _no_part++;
 }
 
-/// Implementation of track data address setter
+//###################################################################################
 void mctruth::set_address(TTree* t)
+//###################################################################################
 {
 
   //Set address of the data_base variables

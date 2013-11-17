@@ -5,7 +5,9 @@
 
 Message* Message::me = 0;
 
+//###################################################
 void Message::send(MSG::Level level, std::string msg)
+//###################################################
 {
   std::cout 
     << MSG::ColorPrefix[level].c_str()
@@ -15,7 +17,9 @@ void Message::send(MSG::Level level, std::string msg)
     << std::endl;
 }
 
+//######################################################################
 void Message::send(MSG::Level level, std::string where, std::string msg)
+//######################################################################
 {
   std::cout 
     << MSG::ColorPrefix[level].c_str()

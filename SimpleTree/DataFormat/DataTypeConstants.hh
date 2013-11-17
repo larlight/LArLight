@@ -24,14 +24,17 @@ namespace DATA{
   const UShort_t kMaxHits        = 20000; ///< Maximum number of hits to be held in C-array
   const UShort_t kMaxPrimaries   = 20000; ///< Maximum number of primary particles from generator
   const UShort_t kMaxClusters    = 1000;  ///< Maximum number of clusters
+  const UChar_t  kMaxNeutrinos   = 100;   ///< Maximum number of neutrinos per event produced by a generator
 
   /// Define identifier for a data container class to be loaded through storage_manager::get_data()
   enum DATA_TYPE{
     Event=0,
     UserInfo,           ///< dynamic data container
+    MCNeutrino,         ///< MCNeutrino
+    GENIE_MCNeutrino,   ///< GENIE MCNeutrino
     MCTruth,            ///< MCTruth
-    CRY_MCTruth,         ///< Cry MCTruth info
-    GENIE_MCTruth,       ///< GENIE MCTruth info
+    CRY_MCTruth,        ///< Cry MCTruth info
+    GENIE_MCTruth,      ///< GENIE MCTruth info
     FIFOChannel,        ///< FIFOChannel
     Wire,               ///< Wire
     Hit,                ///< Hit
@@ -60,6 +63,8 @@ namespace DATA{
   const std::string DATA_TREE_NAME[DATA_TYPE_MAX] = {
     "event",
     "user",
+    "mcnu",
+    "genie_mcnu",
     "mctruth",
     "cry_mctruth",
     "genie_mctruth",

@@ -3,7 +3,9 @@
 
 #include "hit.hh"
 
+//#####################################################################
 hit::hit(DATA::DATA_TYPE type) : data_base(type)
+//#####################################################################
 {
   if(type!=DATA::Hit && 
      type!=DATA::CrawlerHit &&
@@ -23,8 +25,9 @@ hit::hit(DATA::DATA_TYPE type) : data_base(type)
   initialize();
 }
 
-
+//#####################################################################
 void hit::clear_event(bool all)
+//#####################################################################
 {
   // Clear data_base variables
   data_base::clear_event(all);
@@ -43,10 +46,11 @@ void hit::clear_event(bool all)
   _no_hits = 0;
 }
 
-
+//#####################################################################
 void hit::add_hit(UChar_t  plane, UShort_t wire,   UShort_t channel,
 		  Double_t peakT, Double_t charge, Double_t ph,
 		  UShort_t trackID)
+//#####################################################################
 {
   _plane[_no_hits]   = plane;
   _wire[_no_hits]    = wire;
@@ -58,7 +62,9 @@ void hit::add_hit(UChar_t  plane, UShort_t wire,   UShort_t channel,
   _no_hits++;
 }
 
+//#####################################################################
 void hit::set_address(TTree* t)
+//#####################################################################
 {
 
   //Set address of the data_base variables

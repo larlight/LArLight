@@ -4,8 +4,10 @@
 
 storage_manager* storage_manager::me=0;
 
+//###################################################################################
 storage_manager::storage_manager(storage_manager::MODE mode)
   : FrameworkBase()
+//###################################################################################
 {
   _name="storage_manager";
   _fout=0;
@@ -18,7 +20,10 @@ storage_manager::storage_manager(storage_manager::MODE mode)
 
 };
 
-data_base* storage_manager::get_data(DATA::DATA_TYPE type){
+//###################################################################################
+data_base* storage_manager::get_data(DATA::DATA_TYPE type)
+//###################################################################################
+{
 
   // If data class object does not exist, and if it's either WRITE or BOTH mode, create it.
   if(!_ptr_data_array[type] && _mode != READ){
@@ -47,7 +52,9 @@ data_base* storage_manager::get_data(DATA::DATA_TYPE type){
 
 }
 
+//###################################################################################
 void storage_manager::reset()
+//###################################################################################
 {
   if(_verbosity[MSG::DEBUG])
     Message::send(MSG::DEBUG,__PRETTY_FUNCTION__,"called ...");
@@ -83,7 +90,9 @@ void storage_manager::reset()
     Message::send(MSG::DEBUG,__PRETTY_FUNCTION__,"ends ...");  
 };
 
+//###################################################################################
 bool storage_manager::is_open()
+//###################################################################################
 {
   bool status=true;
   switch(_status){
@@ -99,7 +108,9 @@ bool storage_manager::is_open()
   return status;
 }
 
+//###################################################################################
 bool storage_manager::is_ready_io()
+//###################################################################################
 {
   bool status=true;
   switch(_status){
@@ -114,7 +125,9 @@ bool storage_manager::is_ready_io()
   return status;
 }
 
+//###################################################################################
 bool storage_manager::open()
+//###################################################################################
 {
   bool status=true;
 
@@ -186,7 +199,10 @@ bool storage_manager::open()
   return prepare_tree();
 };
 
-bool storage_manager::prepare_tree(){
+//###################################################################################
+bool storage_manager::prepare_tree()
+//###################################################################################
+{
   
   bool status=true;
 
@@ -287,7 +303,10 @@ bool storage_manager::prepare_tree(){
   return status;
 }
 
-void storage_manager::create_data_ptr(DATA::DATA_TYPE type){
+//###################################################################################
+void storage_manager::create_data_ptr(DATA::DATA_TYPE type)
+//###################################################################################
+{
 
   if(_ptr_data_array[type]) return;
 
@@ -314,6 +333,10 @@ void storage_manager::create_data_ptr(DATA::DATA_TYPE type){
   case DATA::CRY_MCTruth:
     _ptr_data_array[type]=(data_base*)(new mctruth(type));
     break;
+  case DATA::MCNeutrino:
+  case DATA::GENIE_MCNeutrino:
+    _ptr_data_array[type]=(data_base*)(new mcnu(type));
+    break;
   case DATA::Cluster:
   case DATA::CrawlerCluster:
   case DATA::DBCluster:
@@ -337,7 +360,10 @@ void storage_manager::create_data_ptr(DATA::DATA_TYPE type){
   return;
 }
 
-void storage_manager::delete_data_ptr(DATA::DATA_TYPE type){
+//###################################################################################
+void storage_manager::delete_data_ptr(DATA::DATA_TYPE type)
+//###################################################################################
+{
 
   if(!_ptr_data_array[type]) return;
 
@@ -348,7 +374,10 @@ void storage_manager::delete_data_ptr(DATA::DATA_TYPE type){
   return;
 }
 
-bool storage_manager::close(){
+//###################################################################################
+bool storage_manager::close()
+//###################################################################################
+{
 
   if(_verbosity[MSG::DEBUG])
     Message::send(MSG::DEBUG,__PRETTY_FUNCTION__,"called ...");
@@ -422,7 +451,10 @@ bool storage_manager::close(){
   return status;
 }
 
-bool storage_manager::go_to(uint32_t index) {
+//###################################################################################
+bool storage_manager::go_to(uint32_t index)
+//###################################################################################
+{
 
   bool status=true;
   if(_mode==WRITE){
@@ -442,7 +474,10 @@ bool storage_manager::go_to(uint32_t index) {
   return status;
 }
 
-bool storage_manager::next_event(){
+//###################################################################################
+bool storage_manager::next_event()
+//###################################################################################
+{
 
   bool status=true;
 
@@ -477,7 +512,10 @@ bool storage_manager::next_event(){
   return status;
 }
 
-bool storage_manager::read_event(){
+//###################################################################################
+bool storage_manager::read_event()
+//###################################################################################
+{
 
   if(_index>=_nevents)
     return false;
@@ -494,7 +532,10 @@ bool storage_manager::read_event(){
   return true;
 }
 
-bool storage_manager::write_event(){
+//###################################################################################
+bool storage_manager::write_event()
+//###################################################################################
+{
   
   for(size_t i=0; i<DATA::DATA_TYPE_MAX; ++i) {
 
@@ -513,7 +554,10 @@ bool storage_manager::write_event(){
   return true;
 }
 
-const TChain* storage_manager::get_chain(){
+//###################################################################################
+const TChain* storage_manager::get_chain()
+//###################################################################################
+{
   
   TChain* ch=0;
 

@@ -18,6 +18,7 @@ class track;
 class sps;
 class hit;
 class cluster;
+class mcnu;
 #endif
 
 
