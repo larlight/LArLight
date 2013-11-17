@@ -3,7 +3,10 @@
 
 #include "ana_processor.hh"
 
-ana_processor::ana_processor(){
+//###################################################################################
+ana_processor::ana_processor()
+//###################################################################################
+{
   _name="ana_processor";
   _ofile_name="";
   //_mode=storage_manager::READ; // default I/O mode is to produce no output
@@ -12,7 +15,10 @@ ana_processor::ana_processor(){
   reset();
 }
 
-void ana_processor::set_verbosity(MSG::Level level){
+//###################################################################################
+void ana_processor::set_verbosity(MSG::Level level)
+//###################################################################################
+{
 
   FrameworkBase::set_verbosity(level);
   if(_storage)
@@ -24,7 +30,10 @@ void ana_processor::set_verbosity(MSG::Level level){
 
 }
 
-void ana_processor::reset(){
+//###################################################################################
+void ana_processor::reset()
+//###################################################################################
+{
   
   if(_verbosity[MSG::DEBUG])
     Message::send(MSG::DEBUG,__PRETTY_FUNCTION__,"called...");
@@ -45,7 +54,10 @@ void ana_processor::reset(){
   _process=INIT;
 }
 
-bool ana_processor::initialize(){
+//###################################################################################
+bool ana_processor::initialize()
+//###################################################################################
+{
 
   set_verbosity(_verbosity_level);
 
@@ -109,7 +121,10 @@ bool ana_processor::initialize(){
   return status;
 }
 
-bool ana_processor::process_event(uint32_t index){
+//###################################################################################
+bool ana_processor::process_event(uint32_t index)
+//###################################################################################
+{
 
   if(_process==INIT) {
     
@@ -143,7 +158,10 @@ bool ana_processor::process_event(uint32_t index){
     return finalize();
 }
 
-bool ana_processor::run(uint32_t start_index, uint32_t nevents){
+//###################################################################################
+bool ana_processor::run(uint32_t start_index, uint32_t nevents)
+//###################################################################################
+{
 
   if(_verbosity[MSG::DEBUG])
     Message::send(MSG::DEBUG,__PRETTY_FUNCTION__,"called...");
@@ -199,7 +217,10 @@ bool ana_processor::run(uint32_t start_index, uint32_t nevents){
   
 }
 
-bool ana_processor::finalize() {
+//###################################################################################
+bool ana_processor::finalize()
+//###################################################################################
+{
 
   if(_verbosity[MSG::DEBUG])
     Message::send(MSG::DEBUG,__PRETTY_FUNCTION__,"called...");
@@ -225,7 +246,10 @@ bool ana_processor::finalize() {
   return status;  
 }
 
-bool ana_processor::get_ana_status(ana_base* ptr) const{
+//###################################################################################
+bool ana_processor::get_ana_status(ana_base* ptr) const
+//###################################################################################
+{
 
   std::map<ana_base*,bool>::const_iterator iter(_ana_status.find(ptr));
   if(iter==_ana_status.end()) return false;
