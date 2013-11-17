@@ -61,6 +61,9 @@ void hit::add_hit(UChar_t  plane, UShort_t wire,   UShort_t channel,
 void hit::set_address(TTree* t)
 {
 
+  //Set address of the data_base variables
+  data_base::set_address(t);
+
   if(t->GetBranch("no_hits")) t->SetBranchAddress("no_hits",&_no_hits);
   else t->Branch("no_hits",&_no_hits,"no_hits/s");
 

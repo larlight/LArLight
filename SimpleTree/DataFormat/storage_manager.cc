@@ -33,7 +33,7 @@ data_base* storage_manager::get_data(DATA::DATA_TYPE type){
     create_data_ptr(type);
 
     _ptr_data_array[(size_t)type]->set_address(_out_ch[(size_t)type]);
-
+    
     Message::send(MSG::WARNING,__FUNCTION__,
 		  Form("Requested tree %s which does not exists yet. Created a new one.", 
 		       _out_ch[(size_t)type]->GetName())
@@ -314,14 +314,17 @@ void storage_manager::create_data_ptr(DATA::DATA_TYPE type){
   case DATA::CRY_MCTruth:
     _ptr_data_array[type]=(data_base*)(new mctruth(type));
     break;
-  case DATA::UserInfo:
-  case DATA::FIFOChannel:
-  case DATA::Wire:
   case DATA::Cluster:
   case DATA::CrawlerCluster:
   case DATA::DBCluster:
   case DATA::FuzzyCluster:
   case DATA::HoughCluster:
+    _ptr_data_array[type]=(data_base*)(new cluster(type));
+    break;
+  case DATA::UserInfo:
+  case DATA::FIFOChannel:
+  case DATA::Wire:
+
   case DATA::Seed:
   case DATA::Shower:
   case DATA::Calorimetry:

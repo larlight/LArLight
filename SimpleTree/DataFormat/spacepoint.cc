@@ -13,7 +13,7 @@ void sps::add_spacepoint(UShort_t spsID,
 			 Float_t ex, Float_t ey, Float_t ez,
 			 Float_t chi2)
 {
-  _spsId[_no_sps] = spsID;
+  _spsID[_no_sps] = spsID;
   _vtxx[_no_sps]  = x;
   _vtxy[_no_sps]  = y;
   _vtxz[_no_sps]  = z;
@@ -31,10 +31,10 @@ void sps::clear_event(bool all)
   data_base::clear_event(all);
 
   for(UShort_t index = 0;
-      (index < _no_sps) || (all && index<DATA::kMaxHits);
+      (index < _no_sps) || (all && index<DATA::kMaxSpacePoints);
       ++index) {
 
-    _spsId[index]      = 0;
+    _spsID[index]      = 0;
     _vtxx[index]       = 0;
     _vtxy[index]       = 0;
     _vtxz[index]       = 0;
@@ -51,31 +51,34 @@ void sps::clear_event(bool all)
 void sps::set_address(TTree* t)
 {
 
-  if(t->GetBranch("nsps")) t->SetBranchAddress("nsps",&_no_sps);
-  else t->Branch("nsps",&_no_sps,"nsps/s");
+  //Set address of the data_base variables
+  data_base::set_address(t);
 
-  if(t->GetBranch("spsId")) t->SetBranchAddress("spsId",_spsId);
-  else t->Branch("spsId",_spsId,"spsId[no_sps]/s");
+  if(t->GetBranch("no_sps")) t->SetBranchAddress("no_sps",&_no_sps);
+  else t->Branch("no_sps",&_no_sps,"no_sps/s");
 
-  if(t->GetBranch("_vtxx")) t->SetBranchAddress("vtxx",_vtxx);
+  if(t->GetBranch("spsID")) t->SetBranchAddress("spsID",_spsID);
+  else t->Branch("spsID",_spsID,"spsID[no_sps]/s");
+
+  if(t->GetBranch("vtxx")) t->SetBranchAddress("vtxx",_vtxx);
   else t->Branch("vtxx",_vtxx,"vtxx[no_sps]/F");
 
-  if(t->GetBranch("_vtxy")) t->SetBranchAddress("vtxy",_vtxy);
+  if(t->GetBranch("vtxy")) t->SetBranchAddress("vtxy",_vtxy);
   else t->Branch("vtxy",_vtxy,"vtxy[no_sps]/F");
 
-  if(t->GetBranch("_vtxz")) t->SetBranchAddress("vtxz",_vtxz);
+  if(t->GetBranch("vtxz")) t->SetBranchAddress("vtxz",_vtxz);
   else t->Branch("vtxz",_vtxz,"vtxz[no_sps]/F");
 
-  if(t->GetBranch("_vtxx_sigma")) t->SetBranchAddress("vtxx_sigma",_vtxx_sigma);
+  if(t->GetBranch("vtxx_sigma")) t->SetBranchAddress("vtxx_sigma",_vtxx_sigma);
   else t->Branch("vtxx_sigma",_vtxx_sigma,"vtxx_sigma[no_sps]/F");
 
-  if(t->GetBranch("_vtxy_sigma")) t->SetBranchAddress("vtxy_sigma",_vtxy_sigma);
+  if(t->GetBranch("vtxy_sigma")) t->SetBranchAddress("vtxy_sigma",_vtxy_sigma);
   else t->Branch("vtxy_sigma",_vtxy_sigma,"vtxy_sigma[no_sps]/F");
 
-  if(t->GetBranch("_vtxz_sigma")) t->SetBranchAddress("vtxz_sigma",_vtxz_sigma);
+  if(t->GetBranch("vtxz_sigma")) t->SetBranchAddress("vtxz_sigma",_vtxz_sigma);
   else t->Branch("vtxz_sigma",_vtxz_sigma,"vtxz_sigma[no_sps]/F");
 
-  if(t->GetBranch("_chi2")) t->SetBranchAddress("chi2",_chi2);
+  if(t->GetBranch("chi2")) t->SetBranchAddress("chi2",_chi2);
   else t->Branch("chi2",_chi2,"chi2[no_sps]/F");
 
 }

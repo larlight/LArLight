@@ -61,12 +61,11 @@ void track::clear_event(bool all)
 {
   // Clear data_base data
   data_base::clear_event(all);
-
+  
   // Clear track data
   for(UShort_t index = 0;
-      (index < _no_tracks) || (all && index<DATA::kMaxHits);
+      (index < _no_tracks) || (all && index<DATA::kMaxTracks);
       ++index) {
-
     _trackID[index]  = 0;
     _startx[index]   = 0;   
     _starty[index]   = 0;   
@@ -87,7 +86,7 @@ void track::clear_event(bool all)
   _no_tracks = 0;
 
   for(UShort_t index = 0;
-      (index < _no_points) || (all && index<DATA::kMaxHits);
+      (index < _no_points) || (all && index<DATA::kMaxTrackPoints);
       ++index) {
     
     _vtxID[index] = 0;

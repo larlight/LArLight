@@ -24,6 +24,7 @@
 #include "spacepoint.hh"
 #include "hit.hh"
 #include "mctruth.hh"
+#include "cluster.hh"
 /*
 #include "mctruth.hh"
 #include "user_info.hh"
@@ -31,7 +32,7 @@
 #include "pmtfifo.hh"
 #include "wire.hh"
 #include "hit.hh"
-#include "cluster.hh"
+
 */
 
 /**

@@ -25,7 +25,7 @@ void mctruth::clear_event(bool all)
   data_base::clear_event(all);
 
   for(UShort_t index = 0;
-      (index < _no_part) || (all && index<DATA::kMaxHits);
+      (index < _no_part) || (all && index<DATA::kMaxPrimaries);
       ++index) {
 
     _pdgid[index] = 0;
@@ -74,6 +74,10 @@ void mctruth::add_primary(Int_t pdgid, Int_t trackID, Int_t status_code,
 /// Implementation of track data address setter
 void mctruth::set_address(TTree* t)
 {
+
+  //Set address of the data_base variables
+  data_base::set_address(t);
+
   if(t->GetBranch("no_part")) t->SetBranchAddress("no_part",&_no_part);
   else t->Branch("no_part",&_no_part,"no_part/s");
 

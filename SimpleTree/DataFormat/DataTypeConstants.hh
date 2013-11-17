@@ -23,6 +23,7 @@ namespace DATA{
   const UShort_t kMaxSpacePoints = 10000; ///< Maximum number of spacepoints to be held in C-array
   const UShort_t kMaxHits        = 20000; ///< Maximum number of hits to be held in C-array
   const UShort_t kMaxPrimaries   = 20000; ///< Maximum number of primary particles from generator
+  const UShort_t kMaxClusters    = 1000;  ///< Maximum number of clusters
 
   /// Define identifier for a data container class to be loaded through storage_manager::get_data()
   enum DATA_TYPE{

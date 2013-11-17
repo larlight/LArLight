@@ -17,4 +17,5 @@
 #pragma link C++ class sps+;
 #pragma link C++ class hit+;
 #pragma link C++ class mctruth+;
+#pragma link C++ class cluster+;
 #endif

@@ -46,7 +46,7 @@ public:
 
   //--- Member getters ---//
   UShort_t        no_sps()     const { return _no_sps;     };
-  const UShort_t* spsId()      const { return _spsId;      };
+  const UShort_t* spsID()      const { return _spsID;      };
   const Float_t*  vtxx()       const { return _vtxx;       };
   const Float_t*  vtxy()       const { return _vtxy;       };
   const Float_t*  vtxz()       const { return _vtxz;       };
@@ -64,7 +64,7 @@ public:
 protected:
 
   UShort_t _no_sps;                            ///< Number of space-points (SPS)
-  UShort_t _spsId[DATA::kMaxSpacePoints];      ///< SPS ID
+  UShort_t _spsID[DATA::kMaxSpacePoints];      ///< SPS ID
   Float_t  _vtxx[DATA::kMaxSpacePoints];       ///< SPS x coordinates
   Float_t  _vtxy[DATA::kMaxSpacePoints];       ///< SPS y coordinates
   Float_t  _vtxz[DATA::kMaxSpacePoints];       ///< SPS z coordinates
