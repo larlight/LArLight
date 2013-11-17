@@ -15,7 +15,7 @@
 #include "track.hh"
 #include "mctruth.hh"
 #include "mcnu.hh"
-
+#include "mcpart.hh"
 // Class forward declaration here
 class storage_manager;
 class data_base;
@@ -26,6 +26,7 @@ class sps;
 class track;
 class mctruth;
 class mcnu;
+class mcpart;
 
 #endif
 

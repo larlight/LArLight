@@ -1,13 +1,13 @@
 /**
  * \file storage_manager.hh
  *
- * \ingroup DataFormat
+ * \ingroup SimpleTreeData
  * 
  * \brief Higher elve data handling class def header file.
  *
  * @author Kazu - Nevis 2013
  */
-/** \addtogroup DataFormat
+/** \addtogroup SimpleTreeData
 
     @{*/
 

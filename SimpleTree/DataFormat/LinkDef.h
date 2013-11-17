@@ -19,5 +19,6 @@
 #pragma link C++ class mctruth+;
 #pragma link C++ class cluster+;
 #pragma link C++ class mcnu+;
+#pragma link C++ class mcpart+;
 #pragma link C++ class event+;
 #endif

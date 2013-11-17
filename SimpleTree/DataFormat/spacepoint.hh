@@ -1,14 +1,14 @@
 /**
  * \file spacepoint.hh
  *
- * \ingroup DataFormat
+ * \ingroup SimpleTreeData
  * 
  * \brief Class def header for sps data container
  *
  * @author Kazu - Nevis 2013
  */
 
-/** \addtogroup DataFormat
+/** \addtogroup SimpleTreeData
 
     @{*/
 

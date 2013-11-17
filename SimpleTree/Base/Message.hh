@@ -1,14 +1,14 @@
 /**
  * \file Message.hh
  *
- * \ingroup Base
+ * \ingroup SimpleTreeBase
  * 
  * \brief Message utility class definition header file.
  *
  * @author Kazu - Nevis 2013
  */
 
-/** \addtogroup Base
+/** \addtogroup SimpleTreeBase
 
     @{*/
 

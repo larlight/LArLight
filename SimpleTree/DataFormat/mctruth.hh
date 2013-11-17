@@ -1,14 +1,14 @@
 /**
  * \file mctruth.hh
  *
- * \ingroup DataFormat
+ * \ingroup SimpleTreeData
  * 
  * \brief Class def header for mctruth data container
  *
  * @author Kazu - Nevis 2013
  */
 
-/** \addtogroup DataFormat
+/** \addtogroup SimpleTreeData
     
 @{*/
 

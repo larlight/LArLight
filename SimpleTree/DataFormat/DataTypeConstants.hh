@@ -1,14 +1,14 @@
 /**
  * \file DataTypeConstants.hh
  *
- * \ingroup DataFormat
+ * \ingroup SimpleTreeData
  * 
  * \brief defines data format related constants used in this framework
  *
  * @author Kazu - Nevis 2013
  */
 
-/** \addtogroup DataFormat
+/** \addtogroup SimpleTreeData
 
     @{*/
 #ifndef DATATYPECONSTANTS_HH
@@ -18,13 +18,15 @@
 namespace DATA{
     
   // Maximum size of C-array
-  const UShort_t kMaxTracks      = 300;   ///< Maximum number of tracks to be held in C-array
-  const UShort_t kMaxTrackPoints = 10000; ///< Maximum number of track trajectory points to be held in C-array
-  const UShort_t kMaxSpacePoints = 10000; ///< Maximum number of spacepoints to be held in C-array
-  const UShort_t kMaxHits        = 20000; ///< Maximum number of hits to be held in C-array
-  const UShort_t kMaxPrimaries   = 20000; ///< Maximum number of primary particles from generator
-  const UShort_t kMaxClusters    = 1000;  ///< Maximum number of clusters
-  const UChar_t  kMaxNeutrinos   = 100;   ///< Maximum number of neutrinos per event produced by a generator
+  const UShort_t kMaxTracks       = 300;    ///< Maximum number of tracks to be held in C-array
+  const UShort_t kMaxTrackPoints  = 10000;  ///< Maximum number of track trajectory points to be held in C-array
+  const UShort_t kMaxSpacePoints  = 10000;  ///< Maximum number of spacepoints to be held in C-array
+  const UShort_t kMaxHits         = 20000;  ///< Maximum number of hits to be held in C-array
+  const UShort_t kMaxPrimaries    = 20000;  ///< Maximum number of primary particles from generator
+  const UShort_t kMaxClusters     = 1000;   ///< Maximum number of clusters
+  const UChar_t  kMaxNeutrinos    = 100;    ///< Maximum number of neutrinos per event produced by a generator
+  const UShort_t kMaxParticles    = 10000;  ///< Maximum number of particles from G4 tracking info
+  const UShort_t kMaxTrajectories = 0xffff; ///< Maximum number of particle's trajectory points that can be stored
 
   /// Define identifier for a data container class to be loaded through storage_manager::get_data()
   enum DATA_TYPE{
