@@ -3,8 +3,6 @@
  *
  * \ingroup SimpleTreeData
  * 
- * \brief defines data format related constants used in this framework
- *
  * @author Kazu - Nevis 2013
  */
 

@@ -2,8 +2,6 @@
  * \file hit.hh
  *
  * \ingroup SimpleTreeData
- * 
- * \brief Class def header for hit data container
  *
  * @author Kazu - Nevis 2013
  */
@@ -18,7 +16,7 @@
 #include "data_base.hh"
 /**
    \class hit
-   LArSoft Hit class equivalent data container
+   LArSoft Hit class equivalent data container that holds C-array with 1 entry per hit. Note it also holds an associated track ID as well.
 */
 class hit : public data_base {
 

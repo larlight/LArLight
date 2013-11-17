@@ -3,8 +3,6 @@
  *
  * \ingroup SimpleTreeData
  * 
- * \brief Class def header for mctruth data container
- *
  * @author Kazu - Nevis 2013
  */
 
@@ -19,7 +17,7 @@
 
 /**
    \class mctruth
-   LArSoft MCTruth information container
+   LArSoft MCTruth information container to hold particle's starting & ending information in particlar from the generator (i.e. not LArGeant but generators such as GENIE, CRY, etc...). More dedicated information is provided by mcpart class which accesses G4 particle information.
 */
 class mctruth : public data_base {
 

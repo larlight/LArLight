@@ -2,8 +2,6 @@
  * \file ana_processor.hh
  *
  * \ingroup Analysis
- * 
- * \brief A batch processor class for arbitrary number of analysis modules
  *
  * @author Kazu - Nevis 2013
  */

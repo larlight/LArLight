@@ -3,8 +3,6 @@
  *
  * \ingroup SimpleTreeBase
  * 
- * \brief Message utility class definition header file.
- *
  * @author Kazu - Nevis 2013
  */
 

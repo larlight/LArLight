@@ -3,8 +3,6 @@
  *
  * \ingroup SimpleTreeData
  * 
- * \brief Class def header for track data container
- *
  * @author Kazu - Nevis 2013
  */
 
@@ -19,7 +17,7 @@
 
 /**
    \class track
-   Implementation of data_base for track data
+   Implementation of data_base for LArSoft Track data class. It holds two kinds of C-arrays: one is a track summary information created per track, and another C-array to hold the full step-wise trajectory points for each track. 
 */
 class track : public data_base {
 

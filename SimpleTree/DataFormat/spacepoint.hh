@@ -3,8 +3,6 @@
  *
  * \ingroup SimpleTreeData
  * 
- * \brief Class def header for sps data container
- *
  * @author Kazu - Nevis 2013
  */
 
@@ -21,7 +19,7 @@
 
 /**
    \class sps
-   LArSoft Sps class equivalent data container
+   LArSoft Spacepoints class equivalent data container. It holds C-array with 1 entry per spacepoint. 
 */
 class sps : public data_base {
 

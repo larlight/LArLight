@@ -1,14 +1,12 @@
 /**
  * \file mcpart.hh
  *
- * \ingroup DataFormat
+ * \ingroup SimpleTreeData
  * 
- * \brief Class def header for mcpart data container
- *
  * @author Kazu - Nevis 2013
  */
 
-/** \addtogroup DataFormat
+/** \addtogroup SimpleTreeData
     
 @{*/
 
@@ -19,7 +17,7 @@
 
 /**
    \class mcpart
-   LArSoft Mcpart information container
+   LArSoft MCParticle information container dedicated for those particles going through the fiducial volume. Some information overlapps with MCTruth as this module also stores only the starting & ending point information. For detailed track, refer to a future implementation of mctrack class which is meant to hold the whole MC trajectory information.
 */
 class mcpart : public data_base {
 

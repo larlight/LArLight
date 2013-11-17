@@ -3,8 +3,6 @@
  *
  * \ingroup SimpleTreeBase
  * 
- * \brief defines basic constants used in this framework
- *
  * @author Kazu - Nevis 2013
  */
 

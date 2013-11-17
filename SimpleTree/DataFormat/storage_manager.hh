@@ -3,8 +3,6 @@
  *
  * \ingroup SimpleTreeData
  * 
- * \brief Higher elve data handling class def header file.
- *
  * @author Kazu - Nevis 2013
  */
 /** \addtogroup SimpleTreeData
@@ -36,7 +34,7 @@
 
 /**
    \class storage_manager
-   A higher level manager class to handle event-wise data and output file.
+   Dedicated file I/O service module. The module provide an efficient event loop ability for analyzers. It can be also used to chain-up multiple trees together to perform a simple TTree::Draw() analysis. For a even higher level analysis loop support, look at ana_processor class in Analysis package.
 */
 class storage_manager : public FrameworkBase {
 

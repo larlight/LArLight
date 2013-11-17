@@ -99,7 +99,7 @@ ALWAYS_DETAILED_SEC    = YES
 # members were ordinary class members. Constructors, destructors and assignment
 # operators of the base classes will not be shown.
 
-INLINE_INHERITED_MEMB  = YES
+INLINE_INHERITED_MEMB  = NO
 
 # If the FULL_PATH_NAMES tag is set to YES then Doxygen will prepend the full
 # path before files name in the file list and in the header files. If set
@@ -153,7 +153,7 @@ QT_AUTOBRIEF           = NO
 # The new default is to treat a multi-line C++ comment block as a detailed
 # description. Set this tag to YES if you prefer the old behaviour instead.
 
-MULTILINE_CPP_IS_BRIEF = NO
+MULTILINE_CPP_IS_BRIEF = YES
 
 # If the INHERIT_DOCS tag is set to YES (the default) then an undocumented
 # member inherits the documentation from any documented member that it

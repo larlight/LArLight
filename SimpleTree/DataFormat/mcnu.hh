@@ -3,8 +3,6 @@
  *
  * \ingroup SimpleTreeData
  * 
- * \brief Class def header for mcnu data container
- *
  * @author Kazu - Nevis 2013
  */
 
@@ -18,7 +16,7 @@
 #include "data_base.hh"
 /**
    \class mcnu
-   Simplified version of MCNeutrino information container
+   Simplified version of MCNeutrino information container to hold truth information from MC neutrino generators such as GENIE. Some information overlaps with mctruth as the same information is stored in MCTruth format.
 */
 class mcnu : public data_base {
 

@@ -3,8 +3,6 @@
  *
  * \ingroup SimpleTreeData
  * 
- * \brief Class def header for event data container
- *
  * @author Kazu - Nevis 2013
  */
 

@@ -3,8 +3,6 @@
  *
  * \ingroup SimpleTreeData
  * 
- * \brief Class def header for cluster data container
- *
  * @author Kazu - Nevis 2013
  */
 
@@ -19,7 +17,7 @@
 
 /**
    \class cluster
-   LArSoft Cluster class equivalent data container
+   LArSoft Cluster class equivalent data container. It contains C-array of cluster information (1 entry per cluster).
 */
 class cluster : public data_base {
 

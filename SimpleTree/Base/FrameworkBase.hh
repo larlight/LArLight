@@ -3,12 +3,11 @@
  *
  * \ingroup SimpleTreeBase
  * 
- * \brief Class definition file of FrameworkBase
- *
  * @author Kazu - Nevis 2013
  */
 
 /** \addtogroup SimpleTreeBase
+    Base package, pretty much empty. Defines message facility & framework base class.
 
     @{*/
 

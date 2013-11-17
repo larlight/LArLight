@@ -3,12 +3,12 @@
  *
  * \ingroup Analysis
  * 
- * \brief Base class def for all analysis classes
- *
  * @author Kazu - Nevis 2013
  */
 
 /** \addtogroup Analysis
+
+    Analysis package dedicated for high level analysis module development and driver code. Empty for now.
 
     @{*/
 
