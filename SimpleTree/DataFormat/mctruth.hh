@@ -1,3 +1,5 @@
+#ifndef MCTRUTH_HH
+#define MCTRUTH_HH
 /**
  * \file mctruth.hh
  *
@@ -10,9 +12,6 @@
     
 @{*/
 
-#ifndef MCTRUTH_HH
-#define MCTRUTH_HH
-
 #include "data_base.hh"
 
 /**
@@ -24,7 +23,7 @@ class mctruth : public data_base {
 public:
 
   /// Default constructor
-  mctruth(DATA::DATA_TYPE type=DATA::Track);
+  mctruth(DATA::DATA_TYPE type=DATA::MCTruth);
 
   /// Default destructor
   virtual ~mctruth(){};

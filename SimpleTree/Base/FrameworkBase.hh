@@ -1,3 +1,5 @@
+#ifndef FRAMEWORKBASE_HH
+#define FRAMEWORKBASE_HH
 /**
  * \file FrameworkBase.hh
  *
@@ -10,9 +12,6 @@
     Base package, pretty much empty. Defines message facility & framework base class.
 
     @{*/
-
-#ifndef FRAMEWORKBASE_HH
-#define FRAMEWORKBASE_HH
 
 #include "BasicConstants.hh"
 #include "Message.hh"

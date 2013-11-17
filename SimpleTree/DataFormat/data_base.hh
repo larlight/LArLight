@@ -1,3 +1,5 @@
+#ifndef DATA_BASE_HH
+#define DATA_BASE_HH
 /**
  * \file data_base.hh
  *
@@ -9,8 +11,6 @@
 /** \addtogroup SimpleTreeData
     This package defines data storage classes that serves as an I/O interface with stored analysis tree. It includes a dedicated event loop I/O facility called storage_manager which also helps analyzers to obtain a simply chained-up TTrees for simple TTree::Draw analysis.
     @{*/
-#ifndef DATA_BASE_HH
-#define DATA_BASE_HH
 
 #include "Base-TypeDef.hh"
 #include "DataTypeConstants.hh"

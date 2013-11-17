@@ -1,3 +1,5 @@
+#ifndef BASICCONSTANTS_HH
+#define BASICCONSTANTS_HH
 /**
  * \file BasicConstants.hh
  *
@@ -10,8 +12,6 @@
 
     @{*/
 
-#ifndef BASICCONSTANTS_HH
-#define BASICCONSTANTS_HH
 #include <TROOT.h>
 #include <string>
 

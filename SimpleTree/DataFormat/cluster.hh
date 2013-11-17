@@ -1,3 +1,5 @@
+#ifndef CLUSTER_HH
+#define CLUSTER_HH
 /**
  * \file cluster.hh
  *
@@ -9,9 +11,6 @@
 /** \addtogroup SimpleTreeData
 
     @{*/
-
-#ifndef CLUSTER_HH
-#define CLUSTER_HH
 
 #include "data_base.hh"
 

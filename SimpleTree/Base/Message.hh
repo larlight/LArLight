@@ -1,3 +1,5 @@
+#ifndef MESSAGE_HH
+#define MESSAGE_HH
 /**
  * \file Message.hh
  *
@@ -9,10 +11,6 @@
 /** \addtogroup SimpleTreeBase
 
     @{*/
-
-
-#ifndef MESSAGE_HH
-#define MESSAGE_HH
 
 #include <cstdio>
 #include <iostream>

@@ -1,3 +1,5 @@
+#ifndef ANA_BASE_HH
+#define ANA_BASE_HH
 /**
  * \file ana_base.hh
  *
@@ -11,9 +13,6 @@
     Analysis package dedicated for high level analysis module development and driver code. Empty for now.
 
     @{*/
-
-#ifndef ANA_BASE_HH
-#define ANA_BASE_HH
 
 #include <TFile.h>
 #include "FrameworkBase.hh"

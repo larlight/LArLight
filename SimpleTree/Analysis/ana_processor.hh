@@ -1,3 +1,5 @@
+#ifndef ANA_PROCESSOR_HH
+#define ANA_PROCESSOR_HH
 /**
  * \file ana_processor.hh
  *
@@ -9,8 +11,6 @@
 /** \addtogroup Analysis
 
     @{*/
-#ifndef ANA_PROCESSOR_HH
-#define ANA_PROCESSOR_HH
 
 #include <TFile.h>
 #include <vector>

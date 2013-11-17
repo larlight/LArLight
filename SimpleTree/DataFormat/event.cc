@@ -16,6 +16,8 @@ void event::clear_event(bool all)
 //####################################################
 {
   /// Clear base class variables
+  data_base::clear_event(all);
+
   _eventID  = 0;
   _runID    = 0;
   _subrunID = 0;
@@ -47,6 +49,9 @@ void event::set_event(UInt_t eventID, UInt_t runID, UInt_t subrunID,
 void event::set_address(TTree* t)
 //#################################################################
 {
+  /// Set base class address
+  data_base::set_address(t);
+  
   if(t->GetBranch("eventID")) t->SetBranchAddress("eventID",&_eventID);
   else t->Branch("eventID",&_eventID,"eventID/i");
 

@@ -1,3 +1,5 @@
+#ifndef MCPART_HH
+#define MCPART_HH
 /**
  * \file mcpart.hh
  *
@@ -10,9 +12,6 @@
     
 @{*/
 
-#ifndef MCPART_HH
-#define MCPART_HH
-
 #include "data_base.hh"
 
 /**
@@ -24,7 +23,7 @@ class mcpart : public data_base {
 public:
 
   /// Default constructor
-  mcpart(DATA::DATA_TYPE type=DATA::Track);
+  mcpart(DATA::DATA_TYPE type=DATA::MCParticle);
 
   /// Default destructor
   virtual ~mcpart(){};
@@ -40,9 +39,40 @@ public:
   /// Implementation of track data address setter
   virtual void set_address(TTree* t);
 
+  /**
+     This method adds a particle information into C-array data structure based on
+     the information provided by mcpart::set_part_info and mcpart::set_fv_part_info
+     methods. Call those two methods first to set particle information before calling
+     this function.
+   */
+  void add_particle(UShort_t trackID, Int_t pdgid, Int_t status_code);
+
+  /**
+     Needs to be called BEFORE mcpart::add_particle function.
+     This sets particle information about the start and end of particle tracking
+     disregard of the fiducial volume.
+  */
+  void set_part_info(Double_t mom, Double_t momx,  Double_t momy,  Double_t momz,
+		     Float_t startx, Float_t starty, Float_t startz, Double_t startt,
+		     Float_t endx,   Float_t endy,   Float_t endz,   Double_t endt,
+		     Float_t len);
+
+  /**
+     Needs to be called BEFORE mcpart::add_particle function.
+     This sets particle information about the start and end of particle tracking
+     inside the fiducial volume.
+  */
+  void set_fv_part_info(Double_t mom, Double_t momx,  Double_t momy,  Double_t momz,
+			Float_t startx, Float_t starty, Float_t startz, Double_t startt,
+			Float_t endx,   Float_t endy,   Float_t endz,   Double_t endt,
+			Float_t len);
+
 protected:
 
-  UShort_t _no_part;                           ///< Number of particles stored
+  bool _part_info_set;    ///< Checker variable set to true by mcpart::set_part_info and false by mcpart::add_particle
+  bool _fv_part_info_set; ///< Checker variable set to true by mcpart::set_fv_part_info and false by mcpart::add_particle
+
+  UShort_t  _no_part;                           ///< Number of particles stored
   UShort_t  _trackID[DATA::kMaxParticles];     ///< Track ID ... unique per particle from G4
   Int_t     _pdgid[DATA::kMaxParticles];       ///< PDGID of a particle
   Int_t     _status_code[DATA::kMaxParticles]; ///< Status code of a particle (what is this?)

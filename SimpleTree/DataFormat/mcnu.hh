@@ -1,3 +1,5 @@
+#ifndef MCNU_HH
+#define MCNU_HH
 /**
  * \file mcnu.hh
  *
@@ -9,9 +11,6 @@
 /** \addtogroup SimpleTreeData
     
 @{*/
-
-#ifndef MCNU_HH
-#define MCNU_HH
 
 #include "data_base.hh"
 /**

@@ -1,3 +1,5 @@
+#ifndef DATATYPECONSTANTS_HH
+#define DATATYPECONSTANTS_HH
 /**
  * \file DataTypeConstants.hh
  *
@@ -9,8 +11,6 @@
 /** \addtogroup SimpleTreeData
 
     @{*/
-#ifndef DATATYPECONSTANTS_HH
-#define DATATYPECONSTANTS_HH
 
 /// Defines constants for data structure definition (system utility)
 namespace DATA{
@@ -24,38 +24,40 @@ namespace DATA{
   const UShort_t kMaxClusters     = 1000;   ///< Maximum number of clusters
   const UChar_t  kMaxNeutrinos    = 100;    ///< Maximum number of neutrinos per event produced by a generator
   const UShort_t kMaxParticles    = 10000;  ///< Maximum number of particles from G4 tracking info
-  const UShort_t kMaxTrajectories = 0xffff; ///< Maximum number of particle's trajectory points that can be stored
+  const Int_t kMaxTrajectories    = 0xffff; ///< Maximum number of particle's trajectory points that can be stored
 
   /// Define identifier for a data container class to be loaded through storage_manager::get_data()
   enum DATA_TYPE{
     Event=0,
     UserInfo,           ///< dynamic data container
-    MCNeutrino,         ///< MCNeutrino
+    MCNeutrino,         ///< LArSoft MCNeutrino
     GENIE_MCNeutrino,   ///< GENIE MCNeutrino
-    MCTruth,            ///< MCTruth
+    MCTruth,            ///< LArSoft MCTruth
     CRY_MCTruth,        ///< Cry MCTruth info
     GENIE_MCTruth,      ///< GENIE MCTruth info
-    FIFOChannel,        ///< FIFOChannel
-    Wire,               ///< Wire
-    Hit,                ///< Hit
+    MCParticle,         ///< LArSoft MCParticle
+    MCTrajectory,       ///< LArSoft MCTrajectory
+    FIFOChannel,        ///< LArSoft FIFOChannel
+    Wire,               ///< LArSoft Wire
+    Hit,                ///< LArSoft Hit
     CrawlerHit,         ///< ClusterCrawler Hit algo
     GausHit,            ///< Gaus Hit algo
     APAHit,             ///< APA Hit algo
     FFTHit,             ///< FFT Hit algo
     RFFHit,             ///< RFF Hit algo
-    Cluster,            ///< Cluster
+    Cluster,            ///< LArSoft Cluster
     FuzzyCluster,       ///< Fuzzy Cluster
     DBCluster,          ///< DBCluster
-    CrawlerCluster,     ///< Crawler
-    HoughCluster,       ///< Hough
-    Seed,               ///< Seed
-    SpacePoint,         ///< Spacepoints
-    Track,              ///< Track
+    CrawlerCluster,     ///< ClusterCrawler
+    HoughCluster,       ///< LArSoft Hough
+    Seed,               ///< LArSoft Seed
+    SpacePoint,         ///< LArSoft Spacepoints
+    Track,              ///< LArSoft Track
     Bezier,             ///< Track (Bezier)
     Kalman3DSPS,        ///< Track (Kalman3DSPS)
     Kalman3DHit,        ///< Track (Kalman3DHit)
-    Shower,             ///< Shower
-    Calorimetry,        ///< Calorimetry
+    Shower,             ///< LArSoft Shower
+    Calorimetry,        ///< LArSoft Calorimetry
     DATA_TYPE_MAX
   };
 
@@ -68,6 +70,8 @@ namespace DATA{
     "mctruth",
     "cry_mctruth",
     "genie_mctruth",
+    "mcpart",
+    "mcstep",
     "pmt",
     "wire",
     "hit",
@@ -94,3 +98,4 @@ namespace DATA{
 }
 
 #endif
+/** @} */ // end of doxygen group 

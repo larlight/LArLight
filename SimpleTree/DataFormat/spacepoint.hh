@@ -1,3 +1,5 @@
+#ifndef SPACEPOINT_HH
+#define SPACEPOINT_HH
 /**
  * \file spacepoint.hh
  *
@@ -9,9 +11,6 @@
 /** \addtogroup SimpleTreeData
 
     @{*/
-
-#ifndef SPACEPOINT_HH
-#define SPACEPOINT_HH
 
 #include "data_base.hh"
 #include "TVector3.h"

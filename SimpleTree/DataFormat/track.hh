@@ -1,3 +1,5 @@
+#ifndef TRACK_HH
+#define TRACK_HH
 /**
  * \file track.hh
  *
@@ -9,9 +11,6 @@
 /** \addtogroup SimpleTreeData
 
     @{*/
-
-#ifndef TRACK_HH
-#define TRACK_HH
 
 #include "data_base.hh"
 

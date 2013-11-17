@@ -347,6 +347,12 @@ void storage_manager::create_data_ptr(DATA::DATA_TYPE type)
   case DATA::HoughCluster:
     _ptr_data_array[type]=(data_base*)(new cluster(type));
     break;
+  case DATA::MCParticle:
+    _ptr_data_array[type]=(data_base*)(new mcpart(type));
+    break;
+  case DATA::MCTrajectory:
+    _ptr_data_array[type]=(data_base*)(new mcstep(type));
+    break;
   case DATA::UserInfo:
   case DATA::FIFOChannel:
   case DATA::Wire:

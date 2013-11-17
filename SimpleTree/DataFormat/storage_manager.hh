@@ -1,3 +1,5 @@
+#ifndef STORAGE_MANAGER_HH
+#define STORAGE_MANAGER_HH
 /**
  * \file storage_manager.hh
  *
@@ -8,9 +10,6 @@
 /** \addtogroup SimpleTreeData
 
     @{*/
-
-#ifndef STORAGE_MANAGER_HH
-#define STORAGE_MANAGER_HH
 
 #include <TSystem.h>
 #include <TFile.h>
@@ -25,7 +24,8 @@
 #include "track.hh"
 #include "mctruth.hh"
 #include "mcnu.hh"
-
+#include "mcpart.hh"
+#include "mcstep.hh"
 /*
 #include "user_info.hh"
 #include "pmtfifo.hh"
