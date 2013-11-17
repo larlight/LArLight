@@ -43,7 +43,6 @@ else
 	    python $MAKE_TOP_DIR/config/srtlocal_clean_link.py
 	    python $MAKE_TOP_DIR/config/srtlocal_make_link.py
 	    rm -f $MAKE_TOP_DIR/LArModule/DataScanner/$ANA_PROC_RELPATH
-	    python $MAKE_TOP_DIR/config/make_link.py 
 	    python $MAKE_TOP_DIR/config/make_link.py $ANA_PROC_DIR  $LAR_MODULE_DIR/DataScanner/$ANA_PROC_RELPATH
 	    python $MAKE_TOP_DIR/config/make_link.py $LAR_MODULE_DIR/DataScanner/src/${ANA_PROC_RELPATH}_module.cc $LAR_MODULE_DIR/DataScanner/DataScanner_module.cc
 	    python $MAKE_TOP_DIR/config/make_link.py $ANA_PROC_DIR/lib/anaproc_rootmap.sh $ANA_PROC_LIBDIR/anaproc_rootmap.sh
