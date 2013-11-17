@@ -19,11 +19,11 @@
 #include <TChain.h>
 #include <TError.h>
 
-#include "fmwk_base.hh"
 #include "data_base.hh"
 #include "track.hh"
 #include "spacepoint.hh"
 #include "hit.hh"
+#include "mctruth.hh"
 /*
 #include "mctruth.hh"
 #include "user_info.hh"
@@ -38,7 +38,7 @@
    \class storage_manager
    A higher level manager class to handle event-wise data and output file.
 */
-class storage_manager : public fmwk_base {
+class storage_manager : public FrameworkBase {
 
 public:
 

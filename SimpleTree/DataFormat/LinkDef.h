@@ -9,9 +9,12 @@
 #pragma link off all classes;
 #pragma link off all functions;
 
+#pragma link C++ namespace DATA;
+
 #pragma link C++ class storage_manager+;
 #pragma link C++ class data_base+;
 #pragma link C++ class track+;
 #pragma link C++ class sps+;
 #pragma link C++ class hit+;
+#pragma link C++ class mctruth+;
 #endif

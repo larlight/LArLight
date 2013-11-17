@@ -5,7 +5,7 @@
 storage_manager* storage_manager::me=0;
 
 storage_manager::storage_manager(storage_manager::MODE mode)
-  : fmwk_base()
+  : FrameworkBase()
 {
   _name="storage_manager";
   _fout=0;
@@ -306,9 +306,14 @@ void storage_manager::create_data_ptr(DATA::DATA_TYPE type){
   case DATA::GausHit:
   case DATA::APAHit:
   case DATA::FFTHit:
+  case DATA::RFFHit:
     _ptr_data_array[type]=(data_base*)(new hit(type));
     break;
   case DATA::MCTruth:
+  case DATA::GENIE_MCTruth:
+  case DATA::CRY_MCTruth:
+    _ptr_data_array[type]=(data_base*)(new mctruth(type));
+    break;
   case DATA::UserInfo:
   case DATA::FIFOChannel:
   case DATA::Wire:

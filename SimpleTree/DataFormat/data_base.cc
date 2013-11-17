@@ -3,7 +3,7 @@
 
 #include "data_base.hh"
 
-data_base::data_base(DATA::DATA_TYPE type) : fmwk_base()
+data_base::data_base(DATA::DATA_TYPE type) : FrameworkBase()
 {
   _name  = DATA::DATA_TREE_NAME[type];
   _type  = type;
@@ -12,10 +12,10 @@ data_base::data_base(DATA::DATA_TYPE type) : fmwk_base()
 
 void data_base::initialize()
 {
-  clear_event();
+  clear_event(true);
 }
 
-void data_base::clear_event()
+void data_base::clear_event(bool all)
 {
   _entry=-1;
 }

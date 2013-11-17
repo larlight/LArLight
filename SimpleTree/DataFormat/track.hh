@@ -24,14 +24,6 @@
 class track : public data_base {
 
 public:
- 
-  /// Maximum track this class can hold
-  static const size_t kMaxTrack = 300;
-  
-  /// Maximum trajectory points this class can hold
-  static const size_t kMaxTrackVtx = 10000;
-
-public:
 
   /// Default constructor
   track(DATA::DATA_TYPE type=DATA::Track);
@@ -39,97 +31,85 @@ public:
   /// Default destructor
   virtual ~track(){};
 
-  /// Implementation of event-wise track data clear method
-  virtual void clear_event();
+  /**
+     Implementation data_base::clear_event. 
+     When the argument boolean "all" is set to true, clear ALL C-array data elements to the default value.
+     When "all" is set to false (default), only filled entries are cleared.
+     This way we save time to loop over array elements.
+  */
+  virtual void clear_event(bool all=false);
 
   /// Implementation of track data address setter
   virtual void set_address(TTree* t);
 
-  //--- Member getters ---//
-  int           ntracks()  const { return _ntracks;  };
-  const int*    trackId()  const { return _trackId;  };
-  const double* startx()   const { return _startx;   };
-  const double* starty()   const { return _starty;   };
-  const double* startz()   const { return _startz;   };
-  const double* startd()   const { return _startd;   };
-  const double* endx()     const { return _endx;     };
-  const double* endy()     const { return _endy;     };
-  const double* endz()     const { return _endz;     };
-  const double* endd()     const { return _endd;     };
-  const double* theta()    const { return _theta;    };
-  const double* theta_xz() const { return _theta_xz; };
-  const double* theta_yz() const { return _theta_yz; };
-  const double* mom()      const { return _mom;      };
-  const double* len()      const { return _len;      };
+  /// Setter method for a track information
+  void add_track(UShort_t trackID, 
+		 Float_t  startx, Float_t  starty,   Float_t  startz,   Float_t  startd,
+		 Float_t  endx,   Float_t  endy,     Float_t  endz,     Float_t  endd,
+		 Float_t  theta,  Float_t  theta_xz, Float_t  theta_yz, 
+		 Double_t mom,    Double_t len);
 
-  //--- Member setters ---//
-  void ntracks(int n)            { _ntracks=n;     };
-  void trackId(int i, int id)    { _trackId[i]=id; };
-  void startx(int i, double v)   { _startx[i]=v;   };
-  void starty(int i, double v)   { _starty[i]=v;   };
-  void startz(int i, double v)   { _startz[i]=v;   };
-  void startd(int i, double v)   { _startd[i]=v;   };
-  void endx(int i, double v)     { _endx[i]=v;     };
-  void endy(int i, double v)     { _endy[i]=v;     };
-  void endz(int i, double v)     { _endz[i]=v;     };
-  void endd(int i, double v)     { _endd[i]=v;     };
-  void theta(int i, double v)    { _theta[i]=v;    };
-  void theta_xz(int i, double v) { _theta_xz[i]=v; };
-  void theta_yz(int i, double v) { _theta_yz[i]=v; };
-  void mom(int i, double v)      { _mom[i]=v;      };
-  void len(int i, double v)      { _len[i]=v;      };
+  //--- Getters for track-wise information ---//
+  UShort_t        no_tracks() const { return _no_tracks; };
+  const UShort_t* trackID()   const { return _trackID;   };
+  const Float_t*  startx()    const { return _startx;    };
+  const Float_t*  starty()    const { return _starty;    };
+  const Float_t*  startz()    const { return _startz;    };
+  const Float_t*  startd()    const { return _startd;    };
+  const Float_t*  endx()      const { return _endx;      };
+  const Float_t*  endy()      const { return _endy;      };
+  const Float_t*  endz()      const { return _endz;      };
+  const Float_t*  endd()      const { return _endd;      };
+  const Float_t*  theta()     const { return _theta;     };
+  const Float_t*  theta_xz()  const { return _theta_xz;  };
+  const Float_t*  theta_yz()  const { return _theta_yz;  };
+  const Double_t* mom()       const { return _mom;       };
+  const Double_t* len()       const { return _len;       };
 
+  /// Setter method for a trajectory point information
+  void add_trajectory(UShort_t vtxID, 
+		      Float_t  x,  Float_t  y,  Float_t  z,
+		      Double_t px, Double_t py, Double_t pz);
 
-  //--- Added member getters ---//
-  const void npoints()    const { return _npoints;  };
-  const void vtxId(int i) const { return _vtxId[i]; };
-  const void vtxx(int i)  const { return _vtxx[i];  };
-  const void vtxy(int i)  const { return _vtxy[i];  };
-  const void vtxz(int i)  const { return _vtxz[i];  };
-  const void momx(int i)  const { return _momx[i];  };
-  const void momy(int i)  const { return _momy[i];  };
-  const void momz(int i)  const { return _momz[i];  };
-
-  //--- Added member setters ---//
-  void npoints(int i)        { _npoints = i; };
-  void vtxId(int i, int v)   { _vtxId[i]=v;  };
-  void vtxx(int i, double v) { _vtxx[i]=v;   };
-  void vtxy(int i, double v) { _vtxy[i]=v;   };
-  void vtxz(int i, double v) { _vtxz[i]=v;   };
-  void momx(int i, double v) { _momx[i]=v;   };
-  void momy(int i, double v) { _momy[i]=v;   };
-  void momz(int i, double v) { _momz[i]=v;   };
+  //--- Getter methods for trajectory points ---//
+  Int_t no_points()       const { return _no_points; };
+  const UShort_t* vtxID() const { return _vtxID;     };
+  const Float_t*  vtxx()  const { return _vtxx;      };
+  const Float_t*  vtxy()  const { return _vtxy;      };
+  const Float_t*  vtxz()  const { return _vtxz;      };
+  const Double_t* momx()  const { return _momx;      };
+  const Double_t* momy()  const { return _momy;      };
+  const Double_t* momz()  const { return _momz;      };
 
 protected:
 
-  int    _ntracks;              ///< Number of tracks
-  int    _trackId[kMaxTrack];   ///< Track ID
-  double _startx[kMaxTrack];    ///< Start position X
-  double _starty[kMaxTrack];    ///< Start position Y
-  double _startz[kMaxTrack];    ///< Start position Z
-  double _startd[kMaxTrack];    ///< Start distance to boundary
-  double _endx[kMaxTrack];      ///< End position X
-  double _endy[kMaxTrack];      ///< End position Y   
-  double _endz[kMaxTrack];      ///< End position Z
-  double _endd[kMaxTrack];      ///< End distance to boundary
-  double _theta[kMaxTrack];     ///< Theta
-  double _phi[kMaxTrack];       ///< Phi
-  double _theta_xz[kMaxTrack];  ///< Theta on XZ plane
-  double _theta_yz[kMaxTrack];  ///< Theta on YZ plane
-  double _mom[kMaxTrack];       ///< Total momentum
-  double _len[kMaxTrack];       ///< Track length 
+  // Tracks
+  UShort_t _no_tracks;                 ///< Number of tracks
+  UShort_t _trackID[DATA::kMaxTracks]; ///< Track ID
+  Float_t _startx[DATA::kMaxTracks];   ///< Start position X
+  Float_t _starty[DATA::kMaxTracks];   ///< Start position Y
+  Float_t _startz[DATA::kMaxTracks];   ///< Start position Z
+  Float_t _startd[DATA::kMaxTracks];   ///< Start distance to boundary
+  Float_t _endx[DATA::kMaxTracks];     ///< End position X
+  Float_t _endy[DATA::kMaxTracks];     ///< End position Y   
+  Float_t _endz[DATA::kMaxTracks];     ///< End position Z
+  Float_t _endd[DATA::kMaxTracks];     ///< End distance to boundary
+  Float_t _theta[DATA::kMaxTracks];    ///< Theta
+  Float_t _phi[DATA::kMaxTracks];      ///< Phi
+  Float_t _theta_xz[DATA::kMaxTracks]; ///< Theta on XZ plane
+  Float_t _theta_yz[DATA::kMaxTracks]; ///< Theta on YZ plane
+  Double_t _mom[DATA::kMaxTracks];     ///< Total momentum
+  Double_t _len[DATA::kMaxTracks];     ///< Track length 
 
-  /**
-     - Trajectory points?
-  */
-  int    _npoints;             ///< Number of trajectory points (for all tracks)
-  int    _vtxId[kMaxTrackVtx]; ///< Array of associated track ID
-  double _vtxx[kMaxTrackVtx];  ///< X coordinate of trajectory points
-  double _vtxy[kMaxTrackVtx];  ///< Y coordinate of trajectory points
-  double _vtxz[kMaxTrackVtx];  ///< Z coordinate of trajectory points
-  double _momx[kMaxTrackVtx];  ///< X component of momentum at this point
-  double _momy[kMaxTrackVtx];  ///< Y component of momentum at this point
-  double _momz[kMaxTrackVtx];  ///< Z component of momentum at this point
+  // Trajectory points
+  UShort_t _no_points;                    ///< Number of trajectory points (for all tracks)
+  UShort_t _vtxID[DATA::kMaxTrackPoints]; ///< Array of associated track ID
+  Float_t  _vtxx[DATA::kMaxTrackPoints];  ///< X coordinate of trajectory points
+  Float_t  _vtxy[DATA::kMaxTrackPoints];  ///< Y coordinate of trajectory points
+  Float_t  _vtxz[DATA::kMaxTrackPoints];  ///< Z coordinate of trajectory points
+  Double_t _momx[DATA::kMaxTrackPoints];  ///< X component of momentum at this point
+  Double_t _momy[DATA::kMaxTrackPoints];  ///< Y component of momentum at this point
+  Double_t _momz[DATA::kMaxTrackPoints];  ///< Z component of momentum at this point
 
 };
 

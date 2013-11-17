@@ -15,6 +15,7 @@
 #define DATA_BASE_HH
 
 #include "Base-TypeDef.hh"
+#include "DataTypeConstants.hh"
 #include <TChain.h>
 
 /**
@@ -27,18 +28,23 @@
    with those trees. TTree will be a private member of data holder class though
    const pointer will be accessible from outside.
  */
-class data_base : public fmwk_base{
+class data_base : public FrameworkBase{
 
 public:
 
-  /// Default constructor
+  /// Default constructor. Provide a corresponding data type defined in DATA namespace.
   data_base(DATA::DATA_TYPE type=DATA::DATA_TYPE_MAX);
 
   /// Default destructor
   virtual ~data_base(){};
 
-  /// Clear method
-  virtual void clear_event();
+  /**
+     Method to clear event-wise data members.
+     The argument boolean, "all", specifies whether the ALL data members to be cleared or not.
+     It is purely for speed performance of using C-array as a data member.
+     See daughters for specific implementation.
+  */
+  virtual void clear_event(bool all=false);
 
   /// Clear everything including TTree (will be deleted)
   virtual void initialize();
