@@ -4,11 +4,11 @@ if [[ -z $MAKE_TOP_DIR ]]; then
     echo \$MAKE_TOP_DIR not set! 
     echo You have to set this first.
 else 
-    if [[ -z $ANA_PROC_DIR ]]; then
-	export ANA_PROC_DIR=$MAKE_TOP_DIR/AnaProcess
-    else
-	export ANA_PROC_DIR=$MAKE_TOP_DIR/$ANA_PROC_DIR
+    if [[ -z $ANA_PROC_RELPATH ]]; then
+	export ANA_PROC_RELPATH=AnaProcess
     fi
+    export ANA_PROC_DIR=$MAKE_TOP_DIR/$ANA_PROC_RELPATH
+
     if [[ -z $ANA_PROC_MODULE ]]; then
 	export ANA_PROC_MODULE="Base DataFormat Analysis"
     fi

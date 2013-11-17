@@ -16,7 +16,7 @@ else:
 
     packages = [x for x in os.environ['ANA_PROC_MODULE'].split(None)]
 
-    print ("\033[93m" + "Specified AnaProcess packages to be compiled by a user:")
+    print ("\033[93m" + "Specified " + os.environ['ANA_PROC_RELPATH'] + " packages to be compiled by a user:" )
     valid_packages=''
     not_found=[]
     for package in packages:

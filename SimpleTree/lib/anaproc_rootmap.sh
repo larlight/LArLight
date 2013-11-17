@@ -20,8 +20,12 @@ rootlibmap libBase.rootmap libBase.so $ANA_PROC_DIR/Base/LinkDef.h
 
 ######################################################
 # DataFormat
-rootlibmap libDataFormat.rootmap libDataFormat.so $ANA_PROCC_DIR/DataFormat/LinkDef.h \
+rootlibmap libDataFormat.rootmap libDataFormat.so $ANA_PROC_DIR/DataFormat/LinkDef.h \
     libTree.so libBase.so 
 
+######################################################
+# Analysis
+rootlibmap libAnalysis.rootmap libAnalysis.so $ANA_PROC_DIR/Analysis/LinkDef.h \
+    libTree.so libGeom.so libGui.so libHist.so  libBase.so libDataFormat.so 
 
 
