@@ -20,12 +20,14 @@
 #include <TError.h>
 
 #include "data_base.hh"
+#include "event.hh"
 #include "hit.hh"
 #include "cluster.hh"
 #include "spacepoint.hh"
 #include "track.hh"
 #include "mctruth.hh"
 #include "mcnu.hh"
+
 /*
 #include "user_info.hh"
 #include "pmtfifo.hh"

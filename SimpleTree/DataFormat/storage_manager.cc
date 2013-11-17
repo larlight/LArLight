@@ -311,6 +311,9 @@ void storage_manager::create_data_ptr(DATA::DATA_TYPE type)
   if(_ptr_data_array[type]) return;
 
   switch(type){
+  case DATA::Event:
+    _ptr_data_array[type]=(data_base*)(new event(type));
+    break;
   case DATA::Track:
   case DATA::Bezier:
   case DATA::Kalman3DHit:
@@ -347,11 +350,9 @@ void storage_manager::create_data_ptr(DATA::DATA_TYPE type)
   case DATA::UserInfo:
   case DATA::FIFOChannel:
   case DATA::Wire:
-
   case DATA::Seed:
   case DATA::Shower:
   case DATA::Calorimetry:
-  case DATA::Event:
   case DATA::DATA_TYPE_MAX:
     print(MSG::ERROR,__FUNCTION__,Form("Data identifier not supported: %d",(int)type));
     break;

@@ -69,7 +69,7 @@ protected:
 
   /**
      - What is _hit_ph?
-     - Associated track id?
+     - Associated cluster id?
      - Hit time width (sigma)?
   */
 

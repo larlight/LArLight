@@ -8,17 +8,25 @@
 // Header files included here
 #include "storage_manager.hh"
 #include "data_base.hh"
-#include "track.hh"
-#include "spacepoint.hh"
+#include "event.hh"
+#include "hit.hh"
 #include "cluster.hh"
+#include "spacepoint.hh"
+#include "track.hh"
+#include "mctruth.hh"
+#include "mcnu.hh"
+
 // Class forward declaration here
 class storage_manager;
 class data_base;
-class track;
-class sps;
+class event;
 class hit;
 class cluster;
+class sps;
+class track;
+class mctruth;
 class mcnu;
+
 #endif
 
 
