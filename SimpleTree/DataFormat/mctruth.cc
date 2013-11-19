@@ -36,43 +36,45 @@ void mctruth::clear_event(bool all)
     _vtxx[index]  = 0;
     _vtxy[index]  = 0;
     _vtxz[index]  = 0;
-    _E[index]    = 0;
+    _E[index]     = 0;
     _mom[index]   = 0;
     _momx[index]  = 0;
     _momy[index]  = 0;
     _momz[index]  = 0;
     _mass[index]  = 0;
-    _status_code[index] = 0;
-    _gen_trackID[index] = 0;
+    _status_code[index]  = 0;
+    _gen_trackID[index]  = 0;
+    _origin[index]       = 0;
     _num_daughter[index] = 0;
-    _mother[index]      = 0;
+    _mother[index]       = 0;
     
   }
   _num_part = 0;
 }
 
 //###################################################################################
-void mctruth::add_primary(Int_t pdgid, Int_t trackID, Int_t status_code, 
+void mctruth::add_primary(Int_t pdgid, UShort_t trackID, Int_t status_code, UChar_t origin,
 			  Int_t ndaughter, Int_t mother,
 			  Float_t x, Float_t y, Float_t z,
 			  Double_t mass, Double_t E,
 			  Double_t mom,  Double_t momx, Double_t momy, Double_t momz)
 //###################################################################################
 {
-  _pdgid[_num_part]       = pdgid;
-  _gen_trackID[_num_part] = trackID;
-  _status_code[_num_part] = status_code;
+  _pdgid[_num_part]        = pdgid;
+  _origin[_num_part]       = origin;
+  _gen_trackID[_num_part]  = trackID;
+  _status_code[_num_part]  = status_code;
   _num_daughter[_num_part] = ndaughter;
-  _mother[_num_part]      = mother;
-  _vtxx[_num_part]        = x;
-  _vtxy[_num_part]        = y;
-  _vtxz[_num_part]        = z;
-  _mass[_num_part]        = mass;
-  _E[_num_part]          = E;
-  _mom[_num_part]         = mom;
-  _momx[_num_part]        = momx;
-  _momy[_num_part]        = momy;
-  _momz[_num_part]        = momz;
+  _mother[_num_part]       = mother;
+  _vtxx[_num_part]         = x;
+  _vtxy[_num_part]         = y;
+  _vtxz[_num_part]         = z;
+  _mass[_num_part]         = mass;
+  _E[_num_part]            = E;
+  _mom[_num_part]          = mom;
+  _momx[_num_part]         = momx;
+  _momy[_num_part]         = momy;
+  _momz[_num_part]         = momz;
   _num_part++;
 }
 
@@ -124,7 +126,10 @@ Bool_t mctruth::set_address(TTree* t,Bool_t create)
   else if(create) t->Branch(Form("%s_mass",_name.c_str()),_mass,Form("%s_mass[num_%s]/D",_name.c_str(),_name.c_str()));
 
   if(t->GetBranch(Form("%s_gen_trackID",_name.c_str()))) t->SetBranchAddress(Form("%s_gen_trackID",_name.c_str()),_gen_trackID);
-  else if(create) t->Branch(Form("%s_gen_trackID",_name.c_str()),_gen_trackID,Form("%s_gen_trackID[num_%s]/I",_name.c_str(),_name.c_str()));
+  else if(create) t->Branch(Form("%s_gen_trackID",_name.c_str()),_gen_trackID,Form("%s_gen_trackID[num_%s]/s",_name.c_str(),_name.c_str()));
+
+  if(t->GetBranch(Form("%s_origin",_name.c_str()))) t->SetBranchAddress(Form("%s_origin",_name.c_str()),_origin);
+  else if(create) t->Branch(Form("%s_origin",_name.c_str()),_origin,Form("%s_origin[num_%s]/b",_name.c_str(),_name.c_str()));
 
   if(t->GetBranch(Form("%s_num_daughter",_name.c_str()))) t->SetBranchAddress(Form("%s_num_daughter",_name.c_str()),_num_daughter);
   else if(create) t->Branch(Form("%s_num_daughter",_name.c_str()),_num_daughter,Form("%s_num_daughter[num_%s]/I",_name.c_str(),_name.c_str()));
