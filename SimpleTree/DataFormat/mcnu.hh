@@ -36,8 +36,7 @@ public:
   virtual void clear_event(bool all=false);
 
   /// Implementation of track data address setter
-  virtual void set_address(TTree* t);
-
+  virtual Bool_t set_address(TTree* t,Bool_t create=false);
 
   /// Setter method to add neutrino information
   void add_neutrino(Int_t pdgid,  Bool_t ccnc,    UChar_t mode,

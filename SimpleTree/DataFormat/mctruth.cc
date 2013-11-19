@@ -77,58 +77,62 @@ void mctruth::add_primary(Int_t pdgid, Int_t trackID, Int_t status_code,
 }
 
 //###################################################################################
-void mctruth::set_address(TTree* t)
+Bool_t mctruth::set_address(TTree* t,Bool_t create)
 //###################################################################################
 {
-
+  print(MSG::DEBUG,__PRETTY_FUNCTION__,Form("%s called...",_name.c_str()));
   //Set address of the data_base variables
-  data_base::set_address(t);
+  Bool_t exist = data_base::set_address(t,create);
 
   if(t->GetBranch(Form("num_%s",_name.c_str()))) t->SetBranchAddress(Form("num_%s",_name.c_str()),&_num_part);
-  else t->Branch(Form("num_%s",_name.c_str()),&_num_part,Form("num_%s/s",_name.c_str()));
+  else {
+    exist = false;
+    if(create) t->Branch(Form("num_%s",_name.c_str()),&_num_part,Form("num_%s/s",_name.c_str()));
+  }
 
   if(t->GetBranch(Form("%s_pdgid",_name.c_str()))) t->SetBranchAddress(Form("%s_pdgid",_name.c_str()),_pdgid);
-  else t->Branch(Form("%s_pdgid",_name.c_str()),&_pdgid,Form("%s_pdgid[num_part]/I",_name.c_str()));
+  else if(create) t->Branch(Form("%s_pdgid",_name.c_str()),&_pdgid,Form("%s_pdgid[num_%s]/I",_name.c_str(),_name.c_str()));
 
   if(t->GetBranch(Form("%s_E",_name.c_str())))  t->SetBranchAddress(Form("%s_E",_name.c_str()),_E);
-  else t->Branch(Form("%s_E",_name.c_str()),_E,Form("%s_E[num_part]/D",_name.c_str()));
+  else if(create) t->Branch(Form("%s_E",_name.c_str()),_E,Form("%s_E[num_%s]/D",_name.c_str(),_name.c_str()));
 
   if(t->GetBranch(Form("%s_vtxx",_name.c_str()))) t->SetBranchAddress(Form("%s_vtxx",_name.c_str()),_vtxx);
-  else t->Branch(Form("%s_vtxx",_name.c_str()),_vtxx,Form("%s_vtxx[num_part]/F",_name.c_str()));
+  else if(create) t->Branch(Form("%s_vtxx",_name.c_str()),_vtxx,Form("%s_vtxx[num_%s]/F",_name.c_str(),_name.c_str()));
 
   if(t->GetBranch(Form("%s_vtxy",_name.c_str()))) t->SetBranchAddress(Form("%s_vtxy",_name.c_str()),_vtxy);
-  else t->Branch(Form("%s_vtxy",_name.c_str()),_vtxy,Form("%s_vtxy[num_part]/F",_name.c_str()));
+  else if(create) t->Branch(Form("%s_vtxy",_name.c_str()),_vtxy,Form("%s_vtxy[num_%s]/F",_name.c_str(),_name.c_str()));
 
   if(t->GetBranch(Form("%s_vtxz",_name.c_str()))) t->SetBranchAddress(Form("%s_vtxz",_name.c_str()),_vtxz);
-  else t->Branch(Form("%s_vtxz",_name.c_str()),_vtxz,Form("%s_vtxz[num_part]/F",_name.c_str()));
+  else if(create) t->Branch(Form("%s_vtxz",_name.c_str()),_vtxz,Form("%s_vtxz[num_%s]/F",_name.c_str(),_name.c_str()));
 
   if(t->GetBranch(Form("%s_momx",_name.c_str()))) t->SetBranchAddress(Form("%s_momx",_name.c_str()),_momx);
-  else t->Branch(Form("%s_momx",_name.c_str()),_momx,Form("%s_momx[num_part]/D",_name.c_str()));
+  else if(create) t->Branch(Form("%s_momx",_name.c_str()),_momx,Form("%s_momx[num_%s]/D",_name.c_str(),_name.c_str()));
 
   if(t->GetBranch(Form("%s_momy",_name.c_str()))) t->SetBranchAddress(Form("%s_momy",_name.c_str()),_momy);
-  else t->Branch(Form("%s_momy",_name.c_str()),_momy,Form("%s_momy[num_part]/D",_name.c_str()));
+  else if(create) t->Branch(Form("%s_momy",_name.c_str()),_momy,Form("%s_momy[num_%s]/D",_name.c_str(),_name.c_str()));
 
   if(t->GetBranch(Form("%s_momz",_name.c_str()))) t->SetBranchAddress(Form("%s_momz",_name.c_str()),_momz);
-  else t->Branch(Form("%s_momz",_name.c_str()),_momz,Form("%s_momz[num_part]/D",_name.c_str()));
+  else if(create) t->Branch(Form("%s_momz",_name.c_str()),_momz,Form("%s_momz[num_%s]/D",_name.c_str(),_name.c_str()));
 
   if(t->GetBranch(Form("%s_mom",_name.c_str()))) t->SetBranchAddress(Form("%s_mom",_name.c_str()),_mom);
-  else t->Branch(Form("%s_mom",_name.c_str()),_mom,Form("%s_mom[num_part]/D",_name.c_str()));
+  else if(create) t->Branch(Form("%s_mom",_name.c_str()),_mom,Form("%s_mom[num_%s]/D",_name.c_str(),_name.c_str()));
 
   if(t->GetBranch(Form("%s_status_code",_name.c_str()))) t->SetBranchAddress(Form("%s_status_code",_name.c_str()),_status_code);
-  else t->Branch(Form("%s_status_code",_name.c_str()),_status_code,Form("%s_status_code[num_part]/I",_name.c_str()));
+  else if(create) t->Branch(Form("%s_status_code",_name.c_str()),_status_code,Form("%s_status_code[num_%s]/I",_name.c_str(),_name.c_str()));
  
   if(t->GetBranch(Form("%s_mass",_name.c_str()))) t->SetBranchAddress(Form("%s_mass",_name.c_str()),_mass);
-  else t->Branch(Form("%s_mass",_name.c_str()),_mass,Form("%s_mass[num_part]/D",_name.c_str()));
+  else if(create) t->Branch(Form("%s_mass",_name.c_str()),_mass,Form("%s_mass[num_%s]/D",_name.c_str(),_name.c_str()));
 
   if(t->GetBranch(Form("%s_gen_trackID",_name.c_str()))) t->SetBranchAddress(Form("%s_gen_trackID",_name.c_str()),_gen_trackID);
-  else t->Branch(Form("%s_gen_trackID",_name.c_str()),_gen_trackID,Form("%s_gen_trackID[num_part]/I",_name.c_str()));
+  else if(create) t->Branch(Form("%s_gen_trackID",_name.c_str()),_gen_trackID,Form("%s_gen_trackID[num_%s]/I",_name.c_str(),_name.c_str()));
 
   if(t->GetBranch(Form("%s_num_daughter",_name.c_str()))) t->SetBranchAddress(Form("%s_num_daughter",_name.c_str()),_num_daughter);
-  else t->Branch(Form("%s_num_daughter",_name.c_str()),_num_daughter,Form("%s_num_daughter[num_part]/I",_name.c_str()));
+  else if(create) t->Branch(Form("%s_num_daughter",_name.c_str()),_num_daughter,Form("%s_num_daughter[num_%s]/I",_name.c_str(),_name.c_str()));
 
   if(t->GetBranch(Form("%s_mother",_name.c_str()))) t->SetBranchAddress(Form("%s_mother",_name.c_str()),_mother);
-  else t->Branch(Form("%s_mother",_name.c_str()),_mother,Form("%s_mother[num_part]/I",_name.c_str()));
+  else if(create) t->Branch(Form("%s_mother",_name.c_str()),_mother,Form("%s_mother[num_%s]/I",_name.c_str(),_name.c_str()));
 
+  return exist;
 }
 
 #endif

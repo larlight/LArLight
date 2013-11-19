@@ -37,7 +37,7 @@ public:
   virtual void clear_event(bool all=false);
 
   /// Implementation of track data address setter
-  virtual void set_address(TTree* t);
+  virtual Bool_t set_address(TTree* t,Bool_t create=false);
 
   //--- Member getters ---//
   UChar_t         num_part()     const { return _num_part; };

@@ -37,7 +37,7 @@ public:
   virtual void clear_event(bool all=false);
 
   /// Implementation of track data address setter
-  virtual void set_address(TTree* t);
+  virtual Bool_t set_address(TTree* t,Bool_t create=false);
 
   /// Method to add an event
   void set_event(UInt_t eventID, UInt_t runID, UInt_t subrunID,

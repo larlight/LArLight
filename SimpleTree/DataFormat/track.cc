@@ -105,80 +105,86 @@ void track::clear_event(bool all)
 }
 
 //#####################################################################
-void track::set_address(TTree* t)
+Bool_t track::set_address(TTree* t,Bool_t create)
 //#####################################################################
 {
+  print(MSG::DEBUG,__PRETTY_FUNCTION__,Form("%s called...",_name.c_str()));
   // base class address set
-  data_base::set_address(t);
+  Bool_t exist = data_base::set_address(t,create);
 
   // track class address set
-  if(t->GetBranch(Form("num_%s",_name.c_str())))  t->SetBranchAddress(Form("num_%s",_name.c_str()),&_num_tracks);
-  else t->Branch(Form("num_%s",_name.c_str()), &_num_tracks, Form("num_%s/s",_name.c_str()));
+  if(t->GetBranch(Form("num_%s",_name.c_str())))
+    t->SetBranchAddress(Form("num_%s",_name.c_str()),&_num_tracks);
+  else {
+    exist = false;
+    if(create) t->Branch(Form("num_%s",_name.c_str()), &_num_tracks,Form("num_%s/s",_name.c_str()));
+  }
 
   if(t->GetBranch(Form("%s_trackID",_name.c_str())))  t->SetBranchAddress(Form("%s_trackID",_name.c_str()),_trackID);
-  else t->Branch(Form("%s_trackID",_name.c_str()), _trackID, Form("%s_trackID[num_tracks]/s",_name.c_str()));
+  else if(create) t->Branch(Form("%s_trackID",_name.c_str()), _trackID, Form("%s_trackID[num_%s]/s",_name.c_str(),_name.c_str()));
 
   if(t->GetBranch(Form("%s_startx",_name.c_str())))   t->SetBranchAddress(Form("%s_startx",_name.c_str()),_startx);
-  else t->Branch(Form("%s_startx",_name.c_str()), _startx, Form("%s_startx[num_tracks]/F",_name.c_str()));
+  else if(create) t->Branch(Form("%s_startx",_name.c_str()), _startx, Form("%s_startx[num_%s]/F",_name.c_str(),_name.c_str()));
 
   if(t->GetBranch(Form("%s_starty",_name.c_str())))   t->SetBranchAddress(Form("%s_starty",_name.c_str()),_starty);
-  else t->Branch(Form("%s_starty",_name.c_str()), _starty, Form("%s_starty[num_tracks]/F",_name.c_str()));
+  else if(create) t->Branch(Form("%s_starty",_name.c_str()), _starty, Form("%s_starty[num_%s]/F",_name.c_str(),_name.c_str()));
 
   if(t->GetBranch(Form("%s_startz",_name.c_str())))   t->SetBranchAddress(Form("%s_startz",_name.c_str()),_startz);
-  else t->Branch(Form("%s_startz",_name.c_str()), _startz, Form("%s_startz[num_tracks]/F",_name.c_str()));
+  else if(create) t->Branch(Form("%s_startz",_name.c_str()), _startz, Form("%s_startz[num_%s]/F",_name.c_str(),_name.c_str()));
 
   if(t->GetBranch(Form("%s_startd",_name.c_str())))   t->SetBranchAddress(Form("%s_startd",_name.c_str()),_startd);
-  else t->Branch(Form("%s_startd",_name.c_str()), _startd, Form("%s_startd[num_tracks]/F",_name.c_str()));
+  else if(create) t->Branch(Form("%s_startd",_name.c_str()), _startd, Form("%s_startd[num_%s]/F",_name.c_str(),_name.c_str()));
 
   if(t->GetBranch(Form("%s_endx",_name.c_str())))   t->SetBranchAddress(Form("%s_endx",_name.c_str()),_endx);
-  else t->Branch(Form("%s_endx",_name.c_str()), _endx, Form("%s_endx[num_tracks]/F",_name.c_str()));
+  else if(create) t->Branch(Form("%s_endx",_name.c_str()), _endx, Form("%s_endx[num_%s]/F",_name.c_str(),_name.c_str()));
 
   if(t->GetBranch(Form("%s_endy",_name.c_str())))   t->SetBranchAddress(Form("%s_endy",_name.c_str()),_endy);
-  else t->Branch(Form("%s_endy",_name.c_str()), _endy, Form("%s_endy[num_tracks]/F",_name.c_str()));
+  else if(create) t->Branch(Form("%s_endy",_name.c_str()), _endy, Form("%s_endy[num_%s]/F",_name.c_str(),_name.c_str()));
 
   if(t->GetBranch(Form("%s_endz",_name.c_str())))   t->SetBranchAddress(Form("%s_endz",_name.c_str()),_endz);
-  else t->Branch(Form("%s_endz",_name.c_str()), _endz, Form("%s_endz[num_tracks]/F",_name.c_str()));
+  else if(create) t->Branch(Form("%s_endz",_name.c_str()), _endz, Form("%s_endz[num_%s]/F",_name.c_str(),_name.c_str()));
 
   if(t->GetBranch(Form("%s_endd",_name.c_str())))   t->SetBranchAddress(Form("%s_endd",_name.c_str()),_endd);
-  else t->Branch(Form("%s_endd",_name.c_str()), _endd, Form("%s_endd[num_tracks]/F",_name.c_str()));
+  else if(create) t->Branch(Form("%s_endd",_name.c_str()), _endd, Form("%s_endd[num_%s]/F",_name.c_str(),_name.c_str()));
 
   if(t->GetBranch(Form("%s_theta",_name.c_str())))  t->SetBranchAddress(Form("%s_theta",_name.c_str()),_theta);
-  else  t->Branch(Form("%s_theta",_name.c_str()), _theta, Form("%s_theta[num_tracks]/F",_name.c_str()));
+  else if(create)  t->Branch(Form("%s_theta",_name.c_str()), _theta, Form("%s_theta[num_%s]/F",_name.c_str(),_name.c_str()));
 
   if(t->GetBranch(Form("%s_phi",_name.c_str())))    t->SetBranchAddress(Form("%s_phi",_name.c_str()),_phi);
-  else t->Branch(Form("%s_phi",_name.c_str()), _phi, Form("%s_phi[num_tracks]/F",_name.c_str()));
+  else if(create) t->Branch(Form("%s_phi",_name.c_str()), _phi, Form("%s_phi[num_%s]/F",_name.c_str(),_name.c_str()));
 
   if(t->GetBranch(Form("%s_startmom",_name.c_str())))    t->SetBranchAddress(Form("%s_startmom",_name.c_str()),_startmom);
-  else t->Branch(Form("%s_startmom",_name.c_str()), _startmom, Form("%s_startmom[num_tracks]/D",_name.c_str()));
+  else if(create) t->Branch(Form("%s_startmom",_name.c_str()), _startmom, Form("%s_startmom[num_%s]/D",_name.c_str(),_name.c_str()));
 
   if(t->GetBranch(Form("%s_len",_name.c_str())))    t->SetBranchAddress(Form("%s_len",_name.c_str()),_len);
-  else t->Branch(Form("%s_len",_name.c_str()), _len, Form("%s_len[num_tracks]/D",_name.c_str()));      
+  else if(create) t->Branch(Form("%s_len",_name.c_str()), _len, Form("%s_len[num_%s]/D",_name.c_str(),_name.c_str()));      
 
   //--- addition ---//
   if(t->GetBranch(Form("%s_points",_name.c_str()))) t->SetBranchAddress(Form("%s_points",_name.c_str()),&_num_points);
-  else t->Branch(Form("%s_points",_name.c_str()),&_num_points,Form("%s_points/s",_name.c_str()));
+  else if(create) t->Branch(Form("%s_points",_name.c_str()),&_num_points,Form("%s_points/s",_name.c_str()));
 
   if(t->GetBranch(Form("%s_vtxID",_name.c_str()))) t->SetBranchAddress(Form("%s_vtxID",_name.c_str()),_vtxID);
-  else t->Branch(Form("%s_vtxID",_name.c_str()),_vtxID,Form("%s_vtxID/s",_name.c_str()));
+  else if(create) t->Branch(Form("%s_vtxID",_name.c_str()),_vtxID,Form("%s_vtxID[%s_points]/s",_name.c_str(),_name.c_str()));
   
   if(t->GetBranch(Form("%s_vtxx",_name.c_str()))) t->SetBranchAddress(Form("%s_vtxx",_name.c_str()),_vtxx);
-  else t->Branch(Form("%s_vtxx",_name.c_str()),_vtxx,Form("%s_vtxx[num_points]/F",_name.c_str()));
+  else if(create) t->Branch(Form("%s_vtxx",_name.c_str()),_vtxx,Form("%s_vtxx[%s_points]/F",_name.c_str(),_name.c_str()));
 
   if(t->GetBranch(Form("%s_vtxy",_name.c_str()))) t->SetBranchAddress(Form("%s_vtxy",_name.c_str()),_vtxy);
-  else t->Branch(Form("%s_vtxy",_name.c_str()),_vtxy,Form("%s_vtxy[num_points]/F",_name.c_str()));
+  else if(create) t->Branch(Form("%s_vtxy",_name.c_str()),_vtxy,Form("%s_vtxy[%s_points]/F",_name.c_str(),_name.c_str()));
 
   if(t->GetBranch(Form("%s_vtxz",_name.c_str()))) t->SetBranchAddress(Form("%s_vtxz",_name.c_str()),_vtxz);
-  else t->Branch(Form("%s_vtxz",_name.c_str()),_vtxz,Form("%s_vtxz[num_points]/F",_name.c_str()));
+  else if(create) t->Branch(Form("%s_vtxz",_name.c_str()),_vtxz,Form("%s_vtxz[%s_points]/F",_name.c_str(),_name.c_str()));
 
   if(t->GetBranch(Form("%s_momx",_name.c_str()))) t->SetBranchAddress(Form("%s_momx",_name.c_str()),_momx);
-  else t->Branch(Form("%s_momx",_name.c_str()),_momx,Form("%s_momx[num_points]/D",_name.c_str()));
+  else if(create) t->Branch(Form("%s_momx",_name.c_str()),_momx,Form("%s_momx[%s_points]/D",_name.c_str(),_name.c_str()));
 
   if(t->GetBranch(Form("%s_momy",_name.c_str()))) t->SetBranchAddress(Form("%s_momy",_name.c_str()),_momy);
-  else t->Branch(Form("%s_momy",_name.c_str()),_momy,Form("%s_momy[num_points]/D",_name.c_str()));
+  else if(create) t->Branch(Form("%s_momy",_name.c_str()),_momy,Form("%s_momy[%s_points]/D",_name.c_str(),_name.c_str()));
 
   if(t->GetBranch(Form("%s_momz",_name.c_str()))) t->SetBranchAddress(Form("%s_momz",_name.c_str()),_momz);
-  else t->Branch(Form("%s_momz",_name.c_str()),_momz,Form("%s_momz[num_points]/D",_name.c_str()));
+  else if(create) t->Branch(Form("%s_momz",_name.c_str()),_momz,Form("%s_momz[%s_points]/D",_name.c_str(),_name.c_str()));
 
+  return exist;
 }
 
 #endif

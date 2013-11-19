@@ -30,18 +30,15 @@ data_base* storage_manager::get_data(DATA::DATA_TYPE type)
 
     _fout->cd();
 
-    _out_ch[(size_t)type]=new TTree(Form("%s",DATA::DATA_TREE_NAME[type].c_str()),
-				    Form("%s Tree",DATA::DATA_TREE_NAME[type].c_str()));
-    _out_ch[(size_t)type]->SetMaxTreeSize    (1024*1024*1024);
-    _out_ch[(size_t)type]->SetMaxVirtualSize (1024*1024*1024);
-    
+    if(!_out_ch) _out_ch = new TTree(DATA::TREE_NAME.c_str(),Form("%s Tree",DATA::TREE_NAME.c_str()));
+
     create_data_ptr(type);
 
-    _ptr_data_array[(size_t)type]->set_address(_out_ch[(size_t)type]);
+    _ptr_data_array[(size_t)type]->set_address(_out_ch,true);
     
     Message::send(MSG::WARNING,__FUNCTION__,
-		  Form("Requested tree %s which does not exists yet. Created a new one.", 
-		       _out_ch[(size_t)type]->GetName())
+		  Form("Requested data container \"%s\" which does not exists yet. Created a new one.", 
+		       _ptr_data_array[type]->class_name().c_str())
 		  );
 
     _write_data_array[(size_t)type]=true;
@@ -81,10 +78,10 @@ void storage_manager::reset()
   for(size_t i=0; i<DATA::DATA_TYPE_MAX; ++i) {
     _read_data_array[i]=true;   // Attempt to read in all data by default
     _write_data_array[i]=false; // Attemp to write no data by default 
-    _in_ch[i]=0;
-    _out_ch[i]=0;
     _ptr_data_array[i]=0;
   }
+  _in_ch=0;
+  _out_ch=0;
 
   if(_verbosity[MSG::DEBUG])
     Message::send(MSG::DEBUG,__PRETTY_FUNCTION__,"ends ...");  
@@ -206,8 +203,6 @@ bool storage_manager::prepare_tree()
   
   bool status=true;
 
-  std::vector<uint64_t> nevents_array(DATA::DATA_TYPE_MAX,0);
-  
   if(_verbosity[MSG::DEBUG])
     Message::send(MSG::DEBUG,__PRETTY_FUNCTION__,"called ...");
 
@@ -217,59 +212,42 @@ bool storage_manager::prepare_tree()
     status=false;
   }
 
+  if(_name_tdirectory.size()>0)
+    _in_ch = new TChain(Form("%s/%s",_name_tdirectory.c_str(),DATA::TREE_NAME.c_str()), 
+			Form("%s Tree",DATA::TREE_NAME.c_str()));
+  else
+    _in_ch = new TChain(DATA::TREE_NAME.c_str(),Form("%s Tree",DATA::TREE_NAME.c_str()));
+
+  _nevents=_in_ch->GetEntries();
+
   for(size_t i=0; i<DATA::DATA_TYPE_MAX; ++i){
 
     if(!_status) break;
 
     if(_mode!=WRITE && _read_data_array[i]) {
 
-      std::string tree_name(Form("%s",DATA::DATA_TREE_NAME[(DATA::DATA_TYPE)i].c_str()));
-
-      if(_name_tdirectory.size()>0)
-	_in_ch[i]=new TChain(Form("%s/%s",_name_tdirectory.c_str(),tree_name.c_str()),
-			     Form("%s Tree",DATA::DATA_TREE_NAME[(DATA::DATA_TYPE)i].c_str()));
-      else
-	_in_ch[i]=new TChain(tree_name.c_str(),
-			     Form("%s Tree",DATA::DATA_TREE_NAME[(DATA::DATA_TYPE)i].c_str()));
-      
       for(size_t j=0; j<_in_fnames.size(); ++j)
+	
+	_in_ch->AddFile(_in_fnames[j].c_str());
 
-	_in_ch[i]->AddFile(_in_fnames[j].c_str());
-
-      // Ignore ROOT error message due to not finding a TTree 
-      gErrorIgnoreLevel = kBreak;
-      nevents_array[i]=_in_ch[i]->GetEntries();
-      gErrorIgnoreLevel = kWarning;
+      create_data_ptr((DATA::DATA_TYPE)i);
       
-      if(nevents_array[i]) { 
+      Bool_t data_exist = _ptr_data_array[i]->set_address((TTree*)_in_ch);
 
-	create_data_ptr((DATA::DATA_TYPE)i);
+      if(_mode==BOTH)
 
-	_ptr_data_array[i]->set_address((TTree*)_in_ch[i]);
-
-	if(!_nevents) _nevents = nevents_array[i];
-
-	if(_mode==BOTH) _write_data_array[i]=true;
-
-      }else{
-	delete _in_ch[i];
-	_in_ch[i]=0;
-	if(_mode==BOTH) _write_data_array[i]=false;
-      }
+	_write_data_array[i] = data_exist;
     }
 
     if(_mode!=READ && _write_data_array[i] ) {
 
       _fout->cd();
 
-      _out_ch[i]=new TTree(Form("%s",DATA::DATA_TREE_NAME[(DATA::DATA_TYPE)i].c_str()),
-			   Form("%s Tree",DATA::DATA_TREE_NAME[(DATA::DATA_TYPE)i].c_str()));
-      _out_ch[i]->SetMaxTreeSize    (1024*1024*1024);
-      _out_ch[i]->SetMaxVirtualSize (1024*1024*1024);
+      _out_ch = new TTree(DATA::TREE_NAME.c_str(),Form("%s Tree",DATA::TREE_NAME.c_str()));
       
       create_data_ptr((DATA::DATA_TYPE)i);
       
-      _ptr_data_array[i]->set_address(_out_ch[i]);
+      _ptr_data_array[i]->set_address(_out_ch,true);
     }
 
     _nevents_written=0;
@@ -281,16 +259,6 @@ bool storage_manager::prepare_tree()
   if( _mode!=WRITE && _nevents==0) {
     Message::send(MSG::ERROR,__FUNCTION__,"Did not find any relevant data tree!");
     status=false;
-  }
-
-  for(size_t i=0; i<DATA::DATA_TYPE_MAX; ++i) {
-
-    if(nevents_array[i] && _nevents!=nevents_array[i]) {
-      sprintf(_buf,"Different number of entries found on tree: %s",DATA::DATA_TREE_NAME[(DATA::DATA_TYPE)i].c_str());
-      Message::send(MSG::ERROR,__FUNCTION__,_buf);
-      status=false;
-    }
-
   }
 
   if(status) _status=READY_IO;
@@ -363,6 +331,10 @@ void storage_manager::create_data_ptr(DATA::DATA_TYPE type)
     print(MSG::ERROR,__FUNCTION__,Form("Data identifier not supported: %d",(int)type));
     break;
   }
+  if(_ptr_data_array[type]) {
+    print(MSG::INFO,__PRETTY_FUNCTION__,Form("Data container \"%s\" created...",_ptr_data_array[type]->class_name().c_str()));
+    _ptr_data_array[type]->set_verbosity(get_verbosity());
+  }
 
   return;
 }
@@ -405,31 +377,17 @@ bool storage_manager::close()
 
       //_fout->cd();
 
-      for(size_t i=0; i<DATA::DATA_TYPE_MAX; i++) {
+      if(_verbosity[MSG::INFO])
 
-	if(!_out_ch[i]) {
-	  
-	  if(_verbosity[MSG::DEBUG])
-	    
-	    Message::send(MSG::DEBUG,__FUNCTION__,
-			  Form("Skipping to write a Tree %s...", 
-			       DATA::DATA_TREE_NAME[(DATA::DATA_TYPE)i].c_str()));
-
-	  continue;
-	}
-
-	if(_verbosity[MSG::INFO])
-
-	  Message::send(MSG::INFO,__FUNCTION__,Form("Writing TTree: %s",_out_ch[i]->GetName()));
-
-	_fout = _out_ch[i]->GetCurrentFile();
-	_out_ch[i]->Write();
+	Message::send(MSG::INFO,__FUNCTION__,Form("Writing TTree: %s",_out_ch->GetName()));
+      
+      _fout = _out_ch->GetCurrentFile();
+      _out_ch->Write();
 	
-	Message::send(MSG::NORMAL,__FUNCTION__,
-		      Form("TTree \"%s\" written with %lld events...",
-			   _out_ch[i]->GetName(),
-			   _out_ch[i]->GetEntries()));
-      }
+      Message::send(MSG::NORMAL,__FUNCTION__,
+		    Form("TTree \"%s\" written with %lld events...",
+			 _out_ch->GetName(),
+			 _out_ch->GetEntries()));
     }
     break;
   }
@@ -441,10 +399,10 @@ bool storage_manager::close()
     if(_fout) _fout->Close();
     _fout=0;
 
+    if(_in_ch)  { delete _in_ch;  _in_ch=0;  }
+    if(_out_ch) { _out_ch=0; }
     for(size_t i=0; i<DATA::DATA_TYPE_MAX; ++i) {
       
-      if(_in_ch[i])  { delete _in_ch[i];  _in_ch[i]=0;  }
-      if(_out_ch[i]) { _out_ch[i]=0; }
       if(_ptr_data_array[i]) delete_data_ptr((DATA::DATA_TYPE)i);
       
     }
@@ -527,12 +485,7 @@ bool storage_manager::read_event()
   if(_index>=_nevents)
     return false;
 
-  for(size_t i=0; i<DATA::DATA_TYPE_MAX; ++i) { 
-
-    if(_in_ch[i])
-      _in_ch[i]->GetEntry(_index);
-
-  }
+  _in_ch->GetEntry(_index);
 
   _index++;
   _nevents_read++;
@@ -543,15 +496,12 @@ bool storage_manager::read_event()
 bool storage_manager::write_event()
 //###################################################################################
 {
-  
-  for(size_t i=0; i<DATA::DATA_TYPE_MAX; ++i) {
 
-    if(!_out_ch[i]) continue;
+  if(_out_ch) _out_ch->Fill();
 
-    _out_ch[i]->Fill();
-    _ptr_data_array[i]->clear_event();
+  for(size_t i=0; i<DATA::DATA_TYPE_MAX; ++i)
 
-  }
+    if(_ptr_data_array[i]) _ptr_data_array[i]->clear_event();
 
   if(_mode==WRITE)
     _index++;
@@ -560,8 +510,9 @@ bool storage_manager::write_event()
   return true;
 }
 
+/*
 //###################################################################################
-const TChain* storage_manager::get_chain()
+const TTree* storage_manager::get_tree()
 //###################################################################################
 {
   
@@ -587,6 +538,7 @@ const TChain* storage_manager::get_chain()
 
   }
 
+
   for(size_t i=0; i<DATA::DATA_TYPE_MAX; ++i) {
 
     if(!_in_ch[i]) continue;
@@ -601,5 +553,5 @@ const TChain* storage_manager::get_chain()
   return ch;
 
 }
-
+*/
 #endif

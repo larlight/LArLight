@@ -75,52 +75,56 @@ void hit::add_hit(UChar_t  plane,  UShort_t wire,   UShort_t channel,
 }
 
 //#####################################################################
-void hit::set_address(TTree* t)
+Bool_t hit::set_address(TTree* t,Bool_t create)
 //#####################################################################
 {
-
+  print(MSG::DEBUG,__PRETTY_FUNCTION__,Form("%s called...",_name.c_str()));
   //Set address of the data_base variables
-  data_base::set_address(t);
+  Bool_t exist = data_base::set_address(t,create);
 
   if(t->GetBranch(Form("num_%s",_name.c_str()))) t->SetBranchAddress(Form("num_%s",_name.c_str()),&_num_hits);
-  else t->Branch(Form("num_%s",_name.c_str()),&_num_hits,Form("num_%s/s",_name.c_str()));
+  else {
+    exist = false;
+    if(create) t->Branch(Form("num_%s",_name.c_str()),&_num_hits,Form("num_%s/s",_name.c_str()));
+  }
 
   if(t->GetBranch(Form("%s_plane",_name.c_str()))) t->SetBranchAddress(Form("%s_plane",_name.c_str()),_plane);
-  else t->Branch(Form("%s_plane",_name.c_str()),_plane,Form("%s_plane[num_hits]/b",_name.c_str()));
+  else if(create) t->Branch(Form("%s_plane",_name.c_str()),_plane,Form("%s_plane[num_%s]/b",_name.c_str(),_name.c_str()));
 
   if(t->GetBranch(Form("%s_wire",_name.c_str()))) t->SetBranchAddress(Form("%s_wire",_name.c_str()),_wire);
-  else t->Branch(Form("%s_wire",_name.c_str()),_wire,Form("%s_wire[num_hits]/s",_name.c_str()));
+  else if(create) t->Branch(Form("%s_wire",_name.c_str()),_wire,Form("%s_wire[num_%s]/s",_name.c_str(),_name.c_str()));
 
   if(t->GetBranch(Form("%s_channel",_name.c_str()))) t->SetBranchAddress(Form("%s_channel",_name.c_str()),_channel);
-  else t->Branch(Form("%s_channel",_name.c_str()),_channel,Form("%s_channel[num_hits]/s",_name.c_str()));
+  else if(create) t->Branch(Form("%s_channel",_name.c_str()),_channel,Form("%s_channel[num_%s]/s",_name.c_str(),_name.c_str()));
 
   if(t->GetBranch(Form("%s_startT",_name.c_str()))) t->SetBranchAddress(Form("%s_startT",_name.c_str()),_startT);
-  else t->Branch(Form("%s_startT",_name.c_str()),_startT,Form("%s_startT[num_hits]/D",_name.c_str()));
+  else if(create) t->Branch(Form("%s_startT",_name.c_str()),_startT,Form("%s_startT[num_%s]/D",_name.c_str(),_name.c_str()));
 
   if(t->GetBranch(Form("%s_peakT",_name.c_str()))) t->SetBranchAddress(Form("%s_peakT",_name.c_str()),_peakT);
-  else t->Branch(Form("%s_peakT",_name.c_str()),_peakT,Form("%s_peakT[num_hits]/D",_name.c_str()));
+  else if(create) t->Branch(Form("%s_peakT",_name.c_str()),_peakT,Form("%s_peakT[num_%s]/D",_name.c_str(),_name.c_str()));
 
   if(t->GetBranch(Form("%s_endT",_name.c_str()))) t->SetBranchAddress(Form("%s_endT",_name.c_str()),_endT);
-  else t->Branch(Form("%s_endT",_name.c_str()),_endT,Form("%s_endT[num_hits]/D",_name.c_str()));
+  else if(create) t->Branch(Form("%s_endT",_name.c_str()),_endT,Form("%s_endT[num_%s]/D",_name.c_str(),_name.c_str()));
 
   if(t->GetBranch(Form("%s_startT_sigma",_name.c_str()))) t->SetBranchAddress(Form("%s_startT_sigma",_name.c_str()),_startT_sigma);
-  else t->Branch(Form("%s_startT_sigma",_name.c_str()),_startT_sigma,Form("%s_startT_sigma[num_hits]/D",_name.c_str()));
+  else if(create) t->Branch(Form("%s_startT_sigma",_name.c_str()),_startT_sigma,Form("%s_startT_sigma[num_%s]/D",_name.c_str(),_name.c_str()));
 
   if(t->GetBranch(Form("%s_peakT_sigma",_name.c_str()))) t->SetBranchAddress(Form("%s_peakT_sigma",_name.c_str()),_peakT_sigma);
-  else t->Branch(Form("%s_peakT_sigma",_name.c_str()),_peakT_sigma,Form("%s_peakT_sigma[num_hits]/D",_name.c_str()));
+  else if(create) t->Branch(Form("%s_peakT_sigma",_name.c_str()),_peakT_sigma,Form("%s_peakT_sigma[num_%s]/D",_name.c_str(),_name.c_str()));
 
   if(t->GetBranch(Form("%s_endT_sigma",_name.c_str()))) t->SetBranchAddress(Form("%s_endT_sigma",_name.c_str()),_endT_sigma);
-  else t->Branch(Form("%s_endT_sigma",_name.c_str()),_endT_sigma,Form("%s_endT_sigma[num_hits]/D",_name.c_str()));
+  else if(create) t->Branch(Form("%s_endT_sigma",_name.c_str()),_endT_sigma,Form("%s_endT_sigma[num_%s]/D",_name.c_str(),_name.c_str()));
 
   if(t->GetBranch(Form("%s_charge",_name.c_str()))) t->SetBranchAddress(Form("%s_charge",_name.c_str()),_charge);
-  else t->Branch(Form("%s_charge",_name.c_str()),_charge,Form("%s_charge[num_hits]/D",_name.c_str()));
+  else if(create) t->Branch(Form("%s_charge",_name.c_str()),_charge,Form("%s_charge[num_%s]/D",_name.c_str(),_name.c_str()));
 
   if(t->GetBranch(Form("%s_charge_sigma",_name.c_str()))) t->SetBranchAddress(Form("%s_charge_sigma",_name.c_str()),_charge_sigma);
-  else t->Branch(Form("%s_charge_sigma",_name.c_str()),_charge_sigma,Form("%s_charge_sigma[num_hits]/D",_name.c_str()));
+  else if(create) t->Branch(Form("%s_charge_sigma",_name.c_str()),_charge_sigma,Form("%s_charge_sigma[num_%s]/D",_name.c_str(),_name.c_str()));
 
   if(t->GetBranch(Form("%s_trackID",_name.c_str()))) t->SetBranchAddress(Form("%s_trackID",_name.c_str()),_trackID);
-  else t->Branch(Form("%s_trackID",_name.c_str()),_trackID,Form("%s_trackID[num_hits]/s",_name.c_str()));
+  else if(create) t->Branch(Form("%s_trackID",_name.c_str()),_trackID,Form("%s_trackID[num_%s]/s",_name.c_str(),_name.c_str()));
 
+  return exist;
 }
 
 #endif

@@ -37,7 +37,7 @@ public:
   virtual void clear_event(bool all=false);
 
   /// Implementation of track data address setter
-  virtual void set_address(TTree* t);
+  virtual Bool_t set_address(TTree* t, Bool_t create=false);
 
   /// Setter method to append a cluster
   void add_cluster(UShort_t clusterID, UChar_t view,

@@ -27,10 +27,10 @@ void data_base::clear_event(bool all)
 }
 
 //#####################################################################
-void data_base::set_address(TTree* t)
+Bool_t data_base::set_address(TTree* t,Bool_t create)
 //#####################################################################
 {
-
+  return true;
 }
 
 #endif

@@ -26,6 +26,8 @@ namespace DATA{
   const UShort_t kMaxParticles    = 10000;  ///< Maximum number of particles from G4 tracking info
   const Int_t kMaxTrajectories    = 0xffff; ///< Maximum number of particle's trajectory points that can be stored
 
+  const std::string TREE_NAME = "anatree";
+
   /// Define identifier for a data container class to be loaded through storage_manager::get_data()
   enum DATA_TYPE{
     Event=0,

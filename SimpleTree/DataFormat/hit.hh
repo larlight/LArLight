@@ -36,7 +36,7 @@ public:
   virtual void clear_event(bool all=false);
 
   /// Implementation of track data address setter
-  virtual void set_address(TTree* t);
+  virtual Bool_t set_address(TTree* t,Bool_t createa=false);
 
   /// Setter method to add a hit
   void add_hit(UChar_t  plane,  UShort_t wire,   UShort_t channel,

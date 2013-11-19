@@ -55,39 +55,44 @@ void sps::clear_event(bool all)
 }
 
 //#####################################################################
-void sps::set_address(TTree* t)
+Bool_t sps::set_address(TTree* t,Bool_t create)
 //#####################################################################
 {
-
+  print(MSG::DEBUG,__PRETTY_FUNCTION__,Form("%s called...",_name.c_str()));
   //Set address of the data_base variables
-  data_base::set_address(t);
+  Bool_t exist = data_base::set_address(t,create);
 
   if(t->GetBranch(Form("num_%s",_name.c_str()))) t->SetBranchAddress(Form("num_%s",_name.c_str()),&_num_sps);
-  else t->Branch(Form("num_%s",_name.c_str()),&_num_sps,Form("num_%s/s",_name.c_str()));
+  else {
+    exist = false;
+    if(create) t->Branch(Form("num_%s",_name.c_str()),&_num_sps,Form("num_%s/s",_name.c_str()));
+  }
 
   if(t->GetBranch(Form("%s_spsID",_name.c_str()))) t->SetBranchAddress(Form("%s_spsID",_name.c_str()),_spsID);
-  else t->Branch(Form("%s_spsID",_name.c_str()),_spsID,Form("%s_spsID[num_sps]/s",_name.c_str()));
+  else if(create) t->Branch(Form("%s_spsID",_name.c_str()),_spsID,Form("%s_spsID[num_%s]/s",_name.c_str(),_name.c_str()));
 
   if(t->GetBranch(Form("%s_vtxx",_name.c_str()))) t->SetBranchAddress(Form("%s_vtxx",_name.c_str()),_vtxx);
-  else t->Branch(Form("%s_vtxx",_name.c_str()),_vtxx,Form("%s_vtxx[num_sps]/F",_name.c_str()));
+  else if(create) t->Branch(Form("%s_vtxx",_name.c_str()),_vtxx,Form("%s_vtxx[num_%s]/F",_name.c_str(),_name.c_str()));
 
   if(t->GetBranch(Form("%s_vtxy",_name.c_str()))) t->SetBranchAddress(Form("%s_vtxy",_name.c_str()),_vtxy);
-  else t->Branch(Form("%s_vtxy",_name.c_str()),_vtxy,Form("%s_vtxy[num_sps]/F",_name.c_str()));
+  else if(create) t->Branch(Form("%s_vtxy",_name.c_str()),_vtxy,Form("%s_vtxy[num_%s]/F",_name.c_str(),_name.c_str()));
 
   if(t->GetBranch(Form("%s_vtxz",_name.c_str()))) t->SetBranchAddress(Form("%s_vtxz",_name.c_str()),_vtxz);
-  else t->Branch(Form("%s_vtxz",_name.c_str()),_vtxz,Form("%s_vtxz[num_sps]/F",_name.c_str()));
+  else if(create) t->Branch(Form("%s_vtxz",_name.c_str()),_vtxz,Form("%s_vtxz[num_%s]/F",_name.c_str(),_name.c_str()));
 
   if(t->GetBranch(Form("%s_vtxx_sigma",_name.c_str()))) t->SetBranchAddress(Form("%s_vtxx_sigma",_name.c_str()),_vtxx_sigma);
-  else t->Branch(Form("%s_vtxx_sigma",_name.c_str()),_vtxx_sigma,Form("%s_vtxx_sigma[num_sps]/F",_name.c_str()));
+  else if(create) t->Branch(Form("%s_vtxx_sigma",_name.c_str()),_vtxx_sigma,Form("%s_vtxx_sigma[num_%s]/F",_name.c_str(),_name.c_str()));
 
   if(t->GetBranch(Form("%s_vtxy_sigma",_name.c_str()))) t->SetBranchAddress(Form("%s_vtxy_sigma",_name.c_str()),_vtxy_sigma);
-  else t->Branch(Form("%s_vtxy_sigma",_name.c_str()),_vtxy_sigma,Form("%s_vtxy_sigma[num_sps]/F",_name.c_str()));
+  else if(create) t->Branch(Form("%s_vtxy_sigma",_name.c_str()),_vtxy_sigma,Form("%s_vtxy_sigma[num_%s]/F",_name.c_str(),_name.c_str()));
 
   if(t->GetBranch(Form("%s_vtxz_sigma",_name.c_str()))) t->SetBranchAddress(Form("%s_vtxz_sigma",_name.c_str()),_vtxz_sigma);
-  else t->Branch(Form("%s_vtxz_sigma",_name.c_str()),_vtxz_sigma,Form("%s_vtxz_sigma[num_sps]/F",_name.c_str()));
+  else if(create) t->Branch(Form("%s_vtxz_sigma",_name.c_str()),_vtxz_sigma,Form("%s_vtxz_sigma[num_%s]/F",_name.c_str(),_name.c_str()));
 
   if(t->GetBranch(Form("%s_chi2",_name.c_str()))) t->SetBranchAddress(Form("%s_chi2",_name.c_str()),_chi2);
-  else t->Branch(Form("%s_chi2",_name.c_str()),_chi2,Form("%s_chi2[num_sps]/F",_name.c_str()));
+  else if(create) t->Branch(Form("%s_chi2",_name.c_str()),_chi2,Form("%s_chi2[num_%s]/F",_name.c_str(),_name.c_str()));
+
+  return exist;
 
 }
 

@@ -49,8 +49,12 @@ public:
 
   //--- TTree I/O functions ---//
 
-  /// Set branch address for reading
-  virtual void set_address(TTree* t);
+  /**
+     Set branch address for reading. 
+     If it finds a variable branch in the tree, it returns true.
+     When the second argument is given as true, it creates a branch in case the branch is not found.
+  */
+  virtual Bool_t set_address(TTree* t,Bool_t create=false);
 
   //--- Member getter functions ---//
   

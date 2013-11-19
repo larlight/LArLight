@@ -58,46 +58,50 @@ void mcstep::add_trajectory(UShort_t trackID, Int_t pdgid,
 }
 
 //################################
-void mcstep::set_address(TTree* t)
+Bool_t mcstep::set_address(TTree* t,Bool_t create)
 //################################
 {
+  print(MSG::DEBUG,__PRETTY_FUNCTION__,Form("%s called...",_name.c_str()));
   /// set base class memory address
-  data_base::set_address(t);
+  Bool_t exist = data_base::set_address(t,create);
 
   if(t->GetBranch(Form("num_%s",_name.c_str()))) t->SetBranchAddress(Form("num_%s",_name.c_str()),&_num_steps);
-  else t->Branch(Form("num_%s",_name.c_str()),&_num_steps,Form("num_%s/i",_name.c_str()));
+  else {
+    exist = false;
+    if(create) t->Branch(Form("num_%s",_name.c_str()),&_num_steps,Form("num_%s/i",_name.c_str()));
+  }
 
   if(t->GetBranch(Form("%s_trackID",_name.c_str()))) t->SetBranchAddress(Form("%s_trackID",_name.c_str()),_trackID);
-  else t->Branch(Form("%s_trackID",_name.c_str()),_trackID,Form("%s_trackID[num_steps]/s",_name.c_str()));
+  else if(create) t->Branch(Form("%s_trackID",_name.c_str()),_trackID,Form("%s_trackID[num_%s]/s",_name.c_str(),_name.c_str()));
 
   if(t->GetBranch(Form("%s_pdgid",_name.c_str()))) t->SetBranchAddress(Form("%s_pdgid",_name.c_str()),_pdgid);
-  else t->Branch(Form("%s_pdgid",_name.c_str()),_pdgid,Form("%s_pdgid[num_steps]/I",_name.c_str()));
+  else if(create) t->Branch(Form("%s_pdgid",_name.c_str()),_pdgid,Form("%s_pdgid[num_%s]/I",_name.c_str(),_name.c_str()));
 
   if(t->GetBranch(Form("%s_momx",_name.c_str()))) t->SetBranchAddress(Form("%s_momx",_name.c_str()),_momx);
-  else t->Branch(Form("%s_momx",_name.c_str()),_momx,Form("%s_momx[num_steps]/D",_name.c_str()));
+  else if(create) t->Branch(Form("%s_momx",_name.c_str()),_momx,Form("%s_momx[num_%s]/D",_name.c_str(),_name.c_str()));
 
   if(t->GetBranch(Form("%s_momy",_name.c_str()))) t->SetBranchAddress(Form("%s_momy",_name.c_str()),_momy);
-  else t->Branch(Form("%s_momy",_name.c_str()),_momy,Form("%s_momy[num_steps]/D",_name.c_str()));
+  else if(create) t->Branch(Form("%s_momy",_name.c_str()),_momy,Form("%s_momy[num_%s]/D",_name.c_str(),_name.c_str()));
 
   if(t->GetBranch(Form("%s_momz",_name.c_str()))) t->SetBranchAddress(Form("%s_momz",_name.c_str()),_momz);
-  else t->Branch(Form("%s_momz",_name.c_str()),_momz,Form("%s_momz[num_steps]/D",_name.c_str()));
+  else if(create) t->Branch(Form("%s_momz",_name.c_str()),_momz,Form("%s_momz[num_%s]/D",_name.c_str(),_name.c_str()));
 
   if(t->GetBranch(Form("%s_vtxx",_name.c_str()))) t->SetBranchAddress(Form("%s_vtxx",_name.c_str()),_vtxx);
-  else t->Branch(Form("%s_vtxx",_name.c_str()),_vtxx,Form("%s_vtxx[num_steps]/F",_name.c_str()));
+  else if(create) t->Branch(Form("%s_vtxx",_name.c_str()),_vtxx,Form("%s_vtxx[num_%s]/F",_name.c_str(),_name.c_str()));
 
   if(t->GetBranch(Form("%s_vtxy",_name.c_str()))) t->SetBranchAddress(Form("%s_vtxy",_name.c_str()),_vtxy);
-  else t->Branch(Form("%s_vtxy",_name.c_str()),_vtxy,Form("%s_vtxy[num_steps]/F",_name.c_str()));
+  else if(create) t->Branch(Form("%s_vtxy",_name.c_str()),_vtxy,Form("%s_vtxy[num_%s]/F",_name.c_str(),_name.c_str()));
 
   if(t->GetBranch(Form("%s_vtxz",_name.c_str()))) t->SetBranchAddress(Form("%s_vtxz",_name.c_str()),_vtxz);
-  else t->Branch(Form("%s_vtxz",_name.c_str()),_vtxz,Form("%s_vtxz[num_steps]/F",_name.c_str()));
+  else if(create) t->Branch(Form("%s_vtxz",_name.c_str()),_vtxz,Form("%s_vtxz[num_%s]/F",_name.c_str(),_name.c_str()));
 
   if(t->GetBranch(Form("%s_de",_name.c_str()))) t->SetBranchAddress(Form("%s_de",_name.c_str()),_de);
-  else t->Branch(Form("%s_de",_name.c_str()),_de,Form("%s_de[num_steps]/D",_name.c_str()));
+  else if(create) t->Branch(Form("%s_de",_name.c_str()),_de,Form("%s_de[num_%s]/D",_name.c_str(),_name.c_str()));
 
   if(t->GetBranch(Form("%s_dx",_name.c_str()))) t->SetBranchAddress(Form("%s_dx",_name.c_str()),_dx);
-  else t->Branch(Form("%s_dx",_name.c_str()),_dx,Form("%s_dx[num_steps]/F",_name.c_str()));
+  else if(create) t->Branch(Form("%s_dx",_name.c_str()),_dx,Form("%s_dx[num_%s]/F",_name.c_str(),_name.c_str()));
 
-
+  return exist;
   
 }
 
