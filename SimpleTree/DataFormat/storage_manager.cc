@@ -312,7 +312,7 @@ void storage_manager::create_data_ptr(DATA::DATA_TYPE type)
 
   switch(type){
   case DATA::Event:
-    _ptr_data_array[type]=(data_base*)(new event(type));
+    _ptr_data_array[type]=(data_base*)(new event());
     break;
   case DATA::Track:
   case DATA::Bezier:
@@ -321,7 +321,7 @@ void storage_manager::create_data_ptr(DATA::DATA_TYPE type)
     _ptr_data_array[type]=(data_base*)(new track(type));
     break;
   case DATA::SpacePoint:
-    _ptr_data_array[type]=(data_base*)(new sps(type));
+    _ptr_data_array[type]=(data_base*)(new sps());
     break;
   case DATA::Hit:
   case DATA::CrawlerHit:
@@ -348,10 +348,10 @@ void storage_manager::create_data_ptr(DATA::DATA_TYPE type)
     _ptr_data_array[type]=(data_base*)(new cluster(type));
     break;
   case DATA::MCParticle:
-    _ptr_data_array[type]=(data_base*)(new mcpart(type));
+    _ptr_data_array[type]=(data_base*)(new mcpart());
     break;
   case DATA::MCTrajectory:
-    _ptr_data_array[type]=(data_base*)(new mcstep(type));
+    _ptr_data_array[type]=(data_base*)(new mcstep());
     break;
   case DATA::UserInfo:
   case DATA::FIFOChannel:
@@ -548,7 +548,6 @@ bool storage_manager::write_event()
 
     if(!_out_ch[i]) continue;
 
-    _ptr_data_array[i]->entry(_index);
     _out_ch[i]->Fill();
     _ptr_data_array[i]->clear_event();
 
@@ -595,7 +594,7 @@ const TChain* storage_manager::get_chain()
     print(MSG::NORMAL,__FUNCTION__,
 	  Form("Found %s tree ... adding to a chain!",DATA::DATA_TREE_NAME[(DATA::DATA_TYPE)i].c_str()));
     if(ch) ch->AddFriend(_in_ch[i]);
-    else ch=_in_ch[i];
+    else ch=(TChain*)(_in_ch[i]->Clone("combined_chain"));
 
   }
 

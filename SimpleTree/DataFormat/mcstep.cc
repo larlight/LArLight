@@ -4,10 +4,10 @@
 #include "mcstep.hh"
 
 //####################################################
-mcstep::mcstep(DATA::DATA_TYPE type) : data_base(type)
+mcstep::mcstep() : data_base(DATA::MCTrajectory)
 //####################################################
 {
-  _name=DATA::DATA_TREE_NAME[type];
+  _name=DATA::DATA_TREE_NAME[DATA::MCTrajectory];
   initialize();
 }
 
@@ -19,7 +19,7 @@ void mcstep::clear_event(bool all)
   data_base::clear_event(all);
 
   for(UShort_t index = 0;
-      (index < _no_steps) || (all && index<DATA::kMaxTrajectories);
+      (index < _num_steps) || (all && index<DATA::kMaxTrajectories);
       ++index) {
 
     _trackID[index] = 0;
@@ -34,27 +34,27 @@ void mcstep::clear_event(bool all)
     _dx[index]      = 0;
   }
 
-  _no_steps=0;
+  _num_steps=0;
 }
 
 //######################################################################
 void mcstep::add_trajectory(UShort_t trackID, Int_t pdgid,
 			    Double_t momx, Double_t momy, Double_t momz,
 			    Float_t vtxx, Float_t vtxy, Float_t vtxz,
-			    Double_t de, Double_t dx)
+			    Double_t de, Float_t dx)
 //######################################################################
 {
-  _trackID[_no_steps] = trackID;
-  _pdgid[_no_steps]   = pdgid;
-  _momx[_no_steps]    = momx;
-  _momy[_no_steps]    = momy;
-  _momz[_no_steps]    = momz;
-  _vtxx[_no_steps]    = vtxx;
-  _vtxy[_no_steps]    = vtxy;
-  _vtxz[_no_steps]    = vtxz;
-  _de[_no_steps]      = de;
-  _dx[_no_steps]      = dx;
-  _no_steps++;
+  _trackID[_num_steps] = trackID;
+  _pdgid[_num_steps]   = pdgid;
+  _momx[_num_steps]    = momx;
+  _momy[_num_steps]    = momy;
+  _momz[_num_steps]    = momz;
+  _vtxx[_num_steps]    = vtxx;
+  _vtxy[_num_steps]    = vtxy;
+  _vtxz[_num_steps]    = vtxz;
+  _de[_num_steps]      = de;
+  _dx[_num_steps]      = dx;
+  _num_steps++;
 }
 
 //################################
@@ -64,38 +64,38 @@ void mcstep::set_address(TTree* t)
   /// set base class memory address
   data_base::set_address(t);
 
-  if(t->GetBranch("no_steps")) t->SetBranchAddress("no_steps",&_no_steps);
-  else t->Branch("no_steps",&_no_steps,"no_steps/i");
+  if(t->GetBranch(Form("num_%s",_name.c_str()))) t->SetBranchAddress(Form("num_%s",_name.c_str()),&_num_steps);
+  else t->Branch(Form("num_%s",_name.c_str()),&_num_steps,Form("num_%s/i",_name.c_str()));
 
-  if(t->GetBranch("trackID")) t->SetBranchAddress("trackID",_trackID);
-  else t->Branch("trackID",_trackID,"trackID[no_steps]/i");
+  if(t->GetBranch(Form("%s_trackID",_name.c_str()))) t->SetBranchAddress(Form("%s_trackID",_name.c_str()),_trackID);
+  else t->Branch(Form("%s_trackID",_name.c_str()),_trackID,Form("%s_trackID[num_steps]/s",_name.c_str()));
 
-  if(t->GetBranch("pdgid")) t->SetBranchAddress("pdgid",_pdgid);
-  else t->Branch("pdgid",_pdgid,"pdgid[no_steps]/I");
+  if(t->GetBranch(Form("%s_pdgid",_name.c_str()))) t->SetBranchAddress(Form("%s_pdgid",_name.c_str()),_pdgid);
+  else t->Branch(Form("%s_pdgid",_name.c_str()),_pdgid,Form("%s_pdgid[num_steps]/I",_name.c_str()));
 
-  if(t->GetBranch("momx")) t->SetBranchAddress("momx",_momx);
-  else t->Branch("momx",_momx,"momx[no_steps]/D");
+  if(t->GetBranch(Form("%s_momx",_name.c_str()))) t->SetBranchAddress(Form("%s_momx",_name.c_str()),_momx);
+  else t->Branch(Form("%s_momx",_name.c_str()),_momx,Form("%s_momx[num_steps]/D",_name.c_str()));
 
-  if(t->GetBranch("momy")) t->SetBranchAddress("momy",_momy);
-  else t->Branch("momy",_momy,"momy[no_steps]/D");
+  if(t->GetBranch(Form("%s_momy",_name.c_str()))) t->SetBranchAddress(Form("%s_momy",_name.c_str()),_momy);
+  else t->Branch(Form("%s_momy",_name.c_str()),_momy,Form("%s_momy[num_steps]/D",_name.c_str()));
 
-  if(t->GetBranch("momz")) t->SetBranchAddress("momz",_momz);
-  else t->Branch("momz",_momz,"momz[no_steps]/D");
+  if(t->GetBranch(Form("%s_momz",_name.c_str()))) t->SetBranchAddress(Form("%s_momz",_name.c_str()),_momz);
+  else t->Branch(Form("%s_momz",_name.c_str()),_momz,Form("%s_momz[num_steps]/D",_name.c_str()));
 
-  if(t->GetBranch("vtxx")) t->SetBranchAddress("vtxx",_vtxx);
-  else t->Branch("vtxx",_vtxx,"vtxx[no_steps]/F");
+  if(t->GetBranch(Form("%s_vtxx",_name.c_str()))) t->SetBranchAddress(Form("%s_vtxx",_name.c_str()),_vtxx);
+  else t->Branch(Form("%s_vtxx",_name.c_str()),_vtxx,Form("%s_vtxx[num_steps]/F",_name.c_str()));
 
-  if(t->GetBranch("vtxy")) t->SetBranchAddress("vtxy",_vtxy);
-  else t->Branch("vtxy",_vtxy,"vtxy[no_steps]/F");
+  if(t->GetBranch(Form("%s_vtxy",_name.c_str()))) t->SetBranchAddress(Form("%s_vtxy",_name.c_str()),_vtxy);
+  else t->Branch(Form("%s_vtxy",_name.c_str()),_vtxy,Form("%s_vtxy[num_steps]/F",_name.c_str()));
 
-  if(t->GetBranch("vtxz")) t->SetBranchAddress("vtxz",_vtxz);
-  else t->Branch("vtxz",_vtxz,"vtxz[no_steps]/F");
+  if(t->GetBranch(Form("%s_vtxz",_name.c_str()))) t->SetBranchAddress(Form("%s_vtxz",_name.c_str()),_vtxz);
+  else t->Branch(Form("%s_vtxz",_name.c_str()),_vtxz,Form("%s_vtxz[num_steps]/F",_name.c_str()));
 
-  if(t->GetBranch("de")) t->SetBranchAddress("de",_de);
-  else t->Branch("de",_de,"de[no_steps]/D");
+  if(t->GetBranch(Form("%s_de",_name.c_str()))) t->SetBranchAddress(Form("%s_de",_name.c_str()),_de);
+  else t->Branch(Form("%s_de",_name.c_str()),_de,Form("%s_de[num_steps]/D",_name.c_str()));
 
-  if(t->GetBranch("dx")) t->SetBranchAddress("dx",_dx);
-  else t->Branch("dx",_dx,"dx[no_steps]/F");
+  if(t->GetBranch(Form("%s_dx",_name.c_str()))) t->SetBranchAddress(Form("%s_dx",_name.c_str()),_dx);
+  else t->Branch(Form("%s_dx",_name.c_str()),_dx,Form("%s_dx[num_steps]/F",_name.c_str()));
 
 
   

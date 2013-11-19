@@ -23,7 +23,7 @@ class event : public data_base {
 public:
 
   /// Default constructor
-  event(DATA::DATA_TYPE type=DATA::Event);
+  event();
 
   /// Default destructor
   virtual ~event(){};

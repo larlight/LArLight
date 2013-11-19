@@ -54,16 +54,7 @@ public:
 
   //--- Member getter functions ---//
   
-  /// Entry ID getter
-  int entry() const {return _entry;};
-
-  //--- Member setter functions ---//
-  void entry(int n) {_entry=n;};
-
 protected:
-
-  /// TTree Entry ID
-  int _entry;
 
   /// Data type
   DATA::DATA_TYPE _type;

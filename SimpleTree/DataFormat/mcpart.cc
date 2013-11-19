@@ -4,10 +4,10 @@
 #include "mcpart.hh"
 
 //####################################################
-mcpart::mcpart(DATA::DATA_TYPE type) : data_base(type)
+mcpart::mcpart() : data_base(DATA::MCParticle)
 //####################################################
 {
-  _name = DATA::DATA_TREE_NAME[type];
+  _name = DATA::DATA_TREE_NAME[DATA::MCParticle];
   initialize();
 }
 
@@ -31,10 +31,10 @@ void mcpart::add_particle(UShort_t trackID, Int_t pdgid, Int_t status_code)
     return;
   }
 
-  _trackID[_no_part]     = trackID;
-  _pdgid[_no_part]       = pdgid;
-  _status_code[_no_part] = status_code;
-  _no_part++;
+  _trackID[_num_part]     = trackID;
+  _pdgid[_num_part]       = pdgid;
+  _status_code[_num_part] = status_code;
+  _num_part++;
 
   _part_info_set=false;
   _fv_part_info_set=false;
@@ -48,19 +48,19 @@ void mcpart::set_part_info(Double_t mom, Double_t momx,  Double_t momy,  Double_
 //#########################################################################################
 {
 
-  _mom[_no_part]    = mom;
-  _momx[_no_part]   = momx;
-  _momy[_no_part]   = momy;
-  _momz[_no_part]   = momz;
-  _startx[_no_part] = startx;
-  _starty[_no_part] = starty;
-  _startz[_no_part] = startz;
-  _startt[_no_part] = startt;
-  _endx[_no_part]   = endx;
-  _endy[_no_part]   = endy;
-  _endz[_no_part]   = endz;
-  _endt[_no_part]   = endt;
-  _len[_no_part]    = len;
+  _mom[_num_part]    = mom;
+  _momx[_num_part]   = momx;
+  _momy[_num_part]   = momy;
+  _momz[_num_part]   = momz;
+  _startx[_num_part] = startx;
+  _starty[_num_part] = starty;
+  _startz[_num_part] = startz;
+  _startt[_num_part] = startt;
+  _endx[_num_part]   = endx;
+  _endy[_num_part]   = endy;
+  _endz[_num_part]   = endz;
+  _endt[_num_part]   = endt;
+  _len[_num_part]    = len;
 
   _part_info_set=true;
 }
@@ -72,19 +72,19 @@ void mcpart::set_fv_part_info(Double_t mom, Double_t momx,  Double_t momy,  Doub
 			      Float_t len)
 //#########################################################################################
 {
-  _fv_mom[_no_part]    = mom;
-  _fv_momx[_no_part]   = momx;
-  _fv_momy[_no_part]   = momy;
-  _fv_momz[_no_part]   = momz;
-  _fv_startx[_no_part] = startx;
-  _fv_starty[_no_part] = starty;
-  _fv_startz[_no_part] = startz;
-  _fv_startt[_no_part] = startt;
-  _fv_endx[_no_part]   = endx;
-  _fv_endy[_no_part]   = endy;
-  _fv_endz[_no_part]   = endz;
-  _fv_endt[_no_part]   = endt;
-  _fv_len[_no_part]    = len;
+  _fv_mom[_num_part]    = mom;
+  _fv_momx[_num_part]   = momx;
+  _fv_momy[_num_part]   = momy;
+  _fv_momz[_num_part]   = momz;
+  _fv_startx[_num_part] = startx;
+  _fv_starty[_num_part] = starty;
+  _fv_startz[_num_part] = startz;
+  _fv_startt[_num_part] = startt;
+  _fv_endx[_num_part]   = endx;
+  _fv_endy[_num_part]   = endy;
+  _fv_endz[_num_part]   = endz;
+  _fv_endt[_num_part]   = endt;
+  _fv_len[_num_part]    = len;
 
   _fv_part_info_set=true;
 }
@@ -97,7 +97,7 @@ void mcpart::clear_event(bool all)
   data_base::clear_event(all);
   
   for(UShort_t index = 0;
-      (index < _no_part) || (all && index<DATA::kMaxParticles);
+      (index < _num_part) || (all && index<DATA::kMaxParticles);
       ++index) {
     _trackID[index]     = 0;    
     _pdgid[index]       = 0;      
@@ -132,7 +132,7 @@ void mcpart::clear_event(bool all)
     _fv_len[index]    = 0;     
   }
 
-  _no_part=0;
+  _num_part=0;
   _part_info_set=false;
   _fv_part_info_set=false;
 
@@ -145,83 +145,83 @@ void mcpart::set_address(TTree* t)
   // Set base class address
   data_base::set_address(t);
 
-  if(t->GetBranch("no_part")) t->SetBranchAddress("no_part",&_no_part);
-  else t->Branch("no_part",&_no_part,"no_part/s");
+  if(t->GetBranch(Form("num_%s",_name.c_str()))) t->SetBranchAddress(Form("num_%s",_name.c_str()),&_num_part);
+  else t->Branch(Form("num_%s",_name.c_str()),&_num_part,Form("num_%s/s",_name.c_str()));
   
-  if(t->GetBranch("pdgid")) t->SetBranchAddress("pdgid",_pdgid);
-  else t->Branch("pdgid",_pdgid,"pdgid[no_part]/I");
+  if(t->GetBranch(Form("%s_pdgid",_name.c_str()))) t->SetBranchAddress(Form("%s_pdgid",_name.c_str()),_pdgid);
+  else t->Branch(Form("%s_pdgid",_name.c_str()),_pdgid,Form("%s_pdgid[num_part]/I",_name.c_str()));
 
-  if(t->GetBranch("trackID")) t->SetBranchAddress("trackID",_trackID);
-  else t->Branch("trackID",_trackID,"trackID[no_part]/b");
+  if(t->GetBranch(Form("%s_trackID",_name.c_str()))) t->SetBranchAddress(Form("%s_trackID",_name.c_str()),_trackID);
+  else t->Branch(Form("%s_trackID",_name.c_str()),_trackID,Form("%s_trackID[num_part]/s",_name.c_str()));
 
-  if(t->GetBranch("status_code")) t->SetBranchAddress("status_code",_status_code);
-  else t->Branch("status_code",_status_code,"status_code[no_part]/I");
+  if(t->GetBranch(Form("%s_status_code",_name.c_str()))) t->SetBranchAddress(Form("%s_status_code",_name.c_str()),_status_code);
+  else t->Branch(Form("%s_status_code",_name.c_str()),_status_code,Form("%s_status_code[num_part]/I",_name.c_str()));
 
-  if(t->GetBranch("momx")) t->SetBranchAddress("momx",_momx);
-  else t->Branch("momx",_momx,"momx[no_part]/D");
+  if(t->GetBranch(Form("%s_momx",_name.c_str()))) t->SetBranchAddress(Form("%s_momx",_name.c_str()),_momx);
+  else t->Branch(Form("%s_momx",_name.c_str()),_momx,Form("%s_momx[num_part]/D",_name.c_str()));
 
-  if(t->GetBranch("momy")) t->SetBranchAddress("momy",_momy);
-  else t->Branch("momy",_momy,"momy[no_part]/D");
+  if(t->GetBranch(Form("%s_momy",_name.c_str()))) t->SetBranchAddress(Form("%s_momy",_name.c_str()),_momy);
+  else t->Branch(Form("%s_momy",_name.c_str()),_momy,Form("%s_momy[num_part]/D",_name.c_str()));
 
-  if(t->GetBranch("momz")) t->SetBranchAddress("momz",_momz);
-  else t->Branch("momz",_momz,"momz[no_part]/D");
+  if(t->GetBranch(Form("%s_momz",_name.c_str()))) t->SetBranchAddress(Form("%s_momz",_name.c_str()),_momz);
+  else t->Branch(Form("%s_momz",_name.c_str()),_momz,Form("%s_momz[num_part]/D",_name.c_str()));
 
-  if(t->GetBranch("startx")) t->SetBranchAddress("startx",_startx);
-  else t->Branch("startx",_startx,"startx[no_part]/F");
+  if(t->GetBranch(Form("%s_startx",_name.c_str()))) t->SetBranchAddress(Form("%s_startx",_name.c_str()),_startx);
+  else t->Branch(Form("%s_startx",_name.c_str()),_startx,Form("%s_startx[num_part]/F",_name.c_str()));
 
-  if(t->GetBranch("starty")) t->SetBranchAddress("starty",_starty);
-  else t->Branch("starty",_starty,"starty[no_part]/F");
+  if(t->GetBranch(Form("%s_starty",_name.c_str()))) t->SetBranchAddress(Form("%s_starty",_name.c_str()),_starty);
+  else t->Branch(Form("%s_starty",_name.c_str()),_starty,Form("%s_starty[num_part]/F",_name.c_str()));
 
-  if(t->GetBranch("startz")) t->SetBranchAddress("startz",_startz);
-  else t->Branch("startz",_startz,"startz[no_part]/F");
+  if(t->GetBranch(Form("%s_startz",_name.c_str()))) t->SetBranchAddress(Form("%s_startz",_name.c_str()),_startz);
+  else t->Branch(Form("%s_startz",_name.c_str()),_startz,Form("%s_startz[num_part]/F",_name.c_str()));
 
-  if(t->GetBranch("endx")) t->SetBranchAddress("endx",_endx);
-  else t->Branch("endx",_endx,"endx[no_part]/F");
+  if(t->GetBranch(Form("%s_endx",_name.c_str()))) t->SetBranchAddress(Form("%s_endx",_name.c_str()),_endx);
+  else t->Branch(Form("%s_endx",_name.c_str()),_endx,Form("%s_endx[num_part]/F",_name.c_str()));
 
-  if(t->GetBranch("endy")) t->SetBranchAddress("endy",_endy);
-  else t->Branch("endy",_endy,"endy[no_part]/F");
+  if(t->GetBranch(Form("%s_endy",_name.c_str()))) t->SetBranchAddress(Form("%s_endy",_name.c_str()),_endy);
+  else t->Branch(Form("%s_endy",_name.c_str()),_endy,Form("%s_endy[num_part]/F",_name.c_str()));
 
-  if(t->GetBranch("endz")) t->SetBranchAddress("endz",_endz);
-  else t->Branch("endz",_endz,"endz[no_part]/F");
+  if(t->GetBranch(Form("%s_endz",_name.c_str()))) t->SetBranchAddress(Form("%s_endz",_name.c_str()),_endz);
+  else t->Branch(Form("%s_endz",_name.c_str()),_endz,Form("%s_endz[num_part]/F",_name.c_str()));
 
-  if(t->GetBranch("mom")) t->SetBranchAddress("mom",_mom);
-  else t->Branch("mom",_mom,"mom[no_part]/D");
+  if(t->GetBranch(Form("%s_mom",_name.c_str()))) t->SetBranchAddress(Form("%s_mom",_name.c_str()),_mom);
+  else t->Branch(Form("%s_mom",_name.c_str()),_mom,Form("%s_mom[num_part]/D",_name.c_str()));
 
-  if(t->GetBranch("len")) t->SetBranchAddress("len",_len);
-  else t->Branch("len",_len,"len[no_part]/F");
+  if(t->GetBranch(Form("%s_len",_name.c_str()))) t->SetBranchAddress(Form("%s_len",_name.c_str()),_len);
+  else t->Branch(Form("%s_len",_name.c_str()),_len,Form("%s_len[num_part]/F",_name.c_str()));
 
-  if(t->GetBranch("fv_momx")) t->SetBranchAddress("fv_momx",_fv_momx);
-  else t->Branch("fv_momx",_fv_momx,"fv_momx[no_part]/D");
+  if(t->GetBranch(Form("%s_fv_momx",_name.c_str()))) t->SetBranchAddress(Form("%s_fv_momx",_name.c_str()),_fv_momx);
+  else t->Branch(Form("%s_fv_momx",_name.c_str()),_fv_momx,Form("%s_fv_momx[num_part]/D",_name.c_str()));
 
-  if(t->GetBranch("fv_momy")) t->SetBranchAddress("fv_momy",_fv_momy);
-  else t->Branch("fv_momy",_fv_momy,"fv_momy[no_part]/D");
+  if(t->GetBranch(Form("%s_fv_momy",_name.c_str()))) t->SetBranchAddress(Form("%s_fv_momy",_name.c_str()),_fv_momy);
+  else t->Branch(Form("%s_fv_momy",_name.c_str()),_fv_momy,Form("%s_fv_momy[num_part]/D",_name.c_str()));
 
-  if(t->GetBranch("fv_momz")) t->SetBranchAddress("fv_momz",_fv_momz);
-  else t->Branch("fv_momz",_fv_momz,"fv_momz[no_part]/D");
+  if(t->GetBranch(Form("%s_fv_momz",_name.c_str()))) t->SetBranchAddress(Form("%s_fv_momz",_name.c_str()),_fv_momz);
+  else t->Branch(Form("%s_fv_momz",_name.c_str()),_fv_momz,Form("%s_fv_momz[num_part]/D",_name.c_str()));
 
-  if(t->GetBranch("fv_startx")) t->SetBranchAddress("fv_startx",_fv_startx);
-  else t->Branch("fv_startx",_fv_startx,"fv_startx[no_part]/F");
+  if(t->GetBranch(Form("%s_fv_startx",_name.c_str()))) t->SetBranchAddress(Form("%s_fv_startx",_name.c_str()),_fv_startx);
+  else t->Branch(Form("%s_fv_startx",_name.c_str()),_fv_startx,Form("%s_fv_startx[num_part]/F",_name.c_str()));
 
-  if(t->GetBranch("fv_starty")) t->SetBranchAddress("fv_starty",_fv_starty);
-  else t->Branch("fv_starty",_fv_starty,"fv_starty[no_part]/F");
+  if(t->GetBranch(Form("%s_fv_starty",_name.c_str()))) t->SetBranchAddress(Form("%s_fv_starty",_name.c_str()),_fv_starty);
+  else t->Branch(Form("%s_fv_starty",_name.c_str()),_fv_starty,Form("%s_fv_starty[num_part]/F",_name.c_str()));
 
-  if(t->GetBranch("fv_startz")) t->SetBranchAddress("fv_startz",_fv_startz);
-  else t->Branch("fv_startz",_fv_startz,"fv_startz[no_part]/F");
+  if(t->GetBranch(Form("%s_fv_startz",_name.c_str()))) t->SetBranchAddress(Form("%s_fv_startz",_name.c_str()),_fv_startz);
+  else t->Branch(Form("%s_fv_startz",_name.c_str()),_fv_startz,Form("%s_fv_startz[num_part]/F",_name.c_str()));
 
-  if(t->GetBranch("fv_endx")) t->SetBranchAddress("fv_endx",_fv_endx);
-  else t->Branch("fv_endx",_fv_endx,"fv_endx[no_part]/F");
+  if(t->GetBranch(Form("%s_fv_endx",_name.c_str()))) t->SetBranchAddress(Form("%s_fv_endx",_name.c_str()),_fv_endx);
+  else t->Branch(Form("%s_fv_endx",_name.c_str()),_fv_endx,Form("%s_fv_endx[num_part]/F",_name.c_str()));
 
-  if(t->GetBranch("fv_endy")) t->SetBranchAddress("fv_endy",_fv_endy);
-  else t->Branch("fv_endy",_fv_endy,"fv_endy[no_part]/F");
+  if(t->GetBranch(Form("%s_fv_endy",_name.c_str()))) t->SetBranchAddress(Form("%s_fv_endy",_name.c_str()),_fv_endy);
+  else t->Branch(Form("%s_fv_endy",_name.c_str()),_fv_endy,Form("%s_fv_endy[num_part]/F",_name.c_str()));
 
-  if(t->GetBranch("fv_endz")) t->SetBranchAddress("fv_endz",_fv_endz);
-  else t->Branch("fv_endz",_fv_endz,"fv_endz[no_part]/F");
+  if(t->GetBranch(Form("%s_fv_endz",_name.c_str()))) t->SetBranchAddress(Form("%s_fv_endz",_name.c_str()),_fv_endz);
+  else t->Branch(Form("%s_fv_endz",_name.c_str()),_fv_endz,Form("%s_fv_endz[num_part]/F",_name.c_str()));
 
-  if(t->GetBranch("fv_mom")) t->SetBranchAddress("fv_mom",_fv_mom);
-  else t->Branch("fv_mom",_fv_mom,"fv_mom[no_part]/D");
+  if(t->GetBranch(Form("%s_fv_mom",_name.c_str()))) t->SetBranchAddress(Form("%s_fv_mom",_name.c_str()),_fv_mom);
+  else t->Branch(Form("%s_fv_mom",_name.c_str()),_fv_mom,Form("%s_fv_mom[num_part]/D",_name.c_str()));
 
-  if(t->GetBranch("fv_len")) t->SetBranchAddress("fv_len",_fv_len);
-  else t->Branch("fv_len",_fv_len,"fv_len[no_part]/F");
+  if(t->GetBranch(Form("%s_fv_len",_name.c_str()))) t->SetBranchAddress(Form("%s_fv_len",_name.c_str()),_fv_len);
+  else t->Branch(Form("%s_fv_len",_name.c_str()),_fv_len,Form("%s_fv_len[num_part]/F",_name.c_str()));
 
 }
 

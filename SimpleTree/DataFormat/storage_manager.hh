@@ -143,7 +143,7 @@ public:
   /// Getter for a counter of written-out events
   inline UInt_t get_entires_written() const {return _nevents_written;};
 
-  TTree* get_tree(DATA::DATA_TYPE type) {return _out_ch[type];};
+  const TTree* get_tree(DATA::DATA_TYPE type) const {return ( _out_ch[type] ? _out_ch[type] : (TTree*)(_in_ch[type]) );};
   
 private:
 

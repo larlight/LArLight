@@ -23,7 +23,7 @@ class mcpart : public data_base {
 public:
 
   /// Default constructor
-  mcpart(DATA::DATA_TYPE type=DATA::MCParticle);
+  mcpart();
 
   /// Default destructor
   virtual ~mcpart(){};
@@ -72,7 +72,7 @@ protected:
   bool _part_info_set;    ///< Checker variable set to true by mcpart::set_part_info and false by mcpart::add_particle
   bool _fv_part_info_set; ///< Checker variable set to true by mcpart::set_fv_part_info and false by mcpart::add_particle
 
-  UShort_t  _no_part;                           ///< Number of particles stored
+  UShort_t  _num_part;                           ///< Number of particles stored
   UShort_t  _trackID[DATA::kMaxParticles];     ///< Track ID ... unique per particle from G4
   Int_t     _pdgid[DATA::kMaxParticles];       ///< PDGID of a particle
   Int_t     _status_code[DATA::kMaxParticles]; ///< Status code of a particle (what is this?)

@@ -50,7 +50,7 @@ public:
 		   Float_t  endx_sigma,   Float_t endy_sigma,   Float_t endz_sigma);
 
   //--- Getter methods ---//
-  UShort_t        no_clusters()  const { return _no_clusters;  };
+  UShort_t        num_clusters()  const { return _num_clusters;  };
   const UShort_t* clusterID()    const { return _clusterID;    };
   const UChar_t*  view()         const { return _view;         };
   const Double_t* charge()       const { return _charge;       };
@@ -73,7 +73,7 @@ public:
 
 protected:
 
-  UShort_t _no_clusters;                      ///< Number of clusters
+  UShort_t _num_clusters;                      ///< Number of clusters
   UShort_t _clusterID[DATA::kMaxClusters];    ///< Cluster ID 
   UChar_t  _view[DATA::kMaxClusters];         ///< View_t key in LArSoft
   Double_t _charge[DATA::kMaxClusters];       ///< Charge sum
