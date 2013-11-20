@@ -126,18 +126,20 @@ bool ana_processor::process_event(uint32_t index)
 //###################################################################################
 {
 
-  if(_process==INIT) {
-    
+  switch(_process){
+  case INIT:
     if(!initialize()) {
-      Message::send(MSG::ERROR,__FUNCTION__,"Aborting.");
+      print(MSG::ERROR,__FUNCTION__,"Aborting.");
       return false;
     }
-    else
-      _process=PROCESSING;
-  }
-
-  if(_process==READY)
+  case READY:
+  case PROCESSING:
     _process=PROCESSING;
+    break;
+  case FINISHED:
+    print(MSG::ERROR,__FUNCTION__,"File already closed!");
+    return false;
+  }
 
   bool event_found = index ? _storage->go_to(index) : _storage->next_event();
 

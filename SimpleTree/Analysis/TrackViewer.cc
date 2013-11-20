@@ -29,11 +29,12 @@ bool TrackViewer::initialize()
 bool TrackViewer::analyze(storage_manager* storage)
 //################################################################
 {
-  
+
   // Clean up histograms if they already exist (from previous event)
   if(_hMCStep)  {delete _hMCStep;  _hMCStep  = 0;};
   if(_hRecoSPS) {delete _hRecoSPS; _hRecoSPS = 0;};
   for(auto h : _hRecoTrack_v) {delete h; h=0;};
+
   _hRecoTrack_v.clear();
   _track = 0;
 
@@ -106,42 +107,38 @@ bool TrackViewer::analyze(storage_manager* storage)
 
   // Tracks
   if(my_track) {
-
+    
     Int_t id=-1;
     TH3D* h=0;
     for(size_t i=0; i<my_track->num_points(); ++i){
-
+      
       if(id<0 || id != my_track->vtxID()[i]) {
 
-	if(h) {
-	  h->SetMarkerStyle(22);
-	  h->SetMarkerColor(kRed);
-	  _hRecoTrack_v.push_back(h);
-	}
-
 	id = my_track->vtxID()[i];
-	h  = 0;
+
+	if(h) _hRecoTrack_v.push_back(h);
+	
+	h  = Prepare3DHisto(Form("_hRecoTrack_%03d",(int)(id)),zmin,zmax,xmin,xmax,ymin,ymax);
+	h->SetMarkerStyle(22);
+	h->SetMarkerColor(kRed);
+
       }
       
-      if(!h)
-	h=Prepare3DHisto(Form("_hRecoTrack_%03d",(int)(id)),
-			 zmin,zmax,xmin,xmax,ymin,ymax);
-      
-      h->Fill(my_track->vtxx()[i],my_track->vtxy()[i],my_track->vtxz()[i]);
+      h->Fill(my_track->vtxz()[i],my_track->vtxx()[i],my_track->vtxy()[i]);
 	      
     }
+    if(h) _hRecoTrack_v.push_back(h);
     _track = (track*)my_track;
   }
-  
+
+  return true;  
   // MC trajectory points
   if(my_mcstep){
-
-
 
     for(size_t i=0; i<my_mcstep->num_steps(); ++i) {
 
       if(my_mcstep->trackID()[i]>1) break;
-      if(my_mcstep->trackID()[i]<1) continue;
+      if(my_mcstep->trackID()[i]==0) continue;
 
       if(!_hMCStep) {
 
@@ -169,7 +166,6 @@ TH3D* TrackViewer::Prepare3DHisto(std::string name,
 {
 
   TH3D* h=0;
-  if(h) delete h;
 
   h = new TH3D(name.c_str(),"3D Viewer; Z; X; Y",
 	       50,  xmin, xmax,

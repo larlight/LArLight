@@ -235,7 +235,16 @@ bool storage_manager::prepare_tree()
       if(_ptr_data_array[i]) {
 
 	Bool_t data_exist = _ptr_data_array[i]->set_address((TTree*)_in_ch);
-	
+
+	if(data_exist)
+	  
+	  print(MSG::INFO,__FUNCTION__,Form("\"%s\" product found in Tree!",DATA::DATA_TREE_NAME[i].c_str()));
+
+	else
+	  
+	  print(MSG::WARNING,__FUNCTION__,Form("\"%s\" product not in Tree...",DATA::DATA_TREE_NAME[i].c_str()));
+
+
 	if(_mode==BOTH)
 	  
 	  _write_data_array[i] = data_exist;
@@ -253,14 +262,13 @@ bool storage_manager::prepare_tree()
       
       _ptr_data_array[i]->set_address(_out_ch,true);
     }
-
-    _nevents=_in_ch->GetEntries();
-    _nevents_written=0;
-    _nevents_read=0;
-    _index=0;
-
   }
 
+  _nevents=_in_ch->GetEntries();
+  _nevents_written=0;
+  _nevents_read=0;
+  _index=0;
+  
   if( _mode!=WRITE && _nevents==0) {
     Message::send(MSG::ERROR,__FUNCTION__,"Did not find any relevant data tree!");
     status=false;
@@ -408,7 +416,7 @@ bool storage_manager::close()
     Message::send(MSG::NORMAL,__FUNCTION__,_buf);
     if(_fout) _fout->Close();
     _fout=0;
-
+    
     if(_in_ch)  { delete _in_ch;  _in_ch=0;  }
     if(_out_ch) { _out_ch=0; }
     for(size_t i=0; i<DATA::DATA_TYPE_MAX; ++i) {
@@ -499,6 +507,7 @@ bool storage_manager::read_event()
 
   _index++;
   _nevents_read++;
+
   return true;
 }
 
