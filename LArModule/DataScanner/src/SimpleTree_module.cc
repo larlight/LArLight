@@ -29,8 +29,8 @@
 #include "art/Framework/Core/EDAnalyzer.h"
 
 // LArLight includes
-#include <AnaProcess/Base/Base-TypeDef.hh>
-#include <AnaProcess/DataFormat/DataFormat-TypeDef.hh>
+#include <SimpleTree/Base/Base-TypeDef.hh>
+#include <SimpleTree/DataFormat/DataFormat-TypeDef.hh>
 
 namespace larlight {
 
@@ -55,6 +55,11 @@ namespace larlight {
     void analyze (const art::Event&); 
 
   private:
+    /// Function to check if the given MC trajectory point is in the readout FV or not
+    bool IsFV(Double_t x, Double_t y, Double_t z, Double_t t) const;
+
+    /// Function to calculate the distance from the closest wall
+    Double_t GetDistanceToWall(Double_t x, Double_t y, Double_t z) const;
 
     /// Function to read & store calibrated wire data
     //void ReadWire(const art::Event& evt, const std::string mod_name, event_wire* data_ptr);
@@ -77,7 +82,10 @@ namespace larlight {
     /// Function to read & store MCTruth information
     void ReadMCTruth(const art::Event& evt, const std::string mod_name, mctruth* data_ptr);
 
-    /// Function to read & store MCTruth information
+    /// Function to read & store MCNeutrino information
+    void ReadMCNeutrino(const art::Event& evt, const std::string mod_name, mcnu* data_ptr);
+
+    /// Function to read & store MCParticle array information
     void ReadMCPartArray(const art::Event& evt, const std::string mod_name, mcstep* step_ptr, mcpart* part_ptr);
 
     /// Utility function to parse module name string
@@ -86,6 +94,16 @@ namespace larlight {
     TTree* _tree; ///< output data holder TTree
     std::vector<std::vector<std::string> > _mod_names; ///< input data production module names input from FCL file
     std::vector<data_base*>                _data_ptr;  ///< output data holder class object pointers
+    Double_t _x_max; ///< Maximum X boundary of the detector
+    Double_t _y_max; ///< Maximum X boundary of the detector
+    Double_t _z_max; ///< Maximum X boundary of the detector
+    Double_t _x_min; ///< Maximum X boundary of the detector
+    Double_t _y_min; ///< Maximum X boundary of the detector
+    Double_t _z_min; ///< Maximum X boundary of the detector
+    Double_t _readout_startT; ///< Time at which readout window starts in G4 clock
+    Double_t _readout_endT;   ///< Time at which readout window ends in G4 clock 
+    Double_t _readout_freq;    ///< TPC sampling frequency in MHz
+    Double_t _readout_size; ///< Readout window size in readout time thick
   };
 
 } 
@@ -122,6 +140,7 @@ namespace larlight {
   DataScanner::DataScanner(fhicl::ParameterSet const& pset) : _data_ptr(DATA::DATA_TYPE_MAX,0)
   //#######################################################################################################
   {
+
     // Initialize module name container
     for(size_t i=0; i<(size_t)(DATA::DATA_TYPE_MAX); i++)
       
@@ -147,7 +166,22 @@ namespace larlight {
     ParseModuleName ( _mod_names[DATA::DBCluster],        pset.get<std::string>( "fModName_DBCluster"        ));
     ParseModuleName ( _mod_names[DATA::FuzzyCluster],     pset.get<std::string>( "fModName_FuzzyCluster"     ));
     ParseModuleName ( _mod_names[DATA::HoughCluster],     pset.get<std::string>( "fModName_HoughCluster"     ));
-    ParseModuleName ( _mod_names[DATA::MCParticle],       pset.get<std::string>( "FModName_MCParticle"       ));
+    ParseModuleName ( _mod_names[DATA::MCParticle],       pset.get<std::string>( "fModName_MCParticle"       ));
+
+    _readout_startT = pset.get<Double_t>("fReadoutStartT");
+    _readout_endT   = pset.get<Double_t>("fReadoutEndT");
+    _readout_freq   = pset.get<Double_t>("fReadoutFreq");
+    _readout_size   = pset.get<Double_t>("fReadoutSize");
+
+    // Set volume boundary parameters
+    art::ServiceHandle<geo::Geometry> geo;
+    _y_max = geo->DetHalfHeight();
+    _y_min = (-1.) * _y_max;
+    _z_min = 0;
+    _z_max = geo->DetLength();
+    _x_min = 0;
+    _x_max = 2.*(geo->DetHalfWidth());
+
     // Next we make storage data class objects for those data types specified in fcl files.
     art::ServiceHandle<art::TFileService>  fileService;
 
@@ -163,6 +197,12 @@ namespace larlight {
 
 	// Next, create data class objects
 	switch(type){
+	case DATA::MCParticle:
+	  _data_ptr[i]=(data_base*)(new mcpart());
+	  break;
+	case DATA::MCTrajectory:
+	  _data_ptr[i]=(data_base*)(new mcstep());
+	  break;
 	case DATA::MCTruth:
 	case DATA::GENIE_MCTruth:
 	case DATA::CRY_MCTruth:
@@ -179,7 +219,7 @@ namespace larlight {
 	  _data_ptr[i]=(data_base*)(new track(type));
 	  break;
 	case DATA::SpacePoint:
-	  _data_ptr[i]=(data_base*)(new sps(type));
+	  _data_ptr[i]=(data_base*)(new sps());
 	  break;
 	case DATA::Hit:
 	case DATA::CrawlerHit:
@@ -268,7 +308,12 @@ namespace larlight {
 	for(size_t j=0; j<_mod_names[i].size(); ++j)
 	  ReadTrack(evt, _mod_names[i][j], (track*)(_data_ptr[i]));
 	break;
-
+      case DATA::MCNeutrino:
+      case DATA::GENIE_MCNeutrino:
+	for(size_t j=0; j<_mod_names[i].size(); ++j){
+	  ;
+	}
+	break;
       case DATA::MCTruth:
       case DATA::GENIE_MCTruth:
       case DATA::CRY_MCTruth:
@@ -305,8 +350,6 @@ namespace larlight {
 	for(size_t j=0; j<_mod_names[i].size(); ++j)
 	  ReadHit(evt,_mod_names[i][j],(hit*)(_data_ptr[i]));
 	break;
-      case DATA::Wire:
-      case DATA::FIFOChannel:
       case DATA::Cluster:
       case DATA::DBCluster:
       case DATA::FuzzyCluster:
@@ -316,6 +359,7 @@ namespace larlight {
 	for(size_t j=0; j<_mod_names[i].size(); ++j)
 	  ReadCluster(evt,_mod_names[i][j],(cluster*)(_data_ptr[i]));
 	break;
+      case DATA::Wire:
       case DATA::FIFOChannel:
       case DATA::MCTrajectory:
       case DATA::Event:
@@ -328,6 +372,28 @@ namespace larlight {
       }
     }
     _tree->Fill();
+  }
+
+  bool DataScanner::IsFV(Double_t x, Double_t y, Double_t z, Double_t t)  const{
+
+    // Hard volume cut
+    if( x > _x_max || x < _x_min || z > _z_max || z < _z_min || y > _y_max || y < _y_min ) return false;
+
+    // Now compare x-coordinate to make sure this point is inside the readout window.
+    Double_t drift_v = (_x_max - _x_min) / (_readout_size / _readout_freq); 
+    Double_t drift_t = (x - _x_min) / drift_v;
+
+    // Charge arrives @ wire-plane @ drift_t + t
+    return ( _readout_startT < (drift_t + t) && (drift_t + t) < _readout_endT);
+  }
+
+  Double_t DataScanner::GetDistanceToWall(Double_t x, Double_t y, Double_t z) const{
+
+    Double_t dx = std::max((x - _x_min), (_x_max - x));
+    Double_t dy = std::max((y - _y_min), (_y_max - y));
+    Double_t dz = std::max((z - _z_min), (_z_max - z));
+    
+    return std::max(dx,std::max(dy,dz));
   }
 
   /*
@@ -499,6 +565,12 @@ namespace larlight {
   }
 
   //#######################################################################################################
+  void ReadMCNeutrino(const art::Event& evt, const std::string mod_name, mcnu* data_ptr)
+  //#######################################################################################################
+  {
+    
+  }
+
   void DataScanner::ReadMCPartArray(const art::Event& evt, const std::string mod_name, 
 				    mcstep* step_ptr, mcpart* part_ptr){
   //#######################################################################################################
@@ -549,7 +621,7 @@ namespace larlight {
 	};
 	dx_tot+=dx;
 
-	if(IsFV(part->Vx(k), part->Vy(k), part->Vz(k))) {
+	if(IsFV(part->Vx(k), part->Vy(k), part->Vz(k), part->T(k))) {
 	  
 	  if(fv_first) {
 	    fv_startx = part->Vx(k);
@@ -579,8 +651,8 @@ namespace larlight {
       
 	last_E = part->E(k);
 	last_x = part->Vx(k);
-	lart_y = part->Vy(k);
-	part_z = part->Vz(k);
+	last_y = part->Vy(k);
+	last_z = part->Vz(k);
       }
       if(part_ptr){
 	part_ptr->set_part_info(part->P(),    part->Px(),   part->Py(),   part->Pz(),
@@ -617,17 +689,15 @@ namespace larlight {
 
       const simb::MCTruth* mci_ptr(mciArray.at(i));
 
-      data_ptr->set_gen_code( (MC::Origin_t) mci_ptr->Origin() );
-
       for(size_t j=0; j < (size_t)(mci_ptr->NParticles()); ++j){
 	
 	const simb::MCParticle part(mci_ptr->GetParticle(j));
 
-	data_ptr->add_primary(part.PdgCode(), part.TrackId(), part.StatusCode(),
+	data_ptr->add_primary(part.PdgCode(), part.TrackId(), part.StatusCode(), (UChar_t)(mci_ptr->Origin()),
 			      part.NumberDaughters(), part.Mother(),
 			      part.Vx(), part.Vy(), part.Vz(),
 			      part.Mass(), part.E(),
-			      part..P(), part.Px(), part.Py(), part.Pz());
+			      part.P(), part.Px(), part.Py(), part.Pz());
       }
     }
   }
@@ -658,22 +728,21 @@ namespace larlight {
       Double_t length=0;
       for(size_t i=0; i<track_ptr->NumberTrajectoryPoints(); i++) {
 
-	TVector3* pos = track_ptr->LocationAtPoint(i);
-
-	data_ptr->add_trajectory(i,
+	const TVector3 pos = track_ptr->LocationAtPoint(i);
+	const TVector3 dir = track_ptr->DirectionAtPoint(i);
+	data_ptr->add_trajectory(track_ptr->ID(),
 				 pos[0],pos[1],pos[2],
-				 track_ptr->MomentumAt(i)[0],
-				 track_ptr->MomentumAt(i)[1],
-				 track_ptr->MomentumAt(i)[2]);
+				 dir[0],dir[1],dir[2],
+				 track_ptr->MomentumAtPoint(i));
 	
-	if(i) length += track_ptr->LocationAtPoint(i);
-	
+	if(i) length += (pos - (track_ptr->LocationAtPoint(i-1))).Mag();
       }
-      
+      const TVector3 end = track_ptr->End();
+      const TVector3 pos = track_ptr->Vertex();
       data_ptr->add_track( track_ptr->ID(),
-			   track_ptr->Vertex()[0], track_ptr->Vertex()[1], track_ptr->Vertex()[2],
-			   track_ptr->End()[0], track_ptr->End()[1], track_ptr->End()[2],
-			   track_ptr->Theta(), track_ptr->VertexMomentum(), length);
+			   pos[0],pos[1],pos[2],GetDistanceToWall(pos[0],pos[1],pos[2]),
+			   end[0],end[1],end[2],GetDistanceToWall(end[0],end[1],end[2]),
+			   track_ptr->Theta(), track_ptr->Phi(), track_ptr->VertexMomentum(), length);
       
     }
     
