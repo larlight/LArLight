@@ -43,7 +43,8 @@ public:
   void add_track(UShort_t trackID, 
 		 Float_t  startx, Float_t  starty,   Float_t  startz,   Float_t  startd,
 		 Float_t  endx,   Float_t  endy,     Float_t  endz,     Float_t  endd,
-		 Float_t  theta, Double_t startmom,    Double_t len);
+		 Float_t  theta,  Float_t  phi,
+		 Double_t startmom,    Double_t len);
 
   //--- Getters for track-wise information ---//
   UShort_t        num_tracks() const { return _num_tracks; };
@@ -57,6 +58,7 @@ public:
   const Float_t*  endz()      const { return _endz;      };
   const Float_t*  endd()      const { return _endd;      };
   const Float_t*  theta()     const { return _theta;     };
+  const Float_t*  phi()       const { return _phi;       };
   const Double_t* startmom()  const { return _startmom;  };
   const Double_t* len()       const { return _len;       };
 

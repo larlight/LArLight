@@ -25,7 +25,8 @@ track::track(DATA::DATA_TYPE type) : data_base(type)
 void track::add_track(UShort_t trackID, 
 		      Float_t  startx, Float_t  starty,   Float_t  startz,   Float_t  startd,
 		      Float_t  endx,   Float_t  endy,     Float_t  endz,     Float_t  endd,
-		      Float_t  theta,  Double_t startmom,    Double_t len)
+		      Float_t  theta,  Float_t  phi,
+		      Double_t startmom,    Double_t len)
 //###########################################################################################
 {
   _trackID[_num_tracks]  = trackID;
@@ -38,6 +39,7 @@ void track::add_track(UShort_t trackID,
   _endz[_num_tracks]     = endz;
   _endd[_num_tracks]     = endd;
   _theta[_num_tracks]    = theta;
+  _phi[_num_tracks]      = phi;
   _startmom[_num_tracks] = startmom;
   _len[_num_tracks]      = len;
   _num_tracks++;
