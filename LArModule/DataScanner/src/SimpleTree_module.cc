@@ -83,7 +83,9 @@ namespace larlight {
     void ReadMCTruth(const art::Event& evt, const std::string mod_name, mctruth* data_ptr);
 
     /// Function to read & store MCNeutrino information
-    void ReadMCNeutrino(const art::Event& evt, const std::string mod_name, mcnu* data_ptr);
+    void ReadMCNeutrino(const art::Event& evt, 
+			const std::string nu_mod_name, const std::string flux_mod_name,
+			mcnu* data_ptr);
 
     /// Function to read & store MCParticle array information
     void ReadMCPartArray(const art::Event& evt, const std::string mod_name, mcstep* step_ptr, mcpart* part_ptr);
@@ -94,6 +96,7 @@ namespace larlight {
     TTree* _tree; ///< output data holder TTree
     std::vector<std::vector<std::string> > _mod_names; ///< input data production module names input from FCL file
     std::vector<data_base*>                _data_ptr;  ///< output data holder class object pointers
+    std::string                            _flux_mod;  ///< Module name for flux file
     Double_t _x_max; ///< Maximum X boundary of the detector
     Double_t _y_max; ///< Maximum X boundary of the detector
     Double_t _z_max; ///< Maximum X boundary of the detector
@@ -137,7 +140,8 @@ namespace larlight {
 namespace larlight {
 
   //#######################################################################################################
-  DataScanner::DataScanner(fhicl::ParameterSet const& pset) : _data_ptr(DATA::DATA_TYPE_MAX,0)
+  DataScanner::DataScanner(fhicl::ParameterSet const& pset) : _data_ptr(DATA::DATA_TYPE_MAX,0),
+							      _flux_mod("")
   //#######################################################################################################
   {
 
@@ -167,7 +171,7 @@ namespace larlight {
     ParseModuleName ( _mod_names[DATA::FuzzyCluster],     pset.get<std::string>( "fModName_FuzzyCluster"     ));
     ParseModuleName ( _mod_names[DATA::HoughCluster],     pset.get<std::string>( "fModName_HoughCluster"     ));
     ParseModuleName ( _mod_names[DATA::MCParticle],       pset.get<std::string>( "fModName_MCParticle"       ));
-
+    _flux_mod       = pset.get<std::string>("fModName_MCFlux");
     _readout_startT = pset.get<Double_t>("fReadoutStartT");
     _readout_endT   = pset.get<Double_t>("fReadoutEndT");
     _readout_freq   = pset.get<Double_t>("fReadoutFreq");
@@ -311,7 +315,7 @@ namespace larlight {
       case DATA::MCNeutrino:
       case DATA::GENIE_MCNeutrino:
 	for(size_t j=0; j<_mod_names[i].size(); ++j){
-	  ;
+	  ReadMCNeutrino(evt, _mod_names[i][j], _flux_mod, (mcnu*)(_data_ptr[i]));
 	}
 	break;
       case DATA::MCTruth:
@@ -565,9 +569,60 @@ namespace larlight {
   }
 
   //#######################################################################################################
-  void ReadMCNeutrino(const art::Event& evt, const std::string mod_name, mcnu* data_ptr)
+  void ReadMCNeutrino(const art::Event& evt, 
+		      const std::string nu_mod_name, const std::string flux_mod_name,
+		      mcnu* data_ptr)
   //#######################################################################################################
   {
+    std::vector<const simb::MCNeutrino*> nuArray;
+    try {
+
+      evt.getView(nu_mod_name,nuArray);
+
+    }catch (art::Exception const& e) {
+
+      if (e.categoryCode() != art::errors::ProductNotFound ) throw;
+
+    }
+
+    std::vector<const simb::MCFlux*> fluxArray;
+    try {
+
+      evt.getView(flux_mod_name,fluxArray);
+
+    }catch (art::Exception const& e) {
+
+      if (e.categoryCode() != art::errors::ProductNotFound ) throw;
+
+    }
+
+    
+
+    for(size_t i=0; i < nuArray.size(); ++i){
+      
+      const simb::MCNeutrino* nu_ptr(nuArray.at(i));
+
+      if(fluxArray.size()){
+
+	const simb::MCFlux flux_ptr(fluxArray.at(0));
+
+	data_ptr->add_neutrino(nu_ptr->Nu().PdgCode(), nu_ptr->CCNC(), nu_ptr->Nu().StatusCode(),
+			       nu_ptr->QSqr(), nu_ptr->W(), 
+			       nu_ptr->HitNuc(), 
+			       nu_ptr->Nu().Vx(), nu_ptr->Nu().Vy(), nu_ptr->Nu().Vz(),
+			       nu_ptr->Nu().E(), nu_ptr->Nu().Px(), nu_ptr->Nu().Py(), nu_ptr->Nu().Pz(),
+			       nc_ptr->Lepton().E(), nu_ptr->Lepton().Px(), nu_ptr->Lepton().Py(), nu_ptr->Lepton().Pz(),
+			       flux_ptr->ftptype, flux_ptr->ftpx, flux_ptr->ftpy, flux_ptr->ftpz);
+      }else{
+	data_ptr->add_neutrino(nu_ptr->Nu().PdgCode(), nu_ptr->CCNC(), nu_ptr->Nu().StatusCode(),
+			       nu_ptr->QSqr(), nu_ptr->W(), 
+			       nu_ptr->HitNuc(), 
+			       nu_ptr->Nu().Vx(), nu_ptr->Nu().Vy(), nu_ptr->Nu().Vz(),
+			       nu_ptr->Nu().E(), nu_ptr->Nu().Px(), nu_ptr->Nu().Py(), nu_ptr->Nu().Pz(),
+			       nc_ptr->Lepton().E(), nu_ptr->Lepton().Px(), nu_ptr->Lepton().Py(), nu_ptr->Lepton().Pz(),
+			       99999, 0, 0, 0);
+
+      }
     
   }
 
