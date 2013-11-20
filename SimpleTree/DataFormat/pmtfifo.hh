@@ -41,7 +41,7 @@ public:
 
   //--- Member getters ---//
   UShort_t        num_pmtfifo() const { return _num_pmtfifo; };
-  const UShort_t* channel()     const { return _channel;     };
+  const UChar_t*  channel()     const { return _channel;     };
   const UChar_t*  discID()      const { return _discID;      };
   const UInt_t*   frame()       const { return _frame;       };
   const UInt_t*   sample()      const { return _sample;      };
@@ -58,7 +58,7 @@ public:
 protected:
 
   UShort_t _num_pmtfifo;                ///< Number of space-points (SPS)
-  UShort_t _channel[DATA::kMaxPMTFIFO]; ///< Channel number
+  UChar_t  _channel[DATA::kMaxPMTFIFO]; ///< Channel number
   UChar_t  _discID[DATA::kMaxPMTFIFO];  ///< Discriminator ID
   UInt_t   _frame[DATA::kMaxPMTFIFO];   ///< Frame ID
   UInt_t   _sample[DATA::kMaxPMTFIFO];  ///< Sample ID

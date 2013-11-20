@@ -73,10 +73,10 @@ Bool_t pmtfifo::set_address(TTree* t,Bool_t create)
   else if(create) t->Branch(Form("%s_discID",_name.c_str()),_discID,Form("%s_discID[num_%sfifo]/b",_name.c_str(),_name.c_str()));
 
   if(t->GetBranch(Form("%s_frame",_name.c_str()))) t->SetBranchAddress(Form("%s_frame",_name.c_str()),_frame);
-  else if(create) t->Branch(Form("%s_frame",_name.c_str()),_frame,Form("%s_frame[num_%sfifo]/b",_name.c_str(),_name.c_str()));
+  else if(create) t->Branch(Form("%s_frame",_name.c_str()),_frame,Form("%s_frame[num_%sfifo]/i",_name.c_str(),_name.c_str()));
 
   if(t->GetBranch(Form("%s_sample",_name.c_str()))) t->SetBranchAddress(Form("%s_sample",_name.c_str()),_sample);
-  else if(create) t->Branch(Form("%s_sample",_name.c_str()),_sample,Form("%s_sample[num_%sfifo]/b",_name.c_str(),_name.c_str()));
+  else if(create) t->Branch(Form("%s_sample",_name.c_str()),_sample,Form("%s_sample[num_%sfifo]/i",_name.c_str(),_name.c_str()));
 
   if(t->GetBranch(Form("num_%s_adc",_name.c_str()))) t->SetBranchAddress(Form("num_%s_adc",_name.c_str()),&_num_adc);
   else if(create) t->Branch(Form("num_%s_adc",_name.c_str()),&_num_adc,Form("num_%s_adc/i",_name.c_str()));

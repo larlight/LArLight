@@ -211,14 +211,18 @@ bool storage_manager::prepare_tree()
     Message::send(MSG::ERROR,__FUNCTION__,_buf);
     status=false;
   }
-
+  
   if(_name_tdirectory.size()>0)
     _in_ch = new TChain(Form("%s/%s",_name_tdirectory.c_str(),DATA::TREE_NAME.c_str()), 
 			Form("%s Tree",DATA::TREE_NAME.c_str()));
   else
     _in_ch = new TChain(DATA::TREE_NAME.c_str(),Form("%s Tree",DATA::TREE_NAME.c_str()));
 
-  _nevents=_in_ch->GetEntries();
+  if(_mode!=WRITE)
+
+    for(size_t j=0; j<_in_fnames.size(); ++j)
+    
+      _in_ch->AddFile(_in_fnames[j].c_str());
 
   for(size_t i=0; i<DATA::DATA_TYPE_MAX; ++i){
 
@@ -226,17 +230,17 @@ bool storage_manager::prepare_tree()
 
     if(_mode!=WRITE && _read_data_array[i]) {
 
-      for(size_t j=0; j<_in_fnames.size(); ++j)
-	
-	_in_ch->AddFile(_in_fnames[j].c_str());
-
       create_data_ptr((DATA::DATA_TYPE)i);
-      
-      Bool_t data_exist = _ptr_data_array[i]->set_address((TTree*)_in_ch);
 
-      if(_mode==BOTH)
+      if(_ptr_data_array[i]) {
 
-	_write_data_array[i] = data_exist;
+	Bool_t data_exist = _ptr_data_array[i]->set_address((TTree*)_in_ch);
+	
+	if(_mode==BOTH)
+	  
+	  _write_data_array[i] = data_exist;
+	
+      }
     }
 
     if(_mode!=READ && _write_data_array[i] ) {
@@ -250,6 +254,7 @@ bool storage_manager::prepare_tree()
       _ptr_data_array[i]->set_address(_out_ch,true);
     }
 
+    _nevents=_in_ch->GetEntries();
     _nevents_written=0;
     _nevents_read=0;
     _index=0;
@@ -330,12 +335,15 @@ void storage_manager::create_data_ptr(DATA::DATA_TYPE type)
   case DATA::Shower:
   case DATA::Calorimetry:
   case DATA::DATA_TYPE_MAX:
-    print(MSG::ERROR,__FUNCTION__,Form("Data identifier not supported: %d",(int)type));
+    print(MSG::ERROR,__FUNCTION__,Form("Data identifier not supported: %s",DATA::DATA_TREE_NAME[type].c_str()));
     break;
   }
+
   if(_ptr_data_array[type]) {
+
     print(MSG::INFO,__PRETTY_FUNCTION__,Form("Data container \"%s\" created...",_ptr_data_array[type]->class_name().c_str()));
     _ptr_data_array[type]->set_verbosity(get_verbosity());
+
   }
 
   return;
