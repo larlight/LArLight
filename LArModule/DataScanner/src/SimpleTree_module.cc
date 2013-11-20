@@ -73,7 +73,7 @@ namespace larlight {
     void ReadCluster(const art::Event& evt, const std::string mod_name, cluster* data_ptr);
 
     /// Function to read & store spacepoints
-    //void ReadPMT(const art::Event& evt, const std::string mod_name, event_pmt* data_ptr);
+    void ReadPMT(const art::Event& evt, const std::string mod_name, pmtfifo* data_ptr);
 
     /// Function to read & store spacepoints
     void ReadSPS(const art::Event& evt, const std::string mod_name, sps* data_ptr);
@@ -341,11 +341,11 @@ namespace larlight {
 	  ReadSPS(evt,_mod_names[i][j], (sps*)(_data_ptr[i]));
 	break;
 
-	//case DATA::FIFOChannel:
+	case DATA::FIFOChannel:
 	//// Data type to be stored in event_pmt class
-	//for(size_t j=0; j<_mod_names[i].size(); ++j)
-	//ReadPMT(evt,_mod_names[i][j], (event_pmt*)(_data_ptr[i]));
-	//break;
+	  for(size_t j=0; j<_mod_names[i].size(); ++j)
+	    ReadPMT(evt,_mod_names[i][j], (event_pmt*)(_data_ptr[i]));
+	  break;
       case DATA::Hit:
       case DATA::CrawlerHit:
       case DATA::GausHit:
@@ -490,7 +490,7 @@ namespace larlight {
     }
   }
 
-  /*
+
   //#######################################################################################################
   void DataScanner::ReadPMT(const art::Event& evt, const std::string mod_name, event_pmt* data_ptr){
   //#######################################################################################################
@@ -510,38 +510,15 @@ namespace larlight {
 
       const optdata::FIFOChannel* fifo_ptr(pmtArray.at(i));
 
-      optdata::Optical_Category_t cat(fifo_ptr->Category());
-      PMT::DISCRIMINATOR disc_id = PMT::DISC_MAX;
-      switch(cat){
-      case optdata::kFEMCosmicHighGain:
-      case optdata::kFEMCosmicLowGain:
-      case optdata::kCosmicPMTTrigger:
-	disc_id = PMT::COSMIC_DISC;
-	break;
-      case optdata::kFEMBeamHighGain:
-      case optdata::kFEMBeamLowGain:
-      case optdata::kBeamPMTTrigger:
-	disc_id = PMT::BEAM_DISC;
-	break;
-      case optdata::kUndefined:
-      case optdata::kHighGain:
-      case optdata::kLowGain:
-      default:
-	disc_id = PMT::DISC_MAX;
-      }
-
-      pmtfifo fifo_light(fifo_ptr->ChannelNumber(),
-			 fifo_ptr->Frame(),
-			 fifo_ptr->TimeSlice(),
-			 disc_id,
-			 *fifo_ptr);
-      
-      data_ptr->add_fifo(fifo_light);
+      data_ptr->add_pmtfifo(fifo_ptr->ChannelNumber(),
+			    fifo_ptr->Category(),
+			    fifo_ptr->Frame(),
+			    fifo_ptr->TimeSlice(),
+			    *fifo_ptr);
     }
     
   }
 
-  */
   //#######################################################################################################
   void DataScanner::ReadSPS(const art::Event& evt, const std::string mod_name, sps* data_ptr){
   //#######################################################################################################
