@@ -25,7 +25,7 @@ track::track(DATA::DATA_TYPE type) : data_base(type)
 void track::add_track(UShort_t trackID, 
 		      Float_t  startx, Float_t  starty,   Float_t  startz,   Float_t  startd,
 		      Float_t  endx,   Float_t  endy,     Float_t  endz,     Float_t  endd,
-		      Float_t  theta,  Double_t mom,    Double_t len)
+		      Float_t  theta,  Double_t startmom,    Double_t len)
 //###########################################################################################
 {
   _trackID[_num_tracks]  = trackID;
@@ -38,7 +38,7 @@ void track::add_track(UShort_t trackID,
   _endz[_num_tracks]     = endz;
   _endd[_num_tracks]     = endd;
   _theta[_num_tracks]    = theta;
-  _startmom[_num_tracks] = mom;
+  _startmom[_num_tracks] = startmom;
   _len[_num_tracks]      = len;
   _num_tracks++;
 }
@@ -46,16 +46,18 @@ void track::add_track(UShort_t trackID,
 //#####################################################################
 void track::add_trajectory(UShort_t vtxID, 
 			   Float_t x,  Float_t y,  Float_t z,
-			   Double_t momx,  Double_t momy,  Double_t momz)
+			   Float_t dirx,  Float_t diry,  Float_t dirz,
+			   Double_t mom)
 //#####################################################################
 {
   _vtxID[_num_points] = vtxID;
   _vtxx[_num_points]  = x;
   _vtxy[_num_points]  = y;
   _vtxz[_num_points]  = z;
-  _momx[_num_points]  = momx;
-  _momy[_num_points]  = momy;
-  _momz[_num_points]  = momz;
+  _dirx[_num_points]  = dirx;
+  _diry[_num_points]  = diry;
+  _dirz[_num_points]  = dirz;
+  _mom[_num_points]   = mom;
   _num_points++;
 }
 
@@ -95,9 +97,9 @@ void track::clear_event(bool all)
     _vtxx[index]  = 0;
     _vtxy[index]  = 0;
     _vtxz[index]  = 0;
-    _momx[index]  = 0;
-    _momy[index]  = 0;
-    _momz[index]  = 0;
+    _dirx[index]  = 0;
+    _diry[index]  = 0;
+    _dirz[index]  = 0;
     
   } // clear loop ends
   _num_points = 0;
@@ -175,14 +177,17 @@ Bool_t track::set_address(TTree* t,Bool_t create)
   if(t->GetBranch(Form("%s_vtxz",_name.c_str()))) t->SetBranchAddress(Form("%s_vtxz",_name.c_str()),_vtxz);
   else if(create) t->Branch(Form("%s_vtxz",_name.c_str()),_vtxz,Form("%s_vtxz[%s_points]/F",_name.c_str(),_name.c_str()));
 
-  if(t->GetBranch(Form("%s_momx",_name.c_str()))) t->SetBranchAddress(Form("%s_momx",_name.c_str()),_momx);
-  else if(create) t->Branch(Form("%s_momx",_name.c_str()),_momx,Form("%s_momx[%s_points]/D",_name.c_str(),_name.c_str()));
+  if(t->GetBranch(Form("%s_dirx",_name.c_str()))) t->SetBranchAddress(Form("%s_dirx",_name.c_str()),_dirx);
+  else if(create) t->Branch(Form("%s_dirx",_name.c_str()),_dirx,Form("%s_dirx[%s_points]/F",_name.c_str(),_name.c_str()));
 
-  if(t->GetBranch(Form("%s_momy",_name.c_str()))) t->SetBranchAddress(Form("%s_momy",_name.c_str()),_momy);
-  else if(create) t->Branch(Form("%s_momy",_name.c_str()),_momy,Form("%s_momy[%s_points]/D",_name.c_str(),_name.c_str()));
+  if(t->GetBranch(Form("%s_diry",_name.c_str()))) t->SetBranchAddress(Form("%s_diry",_name.c_str()),_diry);
+  else if(create) t->Branch(Form("%s_diry",_name.c_str()),_diry,Form("%s_diry[%s_points]/F",_name.c_str(),_name.c_str()));
 
-  if(t->GetBranch(Form("%s_momz",_name.c_str()))) t->SetBranchAddress(Form("%s_momz",_name.c_str()),_momz);
-  else if(create) t->Branch(Form("%s_momz",_name.c_str()),_momz,Form("%s_momz[%s_points]/D",_name.c_str(),_name.c_str()));
+  if(t->GetBranch(Form("%s_dirz",_name.c_str()))) t->SetBranchAddress(Form("%s_dirz",_name.c_str()),_dirz);
+  else if(create) t->Branch(Form("%s_dirz",_name.c_str()),_dirz,Form("%s_dirz[%s_points]/F",_name.c_str(),_name.c_str()));
+
+  if(t->GetBranch(Form("%s_mom",_name.c_str()))) t->SetBranchAddress(Form("%s_mom",_name.c_str()),_mom);
+  else if(create) t->Branch(Form("%s_mom",_name.c_str()),_mom,Form("%s_mom[%s_points]/D",_name.c_str(),_name.c_str()));
 
   return exist;
 }

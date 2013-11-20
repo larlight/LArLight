@@ -43,7 +43,7 @@ public:
   void add_track(UShort_t trackID, 
 		 Float_t  startx, Float_t  starty,   Float_t  startz,   Float_t  startd,
 		 Float_t  endx,   Float_t  endy,     Float_t  endz,     Float_t  endd,
-		 Float_t  theta, Double_t mom,    Double_t len);
+		 Float_t  theta, Double_t startmom,    Double_t len);
 
   //--- Getters for track-wise information ---//
   UShort_t        num_tracks() const { return _num_tracks; };
@@ -63,17 +63,19 @@ public:
   /// Setter method for a trajectory point information
   void add_trajectory(UShort_t vtxID, 
 		      Float_t  x,  Float_t  y,  Float_t  z,
-		      Double_t momx,  Double_t momy,  Double_t momz);
+		      Float_t dirx,  Float_t diry,  Float_t dirz,
+		      Double_t mom);
 
   //--- Getter methods for trajectory points ---//
   Int_t num_points()       const { return _num_points; };
-  const UShort_t*  vtxID() const { return _vtxID;      };
-  const Float_t*   vtxx()  const { return _vtxx;       };
-  const Float_t*   vtxy()  const { return _vtxy;       };
-  const Float_t*   vtxz()  const { return _vtxz;       };
-  const Double_t*  momx()  const { return _momx;       };
-  const Double_t*  momy()  const { return _momy;       };
-  const Double_t*  momz()  const { return _momz;       };
+  const UShort_t* vtxID() const { return _vtxID;      };
+  const Float_t*  vtxx()  const { return _vtxx;       };
+  const Float_t*  vtxy()  const { return _vtxy;       };
+  const Float_t*  vtxz()  const { return _vtxz;       };
+  const Float_t*  dirx()  const { return _dirx;       };
+  const Float_t*  diry()  const { return _diry;       };
+  const Float_t*  dirz()  const { return _dirz;       };
+  const Double_t* mom()   const { return _mom;        };
 
 protected:
 
@@ -96,13 +98,13 @@ protected:
   // Trajectory points
   UShort_t  _num_points;                   ///< Number of trajectory points (for all tracks)
   UShort_t  _vtxID[DATA::kMaxTrackPoints]; ///< Array of associated track ID
-  Float_t   _vtxx[DATA::kMaxTrackPoints];  ///< X coordinate of trajectory points
-  Float_t   _vtxy[DATA::kMaxTrackPoints];  ///< Y coordinate of trajectory points
-  Float_t   _vtxz[DATA::kMaxTrackPoints];  ///< Z coordinate of trajectory points
-  Double_t  _momx[DATA::kMaxTrackPoints];  ///< Momentum X component at a trajectory point
-  Double_t  _momy[DATA::kMaxTrackPoints];  ///< Momentum Y component at a trajectory point
-  Double_t  _momz[DATA::kMaxTrackPoints];  ///< Momentum Z component at a trajectory point
-
+  Float_t   _vtxx[DATA::kMaxTrackPoints];  ///< X coordinate of trajectory point
+  Float_t   _vtxy[DATA::kMaxTrackPoints];  ///< Y coordinate of trajectory point
+  Float_t   _vtxz[DATA::kMaxTrackPoints];  ///< Z coordinate of trajectory point
+  Float_t   _dirx[DATA::kMaxTrackPoints];  ///< X component direction of a trajectory point along a track
+  Float_t   _diry[DATA::kMaxTrackPoints];  ///< Y component direction of a trajectory point along a track
+  Float_t   _dirz[DATA::kMaxTrackPoints];  ///< Z component direction of a trajectory point along a track
+  Double_t  _mom[DATA::kMaxTrackPoints];   ///< Momentum at a trajectory point
 };
 
 #endif
