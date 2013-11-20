@@ -16,6 +16,7 @@
 #include "mctruth.hh"
 #include "mcnu.hh"
 #include "mcpart.hh"
+#include "pmtfifo.hh"
 // Class forward declaration here
 class storage_manager;
 class data_base;
@@ -27,7 +28,7 @@ class track;
 class mctruth;
 class mcnu;
 class mcpart;
-
+class pmtfifo;
 #endif
 
 

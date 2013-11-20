@@ -24,7 +24,9 @@ namespace DATA{
   const UShort_t kMaxClusters     = 1000;   ///< Maximum number of clusters
   const UChar_t  kMaxNeutrinos    = 100;    ///< Maximum number of neutrinos per event produced by a generator
   const UShort_t kMaxParticles    = 10000;  ///< Maximum number of particles from G4 tracking info
-  const Int_t kMaxTrajectories    = 0xffff; ///< Maximum number of particle's trajectory points that can be stored
+  const Int_t    kMaxTrajectories = 0xffff; ///< Maximum number of particle's trajectory points that can be stored
+  const UShort_t kMaxPMTFIFO      = 2000;   ///< Maximum number of discriminator fire
+  const UInt_t   kMaxPMTWords     = 40 * 3000; ///< Maximum number of ADC samples to store (2 beamgate per channel)
 
   const std::string TREE_NAME = "anatree";
 
