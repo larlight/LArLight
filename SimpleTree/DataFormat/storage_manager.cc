@@ -280,7 +280,7 @@ void storage_manager::create_data_ptr(DATA::DATA_TYPE type)
 
   switch(type){
   case DATA::Event:
-    _ptr_data_array[type]=(data_base*)(new event());
+    _ptr_data_array[type]=(data_base*)(new event);
     break;
   case DATA::Track:
   case DATA::Bezier:
@@ -289,7 +289,7 @@ void storage_manager::create_data_ptr(DATA::DATA_TYPE type)
     _ptr_data_array[type]=(data_base*)(new track(type));
     break;
   case DATA::SpacePoint:
-    _ptr_data_array[type]=(data_base*)(new sps());
+    _ptr_data_array[type]=(data_base*)(new sps);
     break;
   case DATA::Hit:
   case DATA::CrawlerHit:
@@ -316,13 +316,15 @@ void storage_manager::create_data_ptr(DATA::DATA_TYPE type)
     _ptr_data_array[type]=(data_base*)(new cluster(type));
     break;
   case DATA::MCParticle:
-    _ptr_data_array[type]=(data_base*)(new mcpart());
+    _ptr_data_array[type]=(data_base*)(new mcpart);
     break;
   case DATA::MCTrajectory:
-    _ptr_data_array[type]=(data_base*)(new mcstep());
+    _ptr_data_array[type]=(data_base*)(new mcstep);
+    break;
+  case DATA::FIFOChannel:
+    _ptr_data_array[type]=(data_base*)(new pmtfifo);
     break;
   case DATA::UserInfo:
-  case DATA::FIFOChannel:
   case DATA::Wire:
   case DATA::Seed:
   case DATA::Shower:

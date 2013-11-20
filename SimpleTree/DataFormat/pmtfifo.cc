@@ -5,7 +5,7 @@
 
 pmtfifo::pmtfifo() : data_base(DATA::FIFOChannel)
 {
-  _name=DATA::TREE_NAME;
+  _name=DATA::DATA_TREE_NAME[DATA::FIFOChannel];
   initialize();
 }
 
@@ -58,7 +58,7 @@ void pmtfifo::add_pmtfifo(UChar_t channel, UChar_t disc,
 Bool_t pmtfifo::set_address(TTree* t,Bool_t create)
 {
   /// set base class address
-  Bool_t exist = set_address(t,create);
+  Bool_t exist = data_base::set_address(t,create);
   
   if(t->GetBranch(Form("num_%sfifo",_name.c_str()))) t->SetBranchAddress(Form("num_%sfifo",_name.c_str()),&_num_pmtfifo);
   else {
@@ -82,7 +82,7 @@ Bool_t pmtfifo::set_address(TTree* t,Bool_t create)
   else if(create) t->Branch(Form("num_%s_adc",_name.c_str()),&_num_adc,Form("num_%s_adc/i",_name.c_str()));
 
   if(t->GetBranch(Form("%s_adc",_name.c_str()))) t->SetBranchAddress(Form("%s_adc",_name.c_str()),_adc);
-  else if(create) t->Branch(Form("%s_adc",_name.c_str()),_adc,Form("%s_adc[num_%sadc]/s",_name.c_str(),_name.c_str()));
+  else if(create) t->Branch(Form("%s_adc",_name.c_str()),_adc,Form("%s_adc[num_%s_adc]/s",_name.c_str(),_name.c_str()));
 
   return exist;
 }

@@ -14,6 +14,9 @@
 #ifndef DataScanner_H
 #define DataScanner_H
 
+// ROOT includes
+#include "TTimeStamp.h"
+
 // LArSoft includes
 #include "Geometry/Geometry.h"
 #include "RecoBase/Wire.h"
@@ -24,11 +27,27 @@
 #include "SimulationBase/MCTruth.h"
 #include "SimulationBase/MCNeutrino.h"
 #include "SimulationBase/MCFlux.h"
+#include "RawData/RawDigit.h"
+#include "RawData/BeamInfo.h"
+#include "SummaryData/POTSummary.h"
 #include "OpticalDetectorData/FIFOChannel.h"
 #include "OpticalDetectorData/OpticalTypes.h"
+#include "Utilities/LArProperties.h"
 
-// ART includes.
+// ART includes
 #include "art/Framework/Core/EDAnalyzer.h"
+#include "art/Framework/Principal/Event.h"
+#include "art/Framework/Principal/SubRun.h"
+#include "art/Framework/Principal/Handle.h"
+#include "art/Persistency/Common/Ptr.h"
+#include "art/Persistency/Common/PtrVector.h"
+#include "art/Framework/Services/Registry/ActivityRegistry.h"
+#include "art/Framework/Services/Registry/ServiceHandle.h"
+#include "art/Framework/Services/Registry/ServiceMacros.h"
+#include "art/Framework/Services/Optional/TFileService.h"
+#include "art/Framework/Services/Optional/TFileDirectory.h"
+#include "messagefacility/MessageLogger/MessageLogger.h"
+#include "fhiclcpp/ParameterSet.h"
 
 // LArLight includes
 #include <SimpleTree/Base/Base-TypeDef.hh>
@@ -53,6 +72,9 @@ namespace larlight {
     /// Function to be called before an event loop
     void beginJob();
 
+    /// Function to be called per sub run
+    void beginSubRun(const art::SubRun& srun);
+
     /// Function to be called per event
     void analyze (const art::Event&); 
 
@@ -62,6 +84,9 @@ namespace larlight {
 
     /// Function to calculate the distance from the closest wall
     Double_t GetDistanceToWall(Double_t x, Double_t y, Double_t z) const;
+
+    /// Function to read event info
+    void ReadEvent(const art::Event& evt, const std::string mod_name, event* data_ptr);
 
     /// Function to read & store calibrated wire data
     //void ReadWire(const art::Event& evt, const std::string mod_name, event_wire* data_ptr);
@@ -96,9 +121,12 @@ namespace larlight {
     void ParseModuleName(std::vector<std::string> &mod_names, std::string name);
 
     TTree* _tree; ///< output data holder TTree
-    std::vector<std::vector<std::string> > _mod_names; ///< input data production module names input from FCL file
-    std::vector<data_base*>                _data_ptr;  ///< output data holder class object pointers
-    std::string                            _flux_mod;  ///< Module name for flux file
+    std::vector<std::vector<std::string> > _mod_names;    ///< input data production module names input from FCL file
+    std::vector<data_base*>                _data_ptr;     ///< output data holder class object pointers
+    std::string                            _potinfo_mod ; ///< Module name for POTSummary 
+    std::string                            _fluxinfo_mod; ///< Module name for flux file
+    std::string                            _beaminfo_mod; ///< Module name for raw::BeamInfo
+    std::string                            _triginfo_mod; ///< Module name for Trigger info (not yet implemented)
     Double_t _x_max; ///< Maximum X boundary of the detector
     Double_t _y_max; ///< Maximum X boundary of the detector
     Double_t _z_max; ///< Maximum X boundary of the detector
@@ -109,6 +137,12 @@ namespace larlight {
     Double_t _readout_endT;   ///< Time at which readout window ends in G4 clock 
     Double_t _readout_freq;    ///< TPC sampling frequency in MHz
     Double_t _readout_size; ///< Readout window size in readout time thick
+
+    art::ServiceHandle<util::LArProperties> _larprop_service; ///< LAr property service handle
+
+    //--- Run-wise variable ---// ... these are determined once and never updated later
+    Double_t _e_lifetime; ///< Electron lifetime
+    Double_t _pot;        ///< Proton on target
   };
 
 } 
@@ -124,29 +158,17 @@ namespace larlight {
   DEFINE_ART_MODULE(DataScanner);
 }
 
-
-// Framework includes
-#include "art/Framework/Principal/Event.h"
-#include "fhiclcpp/ParameterSet.h"
-#include "art/Framework/Principal/Handle.h"
-#include "art/Persistency/Common/Ptr.h"
-#include "art/Persistency/Common/PtrVector.h"
-#include "art/Framework/Services/Registry/ActivityRegistry.h"
-#include "art/Framework/Services/Registry/ServiceHandle.h"
-#include "art/Framework/Services/Registry/ServiceMacros.h"
-#include "art/Framework/Services/Optional/TFileService.h"
-#include "art/Framework/Services/Optional/TFileDirectory.h"
-#include "messagefacility/MessageLogger/MessageLogger.h"
-
-
 namespace larlight {
 
   //#######################################################################################################
   DataScanner::DataScanner(fhicl::ParameterSet const& pset) : _data_ptr(DATA::DATA_TYPE_MAX,0),
-							      _flux_mod("")
+							      _potinfo_mod(""),
+							      _fluxinfo_mod(""),
+							      _beaminfo_mod(""),
+							      _triginfo_mod("")
   //#######################################################################################################
   {
-
+    mf::LogWarning("DataScanner")<<"Constructor called";
     // Initialize module name container
     for(size_t i=0; i<(size_t)(DATA::DATA_TYPE_MAX); i++)
       
@@ -173,7 +195,10 @@ namespace larlight {
     ParseModuleName ( _mod_names[DATA::FuzzyCluster],     pset.get<std::string>( "fModName_FuzzyCluster"     ));
     ParseModuleName ( _mod_names[DATA::HoughCluster],     pset.get<std::string>( "fModName_HoughCluster"     ));
     ParseModuleName ( _mod_names[DATA::MCParticle],       pset.get<std::string>( "fModName_MCParticle"       ));
-    _flux_mod       = pset.get<std::string>("fModName_MCFlux");
+    _potinfo_mod    = pset.get<std::string>("fModName_POTSummary");
+    _triginfo_mod   = pset.get<std::string>("fModName_Trigger");
+    _fluxinfo_mod   = pset.get<std::string>("fModName_MCFlux");
+    _beaminfo_mod   = pset.get<std::string>("fModName_BeamInfo");
     _readout_startT = pset.get<Double_t>("fReadoutStartT");
     _readout_endT   = pset.get<Double_t>("fReadoutEndT");
     _readout_freq   = pset.get<Double_t>("fReadoutFreq");
@@ -191,23 +216,27 @@ namespace larlight {
     // Next we make storage data class objects for those data types specified in fcl files.
     art::ServiceHandle<art::TFileService>  fileService;
 
+    // Create TTree
+    _tree = fileService->make<TTree>(DATA::TREE_NAME.c_str(),"Analysis Tree");
+
+    // By default create event data holder class
+    _data_ptr[DATA::Event] = (data_base*)(new event);
+    _data_ptr[DATA::Event]->set_address(_tree,true);
+
     for(size_t i=0; i<(int)(DATA::DATA_TYPE_MAX); i++){
 
       DATA::DATA_TYPE type = (DATA::DATA_TYPE)i;
-      
+      mf::LogWarning("DataScanner")<<"Module: "<<DATA::DATA_TREE_NAME[type].c_str();      
       // Check if a user provided an input module name for this data type.
       if(_mod_names[i].size()){
-	// Create TTree
-	if(!_tree) 
-	  _tree = fileService->make<TTree>(DATA::TREE_NAME.c_str(),"Analysis Tree");
-
-	// Next, create data class objects
+	mf::LogWarning("DataScanner")<<" ... created";
+	// Next, create data class objects if requested by a user
 	switch(type){
 	case DATA::MCParticle:
-	  _data_ptr[i]=(data_base*)(new mcpart());
+	  _data_ptr[i]=(data_base*)(new mcpart);
 	  break;
 	case DATA::MCTrajectory:
-	  _data_ptr[i]=(data_base*)(new mcstep());
+	  _data_ptr[i]=(data_base*)(new mcstep);
 	  break;
 	case DATA::MCTruth:
 	case DATA::GENIE_MCTruth:
@@ -225,7 +254,7 @@ namespace larlight {
 	  _data_ptr[i]=(data_base*)(new track(type));
 	  break;
 	case DATA::SpacePoint:
-	  _data_ptr[i]=(data_base*)(new sps());
+	  _data_ptr[i]=(data_base*)(new sps);
 	  break;
 	case DATA::Hit:
 	case DATA::CrawlerHit:
@@ -242,9 +271,11 @@ namespace larlight {
 	case DATA::HoughCluster:
 	  _data_ptr[i]=(data_base*)(new cluster(type));
 	  break;
-	case DATA::Wire:
 	case DATA::FIFOChannel:
+	  _data_ptr[i]=(data_base*)(new pmtfifo);
+	  break;
 	case DATA::Event:
+	case DATA::Wire:
 	case DATA::UserInfo:
 	case DATA::Seed:
 	case DATA::Shower:
@@ -257,8 +288,11 @@ namespace larlight {
 	// Set TTree branch to the created data class object's address
 	if(_data_ptr[i])
 	  _data_ptr[i]->set_address(_tree,true);
+	mf::LogWarning("DataScanner")<<" ... address set";
       }
+      mf::LogWarning("DataScanner")<<" ... next data ...";
     }
+    mf::LogWarning("DataScanner")<<"Constructor ends";
     
   }
 
@@ -286,12 +320,25 @@ namespace larlight {
   //#######################################################################################################
   void DataScanner::beginJob()
   //#######################################################################################################
-  {}
+  {
+    _e_lifetime = _larprop_service -> ElectronLifetime();
+  }
+
+  //#######################################################################################################
+  void DataScanner::beginSubRun(const art::SubRun& srun)
+  //#######################################################################################################
+  {
+    _pot = 0.;
+    art::Handle<sumdata::POTSummary> potArray;
+    if(srun.getByLabel(_potinfo_mod,potArray))
+      _pot = potArray->totpot;    
+  }
 
   //#######################################################################################################
   void DataScanner::analyze(const art::Event& evt) 
   //#######################################################################################################
   {
+
     // Loop over data type. We check whether or not to fill each data type
     for(size_t i=0; i<(size_t)(DATA::DATA_TYPE_MAX); i++){
       
@@ -310,20 +357,20 @@ namespace larlight {
       case DATA::Kalman3DSPS:
       case DATA::Kalman3DHit:
       case DATA::Bezier:
-	// Data types to be stored in event_track class
+	// Data types to be stored in track class
 	for(size_t j=0; j<_mod_names[i].size(); ++j)
 	  ReadTrack(evt, _mod_names[i][j], (track*)(_data_ptr[i]));
 	break;
       case DATA::MCNeutrino:
       case DATA::GENIE_MCNeutrino:
 	for(size_t j=0; j<_mod_names[i].size(); ++j){
-	  ReadMCNeutrino(evt, _mod_names[i][j], _flux_mod, (mcnu*)(_data_ptr[i]));
+	  ReadMCNeutrino(evt, _mod_names[i][j], _fluxinfo_mod, (mcnu*)(_data_ptr[i]));
 	}
 	break;
       case DATA::MCTruth:
       case DATA::GENIE_MCTruth:
       case DATA::CRY_MCTruth:
-	// Data type to be stored in event_mc class
+	// Data type to be stored in mctruth class
 	for(size_t j=0; j<_mod_names[i].size(); ++j){
 	  ReadMCTruth     (evt, _mod_names[i][j], (mctruth*)(_data_ptr[i]));
 	}
@@ -336,15 +383,15 @@ namespace larlight {
 	}
 	break;
       case DATA::SpacePoint:
- 	// Data type to be stored in event_sps class
+ 	// Data type to be stored in sps class
 	for(size_t j=0; j<_mod_names[i].size(); ++j)
 	  ReadSPS(evt,_mod_names[i][j], (sps*)(_data_ptr[i]));
 	break;
 
 	case DATA::FIFOChannel:
-	//// Data type to be stored in event_pmt class
+	//// Data type to be stored in pmtfifo class
 	  for(size_t j=0; j<_mod_names[i].size(); ++j)
-	    ReadPMT(evt,_mod_names[i][j], (event_pmt*)(_data_ptr[i]));
+	    ReadPMT(evt,_mod_names[i][j], (pmtfifo*)(_data_ptr[i]));
 	  break;
       case DATA::Hit:
       case DATA::CrawlerHit:
@@ -352,7 +399,7 @@ namespace larlight {
       case DATA::APAHit:
       case DATA::FFTHit:
       case DATA::RFFHit:
-	// Data type to be stored in event_wire class
+	// Data type to be stored in hit class
 	for(size_t j=0; j<_mod_names[i].size(); ++j)
 	  ReadHit(evt,_mod_names[i][j],(hit*)(_data_ptr[i]));
 	break;
@@ -361,14 +408,17 @@ namespace larlight {
       case DATA::FuzzyCluster:
       case DATA::HoughCluster:
       case DATA::CrawlerCluster:
-	// Data type to be stored in event_cluster class
+	// Data type to be stored in cluster class
 	for(size_t j=0; j<_mod_names[i].size(); ++j)
 	  ReadCluster(evt,_mod_names[i][j],(cluster*)(_data_ptr[i]));
 	break;
-      case DATA::Wire:
-      case DATA::FIFOChannel:
-      case DATA::MCTrajectory:
       case DATA::Event:
+	// Data type to be stored in event class
+	for(size_t j=0; j<_mod_names[i].size(); ++j)
+	  ReadEvent(evt,_mod_names[i][j],(event*)(_data_ptr[i]));
+	break;
+      case DATA::Wire:
+      case DATA::MCTrajectory:
       case DATA::Seed:
       case DATA::UserInfo:
       case DATA::Shower:
@@ -380,17 +430,21 @@ namespace larlight {
     _tree->Fill();
   }
 
-  bool DataScanner::IsFV(Double_t x, Double_t y, Double_t z, Double_t t)  const{
+  bool DataScanner::IsFV(Double_t x, Double_t y, Double_t z,Double_t t)  const			 
+  {
+    // x, y, z should be in mm, time in ns
 
     // Hard volume cut
     if( x > _x_max || x < _x_min || z > _z_max || z < _z_min || y > _y_max || y < _y_min ) return false;
 
     // Now compare x-coordinate to make sure this point is inside the readout window.
-    Double_t drift_v = (_x_max - _x_min) / (_readout_size / _readout_freq); 
-    Double_t drift_t = (x - _x_min) / drift_v;
+    Double_t drift_v = (_x_max - _x_min) / (_readout_size / _readout_freq);  // unit = mm / us 
+    Double_t drift_t = (x - _x_min) / drift_v; // unit = us
 
-    // Charge arrives @ wire-plane @ drift_t + t
-    return ( _readout_startT < (drift_t + t) && (drift_t + t) < _readout_endT);
+    // Charge arrives @ wire-plane @ drift_t + t ... compute this in second scale
+    Double_t arrival_t = drift_t*1.e-6 + t*1.e-9;
+
+    return ( _readout_startT < arrival_t && arrival_t < _readout_endT);
   }
 
   Double_t DataScanner::GetDistanceToWall(Double_t x, Double_t y, Double_t z) const{
@@ -401,6 +455,32 @@ namespace larlight {
     
     return std::max(dx,std::max(dy,dz));
   }
+
+  //#######################################################################################################
+  void DataScanner::ReadEvent(const art::Event& evt, const std::string mod_name, event* data_ptr)
+  //#######################################################################################################
+  {
+    Double_t trigger_time = 0;
+    if(_triginfo_mod.size()) {
+      // Fill trigger time here
+      ;
+    }
+    // For now use time stamp stored in evt
+    art::Timestamp ts = evt.time();
+    trigger_time = TTimeStamp(ts.timeHigh(), ts.timeLow()).AsDouble();
+
+    Double_t beam_time = 0;
+    if(_beaminfo_mod.size()) {
+      art::Handle< raw::BeamInfo > beaminfo;
+      if(evt.getByLabel("beam",beaminfo)) beam_time = ((Double_t)(beaminfo->get_t_ms()))/1.e3;
+    }
+
+    data_ptr->set_event(evt.id().event(), evt.run(), evt.subRun(),
+			evt.isRealData(),
+			trigger_time,  beam_time,
+			_pot,  _e_lifetime);
+    
+  } 
 
   /*
   //#######################################################################################################
@@ -492,7 +572,7 @@ namespace larlight {
 
 
   //#######################################################################################################
-  void DataScanner::ReadPMT(const art::Event& evt, const std::string mod_name, event_pmt* data_ptr){
+  void DataScanner::ReadPMT(const art::Event& evt, const std::string mod_name, pmtfifo* data_ptr){
   //#######################################################################################################
     
     std::vector<const optdata::FIFOChannel*> pmtArray;

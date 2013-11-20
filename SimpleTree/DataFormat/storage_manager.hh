@@ -26,9 +26,9 @@
 #include "mcnu.hh"
 #include "mcpart.hh"
 #include "mcstep.hh"
+#include "pmtfifo.hh"
 /*
 #include "user_info.hh"
-#include "pmtfifo.hh"
 #include "wire.hh"
 */
 
