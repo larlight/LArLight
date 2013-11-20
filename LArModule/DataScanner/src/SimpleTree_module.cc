@@ -22,6 +22,8 @@
 #include "RecoBase/Cluster.h"
 #include "RecoBase/SpacePoint.h"
 #include "SimulationBase/MCTruth.h"
+#include "SimulationBase/MCNeutrino.h"
+#include "SimulationBase/MCFlux.h"
 #include "OpticalDetectorData/FIFOChannel.h"
 #include "OpticalDetectorData/OpticalTypes.h"
 
@@ -569,9 +571,9 @@ namespace larlight {
   }
 
   //#######################################################################################################
-  void ReadMCNeutrino(const art::Event& evt, 
-		      const std::string nu_mod_name, const std::string flux_mod_name,
-		      mcnu* data_ptr)
+  void DataScanner::ReadMCNeutrino(const art::Event& evt, 
+				   const std::string nu_mod_name, const std::string flux_mod_name,
+				   mcnu* data_ptr)
   //#######################################################################################################
   {
     std::vector<const simb::MCNeutrino*> nuArray;
@@ -604,14 +606,14 @@ namespace larlight {
 
       if(fluxArray.size()){
 
-	const simb::MCFlux flux_ptr(fluxArray.at(0));
+	const simb::MCFlux* flux_ptr(fluxArray.at(0));
 
 	data_ptr->add_neutrino(nu_ptr->Nu().PdgCode(), nu_ptr->CCNC(), nu_ptr->Nu().StatusCode(),
 			       nu_ptr->QSqr(), nu_ptr->W(), 
 			       nu_ptr->HitNuc(), 
 			       nu_ptr->Nu().Vx(), nu_ptr->Nu().Vy(), nu_ptr->Nu().Vz(),
 			       nu_ptr->Nu().E(), nu_ptr->Nu().Px(), nu_ptr->Nu().Py(), nu_ptr->Nu().Pz(),
-			       nc_ptr->Lepton().E(), nu_ptr->Lepton().Px(), nu_ptr->Lepton().Py(), nu_ptr->Lepton().Pz(),
+			       nu_ptr->Lepton().E(), nu_ptr->Lepton().Px(), nu_ptr->Lepton().Py(), nu_ptr->Lepton().Pz(),
 			       flux_ptr->ftptype, flux_ptr->ftpx, flux_ptr->ftpy, flux_ptr->ftpz);
       }else{
 	data_ptr->add_neutrino(nu_ptr->Nu().PdgCode(), nu_ptr->CCNC(), nu_ptr->Nu().StatusCode(),
@@ -619,11 +621,11 @@ namespace larlight {
 			       nu_ptr->HitNuc(), 
 			       nu_ptr->Nu().Vx(), nu_ptr->Nu().Vy(), nu_ptr->Nu().Vz(),
 			       nu_ptr->Nu().E(), nu_ptr->Nu().Px(), nu_ptr->Nu().Py(), nu_ptr->Nu().Pz(),
-			       nc_ptr->Lepton().E(), nu_ptr->Lepton().Px(), nu_ptr->Lepton().Py(), nu_ptr->Lepton().Pz(),
+			       nu_ptr->Lepton().E(), nu_ptr->Lepton().Px(), nu_ptr->Lepton().Py(), nu_ptr->Lepton().Pz(),
 			       99999, 0, 0, 0);
 
       }
-    
+    }
   }
 
   void DataScanner::ReadMCPartArray(const art::Event& evt, const std::string mod_name, 
