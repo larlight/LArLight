@@ -29,6 +29,18 @@ void track::add_track(UShort_t trackID,
 		      Double_t startmom,    Double_t len)
 //###########################################################################################
 {
+  // Check C-array size capability
+  if(_num_tracks>=DATA::kMaxTracks) {
+
+    if(_num_tracks==DATA::kMaxTracks)
+
+      print(MSG::ERROR,__FUNCTION__,
+	    Form("Exceeding the maximum number of MCTrajectory that can be stored (%d)",DATA::kMaxTracks));
+
+    _num_tracks++;
+
+    return;
+  }
   _trackID[_num_tracks]  = trackID;
   _startx[_num_tracks]   = startx;
   _starty[_num_tracks]   = starty;
@@ -52,6 +64,18 @@ void track::add_trajectory(UShort_t vtxID,
 			   Double_t mom)
 //#####################################################################
 {
+  // Check C-array size capability
+  if(_num_points>=DATA::kMaxTrackPoints) {
+
+    if(_num_points==DATA::kMaxTrackPoints)
+
+      print(MSG::ERROR,__FUNCTION__,
+	    Form("Exceeding the maximum number of MCTrajectory that can be stored (%d)",DATA::kMaxTrackPoints));
+
+    _num_points++;
+
+    return;
+  }
   _vtxID[_num_points] = vtxID;
   _vtxx[_num_points]  = x;
   _vtxy[_num_points]  = y;
@@ -67,6 +91,24 @@ void track::add_trajectory(UShort_t vtxID,
 void track::clear_event(bool all)
 //#####################################################################
 {
+  if(_num_tracks >= DATA::kMaxTracks) {
+
+    print(MSG::WARNING,__FUNCTION__,
+	  Form("Excess Track %d (saved %d)",_num_tracks,DATA::kMaxTracks));
+
+    _num_tracks = DATA::kMaxTracks;
+
+  }
+
+  if(_num_points >= DATA::kMaxTrackPoints) {
+
+    print(MSG::WARNING,__FUNCTION__,
+	  Form("Excess Track-Trajectory-Points %d (saved %d)",_num_points,DATA::kMaxTrackPoints));
+
+    _num_points = DATA::kMaxTrackPoints;
+
+  }
+
   // Clear data_base data
   data_base::clear_event(all);
   

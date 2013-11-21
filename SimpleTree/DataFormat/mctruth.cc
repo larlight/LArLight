@@ -13,7 +13,7 @@ mctruth::mctruth(DATA::DATA_TYPE type) : data_base(type)
      type!=DATA::MCTruth) {
     
     print(MSG::ERROR,__FUNCTION__,
-	  Form("Invalid data type for mctruth: %d ... setting default DATA::MCTruth type",type));
+	  Form("Invalid data type for MCTruth: %d ... setting default DATA::MCTruth type",type));
     _type = DATA::MCTruth;
   }else
     _type = type;
@@ -25,6 +25,16 @@ mctruth::mctruth(DATA::DATA_TYPE type) : data_base(type)
 void mctruth::clear_event(bool all)
 //#####################################################################
 {
+
+  if(_num_part >= DATA::kMaxPrimaries) {
+
+    print(MSG::WARNING,__FUNCTION__,
+	  Form("Excess MCTruth %d (saved %d)",_num_part,DATA::kMaxPrimaries));
+
+    _num_part = DATA::kMaxPrimaries;
+
+  }
+
   // Clear data_base variables
   data_base::clear_event(all);
 
@@ -60,6 +70,19 @@ void mctruth::add_primary(Int_t pdgid, UShort_t trackID, Int_t status_code, UCha
 			  Double_t mom,  Double_t momx, Double_t momy, Double_t momz)
 //###################################################################################
 {
+  // Check C-array size capability
+  if(_num_part>=DATA::kMaxPrimaries) {
+
+    if(_num_part==DATA::kMaxPrimaries)
+
+      print(MSG::ERROR,__FUNCTION__,
+	    Form("Exceeding the maximum number of MCTruth that can be stored (%d)",DATA::kMaxPrimaries));
+    
+    _num_part++;
+
+    return;
+  }
+
   _pdgid[_num_part]        = pdgid;
   _origin[_num_part]       = origin;
   _gen_trackID[_num_part]  = trackID;

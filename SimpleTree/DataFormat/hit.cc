@@ -29,6 +29,15 @@ hit::hit(DATA::DATA_TYPE type) : data_base(type)
 void hit::clear_event(bool all)
 //#####################################################################
 {
+  if(_num_hits >= DATA::kMaxHits) {
+
+    print(MSG::WARNING,__FUNCTION__,
+	  Form("Excess Hit %d (saved %d)",_num_hits,DATA::kMaxHits));
+
+    _num_hits = DATA::kMaxHits;
+
+  }
+
   // Clear data_base variables
   data_base::clear_event(all);
 
@@ -59,6 +68,18 @@ void hit::add_hit(UChar_t  plane,  UShort_t wire,   UShort_t channel,
 		  UShort_t trackID)
 //#####################################################################
 {
+  // Check C-array size capability
+  if(_num_hits>=DATA::kMaxHits) {
+
+    if(_num_hits==DATA::kMaxHits)
+
+      print(MSG::ERROR,__FUNCTION__,
+	    Form("Exceeding the maximum number of Hit that can be stored (%d)",DATA::kMaxHits));
+
+    _num_hits++;
+
+    return;
+  }
   _plane[_num_hits]        = plane;
   _wire[_num_hits]         = wire;
   _channel[_num_hits]      = channel;

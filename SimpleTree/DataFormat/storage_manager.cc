@@ -364,13 +364,14 @@ void storage_manager::create_data_ptr(DATA::DATA_TYPE type)
 void storage_manager::delete_data_ptr(DATA::DATA_TYPE type)
 //###################################################################################
 {
-
+  print(MSG::DEBUG,__FUNCTION__,Form("Deleting %s...",DATA::DATA_TREE_NAME[type].c_str()));
   if(!_ptr_data_array[type]) return;
 
   delete _ptr_data_array[type];
 
   _ptr_data_array[type]=0;
-
+  
+  print(MSG::DEBUG,__FUNCTION__,Form("Nullified %s...",DATA::DATA_TREE_NAME[type].c_str()));
   return;
 }
 

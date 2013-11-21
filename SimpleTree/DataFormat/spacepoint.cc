@@ -18,6 +18,18 @@ void sps::add_spacepoint(UShort_t spsID,
 			 Float_t chi2)
 //#####################################################################
 {
+  // Check C-array size capability
+  if(_num_sps>=DATA::kMaxSpacePoints) {
+
+    if(_num_sps==DATA::kMaxSpacePoints)
+
+      print(MSG::ERROR,__FUNCTION__,
+	    Form("Exceeding the maximum number of SpacePoint that can be stored (%d)",DATA::kMaxSpacePoints));
+
+    _num_sps++;
+
+    return;
+  }
   _spsID[_num_sps] = spsID;
   _vtxx[_num_sps]  = x;
   _vtxy[_num_sps]  = y;
@@ -33,6 +45,16 @@ void sps::add_spacepoint(UShort_t spsID,
 void sps::clear_event(bool all)
 //#####################################################################
 {
+
+  if(_num_sps >= DATA::kMaxSpacePoints) {
+
+    print(MSG::WARNING,__FUNCTION__,
+	  Form("Excess SpacePoint %d (saved %d)",_num_sps,DATA::kMaxSpacePoints));
+
+    _num_sps = DATA::kMaxSpacePoints;
+
+  }
+
   // Clear data_base variables
   data_base::clear_event(all);
 

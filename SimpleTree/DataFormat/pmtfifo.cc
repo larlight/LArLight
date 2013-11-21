@@ -11,6 +11,24 @@ pmtfifo::pmtfifo() : data_base(DATA::FIFOChannel)
 
 void pmtfifo::clear_event(bool all)
 {
+  if(_num_pmtfifo >= DATA::kMaxPMTFIFO) {
+
+    print(MSG::WARNING,__FUNCTION__,
+	  Form("Excess FIFOChannel %d (saved %d)",_num_pmtfifo,DATA::kMaxPMTFIFO));
+
+    _num_pmtfifo = DATA::kMaxPMTFIFO;
+
+  }
+
+  if(_num_adc >= DATA::kMaxPMTWords) {
+
+    print(MSG::WARNING,__FUNCTION__,
+	  Form("Excess ADC-Counts %d (saved %d)",_num_adc,DATA::kMaxPMTWords));
+
+    _num_adc = DATA::kMaxPMTWords;
+
+  }
+
   // Clear data_base data
   data_base::clear_event(all);
   

@@ -29,7 +29,18 @@ void mcnu::add_neutrino(Int_t pdgid,  Bool_t ccnc,    UChar_t mode,
 			Double_t momx_parent, Double_t momy_parent, Double_t momz_parent)
 //#############################################################################################
 {
+  // Check C-array size capability
+  if(_num_nu>=DATA::kMaxNeutrinos) {
 
+    if(_num_nu==DATA::kMaxNeutrinos)
+
+      print(MSG::ERROR,__FUNCTION__,
+	    Form("Exceeding the maximum number of MCNeutrino that can be stored (%d)",DATA::kMaxNeutrinos));
+    
+    _num_nu++;
+
+    return;
+  }
   _pdgid[_num_nu]    = pdgid;
   _ccnc[_num_nu]     = ccnc;
   _mode[_num_nu]     = mode;
@@ -61,6 +72,15 @@ void mcnu::add_neutrino(Int_t pdgid,  Bool_t ccnc,    UChar_t mode,
 void mcnu::clear_event(bool all)
 //#####################################################################
 {
+
+  if(_num_nu >= DATA::kMaxNeutrinos) {
+
+    print(MSG::WARNING,__FUNCTION__,
+	  Form("Excess MCNeutrino %d (saved %d)",_num_nu,DATA::kMaxNeutrinos));
+
+    _num_nu = DATA::kMaxNeutrinos;
+
+  }
 
   /// Clear data_base variables
   data_base::clear_event(all);

@@ -31,6 +31,20 @@ void mcpart::add_particle(UShort_t trackID, Int_t pdgid, Int_t status_code)
     return;
   }
 
+  // Check C-array size capability
+  if(_num_part>=DATA::kMaxParticles) {
+
+    if(_num_part==DATA::kMaxParticles)
+
+      print(MSG::ERROR,__FUNCTION__,
+	    Form("Exceeding the maximum number of MCParticles that can be stored (%d)",DATA::kMaxParticles));
+
+    _num_part++;
+
+    return;
+  }
+
+
   _trackID[_num_part]     = trackID;
   _pdgid[_num_part]       = pdgid;
   _status_code[_num_part] = status_code;
@@ -93,6 +107,15 @@ void mcpart::set_fv_part_info(Double_t mom, Double_t momx,  Double_t momy,  Doub
 void mcpart::clear_event(bool all)
 //####################################################
 {
+  if(_num_part >= DATA::kMaxParticles) {
+
+    print(MSG::WARNING,__FUNCTION__,
+	  Form("Excess MCParticle %d (saved %d)",_num_part,DATA::kMaxParticles));
+
+    _num_part = DATA::kMaxParticles;
+
+  }
+
   /// clear base class variables
   data_base::clear_event(all);
   

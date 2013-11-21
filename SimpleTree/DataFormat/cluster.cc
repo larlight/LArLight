@@ -34,7 +34,18 @@ void cluster::add_cluster(UShort_t clusterID, UChar_t view,
 			  Float_t  endx,   Float_t endy,   Float_t endz,
 			  Float_t  endx_sigma,   Float_t endy_sigma,   Float_t endz_sigma)
 {
+  // Check C-array size capability
+  if(_num_clusters>=DATA::kMaxClusters) {
 
+    if(_num_clusters==DATA::kMaxClusters)
+
+      print(MSG::ERROR,__FUNCTION__,
+	    Form("Exceeding the maximum number of Cluster that can be stored (%d)",DATA::kMaxClusters));
+
+    _num_clusters++;
+
+    return;
+  }
   _clusterID[_num_clusters]  = clusterID;
   _view[_num_clusters]       = view;
   _charge[_num_clusters]     = charge;
@@ -59,6 +70,15 @@ void cluster::add_cluster(UShort_t clusterID, UChar_t view,
 
 void cluster::clear_event(bool all)
 {
+  if(_num_clusters >= DATA::kMaxClusters) {
+
+    print(MSG::WARNING,__FUNCTION__,
+	  Form("Excess Cluster %d (saved %d)",_num_clusters,DATA::kMaxClusters));
+
+    _num_clusters = DATA::kMaxClusters;
+
+  }
+
   // Clear data_base variables
   data_base::clear_event(all);
 

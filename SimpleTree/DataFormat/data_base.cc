@@ -16,7 +16,7 @@ data_base::data_base(DATA::DATA_TYPE type) : FrameworkBase()
 void data_base::initialize()
 //#####################################################################
 {
-  clear_event(true);
+  this->clear_event(true);
 }
 
 //#####################################################################
