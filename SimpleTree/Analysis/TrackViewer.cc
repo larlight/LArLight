@@ -131,12 +131,11 @@ bool TrackViewer::analyze(storage_manager* storage)
     _track = (track*)my_track;
   }
 
-  return true;  
   // MC trajectory points
   if(my_mcstep){
 
     for(size_t i=0; i<my_mcstep->num_steps(); ++i) {
-
+      
       if(my_mcstep->trackID()[i]>1) break;
       if(my_mcstep->trackID()[i]==0) continue;
 
@@ -147,10 +146,10 @@ bool TrackViewer::analyze(storage_manager* storage)
 	_hMCStep->SetMarkerStyle(20);
 	_hMCStep->SetMarkerColor(kCyan);
       }
-	
-      _hMCStep->Fill(my_mcstep->vtxx()[i],
-		     my_mcstep->vtxy()[i],
-		     my_mcstep->vtxz()[i]);
+      
+      _hMCStep->Fill(my_mcstep->vtxz()[i],
+		     my_mcstep->vtxx()[i],
+		     my_mcstep->vtxy()[i]);
     }
   }
   

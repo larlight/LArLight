@@ -240,11 +240,14 @@ bool storage_manager::prepare_tree()
 	  
 	  print(MSG::INFO,__FUNCTION__,Form("\"%s\" product found in Tree!",DATA::DATA_TREE_NAME[i].c_str()));
 
-	else
+	else {
 	  
 	  print(MSG::WARNING,__FUNCTION__,Form("\"%s\" product not in Tree...",DATA::DATA_TREE_NAME[i].c_str()));
 
+	  delete_data_ptr((DATA::DATA_TYPE)i);
 
+	}
+	
 	if(_mode==BOTH)
 	  
 	  _write_data_array[i] = data_exist;
