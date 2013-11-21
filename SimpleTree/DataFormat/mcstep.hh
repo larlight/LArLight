@@ -45,7 +45,7 @@ public:
 
   /// Implementation of track data address setter
   virtual Bool_t set_address(TTree* t,Bool_t create=false);
-  
+
   UInt_t          num_steps() const { return _num_steps; };
   const UShort_t* trackID()  const { return _trackID;  };
   const Int_t*    pdgid()    const { return _pdgid;    };
