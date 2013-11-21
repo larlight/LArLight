@@ -337,14 +337,16 @@ namespace larlight {
     for(size_t i=0; i<(size_t)(DATA::DATA_TYPE_MAX); i++){
 
       DATA::DATA_TYPE type = (DATA::DATA_TYPE)i;
-      // MCTrajectory handled in MCParticle ... skip
-      if(type == DATA::MCTrajectory) continue;
       
       // If data pointer is not set, we don't have to fill this data type
       if(!(_data_ptr[i])) continue;
+
       // Reset data
       _data_ptr[i]->clear_event();
-      
+
+      // MCTrajectory handled in MCParticle ... skip
+      if(type == DATA::MCTrajectory) continue;
+
       // Reaching this point means we want to fill this data type.
       // Handle different kind of data (class wise)
       switch(type){
@@ -384,11 +386,11 @@ namespace larlight {
 	  ReadSPS(evt,_mod_names[i][j], (sps*)(_data_ptr[i]));
 	break;
 
-	case DATA::FIFOChannel:
+      case DATA::FIFOChannel:
 	//// Data type to be stored in pmtfifo class
-	  for(size_t j=0; j<_mod_names[i].size(); ++j)
-	    ReadPMT(evt,_mod_names[i][j], (pmtfifo*)(_data_ptr[i]));
-	  break;
+	for(size_t j=0; j<_mod_names[i].size(); ++j)
+	  ReadPMT(evt,_mod_names[i][j], (pmtfifo*)(_data_ptr[i]));
+	break;
       case DATA::Hit:
       case DATA::CrawlerHit:
       case DATA::GausHit:
