@@ -11,7 +11,6 @@ pmtfifo::pmtfifo() : data_base(DATA::FIFOChannel)
 
 void pmtfifo::clear_event(bool all)
 {
-
   // Clear data_base data
   data_base::clear_event(all);
   
@@ -28,9 +27,9 @@ void pmtfifo::clear_event(bool all)
     _size[index]    = 0;   
 
   }
-
+ 
   for(UInt_t index = 0;
-      (index < _num_pmtfifo) || (all && index<DATA::kMaxPMTWords);
+      (index < _num_adc) || (all && index<DATA::kMaxPMTWords);
       ++index) 
 
 	_adc[index] = 0;
@@ -45,9 +44,11 @@ void pmtfifo::add_pmtfifo(UChar_t channel, UChar_t disc,
 			  const std::vector<UShort_t> wf)
 {
   _channel[_num_pmtfifo] = channel;
-  _discID[_num_pmtfifo]    = disc;
+  _discID[_num_pmtfifo]  = disc;
   _frame[_num_pmtfifo]   = frame;
   _sample[_num_pmtfifo]  = sample;
+  _index[_num_pmtfifo]   = _num_adc;
+  _size[_num_pmtfifo]    = (UShort_t)(wf.size());
   for(auto v : wf){
     _adc[_num_adc] = v;
     _num_adc++;
@@ -77,6 +78,12 @@ Bool_t pmtfifo::set_address(TTree* t,Bool_t create)
 
   if(t->GetBranch(Form("%s_sample",_name.c_str()))) t->SetBranchAddress(Form("%s_sample",_name.c_str()),_sample);
   else if(create) t->Branch(Form("%s_sample",_name.c_str()),_sample,Form("%s_sample[num_%sfifo]/i",_name.c_str(),_name.c_str()));
+
+  if(t->GetBranch(Form("%s_index",_name.c_str()))) t->SetBranchAddress(Form("%s_index",_name.c_str()),_index);
+  else if(create) t->Branch(Form("%s_index",_name.c_str()),_index,Form("%s_index[num_%sfifo]/i",_name.c_str(),_name.c_str()));
+
+  if(t->GetBranch(Form("%s_size",_name.c_str()))) t->SetBranchAddress(Form("%s_size",_name.c_str()),_size);
+  else if(create) t->Branch(Form("%s_size",_name.c_str()),_size,Form("%s_size[num_%sfifo]/s",_name.c_str(),_name.c_str()));
 
   if(t->GetBranch(Form("num_%s_adc",_name.c_str()))) t->SetBranchAddress(Form("num_%s_adc",_name.c_str()),&_num_adc);
   else if(create) t->Branch(Form("num_%s_adc",_name.c_str()),&_num_adc,Form("num_%s_adc/i",_name.c_str()));

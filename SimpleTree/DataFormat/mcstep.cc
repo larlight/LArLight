@@ -18,6 +18,15 @@ void mcstep::clear_event(bool all)
   /// clear base data structure
   data_base::clear_event(all);
 
+  if(_num_steps >= DATA::kMaxTrajectories) {
+
+    print(MSG::WARNING,__FUNCTION__,
+	  Form("Excess trajectories %d (saved %d)",_num_steps,DATA::kMaxTrajectories));
+
+    _num_steps = DATA::kMaxTrajectories;
+
+  }
+  
   for(UShort_t index = 0;
       (index < _num_steps) || (all && index<DATA::kMaxTrajectories);
       ++index) {
@@ -33,7 +42,6 @@ void mcstep::clear_event(bool all)
     _de[index]      = 0;
     _dx[index]      = 0;
   }
-
   _num_steps=0;
 }
 
@@ -44,6 +52,19 @@ void mcstep::add_trajectory(UShort_t trackID, Int_t pdgid,
 			    Double_t de, Float_t dx)
 //######################################################################
 {
+  // Check C-array size capability
+  if(_num_steps>=DATA::kMaxTrajectories) {
+
+    if(_num_steps==DATA::kMaxTrajectories)
+
+      print(MSG::ERROR,__FUNCTION__,
+	    Form("Exceeding the maximum number of MCTrajectory that can be stored (%d)",DATA::kMaxTrajectories));
+
+    _num_steps++;
+
+    return;
+  }
+
   _trackID[_num_steps] = trackID;
   _pdgid[_num_steps]   = pdgid;
   _momx[_num_steps]    = momx;
