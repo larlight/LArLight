@@ -49,16 +49,15 @@ void event::set_event(UInt_t eventID, UInt_t runID, UInt_t subrunID,
 Bool_t event::set_address(TTree* t,Bool_t create)
 //#################################################################
 {
-  std::cout<<_name.c_str()<<std::endl;
+  print(MSG::DEBUG,__PRETTY_FUNCTION__,Form("%s called...",_name.c_str()));
   /// Set base class address
   Bool_t exist = data_base::set_address(t,create);
-  std::cout<<_name.c_str()<<std::endl;
+
   if(t->GetBranch(Form("%s_ID",_name.c_str()))) t->SetBranchAddress(Form("%s_ID",_name.c_str()),&_eventID);
   else {
     exist = false;
     if(create) t->Branch(Form("%s_ID",_name.c_str()),&_eventID,Form("%s_ID/i",_name.c_str()));
   }      
-  std::cout<<_name.c_str()<<std::endl;
 
   if(t->GetBranch(Form("%s_runID",_name.c_str()))) t->SetBranchAddress(Form("%s_runID",_name.c_str()),&_runID);
   else if(create) t->Branch(Form("%s_runID",_name.c_str()),&_runID,Form("%s_runID/i",_name.c_str()));

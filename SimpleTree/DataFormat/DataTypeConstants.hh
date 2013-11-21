@@ -93,10 +93,10 @@ namespace DATA{
     "sps",
     "track",
     "bezier",
-    "kalman3dsps",
-    "kalman3dhit",
+    "k3dsps",
+    "k3dhit",
     "shower",
-    "calorimetry"
+    "calor"
   };
 
 }

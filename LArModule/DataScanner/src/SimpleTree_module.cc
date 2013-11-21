@@ -168,7 +168,7 @@ namespace larlight {
 							      _triginfo_mod("")
   //#######################################################################################################
   {
-    mf::LogWarning("DataScanner")<<"Constructor called";
+
     // Initialize module name container
     for(size_t i=0; i<(size_t)(DATA::DATA_TYPE_MAX); i++)
       
@@ -195,6 +195,7 @@ namespace larlight {
     ParseModuleName ( _mod_names[DATA::FuzzyCluster],     pset.get<std::string>( "fModName_FuzzyCluster"     ));
     ParseModuleName ( _mod_names[DATA::HoughCluster],     pset.get<std::string>( "fModName_HoughCluster"     ));
     ParseModuleName ( _mod_names[DATA::MCParticle],       pset.get<std::string>( "fModName_MCParticle"       ));
+    ParseModuleName ( _mod_names[DATA::MCTrajectory],     pset.get<std::string>( "fModName_MCTrajectory"     ));
     _potinfo_mod    = pset.get<std::string>("fModName_POTSummary");
     _triginfo_mod   = pset.get<std::string>("fModName_Trigger");
     _fluxinfo_mod   = pset.get<std::string>("fModName_MCFlux");
@@ -226,10 +227,10 @@ namespace larlight {
     for(size_t i=0; i<(int)(DATA::DATA_TYPE_MAX); i++){
 
       DATA::DATA_TYPE type = (DATA::DATA_TYPE)i;
-      mf::LogWarning("DataScanner")<<"Module: "<<DATA::DATA_TREE_NAME[type].c_str();      
+
       // Check if a user provided an input module name for this data type.
       if(_mod_names[i].size()){
-	mf::LogWarning("DataScanner")<<" ... created";
+
 	// Next, create data class objects if requested by a user
 	switch(type){
 	case DATA::MCParticle:
@@ -284,16 +285,9 @@ namespace larlight {
 	  mf::LogError("DataScanner")<<Form("Data type %d not supported!",type);
 	  break;
 	}
-
-	// Set TTree branch to the created data class object's address
-	if(_data_ptr[i])
-	  _data_ptr[i]->set_address(_tree,true);
-	mf::LogWarning("DataScanner")<<" ... address set";
+	_data_ptr[i]->set_address(_tree,true);
       }
-      mf::LogWarning("DataScanner")<<" ... next data ...";
     }
-    mf::LogWarning("DataScanner")<<"Constructor ends";
-    
   }
 
   //#######################################################################################################
@@ -341,16 +335,18 @@ namespace larlight {
 
     // Loop over data type. We check whether or not to fill each data type
     for(size_t i=0; i<(size_t)(DATA::DATA_TYPE_MAX); i++){
+
+      DATA::DATA_TYPE type = (DATA::DATA_TYPE)i;
+      // MCTrajectory handled in MCParticle ... skip
+      if(type == DATA::MCTrajectory) continue;
       
       // If data pointer is not set, we don't have to fill this data type
       if(!(_data_ptr[i])) continue;
-      
       // Reset data
       _data_ptr[i]->clear_event();
       
       // Reaching this point means we want to fill this data type.
       // Handle different kind of data (class wise)
-      DATA::DATA_TYPE type = (DATA::DATA_TYPE)i;
       switch(type){
 
       case DATA::Track:
@@ -757,12 +753,11 @@ namespace larlight {
 				       dx_fv_tot);
 	}
 
-	if(step_ptr)
+	if(step_ptr) 
 	  step_ptr->add_trajectory(part->TrackId(), part->PdgCode(),
 				   part->Px(k), part->Py(k), part->Pz(k),
 				   part->Vx(k), part->Vy(k), part->Vz(k),
 				   dx, de);
-      
 	last_E = part->E(k);
 	last_x = part->Vx(k);
 	last_y = part->Vy(k);
@@ -795,11 +790,6 @@ namespace larlight {
     }
 
     for(size_t i=0; i < mciArray.size(); ++i){
-
-      if(i>0) {
-	mf::LogError("DataScanner")<<" Detected multiple MCTruth! The structure does not support this...";
-	break;
-      }
 
       const simb::MCTruth* mci_ptr(mciArray.at(i));
 
