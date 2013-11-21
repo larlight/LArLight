@@ -59,7 +59,6 @@ void cluster::add_cluster(UShort_t clusterID, UChar_t view,
 
 void cluster::clear_event(bool all)
 {
-
   // Clear data_base variables
   data_base::clear_event(all);
 
