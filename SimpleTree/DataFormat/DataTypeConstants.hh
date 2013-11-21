@@ -96,7 +96,7 @@ namespace DATA{
     "k3dsps",
     "k3dhit",
     "shower",
-    "calor"
+    "calo"
   };
 
 }
