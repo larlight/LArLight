@@ -49,21 +49,16 @@ public:
 
   //--- TTree I/O functions ---//
 
-  /// Set branch address for reading
-  virtual void set_address(TTree* t);
+  /**
+     Set branch address for reading. 
+     If it finds a variable branch in the tree, it returns true.
+     When the second argument is given as true, it creates a branch in case the branch is not found.
+  */
+  virtual Bool_t set_address(TTree* t,Bool_t create=false);
 
   //--- Member getter functions ---//
   
-  /// Entry ID getter
-  int entry() const {return _entry;};
-
-  //--- Member setter functions ---//
-  void entry(int n) {_entry=n;};
-
 protected:
-
-  /// TTree Entry ID
-  int _entry;
 
   /// Data type
   DATA::DATA_TYPE _type;

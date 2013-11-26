@@ -25,53 +25,96 @@ track::track(DATA::DATA_TYPE type) : data_base(type)
 void track::add_track(UShort_t trackID, 
 		      Float_t  startx, Float_t  starty,   Float_t  startz,   Float_t  startd,
 		      Float_t  endx,   Float_t  endy,     Float_t  endz,     Float_t  endd,
-		      Float_t  theta,  Float_t  theta_xz, Float_t  theta_yz, 
-		      Double_t mom,    Double_t len)
+		      Float_t  theta,  Float_t  phi,
+		      Double_t startmom,    Double_t len)
 //###########################################################################################
 {
-  _trackID[_no_tracks]  = trackID;
-  _startx[_no_tracks]   = startx;
-  _starty[_no_tracks]   = starty;
-  _startz[_no_tracks]   = startz;
-  _startd[_no_tracks]   = startd;
-  _endx[_no_tracks]     = endx;
-  _endy[_no_tracks]     = endy;
-  _endz[_no_tracks]     = endz;
-  _endd[_no_tracks]     = endd;
-  _theta[_no_tracks]    = theta;
-  _theta_xz[_no_tracks] = theta_xz;
-  _theta_yz[_no_tracks] = theta_yz;
-  _mom[_no_tracks]      = mom;
-  _len[_no_tracks]      = len;
-  _no_tracks++;
+  // Check C-array size capability
+  if(_num_tracks>=DATA::kMaxTracks) {
+
+    if(_num_tracks==DATA::kMaxTracks)
+
+      print(MSG::ERROR,__FUNCTION__,
+	    Form("Exceeding the maximum number of MCTrajectory that can be stored (%d)",DATA::kMaxTracks));
+
+    _num_tracks++;
+
+    return;
+  }
+  _trackID[_num_tracks]  = trackID;
+  _startx[_num_tracks]   = startx;
+  _starty[_num_tracks]   = starty;
+  _startz[_num_tracks]   = startz;
+  _startd[_num_tracks]   = startd;
+  _endx[_num_tracks]     = endx;
+  _endy[_num_tracks]     = endy;
+  _endz[_num_tracks]     = endz;
+  _endd[_num_tracks]     = endd;
+  _theta[_num_tracks]    = theta;
+  _phi[_num_tracks]      = phi;
+  _startmom[_num_tracks] = startmom;
+  _len[_num_tracks]      = len;
+  _num_tracks++;
 }
 
 //#####################################################################
 void track::add_trajectory(UShort_t vtxID, 
 			   Float_t x,  Float_t y,  Float_t z,
-			   Double_t px, Double_t py, Double_t pz)
+			   Float_t dirx,  Float_t diry,  Float_t dirz,
+			   Double_t mom)
 //#####################################################################
 {
-  _vtxID[_no_points] = vtxID;
-  _vtxx[_no_points]  = x;
-  _vtxy[_no_points]  = y;
-  _vtxz[_no_points]  = z;
-  _momx[_no_points]  = px;
-  _momy[_no_points]  = py;
-  _momz[_no_points]  = pz;
-  _no_points++;
+  // Check C-array size capability
+  if(_num_points>=DATA::kMaxTrackPoints) {
+
+    if(_num_points==DATA::kMaxTrackPoints)
+
+      print(MSG::ERROR,__FUNCTION__,
+	    Form("Exceeding the maximum number of MCTrajectory that can be stored (%d)",DATA::kMaxTrackPoints));
+
+    _num_points++;
+
+    return;
+  }
+  _vtxID[_num_points] = vtxID;
+  _vtxx[_num_points]  = x;
+  _vtxy[_num_points]  = y;
+  _vtxz[_num_points]  = z;
+  _dirx[_num_points]  = dirx;
+  _diry[_num_points]  = diry;
+  _dirz[_num_points]  = dirz;
+  _mom[_num_points]   = mom;
+  _num_points++;
 }
 
 //#####################################################################
 void track::clear_event(bool all)
 //#####################################################################
 {
+  if(_num_tracks >= DATA::kMaxTracks) {
+
+    print(MSG::WARNING,__FUNCTION__,
+	  Form("Excess Track %d (saved %d)",_num_tracks,DATA::kMaxTracks));
+
+    _num_tracks = DATA::kMaxTracks;
+
+  }
+
+  if(_num_points >= DATA::kMaxTrackPoints) {
+
+    print(MSG::WARNING,__FUNCTION__,
+	  Form("Excess Track-Trajectory-Points %d (saved %d)",_num_points,DATA::kMaxTrackPoints));
+
+    _num_points = DATA::kMaxTrackPoints;
+
+  }
+
   // Clear data_base data
   data_base::clear_event(all);
   
   // Clear track data
   for(UShort_t index = 0;
-      (index < _no_tracks) || (all && index<DATA::kMaxTracks);
+      (index < _num_tracks) || (all && index<DATA::kMaxTracks);
       ++index) {
     _trackID[index]  = 0;
     _startx[index]   = 0;   
@@ -84,112 +127,113 @@ void track::clear_event(bool all)
     _endd[index]     = 0;     
     _theta[index]    = 0;    
     _phi[index]      = 0;      
-    _theta_xz[index] = 0; 
-    _theta_yz[index] = 0; 
-    _mom[index]      = 0;      
+    _startmom[index] = 0;      
     _len[index]      = 0;      
 
   }
-  _no_tracks = 0;
+  _num_tracks = 0;
 
   for(UShort_t index = 0;
-      (index < _no_points) || (all && index<DATA::kMaxTrackPoints);
+      (index < _num_points) || (all && index<DATA::kMaxTrackPoints);
       ++index) {
     
     _vtxID[index] = 0;
     _vtxx[index]  = 0;
     _vtxy[index]  = 0;
     _vtxz[index]  = 0;
-    _momx[index]  = 0;
-    _momy[index]  = 0;
-    _momz[index]  = 0;
+    _dirx[index]  = 0;
+    _diry[index]  = 0;
+    _dirz[index]  = 0;
     
   } // clear loop ends
-  _no_points = 0;
+  _num_points = 0;
 
 }
 
 //#####################################################################
-void track::set_address(TTree* t)
+Bool_t track::set_address(TTree* t,Bool_t create)
 //#####################################################################
 {
+  print(MSG::DEBUG,__PRETTY_FUNCTION__,Form("%s called...",_name.c_str()));
   // base class address set
-  data_base::set_address(t);
+  Bool_t exist = data_base::set_address(t,create);
 
   // track class address set
-  if(t->GetBranch("no_tracks"))  t->SetBranchAddress("no_tracks",&_no_tracks);
-  else t->Branch("no_tracks", &_no_tracks, "no_tracks/s");
+  if(t->GetBranch(Form("num_%s",_name.c_str())))
+    t->SetBranchAddress(Form("num_%s",_name.c_str()),&_num_tracks);
+  else {
+    exist = false;
+    if(create) t->Branch(Form("num_%s",_name.c_str()), &_num_tracks,Form("num_%s/s",_name.c_str()));
+  }
 
-  if(t->GetBranch("trackID"))  t->SetBranchAddress("trackID",_trackID);
-  else t->Branch("trackID", _trackID, "trackID[no_tracks]/s");
+  if(t->GetBranch(Form("%s_trackID",_name.c_str())))  t->SetBranchAddress(Form("%s_trackID",_name.c_str()),_trackID);
+  else if(create) t->Branch(Form("%s_trackID",_name.c_str()), _trackID, Form("%s_trackID[num_%s]/s",_name.c_str(),_name.c_str()));
 
-  if(t->GetBranch("startx"))   t->SetBranchAddress("startx",_startx);
-  else t->Branch("startx", _startx, "startx[no_tracks]/F");
+  if(t->GetBranch(Form("%s_startx",_name.c_str())))   t->SetBranchAddress(Form("%s_startx",_name.c_str()),_startx);
+  else if(create) t->Branch(Form("%s_startx",_name.c_str()), _startx, Form("%s_startx[num_%s]/F",_name.c_str(),_name.c_str()));
 
-  if(t->GetBranch("starty"))   t->SetBranchAddress("starty",_starty);
-  else t->Branch("starty", _starty, "starty[no_tracks]/F");
+  if(t->GetBranch(Form("%s_starty",_name.c_str())))   t->SetBranchAddress(Form("%s_starty",_name.c_str()),_starty);
+  else if(create) t->Branch(Form("%s_starty",_name.c_str()), _starty, Form("%s_starty[num_%s]/F",_name.c_str(),_name.c_str()));
 
-  if(t->GetBranch("startz"))   t->SetBranchAddress("startz",_startz);
-  else t->Branch("startz", _startz, "startz[no_tracks]/F");
+  if(t->GetBranch(Form("%s_startz",_name.c_str())))   t->SetBranchAddress(Form("%s_startz",_name.c_str()),_startz);
+  else if(create) t->Branch(Form("%s_startz",_name.c_str()), _startz, Form("%s_startz[num_%s]/F",_name.c_str(),_name.c_str()));
 
-  if(t->GetBranch("startd"))   t->SetBranchAddress("startd",_startd);
-  else t->Branch("startd", _startd, "startd[no_tracks]/F");
+  if(t->GetBranch(Form("%s_startd",_name.c_str())))   t->SetBranchAddress(Form("%s_startd",_name.c_str()),_startd);
+  else if(create) t->Branch(Form("%s_startd",_name.c_str()), _startd, Form("%s_startd[num_%s]/F",_name.c_str(),_name.c_str()));
 
-  if(t->GetBranch("endx"))   t->SetBranchAddress("endx",_endx);
-  else t->Branch("endx", _endx, "endx[no_tracks]/F");
+  if(t->GetBranch(Form("%s_endx",_name.c_str())))   t->SetBranchAddress(Form("%s_endx",_name.c_str()),_endx);
+  else if(create) t->Branch(Form("%s_endx",_name.c_str()), _endx, Form("%s_endx[num_%s]/F",_name.c_str(),_name.c_str()));
 
-  if(t->GetBranch("endy"))   t->SetBranchAddress("endy",_endy);
-  else t->Branch("endy", _endy, "endy[no_tracks]/F");
+  if(t->GetBranch(Form("%s_endy",_name.c_str())))   t->SetBranchAddress(Form("%s_endy",_name.c_str()),_endy);
+  else if(create) t->Branch(Form("%s_endy",_name.c_str()), _endy, Form("%s_endy[num_%s]/F",_name.c_str(),_name.c_str()));
 
-  if(t->GetBranch("endz"))   t->SetBranchAddress("endz",_endz);
-  else t->Branch("endz", _endz, "endz[no_tracks]/F");
+  if(t->GetBranch(Form("%s_endz",_name.c_str())))   t->SetBranchAddress(Form("%s_endz",_name.c_str()),_endz);
+  else if(create) t->Branch(Form("%s_endz",_name.c_str()), _endz, Form("%s_endz[num_%s]/F",_name.c_str(),_name.c_str()));
 
-  if(t->GetBranch("endd"))   t->SetBranchAddress("endd",_endd);
-  else t->Branch("endd", _endd, "endd[no_tracks]/F");
+  if(t->GetBranch(Form("%s_endd",_name.c_str())))   t->SetBranchAddress(Form("%s_endd",_name.c_str()),_endd);
+  else if(create) t->Branch(Form("%s_endd",_name.c_str()), _endd, Form("%s_endd[num_%s]/F",_name.c_str(),_name.c_str()));
 
-  if(t->GetBranch("theta"))  t->SetBranchAddress("theta",_theta);
-  else  t->Branch("theta", _theta, "theta[no_tracks]/F");
+  if(t->GetBranch(Form("%s_theta",_name.c_str())))  t->SetBranchAddress(Form("%s_theta",_name.c_str()),_theta);
+  else if(create)  t->Branch(Form("%s_theta",_name.c_str()), _theta, Form("%s_theta[num_%s]/F",_name.c_str(),_name.c_str()));
 
-  if(t->GetBranch("phi"))    t->SetBranchAddress("phi",_phi);
-  else t->Branch("phi", _phi, "phi[no_tracks]/F");
+  if(t->GetBranch(Form("%s_phi",_name.c_str())))    t->SetBranchAddress(Form("%s_phi",_name.c_str()),_phi);
+  else if(create) t->Branch(Form("%s_phi",_name.c_str()), _phi, Form("%s_phi[num_%s]/F",_name.c_str(),_name.c_str()));
 
-  if(t->GetBranch("theta_xz")) t->SetBranchAddress("theta_xz",_theta_xz);
-  else t->Branch("theta_xz", _theta_xz, "theta_xz[no_tracks]/F");
+  if(t->GetBranch(Form("%s_startmom",_name.c_str())))    t->SetBranchAddress(Form("%s_startmom",_name.c_str()),_startmom);
+  else if(create) t->Branch(Form("%s_startmom",_name.c_str()), _startmom, Form("%s_startmom[num_%s]/D",_name.c_str(),_name.c_str()));
 
-  if(t->GetBranch("theta_yz")) t->SetBranchAddress("theta_yz",_theta_yz);
-  else t->Branch("ttheta_yz", _theta_yz, "theta_yz[no_tracks]/F");
-
-  if(t->GetBranch("mom"))    t->SetBranchAddress("mom",_mom);
-  else t->Branch("mom", _mom, "mom[no_tracks]/D");
-
-  if(t->GetBranch("len"))    t->SetBranchAddress("len",_len);
-  else t->Branch("len", _len, "len[no_tracks]/D");      
+  if(t->GetBranch(Form("%s_len",_name.c_str())))    t->SetBranchAddress(Form("%s_len",_name.c_str()),_len);
+  else if(create) t->Branch(Form("%s_len",_name.c_str()), _len, Form("%s_len[num_%s]/D",_name.c_str(),_name.c_str()));      
 
   //--- addition ---//
-  if(t->GetBranch("no_points")) t->SetBranchAddress("no_points",&_no_points);
-  else t->Branch("no_points",&_no_points,"no_points/s");
+  if(t->GetBranch(Form("%s_points",_name.c_str()))) t->SetBranchAddress(Form("%s_points",_name.c_str()),&_num_points);
+  else if(create) t->Branch(Form("%s_points",_name.c_str()),&_num_points,Form("%s_points/s",_name.c_str()));
 
-  if(t->GetBranch("vtxID")) t->SetBranchAddress("vtxID",_vtxID);
-  else t->Branch("vtxID",_vtxID,"vtxID/s");
+  if(t->GetBranch(Form("%s_vtxID",_name.c_str()))) t->SetBranchAddress(Form("%s_vtxID",_name.c_str()),_vtxID);
+  else if(create) t->Branch(Form("%s_vtxID",_name.c_str()),_vtxID,Form("%s_vtxID[%s_points]/s",_name.c_str(),_name.c_str()));
   
-  if(t->GetBranch("vtxx")) t->SetBranchAddress("vtxx",_vtxx);
-  else t->Branch("vtxx",_vtxx,"vtxx[no_points]/F");
+  if(t->GetBranch(Form("%s_vtxx",_name.c_str()))) t->SetBranchAddress(Form("%s_vtxx",_name.c_str()),_vtxx);
+  else if(create) t->Branch(Form("%s_vtxx",_name.c_str()),_vtxx,Form("%s_vtxx[%s_points]/F",_name.c_str(),_name.c_str()));
 
-  if(t->GetBranch("vtxy")) t->SetBranchAddress("vtxy",_vtxy);
-  else t->Branch("vtxy",_vtxy,"vtxy[no_points]/F");
+  if(t->GetBranch(Form("%s_vtxy",_name.c_str()))) t->SetBranchAddress(Form("%s_vtxy",_name.c_str()),_vtxy);
+  else if(create) t->Branch(Form("%s_vtxy",_name.c_str()),_vtxy,Form("%s_vtxy[%s_points]/F",_name.c_str(),_name.c_str()));
 
-  if(t->GetBranch("vtxz")) t->SetBranchAddress("vtxz",_vtxz);
-  else t->Branch("vtxz",_vtxz,"vtxz[no_points]/F");
+  if(t->GetBranch(Form("%s_vtxz",_name.c_str()))) t->SetBranchAddress(Form("%s_vtxz",_name.c_str()),_vtxz);
+  else if(create) t->Branch(Form("%s_vtxz",_name.c_str()),_vtxz,Form("%s_vtxz[%s_points]/F",_name.c_str(),_name.c_str()));
 
-  if(t->GetBranch("momx")) t->SetBranchAddress("momx",_momx);
-  else t->Branch("momx",_momx,"momx[no_points]/D");
+  if(t->GetBranch(Form("%s_dirx",_name.c_str()))) t->SetBranchAddress(Form("%s_dirx",_name.c_str()),_dirx);
+  else if(create) t->Branch(Form("%s_dirx",_name.c_str()),_dirx,Form("%s_dirx[%s_points]/F",_name.c_str(),_name.c_str()));
 
-  if(t->GetBranch("momy")) t->SetBranchAddress("momy",_momy);
-  else t->Branch("momy",_momy,"momy[no_points]/D");
+  if(t->GetBranch(Form("%s_diry",_name.c_str()))) t->SetBranchAddress(Form("%s_diry",_name.c_str()),_diry);
+  else if(create) t->Branch(Form("%s_diry",_name.c_str()),_diry,Form("%s_diry[%s_points]/F",_name.c_str(),_name.c_str()));
 
-  if(t->GetBranch("momz")) t->SetBranchAddress("momz",_momz);
-  else t->Branch("momz",_momz,"momz[no_points]/D");
+  if(t->GetBranch(Form("%s_dirz",_name.c_str()))) t->SetBranchAddress(Form("%s_dirz",_name.c_str()),_dirz);
+  else if(create) t->Branch(Form("%s_dirz",_name.c_str()),_dirz,Form("%s_dirz[%s_points]/F",_name.c_str(),_name.c_str()));
 
+  if(t->GetBranch(Form("%s_mom",_name.c_str()))) t->SetBranchAddress(Form("%s_mom",_name.c_str()),_mom);
+  else if(create) t->Branch(Form("%s_mom",_name.c_str()),_mom,Form("%s_mom[%s_points]/D",_name.c_str(),_name.c_str()));
+
+  return exist;
 }
 
 #endif

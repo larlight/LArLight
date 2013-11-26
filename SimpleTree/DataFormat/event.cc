@@ -4,10 +4,10 @@
 #include "event.hh"
 
 //####################################################
-event::event(DATA::DATA_TYPE type) : data_base(type)
+event::event() : data_base(DATA::Event)
 //####################################################
 {
-  _name = DATA::DATA_TREE_NAME[type];
+  _name = DATA::DATA_TREE_NAME[DATA::Event];
   initialize();
 }
 
@@ -46,36 +46,41 @@ void event::set_event(UInt_t eventID, UInt_t runID, UInt_t subrunID,
 }
 
 //#################################################################
-void event::set_address(TTree* t)
+Bool_t event::set_address(TTree* t,Bool_t create)
 //#################################################################
 {
+  print(MSG::DEBUG,__PRETTY_FUNCTION__,Form("%s called...",_name.c_str()));
   /// Set base class address
-  data_base::set_address(t);
-  
-  if(t->GetBranch("eventID")) t->SetBranchAddress("eventID",&_eventID);
-  else t->Branch("eventID",&_eventID,"eventID/i");
+  Bool_t exist = data_base::set_address(t,create);
 
-  if(t->GetBranch("runID")) t->SetBranchAddress("runID",&_runID);
-  else t->Branch("runID",&_runID,"runID/i");
+  if(t->GetBranch(Form("%s_ID",_name.c_str()))) t->SetBranchAddress(Form("%s_ID",_name.c_str()),&_eventID);
+  else {
+    exist = false;
+    if(create) t->Branch(Form("%s_ID",_name.c_str()),&_eventID,Form("%s_ID/i",_name.c_str()));
+  }      
 
-  if(t->GetBranch("subrunID")) t->SetBranchAddress("subrunID",&_subrunID);
-  else t->Branch("subrunID",&_subrunID,"subrunID/i");
+  if(t->GetBranch(Form("%s_runID",_name.c_str()))) t->SetBranchAddress(Form("%s_runID",_name.c_str()),&_runID);
+  else if(create) t->Branch(Form("%s_runID",_name.c_str()),&_runID,Form("%s_runID/i",_name.c_str()));
 
-  if(t->GetBranch("triggerT")) t->SetBranchAddress("triggerT",&_triggerT);
-  else t->Branch("triggerT",&_triggerT,"triggerT/D");
+  if(t->GetBranch(Form("%s_subrunID",_name.c_str()))) t->SetBranchAddress(Form("%s_subrunID",_name.c_str()),&_subrunID);
+  else if(create) t->Branch(Form("%s_subrunID",_name.c_str()),&_subrunID,Form("%s_subrunID/i",_name.c_str()));
 
-  if(t->GetBranch("beamT")) t->SetBranchAddress("beamT",&_beamT);
-  else t->Branch("beamT",&_beamT,"beamT/D");
+  if(t->GetBranch(Form("%s_triggerT",_name.c_str()))) t->SetBranchAddress(Form("%s_triggerT",_name.c_str()),&_triggerT);
+  else if(create) t->Branch(Form("%s_triggerT",_name.c_str()),&_triggerT,Form("%s_triggerT/D",_name.c_str()));
 
-  if(t->GetBranch("pot")) t->SetBranchAddress("pot",&_pot);
-  else t->Branch("pot",&_pot,"pot/D");
+  if(t->GetBranch(Form("%s_beamT",_name.c_str()))) t->SetBranchAddress(Form("%s_beamT",_name.c_str()),&_beamT);
+  else if(create) t->Branch(Form("%s_beamT",_name.c_str()),&_beamT,Form("%s_beamT/D",_name.c_str()));
 
-  if(t->GetBranch("etau")) t->SetBranchAddress("etau",&_etau);
-  else t->Branch("etau",&_etau,"etau/D");
+  if(t->GetBranch(Form("%s_pot",_name.c_str()))) t->SetBranchAddress(Form("%s_pot",_name.c_str()),&_pot);
+  else if(create) t->Branch(Form("%s_pot",_name.c_str()),&_pot,Form("%s_pot/D",_name.c_str()));
 
-  if(t->GetBranch("isdata")) t->SetBranchAddress("isdata",&_isdata);
-  else t->Branch("isdata",&_isdata,"isdata/O");
+  if(t->GetBranch(Form("%s_etau",_name.c_str()))) t->SetBranchAddress(Form("%s_etau",_name.c_str()),&_etau);
+  else if(create) t->Branch(Form("%s_etau",_name.c_str()),&_etau,Form("%s_etau/D",_name.c_str()));
 
+  if(t->GetBranch(Form("%s_isdata",_name.c_str()))) t->SetBranchAddress(Form("%s_isdata",_name.c_str()),&_isdata);
+  else if(create) t->Branch(Form("%s_isdata",_name.c_str()),&_isdata,Form("%s_isdata/O",_name.c_str()));
+
+  return exist;
 }
 
 #endif

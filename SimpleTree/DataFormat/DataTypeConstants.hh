@@ -16,15 +16,19 @@
 namespace DATA{
     
   // Maximum size of C-array
-  const UShort_t kMaxTracks       = 300;    ///< Maximum number of tracks to be held in C-array
+  const UShort_t kMaxTracks       = 10000;  ///< Maximum number of tracks to be held in C-array
   const UShort_t kMaxTrackPoints  = 10000;  ///< Maximum number of track trajectory points to be held in C-array
   const UShort_t kMaxSpacePoints  = 10000;  ///< Maximum number of spacepoints to be held in C-array
   const UShort_t kMaxHits         = 20000;  ///< Maximum number of hits to be held in C-array
   const UShort_t kMaxPrimaries    = 20000;  ///< Maximum number of primary particles from generator
-  const UShort_t kMaxClusters     = 1000;   ///< Maximum number of clusters
+  const UShort_t kMaxClusters     = 10000;  ///< Maximum number of clusters
   const UChar_t  kMaxNeutrinos    = 100;    ///< Maximum number of neutrinos per event produced by a generator
   const UShort_t kMaxParticles    = 10000;  ///< Maximum number of particles from G4 tracking info
-  const Int_t kMaxTrajectories    = 0xffff; ///< Maximum number of particle's trajectory points that can be stored
+  const UInt_t   kMaxTrajectories = 0xffff; ///< Maximum number of particle's trajectory points that can be stored
+  const UShort_t kMaxPMTFIFO      = 10000;  ///< Maximum number of discriminator fire
+  const UInt_t   kMaxPMTWords     = 40 * 3000; ///< Maximum number of ADC samples to store (2 beamgate per channel)
+
+  const std::string TREE_NAME = "anatree";
 
   /// Define identifier for a data container class to be loaded through storage_manager::get_data()
   enum DATA_TYPE{
@@ -89,10 +93,10 @@ namespace DATA{
     "sps",
     "track",
     "bezier",
-    "kalman3dsps",
-    "kalman3dhit",
+    "k3dsps",
+    "k3dhit",
     "shower",
-    "calorimetry"
+    "calo"
   };
 
 }

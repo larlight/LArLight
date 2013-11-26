@@ -21,4 +21,5 @@
 #pragma link C++ class mcnu+;
 #pragma link C++ class mcpart+;
 #pragma link C++ class event+;
+#pragma link C++ class pmtfifo+;
 #endif

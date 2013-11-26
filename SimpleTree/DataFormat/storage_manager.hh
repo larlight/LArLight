@@ -26,9 +26,9 @@
 #include "mcnu.hh"
 #include "mcpart.hh"
 #include "mcstep.hh"
+#include "pmtfifo.hh"
 /*
 #include "user_info.hh"
-#include "pmtfifo.hh"
 #include "wire.hh"
 */
 
@@ -66,9 +66,6 @@ public:
   /// Setter to specify a certain data class to be read from input
   void set_data_to_read(DATA::DATA_TYPE type,bool read=true)
   {_read_data_array[type]=read;};
-
-  /// Getter for chained tree
-  const TChain* get_chain();
 
   /// Setter for I/O mode.
   void set_io_mode(MODE mode)         {_mode=mode;};
@@ -143,7 +140,7 @@ public:
   /// Getter for a counter of written-out events
   inline UInt_t get_entires_written() const {return _nevents_written;};
 
-  TTree* get_tree(DATA::DATA_TYPE type) {return _out_ch[type];};
+  const TTree* get_tree() const {return ( _out_ch ? _out_ch : (TTree*)(_in_ch) );};
   
 private:
 
@@ -195,8 +192,8 @@ private:
 
   /// TTree instance
   //TTree *_in_tree, *_out_tree;  
-  TChain *_in_ch[DATA::DATA_TYPE_MAX];
-  TTree  *_out_ch[DATA::DATA_TYPE_MAX];
+  TChain *_in_ch;
+  TTree  *_out_ch;
 
 };
 

@@ -25,7 +25,7 @@ class sps : public data_base {
 public:
 
   /// Default constructor
-  sps(DATA::DATA_TYPE type=DATA::SpacePoint);
+  sps();
 
   /// Default destructor
   virtual ~sps(){};
@@ -39,10 +39,10 @@ public:
   virtual void clear_event(bool all=false);
 
   /// Implementation of track data address setter
-  virtual void set_address(TTree* t);
+  virtual Bool_t set_address(TTree* t,Bool_t create=false);
 
   //--- Member getters ---//
-  UShort_t        no_sps()     const { return _no_sps;     };
+  UShort_t        num_sps()     const { return _num_sps;     };
   const UShort_t* spsID()      const { return _spsID;      };
   const Float_t*  vtxx()       const { return _vtxx;       };
   const Float_t*  vtxy()       const { return _vtxy;       };
@@ -60,7 +60,7 @@ public:
 
 protected:
 
-  UShort_t _no_sps;                            ///< Number of space-points (SPS)
+  UShort_t _num_sps;                            ///< Number of space-points (SPS)
   UShort_t _spsID[DATA::kMaxSpacePoints];      ///< SPS ID
   Float_t  _vtxx[DATA::kMaxSpacePoints];       ///< SPS x coordinates
   Float_t  _vtxy[DATA::kMaxSpacePoints];       ///< SPS y coordinates

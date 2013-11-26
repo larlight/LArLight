@@ -16,22 +16,21 @@ data_base::data_base(DATA::DATA_TYPE type) : FrameworkBase()
 void data_base::initialize()
 //#####################################################################
 {
-  clear_event(true);
+  this->clear_event(true);
 }
 
 //#####################################################################
 void data_base::clear_event(bool all)
 //#####################################################################
 {
-  _entry=-1;
+
 }
 
 //#####################################################################
-void data_base::set_address(TTree* t)
+Bool_t data_base::set_address(TTree* t,Bool_t create)
 //#####################################################################
 {
-  if(t->GetBranch("_entry")) t->SetBranchAddress("_entry",&_entry);
-  else t->Branch("entry",&_entry,"entry/I");
+  return true;
 }
 
 #endif

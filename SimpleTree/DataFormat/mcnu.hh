@@ -36,8 +36,7 @@ public:
   virtual void clear_event(bool all=false);
 
   /// Implementation of track data address setter
-  virtual void set_address(TTree* t);
-
+  virtual Bool_t set_address(TTree* t,Bool_t create=false);
 
   /// Setter method to add neutrino information
   void add_neutrino(Int_t pdgid,  Bool_t ccnc,    UChar_t mode,
@@ -50,7 +49,7 @@ public:
 		    Double_t momx_parent, Double_t momy_parent, Double_t momz_parent);
   
   //--- Getter methods ---//
-  UChar_t         no_nu()    const { return _no_nu;    };
+  UChar_t         num_nu()   const { return _num_nu;   };
   const Int_t*    pdgid()    const { return _pdgid;    };
   const Bool_t*   ccnc()     const { return _ccnc;     };
   const UChar_t*  mode()     const { return _mode;     };
@@ -60,11 +59,11 @@ public:
   const Float_t*  vtxx()     const { return _vtxx;     };
   const Float_t*  vtxy()     const { return _vtxy;     };
   const Float_t*  vtxz()     const { return _vtxz;     };
-  const Double_t* en()       const { return _en;       };
+  const Double_t* E()        const { return _E;        };
   const Double_t* momx()     const { return _momx;     };
   const Double_t* momy()     const { return _momy;     };
   const Double_t* momz()     const { return _momz;     };
-  const Double_t* en_lep()   const { return _en_lep;   };
+  const Double_t* E_lep()    const { return _E_lep;    };
   const Double_t* momx_lep() const { return _momx_lep; };
   const Double_t* momy_lep() const { return _momy_lep; };
   const Double_t* momz_lep() const { return _momz_lep; };
@@ -75,7 +74,7 @@ public:
   const Int_t*    pdgid_parent() const { return _pdgid_parent; };
 protected:
 
-  UChar_t  _no_nu;                             ///< Number of neutrinos
+  UChar_t  _num_nu;                             ///< Number of neutrinos
   Int_t    _pdgid[DATA::kMaxNeutrinos];       ///< PDGID of a neutrino
   Bool_t   _ccnc[DATA::kMaxNeutrinos];        ///< 0=CC, 1=NC
   UChar_t  _mode[DATA::kMaxNeutrinos];        ///< 0=QE/E1, 1=RES, 2=DIS, 3=Coherent interaction mode 
@@ -85,11 +84,11 @@ protected:
   Float_t  _vtxx[DATA::kMaxNeutrinos];        ///< X coordinate position of the interaction vtx
   Float_t  _vtxy[DATA::kMaxNeutrinos];        ///< Y coordinate position of the interaction vtx
   Float_t  _vtxz[DATA::kMaxNeutrinos];        ///< Z coordinate position of the interaction vtx
-  Double_t _en[DATA::kMaxNeutrinos];          ///< Energy
+  Double_t _E[DATA::kMaxNeutrinos];          ///< Energy
   Double_t _momx[DATA::kMaxNeutrinos];        ///< X component of neutrino momentum
   Double_t _momy[DATA::kMaxNeutrinos];        ///< Y component of neutrino momentum
   Double_t _momz[DATA::kMaxNeutrinos];        ///< Z component of neutrino momentum
-  Double_t _en_lep[DATA::kMaxNeutrinos];      ///< Energy of the outgoing lepton
+  Double_t _E_lep[DATA::kMaxNeutrinos];      ///< Energy of the outgoing lepton
   Double_t _momx_lep[DATA::kMaxNeutrinos];    ///< X component of outgoing lepton momentum
   Double_t _momy_lep[DATA::kMaxNeutrinos];    ///< Y component of outgoing lepton momentum
   Double_t _momz_lep[DATA::kMaxNeutrinos];    ///< Z component of outgoing lepton momentum
