@@ -27,6 +27,9 @@
 
 // ART includes.
 #include "art/Framework/Core/EDAnalyzer.h"
+#include "art/Framework/Core/FindManyP.h"
+#include "art/Persistency/Common/Ptr.h"
+#include "art/Persistency/Common/PtrVector.h"
 
 // LArLight includes
 #include <AnaProcess/Base/Base-TypeDef.hh>
@@ -410,7 +413,13 @@ namespace larlight {
 
       if (e.categoryCode() != art::errors::ProductNotFound ) throw;
 
+      return;
+
     }
+
+    art::Handle< std::vector<recob::Cluster> > cluster_handle;
+    evt.getByLabel(mod_name, cluster_handle);
+    art::FindManyP<recob::Hit> hit_m(cluster_handle, evt, mod_name);
 
     for(size_t i=0; i<clusterArray.size(); ++i) {
 
@@ -428,6 +437,30 @@ namespace larlight {
       cluster_light.set_end_vtx(cluster_ptr->EndPos());
       cluster_light.set_start_vtx_err(cluster_ptr->SigmaStartPos());
       cluster_light.set_end_vtx_err(cluster_ptr->SigmaEndPos());
+
+      const std::vector<art::Ptr<recob::Hit> > hit_v = hit_m.at(i);
+
+      for(auto const hit_ptr : hit_v){
+
+	hit hit_light;
+	hit_light.set_waveform(hit_ptr->fHitSignal);
+	hit_light.set_times(hit_ptr->StartTime(),
+			    hit_ptr->PeakTime(),
+			    hit_ptr->EndTime());
+	hit_light.set_times_err(hit_ptr->SigmaStartTime(),
+				hit_ptr->SigmaPeakTime(),
+				hit_ptr->SigmaEndTime());
+	hit_light.set_charge(hit_ptr->Charge(),hit_ptr->Charge(true));
+	hit_light.set_charge_err(hit_ptr->SigmaCharge(),hit_ptr->SigmaCharge(true));
+	hit_light.set_multiplicity(hit_ptr->Multiplicity());
+	hit_light.set_channel(hit_ptr->Channel());
+	hit_light.set_fit_goodness(hit_ptr->GoodnessOfFit());
+	hit_light.set_view((GEO::View_t)(hit_ptr->View()));
+	hit_light.set_sigtype((GEO::SigType_t)(hit_ptr->SignalType()));
+	
+	cluster_light.add_hit(hit_light);
+	
+      }
 
       data_ptr->add_cluster(cluster_light);
     }

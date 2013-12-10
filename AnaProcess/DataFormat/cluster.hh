@@ -16,7 +16,7 @@
 #define CLUSTER_HH
 
 #include "data_base.hh"
-
+#include "hit.hh"
 /**
    \class cluster
    LArSoft Cluster class equivalent data container
@@ -42,6 +42,7 @@ public:
   void set_end_vtx       (const std::vector<double> vtx) { fEndPos=vtx;        };
   void set_start_vtx_err (const std::vector<double> vtx) { fSigmaStartPos=vtx; };
   void set_end_vtx_err   (const std::vector<double> vtx) { fSigmaEndPos=vtx;   };
+  void add_hit           (const hit h)                   { fHitVector.push_back(h); }
 
   inline double       Charge()    const { return fTotalCharge;   }
   inline double       dTdW()      const { return fdTdW;          }
@@ -55,7 +56,7 @@ public:
   inline const std::vector<double>& EndPos()        const { return fEndPos;        }
   inline const std::vector<double>& SigmaStartPos() const { return fSigmaStartPos; }
   inline const std::vector<double>& SigmaEndPos()   const { return fSigmaEndPos;   }
-
+  inline const std::vector<hit>&    Hits()          const { return fHitVector;     }
   virtual void clear_data(){
     fTotalCharge = -1;
     fdTdW = fdQdW = fSigmadTdW = fSigmadQdW = -1;
@@ -63,6 +64,7 @@ public:
     fEndPos.clear();
     fSigmaStartPos.clear();
     fSigmaEndPos.clear();
+    fHitVector.clear();
     fID = -1;
     fView = GEO::kUnknown;
   }
@@ -78,11 +80,12 @@ private:
   std::vector<double>        fEndPos;         ///< start of cluster in (wire, tdc) plane
   std::vector<double>        fSigmaStartPos;  ///< start of cluster in (wire, tdc) plane
   std::vector<double>        fSigmaEndPos;    ///< start of cluster in (wire, tdc) plane
+  std::vector<hit>           fHitVector;      ///< Hit vector
   int                        fID;             ///< cluster's ID
   GEO::View_t                fView;           ///< View associated w/ this cluster
 
   ////////////////////////
-  ClassDef(cluster,1)
+  ClassDef(cluster,2)
   ////////////////////////
 
 };
