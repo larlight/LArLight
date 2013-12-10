@@ -122,7 +122,8 @@ namespace larlight {
 namespace larlight {
 
   //#######################################################################################################
-  DataScanner::DataScanner(fhicl::ParameterSet const& pset) : _trees(DATA::DATA_TYPE_MAX,0), 
+  DataScanner::DataScanner(fhicl::ParameterSet const& pset) : EDAnalyzer(pset),
+							      _trees(DATA::DATA_TYPE_MAX,0), 
 							      _data_ptr(DATA::DATA_TYPE_MAX,0)
   //#######################################################################################################
   {
