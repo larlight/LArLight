@@ -69,6 +69,17 @@ public:
     fView = GEO::kUnknown;
   }
 
+
+  /**
+     A utility function to obtain maximum & minimum of clusters' hits' vertex
+     NOTE: the initial max/min values matter. It only modifies max/min if it finds values that is 
+     above/below those initial values.
+  */
+  void get_axis_range (double &xmax, double &xmin,
+		       double &ymax, double &ymin,
+		       double &zmax, double &zmin) const;  
+
+
 private:
 
   double                     fTotalCharge;    ///< total charge in cluster
@@ -117,6 +128,16 @@ public:
 
   /// Default destructor
   ~event_cluster(){};
+
+
+  /**
+     A utility function to obtain maximum & minimum of clusters' hits' vertex
+     NOTE: the initial max/min values matter. It only modifies max/min if it finds values that is 
+     above/below those initial values.
+  */
+  void get_axis_range (double &xmax, double &xmin,
+		       double &ymax, double &ymin,
+		       double &zmax, double &zmin) const;  
 
 
 private:

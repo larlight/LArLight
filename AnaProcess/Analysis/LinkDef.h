@@ -14,6 +14,7 @@
 #pragma link C++ class ana_processor+;
 #pragma link C++ class TrackViewer+;
 #pragma link C++ class std::vector<TH3D*>+;
+#pragma link C++ class ClusterViewer+;
 //ADD_NEW_CLASS ... do not change this line
 #endif
 
