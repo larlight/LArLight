@@ -134,21 +134,23 @@ namespace larlight {
 
     // Obtain module names for input data
     // If a user set an empty string for these params, they are ignored for processing.
-    ParseModuleName ( _mod_names[DATA::Bezier],         pset.get<std::string>("fModName_Bezier")         );
-    ParseModuleName ( _mod_names[DATA::Kalman3DSPS],    pset.get<std::string>("fModName_Kalman3DSPS")    );
-    ParseModuleName ( _mod_names[DATA::Kalman3DHit],    pset.get<std::string>("fModName_Kalman3DHit")    );
-    ParseModuleName ( _mod_names[DATA::MCTruth],        pset.get<std::string>("fModName_MCTruth")        );
-    ParseModuleName ( _mod_names[DATA::SpacePoint],     pset.get<std::string>("fModName_SpacePoint")     );
-    ParseModuleName ( _mod_names[DATA::FIFOChannel],    pset.get<std::string>("fModName_FIFOChannel")    );
-    ParseModuleName ( _mod_names[DATA::Wire],           pset.get<std::string>("fModName_CalData")        );
-    ParseModuleName ( _mod_names[DATA::CrawlerHit],     pset.get<std::string>("fModName_CrawlerHit")     );
-    ParseModuleName ( _mod_names[DATA::GausHit],        pset.get<std::string>("fModName_GausHit")        );
-    ParseModuleName ( _mod_names[DATA::APAHit],         pset.get<std::string>("fModName_APAHit")         );
-    ParseModuleName ( _mod_names[DATA::FFTHit],         pset.get<std::string>("fModName_FFTHit")         );
-    ParseModuleName ( _mod_names[DATA::CrawlerCluster], pset.get<std::string>("fModName_CrawlerCluster") );
-    ParseModuleName ( _mod_names[DATA::DBCluster],      pset.get<std::string>("fModName_DBCluster")      );
-    ParseModuleName ( _mod_names[DATA::FuzzyCluster],   pset.get<std::string>("fModName_FuzzyCluster")   );
-    ParseModuleName ( _mod_names[DATA::HoughCluster],   pset.get<std::string>("fModName_HoughCluster")   );
+    ParseModuleName ( _mod_names[DATA::Bezier],               pset.get<std::string>("fModName_Bezier")               );
+    ParseModuleName ( _mod_names[DATA::Kalman3DSPS],          pset.get<std::string>("fModName_Kalman3DSPS")          );
+    ParseModuleName ( _mod_names[DATA::Kalman3DHit],          pset.get<std::string>("fModName_Kalman3DHit")          );
+    ParseModuleName ( _mod_names[DATA::MCTruth],              pset.get<std::string>("fModName_MCTruth")              );
+    ParseModuleName ( _mod_names[DATA::SpacePoint],           pset.get<std::string>("fModName_SpacePoint")           );
+    ParseModuleName ( _mod_names[DATA::FIFOChannel],          pset.get<std::string>("fModName_FIFOChannel")          );
+    ParseModuleName ( _mod_names[DATA::Wire],                 pset.get<std::string>("fModName_CalData")              );
+    ParseModuleName ( _mod_names[DATA::CrawlerHit],           pset.get<std::string>("fModName_CrawlerHit")           );
+    ParseModuleName ( _mod_names[DATA::GausHit],              pset.get<std::string>("fModName_GausHit")              );
+    ParseModuleName ( _mod_names[DATA::APAHit],               pset.get<std::string>("fModName_APAHit")               );
+    ParseModuleName ( _mod_names[DATA::FFTHit],               pset.get<std::string>("fModName_FFTHit")               );
+    ParseModuleName ( _mod_names[DATA::CrawlerCluster],       pset.get<std::string>("fModName_CrawlerCluster")       );
+    ParseModuleName ( _mod_names[DATA::DBCluster],            pset.get<std::string>("fModName_DBCluster")            );
+    ParseModuleName ( _mod_names[DATA::FuzzyCluster],         pset.get<std::string>("fModName_FuzzyCluster")         );
+    ParseModuleName ( _mod_names[DATA::HoughCluster],         pset.get<std::string>("fModName_HoughCluster")         );
+    ParseModuleName ( _mod_names[DATA::ShowerAngleCluster],   pset.get<std::string>("fModName_ShowerAngleCluster")   );
+    
     // Next we make storage data class objects for those data types specified in fcl files.
     art::ServiceHandle<art::TFileService>  fileService;
 
@@ -193,6 +195,7 @@ namespace larlight {
 	case DATA::DBCluster:
 	case DATA::FuzzyCluster:
 	case DATA::HoughCluster:
+	case DATA::ShowerAngleCluster:
 	  _data_ptr[i]=(data_base*)(new event_cluster);
 	  break;
 	case DATA::Event:
@@ -313,6 +316,7 @@ namespace larlight {
       case DATA::FuzzyCluster:
       case DATA::HoughCluster:
       case DATA::CrawlerCluster:
+      case DATA::ShowerAngleCluster:
 	// Data type to be stored in event_cluster class
 	for(size_t j=0; j<_mod_names[i].size(); ++j)
 	  ReadCluster(evt,_mod_names[i][j],(event_cluster*)(_data_ptr[i]));

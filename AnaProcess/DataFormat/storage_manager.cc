@@ -331,6 +331,7 @@ void storage_manager::create_data_ptr(DATA::DATA_TYPE type){
   case DATA::DBCluster:
   case DATA::FuzzyCluster:
   case DATA::HoughCluster:
+  case DATA::ShowerAngleCluster:
     _ptr_data_array[type]=(data_base*)(new event_cluster);
     break;
   case DATA::Seed:

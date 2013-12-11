@@ -71,6 +71,7 @@ namespace DATA{
     DBCluster,          ///< DBCluster
     CrawlerCluster,     ///< Crawler
     HoughCluster,       ///< Hough
+    ShowerAngleCluster, ///< ShowerAngleCluster
     Seed,               ///< Seed
     SpacePoint,         ///< Spacepoints
     Track,              ///< Track
