@@ -100,6 +100,7 @@ namespace DATA{
     "dbcluster",
     "crawlercluster",
     "houghcluster",
+    "showeranglecluster",
     "seed",
     "sps",
     "track",
