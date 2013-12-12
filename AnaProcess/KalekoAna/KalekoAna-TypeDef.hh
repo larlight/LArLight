@@ -10,7 +10,7 @@
 #include "KalekoUtilFunc.hh"
 
 // Class forward declaration here
-class KalekoAna;
-class UtilFunctions;
+class kaleko::KalekoAna;
+class kaleko::UtilFunctions;
 
 #endif
