@@ -9,11 +9,12 @@
 #pragma link off all classes;
 #pragma link off all functions;
 
-#pragma link C++ namespace MSG;
-#pragma link C++ namespace PMT;
-#pragma link C++ namespace DATA;
+#pragma link C++ namespace larlight;
+#pragma link C++ namespace larlight::MSG;
+#pragma link C++ namespace larlight::PMT;
+#pragma link C++ namespace larlight::DATA;
 
-#pragma link C++ class Message+;
-#pragma link C++ class larlight_base+;
+#pragma link C++ class larlight::Message+;
+#pragma link C++ class larlight::larlight_base+;
 
 #endif

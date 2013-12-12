@@ -13,11 +13,13 @@
 //ADD_NEW_HEADER ... do not change this line
 
 // Class forward declaration here
-class ana_base;
-class ana_processor;
-class TrackViewer;
-class ClusterViewer;
-//ADD_NEW_CLASS ... do not change this line
+namespace larlight {
+  class ana_base;
+  class ana_processor;
+  class TrackViewer;
+  class ClusterViewer;
+  //ADD_NEW_CLASS ... do not change this line
+}
 
 #endif
 

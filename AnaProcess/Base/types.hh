@@ -17,12 +17,13 @@
 #include <TROOT.h>
 #include <vector>
 
-namespace DATA{
-
-  //typedef uint16_t ch_number_t;    ///< Channel number type definition
-  typedef UShort_t ch_number_t;    ///< Channel number type definition
-
-};
-
+namespace larlight{
+  namespace DATA{
+    
+    //typedef uint16_t ch_number_t;    ///< Channel number type definition
+    typedef UShort_t ch_number_t;    ///< Channel number type definition
+    
+  };
+}
 #endif
 /** @} */ // end of doxygen group

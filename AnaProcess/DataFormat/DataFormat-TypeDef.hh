@@ -10,37 +10,42 @@
 #include "hit.hh"
 #include "user_info.hh"
 #include "track.hh"
+#include "cluster.hh"
 #include "mctruth.hh"
 #include "spacepoint.hh"
 #include "storage_manager.hh"
 // Class forward declaration here
-class data_base;
+namespace larlight{
 
-class wire;
-class event_wire;
+  class data_base;
+  
+  class wire;
+  class event_wire;
+  
+  class hit;
+  class event_hit;
 
-class hit;
-class event_hit;
 
-class cluster;
-class event_cluster;
+  class cluster;
+  class event_cluster;
 
-class pmtfifo;
-class event_pmt;
-
-class part_mc;
-class event_mc;
-
-class spacepoint;
-class event_sps;
-
-class user_info;
-class event_user;
-
-class track;
-class event_track;
-
-class storage_manager;
+  class pmtfifo;
+  class event_pmt;
+  
+  class part_mc;
+  class event_mc;
+  
+  class spacepoint;
+  class event_sps;
+  
+  class user_info;
+  class event_user;
+  
+  class track;
+  class event_track;
+  
+  class storage_manager;
+};
 #endif
 
 

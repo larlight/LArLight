@@ -3,14 +3,15 @@
 
 #include "wire.hh"
 
-//######################################################################
-void wire::clear_data()
-//######################################################################
-{
-  fSignal.clear();
-  fView       = GEO::kUnknown;
-  fSignalType = GEO::kMysteryType;
-  fChannel    = 0xffffffff;
+namespace larlight {
+  //######################################################################
+  void wire::clear_data()
+  //######################################################################
+  {
+    fSignal.clear();
+    fView       = GEO::kUnknown;
+    fSignalType = GEO::kMysteryType;
+    fChannel    = 0xffffffff;
+  }
 }
-
 #endif

@@ -12,7 +12,8 @@
 #include "messenger.hh"
 
 // Class forward declaration here
-class larlight_base;
-class Message;
-
+namespace larlight{
+  class larlight_base;
+  class Message;
+}
 #endif
