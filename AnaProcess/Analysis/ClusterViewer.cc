@@ -5,13 +5,16 @@
 
 namespace larlight {
   //################################################################
-  ClusterViewer::ClusterViewer() : ana_base(), _hRecoCluster_v_0(), _hRecoCluster_v_1(), _hRecoCluster_v_2(), _cluster_v()
+  ClusterViewer::ClusterViewer() : ana_base(), _hRecoCluster_v_0(), _hRecoCluster_v_1(), _hRecoCluster_v_2(), _cluster_v(), _hHits_0(), _hHits_1(), _hHits_2(), _hClusterGraph_v_0(), _hClusterGraph_v_1(), _hClusterGraph_v_2()
   //################################################################
   {
     // Class name
     _name = "ClusterViewer";
     // Set initialization values for pointers
     _fout     = 0;
+    _hHits_0 = 0; 
+    _hHits_1 = 0;
+    _hHits_2 = 0;
     //  _hMCStep  = 0;
     
   }
@@ -20,6 +23,7 @@ namespace larlight {
   bool ClusterViewer::initialize()
   //################################################################
   {
+    g = new TGraph();
     return true;
   }
   
@@ -29,13 +33,21 @@ namespace larlight {
   {
     
     // Clean up histograms if they already exist (from previous event)
-    //  if(_hMCStep)  {delete _hMCStep;  _hMCStep  = 0;};
+    if(_hHits_0)  {delete _hHits_0;  _hHits_0  = 0;}; 
+    if(_hHits_1)  {delete _hHits_1;  _hHits_1  = 0;}; 
+    if(_hHits_2)  {delete _hHits_2;  _hHits_2  = 0;}; 
     for(auto h : _hRecoCluster_v_0) {delete h; h=0;};
     for(auto h : _hRecoCluster_v_1) {delete h; h=0;};
     for(auto h : _hRecoCluster_v_2) {delete h; h=0;};
+    for(auto h : _hClusterGraph_v_0) {delete h; h=0;};
+    for(auto h : _hClusterGraph_v_1) {delete h; h=0;};
+    for(auto h : _hClusterGraph_v_2) {delete h; h=0;};
     _hRecoCluster_v_0.clear();
     _hRecoCluster_v_1.clear();
     _hRecoCluster_v_2.clear();
+    _hClusterGraph_v_0.clear();
+    _hClusterGraph_v_1.clear();
+    _hClusterGraph_v_2.clear();
     _cluster_v.clear();
     
     //
@@ -53,16 +65,8 @@ namespace larlight {
     
     // Find max/min boundary for all axis (clusters)
     
-    if(ev_clus){
-      //      for(int david = 0; david < 3; ++david)
+    if(ev_clus)
       ev_clus->get_axis_range(wiremax, wiremin, timemax, timemin);
-      /*
-      wiremax[0]=7000;       wiremax[2]=7000;       wiremax[2]=7000; 
-      wiremin[0]=0;       wiremin[2]=0;       wiremin[2]=0; 
-      timemax[0]=1000;       timemax[1]=1000;       timemax[2]=1000;
-      timemin[0]=0;       timemin[1]=0;       timemin[2]=0; 
-      */
-    }
     
     // Proceed only if minimum/maximum are set to some values other than the defaults
     if(wiremax[0] == -1) {
@@ -82,6 +86,10 @@ namespace larlight {
       
       const std::vector<cluster> clus_v = ev_clus->GetClusterCollection();
       
+      _hHits_0 = Prepare2DHisto("hitshist0",wiremin[0],wiremax[0],timemin[0],timemax[0]);
+      _hHits_1 = Prepare2DHisto("hitshist1",wiremin[1],wiremax[1],timemin[1],timemax[1]);
+      _hHits_2 = Prepare2DHisto("hitshist2",wiremin[2],wiremax[2],timemin[2],timemax[2]);
+
       int tmpcounter = 0;
       //loop over the clusters in the event
       for(auto clus : clus_v){
@@ -90,69 +98,71 @@ namespace larlight {
 	//check from which view the cluster comes
 	iview = clus.View();
 
-	TH2D* h = 0;
-	
+	//prepare the cluster th2d histogram
+	TH2D* h=0;
+	if(h) delete h;
 	h = Prepare2DHisto(Form("_hRecoCluster_%03d",tmpcounter), wiremin[iview], wiremax[iview], timemin[iview], timemax[iview]);
-	
-	
+
+	TGraph* g=0;
+	if(g) delete g;
+	g = PrepareGraph();
+
+	//prepare the cluster start/endpoint graph
+	//clear any old points that might be in the graph
+	//	g->Set(0);
+	//fill the graph with start and end point
+	g->SetPoint(0,clus.StartPos()[0],clus.StartPos()[1]);
+	g->SetPoint(1,clus.EndPos()[0],clus.EndPos()[1]);
+	Printf("just filled the graph with points (%f,%f), (%f,%f). view is %d\n",
+	       clus.StartPos()[0], clus.StartPos()[1],
+	       clus.EndPos()[0], clus.EndPos()[1], clus.View());
+
 	//then loop through its hits, and plot wire/time for each hit in the right _hRecoCluster_v_blah histo
 	ihit_v = clus.Hits();
-	
+
 	for(auto hit : ihit_v){
 	  
 	  if (hit.View() != iview) std::cout<<"diff views? dunno what's going on."<<std::endl;
-	  
+	  //fill those hits into the cluster plot
 	  h->Fill(hit.Channel(),hit.PeakTime());
-	  std::cout<<"filling h with "<<hit.Channel()<<","<<hit.PeakTime()<<std::endl;
-	  	  
-	}
+	  
+	  //fill the hits histogram, weight is the charge of the hit
+	  if(hit.View() == 0)
+	    _hHits_0->Fill(hit.Channel(),hit.PeakTime(),hit.Charge());
+	  if(hit.View() == 1)
+	    _hHits_1->Fill(hit.Channel(),hit.PeakTime(),hit.Charge());
+	  if(hit.View() == 2)
+	    _hHits_2->Fill(hit.Channel(),hit.PeakTime(),hit.Charge());
+
+	} //end looping over hits
+
 	
 	//need to make each cluster a different color... 
-	//for now they're all blue
+	//there's probably a better way to do this. implement later
 	h->SetMarkerStyle(23);
-	h->SetMarkerColor(tmpcounter);
+	h->SetMarkerColor(tmpcounter);	
 
 
-	if((int)iview == 0)
+
+	if((int)iview == 0){
 	  _hRecoCluster_v_0.push_back(h);
-	else if ((int)iview == 1)
+	  _hClusterGraph_v_0.push_back(g);
+	}
+	else if ((int)iview == 1){
 	  _hRecoCluster_v_1.push_back(h);
-	else if ((int)iview == 2)
+	  _hClusterGraph_v_1.push_back(g);
+	}
+	else if ((int)iview == 2){
 	  _hRecoCluster_v_2.push_back(h);
+	  _hClusterGraph_v_2.push_back(g);
+	}
 	else
 	  std::cout<<"iview is not 0, 1, or 2... wtf?"<<std::endl;
-	
+
       }//end loop over clusters in the event
 
     }
     
-    /*    // MC trajectory points
-    if(ev_mc){
-    
-    const std::vector<part_mc> part_v = ev_mc->GetParticleCollection();
-    
-    for(auto const& part : part_v){
-    
-    // Plotting MC points from all particles ... do we have the "keepemshowerdaughers" tag on?
-    //      if(part.track_id() != 1)
-    
-    //	continue;
-    
-    const std::vector<TVector3> vertex_v = part.step_vertex();
-    
-    _hMCStep = Prepare3DHisto("_hMCStep",
-    zmin, zmax, xmin, xmax, ymin, ymax);
-    
-    for(auto const& vtx : vertex_v) 
-    
-    _hMCStep->Fill(vtx[2],vtx[0],vtx[1]);
-    
-    _hMCStep->SetMarkerStyle(20);
-    _hMCStep->SetMarkerColor(kCyan);
-    break; // Only make 1 histogram
-    }
-    }
-    */
     return true;
   };
   
@@ -173,6 +183,20 @@ namespace larlight {
     return h;
   }
   
+  
+  //################################################################
+  TGraph* ClusterViewer::PrepareGraph()
+  //################################################################
+  {
+    TGraph* g=0;
+    if(g) delete g;
+    
+    g = new TGraph();
+    g->Set(0);
+    
+    return g;
+  }
+
   bool ClusterViewer::finalize() {
     
     // This function is called at the end of event loop.

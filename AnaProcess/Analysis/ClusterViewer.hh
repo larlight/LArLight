@@ -17,6 +17,7 @@
 
 #include "ana_base.hh"
 #include <TH2D.h>
+#include <TGraph.h>
 #include <TCanvas.h>
 #include <TPad.h>
 
@@ -55,6 +56,7 @@ namespace larlight{
 			 double wiremin, double wiremax,
 			 double timemin, double timemax);
     
+    TGraph* PrepareGraph();
     /// Getter for MC points
     //  const TH2D* GetHisto_MC   () const {return _hMCStep;};
     
@@ -79,6 +81,36 @@ namespace larlight{
     /// length of this vector is the total # of clusters in the event
     const std::vector<cluster>  GetData_Reco  () const {return _cluster_v;};
     
+    /// Getter for hit TH2D histo, weighted by charge
+    const TH2D*  GetHisto_Hits (int view) const {
+      if(view==0)
+	return _hHits_0;
+      else if(view==1)
+	return _hHits_1;
+      else if(view==2)
+	return _hHits_2;
+      else {
+	std::cout<<"*******************you screwed something up. view should be 0 1 or 2!"<<std::endl;
+	std::cout<<"returning _hHits_0 because i don't know what else to return"<<std::endl;
+	return _hHits_0;
+      }
+    };
+
+    const std::vector<TGraph*>  GetClusterGraph_Reco (int view) const {
+      if(view==0)
+	return _hClusterGraph_v_0;
+      else if(view==1)
+	return _hClusterGraph_v_1;
+      else if(view==2)
+	return _hClusterGraph_v_2;
+      else {
+	std::cout<<"*******************you screwed something up. view should be 0 1 or 2!"<<std::endl;
+	std::cout<<"returning _hClusterGraph_v_0 because i don't know what else to return"<<std::endl;
+	return _hClusterGraph_v_0;
+      }
+
+    };
+
   protected:
     /// Main canvas
     TCanvas* _c1;
@@ -96,6 +128,17 @@ namespace larlight{
     /// cluster data product vector
     std::vector<cluster> _cluster_v;
     
+    /// Hit histograms to sit next to cluster ones,
+    TH2D* _hHits_0;   
+    TH2D* _hHits_1;    
+    TH2D* _hHits_2;
+
+    std::vector<TGraph*> _hClusterGraph_v_0;
+    std::vector<TGraph*> _hClusterGraph_v_1;
+    std::vector<TGraph*> _hClusterGraph_v_2;
+    
+    TGraph *g;
+
     GEO::View_t iview;
     std::vector<hit> ihit_v;
   };
