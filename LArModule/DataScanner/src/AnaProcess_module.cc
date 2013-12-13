@@ -428,10 +428,11 @@ namespace datascanner {
       hit_light.set_charge_err(hit_ptr->SigmaCharge(),hit_ptr->SigmaCharge(true));
       hit_light.set_multiplicity(hit_ptr->Multiplicity());
       hit_light.set_channel(hit_ptr->Channel());
+      hit_light.set_wire(hit_ptr->WireID().Wire);
       hit_light.set_fit_goodness(hit_ptr->GoodnessOfFit());
       hit_light.set_view((larlight::GEO::View_t)(hit_ptr->View()));
       hit_light.set_sigtype((larlight::GEO::SigType_t)(hit_ptr->SignalType()));
-
+      
       data_ptr->add_hit(hit_light);
     }
   }
@@ -490,6 +491,7 @@ namespace datascanner {
 	hit_light.set_charge_err(hit_ptr->SigmaCharge(),hit_ptr->SigmaCharge(true));
 	hit_light.set_multiplicity(hit_ptr->Multiplicity());
 	hit_light.set_channel(hit_ptr->Channel());
+	hit_light.set_wire(hit_ptr->WireID().Wire);
 	hit_light.set_fit_goodness(hit_ptr->GoodnessOfFit());
 	hit_light.set_view((larlight::GEO::View_t)(hit_ptr->View()));
 	hit_light.set_sigtype((larlight::GEO::SigType_t)(hit_ptr->SignalType()));
