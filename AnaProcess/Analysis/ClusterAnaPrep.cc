@@ -13,7 +13,7 @@ namespace larlight {
   { 
     _name="ClusterAnaPrep"; 
     _fout=0;
-    _run = _subrun = _event = -1;
+    clear_event_info();
     
     _hMultU = _hMultV = _hMultW = 0;
     _h2DAngleU = _h2DAngleV = _h2DAngleW = 0;
@@ -24,6 +24,19 @@ namespace larlight {
 
     _sigma_cut  = 100;
 
+  }
+
+  //*************************************
+  void ClusterAnaPrep::clear_event_info()
+  //*************************************
+  { 
+    _uclusters.clear(); 
+    _vclusters.clear(); 
+    _wclusters.clear(); 
+
+    _run    = -1;
+    _subrun = -1;
+    _event  = -1;
   }
 
   //********************************************************************************************
@@ -49,6 +62,8 @@ namespace larlight {
   {
 
     _skipped_cluster_cnt = 0;
+    
+    clear_event_info();
 
     if(!_hMultU) _hMultU = new TH1D("hMultU","",50,-0.5,49.5);
     else _hMultU->Reset();
@@ -101,13 +116,10 @@ namespace larlight {
     const std::vector<cluster> cluster_collection = ev_cluster->GetClusterCollection();
 
     if(same_event((data_base*)(ev_cluster))) return true;
-
+    clear_event_info();
     _run    = ev_cluster->run();
     _subrun = ev_cluster->subrun();
     _event  = ev_cluster->event_id();
-    _uclusters.clear();
-    _vclusters.clear();
-    _wclusters.clear();
 
     // Initialize event-wise counter
     unsigned short skipped_event_cluster_cnt = 0;
@@ -146,7 +158,7 @@ namespace larlight {
       double sum_charge = 0;
       for(size_t i=0; i<hits.size(); i++) {
 	
-	hits_qsort[hits[i].Charge()] = i;
+	hits_qsort[1./(hits[i].Charge())] = i;
 
 	sum_charge += hits[i].Charge();
 
@@ -156,6 +168,11 @@ namespace larlight {
       cluster_ana_info ci;
       ci.view = view;
       ci.cluster_index = i_cluster.ID();
+      ci.start_wire = start_wire;
+      ci.start_time = start_time;
+      ci.end_wire   = end_wire;
+      ci.end_time   = end_time;
+      ci.angle      = xangle;
       for( std::map<double,size_t>::const_iterator iter(hits_qsort.begin());
 	   iter!=hits_qsort.end();
 	   ++iter ) {

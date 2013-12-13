@@ -6,6 +6,7 @@
 #define ANALYSIS_TYPEDEF_HH
 
 // Header files included here
+#include "ana_info_struct.hh"
 #include "ana_processor.hh"
 #include "TrackViewer.hh"
 #include "ClusterViewer.hh"
