@@ -11,7 +11,8 @@ gSystem.Load("libAnalysis")
 #    print
 
 
-filename = "shower_dsout_sac.root"
+#filename = "shower_dsout_sac.root"
+filename = "/Users/kazuhiro/PlayGIT/LArLight/AnaProcess/Analysis/mac/DATA/PDGID_11/shower_larlight_11.root"
 
 
 
@@ -34,19 +35,26 @@ my_proc.add_process(my_ana)
 
 
 
-c=TCanvas("c","",600,500)
+c=TCanvas("c","",600,800)
+c.Divide(1,3)
 gStyle.SetOptStat(0)
 
 #while my_proc.process_event():
 
 my_proc.process_event()
 
-vReco = my_ana.GetHisto_Reco_0()
 
-#vReco.at(0).Draw()
-#    for x in xrange(vReco.size()-1):
-#        vReco.at(x+1).Draw("same");
 
+for pad in xrange(3):
+
+    c.cd(pad+1)
+
+    vReco = my_ana.GetHisto_Reco(int(pad))
+        
+    for x in xrange(vReco.size()):
+        vReco.at(x).Draw("same")
+        
+c.Update()
 print "continuing to next evt..."
 sys.stdin.readline()
 
