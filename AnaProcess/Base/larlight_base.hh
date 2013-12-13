@@ -30,7 +30,7 @@ namespace larlight{
   public:
     
     /// Default constructor
-    larlight_base() : _name("larlight_base")
+    larlight_base() : _verbosity(MSG::MSG_TYPE_MAX,false), _name("larlight_base")
     {set_verbosity(MSG::NORMAL);}
     
     /// Default copy constructor
@@ -49,19 +49,19 @@ namespace larlight{
     inline const std::string class_name() const {return _name;};
     
     /// message print out method
-    inline void print(MSG::Level level, std::string where, std::string msg)
-    {if(_verbosity[level]) Message::send(level,where,msg);};
+    inline void print(MSG::Level level, std::string where, std::string msg) const
+    {if(_verbosity.at(level)) Message::send(level,where,msg);};
     
     /// message print out method
-    inline void print(MSG::Level level, std::string msg)
-    {if(_verbosity[level]) Message::send(level,msg);};
+    inline void print(MSG::Level level, std::string msg) const
+    {if(_verbosity.at(level)) Message::send(level,msg);};
     
   protected:
     
-    char _buf[200];                           ///< char buffer for message manipulation
-    bool       _verbosity[MSG::MSG_TYPE_MAX]; ///< holder for enabled message levels
-    MSG::Level _verbosity_level;              ///< holder for specified verbosity level
-    std::string _name;                        ///< class name holder
+    char _buf[200];                ///< char buffer for message manipulation
+    std::vector<bool> _verbosity;  ///< holder for enabled message levels
+    MSG::Level _verbosity_level;   ///< holder for specified verbosity level
+    std::string _name;             ///< class name holder
     
   };
 }

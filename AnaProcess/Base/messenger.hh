@@ -54,7 +54,7 @@ namespace larlight {
     static void send(MSG::Level level, std::string msg);
     
     /// Extra argument "where" is used to indicate function/class name.
-    static void send(MSG::Level level, std::string where, std::string msg);  
+    static void send(MSG::Level level, std::string where, std::string msg);
     
   };
 }
