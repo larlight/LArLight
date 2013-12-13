@@ -69,31 +69,22 @@ namespace larlight {
       
     }
     
-    if(_ofile_name.size()==0){
+    if(_ofile_name.size()==0)
       
-      Message::send(MSG::ERROR,__FUNCTION__,
-		    "Must provide an output filename!");
-      return false;
-    }
+      Message::send(MSG::WARNING,__FUNCTION__,
+		    "Analysis output file will not be created for this time...");
+
+    else
     
-    _fout=TFile::Open(_ofile_name.c_str(),"RECREATE");
+      _fout=TFile::Open(_ofile_name.c_str(),"RECREATE");
     
-    if(!_fout){
-      
-      sprintf(_buf,"Failed to open an output file: %s",_ofile_name.c_str());
-      
-      Message::send(MSG::ERROR,__FUNCTION__,_buf);
-      
-      return false;
-      
-    }
-    
-    bool status = true;
+
+     bool status = true;
     
     for(std::vector<ana_base*>::iterator iter(_analyzers.begin());
 	iter!=_analyzers.end();
 	++iter) {
-      
+
       (*iter)->set_output_file(_fout);
       
       if(!((*iter)->initialize())){
