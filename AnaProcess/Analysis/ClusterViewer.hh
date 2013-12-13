@@ -60,9 +60,7 @@ namespace larlight{
     
     /// Getter for Cluster histogram vector
     /// length of this vector should be the number of clusters in that view
-    const std::vector<TH2D*>  GetHisto_Reco_0 () const {
-      //just return one of the views for now?
-      return _hRecoCluster_v_0;};
+    const std::vector<TH2D*>  GetHisto_Reco_0 () const {return _hRecoCluster_v_0;};
 
     /// Getter for cluster data object vector
     /// length of this vector is the total # of clusters in the event

@@ -13,9 +13,7 @@ namespace larlight {
     // Set initialization values for pointers
     _fout     = 0;
     //  _hMCStep  = 0;
-    //  _hRecoCluster_v_0 = 0;
-    //  _hRecoCluster_v_1 = 0;
-    //  _hRecoCluster_v_2 = 0;
+    
   }
   
   //################################################################
@@ -119,6 +117,8 @@ namespace larlight {
 	else
 	  std::cout<<"iview is not 0, 1, or 2... wtf?"<<std::endl;
 	
+	std::cout<<"at this point in time, _hRecoCluster_v_0.size() is "
+		 <<_hRecoCluster_v_0.size()<<std::endl;
 	
       }//end loop over clusters in the event
       //    _hRecoSPS->SetMarkerStyle(23);
