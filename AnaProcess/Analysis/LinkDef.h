@@ -16,8 +16,11 @@
 #pragma link C++ class std::vector<TH3D*>+;
 #pragma link C++ class larlight::ClusterViewer+;
 #pragma link C++ class std::vector<TH2D*>+;
+#pragma link C++ class larlight::ClusterAnaPrep+;
 //ADD_NEW_CLASS ... do not change this line
 #endif
+
+
 
 
 
