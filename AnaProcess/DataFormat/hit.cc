@@ -22,7 +22,8 @@ namespace larlight {
 				  fGoodnessOfFit(original.fGoodnessOfFit),
 				  fView(original.fView),
 				  fSignalType(original.fSignalType),
-				  fChannel(original.fChannel)
+                                  fChannel(original.fChannel),
+                                  fWire(original.fWire)
   //##########################################################################
   {};
   
@@ -40,6 +41,7 @@ namespace larlight {
     fView = GEO::kUnknown;
     fSignalType = GEO::kMysteryType;
     fChannel = 0xffffffff;
+    fWire    = 0xffffffff;
   }
 }
 #endif

@@ -49,6 +49,7 @@ namespace larlight{
     {fSigmaCharge=q; fSigmaMaxCharge=q_max;};
     void set_multiplicity(int m){ fMultiplicity=m;};
     void set_channel (UInt_t ch){ fChannel=ch;};
+    void set_wire    (UInt_t wire) { fWire=wire;};
     void set_fit_goodness(double v){ fGoodnessOfFit = v;};
     void set_view(GEO::View_t v){ fView = v;};
     void set_sigtype(GEO::SigType_t t) {fSignalType=t;};
@@ -63,6 +64,7 @@ namespace larlight{
     double          SigmaPeakTime()             const { return fSigmaPeakTime;  };
     int             Multiplicity()              const { return fMultiplicity;   };
     UInt_t          Channel()                   const { return fChannel;        };
+    UInt_t          Wire()                      const { return fWire;           };
     double          Charge(bool max=false)      const { return ( max ? fMaxCharge : fCharge);};
     double          SigmaCharge(bool max=false) const { return ( max ? fSigmaMaxCharge : fSigmaCharge ); };
     double          GoodnessOfFit()             const { return fGoodnessOfFit;  };
@@ -87,7 +89,7 @@ namespace larlight{
     GEO::View_t             fView;           ///< view for the plane of the hit
     GEO::SigType_t          fSignalType;     ///< signal type for the plane of the hit
     UInt_t                  fChannel;        ///< channel number
-    
+    UInt_t                  fWire;           ///< wire number
   private:
     
     ////////////////////////
