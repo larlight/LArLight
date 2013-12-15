@@ -336,9 +336,13 @@ namespace larlight {
     case DATA::ShowerAngleCluster:
       _ptr_data_array[type]=(data_base*)(new event_cluster);
       break;
-    case DATA::Seed:
     case DATA::Shower:
+      _ptr_data_array[type]=(data_base*)(new event_shower);
+      break;
     case DATA::Calorimetry:
+      _ptr_data_array[type]=(data_base*)(new event_calorimetry);
+      break;
+    case DATA::Seed:
     case DATA::Event:
       /*
 	case DATA::PMT_WF_COLLECTION:

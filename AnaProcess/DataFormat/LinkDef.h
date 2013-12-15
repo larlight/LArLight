@@ -42,6 +42,14 @@
 #pragma link C++ class std::vector<larlight::spacepoint>+;
 #pragma link C++ class larlight::event_sps+;
 
+#pragma link C++ class larlight::shower+;
+#pragma link C++ class std::vector<larlight::shower>+;
+#pragma link C++ class larlight::event_shower+;
+
+#pragma link C++ class larlight::calorimetry+;
+#pragma link C++ class std::vector<larlight::calorimetry>+;
+#pragma link C++ class larlight::event_calorimetry+;
+
 #pragma link C++ class larlight::user_info+;
 #pragma link C++ class std::vector<larlight::user_info>+;
 #pragma link C++ class larlight::event_user+;

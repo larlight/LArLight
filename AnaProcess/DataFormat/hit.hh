@@ -123,7 +123,7 @@ namespace larlight{
     inline void  add_hit(const hit h) {fHit_v.push_back(h);};
     
     /// Method to get an array of hit
-    inline const std::vector<larlight::hit>& GetHitCollection() { return fHit_v; };
+    inline const std::vector<larlight::hit>& GetHitCollection() const { return fHit_v; };
     
   private:
     

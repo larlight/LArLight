@@ -28,7 +28,7 @@ namespace larlight{
   public:
     
     /// Default constructor
-    cluster() : data_base() {};
+    cluster() : data_base() {clear_data();};
     
     /// Default destructor
     virtual ~cluster(){};
@@ -60,6 +60,7 @@ namespace larlight{
     inline const std::vector<double>& SigmaEndPos()   const { return fSigmaEndPos;   }
     inline const std::vector<hit>&    Hits()          const { return fHitVector;     }
     virtual void clear_data(){
+      data_base::clear_data();
       fTotalCharge = -1;
       fdTdW = fdQdW = fSigmadTdW = fSigmadQdW = -1;
       fStartPos.clear();

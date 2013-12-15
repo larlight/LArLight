@@ -26,6 +26,8 @@
 #include "wire.hh"
 #include "hit.hh"
 #include "cluster.hh"
+#include "shower.hh"
+#include "calorimetry.hh"
 
 namespace larlight {
   /**

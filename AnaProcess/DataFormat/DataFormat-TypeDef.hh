@@ -13,6 +13,8 @@
 #include "cluster.hh"
 #include "mctruth.hh"
 #include "spacepoint.hh"
+#include "shower.hh"
+#include "calorimetry.hh"
 #include "storage_manager.hh"
 // Class forward declaration here
 namespace larlight{
@@ -43,6 +45,12 @@ namespace larlight{
   
   class track;
   class event_track;
+
+  class shower;
+  class event_shower;
+
+  class calorimetry;
+  class event_calorimetry;
   
   class storage_manager;
 };
