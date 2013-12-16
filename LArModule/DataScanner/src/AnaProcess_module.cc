@@ -723,8 +723,8 @@ namespace datascanner {
       light_shower.set_total_charge(shower_ptr->TotalCharge());
       light_shower.set_direction(shower_ptr->Direction());
       light_shower.set_direction_err(shower_ptr->DirectionErr());
-      light_shower.set_max_width(shower_ptr->MaxWidthX(),shower_ptr->MaxWidthY());
-      light_shower.set_distance_max_width(shower_ptr->DistanceMaxWidth());
+      //light_shower.set_max_width(shower_ptr->MaxWidthX(),shower_ptr->MaxWidthY());
+      //light_shower.set_distance_max_width(shower_ptr->DistanceMaxWidth());
 
       const std::vector<art::Ptr<recob::Cluster> > cluster_v = cluster_m.at(i);
 
