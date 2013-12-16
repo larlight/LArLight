@@ -6,11 +6,11 @@
 #define KALEKOANA_TYPEDEF_HH
 
 // Header files included here
-#include "KalekoAna.hh"
+#include "KalekoTrackAna.hh"
 #include "KalekoUtilFunc.hh"
 
 // Class forward declaration here
-class kaleko::KalekoAna;
+class kaleko::KalekoTrackAna;
 class kaleko::UtilFunctions;
 
 #endif

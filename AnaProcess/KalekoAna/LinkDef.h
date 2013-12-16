@@ -9,7 +9,7 @@
 #pragma link off all classes;
 #pragma link off all functions;
 
-#pragma link C++ class kaleko::KalekoAna+;
+#pragma link C++ class kaleko::KalekoTrackAna+;
 #pragma link C++ class kaleko::UtilFunctions+;
 
 #endif
