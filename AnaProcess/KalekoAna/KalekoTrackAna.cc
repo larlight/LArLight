@@ -1,8 +1,11 @@
-#include "KalekoAna.hh"
+#ifndef KALEKOTRACKANA_CC
+#define KALEKOTRACKANA_CC
+
+#include "KalekoTrackAna.hh"
 
 namespace kaleko{
   
-  KalekoAna::KalekoAna(){
+  KalekoTrackAna::KalekoTrackAna(){
     //
     // Constructor, clears histograms, clears tree
     //
@@ -16,7 +19,7 @@ namespace kaleko{
   };
   
   
-  int KalekoAna::EventLoop(std::string filename, const int MCTheta, const int max_evts, const int n_bins_histo){
+  int KalekoTrackAna::EventLoop(std::string filename, const int MCTheta, const int max_evts, const int n_bins_histo){
     
     //
     // A simple routine to read a data file and perform an event loop.
@@ -308,7 +311,7 @@ namespace kaleko{
     
   } //end EventLoop function
   
-  void KalekoAna::InitializeHistograms(const int MCTheta, const int n_bins_histo){
+  void KalekoTrackAna::InitializeHistograms(const int MCTheta, const int n_bins_histo){
     
     char hname[500];
     char htitle[500];
@@ -346,7 +349,7 @@ namespace kaleko{
     
   }
   
-  void KalekoAna::PrepareDataTree(){
+  void KalekoTrackAna::PrepareDataTree(){
     
     DataTree = new TTree();
     DataTree->Branch("myEventNumber", &myEventNumber, "myEventNumber/I");
@@ -366,7 +369,7 @@ namespace kaleko{
     
   }
   
-  void KalekoAna::LoopOverTree(){
+  void KalekoTrackAna::LoopOverTree(){
     
     //loop over data tree I created in the main event loop and make histograms from its contents
     for(int ientry=0; ientry<DataTree->GetEntries(); ++ientry){
@@ -395,3 +398,5 @@ namespace kaleko{
     } // end for-loop over tree entries
   }//end LoopOverTree()
 }
+
+#endif

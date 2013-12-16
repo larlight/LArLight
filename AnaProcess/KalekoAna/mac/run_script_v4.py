@@ -128,7 +128,7 @@ def main():
     if not os.path.exists(out_dir):
         os.makedirs(out_dir)
 
-    mykal=KalekoAna()
+    mykal=KalekoTrackAna()
     
 #    if reco_type == "Kalman3DSPS":
 #        mykal.set_data_type(DATA.Kalman3DSPS)

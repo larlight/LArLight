@@ -14,7 +14,7 @@ n_bins_histo = 100
 in_path = os.environ.get('MAKE_TOP_DIR')+"/kaleko_input_files_LArLight/"
 in_fname =  "v3_ang0_dsout_reduced_%s.root" % reco_type
 
-mykal=KalekoAna()
+mykal=KalekoTrackAna()
 mykal.set_data_type(DATA.Kalman3DSPS)
 
 mykal.EventLoop( in_path+in_fname,
