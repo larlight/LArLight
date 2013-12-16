@@ -1,4 +1,5 @@
 #include "job/services.fcl"
+#include "clusteralgorithms.fcl"
 
 process_name: DataReader
 
@@ -22,6 +23,10 @@ standard_datascanner:
     fModName_SpacePoint:          "spacepointfinder"
     fModName_Kalman3DSPS:         "trackkal"
     fModName_Kalman3DSPS:         "trackkalhit"
+    fModName_Shower:              "showerreco"
+    fModName_Calorimetry:         "showerreco"
+
+    ClusterParamsAlg:             @local::standard_clusterparamsalg
 }
 
 # TIP: 
@@ -49,6 +54,8 @@ standard_datascanner.fModName_ShowerAngleCluster: ""
 standard_datascanner.fModName_Bezier:         ""
 #standard_datascanner.fModName_SpacePoint:     ""
 #standard_datascanner.fModName_Kalman3DSPS:    ""
+standard_datascanner.fModName_Shower:         ""
+standard_datascanner.fModName_Calorimetry:    ""
 
 services:
 {
