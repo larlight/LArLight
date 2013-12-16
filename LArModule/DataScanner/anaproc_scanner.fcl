@@ -22,7 +22,7 @@ standard_datascanner:
     fModName_Bezier:              "bezier"
     fModName_SpacePoint:          "spacepointfinder"
     fModName_Kalman3DSPS:         "trackkal"
-    fModName_Kalman3DSPS:         "trackkalhit"
+    fModName_Kalman3DHit:         "trackkalhit"
     fModName_Shower:              "showerreco"
     fModName_Calorimetry:         "showerreco"
 
