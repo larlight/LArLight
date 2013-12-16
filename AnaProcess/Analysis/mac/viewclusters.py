@@ -45,6 +45,7 @@ c_graph=TCanvas("csub","Individual cluster start/end points",500,300)
 
 while my_proc.process_event():
     currentview = 0;
+    #First fill the 6 pads on the main canvas with stuff
     for pad in xrange(1,7,2):
         
         c.cd(pad)
@@ -60,7 +61,8 @@ while my_proc.process_event():
         currentview = currentview + 1
         c.Update()
     
-    #now draw individual clusters on the separate canvase
+
+    #now draw individual clusters on the separate canvas
     c_graph.cd()
     for iview in xrange(0,3):
         for iclus in xrange(my_ana.GetClusterGraph_Reco(int(iview)).size()):
@@ -74,7 +76,10 @@ while my_proc.process_event():
             g.SetTitle("View: %d, Cluster: %d"%(iview+1,iclus))
             g.SetMarkerSize(5)
             g.SetMarkerStyle(34)
+
             g.Draw("ALP")
+            my_ana.GetHisto_Reco(int(iview)).at(iclus).Draw("same")
+
             c_graph.Update()
             print "Drawing cluster %d out of %d for view %d. To look at the next cluster hit enter." % (iclus+1,my_ana.GetClusterGraph_Reco(int(iview)).size(),iview+1)
             sys.stdin.readline()

@@ -110,9 +110,6 @@ namespace larlight {
 	//fill the graph with start and end point
 	g->SetPoint(0,clus.StartPos()[0],clus.StartPos()[1]);
 	g->SetPoint(1,clus.EndPos()[0],clus.EndPos()[1]);
-	Printf("just filled the graph with points (%f,%f), (%f,%f). view is %d\n",
-	       clus.StartPos()[0], clus.StartPos()[1],
-	       clus.EndPos()[0], clus.EndPos()[1], clus.View());
 
 	//then loop through its hits, and plot wire/time for each hit in the right _hRecoCluster_v_blah histo
 	ihit_v = clus.Hits();
@@ -136,7 +133,7 @@ namespace larlight {
 	
 	//need to make each cluster a different color... 
 	//there's probably a better way to do this. implement later
-	h->SetMarkerStyle(23);
+	h->SetMarkerStyle(kFullStar);
 	h->SetMarkerColor(tmpcounter);	
 
 
