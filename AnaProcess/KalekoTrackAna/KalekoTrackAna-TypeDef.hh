@@ -2,8 +2,8 @@
 // type-def file for ROOT
 //
 
-#ifndef KALEKOANA_TYPEDEF_HH
-#define KALEKOANA_TYPEDEF_HH
+#ifndef KALEKOTRACKANA_TYPEDEF_HH
+#define KALEKOTRACKANA_TYPEDEF_HH
 
 // Header files included here
 #include "KalekoTrackAna.hh"

@@ -4,7 +4,7 @@ try:
 except AttributeError:
     import ROOT
 from ROOT import *
-gSystem.Load("libKalekoAna")
+gSystem.Load("libKalekoTrackAna")
 
 
 reco_type = "Kalman3DSPS" # "Bezier" or "Kalman3DSPS"
@@ -22,7 +22,7 @@ in_fname = [ "v3_ang0_dsout_reduced_%s.root" % reco_type,
              "v3_ang90_dsout_reduced_%s.root" % reco_type ]
 
 out_dir = os.environ.get('MAKE_TOP_DIR')+\
-          "/AnaProcess/KalekoAna/mac/output_plots/v3_%s" % reco_type
+          "/AnaProcess/KalekoTrackAna/mac/output_plots/v3_%s" % reco_type
 
 in_angles = [ 0, 30, 45, 60, 90 ]
 

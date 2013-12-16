@@ -1,14 +1,14 @@
 /**
- * \file KalekoAna.hh
+ * \file KalekoTrackAna.hh
  *
- * \ingroup KalekoAna
+ * \ingroup KalekoTrackAna
  * 
- * \brief Class def header for a class KalekoAna
+ * \brief Class def header for a class KalekoTrackAna
  *
  * @author davidkaleko
  */
 
-/** \addtogroup KalekoAna
+/** \addtogroup KalekoTrackAna
 
     @{*/
 #ifndef KALEKOANA_HH
@@ -29,19 +29,19 @@
 
 namespace kaleko {
   /**
-     \class KalekoAna
-     User defined class KalekoAna ... these comments are used to generate
+     \class KalekoTrackAna
+     User defined class KalekoTrackAna ... these comments are used to generate
      doxygen documentation!
   */
-  class KalekoAna{
+  class KalekoTrackAna{
     
   public:
     
     /// Default constructor
-    KalekoAna();
+    KalekoTrackAna();
     
     /// Default destructor
-    virtual ~KalekoAna(){};
+    virtual ~KalekoTrackAna(){};
 
     /// Set the data type
     larlight::DATA::DATA_TYPE fDataType;

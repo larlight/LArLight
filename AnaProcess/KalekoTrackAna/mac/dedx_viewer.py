@@ -4,7 +4,7 @@ try:
 except AttributeError:
     import ROOT
 from ROOT import *
-gSystem.Load("libKalekoAna")
+gSystem.Load("libKalekoTrackAna")
 
 reco_type = "Kalman3DSPS"
 max_evts = 5

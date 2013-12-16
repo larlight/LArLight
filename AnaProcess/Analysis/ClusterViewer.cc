@@ -58,15 +58,12 @@ namespace larlight {
     
     // Define utility variables to hold max/min of each axis range, for each of 3 views
     //vector of length 3 initialized to -1
-    std::vector<double> wiremax (3,-1.);
-    std::vector<double> wiremin (3,99999.);
-    std::vector<double> timemax (3,-1.);
-    std::vector<double> timemin (3,99999.);
+    std::vector<double> chmax, chmin, wiremax, wiremin, timemax, timemin;
     
     // Find max/min boundary for all axis (clusters)
     
     if(ev_clus)
-      ev_clus->get_axis_range(wiremax, wiremin, timemax, timemin);
+      ev_clus->get_axis_range(chmax, chmin, wiremax, wiremin, timemax, timemin);
     
     // Proceed only if minimum/maximum are set to some values other than the defaults
     if(wiremax[0] == -1) {
@@ -124,15 +121,15 @@ namespace larlight {
 	  
 	  if (hit.View() != iview) std::cout<<"diff views? dunno what's going on."<<std::endl;
 	  //fill those hits into the cluster plot
-	  h->Fill(hit.Channel(),hit.PeakTime());
+	  h->Fill(hit.Wire(),hit.PeakTime());
 	  
 	  //fill the hits histogram, weight is the charge of the hit
 	  if(hit.View() == 0)
-	    _hHits_0->Fill(hit.Channel(),hit.PeakTime(),hit.Charge());
+	    _hHits_0->Fill(hit.Wire(),hit.PeakTime(),hit.Charge());
 	  if(hit.View() == 1)
-	    _hHits_1->Fill(hit.Channel(),hit.PeakTime(),hit.Charge());
+	    _hHits_1->Fill(hit.Wire(),hit.PeakTime(),hit.Charge());
 	  if(hit.View() == 2)
-	    _hHits_2->Fill(hit.Channel(),hit.PeakTime(),hit.Charge());
+	    _hHits_2->Fill(hit.Wire(),hit.PeakTime(),hit.Charge());
 
 	} //end looping over hits
 

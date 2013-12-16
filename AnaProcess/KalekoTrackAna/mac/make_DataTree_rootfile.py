@@ -1,7 +1,7 @@
 import sys, os
 import ROOT
 from ROOT import *
-gSystem.Load("libKalekoAna")
+gSystem.Load("libKalekoTrackAna")
 
 
 reco_type = "Kalman3DSPS" # "Bezier" or "Kalman3DSPS"
@@ -23,7 +23,7 @@ in_path = "/a/data/morningside/kaleko"+"/kaleko_input_files_LArLight/"
 #             "v4_ang90_dsout_reduced_%s.root" % reco_type ]
 in_fname = ["v4_ang60_dsout_reduced_Kalman3DSPS.root"]
 out_dir = os.environ.get('MAKE_TOP_DIR')+\
-          "/AnaProcess/KalekoAna/mac/output_datatree/v4"
+          "/AnaProcess/KalekoTrackAna/mac/output_datatree/v4"
 
 #in_angles = [ 0, 10, 20, 30, 40, 50, 60, 70, 80, 90 ]
 in_angles = [ 60 ]

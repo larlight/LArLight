@@ -77,8 +77,8 @@ namespace larlight{
        NOTE: the initial max/min values matter. It only modifies max/min if it finds values that is 
        above/below those initial values.
     */
-
-    void get_axis_range (std::vector<double> &wiremax, std::vector<double> &wiremin,
+    void get_axis_range (std::vector<double> &chmax,   std::vector<double> &chmin,
+			 std::vector<double> &wiremax, std::vector<double> &wiremin,
 			 std::vector<double> &timemax, std::vector<double> &timemin) const;
 
 
@@ -136,7 +136,8 @@ namespace larlight{
        NOTE: the initial max/min values matter. It only modifies max/min if it finds values that is
        above/below those initial values.
     */
-    void get_axis_range (std::vector<double> &wiremax, std::vector<double> &wiremin,
+    void get_axis_range (std::vector<double> &chmax,   std::vector<double> &chmin,
+			 std::vector<double> &wiremax, std::vector<double> &wiremin,
 			 std::vector<double> &timemax, std::vector<double> &timemin) const;
     
   private:
