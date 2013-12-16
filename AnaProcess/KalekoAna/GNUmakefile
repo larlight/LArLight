@@ -13,6 +13,7 @@ OBJECTS = $(SOURCES:.cc=.o)
 INCFLAGS = -I.                       #Include itself
 INCFLAGS += -I$(MAKE_TOP_DIR)/AnaProcess/Base
 INCFLAGS += -I$(MAKE_TOP_DIR)/AnaProcess/DataFormat
+INCFLAGS += -I$(MAKE_TOP_DIR)/AnaProcess/Analysis
 
 
 # platform-specific options
