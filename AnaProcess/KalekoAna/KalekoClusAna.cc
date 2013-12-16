@@ -11,7 +11,7 @@ namespace kaleko {
     // This function is called in the beggining of event loop
     // Do all variable initialization you wish to do here.
     // If you need, you have an output root file pointer "_fout".
-
+    larlight::ClusterAnaPrep::get()->initialize();
     return true;
   }
   
@@ -30,7 +30,7 @@ namespace kaleko {
   }
 
   bool KalekoClusAna::finalize() {
-  
+    larlight::ClusterAnaPrep::get()->finalize();  
     // This function is called at the end of event loop.
     // Do all variable finalization you wish to do here.
     // If you need, you can store your ROOT class instance in the output
