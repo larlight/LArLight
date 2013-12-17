@@ -57,8 +57,6 @@ namespace larlight{
 			 double timemin, double timemax);
     
     TGraph* PrepareGraph();
-    /// Getter for MC points
-    //  const TH2D* GetHisto_MC   () const {return _hMCStep;};
     
     /// Getter for Cluster histogram vector
     /// length of this vector should be the number of clusters in that view
@@ -76,7 +74,7 @@ namespace larlight{
 	return _hRecoCluster_v_0;
       }
     };
-
+    
     /// Getter for cluster data object vector
     /// length of this vector is the total # of clusters in the event
     const std::vector<cluster>  GetData_Reco  () const {return _cluster_v;};
@@ -95,22 +93,35 @@ namespace larlight{
 	return _hHits_0;
       }
     };
-
-    const std::vector<TGraph*>  GetClusterGraph_Reco (int view) const {
-      if(view==0)
-	return _hClusterGraph_v_0;
-      else if(view==1)
-	return _hClusterGraph_v_1;
-      else if(view==2)
-	return _hClusterGraph_v_2;
+    
+    const std::vector<TGraph*>  GetClusterGraph_Reco (int view, bool start) const {
+      
+      if(view==0){
+	if(start)
+	  return _hClusterGraph_v_0_start;
+	else
+	  return _hClusterGraph_v_0_end;
+      }
+      else if(view==1){
+	if(start)
+	  return _hClusterGraph_v_1_start;
+	else
+	  return _hClusterGraph_v_1_end;
+      }
+      else if(view==2){
+	if(start)
+	  return _hClusterGraph_v_2_start;
+	else
+	  return _hClusterGraph_v_2_end;
+      }
       else {
 	std::cout<<"*******************you screwed something up. view should be 0 1 or 2!"<<std::endl;
-	std::cout<<"returning _hClusterGraph_v_0 because i don't know what else to return"<<std::endl;
-	return _hClusterGraph_v_0;
+	std::cout<<"returning _hClusterGraph_v_1_start because i don't know what else to return"<<std::endl;
+	return _hClusterGraph_v_1_start;
       }
-
+      
     };
-
+    
   protected:
     /// Main canvas
     TCanvas* _c1;
@@ -133,15 +144,23 @@ namespace larlight{
     TH2D* _hHits_1;    
     TH2D* _hHits_2;
 
-    std::vector<TGraph*> _hClusterGraph_v_0;
-    std::vector<TGraph*> _hClusterGraph_v_1;
-    std::vector<TGraph*> _hClusterGraph_v_2;
+    std::vector<TGraph*> _hClusterGraph_v_0_start;
+    std::vector<TGraph*> _hClusterGraph_v_1_start;
+    std::vector<TGraph*> _hClusterGraph_v_2_start;
+    std::vector<TGraph*> _hClusterGraph_v_0_end;
+    std::vector<TGraph*> _hClusterGraph_v_1_end;
+    std::vector<TGraph*> _hClusterGraph_v_2_end;
     
+    //Each graph has only one point (start, or end point).
+    //Doing this so I can make them different colors to show which are start and end.
+    //    TGraph *g_start;
+    //    TGraph *g_end;
     TGraph *g;
 
     GEO::View_t iview;
     std::vector<hit> ihit_v;
   };
+  
 }
 #endif
 

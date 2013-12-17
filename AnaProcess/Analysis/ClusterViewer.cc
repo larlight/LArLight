@@ -5,7 +5,7 @@
 
 namespace larlight {
   //################################################################
-  ClusterViewer::ClusterViewer() : ana_base(), _hRecoCluster_v_0(), _hRecoCluster_v_1(), _hRecoCluster_v_2(), _cluster_v(), _hHits_0(), _hHits_1(), _hHits_2(), _hClusterGraph_v_0(), _hClusterGraph_v_1(), _hClusterGraph_v_2()
+  ClusterViewer::ClusterViewer() : ana_base(), _hRecoCluster_v_0(), _hRecoCluster_v_1(), _hRecoCluster_v_2(), _cluster_v(), _hHits_0(), _hHits_1(), _hHits_2(), _hClusterGraph_v_0_start(), _hClusterGraph_v_1_start(), _hClusterGraph_v_2_start(),_hClusterGraph_v_0_end(), _hClusterGraph_v_1_end(), _hClusterGraph_v_2_end()
   //################################################################
   {
     // Class name
@@ -39,15 +39,21 @@ namespace larlight {
     for(auto h : _hRecoCluster_v_0) {delete h; h=0;};
     for(auto h : _hRecoCluster_v_1) {delete h; h=0;};
     for(auto h : _hRecoCluster_v_2) {delete h; h=0;};
-    for(auto h : _hClusterGraph_v_0) {delete h; h=0;};
-    for(auto h : _hClusterGraph_v_1) {delete h; h=0;};
-    for(auto h : _hClusterGraph_v_2) {delete h; h=0;};
+    for(auto h : _hClusterGraph_v_0_start) {delete h; h=0;};
+    for(auto h : _hClusterGraph_v_1_start) {delete h; h=0;};
+    for(auto h : _hClusterGraph_v_2_start) {delete h; h=0;};
+    for(auto h : _hClusterGraph_v_0_end) {delete h; h=0;};
+    for(auto h : _hClusterGraph_v_1_end) {delete h; h=0;};
+    for(auto h : _hClusterGraph_v_2_end) {delete h; h=0;};
     _hRecoCluster_v_0.clear();
     _hRecoCluster_v_1.clear();
     _hRecoCluster_v_2.clear();
-    _hClusterGraph_v_0.clear();
-    _hClusterGraph_v_1.clear();
-    _hClusterGraph_v_2.clear();
+    _hClusterGraph_v_0_start.clear();
+    _hClusterGraph_v_1_start.clear();
+    _hClusterGraph_v_2_start.clear();
+    _hClusterGraph_v_0_end.clear();
+    _hClusterGraph_v_1_end.clear();
+    _hClusterGraph_v_2_end.clear();
     _cluster_v.clear();
     
     //
@@ -100,16 +106,19 @@ namespace larlight {
 	if(h) delete h;
 	h = Prepare2DHisto(Form("_hRecoCluster_%03d",tmpcounter), wiremin[iview], wiremax[iview], timemin[iview], timemax[iview]);
 
-	TGraph* g=0;
-	if(g) delete g;
-	g = PrepareGraph();
+	TGraph* g_start=0;
+	if(g_start) delete g_start;
+	g_start = PrepareGraph();
+	TGraph* g_end=0;
+	if(g_end) delete g_end;
+	g_end = PrepareGraph();
 
 	//prepare the cluster start/endpoint graph
 	//clear any old points that might be in the graph
 	//	g->Set(0);
 	//fill the graph with start and end point
-	g->SetPoint(0,clus.StartPos()[0],clus.StartPos()[1]);
-	g->SetPoint(1,clus.EndPos()[0],clus.EndPos()[1]);
+	g_start->SetPoint(0,clus.StartPos()[0],clus.StartPos()[1]);
+	g_end->SetPoint(0,clus.EndPos()[0],clus.EndPos()[1]);
 
 	//then loop through its hits, and plot wire/time for each hit in the right _hRecoCluster_v_blah histo
 	ihit_v = clus.Hits();
@@ -140,15 +149,18 @@ namespace larlight {
 
 	if((int)iview == 0){
 	  _hRecoCluster_v_0.push_back(h);
-	  _hClusterGraph_v_0.push_back(g);
+	  _hClusterGraph_v_0_start.push_back(g_start);
+	  _hClusterGraph_v_0_end.push_back(g_end);
 	}
 	else if ((int)iview == 1){
 	  _hRecoCluster_v_1.push_back(h);
-	  _hClusterGraph_v_1.push_back(g);
+	  _hClusterGraph_v_1_start.push_back(g_start);	 
+	  _hClusterGraph_v_1_end.push_back(g_end);
 	}
 	else if ((int)iview == 2){
 	  _hRecoCluster_v_2.push_back(h);
-	  _hClusterGraph_v_2.push_back(g);
+	  _hClusterGraph_v_2_start.push_back(g_start);
+	  _hClusterGraph_v_2_end.push_back(g_end);
 	}
 	else
 	  std::cout<<"iview is not 0, 1, or 2... wtf?"<<std::endl;
