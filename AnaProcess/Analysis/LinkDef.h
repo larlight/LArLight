@@ -18,8 +18,12 @@
 #pragma link C++ class std::vector<TH2D*>+;
 #pragma link C++ class larlight::ClusterAnaPrep+;
 #pragma link C++ class std::vector<TGraph*>+;
+#pragma link C++ class larlight::ClusterMerge+;
 //ADD_NEW_CLASS ... do not change this line
 #endif
+
+
+
 
 
 

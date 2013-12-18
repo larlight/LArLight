@@ -24,6 +24,8 @@ namespace larlight {
 
     _sigma_cut  = 100;
 
+    _initialized=false;
+    _finalized=false;
   }
 
   //*************************************
@@ -60,6 +62,7 @@ namespace larlight {
   bool ClusterAnaPrep::initialize() 
   //***********************************************
   {
+    if(_initialized) return true;
 
     _skipped_cluster_cnt = 0;
     
@@ -105,6 +108,8 @@ namespace larlight {
     if(!_h2DAngleW) _h2DAngleW  = new TH1D("h2DAngleW","",100,0,1);
     else _h2DAngleW->Reset();
 
+    _initialized = true;
+    _finalized   = false;
     return true;
   }
 
@@ -112,6 +117,13 @@ namespace larlight {
   bool ClusterAnaPrep::analyze(storage_manager* storage)
   //******************************************************  
   {
+    if(!_initialized){
+      
+      print(MSG::ERROR,__PRETTY_FUNCTION__,"Called analyze before initialize!");
+      return false;
+
+    }
+
     const event_cluster* ev_cluster = (const event_cluster*)(storage->get_data(DATA::ShowerAngleCluster));
     const std::vector<cluster> cluster_collection = ev_cluster->GetClusterCollection();
 
@@ -240,6 +252,8 @@ namespace larlight {
   bool ClusterAnaPrep::finalize()
   //******************************************************  
   {
+    if(_finalized) return true;
+
     if(_fout) {
       _hMultU->Write();
       _hMultV->Write();
@@ -254,6 +268,8 @@ namespace larlight {
       _hEndPosV->Write();
       _hEndPosW->Write();
     }
+    _finalized=true;
+    _initialized=false;
     return true;
   }
 }

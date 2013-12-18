@@ -120,8 +120,11 @@ namespace larlight{
     {};
     
     /// Method to clear currently held data contents in the buffer
-    virtual void clear_data(){data_base::clear_data(); fCluster_v.clear();};
+    virtual void clear_data(){data_base::clear_data(); clear_clusters();}
     
+    /// Method to clear only cluster vector
+    virtual void clear_clusters(){ fCluster_v.clear(); };
+
     /// Method to add a cluster
     void add_cluster(const cluster c){fCluster_v.push_back(c);};
     

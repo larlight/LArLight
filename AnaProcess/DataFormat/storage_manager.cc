@@ -232,6 +232,9 @@ namespace larlight {
 	
 	if(nevents_array[i]) { 
 	  
+	  print(MSG::DEBUG,__FUNCTION__,
+		Form("Found %llu events found in TTree %s ...",nevents_array[i],tree_name.c_str()));
+	  
 	  create_data_ptr((DATA::DATA_TYPE)i);
 	  
 	  _in_ch[i]->SetBranchAddress(Form("%s_branch",DATA::DATA_TREE_NAME[(DATA::DATA_TYPE)i].c_str()),&(_ptr_data_array[i]));
@@ -278,7 +281,9 @@ namespace larlight {
     for(size_t i=0; i<DATA::DATA_TYPE_MAX; ++i) {
       
       if(nevents_array[i] && _nevents!=nevents_array[i]) {
-	sprintf(_buf,"Different number of entries found on tree: %s",DATA::DATA_TREE_NAME[(DATA::DATA_TYPE)i].c_str());
+	sprintf(_buf,"Different number of entries found on tree: %s (found %ud while previous found %llu)",
+		DATA::DATA_TREE_NAME[(DATA::DATA_TYPE)i].c_str(),
+		_nevents, nevents_array[i]);
 	Message::send(MSG::ERROR,__FUNCTION__,_buf);
 	status=false;
       }

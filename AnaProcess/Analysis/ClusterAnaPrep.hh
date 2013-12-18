@@ -107,6 +107,9 @@ namespace larlight {
     /// Static self-pointer
     static ClusterAnaPrep* _me;
 
+    /// Boolean to specify the status of initialization & finalization
+    bool _initialized, _finalized;
+
     /// integers used to identify an event
     Int_t _run, _subrun, _event;
     

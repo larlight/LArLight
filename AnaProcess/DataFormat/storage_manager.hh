@@ -172,7 +172,7 @@ namespace larlight {
     /// Boolean to record what data to be written out from a file
     bool _write_data_array[DATA::DATA_TYPE_MAX];
     
-    /// Data pointer array
+    /// Data pointer array for reading
     data_base *_ptr_data_array[DATA::DATA_TYPE_MAX];
     
     /// I/O filename
