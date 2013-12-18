@@ -81,7 +81,7 @@ while my_proc.process_event():
             leg.AddEntry(gend,"End Point","p")
             leg.Draw()
             c_graph.Update()
-            print "Drawing cluster %d out of %d for view %d. To look at the next cluster hit enter." % (iclus+1,my_ana.GetClusterGraph_Reco(int(iview),bool(true)).size(),iview+1)
+            print "Drawing cluster %d out of %d for view %d. To look at the next cluster hit enter." % (iclus,my_ana.GetClusterGraph_Reco(int(iview),bool(true)).size()-1,iview+1)
             sys.stdin.readline()
 
     print "Hit Enter to continue to next evt..."

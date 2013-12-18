@@ -182,9 +182,14 @@ namespace larlight {
     TH2D* h=0;
     if(h) delete h;
     
+    double mywiremin=0.9*wiremin;
+    double mywiremax=1.1*wiremax;
+    double mytimemin=0.9*timemin;
+    double mytimemax=1.1*timemax;
+
     h = new TH2D(name.c_str(),"2D Viewer; Wire; Time;",
-		 50,  wiremin, wiremax,
-		 50,  timemin, timemax);
+		 50,  mywiremin, mywiremax,
+		 50,  mytimemin, mytimemax);
     
     return h;
   }

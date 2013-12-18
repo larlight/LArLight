@@ -37,44 +37,31 @@ namespace kaleko {
 		    (int)u_clusters->size(),(int)v_clusters->size(),(int)w_clusters->size())
 	     <<std::endl;
     
-
+    
+    //Loop over all possible combinations of clusters in u-view
     for(int iclus = 0; iclus < (int)u_clusters->size(); ++iclus){
-      //      PrintClusterVars( u_clusters->at(iclus) );
-
-      for(int jclus = 0; jclus < (int)u_clusters->size(); ++jclus){
-	if(iclus != jclus){
-	  /*
-	  std::cout<<"Comparing U-cluster "<<iclus<<" and "<<jclus<<" ..."<<std::endl;
-	  std::cout<<"Cluster "<<iclus<<" has info:"<<std::endl;
-	  PrintClusterVars(u_clusters->at(iclus));
-	  std::cout<<"While cluster "<<jclus<<" has info:"<<std::endl;
-	  PrintClusterVars(u_clusters->at(jclus));
-	  */
-
-	  if(Angle2DCompatibility(u_clusters->at(iclus).angle,
-				  u_clusters->at(jclus).angle,
-				  max_allowed_2D_angle_diff) )
-	    
-	    std::cout<<"U_Clusters i:"<<iclus<<" and j:"<<jclus<<" are 2D angle-compatible!"
-		     <<std::endl;
-	  
-	  if(StartEnd2DCompatibility(u_clusters->at(iclus).start_time,
-				     u_clusters->at(iclus).start_wire,
-				     u_clusters->at(iclus).end_time,
-				     u_clusters->at(iclus).end_wire,
-				     u_clusters->at(jclus).start_time,
-				     u_clusters->at(jclus).start_wire,
-				     u_clusters->at(jclus).end_time,
-				     u_clusters->at(jclus).end_wire,
-				     max_allowed_2D_startendpt_diff) )
-	    
-	    std::cout<<"U_Clusters i:"<<iclus<<" and j:"<<jclus<<" are StartEnd 2D Compatible!"
-	 	     <<std::endl;
-	  
-	}//end if iclus != jclus
+      for(int jclus = iclus+1; jclus < (int)u_clusters->size(); ++jclus){
+	std::cout<<"Comparing U-cluster "<<iclus<<" and "<<jclus<<" ..."<<std::endl;	
+	CompareClusters(u_clusters->at(iclus),u_clusters->at(jclus));
       }//end loop over jclus u_clusters
     }//end loop over iclus u_clusters
 
+    //Loop over all possible combinations of clusters in v-view
+    for(int iclus = 0; iclus < (int)v_clusters->size(); ++iclus){
+      for(int jclus = iclus+1; jclus < (int)v_clusters->size(); ++jclus){
+	std::cout<<"Comparing V-cluster "<<iclus<<" and "<<jclus<<" ..."<<std::endl;	
+	CompareClusters(v_clusters->at(iclus),v_clusters->at(jclus));
+      }//end loop over jclus v_clusters
+    }//end loop over iclus v_clusters
+
+    //Loop over all possible combinations of clusters in w-view
+    for(int iclus = 0; iclus < (int)w_clusters->size(); ++iclus){
+      for(int jclus = iclus+1; jclus < (int)w_clusters->size(); ++jclus){
+	std::cout<<"Comparing W-cluster "<<iclus<<" and "<<jclus<<" ..."<<std::endl;	
+	CompareClusters(w_clusters->at(iclus),w_clusters->at(jclus));
+      }//end loop over jclus w_clusters
+    }//end loop over iclus w_clusters
+    
     return true;
   }
 
@@ -87,8 +74,33 @@ namespace kaleko {
   
     return true;
   }
+  
+  bool KalekoClusAna::CompareClusters(larlight::cluster_ana_info clusA,
+				      larlight::cluster_ana_info clusB){
+    
+    /*
+      std::cout<<"Cluster "<<iclus<<" has info:"<<std::endl;
+      PrintClusterVars(u_clusters->at(iclus));
+      std::cout<<"While cluster "<<jclus<<" has info:"<<std::endl;
+      PrintClusterVars(u_clusters->at(jclus));
+    */
+    
+    if( Angle2DCompatibility(clusA.angle,clusB.angle,max_allowed_2D_angle_diff) )
+	  std::cout<<"The two clusters are ANGLE compatible!"<<std::endl;
+	
+    if( StartEnd2DCompatibility(clusA.start_time, clusA.start_wire,
+				clusA.end_time, clusA.end_wire,
+				clusB.start_time, clusB.start_wire,
+				clusB.end_time, clusB.end_wire,
+				max_allowed_2D_startendpt_diff) )
+      std::cout<<"The two clusters are STARTENDPOINT compatible!"<<std::endl;
+    
+    return true;
+  }
+
 
   bool KalekoClusAna::Angle2DCompatibility(double angle1, double angle2, double max_allowed_2D_angle_diff){
+    
     if(std::abs(angle1-angle2)     < max_allowed_2D_angle_diff ||
        std::abs(angle1-angle2-180) < max_allowed_2D_angle_diff ||
        std::abs(angle1-angle2+180) < max_allowed_2D_angle_diff )
@@ -101,6 +113,7 @@ namespace kaleko {
   bool KalekoClusAna::StartEnd2DCompatibility(double t_start1, double w_start1, double t_end1, double w_end1,
 					      double t_start2, double w_start2, double t_end2, double w_end2,
 					      double max_allowed_2D_startendpt_diff){
+    
     //if end of 1 matches start of 2
     double tmp_dist1 = std::sqrt(std::pow(t_end1-t_start2,2)+std::pow(w_end1-w_start2,2));
     //if end of 1 matches end of 2
@@ -109,7 +122,6 @@ namespace kaleko {
     double tmp_dist3 = std::sqrt(std::pow(t_start1-t_end2,2)+std::pow(w_start1-w_end2,2));
     //if start of 1 matches start of 2
     double tmp_dist4 = std::sqrt(std::pow(t_start1-t_start2,2)+std::pow(w_start1-w_start2,2));
-
 
     if(tmp_dist1 < max_allowed_2D_startendpt_diff)
       std::cout<<"The end of the first cluster matched the start of the 2nd. Dist = "

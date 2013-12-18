@@ -49,6 +49,9 @@ namespace kaleko {
     */
     virtual bool finalize();
 
+    bool CompareClusters(larlight::cluster_ana_info clus_info_A,
+			 larlight::cluster_ana_info clus_info_B);
+
     /// Function to compare the 2D angles of two clusters and return true if they are
     /// within the maximum allowed parameter. Includes shifting by 180 for backwards clusters.
     bool Angle2DCompatibility(double angle1, double angle2, double max_allowed_2D_angle_diff);
