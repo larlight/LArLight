@@ -19,22 +19,25 @@ namespace larlight {
     //
     
     ClusterAnaPrep::get()->analyze(storage);
-    const std::vector<cluster_ana_info>* uclusters = ClusterAnaPrep::get()->get_cluster_info(GEO::kU);
-    const std::vector<cluster_ana_info>* vclusters = ClusterAnaPrep::get()->get_cluster_info(GEO::kV);
-    const std::vector<cluster_ana_info>* wclusters = ClusterAnaPrep::get()->get_cluster_info(GEO::kW);
+    //    const std::vector<cluster_ana_info>* uclusters = ClusterAnaPrep::get()->get_cluster_info(GEO::kU);
+    //    const std::vector<cluster_ana_info>* vclusters = ClusterAnaPrep::get()->get_cluster_info(GEO::kV);
+    //    const std::vector<cluster_ana_info>* wclusters = ClusterAnaPrep::get()->get_cluster_info(GEO::kW);
 
     // cluster_sets is a vector of vector where the inner vector is a set of cluster IDs 
     // to be merged into one. I assume all cluster index to be output are in cluster_sets.
     // Say you have clusters A, B, and C, and we decide to merge A and B (call it D=A+B).
     // Then a complete set of clusters in the output means cluster_sets should have
     // one vector with A and B cluster ID, then one vector of length 1 with cluster ID of C.
-    std::vector<std::vector<unsigned int> > cluster_sets;
-    
+    const std::vector<std::vector<unsigned int> > cluster_sets = ClusterMergeAlgo::get()->GetClusterSets();
+
+    std::cout<<cluster_sets.size()<<std::endl;
 
     //
     // Merging operation
     //
-
+    
+    
+    /*
     // In this example, I set cluster_sets such that all clusters to be merged...
     size_t nclusters = uclusters->size() + vclusters->size() + wclusters->size();
     std::vector<unsigned int> cluster_id;
@@ -43,6 +46,8 @@ namespace larlight {
       cluster_id.push_back(i);
     
     cluster_sets.push_back(cluster_id);
+    */
+
 
     //
     // Creating output of merged clusters

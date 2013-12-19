@@ -17,6 +17,7 @@
 
 #include "ana_base.hh"
 #include "ClusterAnaPrep.hh"
+#include "ClusterMergeAlgo.hh"
 
 namespace larlight {
   /**
