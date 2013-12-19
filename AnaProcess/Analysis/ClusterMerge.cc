@@ -30,8 +30,6 @@ namespace larlight {
     // one vector with A and B cluster ID, then one vector of length 1 with cluster ID of C.
     const std::vector<std::vector<unsigned int> > cluster_sets = ClusterMergeAlgo::get()->GetClusterSets();
 
-    std::cout<<cluster_sets.size()<<std::endl;
-
     //
     // Merging operation
     //
