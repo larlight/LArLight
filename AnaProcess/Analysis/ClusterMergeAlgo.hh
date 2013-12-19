@@ -1,9 +1,9 @@
 /**
- * \file KalekoClusAna.hh
+ * \file ClusterMergeAlgo.hh
  *
  * \ingroup Analysis
  * 
- * \brief Class def header for a class KalekoClusAna
+ * \brief Class def header for a class ClusterMergeAlgo
  *
  * @author davidkaleko
  */
@@ -12,39 +12,40 @@
 
     @{*/
 
-#ifndef KALEKOCLUSANA_HH
-#define KALEKOCLUSANA_HH
+#ifndef CLUSTERMERGEALGO_HH
+#define CLUSTERMERGEALGO_HH
 
 #include "ana_base.hh"
 #include "ClusterAnaPrep.hh"
 #include <cmath> //used for std::abs() absolute value
 
-namespace kaleko {
+
+namespace larlight {
   /**
-     \class KalekoClusAna
+     \class ClusterMergeAlgo
      User custom analysis class made by davidkaleko
    */
-  class KalekoClusAna : public larlight::ana_base{
+  class ClusterMergeAlgo : public larlight::ana_base{
   
   public:
 
     /// Default constructor
-    KalekoClusAna(){ _name="KalekoClusAna"; _fout=0;};
+    ClusterMergeAlgo(){ _name="ClusterMergeAlgo"; _fout=0;};
 
     /// Default destructor
-    virtual ~KalekoClusAna(){};
+    virtual ~ClusterMergeAlgo(){};
 
-    /** IMPLEMENT in KalekoClusAna.cc!
+    /** IMPLEMENT in ClusterMergeAlgo.cc!
         Initialization method to be called before the analysis event loop.
     */ 
     virtual bool initialize();
 
-    /** IMPLEMENT in KalekoClusAna.cc! 
+    /** IMPLEMENT in ClusterMergeAlgo.cc! 
         Analyze a data event-by-event  
     */
     virtual bool analyze(larlight::storage_manager* storage);
 
-    /** IMPLEMENT in KalekoClusAna.cc! 
+    /** IMPLEMENT in ClusterMergeAlgo.cc! 
         Finalize method to be called after all events processed.
     */
     virtual bool finalize();
@@ -56,10 +57,10 @@ namespace kaleko {
     /// within the maximum allowed parameter. Includes shifting by 180 for backwards clusters.
     bool Angle2DCompatibility(double angle1, double angle2, double max_allowed_2D_angle_diff);
     
-    bool StartEnd2DCompatibility(double t_start1, double w_start1, double t_end1, double w_end1,
-				 double t_start2, double w_start2, double t_end2, double w_end2,
-				 double max_allowed_2D_startendpt_diff);
-
+    bool ShortestDistanceCompatibility(double t_start1, double w_start1, double t_end1, double w_end1,
+				       double t_start2, double w_start2, double t_end2, double w_end2,
+				       double max_allowed_2D_startendpt_diff);
+    
 
     /// Function to print to screen a specific cluser's info
     /// from ClusterPrepAna module. Used for debugging.

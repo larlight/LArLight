@@ -23,6 +23,7 @@ namespace larlight {
   class ClusterViewer;
   class ClusterAnaPrep;
   class ClusterMerge;
+  class ClusterMergeAlgo;
   //ADD_NEW_CLASS ... do not change this line
 }
 

@@ -1,11 +1,11 @@
-#ifndef KALEKOCLUSANA_CC
-#define KALEKOCLUSANA_CC
+#ifndef CLUSTERMERGEALGO_CC
+#define CLUSTERMERGEALGO_CC
 
-#include "KalekoClusAna.hh"
+#include "ClusterMergeAlgo.hh"
 
-namespace kaleko {
+namespace larlight {
 
-  bool KalekoClusAna::initialize() {
+  bool ClusterMergeAlgo::initialize() {
 
     //
     // This function is called in the beggining of event loop
@@ -18,7 +18,7 @@ namespace kaleko {
     return true;
   }
   
-  bool KalekoClusAna::analyze(larlight::storage_manager* storage) {
+  bool ClusterMergeAlgo::analyze(larlight::storage_manager* storage) {
   
     //Run ClusterAnaPrep on this event, which does a loop over the hits, etc.
     //First, initialize it's q_frac_cut parameter
@@ -65,7 +65,7 @@ namespace kaleko {
     return true;
   }
 
-  bool KalekoClusAna::finalize() {
+  bool ClusterMergeAlgo::finalize() {
     larlight::ClusterAnaPrep::get()->finalize();  
     // This function is called at the end of event loop.
     // Do all variable finalization you wish to do here.
@@ -75,7 +75,7 @@ namespace kaleko {
     return true;
   }
   
-  bool KalekoClusAna::CompareClusters(larlight::cluster_ana_info clusA,
+  bool ClusterMergeAlgo::CompareClusters(larlight::cluster_ana_info clusA,
 				      larlight::cluster_ana_info clusB){
     
     /*
@@ -88,18 +88,18 @@ namespace kaleko {
     if( Angle2DCompatibility(clusA.angle,clusB.angle,max_allowed_2D_angle_diff) )
 	  std::cout<<"The two clusters are ANGLE compatible!"<<std::endl;
 	
-    if( StartEnd2DCompatibility(clusA.start_time, clusA.start_wire,
-				clusA.end_time, clusA.end_wire,
-				clusB.start_time, clusB.start_wire,
-				clusB.end_time, clusB.end_wire,
-				max_allowed_2D_startendpt_diff) )
+    if( ShortestDistanceCompatibility(clusA.start_time, clusA.start_wire,
+				      clusA.end_time, clusA.end_wire,
+				      clusB.start_time, clusB.start_wire,
+				      clusB.end_time, clusB.end_wire,
+				      max_allowed_2D_startendpt_diff) )
       std::cout<<"The two clusters are STARTENDPOINT compatible!"<<std::endl;
     
     return true;
   }
 
 
-  bool KalekoClusAna::Angle2DCompatibility(double angle1, double angle2, double max_allowed_2D_angle_diff){
+  bool ClusterMergeAlgo::Angle2DCompatibility(double angle1, double angle2, double max_allowed_2D_angle_diff){
     
     if(std::abs(angle1-angle2)     < max_allowed_2D_angle_diff ||
        std::abs(angle1-angle2-180) < max_allowed_2D_angle_diff ||
@@ -110,10 +110,11 @@ namespace kaleko {
 
   }//end Angle2DCompatibility
 
-  bool KalekoClusAna::StartEnd2DCompatibility(double t_start1, double w_start1, double t_end1, double w_end1,
-					      double t_start2, double w_start2, double t_end2, double w_end2,
-					      double max_allowed_2D_startendpt_diff){
-    
+  bool ClusterMergeAlgo::ShortestDistanceCompatibility(double t_start1, double w_start1, double t_end1, double w_end1,
+						       double t_start2, double w_start2, double t_end2, double w_end2,
+						       double max_allowed_2D_startendpt_diff){
+    //old version of code, delete once newer version is working
+    /*
     //if end of 1 matches start of 2
     double tmp_dist1 = std::sqrt(std::pow(t_end1-t_start2,2)+std::pow(w_end1-w_start2,2));
     //if end of 1 matches end of 2
@@ -147,17 +148,78 @@ namespace kaleko {
       return true;
     else
       return false;
- 
+    */
+    
+    //code based off sample from 
+    //http://stackoverflow.com/questions/849211/shortest-distance-between-a-point-and-a-line-segment
+    //note to self: rewrite this with TVector2 and compare time differences... 
+    //TVector2 code might be more understandable
+    
+    double shortest_distance2 = 9999999.;
+    double shortest_distance2_tmp = 0.;
+    double l2 = -1.;
+    double t = -1.;
+    
+
+    //Line segment: from ("V")=(w_start1,t_start1) to ("W")=(w_end1,t_end1)
+    l2 = std::pow(w_end1-w_start1,2)+std::pow(t_end1-t_start1,2);
+    
+    //Find shortest distance between point ("P")=(w_start2,t_start2) to this line segment
+    std::cout<<"Comparing start of second cluster to line segment of first..."<<std::endl;
+    t = ( (w_start2-w_start1)*(w_end1-w_start1) + (t_start2-t_start1)*(t_end1-t_start1) ) / l2;
+    if(t<0.0) shortest_distance2_tmp = std::pow(w_start2-w_start1,2)+std::pow(t_start2-t_start1,2);
+    else if (t>1.0) shortest_distance2_tmp = std::pow(w_start2-w_end1,2)+std::pow(t_start2-t_end1,2);
+    else shortest_distance2_tmp = std::pow(w_start2-(w_start1+t*(w_end1-w_start1)),2)+
+	   std::pow(t_start2-(t_start1+t*(t_end1-t_start1)),2);
+    if(shortest_distance2_tmp < shortest_distance2) shortest_distance2 = shortest_distance2_tmp;
+    std::cout<<"shortest_distance2_tmp is "<<shortest_distance2_tmp<<std::endl;
+
+    //Find shortest distance between point ("P")=(w_end2,t_end2) to this line segment
+    std::cout<<"Comparing end of second cluster to line segment of first..."<<std::endl;
+    t = ( (w_end2-w_start1)*(w_end1-w_start1) + (t_end2-t_start1)*(t_end1-t_start1) ) / l2;
+    if(t<0.0) shortest_distance2_tmp = std::pow(w_end2-w_start1,2)+std::pow(t_end2-t_start1,2);
+    else if (t>1.0) shortest_distance2_tmp = std::pow(w_end2-w_end1,2)+std::pow(t_end2-t_end1,2);
+    else shortest_distance2_tmp = std::pow(w_end2-(w_start1+t*(w_end1-w_start1)),2)+
+	   std::pow(t_end2-(t_start1+t*(t_end1-t_start1)),2);
+    if(shortest_distance2_tmp < shortest_distance2) shortest_distance2 = shortest_distance2_tmp;
+    std::cout<<"shortest_distance2_tmp is "<<shortest_distance2_tmp<<std::endl;
+    
+    //Line segment: from ("V")=(w_start2,t_start2) to ("W")=(w_end2,t_end2)
+    l2 = std::pow(w_start2-w_start1,2)+std::pow(t_start2-t_start1,2);
+    
+    //Find shortest distance between point ("P")=(w_start1,t_start1) and this line segment
+    std::cout<<"Comparing start of first cluster to line segment of second..."<<std::endl;
+    t = ( (w_start1-w_start2)*(w_end2-w_start2) + (t_start1-t_start2)*(t_end2-t_start2) ) / l2;
+    if(t<0.0) shortest_distance2_tmp = std::pow(w_start2-w_start1,2)+std::pow(t_start2-t_start1,2);
+    else if (t>1.0) shortest_distance2_tmp = std::pow(w_end2-w_start1,2)+std::pow(t_end2-t_start1,2);
+    else shortest_distance2_tmp = std::pow(w_start1-(w_start2+t*(w_end2-w_start2)),2)+
+	   std::pow(t_start1-(t_start2+t*(t_end2-t_start2)),2);
+    if(shortest_distance2_tmp < shortest_distance2) shortest_distance2 = shortest_distance2_tmp;
+    std::cout<<"shortest_distance2_tmp is "<<shortest_distance2_tmp<<std::endl;
+
+    //Find shortest distance between point ("P")=(w_end1,t_end1) and this line segment
+    std::cout<<"Comparing end of first cluster to line segment of second..."<<std::endl;
+    t = ( (w_end1-w_start2)*(w_end2-w_start2) + (t_end1-t_start2)*(t_end2-t_start2) ) / l2;
+    if(t<0.0) shortest_distance2_tmp = std::pow(w_start2-w_end1,2)+std::pow(t_start2-t_end1,2);
+    else if (t>1.0) shortest_distance2_tmp = std::pow(w_end2-w_end1,2)+std::pow(t_end2-t_end1,2);
+    else shortest_distance2_tmp = std::pow(w_end1-(w_start2+t*(w_end2-w_start2)),2)+
+	   std::pow(t_end1-(t_start2+t*(t_end2-t_start2)),2);
+    if(shortest_distance2_tmp < shortest_distance2) shortest_distance2 = shortest_distance2_tmp;
+    std::cout<<"shortest_distance2_tmp is "<<shortest_distance2_tmp<<std::endl;
+
+    std::cout<<"After all of those comparisons, shortest_distance2 is "<<shortest_distance2<<std::endl;
+    
+    return true;
   }//end startend2dcompatibility
   
-
-
-  void KalekoClusAna::PrintClusterVars(larlight::cluster_ana_info clus_info){
+  
+  
+  void ClusterMergeAlgo::PrintClusterVars(larlight::cluster_ana_info clus_info){
     std::cout<<std::endl;
     std::cout<<"***********CLUSTER INFO PARAMETERS***********"<<std::endl;
     /*
-    std::cout<<"cluster_index = "
-	     <<clus_info.cluster_index
+      std::cout<<"cluster_index = "
+      <<clus_info.cluster_index
 	     <<std::endl;
     */
     std::cout<<"start_wire = "
@@ -203,6 +265,6 @@ namespace kaleko {
   }//end PrintClusterVars function
 
 
-}  
+}
 
 #endif

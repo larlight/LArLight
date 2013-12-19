@@ -19,6 +19,7 @@
 #pragma link C++ class larlight::ClusterAnaPrep+;
 #pragma link C++ class std::vector<TGraph*>+;
 #pragma link C++ class larlight::ClusterMerge+;
+#pragma link C++ class larlight::ClusterMergeAlgo+;
 //ADD_NEW_CLASS ... do not change this line
 #endif
 
