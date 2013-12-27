@@ -16,7 +16,7 @@
 #define CLUSTERMERGE_HH
 
 #include "ana_base.hh"
-#include "ClusterMergeAlgo.hh"
+#include "ClusterMergeAlg.hh"
 
 namespace larlight {
   /**
@@ -28,7 +28,7 @@ namespace larlight {
   public:
 
     /// Default constructor
-    ClusterMerge() : fCMergeAlgo() { _name="ClusterMerge"; _fout=0;};
+    ClusterMerge() : fCMergeAlg() { _name="ClusterMerge"; _fout=0;};
 
     /// Default destructor
     virtual ~ClusterMerge(){};
@@ -50,7 +50,7 @@ namespace larlight {
 
     protected:
     
-    ClusterMergeAlgo fCMergeAlgo;
+    ClusterMergeAlg fCMergeAlg;
 
   };
 }

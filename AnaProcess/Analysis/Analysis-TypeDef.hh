@@ -13,6 +13,7 @@
 #include "ClusterViewer.hh"
 #include "ClusterAnaPrep.hh"
 #include "ClusterMerge.hh"
+#include "ClusterMergeAlg.hh"
 //ADD_NEW_HEADER ... do not change this line
 
 // Class forward declaration here
@@ -23,7 +24,7 @@ namespace larlight {
   class ClusterViewer;
   class ClusterAnaPrep;
   class ClusterMerge;
-  class ClusterMergeAlgo;
+  class ClusterMergeAlg;
   //ADD_NEW_CLASS ... do not change this line
 }
 

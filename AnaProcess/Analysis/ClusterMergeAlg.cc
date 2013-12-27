@@ -1,13 +1,13 @@
-#ifndef CLUSTERMERGEALGO_CC
-#define CLUSTERMERGEALGO_CC
+#ifndef CLUSTERMERGEALG_CC
+#define CLUSTERMERGEALG_CC
 
-#include "ClusterMergeAlgo.hh"
+#include "ClusterMergeAlg.hh"
 
 namespace larlight {
 
-  ClusterMergeAlgo::ClusterMergeAlgo() : ana_base() {
+  ClusterMergeAlg::ClusterMergeAlg() : ana_base() {
     
-    _name="ClusterMergeAlgo"; 
+    _name="ClusterMergeAlg"; 
     _fout=0;     
     _verbose=false;
     
@@ -15,14 +15,20 @@ namespace larlight {
 
     SetSquaredDistanceCut(1e9);
 
+    _det_params_prepared = false;
+
+    _merge_tree = 0;
+
     SetWire2Cm(1.);
 
     SetTime2Cm(1.);
 
     ClearEventInfo();
-  };
 
-  void ClusterMergeAlgo::ReportConfig() const {
+  };
+  
+
+  void ClusterMergeAlg::ReportConfig() const {
 
     std::ostringstream msg;
     msg
@@ -43,23 +49,30 @@ namespace larlight {
 
   }
 
-  bool ClusterMergeAlgo::initialize() {
+  bool ClusterMergeAlg::initialize() {
 
     return true;
   }
 
-  bool ClusterMergeAlgo::finalize() {
+  bool ClusterMergeAlg::finalize() {
+
+    if(_fout) {
+
+      _fout->cd();
+      _merge_tree->Write();
+
+    }
   
     return true;
   }
   
   /**
-     In case ClusterMergeAlgo is run as analysis module in ana_processor, it does following tasks:
+     In case ClusterMergeAlg is run as analysis module in ana_processor, it does following tasks:
      (0) Clear event-wise information (input & output)
      (1) Read-in cluster information into cluster_merge_info struct
      (2) Process read-in cluster information for merging
   */
-  bool ClusterMergeAlgo::analyze(storage_manager* storage) {
+  bool ClusterMergeAlg::analyze(storage_manager* storage) {
 
     // Step (0) ... Clear input cluster information
     
@@ -73,17 +86,19 @@ namespace larlight {
 
     for(auto const i_cluster: cluster_collection)
 
-      AppendClusterInfo(i_cluster);
+      AppendClusterInfo(i_cluster,i_cluster.Hits());
 
     // Step (2) ... Run algorithm
-    ProcessMergeAlgo();
+    ProcessMergeAlg();
 
     return true;
 
   }
 
-  void ClusterMergeAlgo::AppendClusterInfo(const cluster &cl) {
+  void ClusterMergeAlg::AppendClusterInfo(const cluster &cl, 
+					   const std::vector<larlight::hit> &in_hit_v) {
 
+    PrepareDetParams();
     cluster_merge_info ci;
     ci.cluster_index = cl.ID();
     ci.view       = cl.View();
@@ -92,6 +107,8 @@ namespace larlight {
     ci.end_wire   = cl.EndPos()[0];
     ci.end_time   = cl.EndPos()[1];
     ci.angle      = cl.dTdW();
+
+    AppendHitInfo(ci, in_hit_v);
     
     if(ci.view == GEO::kU) _u_clusters.push_back(ci);
     else if(ci.view == GEO::kV) _v_clusters.push_back(ci);
@@ -107,20 +124,29 @@ namespace larlight {
 
   }
 
-  void ClusterMergeAlgo::ClearEventInfo() {
-    
-    ClearOutputInfo();
-    ClearInputInfo();
+  void ClusterMergeAlg::AppendHitInfo(cluster_merge_info ci, const std::vector<larlight::hit> &in_hit_v)
+  {};
 
+  void ClusterMergeAlg::PrepareTTree() {
+
+    if(!_merge_tree) {
+
+      _merge_tree = new TTree("merge_tree","");
+
+    }
   }
 
-  void ClusterMergeAlgo::ClearOutputInfo() {
+  void ClusterMergeAlg::PrepareDetParams() {
 
-    _cluster_sets_v.clear();
+    if(!_det_params_prepared) {
+      SetWire2Cm(1.);
+      SetTime2Cm(1.);
+      ReportConfig();
+      _det_params_prepared = true;
+    }
+  } 
 
-  }
-
-  void ClusterMergeAlgo::ClearInputInfo() {
+  void ClusterMergeAlg::ClearInputInfo() {
 
     _u_clusters.clear();
     _v_clusters.clear();
@@ -129,8 +155,28 @@ namespace larlight {
 
   }
 
+  void ClusterMergeAlg::ClearOutputInfo() {
 
-  void ClusterMergeAlgo::ProcessMergeAlgo() {
+    _cluster_sets_v.clear();
+
+  }
+
+  void ClusterMergeAlg::ClearTTreeInfo() {}
+
+  void ClusterMergeAlg::ClearEventInfo() {
+
+    // Clear input event data holders
+    ClearInputInfo();
+
+    // Clear result data holders
+    ClearOutputInfo();
+
+    /// Clear TTree variables
+    ClearTTreeInfo();
+
+  }
+
+  void ClusterMergeAlg::ProcessMergeAlg() {
 
     // Clear all algorithm's output
     ClearOutputInfo();
@@ -173,8 +219,8 @@ namespace larlight {
 
   }
   
-  bool ClusterMergeAlgo::CompareClusters(cluster_merge_info clusA,
-					 cluster_merge_info clusB){
+  bool ClusterMergeAlg::CompareClusters(const cluster_merge_info &clusA,
+					 const cluster_merge_info &clusB){
     
     if(_verbose) {
       print(MSG::NORMAL,__FUNCTION__,"Printing out two input cluster information...");
@@ -193,7 +239,7 @@ namespace larlight {
   }
 
 
-  bool ClusterMergeAlgo::Angle2DCompatibility(const cluster_merge_info &cluster_a, 
+  bool ClusterMergeAlg::Angle2DCompatibility(const cluster_merge_info &cluster_a, 
 					      const cluster_merge_info &cluster_b) const {
 			    
     double angle1 = cluster_a.angle * _time_2_cm / _wire_2_cm;
@@ -214,7 +260,7 @@ namespace larlight {
 
   }//end Angle2DCompatibility
 
-  bool ClusterMergeAlgo::ShortestDistanceCompatibility(const cluster_merge_info &clus_info_A,
+  bool ClusterMergeAlg::ShortestDistanceCompatibility(const cluster_merge_info &clus_info_A,
 						       const cluster_merge_info &clus_info_B) const {
 
     double w_start1 = clus_info_A.start_wire * _wire_2_cm;
@@ -258,7 +304,6 @@ namespace larlight {
     
     shortest_distance2 = (shortest_distance2_tmp < shortest_distance2) ? shortest_distance2_tmp : shortest_distance2;
 
-
     bool compatible = shortest_distance2 < _max_2D_dist2;
 
     if(_verbose) {
@@ -272,7 +317,7 @@ namespace larlight {
 
   }//end startend2dcompatibility
 
-  double ClusterMergeAlgo::ShortestDistanceSquared(double point_x, double point_y, 
+  double ClusterMergeAlg::ShortestDistanceSquared(double point_x, double point_y, 
 						   double start_x, double start_y,
 						   double end_x,   double end_y  ) const {
 
@@ -299,7 +344,7 @@ namespace larlight {
     return distance_squared;
   }  
   
-  void ClusterMergeAlgo::PrintClusterVars(cluster_merge_info clus_info) const{
+  void ClusterMergeAlg::PrintClusterVars(cluster_merge_info clus_info) const{
 
     std::ostringstream msg;
 
@@ -318,7 +363,7 @@ namespace larlight {
 
   }//end PrintClusterVars function
 
-  int ClusterMergeAlgo::AppendToClusterSets(unsigned int cluster_index, int merged_index) {
+  int ClusterMergeAlg::AppendToClusterSets(unsigned int cluster_index, int merged_index) {
 
     // This function append the provided cluster_index into the _cluster_sets_v.
     // If merged_index is not provided (default=-1), then we assume this meands to append a new merged cluster set.
@@ -342,7 +387,7 @@ namespace larlight {
       _cluster_sets_v.push_back(tmp);
 
     }
-    else if(merged_index < _cluster_sets_v.size()) {
+    else if(merged_index < (int)(_cluster_sets_v.size())) {
 
       _cluster_merged_index[cluster_index] = merged_index;
 
@@ -358,7 +403,8 @@ namespace larlight {
   }
 
 
-  void ClusterMergeAlgo::BuildClusterSets(cluster_merge_info clusA, cluster_merge_info clusB){
+  void ClusterMergeAlg::BuildClusterSets(const cluster_merge_info &clusA, 
+					  const cluster_merge_info &clusB){
     //this function builds the _cluster_sets_v vector, according to the format defined
     //in ClusterAlgo. here's an example of what _cluster_sets_v format is:
     //imagine an event with clusters 0, 1, 2, 3, 4, 5
@@ -418,7 +464,7 @@ namespace larlight {
     
   }//end BuildClusterSets
 
-  void ClusterMergeAlgo::FinalizeClusterSets() {
+  void ClusterMergeAlg::FinalizeClusterSets() {
 
     //loop over all cluster ID's in the event... guess I have to do it view-by-view
     for(int iclus = 0; iclus < (int)_u_clusters.size(); ++iclus){    
@@ -448,7 +494,7 @@ namespace larlight {
     
   } // end FinalizeClusterSets
   
-  int ClusterMergeAlgo::isInClusterSets(unsigned int index) const {
+  int ClusterMergeAlg::isInClusterSets(unsigned int index) const {
     //function to check if an index is in _cluster_sets_v anywhere,
     //and return where it is (-1 if it's not in _cluster_sets_v)
 

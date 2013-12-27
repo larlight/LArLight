@@ -18,7 +18,7 @@ larlight.storage_manager.get().set_data_to_read(larlight.DATA.UserInfo,False)
 
 my_proc.set_ana_output_file("")
 
-my_ana0 = larlight.ClusterMergeAlgo()
+my_ana0 = larlight.ClusterMergeAlg()
 my_ana= larlight.ClusterViewer()
 
 my_proc.add_process(my_ana0)

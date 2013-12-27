@@ -1,9 +1,9 @@
 /**
- * \file ClusterMergeAlgo.hh
+ * \file ClusterMergeAlg.hh
  *
  * \ingroup Analysis
  * 
- * \brief Class def header for a class ClusterMergeAlgo
+ * \brief Class def header for a class ClusterMergeAlg
  *
  * @author davidkaleko
  */
@@ -12,8 +12,8 @@
 
     @{*/
 
-#ifndef CLUSTERMERGEALGO_HH
-#define CLUSTERMERGEALGO_HH
+#ifndef CLUSTERMERGEALG_HH
+#define CLUSTERMERGEALG_HH
 
 #include "ana_base.hh"
 #include "ana_info_struct.hh"
@@ -23,18 +23,18 @@
 namespace larlight {
 
   /**
-     \class ClusterMergeAlgo
+     \class ClusterMergeAlg
      User custom analysis class made by davidkaleko
    */
-  class ClusterMergeAlgo : public ana_base{
+  class ClusterMergeAlg : public ana_base{
 
   public:
 
     /// Default constructor
-    ClusterMergeAlgo();
+    ClusterMergeAlg();
 
     /// Default destructor
-    virtual ~ClusterMergeAlgo(){};
+    virtual ~ClusterMergeAlg(){};
 
     /**
         Initialization method to be called before the analysis event loop.
@@ -63,31 +63,26 @@ namespace larlight {
     /// Method to set cut value in cm^2 for distance compatibility test
     void SetSquaredDistanceCut(double d) { _max_2D_dist2 = d; }
 
-    /// Method to set a conversion factor from wire to cm scale
-    void SetWire2Cm(double f) { _wire_2_cm = f; }
-
-    /// Method to set a conversion factor from time to cm scale
-    void SetTime2Cm(double f) { _time_2_cm = f; }
-
     /// Method to clear event-wise information (both input cluster info & output merged cluster sets)
     void ClearEventInfo();
 
     /// Method to add a cluster information for processing
-    void AppendClusterInfo(const cluster &cl);
+    void AppendClusterInfo(const cluster &cl,
+			   const std::vector<larlight::hit> &in_hit_v);
 
     /**
        Method to execute the algorithm. All parameter configuration + adding input cluster information
        should be done before calling this function. This function generate a resulting set of cluster IDs
        for merging, which can be accessed through GetClusterSets() function.
     */
-    void ProcessMergeAlgo();
+    void ProcessMergeAlg();
 
-    /// Method to extract resulting set of cluster IDs for merging computed by ProcessMergeAlgo() function.
+    /// Method to extract resulting set of cluster IDs for merging computed by ProcessMergeAlg() function.
     const std::vector<std::vector<unsigned int> > GetClusterSets () const {return _cluster_sets_v;};
 
     /// Method to compare a compatibility between two clusters
-    bool CompareClusters(cluster_merge_info clus_info_A,
-			 cluster_merge_info clus_info_B);
+    bool CompareClusters(const cluster_merge_info &clus_info_A,
+			 const cluster_merge_info &clus_info_B);
 
     /**
        Function to compare the 2D angles of two clusters and return true if they are
@@ -129,18 +124,36 @@ namespace larlight {
     
   protected:
 
+    /// Method to set a conversion factor from wire to cm scale
+    void SetWire2Cm(double f) { _wire_2_cm = f; }
+
+    /// Method to set a conversion factor from time to cm scale
+    void SetTime2Cm(double f) { _time_2_cm = f; }
+
     /// Method to clear output merged cluster sets (_cluster_sets_v)
     void ClearOutputInfo();
 
     /// Method to clear input cluster information
     void ClearInputInfo();
 
+    /// Method to clear quality control TTree variables
+    void ClearTTreeInfo();
+
+    /// Method to prepare quality control TTree
+    void PrepareTTree();
+
+    /// Method to prepare detector parameters
+    void PrepareDetParams();    
+
+    /// Method to append hit-array-info per cluster ... called by AppendClusterInfo() function.
+    void AppendHitInfo(cluster_merge_info ci, const std::vector<larlight::hit> &in_hit_v);
+
     /**
        For a given pair of clusters, this function calls CompareClusters() and append to the resulting
        merged cluster sets (_cluster_sets_v) by calling AppendToClusterSets() when they are compatible.
     */
-    void BuildClusterSets(cluster_merge_info clus_info_A,
-			  cluster_merge_info clus_info_B);
+    void BuildClusterSets(const cluster_merge_info &clus_info_A,
+			  const cluster_merge_info &clus_info_B);
 
     /**
        Function to loop through _cluster_sets_v and add in the un-mergable clusters
@@ -154,6 +167,8 @@ namespace larlight {
   protected:
 
     bool _verbose; ///< Verbose mode boolean
+    bool _det_params_prepared; ///< Boolean to keep track of detector parameter preparation
+    TTree* _merge_tree;        ///< Quality Control TTree pointer
 
     /**
        Book-keeping vector which length is same as input cluster array's length.
@@ -165,7 +180,7 @@ namespace larlight {
     std::vector<int> _cluster_merged_index;
 
     /**
-       The result container of ProcessMergeAlgo() function.
+       The result container of ProcessMergeAlg() function.
        The structure is such that the inner vector holds the cluster IDs to be merged into one cluster.
        Naturally we expect multiple merged clusters, hence it's a vector of vector.
     */
