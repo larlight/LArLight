@@ -7,7 +7,7 @@ namespace larlight {
 
   bool ClusterMerge::initialize() {
 
-    ClusterAnaPrep::get()->initialize();
+    ClusterMergeAlgo::get()->initialize();
 
     return true;
   }
@@ -17,11 +17,20 @@ namespace larlight {
     //
     // Preparation
     //
-    
-    ClusterAnaPrep::get()->analyze(storage);
-    //    const std::vector<cluster_ana_info>* uclusters = ClusterAnaPrep::get()->get_cluster_info(GEO::kU);
-    //    const std::vector<cluster_ana_info>* vclusters = ClusterAnaPrep::get()->get_cluster_info(GEO::kV);
-    //    const std::vector<cluster_ana_info>* wclusters = ClusterAnaPrep::get()->get_cluster_info(GEO::kW);
+    ClusterMergeAlgo::get()->ClearEventInfo();
+
+    event_cluster* ev_cluster = (event_cluster*)(storage->get_data(DATA::ShowerAngleCluster));
+
+    const std::vector<cluster> cluster_collection = ev_cluster->GetClusterCollection();
+
+    for(auto const i_cluster: cluster_collection)
+
+      ClusterMergeAlgo::get()->AppendClusterInfo(i_cluster);
+
+    //
+    // Merging operation
+    //
+    ClusterMergeAlgo::get()->ProcessMergeAlgo();
 
     // cluster_sets is a vector of vector where the inner vector is a set of cluster IDs 
     // to be merged into one. I assume all cluster index to be output are in cluster_sets.
@@ -31,30 +40,10 @@ namespace larlight {
     const std::vector<std::vector<unsigned int> > cluster_sets = ClusterMergeAlgo::get()->GetClusterSets();
 
     //
-    // Merging operation
-    //
-    
-    
-    /*
-    // In this example, I set cluster_sets such that all clusters to be merged...
-    size_t nclusters = uclusters->size() + vclusters->size() + wclusters->size();
-    std::vector<unsigned int> cluster_id;
-    for(size_t i=0; i<nclusters; i++)
-
-      cluster_id.push_back(i);
-    
-    cluster_sets.push_back(cluster_id);
-    */
-
-
-    //
     // Creating output of merged clusters
     //
 
     // Save original cluster sets
-    event_cluster* ev_cluster = (event_cluster*)(storage->get_data(DATA::ShowerAngleCluster));
-
-    const std::vector<cluster> original_cluster_v = ev_cluster->GetClusterCollection();
     std::vector<cluster>       merged_cluster_v;
     merged_cluster_v.reserve(cluster_sets.size());
 
@@ -69,13 +58,13 @@ namespace larlight {
       // Loop over clusters to be merged
       for(auto const& cluster_id : cluster_id_set) {
 
-	const std::vector<hit> original_hit_v = original_cluster_v[cluster_id].Hits();
+	const std::vector<hit> original_hit_v = cluster_collection[cluster_id].Hits();
 	
 	for(auto const& original_hit : original_hit_v)
 
 	  merged_cluster.add_hit(original_hit);
 	
-	if(view == GEO::kUnknown) view = original_cluster_v[cluster_id].View();
+	if(view == GEO::kUnknown) view = cluster_collection[cluster_id].View();
 
       } // End of looping over original clusters to be merged
 
@@ -112,7 +101,7 @@ namespace larlight {
 
   bool ClusterMerge::finalize() {
 
-    ClusterAnaPrep::get()->finalize();
+    ClusterMergeAlgo::get()->finalize();
   
     return true;
   }

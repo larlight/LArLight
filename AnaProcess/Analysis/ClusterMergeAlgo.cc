@@ -7,117 +7,207 @@ namespace larlight {
 
   ClusterMergeAlgo* ClusterMergeAlgo::_me=0;
 
+  ClusterMergeAlgo::ClusterMergeAlgo() : ana_base() {
+    
+    _name="ClusterMergeAlgo"; 
+    _fout=0;     
+    _verbose=false;
+    
+    SetAngleCut(10.);
+
+    SetSquaredDistanceCut(1e9);
+
+    SetWire2Cm(1.);
+
+    SetTime2Cm(1.);
+
+    ClearEventInfo();
+  };
+
   bool ClusterMergeAlgo::initialize() {
-
-    //
-    // This function is called in the beggining of event loop
-    // Do all variable initialization you wish to do here.
-    // If you need, you have an output root file pointer "_fout".
-    ClusterAnaPrep::get()->initialize();
-
-    max_allowed_2D_angle_diff = 10.;
-    max_2D_dist2 = 999999.;
-    return true;
-  }
-  
-  //analyze function builds the _cluster_sets_v vector, used by ClusterMerge.cc
-  bool ClusterMergeAlgo::analyze(storage_manager* storage) {
-  
-    //Run ClusterAnaPrep on this event, which does a loop over the hits, etc.
-    //Note, ClusterAnaPrep should automatically NOT run if it has already been done by previous ana module
-    //First, initialize it's q_frac_cut parameter (should I do this in the initialize() function?)
-    ClusterAnaPrep::get()->set_q_frac_cut(1.);
-    //    std::cout<<"Setting set_q_frac_cut to 1."<<std::endl;
-
-    //Next, reset the _cluster_sets_v vector<vector<int>> which is used by ClusterMerge
-    _cluster_sets_v.clear();
-
-    //Then, run ClusterAnaPrep over the event.
-    ClusterAnaPrep::get()->analyze(storage);
-
-    //the following clear()'s not needed?
-    //u_clusters->clear(); v_clusters->clear(); w_clusters->clear();
-    u_clusters = ClusterAnaPrep::get()->get_cluster_info(GEO::kU);
-    v_clusters = ClusterAnaPrep::get()->get_cluster_info(GEO::kV);    
-    w_clusters = ClusterAnaPrep::get()->get_cluster_info(GEO::kW);
-    
-    //Loop over all possible combinations of clusters in u-view
-    for(int iclus = 0; iclus < (int)u_clusters->size(); ++iclus){
-      for(int jclus = iclus+1; jclus < (int)u_clusters->size(); ++jclus){
-	BuildClusterSets(u_clusters->at(iclus),u_clusters->at(jclus));
-      }//end loop over jclus u_clusters
-    }//end loop over iclus u_clusters
-
-    //Loop over all possible combinations of clusters in v-view
-    for(int iclus = 0; iclus < (int)v_clusters->size(); ++iclus){
-      for(int jclus = iclus+1; jclus < (int)v_clusters->size(); ++jclus){
-	BuildClusterSets(v_clusters->at(iclus),v_clusters->at(jclus));
-      }//end loop over jclus v_clusters
-    }//end loop over iclus v_clusters
-
-    //Loop over all possible combinations of clusters in w-view
-    for(int iclus = 0; iclus < (int)w_clusters->size(); ++iclus){
-      for(int jclus = iclus+1; jclus < (int)w_clusters->size(); ++jclus){
-	BuildClusterSets(w_clusters->at(iclus),w_clusters->at(jclus));
-      }//end loop over jclus w_clusters
-    }//end loop over iclus w_clusters
-    
-    //make sure all of the un-mergable clusters are in _cluster_sets_v, individually
-    FinalizeClusterSets(u_clusters,v_clusters,w_clusters);
 
     return true;
   }
 
   bool ClusterMergeAlgo::finalize() {
-    ClusterAnaPrep::get()->finalize();  
-    // This function is called at the end of event loop.
-    // Do all variable finalization you wish to do here.
-    // If you need, you can store your ROOT class instance in the output
-    // file. You have an access to the output file through "_fout" pointer.
   
     return true;
   }
   
-  bool ClusterMergeAlgo::CompareClusters(cluster_ana_info clusA,
-					 cluster_ana_info clusB){
-    
-    /*
-      std::cout<<"Cluster "<<iclus<<" has info:"<<std::endl;
-      PrintClusterVars(u_clusters->at(iclus));
-      std::cout<<"While cluster "<<jclus<<" has info:"<<std::endl;
-      PrintClusterVars(u_clusters->at(jclus));
-    */
+  /**
+     In case ClusterMergeAlgo is run as analysis module in ana_processor, it does following tasks:
+     (0) Clear event-wise information (input & output)
+     (1) Read-in cluster information into cluster_merge_info struct
+     (2) Process read-in cluster information for merging
+  */
+  bool ClusterMergeAlgo::analyze(storage_manager* storage) {
 
-    //    if( Angle2DCompatibility(clusA.angle,clusB.angle,max_allowed_2D_angle_diff) )
-    //	  std::cout<<"The two clusters are ANGLE compatible!"<<std::endl;
-    if( ShortestDistanceCompatibility(clusA.start_time, clusA.start_wire,
-    				      clusA.end_time, clusA.end_wire,
-    				      clusB.start_time, clusB.start_wire,
-    				      clusB.end_time, clusB.end_wire,
-    				      max_2D_dist2) )
-      //  std::cout<<"The two clusters are STARTENDPOINT compatible!"<<std::endl;
-      return true;
-    else
-      return false;
+    // Step (0) ... Clear input cluster information
+    
+    ClearEventInfo();
+
+    // Step (1) ... loop over input cluster sets and store relevant information into the cluster_merge_info
+
+    const event_cluster* ev_cluster = (const event_cluster*)(storage->get_data(DATA::ShowerAngleCluster));
+
+    const std::vector<cluster> cluster_collection = ev_cluster->GetClusterCollection();
+
+    for(auto const i_cluster: cluster_collection)
+
+      AppendClusterInfo(i_cluster);
+
+    // Step (2) ... Run algorithm
+    ProcessMergeAlgo();
+
+    return true;
+
+  }
+
+  void ClusterMergeAlgo::AppendClusterInfo(const cluster &cl) {
+
+    cluster_merge_info ci;
+    ci.cluster_index = cl.ID();
+    ci.view       = cl.View();
+    ci.start_wire = cl.StartPos()[0] * _wire_2_cm;
+    ci.start_time = cl.StartPos()[1] * _time_2_cm;
+    ci.end_wire   = cl.EndPos()[0]   * _wire_2_cm;
+    ci.end_time   = cl.EndPos()[1]   * _time_2_cm; 
+    ci.angle      = cl.dTdW()        * _time_2_cm / _wire_2_cm;
+    
+    if(ci.view == GEO::kU) _u_clusters.push_back(ci);
+    else if(ci.view == GEO::kV) _v_clusters.push_back(ci);
+    else if(ci.view == GEO::kW) _w_clusters.push_back(ci);
+    else print(MSG::ERROR,__FUNCTION__,Form("Invalid plane ID: %d",ci.view));
+
+    if(_cluster_merged_index.size() <= (size_t)(ci.cluster_index)) {
+
+      _cluster_merged_index.resize((size_t)(ci.cluster_index+1),-1);
+
+      print(MSG::INFO,__FUNCTION__,Form("Extending the input cluster index ... length = %zu",_cluster_merged_index.size()));
+    }
+
+  }
+
+  void ClusterMergeAlgo::ClearEventInfo() {
+    
+    ClearOutputInfo();
+    ClearInputInfo();
+
+  }
+
+  void ClusterMergeAlgo::ClearOutputInfo() {
+
+    _cluster_sets_v.clear();
+
+  }
+
+  void ClusterMergeAlgo::ClearInputInfo() {
+
+    _u_clusters.clear();
+    _v_clusters.clear();
+    _w_clusters.clear();
+    _cluster_merged_index.clear();
+
   }
 
 
-  bool ClusterMergeAlgo::Angle2DCompatibility(double angle1, double angle2, double max_allowed_2D_angle_diff){
+  void ClusterMergeAlgo::ProcessMergeAlgo() {
+
+    // Clear all algorithm's output
+    ClearOutputInfo();
+	
+    //Loop over all possible combinations of clusters in u-view
+    for(int iclus = 0; iclus < (int)_u_clusters.size(); ++iclus){
+
+      for(int jclus = iclus+1; jclus < (int)_u_clusters.size(); ++jclus){
+
+	BuildClusterSets(_u_clusters.at(iclus),_u_clusters.at(jclus));
+
+      }//end loop over jclus _u_clusters
+
+    }//end loop over iclus _u_clusters
+
+    //Loop over all possible combinations of clusters in v-view
+    for(int iclus = 0; iclus < (int)_v_clusters.size(); ++iclus){
+
+      for(int jclus = iclus+1; jclus < (int)_v_clusters.size(); ++jclus){
+
+	BuildClusterSets(_v_clusters.at(iclus),_v_clusters.at(jclus));
+
+      }//end loop over jclus _v_clusters
+
+    }//end loop over iclus _v_clusters
+
+    //Loop over all possible combinations of clusters in w-view
+    for(int iclus = 0; iclus < (int)_w_clusters.size(); ++iclus){
+
+      for(int jclus = iclus+1; jclus < (int)_w_clusters.size(); ++jclus){
+
+	BuildClusterSets(_w_clusters.at(iclus),_w_clusters.at(jclus));
+
+      }//end loop over jclus _w_clusters
+
+    }//end loop over iclus _w_clusters
     
-    if(std::abs(angle1-angle2)     < max_allowed_2D_angle_diff ||
-       std::abs(angle1-angle2-180) < max_allowed_2D_angle_diff ||
-       std::abs(angle1-angle2+180) < max_allowed_2D_angle_diff )
-      return true;
-    else
-      return false;
+    //make sure all of the un-mergable clusters are in _cluster_sets_v, individually
+    FinalizeClusterSets();
+
+  }
+  
+  bool ClusterMergeAlgo::CompareClusters(cluster_merge_info clusA,
+					 cluster_merge_info clusB){
+    
+    if(_verbose) {
+      print(MSG::NORMAL,__FUNCTION__,"Printing out two input cluster information...");
+      PrintClusterVars(clusA);
+      PrintClusterVars(clusB);
+    }
+
+    bool merge_clusters = true;
+
+    //merge_clusters = merge_clusters && Angle2DCompatibility(clusA, clusB);
+
+    merge_clusters = merge_clusters &&  ShortestDistanceCompatibility(clusA, clusB);
+
+    return merge_clusters;
+
+  }
+
+
+  bool ClusterMergeAlgo::Angle2DCompatibility(const cluster_merge_info &cluster_a, 
+					      const cluster_merge_info &cluster_b) const {
+			    
+    double angle1 = cluster_a.angle;
+    double angle2 = cluster_b.angle;
+
+    bool compatible = ( abs(angle1-angle2)     < _max_allowed_2D_angle_diff ||
+			abs(angle1-angle2-180) < _max_allowed_2D_angle_diff ||
+			abs(angle1-angle2+180) < _max_allowed_2D_angle_diff   );
+
+    if(_verbose) {
+
+      if(compatible) print(MSG::NORMAL,__FUNCTION__," Compatible in angle.");
+      else print(MSG::NORMAL,__FUNCTION__," NOT compatible in angle.");
+
+    }
+
+    return compatible;
 
   }//end Angle2DCompatibility
 
-  bool ClusterMergeAlgo::ShortestDistanceCompatibility(double t_start1, double w_start1, double t_end1, double w_end1,
-						       double t_start2, double w_start2, double t_end2, double w_end2,
-						       double max_2D_dist2){
+  bool ClusterMergeAlgo::ShortestDistanceCompatibility(const cluster_merge_info &clus_info_A,
+						       const cluster_merge_info &clus_info_B) const {
 
-    //This code finds the shortest distance between a point and a line segment.
+    double w_start1 = clus_info_A.start_wire;
+    double t_start1 = clus_info_A.start_time;
+    double w_end1   = clus_info_A.end_wire;
+    double t_end1   = clus_info_A.end_time;
+
+    double w_start2 = clus_info_B.start_wire;
+    double t_start2 = clus_info_B.start_time;
+    double w_end2   = clus_info_B.end_wire;
+    double t_end2   = clus_info_B.end_time;
+    
     //First, pretend the first cluster is a 2D line segment, from its start point to end point
     //Find the shortest distance between start point of the second cluster to this line segment.
     //Repeat for end point of second cluster to this line segment.
@@ -127,122 +217,129 @@ namespace larlight {
     //If the shortest of these four distances is less than the cutoff, 
     //return true... the clusters are merge-compatible. else, return false.
     
+    // Step 1: inspect (w_start1, t_start1) vs. line (w_start2, t_start2) => (w_end2, t_end2)
+    double shortest_distance2 = ShortestDistanceSquared(w_start1, t_start1,
+							w_start2, t_start2, w_end2, t_end2);
+    
+    // Step 2: inspect (w_end1, t_end1) vs. line (w_start2, t_start2) => (w_end2, t_end2)
+    double shortest_distance2_tmp = ShortestDistanceSquared(w_end1, t_end1,
+							    w_start2, t_start2, w_end2, t_end2);
+
+    shortest_distance2 = (shortest_distance2_tmp < shortest_distance2) ? shortest_distance2_tmp : shortest_distance2;
+
+    // Step 3: inspect (w_start2, t_start2) vs. line (w_start1, t_start1) => (w_end1, t_end1)
+    shortest_distance2_tmp = ShortestDistanceSquared(w_start2, t_start2,
+						     w_start1, t_start1, w_end1, t_end1);
+
+    shortest_distance2 = (shortest_distance2_tmp < shortest_distance2) ? shortest_distance2_tmp : shortest_distance2;
+
+    // Step 4: inspect (w_end2, t_end2) vs. line (w_start1, t_start1) => (w_end1, t_end1)
+    shortest_distance2_tmp = ShortestDistanceSquared(w_end2, t_end2,
+						     w_start1, t_start1, w_end1, t_end1);
+    
+    shortest_distance2 = (shortest_distance2_tmp < shortest_distance2) ? shortest_distance2_tmp : shortest_distance2;
+
+
+    bool compatible = shortest_distance2 < _max_2D_dist2;
+
+    if(_verbose) {
+
+      if(compatible) print(MSG::NORMAL,__FUNCTION__,Form(" Compatible in distance (%g)",shortest_distance2));
+      else print(MSG::NORMAL,__FUNCTION__,Form(" NOT compatible in distance (%g).",shortest_distance2));
+
+    }
+
+    return compatible;
+
+  }//end startend2dcompatibility
+
+  double ClusterMergeAlgo::ShortestDistanceSquared(double point_x, double point_y, 
+						   double start_x, double start_y,
+						   double end_x,   double end_y  ) const {
+
+    //This code finds the shortest distance between a point and a line segment.    
     //code based off sample from 
     //http://stackoverflow.com/questions/849211/shortest-distance-between-a-point-and-a-line-segment
     //note to self: rewrite this with TVector2 and compare time differences... 
     //TVector2 code might be more understandable
-    
-    double shortest_distance2 = 9999999.;
-    double shortest_distance2_tmp = 0.;
-    double l2 = -1.;
-    double t = -1.;
-    
 
-    //Line segment: from ("V")=(w_start1,t_start1) to ("W")=(w_end1,t_end1)
-    l2 = std::pow(w_end1-w_start1,2)+std::pow(t_end1-t_start1,2);
-    
-    //Find shortest distance between point ("P")=(w_start2,t_start2) to this line segment
-    t = ( (w_start2-w_start1)*(w_end1-w_start1) + (t_start2-t_start1)*(t_end1-t_start1) ) / l2;
-    if(t<0.0) shortest_distance2_tmp = std::pow(w_start2-w_start1,2)+std::pow(t_start2-t_start1,2);
-    else if (t>1.0) shortest_distance2_tmp = std::pow(w_start2-w_end1,2)+std::pow(t_start2-t_end1,2);
-    else shortest_distance2_tmp = std::pow(w_start2-(w_start1+t*(w_end1-w_start1)),2)+
-	   std::pow(t_start2-(t_start1+t*(t_end1-t_start1)),2);
-    if(shortest_distance2_tmp < shortest_distance2) shortest_distance2 = shortest_distance2_tmp;
-    //    std::cout<<"start of 2nd to segment of 1st: dist2 is "<<shortest_distance2_tmp<<std::endl;
+    double distance_squared = -1;
 
-    //Find shortest distance between point ("P")=(w_end2,t_end2) to this line segment
-    t = ( (w_end2-w_start1)*(w_end1-w_start1) + (t_end2-t_start1)*(t_end1-t_start1) ) / l2;
-    if(t<0.0) shortest_distance2_tmp = std::pow(w_end2-w_start1,2)+std::pow(t_end2-t_start1,2);
-    else if (t>1.0) shortest_distance2_tmp = std::pow(w_end2-w_end1,2)+std::pow(t_end2-t_end1,2);
-    else shortest_distance2_tmp = std::pow(w_end2-(w_start1+t*(w_end1-w_start1)),2)+
-	   std::pow(t_end2-(t_start1+t*(t_end1-t_start1)),2);
-    if(shortest_distance2_tmp < shortest_distance2) shortest_distance2 = shortest_distance2_tmp;
-    //    std::cout<<"end of 2nd to segment of 1st: dist2 is "<<shortest_distance2_tmp<<std::endl;
-    
-    //Line segment: from ("V")=(w_start2,t_start2) to ("W")=(w_end2,t_end2)
-    l2 = std::pow(w_start2-w_start1,2)+std::pow(t_start2-t_start1,2);
-    
-    //Find shortest distance between point ("P")=(w_start1,t_start1) and this line segment
-    t = ( (w_start1-w_start2)*(w_end2-w_start2) + (t_start1-t_start2)*(t_end2-t_start2) ) / l2;
-    if(t<0.0) shortest_distance2_tmp = std::pow(w_start2-w_start1,2)+std::pow(t_start2-t_start1,2);
-    else if (t>1.0) shortest_distance2_tmp = std::pow(w_end2-w_start1,2)+std::pow(t_end2-t_start1,2);
-    else shortest_distance2_tmp = std::pow(w_start1-(w_start2+t*(w_end2-w_start2)),2)+
-	   std::pow(t_start1-(t_start2+t*(t_end2-t_start2)),2);
-    if(shortest_distance2_tmp < shortest_distance2) shortest_distance2 = shortest_distance2_tmp;
-    //    std::cout<<"start of 1st to segment of 2nd: dist2 is "<<shortest_distance2_tmp<<std::endl;
+    // Line segment: from ("V") = (start_x, start_y) to ("W")=(end_x, end_y)
+    double length_squared = pow((end_x - start_x), 2) + pow((end_y - start_y), 2);
 
-    //Find shortest distance between point ("P")=(w_end1,t_end1) and this line segment
-    t = ( (w_end1-w_start2)*(w_end2-w_start2) + (t_end1-t_start2)*(t_end2-t_start2) ) / l2;
-    if(t<0.0) shortest_distance2_tmp = std::pow(w_start2-w_end1,2)+std::pow(t_start2-t_end1,2);
-    else if (t>1.0) shortest_distance2_tmp = std::pow(w_end2-w_end1,2)+std::pow(t_end2-t_end1,2);
-    else shortest_distance2_tmp = std::pow(w_end1-(w_start2+t*(w_end2-w_start2)),2)+
-	   std::pow(t_end1-(t_start2+t*(t_end2-t_start2)),2);
-    if(shortest_distance2_tmp < shortest_distance2) shortest_distance2 = shortest_distance2_tmp;
-    //    std::cout<<"end of 1st to segment of 2nd: dist2 is "<<shortest_distance2_tmp<<std::endl;
+    //Find shortest distance between point ("P")=(point_x,point_y) to this line segment
+    double t = ( (point_x - start_x)*(end_x - start_x) + (point_y - start_y)*(end_y - start_y) ) / length_squared;
 
-    //    std::cout<<"After all of those comparisons, shortest_distance2 is "<<shortest_distance2<<std::endl;
+    if(t<0.0) distance_squared = pow((point_x - start_x), 2) + pow((point_y - start_y), 2);
 
-    if(shortest_distance2 < max_2D_dist2)
-      return true;
-    else
-      return false;
+    else if (t>1.0) distance_squared = pow((point_x - end_x), 2) + pow(point_y - end_y, 2);
 
-  }//end startend2dcompatibility
+    else distance_squared = pow((point_x - (start_x + t*(end_x - start_x))), 2) + pow((point_y - (start_y + t*(end_y - start_y))),2);
+	   
+    return distance_squared;
+  }  
   
+  void ClusterMergeAlgo::PrintClusterVars(cluster_merge_info clus_info) const{
+
+    std::ostringstream msg;
+
+    msg
+      << std::endl
+      << "***********CLUSTER INFO PARAMETERS***********" << std::endl
+      << " ID: " << clus_info.cluster_index << std::endl
+      << " start_wire : " << clus_info.start_wire << std::endl
+      << " start_time : " << clus_info.start_time << std::endl
+      << " end wire   : " << clus_info.end_wire << std::endl
+      << " end_time   : " << clus_info.end_time << std::endl
+      << " angle      : " << clus_info.angle << std::endl
+      << std::endl;
   
-  
-  void ClusterMergeAlgo::PrintClusterVars(cluster_ana_info clus_info){
-    std::cout<<std::endl;
-    std::cout<<"***********CLUSTER INFO PARAMETERS***********"<<std::endl;
-    /*
-      std::cout<<"cluster_index = "
-      <<clus_info.cluster_index
-	     <<std::endl;
-    */
-    std::cout<<"start_wire = "
-	     <<clus_info.start_wire
-	     <<std::endl;
-    std::cout<<"start_time = "
-	     <<clus_info.start_time
-	     <<std::endl;
-    std::cout<<"end wire = "
-	     <<clus_info.end_wire
-	     <<std::endl;
-    std::cout<<"end_time = "
-	     <<clus_info.end_time
-	     <<std::endl;
-    /*
-    std::cout<<"angle = "
-	     <<clus_info.angle
-	     <<std::endl;
-    	  std::cout<<"start_time_max = "
-	     <<clus_info.start_time_max
-	     <<std::endl;
-    std::cout<<"start_time_min = "
-	     <<clus_info.start_time_min
-	     <<std::endl;
-    std::cout<<"peak_time_max = "
-	     <<clus_info.peak_time_max
-	     <<std::endl;
-    std::cout<<"peak_time_min = "
-	     <<clus_info.peak_time_min
-	     <<std::endl;
-    std::cout<<"end_time_max = "
-	     <<clus_info.end_time_max
-	     <<std::endl;
-    std::cout<<"end_time_min = "
-	     <<clus_info.end_time_min
-	     <<std::endl;
-    std::cout<<"sum_charge = "
-	     <<clus_info.sum_charge
-	     <<std::endl;
-    */
-    std::cout<<std::endl;
-  
+    print(MSG::NORMAL,__FUNCTION__,msg.str());
+
   }//end PrintClusterVars function
 
+  int ClusterMergeAlgo::AppendToClusterSets(unsigned int cluster_index, int merged_index) {
 
-  void ClusterMergeAlgo::BuildClusterSets(cluster_ana_info clusA, cluster_ana_info clusB){
+    // This function append the provided cluster_index into the _cluster_sets_v.
+    // If merged_index is not provided (default=-1), then we assume this meands to append a new merged cluster set.
+    // Note we also log the merged index in _cluster_merged_index vector to support fast search in isInClusterSets() function.
+
+    // First, check if this cluster_index is already in the set or not.
+    if(!(isInClusterSets(cluster_index)<0)) {
+
+      print(MSG::ERROR,__FUNCTION__,Form(" Cluster ID = %d already in the set!",cluster_index));
+
+      return isInClusterSets(cluster_index);
+      
+    }
+
+    if(merged_index < 0) {
+
+      std::vector<unsigned int> tmp(1,cluster_index);
+
+      _cluster_merged_index[cluster_index] = (unsigned int)(_cluster_sets_v.size());
+
+      _cluster_sets_v.push_back(tmp);
+
+    }
+    else if(merged_index < _cluster_sets_v.size()) {
+
+      _cluster_merged_index[cluster_index] = merged_index;
+
+      _cluster_sets_v[merged_index].push_back(cluster_index);
+
+    }
+    else
+
+      print(MSG::ERROR,__FUNCTION__,
+	    Form(" Requested to merge the cluster ID = %ud into the set = %d which does not exist!",cluster_index,merged_index));
+
+    return isInClusterSets(cluster_index);
+  }
+
+
+  void ClusterMergeAlgo::BuildClusterSets(cluster_merge_info clusA, cluster_merge_info clusB){
     //this function builds the _cluster_sets_v vector, according to the format defined
     //in ClusterAlgo. here's an example of what _cluster_sets_v format is:
     //imagine an event with clusters 0, 1, 2, 3, 4, 5
@@ -256,116 +353,98 @@ namespace larlight {
     if( CompareClusters(clusA,clusB) ){
      
       //if this is the first compatibility found for this entire event
-      if((int)_cluster_sets_v.size() == 0){
+      if(_cluster_sets_v.empty()){
 	//push both IDs in to the _cluster_sets_v vector, grouped together as one element
-	std::vector<unsigned int> myvec;
-	myvec.push_back(clusA.cluster_index);
-	myvec.push_back(clusB.cluster_index);
-	_cluster_sets_v.push_back(myvec);
+	AppendToClusterSets(clusA.cluster_index);
+	AppendToClusterSets(clusB.cluster_index,0);
       }
-      
-      //else if only A index already somewhere in the _cluster_sets_v vector, and B index is not
-      else if(isInClusterSets(clusA.cluster_index) != -1 &&
-	      isInClusterSets(clusB.cluster_index) == -1){
-	//push the B index in to that element vector of _cluster_sets_v
-	_cluster_sets_v.at(isInClusterSets(clusA.cluster_index)).push_back(clusB.cluster_index);
-      }
+      else {
 
-      //else if only B index already somewhere in the _cluster_sets_v vector, and A index is not
-      else if(isInClusterSets(clusB.cluster_index) != -1 &&
-	      isInClusterSets(clusA.cluster_index) == -1){
-	//push the B index in to that element vector of _cluster_sets_v
-	_cluster_sets_v.at(isInClusterSets(clusB.cluster_index)).push_back(clusA.cluster_index);
-      }
+	// Inspect if these clusters are already in the set or not.
+	// Return value < 0 indicates the set does not hold the subject cluster.
+	// Otherwise the function returns the index of a set that includes the cluster.
+	int a_index = isInClusterSets(clusA.cluster_index);
+	int b_index = isInClusterSets(clusB.cluster_index);
 
-      //else if neither of the two are already in the _cluster_sets_v vector, anywhere
-      else if(isInClusterSets(clusB.cluster_index) == -1 &&
-	      isInClusterSets(clusA.cluster_index) == -1){
-	//push both IDs into the _cluster_sets_v vector, grouped together, as a new element
-	std::vector<unsigned int> tmp;
-	tmp.push_back((unsigned int)clusA.cluster_index);
-	tmp.push_back((unsigned int)clusB.cluster_index);
-	_cluster_sets_v.push_back(tmp);
-      }
-       
-      //else if both indexes are already in the _cluster_sets_v vector
-      else if(isInClusterSets(clusB.cluster_index) != -1 &&
-	      isInClusterSets(clusA.cluster_index) != -1){
-	//if they're in the same element already, do nothing.
-	//if they're in separate elements... something went wrong. 
-	//they should always be in the same element, by construction 
-	//(assuming the above if, else ifs, etc are done correctly)
-	if(isInClusterSets(clusA.cluster_index) != isInClusterSets(clusB.cluster_index))
-	  std::cout<<"SOMETHING WENT HORRIBLY WRONG!!!"<<std::endl;
-      }
+	// if only A index already somewhere in the _cluster_sets_v vector, and B index is not
+	if(a_index >= 0 && b_index < 0) 
 
-      //at the end of all possible cluster matching permutations, if some are not in 
-      //_cluster_sets_v yet, push them back individually as individual elements...
-      //this is what FinalizeClusterSets function is for
+	  AppendToClusterSets(clusB.cluster_index, a_index);
+
+	// else if only B index already somewhere in the _cluster_sets_v vector, and A index is not
+	else if(a_index < 0 && b_index >= 0)
+
+	  AppendToClusterSets(clusA.cluster_index, b_index);
+
+	// else if neither of the two are already in the _cluster_sets_v vector, anywhere
+	else if(a_index < 0 && b_index < 0) {
+	
+	  a_index = AppendToClusterSets(clusA.cluster_index);
+	  AppendToClusterSets(clusB.cluster_index,a_index);
+	  
+	}	  
+
+	// else if both indexes are already in the _cluster_sets_v vector but the indexes are not same
+	else if(a_index != b_index)
+
+	  print(MSG::ERROR,__FUNCTION__,"LOGIC ERROR: Found two compatible clusters in different sets!");
+
+	//at the end of all possible cluster matching permutations, if some are not in 
+	//_cluster_sets_v yet, push them back individually as individual elements...
+	//this is what FinalizeClusterSets function is for
+
+      }//end if _cluster_sets_v is non-empty
 
     }//end if the two clusters are compatible for merging
     
   }//end BuildClusterSets
-  
 
-  void ClusterMergeAlgo::FinalizeClusterSets(const std::vector<cluster_ana_info> *u_clusters,
-					     const std::vector<cluster_ana_info> *v_clusters,
-					     const std::vector<cluster_ana_info> *w_clusters){
+  void ClusterMergeAlgo::FinalizeClusterSets() {
 
     //loop over all cluster ID's in the event... guess I have to do it view-by-view
-    for(int iclus = 0; iclus < (int)u_clusters->size(); ++iclus){    
-	//if the cluster_id is not in _cluster_sets_v at all, push it back individually
-      if(isInClusterSets((int)(u_clusters->at(iclus).cluster_index)) == -1){
-	std::vector<unsigned int> tmpvec;
-	tmpvec.push_back( (unsigned int)(u_clusters->at(iclus).cluster_index ));
-	_cluster_sets_v.push_back(tmpvec);
-      }
+    for(int iclus = 0; iclus < (int)_u_clusters.size(); ++iclus){    
+      //if the cluster_id is not in _cluster_sets_v at all, push it back individually
+      if(isInClusterSets(_u_clusters.at(iclus).cluster_index) < 0)
+
+	AppendToClusterSets(_u_clusters.at(iclus).cluster_index);
+
     }
 
-    for(int iclus = 0; iclus < (int)v_clusters->size(); ++iclus){    
-	//if the cluster_id is not in _cluster_sets_v at all, push it back individually
-      if(isInClusterSets(v_clusters->at(iclus).cluster_index) == -1){
-	std::vector<unsigned int> tmpvec;
-	tmpvec.push_back( (int)v_clusters->at(iclus).cluster_index );
-	_cluster_sets_v.push_back(tmpvec);
-      }
+    for(int iclus = 0; iclus < (int)_v_clusters.size(); ++iclus){    
+      //if the cluster_id is not in _cluster_sets_v at all, push it back individually
+      if(isInClusterSets(_v_clusters.at(iclus).cluster_index) < 0)
+
+	AppendToClusterSets(_v_clusters.at(iclus).cluster_index);
+
     }
 
-    for(int iclus = 0; iclus < (int)w_clusters->size(); ++iclus){    
-	//if the cluster_id is not in _cluster_sets_v at all, push it back individually
-      if(isInClusterSets(w_clusters->at(iclus).cluster_index) == -1){
-	std::vector<unsigned int> tmpvec;
-	tmpvec.push_back( (int)w_clusters->at(iclus).cluster_index );
-	_cluster_sets_v.push_back(tmpvec);
-      }
+    for(int iclus = 0; iclus < (int)_w_clusters.size(); ++iclus){    
+      //if the cluster_id is not in _cluster_sets_v at all, push it back individually
+      if(isInClusterSets(_w_clusters.at(iclus).cluster_index) < 0)
+
+	AppendToClusterSets(_w_clusters.at(iclus).cluster_index);
+
     }
 
     
   } // end FinalizeClusterSets
   
-  
-  
-  
-  
-  int ClusterMergeAlgo::isInClusterSets(int index){
+  int ClusterMergeAlgo::isInClusterSets(unsigned int index) const {
     //function to check if an index is in _cluster_sets_v anywhere,
     //and return where it is (-1 if it's not in _cluster_sets_v)
-    
-    int where_is_it = -1;
 
-    for(size_t i=0; i<_cluster_sets_v.size() && where_is_it<0; ++i) {
+    // Check if the provided index does not exceed the book-keeping vector
+    if((size_t)index < _cluster_merged_index.size())
 
-      for(auto const& cluster_id : _cluster_sets_v.at(i)) {
+      return _cluster_merged_index.at(index);
 
-	if((int)cluster_id == index) {
-	  where_is_it = i;
-	  break;
-	}
-      }
+    else {
+
+      print(MSG::ERROR,__FUNCTION__,Form(" Cluster index %d not found among the input clusters!",index));
+
+      return -2;
 
     }
-    
-    return where_is_it;
     
   }//end isInClusterSets function
   

@@ -28,7 +28,7 @@ namespace larlight {
      \class ClusterAnaPrep
      A utility class to loop over cluster & associated hits to extract cluster-wise parametes.
      It makes some histograms as well, but the main purpose is to fill & hold cluster_ana_info
-     C++ struct data which holds cluster-wise information. 
+     and cluster_merge_info C++ structs data which holds cluster-wise information. 
      The class is a singleton and can be called from anywhere through ClusterAnaPrep::get() function.
      Running ClusterAnaPrep::analyze() records processed run/subrun/event-ID in the local variable.
      If ClusterAnaPrep::analyze() is called again for the same event, it returns w/o doing anything.

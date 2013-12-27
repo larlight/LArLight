@@ -136,7 +136,6 @@ namespace larlight {
     // Initialize event-wise counter
     unsigned short skipped_event_cluster_cnt = 0;
 
-
     // Loop over clusters
     for(auto const i_cluster: cluster_collection) {
 

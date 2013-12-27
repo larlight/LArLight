@@ -6,10 +6,15 @@
 namespace larlight {
 
   /**
-     \struct cluster_ana_info
-     A utility struct for cluster-wise analysis information.
+     \struct cluster_match_info
+     A utility struct for cluster-wise analysis information for matching     
    */
   struct cluster_ana_info {
+
+    //View of this specific cluster
+    GEO::View_t view;
+    //Unique (to the event) ID number for this cluster
+    size_t cluster_index;
 
     //Wire number corresponding to calculated cluster start point
     double start_wire;
@@ -40,10 +45,6 @@ namespace larlight {
     double end_time_min;
     //Total charge of all hits in the cluster
     double sum_charge;
-    //View of this specific cluster
-    GEO::View_t view;
-    //Unique (to the event) ID number for this cluster
-    size_t cluster_index;
 
     cluster_ana_info(){
       start_wire = start_time = -1;
@@ -55,6 +56,40 @@ namespace larlight {
       sum_charge = 0;
       view = GEO::kUnknown;
       cluster_index = 0xffff;
+    };
+
+  };
+
+
+  /**
+     \struct cluster_merge_info
+     A utility struct for cluster-wise analysis information for merging
+   */
+  struct cluster_merge_info {
+
+    unsigned int cluster_index; ///< Input cluster ID
+    GEO::View_t  view;          ///< Wire plane ID
+
+    double start_wire;          ///< Vertex wire
+    double start_time;          ///< Vertex time
+    double end_wire;            ///< End point wire
+    double end_time;            ///< End point time
+
+    double start_wire_err;      ///< Vertex wire error
+    double start_time_err;      ///< Vertex time error
+    double end_wire_err;        ///< End point wire error
+    double end_time_err;        ///< End point time error
+
+    double angle;               ///< 2D angle
+
+    /// Default constructor
+    cluster_merge_info() {
+      
+      cluster_index = 0xffffffff;
+      view = GEO::kUnknown;
+      start_wire = start_time = end_wire = end_time = -1;
+      start_wire_err = start_time_err = end_wire_err =end_time_err = -1;
+
     };
 
   };
