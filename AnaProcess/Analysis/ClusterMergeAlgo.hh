@@ -28,20 +28,10 @@ namespace larlight {
    */
   class ClusterMergeAlgo : public ana_base{
 
-  private:
-    /// Default constructor
-    ClusterMergeAlgo();
-  
   public:
 
-    /// Public pointer getter
-    static ClusterMergeAlgo* get() {
-
-      if(!_me) _me = new ClusterMergeAlgo;
-
-      return _me;
-    }
-      
+    /// Default constructor
+    ClusterMergeAlgo();
 
     /// Default destructor
     virtual ~ClusterMergeAlgo(){};
@@ -61,37 +51,65 @@ namespace larlight {
     */
     virtual bool finalize();
 
+    /// Method to set verbose mode
     void VerboseMode(bool on) { _verbose = on; }
 
+    /// Method to report current configuration
+    void ReportConfig() const;
+
+    /// Method to set cut value in degrees for angle compatibility test
     void SetAngleCut(double angle) { _max_allowed_2D_angle_diff = angle; }
 
+    /// Method to set cut value in cm^2 for distance compatibility test
     void SetSquaredDistanceCut(double d) { _max_2D_dist2 = d; }
 
+    /// Method to set a conversion factor from wire to cm scale
     void SetWire2Cm(double f) { _wire_2_cm = f; }
-    
+
+    /// Method to set a conversion factor from time to cm scale
     void SetTime2Cm(double f) { _time_2_cm = f; }
 
+    /// Method to clear event-wise information (both input cluster info & output merged cluster sets)
     void ClearEventInfo();
 
+    /// Method to add a cluster information for processing
     void AppendClusterInfo(const cluster &cl);
 
+    /**
+       Method to execute the algorithm. All parameter configuration + adding input cluster information
+       should be done before calling this function. This function generate a resulting set of cluster IDs
+       for merging, which can be accessed through GetClusterSets() function.
+    */
     void ProcessMergeAlgo();
 
+    /// Method to extract resulting set of cluster IDs for merging computed by ProcessMergeAlgo() function.
     const std::vector<std::vector<unsigned int> > GetClusterSets () const {return _cluster_sets_v;};
 
+    /// Method to compare a compatibility between two clusters
     bool CompareClusters(cluster_merge_info clus_info_A,
 			 cluster_merge_info clus_info_B);
 
     /**
        Function to compare the 2D angles of two clusters and return true if they are
        within the maximum allowed parameter. Includes shifting by 180 for backwards clusters.
+       This is called within CompareClusters().
     */
     bool Angle2DCompatibility(const cluster_merge_info &clus_info_A,
 			      const cluster_merge_info &clus_info_B) const;
-    
+
+    /**
+       Function to compare the 2D distance of two clusters and return true if they are
+       within the maximum allowed distance.The distance-squared is computed by another
+       function, ShortestDistanceSquared().
+       This is called within CompareClusters().
+     */
     bool ShortestDistanceCompatibility(const cluster_merge_info &clus_info_A,
 				       const cluster_merge_info &clus_info_B) const;
 
+    /**
+       Function to compute a distance between a 2D point (point_x, point_y) to a 2D finite line segment
+       (start_x, start_y) => (end_x, end_y).
+     */
     double ShortestDistanceSquared(double point_x, double point_y, 
 				   double start_x, double start_y,
 				   double end_x,   double end_y  ) const;
@@ -111,11 +129,16 @@ namespace larlight {
     
   protected:
 
+    /// Method to clear output merged cluster sets (_cluster_sets_v)
     void ClearOutputInfo();
 
+    /// Method to clear input cluster information
     void ClearInputInfo();
 
-    /// Function to push stuff back into the _cluster_sets_v vector in the right structure
+    /**
+       For a given pair of clusters, this function calls CompareClusters() and append to the resulting
+       merged cluster sets (_cluster_sets_v) by calling AppendToClusterSets() when they are compatible.
+    */
     void BuildClusterSets(cluster_merge_info clus_info_A,
 			  cluster_merge_info clus_info_B);
 
@@ -125,24 +148,35 @@ namespace larlight {
     */
     void FinalizeClusterSets();
 
+    /// A function to add a cluster to a merged sets (_cluster_sets_v)
     int AppendToClusterSets(unsigned int cluster_index, int merged_index=-1);
 
   protected:
 
-    bool _verbose;
+    bool _verbose; ///< Verbose mode boolean
 
+    /**
+       Book-keeping vector which length is same as input cluster array's length.
+       The stored value is the merged cluster sets' index (_cluster_sets_v).
+       For instance, given 5 clusters (0, 1, 2, 3, 4) as an input among which
+       1,2,3 are to be merged. _cluster_merged_index may hold contents like
+       [1,0,0,0,2] when _cluster_sets_v contents are [[1,2,3],[0],[4]].
+     */
     std::vector<int> _cluster_merged_index;
-    
+
+    /**
+       The result container of ProcessMergeAlgo() function.
+       The structure is such that the inner vector holds the cluster IDs to be merged into one cluster.
+       Naturally we expect multiple merged clusters, hence it's a vector of vector.
+    */
     std::vector<std::vector<unsigned int> > _cluster_sets_v;
-    /// Vectors to store output of ClusterPrepAna module
-    std::vector<larlight::cluster_merge_info> _u_clusters;
-    std::vector<larlight::cluster_merge_info> _v_clusters;
-    std::vector<larlight::cluster_merge_info> _w_clusters;
 
-    static ClusterMergeAlgo* _me;
+    std::vector<larlight::cluster_merge_info> _u_clusters; ///< Input U-plane clusters' information 
+    std::vector<larlight::cluster_merge_info> _v_clusters; ///< Input V-plane clusters' information
+    std::vector<larlight::cluster_merge_info> _w_clusters; ///< Input W-plane clusters' information
 
-    double _wire_2_cm;
-    double _time_2_cm;
+    double _wire_2_cm; ///< Conversion factor from wire number to cm scale
+    double _time_2_cm; ///< Conversion factor from time to cm scale
     double _max_allowed_2D_angle_diff; //in degrees
     double _max_2D_dist2;              //in ((wirenumber^2)+(seconds^2))^0.5
     

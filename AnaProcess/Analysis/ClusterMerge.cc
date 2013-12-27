@@ -7,7 +7,7 @@ namespace larlight {
 
   bool ClusterMerge::initialize() {
 
-    ClusterMergeAlgo::get()->initialize();
+    fCMergeAlgo.initialize();
 
     return true;
   }
@@ -17,7 +17,7 @@ namespace larlight {
     //
     // Preparation
     //
-    ClusterMergeAlgo::get()->ClearEventInfo();
+    fCMergeAlgo.ClearEventInfo();
 
     event_cluster* ev_cluster = (event_cluster*)(storage->get_data(DATA::ShowerAngleCluster));
 
@@ -25,19 +25,19 @@ namespace larlight {
 
     for(auto const i_cluster: cluster_collection)
 
-      ClusterMergeAlgo::get()->AppendClusterInfo(i_cluster);
+      fCMergeAlgo.AppendClusterInfo(i_cluster);
 
     //
     // Merging operation
     //
-    ClusterMergeAlgo::get()->ProcessMergeAlgo();
+    fCMergeAlgo.ProcessMergeAlgo();
 
     // cluster_sets is a vector of vector where the inner vector is a set of cluster IDs 
     // to be merged into one. I assume all cluster index to be output are in cluster_sets.
     // Say you have clusters A, B, and C, and we decide to merge A and B (call it D=A+B).
     // Then a complete set of clusters in the output means cluster_sets should have
     // one vector with A and B cluster ID, then one vector of length 1 with cluster ID of C.
-    const std::vector<std::vector<unsigned int> > cluster_sets = ClusterMergeAlgo::get()->GetClusterSets();
+    const std::vector<std::vector<unsigned int> > cluster_sets = fCMergeAlgo.GetClusterSets();
 
     //
     // Creating output of merged clusters
@@ -101,7 +101,7 @@ namespace larlight {
 
   bool ClusterMerge::finalize() {
 
-    ClusterMergeAlgo::get()->finalize();
+    fCMergeAlgo.finalize();
   
     return true;
   }

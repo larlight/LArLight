@@ -5,15 +5,13 @@
 
 namespace larlight {
 
-  ClusterMergeAlgo* ClusterMergeAlgo::_me=0;
-
   ClusterMergeAlgo::ClusterMergeAlgo() : ana_base() {
     
     _name="ClusterMergeAlgo"; 
     _fout=0;     
     _verbose=false;
     
-    SetAngleCut(10.);
+    SetAngleCut(180.);
 
     SetSquaredDistanceCut(1e9);
 
@@ -23,6 +21,27 @@ namespace larlight {
 
     ClearEventInfo();
   };
+
+  void ClusterMergeAlgo::ReportConfig() const {
+
+    std::ostringstream msg;
+    msg
+      << std::endl
+      << " ClusterMergeAlg Configuration:              " << std::endl
+      << "---------------------------------------------" << std::endl;
+    msg 
+      << " Verbose Mode ... " << (_verbose ? "enabled!" : "disabled!") << std::endl
+      << " Wire => Cm Conversion: " << _wire_2_cm << std::endl
+      << " Time => Cm Conversion: " << _time_2_cm << std::endl
+      << std::endl
+      << " Squared-Distance Cut: " << _max_2D_dist2 << std::endl
+      << " Angle Difference Cut: " << _max_allowed_2D_angle_diff << std::endl
+      << std::endl
+      << "---------------------------------------------" << std::endl;
+
+    print(MSG::NORMAL,__FUNCTION__,msg.str());
+
+  }
 
   bool ClusterMergeAlgo::initialize() {
 
@@ -68,11 +87,11 @@ namespace larlight {
     cluster_merge_info ci;
     ci.cluster_index = cl.ID();
     ci.view       = cl.View();
-    ci.start_wire = cl.StartPos()[0] * _wire_2_cm;
-    ci.start_time = cl.StartPos()[1] * _time_2_cm;
-    ci.end_wire   = cl.EndPos()[0]   * _wire_2_cm;
-    ci.end_time   = cl.EndPos()[1]   * _time_2_cm; 
-    ci.angle      = cl.dTdW()        * _time_2_cm / _wire_2_cm;
+    ci.start_wire = cl.StartPos()[0];
+    ci.start_time = cl.StartPos()[1];
+    ci.end_wire   = cl.EndPos()[0];
+    ci.end_time   = cl.EndPos()[1];
+    ci.angle      = cl.dTdW();
     
     if(ci.view == GEO::kU) _u_clusters.push_back(ci);
     else if(ci.view == GEO::kV) _v_clusters.push_back(ci);
@@ -165,7 +184,7 @@ namespace larlight {
 
     bool merge_clusters = true;
 
-    //merge_clusters = merge_clusters && Angle2DCompatibility(clusA, clusB);
+    merge_clusters = merge_clusters && Angle2DCompatibility(clusA, clusB);
 
     merge_clusters = merge_clusters &&  ShortestDistanceCompatibility(clusA, clusB);
 
@@ -177,8 +196,8 @@ namespace larlight {
   bool ClusterMergeAlgo::Angle2DCompatibility(const cluster_merge_info &cluster_a, 
 					      const cluster_merge_info &cluster_b) const {
 			    
-    double angle1 = cluster_a.angle;
-    double angle2 = cluster_b.angle;
+    double angle1 = cluster_a.angle * _time_2_cm / _wire_2_cm;
+    double angle2 = cluster_b.angle * _time_2_cm / _wire_2_cm;
 
     bool compatible = ( abs(angle1-angle2)     < _max_allowed_2D_angle_diff ||
 			abs(angle1-angle2-180) < _max_allowed_2D_angle_diff ||
@@ -198,15 +217,15 @@ namespace larlight {
   bool ClusterMergeAlgo::ShortestDistanceCompatibility(const cluster_merge_info &clus_info_A,
 						       const cluster_merge_info &clus_info_B) const {
 
-    double w_start1 = clus_info_A.start_wire;
-    double t_start1 = clus_info_A.start_time;
-    double w_end1   = clus_info_A.end_wire;
-    double t_end1   = clus_info_A.end_time;
+    double w_start1 = clus_info_A.start_wire * _wire_2_cm;
+    double t_start1 = clus_info_A.start_time * _time_2_cm;
+    double w_end1   = clus_info_A.end_wire   * _wire_2_cm;
+    double t_end1   = clus_info_A.end_time   * _time_2_cm;
 
-    double w_start2 = clus_info_B.start_wire;
-    double t_start2 = clus_info_B.start_time;
-    double w_end2   = clus_info_B.end_wire;
-    double t_end2   = clus_info_B.end_time;
+    double w_start2 = clus_info_B.start_wire * _wire_2_cm;
+    double t_start2 = clus_info_B.start_time * _time_2_cm;
+    double w_end2   = clus_info_B.end_wire   * _wire_2_cm;
+    double t_end2   = clus_info_B.end_time   * _time_2_cm;
     
     //First, pretend the first cluster is a 2D line segment, from its start point to end point
     //Find the shortest distance between start point of the second cluster to this line segment.

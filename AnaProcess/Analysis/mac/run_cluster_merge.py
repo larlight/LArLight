@@ -16,8 +16,6 @@ ana_proc.set_output_file("aho.root")
 
 ana_proc.set_ana_output_file("")
 
-#ana_proc.add_process(larlight.ClusterMergeAlgo.get())
-
 ana_proc.add_process(larlight.ClusterMerge())
 
 #ana_proc.process_event()

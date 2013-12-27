@@ -28,7 +28,7 @@ namespace larlight {
   public:
 
     /// Default constructor
-    ClusterMerge(){ _name="ClusterMerge"; _fout=0;};
+    ClusterMerge() : fCMergeAlgo() { _name="ClusterMerge"; _fout=0;};
 
     /// Default destructor
     virtual ~ClusterMerge(){};
@@ -49,6 +49,8 @@ namespace larlight {
     virtual bool finalize();
 
     protected:
+    
+    ClusterMergeAlgo fCMergeAlgo;
 
   };
 }
