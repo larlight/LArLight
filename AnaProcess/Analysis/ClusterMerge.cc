@@ -5,39 +5,47 @@
 
 namespace larlight {
 
+  bool ClusterMerge::check_algo_ptr() const {
+
+    if(fCMergeAlg) return true;
+
+    std::ostringstream msg;
+    msg 
+      << std::endl
+      << "  You have not set ClusterMergeAlg pointer!" << std::endl
+      << "  To run ClusterMerge module in ana_processor, you must create & attach ClusterMergeAlg" << std::endl
+      << "  to the ana_processor instance, then also pass its pointer to ClusterMerge instance." << std::endl
+      << "  Aborting..." << std::endl
+      << std::endl;
+    
+    print(MSG::ERROR,__PRETTY_FUNCTION__,msg.str());
+
+    return false;
+
+  }
+
   bool ClusterMerge::initialize() {
 
-    fCMergeAlg.initialize();
+    return check_algo_ptr();
 
-    return true;
   }
   
   bool ClusterMerge::analyze(storage_manager* storage) {
-    
+
+    if(!check_algo_ptr()) return false;
+
     //
     // Preparation
     //
-    fCMergeAlg.ClearEventInfo();
-
     event_cluster* ev_cluster = (event_cluster*)(storage->get_data(DATA::ShowerAngleCluster));
-
     const std::vector<cluster> cluster_collection = ev_cluster->GetClusterCollection();
-
-    for(auto const i_cluster: cluster_collection)
-
-      fCMergeAlg.AppendClusterInfo(i_cluster, i_cluster.Hits());
-
-    //
-    // Merging operation
-    //
-    fCMergeAlg.ProcessMergeAlg();
-
+    
     // cluster_sets is a vector of vector where the inner vector is a set of cluster IDs 
     // to be merged into one. I assume all cluster index to be output are in cluster_sets.
     // Say you have clusters A, B, and C, and we decide to merge A and B (call it D=A+B).
     // Then a complete set of clusters in the output means cluster_sets should have
     // one vector with A and B cluster ID, then one vector of length 1 with cluster ID of C.
-    const std::vector<std::vector<unsigned int> > cluster_sets = fCMergeAlg.GetClusterSets();
+    const std::vector<std::vector<unsigned int> > cluster_sets = fCMergeAlg->GetClusterSets();
 
     //
     // Creating output of merged clusters
@@ -101,8 +109,6 @@ namespace larlight {
 
   bool ClusterMerge::finalize() {
 
-    fCMergeAlg.finalize();
-  
     return true;
   }
 }
