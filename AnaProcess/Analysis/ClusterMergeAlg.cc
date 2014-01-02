@@ -19,9 +19,9 @@ namespace larlight {
 
     _merge_tree = 0;
 
-    SetWire2Cm(1.);
+    SetWire2Cm(0.3);
 
-    SetTime2Cm(1.);
+    SetTime2Cm(0.0818566);
 
     ClearEventInfo();
 
@@ -331,6 +331,26 @@ namespace larlight {
 
     // Line segment: from ("V") = (start_x, start_y) to ("W")=(end_x, end_y)
     double length_squared = pow((end_x - start_x), 2) + pow((end_y - start_y), 2);
+
+    // Treat the case start & end point overlaps
+    if(length_squared < _min_distance_unit) {
+      
+      std::ostringstream msg;
+      msg
+        << std::endl
+        << Form(" Provided very short line segment: (%g,%g) => (%g,%g)",start_x,start_y,end_x,end_y) << std::endl
+	<< " Likely this means one of two clusters have start & end point identical." << std::endl
+        << " Check the cluster output!" << std::endl
+        << std::endl
+        << Form(" At this time, the algorithm uses a point (%g,%g)",start_x,start_y) << std::endl
+        << " to represent this cluster's location." << std::endl
+        << std::endl;
+
+      print(MSG::WARNING,__FUNCTION__,msg.str());
+
+      return (pow((point_x - start_x),2) + pow((point_y - start_y),2));
+
+    }
 
     //Find shortest distance between point ("P")=(point_x,point_y) to this line segment
     double t = ( (point_x - start_x)*(end_x - start_x) + (point_y - start_y)*(end_y - start_y) ) / length_squared;
