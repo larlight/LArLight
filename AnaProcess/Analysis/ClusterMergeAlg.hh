@@ -80,6 +80,9 @@ namespace larlight {
     /// Method to extract resulting set of cluster IDs for merging computed by ProcessMergeAlg() function.
     const std::vector<std::vector<unsigned int> > GetClusterSets () const {return _cluster_sets_v;};
 
+    /// Method to get pointer to the quality control TTree for analysis
+    TTree* GetMergeTree() const {return _merge_tree;}
+
     /// Method to compare a compatibility between two clusters
     bool CompareClusters(const cluster_merge_info &clus_info_A,
 			 const cluster_merge_info &clus_info_B);
