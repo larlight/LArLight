@@ -33,17 +33,20 @@ namespace larlight {
     /// Default destructor
     virtual ~ClusterMerge(){};
 
-    /** IMPLEMENT in ClusterMerge.cc!
+    /// Method to set ClusterMergeAlg pointer which should be processed prior to ClusterMerge::analyze() call.
+    void set_mergealg(ClusterMergeAlg* alg){ fCMergeAlg = alg;}
+
+    /** 
         Initialization method to be called before the analysis event loop.
     */ 
     virtual bool initialize();
 
-    /** IMPLEMENT in ClusterMerge.cc! 
+    /** 
         Analyze a data event-by-event  
     */
     virtual bool analyze(storage_manager* storage);
 
-    /** IMPLEMENT in ClusterMerge.cc! 
+    /** 
         Finalize method to be called after all events processed.
     */
     virtual bool finalize();
