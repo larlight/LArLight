@@ -15,13 +15,11 @@ namespace larlight {
 
     SetSquaredDistanceCut(1e9);
 
+    _min_distance_unit = -1;
+
     _det_params_prepared = false;
 
     _merge_tree = 0;
-
-    SetWire2Cm(0.3);
-
-    SetTime2Cm(0.0818566);
 
     ClearEventInfo();
 
@@ -139,8 +137,18 @@ namespace larlight {
   void ClusterMergeAlg::PrepareDetParams() {
 
     if(!_det_params_prepared) {
-      SetWire2Cm(1.);
-      SetTime2Cm(1.);
+
+      _wire_2_cm = 0.3;
+      _time_2_cm = 0.0818566;
+
+      if(_min_distance_unit < 0) {
+
+        double smaller_factor = (_wire_2_cm < _time_2_cm) ? _wire_2_cm : _time_2_cm;
+
+        _min_distance_unit = pow(smaller_factor,2);
+
+      }
+
       ReportConfig();
       _det_params_prepared = true;
     }
@@ -216,6 +224,8 @@ namespace larlight {
     
     //make sure all of the un-mergable clusters are in _cluster_sets_v, individually
     FinalizeClusterSets();
+
+    if(_merge_tree) _merge_tree->Fill();
 
   }
   

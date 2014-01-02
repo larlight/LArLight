@@ -193,8 +193,8 @@ namespace larlight {
     double _wire_2_cm; ///< Conversion factor from wire number to cm scale
     double _time_2_cm; ///< Conversion factor from time to cm scale
     double _max_allowed_2D_angle_diff; //in degrees
-    double _max_2D_dist2;              //in ((wirenumber^2)+(seconds^2))^0.5
-    
+    double _max_2D_dist2;              //in cm^2
+    double _min_distance_unit;         //in cm^2
   };
 }
 #endif
