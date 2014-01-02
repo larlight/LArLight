@@ -145,6 +145,9 @@ namespace larlight {
     /// Method to prepare detector parameters
     void PrepareDetParams();    
 
+    /// Method to calculate TTree variables that require calculation
+    void CalculateTTreeVars();
+
     /// Method to append hit-array-info per cluster ... called by AppendClusterInfo() function.
     void AppendHitInfo(cluster_merge_info ci, const std::vector<larlight::hit> &in_hit_v);
 
@@ -195,6 +198,10 @@ namespace larlight {
     double _max_allowed_2D_angle_diff; //in degrees
     double _max_2D_dist2;              //in cm^2
     double _min_distance_unit;         //in cm^2
+
+    /// cluster multiplicity, per view, after merge algo
+    /// These go into quality control TTree
+    int u_clus_mult, v_clus_mult, w_clus_mult;
   };
 }
 #endif

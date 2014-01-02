@@ -49,6 +49,8 @@ namespace larlight {
 
   bool ClusterMergeAlg::initialize() {
 
+    PrepareTTree();
+
     return true;
   }
 
@@ -131,6 +133,10 @@ namespace larlight {
 
       _merge_tree = new TTree("merge_tree","");
 
+      _merge_tree->Branch("u_clus_mult", &u_clus_mult, "u_clus_mult/I");
+      _merge_tree->Branch("v_clus_mult", &v_clus_mult, "v_clus_mult/I");
+      _merge_tree->Branch("w_clus_mult", &w_clus_mult, "w_clus_mult/I");
+
     }
   }
 
@@ -154,6 +160,59 @@ namespace larlight {
     }
   } 
 
+  void ClusterMergeAlg::CalculateTTreeVars() {
+    //loop over _cluster_sets_v
+    //for each element (vector), check the view of all the inner clusters
+    //if they all match (which they should, by construction), add to the
+    //appropriate *_clus_mult variable
+
+    for(auto const i_cluster_set: _cluster_sets_v){
+      
+      bool set_is_in_u_plane = false;
+      bool set_is_in_v_plane = false;
+      bool set_is_in_w_plane = false;
+      
+      //find what view the first cluster_index in this set is from
+      //(assuming the algo works, and all clusters in this set are from same view)
+	
+      //check if this cluster ID is in the _u_clusters vector
+      for(auto const i_u_clus: _u_clusters){
+	if(i_cluster_set[0] == i_u_clus.cluster_index){
+	  set_is_in_u_plane = true;
+	  std::cout<<"Cluster "<<i_cluster_set[0]<<" is in _u_clusters."<<std::endl;
+	  //	  break;
+	}
+      }
+      //check if this cluster ID is in the _v_clusters vector
+      for(auto const i_v_clus: _v_clusters){
+	if(i_cluster_set[0] == i_v_clus.cluster_index){
+	  //	    v_clus_mult++;
+	  set_is_in_v_plane = true;
+	  std::cout<<"Cluster "<<i_cluster_set[0]<<" is in _v_clusters."<<std::endl;
+	  //	  break;
+	}
+      }
+      //check if this cluster ID is in the _w_clusters vector
+      for(auto const i_w_clus: _w_clusters){
+	if(i_cluster_set[0] == i_w_clus.cluster_index){
+	  //	    w_clus_mult++;
+	  set_is_in_w_plane = true;
+	  std::cout<<"Cluster "<<i_cluster_set[0]<<" is in _w_clusters."<<std::endl;
+	  //	  break;
+	}
+      }
+      
+      //now, i know what view this cluster grouping belongs to
+      if(set_is_in_u_plane) u_clus_mult++;
+      if(set_is_in_v_plane) v_clus_mult++;
+      if(set_is_in_w_plane) w_clus_mult++;
+      
+    }
+    std::cout<<"Done looping over clusters_v for ttree... #u,#v,#w = "
+	     <<Form("%d,%d,%d",u_clus_mult,v_clus_mult,w_clus_mult)
+	     <<std::endl;
+  }
+  
   void ClusterMergeAlg::ClearInputInfo() {
 
     _u_clusters.clear();
@@ -169,7 +228,13 @@ namespace larlight {
 
   }
 
-  void ClusterMergeAlg::ClearTTreeInfo() {}
+  void ClusterMergeAlg::ClearTTreeInfo() {
+
+    u_clus_mult = 0;
+    v_clus_mult = 0;
+    w_clus_mult = 0;
+
+  }
 
   void ClusterMergeAlg::ClearEventInfo() {
 
@@ -224,6 +289,9 @@ namespace larlight {
     
     //make sure all of the un-mergable clusters are in _cluster_sets_v, individually
     FinalizeClusterSets();
+
+    //calculate the quality control TTree vars that require calculation
+    CalculateTTreeVars();
 
     if(_merge_tree) _merge_tree->Fill();
 
