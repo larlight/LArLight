@@ -16,9 +16,21 @@ ana_proc.set_output_file("aho.root")
 
 ana_proc.set_ana_output_file("")
 
-ana_proc.add_process(larlight.ClusterMerge())
+my_merge_alg = larlight.ClusterMergeAlg()
+my_merger = larlight.ClusterMerge()
 
-#ana_proc.process_event()
-ana_proc.run()
+my_merger.set_mergealg(my_merge_alg)
+
+ana_proc.add_process(my_merge_alg)
+
+ana_proc.add_process(my_merger)
+
+while ana_proc.process_event():
+    
+    print my_merge_alg.GetMergeTree()
+
+    sys.stdin.readline()
+
+#ana_proc.run()
 
 
