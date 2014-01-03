@@ -205,6 +205,7 @@ namespace larlight {
     /// cluster multiplicity, per view, after merge algo
     /// These go into quality control TTree
     int u_clus_mult, v_clus_mult, w_clus_mult;
+    std::vector<double> u_angles, v_angles, w_angles;
   };
 }
 #endif

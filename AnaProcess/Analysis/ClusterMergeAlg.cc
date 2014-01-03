@@ -136,6 +136,9 @@ namespace larlight {
       _merge_tree->Branch("u_clus_mult", &u_clus_mult, "u_clus_mult/I");
       _merge_tree->Branch("v_clus_mult", &v_clus_mult, "v_clus_mult/I");
       _merge_tree->Branch("w_clus_mult", &w_clus_mult, "w_clus_mult/I");
+      _merge_tree->Branch("u_angles", "std::vector<double>", &u_angles);
+      _merge_tree->Branch("v_angles", "std::vector<double>", &v_angles);
+      _merge_tree->Branch("w_angles", "std::vector<double>", &w_angles);
 
     }
   }
@@ -176,42 +179,34 @@ namespace larlight {
       //(assuming the algo works, and all clusters in this set are from same view)
 	
       //check if this cluster ID is in the _u_clusters vector
+      //also push back the angle, which is another ttree variable
       for(auto const i_u_clus: _u_clusters){
-	if(i_cluster_set[0] == i_u_clus.cluster_index){
+	if(i_cluster_set[0] == i_u_clus.cluster_index)
 	  set_is_in_u_plane = true;
-	  std::cout<<"Cluster "<<i_cluster_set[0]<<" is in _u_clusters."<<std::endl;
-	  //	  break;
-	}
+	u_angles.push_back(i_u_clus.angle);
       }
       //check if this cluster ID is in the _v_clusters vector
+      //also push back the angle, which is another ttree variable
       for(auto const i_v_clus: _v_clusters){
-	if(i_cluster_set[0] == i_v_clus.cluster_index){
-	  //	    v_clus_mult++;
+	if(i_cluster_set[0] == i_v_clus.cluster_index)
 	  set_is_in_v_plane = true;
-	  std::cout<<"Cluster "<<i_cluster_set[0]<<" is in _v_clusters."<<std::endl;
-	  //	  break;
-	}
+	v_angles.push_back(i_v_clus.angle);
       }
       //check if this cluster ID is in the _w_clusters vector
+      //also push back the angle, which is another ttree variable
       for(auto const i_w_clus: _w_clusters){
-	if(i_cluster_set[0] == i_w_clus.cluster_index){
-	  //	    w_clus_mult++;
+	if(i_cluster_set[0] == i_w_clus.cluster_index)
 	  set_is_in_w_plane = true;
-	  std::cout<<"Cluster "<<i_cluster_set[0]<<" is in _w_clusters."<<std::endl;
-	  //	  break;
-	}
+	w_angles.push_back(i_w_clus.angle);
       }
       
-      //now, i know what view this cluster grouping belongs to
+      //now, I know what view this cluster grouping belongs to, ++ multiplicity
       if(set_is_in_u_plane) u_clus_mult++;
       if(set_is_in_v_plane) v_clus_mult++;
       if(set_is_in_w_plane) w_clus_mult++;
-      
     }
-    std::cout<<"Done looping over clusters_v for ttree... #u,#v,#w = "
-	     <<Form("%d,%d,%d",u_clus_mult,v_clus_mult,w_clus_mult)
-	     <<std::endl;
-  }
+    
+  } //end CalculateTTreeVars
   
   void ClusterMergeAlg::ClearInputInfo() {
 
@@ -233,6 +228,9 @@ namespace larlight {
     u_clus_mult = 0;
     v_clus_mult = 0;
     w_clus_mult = 0;
+    u_angles.clear();
+    v_angles.clear();
+    w_angles.clear();
 
   }
 
@@ -323,10 +321,11 @@ namespace larlight {
     double angle1 = cluster_a.angle * _time_2_cm / _wire_2_cm;
     double angle2 = cluster_b.angle * _time_2_cm / _wire_2_cm;
 
-    bool compatible = ( abs(angle1-angle2)     < _max_allowed_2D_angle_diff ||
+    bool compatible = ( abs(angle1-angle2)     < _max_allowed_2D_angle_diff );
+      /*||
 			abs(angle1-angle2-180) < _max_allowed_2D_angle_diff ||
 			abs(angle1-angle2+180) < _max_allowed_2D_angle_diff   );
-
+      */
     if(_verbose) {
 
       if(compatible) print(MSG::NORMAL,__FUNCTION__," Compatible in angle.");
