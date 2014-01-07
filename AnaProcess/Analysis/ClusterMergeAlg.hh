@@ -17,8 +17,10 @@
 
 #include "ana_base.hh"
 #include "ana_info_struct.hh"
-#include <cmath> //used for std::abs() absolute value
+#include <cmath> //used for std::abs() absolute value, acos() function
 #include <sstream>
+#include <TH1F.h> //used for histos in RefineStartPoint stuff
+#include <TH2F.h> //used for temporary histogram comparing angle definitions
 
 namespace larlight {
 
@@ -125,6 +127,20 @@ namespace larlight {
     */
     int isInClusterSets(unsigned int index) const;
     
+
+    /**
+        This function should probably be it's own module. Writing it here for now...
+	It will use the hits in a cluster and based on the shape of the cluster
+	(cone? backwards cone?) it will determine if the initial start/end points
+	should be swapped
+    */
+    void RefineStartPointsShowerShape(cluster_merge_info &ci, const std::vector<larlight::hit> &in_hit_v);
+
+
+    //temporary function just so i can look at histos from RefineStartPoint
+    const TH1F* GetHisto_angles_forward() const{ return _hit_angles_forwards; };
+    const TH1F* GetHisto_angles_backward() const{ return _hit_angles_backwards; };
+    
   protected:
 
     /// Method to set a conversion factor from wire to cm scale
@@ -145,6 +161,9 @@ namespace larlight {
     /// Method to prepare quality control TTree
     void PrepareTTree();
 
+    /// Method to prepare histograms used in RefineStartPoint functions
+    void PrepareHistos();
+
     /// Method to prepare detector parameters
     void PrepareDetParams();    
 
@@ -152,7 +171,7 @@ namespace larlight {
     void CalculateTTreeVars();
 
     /// Method to append hit-array-info per cluster ... called by AppendClusterInfo() function.
-    void AppendHitInfo(cluster_merge_info ci, const std::vector<larlight::hit> &in_hit_v);
+    void AppendHitInfo(cluster_merge_info &ci, const std::vector<larlight::hit> &in_hit_v);
 
     /**
        For a given pair of clusters, this function calls CompareClusters() and append to the resulting
@@ -169,6 +188,10 @@ namespace larlight {
 
     /// A function to add a cluster to a merged sets (_cluster_sets_v)
     int AppendToClusterSets(unsigned int cluster_index, int merged_index=-1);
+
+    /// Temporary utility function to print out the _cluster_sets_v vector for debugging
+    void PrintClusterSetsV();
+
 
   protected:
 
@@ -201,7 +224,11 @@ namespace larlight {
     double _max_allowed_2D_angle_diff; //in degrees
     double _max_2D_dist2;              //in cm^2
     double _min_distance_unit;         //in cm^2
+    int    _min_hits_to_consider; ///< Minimum # of hits to bother trying to refine start/endpoints
 
+    /// Angle histgrams used in RefineStartPointShowerShape stuff
+    TH1F *_hit_angles_forwards, *_hit_angles_backwards;
+    TH2F *_compare_angle_definitions;
     /// cluster multiplicity, per view, after merge algo
     /// These go into quality control TTree
     int u_clus_mult, v_clus_mult, w_clus_mult;

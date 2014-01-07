@@ -21,6 +21,9 @@ namespace larlight {
 
     _merge_tree = 0;
 
+    _min_hits_to_consider = 200;
+
+
     ClearEventInfo();
 
   };
@@ -51,10 +54,20 @@ namespace larlight {
 
     PrepareTTree();
 
+    PrepareHistos();
+    
     return true;
   }
 
   bool ClusterMergeAlg::finalize() {
+    
+    if(_hit_angles_forwards)
+      {delete _hit_angles_forwards; _hit_angles_forwards=0;}
+    if(_hit_angles_backwards)
+      {delete _hit_angles_backwards; _hit_angles_backwards=0;}
+    if(_compare_angle_definitions)
+      {delete _compare_angle_definitions; _compare_angle_definitions=0;}
+    
 
     if(_fout) {
 
@@ -88,6 +101,7 @@ namespace larlight {
 
       AppendClusterInfo(i_cluster,i_cluster.Hits());
 
+    
     // Step (2) ... Run algorithm
     ProcessMergeAlg();
 
@@ -99,6 +113,7 @@ namespace larlight {
 					   const std::vector<larlight::hit> &in_hit_v) {
 
     PrepareDetParams();
+
     cluster_merge_info ci;
     ci.cluster_index = cl.ID();
     ci.view       = cl.View();
@@ -107,9 +122,25 @@ namespace larlight {
     ci.end_wire   = cl.EndPos()[0];
     ci.end_time   = cl.EndPos()[1];
     ci.angle      = cl.dTdW();
+    ci.n_hits     = in_hit_v.size();
 
+
+    //trying to compare andrzej's angle (which comes from a loop over hits and calls to a geometry package) to the angle calculated from start-to-end point and conversion to the proper units
+    //it seems they're TOTALLY different. not sure what to do about it. for now, i'm just excluding these events from multiplicity plots
+    /*
+    double tmpangle = (ci.end_wire-ci.start_wire)/
+      pow(pow( (ci.end_wire-ci.start_wire),2 ) + 
+	  pow( (ci.end_time-ci.start_time),2 ),0.5 );
+    tmpangle = acos(tmpangle);
+    tmpangle = tmpangle * 180. / 3.14159;
+    _compare_angle_definitions->Fill(ci.angle,tmpangle);
+    std::cout<<Form("angle = %f, tmpangle = %f\n",ci.angle,tmpangle)
+	     <<std::endl;
+    */
+
+    //this function modifies ci
     AppendHitInfo(ci, in_hit_v);
-    
+
     if(ci.view == GEO::kU) _u_clusters.push_back(ci);
     else if(ci.view == GEO::kV) _v_clusters.push_back(ci);
     else if(ci.view == GEO::kW) _w_clusters.push_back(ci);
@@ -123,10 +154,84 @@ namespace larlight {
     }
 
   }
+  
+  void ClusterMergeAlg::AppendHitInfo(cluster_merge_info &ci, const std::vector<larlight::hit> &in_hit_v)
+  {
+    //This function loops over hits and changes cluster_merge_info if it decides it wants to
+    //For now, if it wants to siwtch the start/endpoint, it clears the cluster_info so it won't be
+    //included in the rest of the routine. Ideally, I want to switch start/endpoint *and* the angle
+    //but for now I can't figure how how the hell to deal with angle switch. It's complicated.
+    RefineStartPointsShowerShape(ci, in_hit_v);
 
-  void ClusterMergeAlg::AppendHitInfo(cluster_merge_info ci, const std::vector<larlight::hit> &in_hit_v)
-  {};
+  };
 
+  void ClusterMergeAlg::RefineStartPointsShowerShape(cluster_merge_info &ci, const std::vector<larlight::hit> &in_hit_v)
+  {
+
+    double i_hit_angle = -1.;
+    _hit_angles_forwards->Reset();
+    _hit_angles_backwards->Reset();
+    
+    //only bother refining stat/endpoints if the # of hits in the cluster is big enough
+    if((int)in_hit_v.size() > _min_hits_to_consider){
+      
+      //loop over hits, make histogram of angle b/t hit and cluster axis
+      //(line connecting the start point and end point)
+      for(auto i_hit: in_hit_v){
+	//dot product to calculate angle... is TVector2 faster?
+	i_hit_angle = 
+	  ( (ci.end_wire - ci.start_wire) * (i_hit.Wire()     - ci.start_wire) ) +
+	  ( (ci.end_time - ci.start_time) * (i_hit.PeakTime() - ci.start_time) );
+	//divide by magnitude
+	i_hit_angle /= 
+	  pow(( pow((ci.end_wire -ci.start_wire),2) + pow((ci.end_time     -ci.start_time),2) ),0.5) *
+	  pow(( pow((i_hit.Wire()-ci.start_wire),2) + pow((i_hit.PeakTime()-ci.start_time),2) ),0.5);
+	
+	//      std::cout<<Form("cluster info: start: (%f,%f), end: (%f,%f), hit info: (%u,%f), calculated cos(angle) = %f",ci.start_wire,ci.start_time,ci.end_wire,ci.end_time,i_hit.Wire(),i_hit.PeakTime(),i_hit_angle)<<std::endl;
+	
+	_hit_angles_forwards->Fill(i_hit_angle);
+	
+	//now, pretend start and end points are swapped and make a histogram for that
+	i_hit_angle = 
+	  ( (ci.start_wire - ci.end_wire) * (i_hit.Wire()     - ci.end_wire) ) +
+	  ( (ci.start_time - ci.end_time) * (i_hit.PeakTime() - ci.end_time) );
+	//divide by magnitude
+	i_hit_angle /= 
+	  pow(( pow((ci.start_wire-ci.end_wire),2) + pow((ci.start_time   -ci.end_time),2) ),0.5) *
+	  pow(( pow((i_hit.Wire() -ci.end_wire),2) + pow((i_hit.PeakTime()-ci.end_time),2) ),0.5);
+	
+	_hit_angles_backwards->Fill(i_hit_angle);
+	
+      }//end looping over hits in this cluster
+      
+      double f_mean = _hit_angles_forwards ->GetMean();
+      double b_mean = _hit_angles_backwards->GetMean();
+      double f_RMS  = _hit_angles_forwards ->GetRMS();
+      double b_RMS  = _hit_angles_backwards->GetRMS();
+      
+      bool should_switch = (b_mean > f_mean) && (b_RMS < f_RMS);
+
+      if(should_switch){
+
+	double new_start_wire = ci.end_wire;
+	double new_end_wire   = ci.start_wire;
+	double new_start_time = ci.end_time;
+	double new_end_time   = ci.start_time;
+	
+	ci.start_wire = new_start_wire;
+	ci.start_time = new_start_time;
+	ci.end_wire   = new_end_wire;
+	ci.end_time   = new_end_time;
+	// ci.angle      = something goes here
+	//TEMPORARY workaround to angle problem.
+	//angle2dcompatibility will ask if n_hits==-1, allow +/-180 on the angle
+	ci.n_hits = -1;
+      }
+
+    } // end if there are enough hits in the cluster
+
+  } // end RefineStartstuff function
+  
   void ClusterMergeAlg::PrepareTTree() {
 
     if(!_merge_tree) {
@@ -143,6 +248,23 @@ namespace larlight {
     }
   }
 
+  void ClusterMergeAlg::PrepareHistos() {
+
+    //need to intialize the pointers to zero or the shit hits the fan!
+    _hit_angles_forwards=0;
+    _hit_angles_backwards=0;
+    _compare_angle_definitions=0;
+    
+    if(!_hit_angles_forwards)
+      _hit_angles_forwards = new TH1F("_hit_angles_forwards","_hit_angles_forwards",200,-1,1);
+    
+    if(!_hit_angles_backwards)
+      _hit_angles_backwards = new TH1F("_hit_angles_backwards","_hit_angles_backwards",200,-1,1);
+    
+    if(!_compare_angle_definitions)
+      _compare_angle_definitions = new TH2F("_compare_angle_definitions","angle def comparison",100,-180,180,100,-180,180);
+  }
+  
   void ClusterMergeAlg::PrepareDetParams() {
 
     if(!_det_params_prepared) {
@@ -201,6 +323,8 @@ namespace larlight {
       }
       
       //now, I know what view this cluster grouping belongs to, ++ multiplicity
+      //note i'm only doing ++, not += i_cluster_set.size() because this is the
+      //multiplicity *after* all of the elements of i_cluster_set are theoretically merged
       if(set_is_in_u_plane) u_clus_mult++;
       if(set_is_in_v_plane) v_clus_mult++;
       if(set_is_in_w_plane) w_clus_mult++;
@@ -220,7 +344,9 @@ namespace larlight {
   void ClusterMergeAlg::ClearOutputInfo() {
 
     _cluster_sets_v.clear();
-
+    u_angles.clear();
+    v_angles.clear();
+    w_angles.clear();
   }
 
   void ClusterMergeAlg::ClearTTreeInfo() {
@@ -252,6 +378,7 @@ namespace larlight {
     // Clear all algorithm's output
     ClearOutputInfo();
 	
+
     //Loop over all possible combinations of clusters in u-view
     for(int iclus = 0; iclus < (int)_u_clusters.size(); ++iclus){
 
@@ -305,34 +432,44 @@ namespace larlight {
     }
 
     bool merge_clusters = true;
-
+    
+    
     merge_clusters = merge_clusters && Angle2DCompatibility(clusA, clusB);
-
-    merge_clusters = merge_clusters &&  ShortestDistanceCompatibility(clusA, clusB);
-
+    
+    merge_clusters = merge_clusters && ShortestDistanceCompatibility(clusA, clusB);
+    
+    
     return merge_clusters;
-
+    
   }
 
 
   bool ClusterMergeAlg::Angle2DCompatibility(const cluster_merge_info &cluster_a, 
 					      const cluster_merge_info &cluster_b) const {
-			    
-    double angle1 = cluster_a.angle * _time_2_cm / _wire_2_cm;
-    double angle2 = cluster_b.angle * _time_2_cm / _wire_2_cm;
+    bool compatible = false;
 
-    bool compatible = ( abs(angle1-angle2)     < _max_allowed_2D_angle_diff );
-      /*||
-			abs(angle1-angle2-180) < _max_allowed_2D_angle_diff ||
-			abs(angle1-angle2+180) < _max_allowed_2D_angle_diff   );
-      */
+    //I don't think these conversion factors are needed. I'm 99% sure.
+    double angle1 = cluster_a.angle;// * _time_2_cm / _wire_2_cm;
+    double angle2 = cluster_b.angle;// * _time_2_cm / _wire_2_cm;
+    
+    //"if refinestart function wanted to switch the start/end point of either cluster
+    //then accept the +/- 180 stuff on the angle cut. else, don't accept +/- 180 stuff"
+    if(cluster_a.n_hits == -1 || cluster_b.n_hits == -1)
+      compatible = (abs(angle1-angle2)     < _max_allowed_2D_angle_diff ||
+		    abs(angle1-angle2-180) < _max_allowed_2D_angle_diff ||
+		    abs(angle1-angle2+180) < _max_allowed_2D_angle_diff   );
+    
+    else
+      compatible = (abs(angle1-angle2)     < _max_allowed_2D_angle_diff );
+    
+    
     if(_verbose) {
-
+      
       if(compatible) print(MSG::NORMAL,__FUNCTION__," Compatible in angle.");
       else print(MSG::NORMAL,__FUNCTION__," NOT compatible in angle.");
-
+      
     }
-
+    
     return compatible;
 
   }//end Angle2DCompatibility
@@ -463,7 +600,7 @@ namespace larlight {
   int ClusterMergeAlg::AppendToClusterSets(unsigned int cluster_index, int merged_index) {
 
     // This function append the provided cluster_index into the _cluster_sets_v.
-    // If merged_index is not provided (default=-1), then we assume this meands to append a new merged cluster set.
+    // If merged_index is not provided (default=-1), then we assume this means to append a new merged cluster set.
     // Note we also log the merged index in _cluster_merged_index vector to support fast search in isInClusterSets() function.
 
     // First, check if this cluster_index is already in the set or not.
@@ -505,9 +642,10 @@ namespace larlight {
     //this function builds the _cluster_sets_v vector, according to the format defined
     //in ClusterAlgo. here's an example of what _cluster_sets_v format is:
     //imagine an event with clusters 0, 1, 2, 3, 4, 5
-    //pretend 0, 1 are found compatible for merging.
-    //pretend 1, 2 are found compatible for merging.
-    //pretend 4, 5 are found compatible for merging.
+    //pretend 0, 1 are found compatible for merging (pass cuts && are in same view, EG: U).
+    //pretend 1, 2 are found compatible for merging (pass cuts && are in same view, U).
+    //pretend 4, 5 are found compatible for merging (pass cuts && are in same view, EG: V)
+    //pretend 3 is not found compatible for merging with anything, and is in view W.
     //_cluster_sets_v is a vector<vector<int>>, and it should look like
     //_cluster_sets_v = ( (0, 1, 2), (4, 5), (3) )
 
@@ -547,10 +685,12 @@ namespace larlight {
 	}	  
 
 	// else if both indexes are already in the _cluster_sets_v vector but the indexes are not same
-	else if(a_index != b_index)
+	else if(a_index != b_index){
 
 	  print(MSG::ERROR,__FUNCTION__,"LOGIC ERROR: Found two compatible clusters in different sets!");
-
+	  //	  std::cout<<"a_index = "<<a_index<<", b_index = "<<b_index<<std::endl;
+	  //	  PrintClusterSetsV();
+	}
 	//at the end of all possible cluster matching permutations, if some are not in 
 	//_cluster_sets_v yet, push them back individually as individual elements...
 	//this is what FinalizeClusterSets function is for
@@ -610,8 +750,20 @@ namespace larlight {
     
   }//end isInClusterSets function
   
-  
 
+  void ClusterMergeAlg::PrintClusterSetsV(){
+    
+    std::cout<<"_cluster_sets_v = {";
+    for(auto const i_cluster_set: _cluster_sets_v){
+      std::cout<<"[";
+      for(auto const i_index: i_cluster_set){
+	std::cout<<i_index<<", ";
+      }
+      std::cout<<"],";
+    }
+    std::cout<<"}."<<std::endl;
+    
+  }//end print cluster sets v
 }
 
 #endif

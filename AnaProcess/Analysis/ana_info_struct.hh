@@ -46,6 +46,7 @@ namespace larlight {
     //Total charge of all hits in the cluster
     double sum_charge;
 
+
     cluster_ana_info(){
       start_wire = start_time = -1;
       end_wire = end_time = -1;
@@ -56,6 +57,7 @@ namespace larlight {
       sum_charge = 0;
       view = GEO::kUnknown;
       cluster_index = 0xffff;
+
     };
 
   };
@@ -82,6 +84,8 @@ namespace larlight {
 
     double angle;               ///< 2D angle
 
+    int n_hits;                 ///< Total number of hits in cluster
+
     /// Default constructor
     cluster_merge_info() {
       
@@ -89,6 +93,7 @@ namespace larlight {
       view = GEO::kUnknown;
       start_wire = start_time = end_wire = end_time = -1;
       start_wire_err = start_time_err = end_wire_err =end_time_err = -1;
+      n_hits = -1;
 
     };
 
