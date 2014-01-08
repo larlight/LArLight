@@ -21,6 +21,9 @@ namespace larlight {
 
     _merge_tree = 0;
 
+    _hit_angles_forwards=0;
+    _hit_angles_backwards=0;
+
     ClearEventInfo();
 
   };
@@ -54,6 +57,8 @@ namespace larlight {
     _merge_tree = 0;
 
     PrepareTTree();
+    
+    PrepareHistos();
 
     ClearEventInfo();
 
@@ -69,6 +74,11 @@ namespace larlight {
 
     }
   
+    if(_hit_angles_forwards)
+      {delete _hit_angles_forwards; _hit_angles_forwards=0;}
+    if(_hit_angles_backwards)
+      {delete _hit_angles_backwards; _hit_angles_backwards=0;}
+
     return true;
   }
   
@@ -130,11 +140,81 @@ namespace larlight {
 
   }
 
-  void ClusterMergeAlg::AppendHitInfo(cluster_merge_info ci, const std::vector<larlight::hit> &in_hit_v)
-  {};
+  void ClusterMergeAlg::AppendHitInfo(cluster_merge_info &ci, const std::vector<larlight::hit> &in_hit_v)
+  {
+    RefineStartPointsShowerShape(ci,in_hit_v);
+  }
+  
+  void ClusterMergeAlg::RefineStartPointsShowerShape(cluster_merge_info &ci, const std::vector<larlight::hit> &in_hit_v){
+    //assuming start/endpoint are correct, make histogram of angles between
+    //individual hits and the vector pointing from start to end point
+    _min_hits_to_consider = 200;
 
+    _hit_angles_forwards -> Reset();
+    _hit_angles_backwards-> Reset();
+
+    if((int)in_hit_v.size() >= _min_hits_to_consider){
+      
+      double cosangle = 99999999.;
+      
+      //vector from start point to end point is SEPvec
+      //vector from start point to hit is SHITvec ;)
+      
+      //loop over hits
+      for(auto const i_hit: in_hit_v){
+	
+	double SEP_x  = (ci.end_wire      - ci.start_wire) * _wire_2_cm;
+	double SEP_y  = (ci.end_time      - ci.start_time) * _time_2_cm;
+	double SHIT_x = (i_hit.Wire()     - ci.start_wire) * _wire_2_cm;
+	double SHIT_y = (i_hit.PeakTime() - ci.start_time) * _time_2_cm;    
+	
+	cosangle = ( SEP_x*SHIT_x + SEP_y*SHIT_y );
+	cosangle = cosangle / (
+			       pow( pow(SEP_x,2)+ pow(SEP_y,2) ,0.5) *
+			       pow( pow(SHIT_x,2)+pow(SHIT_y,2),0.5)
+			       );
+	
+	_hit_angles_forwards->Fill(cosangle);
+	
+	//now switch the vector to be from end point to start point and re-do
+	SEP_x  = (ci.start_wire    - ci.end_wire) * _wire_2_cm;
+	SEP_y  = (ci.start_time    - ci.end_time) * _time_2_cm;
+	SHIT_x = (i_hit.Wire()     - ci.end_wire) * _wire_2_cm;
+	SHIT_y = (i_hit.PeakTime() - ci.end_time) * _time_2_cm;        
+
+	cosangle = ( SEP_x*SHIT_x + SEP_y*SHIT_y );
+	cosangle = cosangle / (
+			       pow( pow(SEP_x,2)+ pow(SEP_y,2) ,0.5) *
+			       pow( pow(SHIT_x,2)+pow(SHIT_y,2),0.5)
+			       );
+	
+	_hit_angles_backwards->Fill(cosangle);
+      }
+      
+      //decide if you want to switch the start and end point
+      //for now, use biggest mean && smallest RMS to decide
+      if(_hit_angles_forwards->GetMean() < _hit_angles_backwards->GetMean() &&
+	 _hit_angles_forwards->GetRMS()  > _hit_angles_backwards->GetRMS() ){
+
+	int new_end_wire   = ci.start_wire;
+	int new_end_time   = ci.start_time;
+	int new_start_wire = ci.end_wire;
+	int new_start_time = ci.end_time;
+	//int new_angle = something?!! not trivial to switch it
+	ci.start_wire = new_start_wire;
+	ci.end_wire   = new_end_wire;
+	ci.start_time = new_start_time;
+	ci.end_time   = new_end_time;
+	//if swapped, for now, set n_hits = -1 to ignore it in multiplicity stuff
+	ci.n_hits = -1;
+      }
+      
+    } //end if more than _min_hits_to_consider hits
+    
+  }//end RefineStart shit
+  
   void ClusterMergeAlg::PrepareTTree() {
-
+    
     if(!_merge_tree) {
 
       _merge_tree = new TTree("merge_tree","");
@@ -147,6 +227,16 @@ namespace larlight {
       _merge_tree->Branch("w_angles", "std::vector<double>", &w_angles);
 
     }
+  }
+
+  void ClusterMergeAlg::PrepareHistos() {
+
+    if(!_hit_angles_forwards)
+      _hit_angles_forwards = new TH1F("_hit_angles_forwards","_hit_angles_forwards",100,-1.,1.);
+    if(!_hit_angles_backwards)
+      _hit_angles_backwards = new TH1F("_hit_angles_backwards","_hit_angles_backwards",100,-1.,1.);
+
+
   }
 
   void ClusterMergeAlg::PrepareDetParams() {
@@ -324,14 +414,21 @@ namespace larlight {
   bool ClusterMergeAlg::Angle2DCompatibility(const cluster_merge_info &cluster_a, 
 					      const cluster_merge_info &cluster_b) const {
 			    
-    double angle1 = cluster_a.angle * _time_2_cm / _wire_2_cm;
-    double angle2 = cluster_b.angle * _time_2_cm / _wire_2_cm;
+    //pretty sure we don't need conversion factors here. already in cm/cm units
+    double angle1 = cluster_a.angle;// * _time_2_cm / _wire_2_cm;
+    double angle2 = cluster_b.angle;// * _time_2_cm / _wire_2_cm;
 
-    bool compatible = ( abs(angle1-angle2)     < _max_allowed_2D_angle_diff );
-      /*||
-			abs(angle1-angle2-180) < _max_allowed_2D_angle_diff ||
-			abs(angle1-angle2+180) < _max_allowed_2D_angle_diff   );
-      */
+    bool compatible = false;
+    
+    //if RefineStart shit decided to swap the start/end points (IE it set n_hits = -1),
+    //then allow the +/- 180 degree ambiguity, for now
+    if(cluster_a.n_hits == -1 || cluster_b.n_hits == -1)
+      compatible = ( abs(angle1-angle2)     < _max_allowed_2D_angle_diff ||
+		     abs(angle1-angle2-180) < _max_allowed_2D_angle_diff ||
+		     abs(angle1-angle2+180) < _max_allowed_2D_angle_diff   );
+    else
+      compatible = ( abs(angle1-angle2)     < _max_allowed_2D_angle_diff );
+
     if(_verbose) {
 
       if(compatible) print(MSG::NORMAL,__FUNCTION__," Compatible in angle.");
