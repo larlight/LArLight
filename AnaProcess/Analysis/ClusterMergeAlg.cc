@@ -123,6 +123,7 @@ namespace larlight {
     ci.end_wire   = cl.EndPos()[0];
     ci.end_time   = cl.EndPos()[1];
     ci.angle      = cl.dTdW();
+    ci.n_hits     = (int)cl.Hits().size();
 
     AppendHitInfo(ci, in_hit_v);
     
@@ -153,8 +154,8 @@ namespace larlight {
     _hit_angles_forwards -> Reset();
     _hit_angles_backwards-> Reset();
 
+
     if((int)in_hit_v.size() >= _min_hits_to_consider){
-      
       double cosangle = 99999999.;
       
       //vector from start point to end point is SEPvec
@@ -195,7 +196,6 @@ namespace larlight {
       //for now, use biggest mean && smallest RMS to decide
       if(_hit_angles_forwards->GetMean() < _hit_angles_backwards->GetMean() &&
 	 _hit_angles_forwards->GetRMS()  > _hit_angles_backwards->GetRMS() ){
-
 	int new_end_wire   = ci.start_wire;
 	int new_end_time   = ci.start_time;
 	int new_start_wire = ci.end_wire;
@@ -208,8 +208,10 @@ namespace larlight {
 	//if swapped, for now, set n_hits = -1 to ignore it in multiplicity stuff
 	ci.n_hits = -1;
       }
+
       
     } //end if more than _min_hits_to_consider hits
+
     
   }//end RefineStart shit
   
@@ -422,12 +424,17 @@ namespace larlight {
     
     //if RefineStart shit decided to swap the start/end points (IE it set n_hits = -1),
     //then allow the +/- 180 degree ambiguity, for now
+
     if(cluster_a.n_hits == -1 || cluster_b.n_hits == -1)
       compatible = ( abs(angle1-angle2)     < _max_allowed_2D_angle_diff ||
 		     abs(angle1-angle2-180) < _max_allowed_2D_angle_diff ||
 		     abs(angle1-angle2+180) < _max_allowed_2D_angle_diff   );
+    
     else
       compatible = ( abs(angle1-angle2)     < _max_allowed_2D_angle_diff );
+    
+
+
 
     if(_verbose) {
 
