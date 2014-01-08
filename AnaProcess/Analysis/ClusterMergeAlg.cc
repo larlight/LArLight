@@ -49,7 +49,13 @@ namespace larlight {
 
   bool ClusterMergeAlg::initialize() {
 
+    _det_params_prepared = false;
+
+    _merge_tree = 0;
+
     PrepareTTree();
+
+    ClearEventInfo();
 
     return true;
   }
