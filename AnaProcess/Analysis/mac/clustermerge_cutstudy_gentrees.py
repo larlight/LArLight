@@ -10,8 +10,8 @@ filename = sys.argv[1]
 
 #for studying angle cuts
 #cutvals = [0, 2, 4, 7, 10, 15, 20, 25, 30, 50, 70, 90, 110, 120, 140, 160, 180]
-cutvals = [ 0 ]
-#cutvals = [ 2 ]
+#cutvals = [ 0 ]
+cutvals = [ 2 ]
 
 # Create processor 
 ana_proc = larlight.ana_processor()
@@ -40,7 +40,8 @@ for x in cutvals:
     ana_proc.set_ana_output_file("outputs/merge_Tree_cut%d.root" % x )
 
     # Run
-    ana_proc.run()
+    ana_proc.run(123,1)
+    #ana_proc.run(405,1)
 
 
 

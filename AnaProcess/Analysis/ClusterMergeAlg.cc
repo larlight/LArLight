@@ -11,6 +11,7 @@ namespace larlight {
     _fout=0;     
     _verbose=false;
     
+    //SetAngleCut(180.);
     SetAngleCut(180.);
 
     SetSquaredDistanceCut(1e9);
@@ -89,7 +90,7 @@ namespace larlight {
      (2) Process read-in cluster information for merging
   */
   bool ClusterMergeAlg::analyze(storage_manager* storage) {
-
+    //    std::cout<<"-------------ANALYZING BEIGNNING-------------"<<std::endl;
     // Step (0) ... Clear input cluster information
     
     ClearEventInfo();
@@ -99,11 +100,13 @@ namespace larlight {
     const event_cluster* ev_cluster = (const event_cluster*)(storage->get_data(DATA::ShowerAngleCluster));
 
     const std::vector<cluster> cluster_collection = ev_cluster->GetClusterCollection();
+    std::cout<<"this ev_cluster has event_id() = "<<ev_cluster->event_id()<<std::endl;
 
-    for(auto const i_cluster: cluster_collection)
+    for(auto const i_cluster: cluster_collection){
 
+      std::cout<<"this cluster has event_id() = "<<i_cluster.event_id()<<std::endl;
       AppendClusterInfo(i_cluster,i_cluster.Hits());
-
+    }
     // Step (2) ... Run algorithm
     ProcessMergeAlg();
 
@@ -124,6 +127,10 @@ namespace larlight {
     ci.end_time   = cl.EndPos()[1];
     ci.angle      = cl.dTdW();
     ci.n_hits     = (int)cl.Hits().size();
+    ci.event_id   = cl.event_id();
+
+    //    std::cout<<"in AppendClusterInfo, ci.event_id is"
+    //	     <<ci.event_id<<std::endl;
 
     AppendHitInfo(ci, in_hit_v);
     
@@ -196,10 +203,11 @@ namespace larlight {
       //for now, use biggest mean && smallest RMS to decide
       if(_hit_angles_forwards->GetMean() < _hit_angles_backwards->GetMean() &&
 	 _hit_angles_forwards->GetRMS()  > _hit_angles_backwards->GetRMS() ){
-	int new_end_wire   = ci.start_wire;
-	int new_end_time   = ci.start_time;
-	int new_start_wire = ci.end_wire;
-	int new_start_time = ci.end_time;
+
+	double new_end_wire   = ci.start_wire;
+	double new_end_time   = ci.start_time;
+	double new_start_wire = ci.end_wire;
+	double new_start_time = ci.end_time;
 	//int new_angle = something?!! not trivial to switch it
 	ci.start_wire = new_start_wire;
 	ci.end_wire   = new_end_wire;
@@ -207,6 +215,7 @@ namespace larlight {
 	ci.end_time   = new_end_time;
 	//if swapped, for now, set n_hits = -1 to ignore it in multiplicity stuff
 	ci.n_hits = -1;
+
       }
 
       
@@ -394,7 +403,7 @@ namespace larlight {
   }
   
   bool ClusterMergeAlg::CompareClusters(const cluster_merge_info &clusA,
-					 const cluster_merge_info &clusB){
+					const cluster_merge_info &clusB){
     
     if(_verbose) {
       print(MSG::NORMAL,__FUNCTION__,"Printing out two input cluster information...");
@@ -403,10 +412,13 @@ namespace larlight {
     }
 
     bool merge_clusters = true;
-
+    
+    //    std::cout<<"about to call angle2dcompat. cluster infos"<<std::endl;
+    //    PrintClusterVars(clusA);
+    //    PrintClusterVars(clusB);
     merge_clusters = merge_clusters && Angle2DCompatibility(clusA, clusB);
-
-    merge_clusters = merge_clusters &&  ShortestDistanceCompatibility(clusA, clusB);
+    
+    merge_clusters = merge_clusters && ShortestDistanceCompatibility(clusA, clusB);
 
     return merge_clusters;
 
@@ -449,7 +461,6 @@ namespace larlight {
 
   bool ClusterMergeAlg::ShortestDistanceCompatibility(const cluster_merge_info &clus_info_A,
 						       const cluster_merge_info &clus_info_B) const {
-
     double w_start1 = clus_info_A.start_wire * _wire_2_cm;
     double t_start1 = clus_info_A.start_time * _time_2_cm;
     double w_end1   = clus_info_A.end_wire   * _wire_2_cm;
@@ -460,6 +471,9 @@ namespace larlight {
     double w_end2   = clus_info_B.end_wire   * _wire_2_cm;
     double t_end2   = clus_info_B.end_time   * _time_2_cm;
     
+    //    std::cout<<Form("ShortestDistanceCompatibility: cluster event_IDs are %d and %d.",clus_info_A.event_id,clus_info_B.event_id)<<std::endl;
+    
+
     //First, pretend the first cluster is a 2D line segment, from its start point to end point
     //Find the shortest distance between start point of the second cluster to this line segment.
     //Repeat for end point of second cluster to this line segment.
@@ -672,7 +686,7 @@ namespace larlight {
   }//end BuildClusterSets
 
   void ClusterMergeAlg::FinalizeClusterSets() {
-
+   
     //loop over all cluster ID's in the event... guess I have to do it view-by-view
     for(int iclus = 0; iclus < (int)_u_clusters.size(); ++iclus){    
       //if the cluster_id is not in _cluster_sets_v at all, push it back individually
@@ -698,7 +712,7 @@ namespace larlight {
 
     }
 
-    
+
   } // end FinalizeClusterSets
   
   int ClusterMergeAlg::isInClusterSets(unsigned int index) const {
@@ -719,7 +733,18 @@ namespace larlight {
     }
     
   }//end isInClusterSets function
-  
+
+  void ClusterMergeAlg::PrintClusterSetsV(){
+    std::cout<<"_cluster_sets_v = {";
+    for(auto const i_set : _cluster_sets_v){
+      std::cout<<"[ ";
+	for(auto const i : i_set){
+	  std::cout<<i<<",";
+      }
+      std::cout<<" ],";
+    }
+    std::cout<<"}"<<std::endl;
+  }
   
 
 }
