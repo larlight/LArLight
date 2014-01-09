@@ -8,7 +8,6 @@ namespace larlight {
   ana_processor::ana_processor(){
     _name="ana_processor";
     _ofile_name="";
-    //_mode=storage_manager::READ; // default I/O mode is to produce no output
     _storage=storage_manager::get();
     _fout=0;
     reset();
