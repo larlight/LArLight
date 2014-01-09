@@ -86,7 +86,6 @@ namespace larlight {
 
     int n_hits;                 ///< Total number of hits in cluster
 
-    int event_id;               ///< event_ID taken from data_base
     /// Default constructor
     cluster_merge_info() {
       
@@ -95,7 +94,7 @@ namespace larlight {
       start_wire = start_time = end_wire = end_time = -1;
       start_wire_err = start_time_err = end_wire_err =end_time_err = -1;
       n_hits = -1;
-      event_id = -1;
+
     };
 
   };

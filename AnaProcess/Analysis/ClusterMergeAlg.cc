@@ -90,7 +90,6 @@ namespace larlight {
      (2) Process read-in cluster information for merging
   */
   bool ClusterMergeAlg::analyze(storage_manager* storage) {
-    //    std::cout<<"-------------ANALYZING BEIGNNING-------------"<<std::endl;
     // Step (0) ... Clear input cluster information
     
     ClearEventInfo();
@@ -102,11 +101,10 @@ namespace larlight {
     const std::vector<cluster> cluster_collection = ev_cluster->GetClusterCollection();
     std::cout<<"this ev_cluster has event_id() = "<<ev_cluster->event_id()<<std::endl;
 
-    for(auto const i_cluster: cluster_collection){
+    for(auto const i_cluster: cluster_collection)
 
-      std::cout<<"this cluster has event_id() = "<<i_cluster.event_id()<<std::endl;
       AppendClusterInfo(i_cluster,i_cluster.Hits());
-    }
+
     // Step (2) ... Run algorithm
     ProcessMergeAlg();
 
@@ -127,10 +125,7 @@ namespace larlight {
     ci.end_time   = cl.EndPos()[1];
     ci.angle      = cl.dTdW();
     ci.n_hits     = (int)cl.Hits().size();
-    ci.event_id   = cl.event_id();
 
-    //    std::cout<<"in AppendClusterInfo, ci.event_id is"
-    //	     <<ci.event_id<<std::endl;
 
     AppendHitInfo(ci, in_hit_v);
     
@@ -470,8 +465,6 @@ namespace larlight {
     double t_start2 = clus_info_B.start_time * _time_2_cm;
     double w_end2   = clus_info_B.end_wire   * _wire_2_cm;
     double t_end2   = clus_info_B.end_time   * _time_2_cm;
-    
-    //    std::cout<<Form("ShortestDistanceCompatibility: cluster event_IDs are %d and %d.",clus_info_A.event_id,clus_info_B.event_id)<<std::endl;
     
 
     //First, pretend the first cluster is a 2D line segment, from its start point to end point
