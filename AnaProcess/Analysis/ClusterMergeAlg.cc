@@ -11,10 +11,11 @@ namespace larlight {
     _fout=0;     
     _verbose=false;
     
-    //SetAngleCut(180.);
     SetAngleCut(180.);
 
     SetSquaredDistanceCut(1e9);
+
+    _min_hits_to_consider = 200;
 
     _min_distance_unit = -1;
 
@@ -99,7 +100,7 @@ namespace larlight {
     const event_cluster* ev_cluster = (const event_cluster*)(storage->get_data(DATA::ShowerAngleCluster));
 
     const std::vector<cluster> cluster_collection = ev_cluster->GetClusterCollection();
-    std::cout<<"this ev_cluster has event_id() = "<<ev_cluster->event_id()<<std::endl;
+    //    std::cout<<"this ev_cluster has event_id() = "<<ev_cluster->event_id()<<std::endl;
 
     for(auto const i_cluster: cluster_collection)
 
@@ -116,6 +117,9 @@ namespace larlight {
 					   const std::vector<larlight::hit> &in_hit_v) {
 
     PrepareDetParams();
+
+    if(in_hit_v.size() <= _min_hits_to_consider) return;
+
     cluster_merge_info ci;
     ci.cluster_index = cl.ID();
     ci.view       = cl.View();
@@ -151,8 +155,7 @@ namespace larlight {
   void ClusterMergeAlg::RefineStartPointsShowerShape(cluster_merge_info &ci, const std::vector<larlight::hit> &in_hit_v){
     //assuming start/endpoint are correct, make histogram of angles between
     //individual hits and the vector pointing from start to end point
-    _min_hits_to_consider = 200;
-
+    
     _hit_angles_forwards -> Reset();
     _hit_angles_backwards-> Reset();
 
@@ -177,7 +180,7 @@ namespace larlight {
 			       pow( pow(SHIT_x,2)+pow(SHIT_y,2),0.5)
 			       );
 	
-	_hit_angles_forwards->Fill(cosangle);
+	_hit_angles_forwards->Fill(cosangle,i_hit.Charge());
 	
 	//now switch the vector to be from end point to start point and re-do
 	SEP_x  = (ci.start_wire    - ci.end_wire) * _wire_2_cm;
@@ -191,19 +194,20 @@ namespace larlight {
 			       pow( pow(SHIT_x,2)+pow(SHIT_y,2),0.5)
 			       );
 	
-	_hit_angles_backwards->Fill(cosangle);
+	_hit_angles_backwards->Fill(cosangle,i_hit.Charge());
       }
       
       //decide if you want to switch the start and end point
       //for now, use biggest mean && smallest RMS to decide
       if(_hit_angles_forwards->GetMean() < _hit_angles_backwards->GetMean() &&
 	 _hit_angles_forwards->GetRMS()  > _hit_angles_backwards->GetRMS() ){
-
+	//if(_hit_angles_forwards->GetRMS()  > _hit_angles_backwards->GetRMS() ){
+	//if(_hit_angles_forwards->GetMean() < _hit_angles_backwards->GetMean()){
 	double new_end_wire   = ci.start_wire;
 	double new_end_time   = ci.start_time;
 	double new_start_wire = ci.end_wire;
 	double new_start_time = ci.end_time;
-	//int new_angle = something?!! not trivial to switch it
+	//double new_angle = something?!! not trivial to switch it
 	ci.start_wire = new_start_wire;
 	ci.end_wire   = new_end_wire;
 	ci.start_time = new_start_time;
@@ -431,7 +435,7 @@ namespace larlight {
     
     //if RefineStart shit decided to swap the start/end points (IE it set n_hits = -1),
     //then allow the +/- 180 degree ambiguity, for now
-
+    
     if(cluster_a.n_hits == -1 || cluster_b.n_hits == -1)
       compatible = ( abs(angle1-angle2)     < _max_allowed_2D_angle_diff ||
 		     abs(angle1-angle2-180) < _max_allowed_2D_angle_diff ||
@@ -440,16 +444,14 @@ namespace larlight {
     else
       compatible = ( abs(angle1-angle2)     < _max_allowed_2D_angle_diff );
     
-
-
-
+    
     if(_verbose) {
-
+      
       if(compatible) print(MSG::NORMAL,__FUNCTION__," Compatible in angle.");
       else print(MSG::NORMAL,__FUNCTION__," NOT compatible in angle.");
-
+      
     }
-
+    
     return compatible;
 
   }//end Angle2DCompatibility
