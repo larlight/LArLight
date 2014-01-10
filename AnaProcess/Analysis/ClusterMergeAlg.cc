@@ -130,7 +130,6 @@ namespace larlight {
     ci.angle      = cl.dTdW();
     ci.n_hits     = (int)cl.Hits().size();
 
-
     AppendHitInfo(ci, in_hit_v);
     
     if(ci.view == GEO::kU) _u_clusters.push_back(ci);
@@ -618,9 +617,8 @@ namespace larlight {
     return isInClusterSets(cluster_index);
   }
 
-
   void ClusterMergeAlg::BuildClusterSets(const cluster_merge_info &clusA, 
-					  const cluster_merge_info &clusB){
+					 const cluster_merge_info &clusB){
     //this function builds the _cluster_sets_v vector, according to the format defined
     //in ClusterAlgo. here's an example of what _cluster_sets_v format is:
     //imagine an event with clusters 0, 1, 2, 3, 4, 5
@@ -632,7 +630,13 @@ namespace larlight {
 
     //if the two clusters are compatible for merging
     if( CompareClusters(clusA,clusB) ){
-     
+
+      if(_verbose)
+	
+	print(MSG::NORMAL,__FUNCTION__,Form(" Merging clusters %d + %d...",
+					    clusA.cluster_index,
+					    clusB.cluster_index));
+	  
       //if this is the first compatibility found for this entire event
       if(_cluster_sets_v.empty()){
 	//push both IDs in to the _cluster_sets_v vector, grouped together as one element
@@ -668,7 +672,9 @@ namespace larlight {
 	// else if both indexes are already in the _cluster_sets_v vector but the indexes are not same
 	else if(a_index != b_index)
 
-	  print(MSG::ERROR,__FUNCTION__,"LOGIC ERROR: Found two compatible clusters in different sets!");
+	  print(MSG::ERROR,__FUNCTION__,
+		Form("LOGIC ERROR: Found two compatible clusters (%d and %d) in different sets (%d and %d)!",
+		     clusA.cluster_index,clusB.cluster_index,a_index,b_index));
 
 	//at the end of all possible cluster matching permutations, if some are not in 
 	//_cluster_sets_v yet, push them back individually as individual elements...
