@@ -79,12 +79,10 @@ namespace larlight {
     // Spacepoints
     if(ev_sps) {
       
-      const std::vector<spacepoint> sps_v = ev_sps->GetSPSCollection();
-      
       /// Note: for a plotting style, it is convenient to have a (x, y, z) labeled as (z, x, y).
       _hRecoSPS = Prepare3DHisto("_hRecoSPS", zmin, zmax, xmin, xmax, ymin, ymax);
       
-      for(auto sps : sps_v)
+      for(auto sps : *ev_sps)
 	
 	_hRecoSPS->Fill(sps.XYZ()[2], sps.XYZ()[0], sps.XYZ()[1]);
       
@@ -95,9 +93,7 @@ namespace larlight {
     // Tracks
     if(ev_track) {
       
-      const std::vector<track> track_v = ev_track->GetTrackCollection();
-      
-      for(auto const& trk : track_v){
+      for(auto const& trk : *ev_track){
 	
 	TH3D* h=0;
 	h=Prepare3DHisto(Form("_hRecoTrack_%03d",(int)(_hRecoTrack_v.size())),
@@ -124,9 +120,7 @@ namespace larlight {
     // MC trajectory points
     if(ev_mc){
       
-      const std::vector<part_mc> part_v = ev_mc->GetParticleCollection();
-      
-      for(auto const& part : part_v){
+      for(auto const& part : *ev_mc){
 	
 	// Only care about a primary particle
 	if(part.track_id() != 1)
