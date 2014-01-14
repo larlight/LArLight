@@ -10,7 +10,7 @@ else
     export ANA_PROC_DIR=$MAKE_TOP_DIR/$ANA_PROC_RELPATH
 
     if [[ -z $DECODER_RELPATH ]]; then
-	export DECODER_RELPATH=Decoder
+	export DECODER_RELPATH=NevisDecoder
     fi
     export DECODER_DIR=$MAKE_TOP_DIR/$DECODER_RELPATH
 	

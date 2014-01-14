@@ -10,11 +10,14 @@ if not 'ANA_PROC_DIR' in os.environ.keys():
 
 name=sys.argv[1]
 target_dir='%s/%s' % (os.environ['ANA_PROC_DIR'],name)
-source_dir='%s/bin/tmp' % os.environ['ANA_PROC_DIR']
+source_dir='%s/bin/tmp_ana' % os.environ['ANA_PROC_DIR']
 
 if not os.path.exists(target_dir):
    try:
       os.makedirs(target_dir)
+      os.makedirs('%s/bin' % target_dir)
+      # Copy analysis code generator
+      os.system("scp -r %s/bin %s" % (source_dir,target_dir))
    except OSError:
       sys.stderr.write('Failed to create a dir: %s\n' % target_dir)
       sys.stderr.write('Maybe lacking a permission?\n\n')
@@ -29,12 +32,15 @@ in_linkdef='%s/LinkDef.tmp' % source_dir
 in_typedef='%s/TypeDef.tmp' % source_dir
 in_source='%s/cc.tmp' % source_dir
 in_header='%s/hh.tmp' % source_dir
+in_script='%s/bin/gen_newana' % source_dir
 
-src_list = { in_makefile : '%s/GNUmakefile'   % target_dir,
-             in_linkdef  : '%s/LinkDef.h'     % target_dir,
-             in_typedef  : '%s/%s-TypeDef.hh' % (target_dir,name),
-             in_source   : '%s/%s.cc'         % (target_dir,name),
-             in_header   : '%s/%s.hh'         % (target_dir,name) }
+src_list = { in_makefile : '%s/GNUmakefile'    % target_dir,
+             in_linkdef  : '%s/LinkDef.h'      % target_dir,
+             in_typedef  : '%s/%s-TypeDef.hh'  % (target_dir,name),
+             in_source   : '%s/%s.cc'          % (target_dir,name),
+             in_header   : '%s/%s.hh'          % (target_dir,name),
+             in_script   : '%s/bin/gen_newana' % target_dir        }
+
 for src in src_list.keys():
    contents=open(src,'r').read()
    contents=contents.replace('PACKAGE_NAME',name.upper())

@@ -14,10 +14,12 @@
 namespace larlight {
   class ana_base;
   class ana_processor;
+
+  //ADD_NEW_CLASS ... do not change this line
 }
-//ADD_NEW_CLASS ... do not change this line
 
 #endif
+
 
 
 
