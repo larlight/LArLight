@@ -11,8 +11,11 @@
 
 #pragma link C++ namespace larlight;
 #pragma link C++ namespace larlight::MSG;
-#pragma link C++ namespace larlight::PMT;
+#pragma link C++ namespace larlight::FEM;
 #pragma link C++ namespace larlight::DATA;
+#pragma link C++ namespace larlight::GEO;
+#pragma link C++ namespace larlight::MC;
+#pragma link C++ namespace larlight::FORMAT;
 
 #pragma link C++ class larlight::Message+;
 #pragma link C++ class larlight::larlight_base+;

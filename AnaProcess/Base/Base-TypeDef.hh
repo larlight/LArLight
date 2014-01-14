@@ -7,7 +7,12 @@
 
 // Header files included here
 #include "types.hh"
-#include "constants.hh"
+#include "FrameworkConstants.hh"
+#include "MCConstants.hh"
+#include "GeoConstants.hh"
+#include "FEMConstants.hh"
+#include "DecoderConstants.hh"
+#include "DataFormatConstants.hh"
 #include "larlight_base.hh"
 #include "messenger.hh"
 

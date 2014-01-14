@@ -15,8 +15,8 @@
 #ifndef LARLIGHT_BASE_HH
 #define LARLIGHT_BASE_HH
 
-#include "types.hh"
-#include "constants.hh"
+#include <vector>
+#include "FrameworkConstants.hh"
 #include "messenger.hh"
 
 namespace larlight{
