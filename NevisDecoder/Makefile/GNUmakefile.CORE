@@ -42,7 +42,7 @@ $(DECODER_DIR)/lib/$(SHLIB): lib/$(SHLIB)
 ifdef ROOTMAP
 $(ROOTMAP): $(DECODER_DIR)/lib/$(SHLIB)
 	@echo "<< Making rootmaps >>"
-	@cd $(DECODER_DIR)/lib && ./make_rootmap.sh
+	@cd $(DECODER_DIR)/lib && ./decoder_rootmap.sh
 	@rm $(DECODER_DIR)/lib/*.temp
 endif
 
