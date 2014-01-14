@@ -33,6 +33,16 @@ rootlibmap libAnalysis.rootmap libAnalysis.so $ANA_PROC_DIR/Analysis/LinkDef.h \
     libTree.so libGeom.so libGui.so libHist.so  libBase.so libDataFormat.so 
 
 ######################################################
+# TrackStudy
+rootlibmap libTrackStudy.rootmap libTrackStudy.so $ANA_PROC_DIR/TrackStudy/LinkDef.h \
+    libAnalysis.so
+
+######################################################
+# ClusterStudy
+rootlibmap libClusterStudy.rootmap libClusterStudy.so $ANA_PROC_DIR/ClusterStudy/LinkDef.h \
+    libClusterStudy.so
+
+######################################################
 # KalekoAna gSystem->Load("KalekoAna") loads ALL OF THESE THINGS
 rootlibmap libKalekoAna.rootmap libKalekoAna.so $ANA_PROC_DIR/KalekoAna/LinkDef.h \
     libTree.so libGeom.so libGui.so libHist.so libBase.so libDataFormat.so libAnalysis.so

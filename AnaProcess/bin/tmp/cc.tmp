@@ -1,3 +1,6 @@
+#ifndef PACKAGE_NAME_HH
+#define PACKAGE_NAME_HH
+
 #include "Package_Name.hh"
 
-
+#endif

@@ -29,6 +29,9 @@ all:
 	@echo "Start building AnaProcess"
 	@make --directory=$(ANA_PROC_DIR)
 	@echo 
+	@echo "Start building Decoder"
+	@make --directory=$(DECODER_DIR)
+	@echo 
 ifdef SRT_LOCAL
 	@echo
 	@echo "Start building LArSoft components"
@@ -40,6 +43,8 @@ endif
 clean:
 	@echo "Cleaning AnaProcess"
 	@make clean --directory=$(ANA_PROC_DIR)
+	@echo "Cleaning Decoder"
+	@make clean --directory=$(DECODER_DIR)
 ifdef SRT_LOCAL
 	@echo
 	@echo "Cleaning LArSoft components"
