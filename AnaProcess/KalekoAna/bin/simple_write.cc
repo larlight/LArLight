@@ -1,7 +1,7 @@
 #include <TSystem.h>
 #include <TVector3.h>
 #include <storage_manager.hh>
-#include <constants.hh>
+#include <Base-TypeDef.hh>
 
 int main(){
 
@@ -11,15 +11,15 @@ int main(){
   // decoder output root file. 
   //
 
-  storage_manager my_storage;
+  larlight::storage_manager my_storage;
 
   // If you wish, change the message level to DEBUG.
   // Commented out by default.
-  my_storage.set_verbosity(MSG::DEBUG);
+  my_storage.set_verbosity(larlight::MSG::DEBUG);
   
 
   // Step 0: Set I/O mode: we are reading in, so "READ"
-  my_storage.set_io_mode(storage_manager::WRITE);
+  my_storage.set_io_mode(larlight::storage_manager::WRITE);
 
   // Step 1: Set output file 
   my_storage.set_out_filename("trial.root");
@@ -39,7 +39,7 @@ int main(){
   }
 
   // Let's fill event_track for 100 events.
-  event_track* my_event_track = (event_track*)(my_storage.get_data(DATA::Track));
+  larlight::event_track* my_event_track = (larlight::event_track*)(my_storage.get_data(larlight::DATA::Track));
   int run_id = 1;
   int subrun_id = 1;
   for( int i=0; i<100; i++){
@@ -51,7 +51,7 @@ int main(){
 
     // Let's make 2 tracks!
     for( int j=0; j<2; j++){
-      track t;
+      larlight::track t;
       t.set_track_id(j); 
 
       // Let's make a track with 20 fake space points
@@ -62,7 +62,7 @@ int main(){
       }
     
       // Append to the event track array
-      my_event_track->add_track(t);
+      my_event_track->push_back(t);
     }
 
     // Store event

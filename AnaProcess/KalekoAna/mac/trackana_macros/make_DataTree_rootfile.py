@@ -35,7 +35,7 @@ n_bins_histo = 100
 if not os.path.exists(out_dir):
     os.makedirs(out_dir)
 
-mykal=KalekoTrackAna()
+mykal=larlight.KalekoTrackAna()
     
 for x in xrange(len(in_fname)):
 

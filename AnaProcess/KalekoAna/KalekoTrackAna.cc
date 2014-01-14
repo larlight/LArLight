@@ -125,49 +125,45 @@ namespace kaleko{
 	
 	else{
 	  
-	  const std::vector<larlight::track> my_track(my_event_track->GetTrackCollection());
-	  const std::vector<larlight::part_mc> my_part_mc(my_event_mc->GetParticleCollection());
-	  const std::vector<larlight::spacepoint> my_sps(my_event_sps->GetSPSCollection());
-	
-	  nSpacePoints = (int)my_sps.size();
+	  nSpacePoints = (int)my_event_sps->size();
 	  
 	  //finding max # of reconstructed tracks (over all events) for histogram boundaries
-	  if(max_nRecoTracks < (int)my_track.size()) max_nRecoTracks = (int)my_track.size();
+	  if(max_nRecoTracks < (int)my_event_track->size()) max_nRecoTracks = (int)my_event_track->size();
 	  
 	  //some of the DataTree variables
 	  myMCTheta = (double)MCTheta;
-	  nRecoTracks = (int)my_track.size();
+	  nRecoTracks = (int)my_event_track->size();
 	  
 	  //loop over all of the reconstructed tracks in the event
-	  for(size_t i=0; i<my_track.size(); i++){
+	  for(size_t i=0; i<my_event_track->size(); i++){
 	    
-	    nTrackPoints.push_back( (int)my_track.at(i).n_point() );
+	    nTrackPoints.push_back( (int)my_event_track->at(i).n_point() );
 	    
 	    //initial guess for ranges, will be altered by get_axis_range()
-	    track_xmin = track_xmax = my_track.at(i).vertex_at(0).X();
-	    track_ymin = track_ymax = my_track.at(i).vertex_at(0).Y();
-	    track_zmin = track_zmax = my_track.at(i).vertex_at(0).Z();
+	    track_xmin = track_xmax = my_event_track->at(i).vertex_at(0).X();
+	    track_ymin = track_ymax = my_event_track->at(i).vertex_at(0).Y();
+	    track_zmin = track_zmax = my_event_track->at(i).vertex_at(0).Z();
 	    //updates the track_xmin, etc variables to be true mins and maxes
 	    //(min and max for this reconstructed track)
-	    my_track.at(i).get_axis_range(track_xmax, track_xmin,
+	    my_event_track->at(i).get_axis_range(track_xmax, track_xmin,
 					  track_ymax, track_ymin,
 					  track_zmax, track_zmin);
 	    
-	    //	  std::cout<<"in this track there were "<<my_track.at(i).n_point()<<" reco points, and "<<my_part_mc.at(0).step_vertex().size()<<" MC points."<<std::endl;	  
+	    //	  std::cout<<"in this track there were "<<my_event_track->at(i).n_point()<<" reco points, and "<<my_event_mc->at(0).step_vertex().size()<<" MC points."<<std::endl;	  
 	    
 	    double tmplength = 0;
 	    //for each track, loop over the reconstructed points in it
-	    for(size_t j=0; j < my_track.at(i).n_point()-1; j++){
+	    for(size_t j=0; j < my_event_track->at(i).n_point()-1; j++){
 	      //	    std::cout<<Form("Reco point: (%f,%f,%f)\n",
-	      //			    my_track.at(i).vertex_at(j).X(),
-	      //			    my_track.at(i).vertex_at(j).Y(),
-	      //			    my_track.at(i).vertex_at(j).Z());
+	      //			    my_event_track->at(i).vertex_at(j).X(),
+	      //			    my_event_track->at(i).vertex_at(j).Y(),
+	      //			    my_event_track->at(i).vertex_at(j).Z());
 	      tmplength += 
-		(my_track.at(i).vertex_at(j) - my_track.at(i).vertex_at(j+1)).Mag();
+		(my_event_track->at(i).vertex_at(j) - my_event_track->at(i).vertex_at(j+1)).Mag();
 	    }//end loop over points in individual track
 	    crude_reco_tracklengths.push_back(tmplength);
-	    double straightline_reco_tkln = (my_track.at(i).vertex_at(0)-
-					     my_track.at(i).vertex_at(my_track.at(i).n_point()-1)).Mag();
+	    double straightline_reco_tkln = (my_event_track->at(i).vertex_at(0)-
+					     my_event_track->at(i).vertex_at(my_event_track->at(i).n_point()-1)).Mag();
 	    straightline_reco_tracklengths.push_back( straightline_reco_tkln );
 	    //	  std::cout<<"straight line reco track length = "<< straightline_reco_tkln << std::endl;
 	    //	  std::cout<<"crude reco track length = "<< tmplength << std::endl;
@@ -184,11 +180,11 @@ namespace kaleko{
 	    double de_dx = -1.;
 	    
 	    tmplength = 0;
-	    for(size_t j=0; j < my_part_mc.at(0).step_vertex().size()-1; j++){
-	      TVector3 vtx_j = my_part_mc.at(0).step_vertex().at(j);	
-	      TVector3 vtx_jp1 = my_part_mc.at(0).step_vertex().at(j+1);
-	      TVector3 mom_j = my_part_mc.at(0).step_momentum().at(j);
-	      TVector3 mom_jp1 = my_part_mc.at(0).step_momentum().at(j+1);
+	    for(size_t j=0; j < my_event_mc->at(0).step_vertex().size()-1; j++){
+	      TVector3 vtx_j = my_event_mc->at(0).step_vertex().at(j);	
+	      TVector3 vtx_jp1 = my_event_mc->at(0).step_vertex().at(j+1);
+	      TVector3 mom_j = my_event_mc->at(0).step_momentum().at(j);
+	      TVector3 mom_jp1 = my_event_mc->at(0).step_momentum().at(j+1);
 	      
 	      //only add to MC tracklength, calculate dedx, etc
 	      //only if both points j and j+1 of muon are within the detector volume
@@ -224,30 +220,30 @@ namespace kaleko{
 	    //	  std::cout<<"meanwhile, MC tracklength is calculated as "<<tmplength<<std::endl;
 	    
 	    //if you want to look at reco track angle b/t first two points...
-	    //	  myRecoTrackAngle.push_back(my_track.at(i).direction_at(0).Theta() * UtilFunctions().DegreesPerRadian);
+	    //	  myRecoTrackAngle.push_back(my_event_track->at(i).direction_at(0).Theta() * UtilFunctions().DegreesPerRadian);
 	    //if you want to look @ length-weighted average reco track angle
-	    myRecoTrackAngle.push_back( UtilFunctions().CalculateWeightedAvgTheta( my_track.at(i) ) 
+	    myRecoTrackAngle.push_back( UtilFunctions().CalculateWeightedAvgTheta( my_event_track->at(i) ) 
 					* UtilFunctions().DegreesPerRadian );
-	    myRecoStartingZ.push_back(my_track.at(i).vertex_at(0).Z());
+	    myRecoStartingZ.push_back(my_event_track->at(i).vertex_at(0).Z());
 	    
 	    //do i want to plot difference from the muon-generated angle?
-	    //double dRecoTrackAngle_i = (my_track.at(i).direction_at(0).Theta()
+	    //double dRecoTrackAngle_i = (my_event_track->at(i).direction_at(0).Theta()
 	    //* UtilFunctions().DegreesPerRadian ) - MCTheta;
 	    
 	    //or, difference from the angle of muon as it enters the reconstructed "box"?
-	    //	  double dRecoTrackAngle_i = (my_track.at(i).direction_at(0).Theta()
+	    //	  double dRecoTrackAngle_i = (my_event_track->at(i).direction_at(0).Theta()
 	    //				      * UtilFunctions().DegreesPerRadian ) - (dMCBoxTheta_i+MCTheta);
 	    
 	    
 	    //and, do i want to look at weighted average track angle? or direction from first point? this is weighted:
-	    double dRecoTrackAngle_i = (UtilFunctions().CalculateWeightedAvgTheta( my_track.at(i) ) 
+	    double dRecoTrackAngle_i = (UtilFunctions().CalculateWeightedAvgTheta( my_event_track->at(i) ) 
 					* UtilFunctions().DegreesPerRadian) - MCTheta;
 	    
 	    //temp: calculate average reco track angle and push it back
 	    double avgang=0;
-	    for(size_t j=0; j<my_track.at(i).n_point()-1; j++)
-	      avgang+=my_track.at(i).direction_at(j).Theta();
-	    avgang/=(my_track.at(i).n_point()-1);
+	    for(size_t j=0; j<my_event_track->at(i).n_point()-1; j++)
+	      avgang+=my_event_track->at(i).direction_at(j).Theta();
+	    avgang/=(my_event_track->at(i).n_point()-1);
 	    myAverageRecoTrackAngle.push_back(avgang*UtilFunctions().DegreesPerRadian);
 	    
 	    
