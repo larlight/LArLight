@@ -6,7 +6,8 @@
 namespace larlight {
 
   algo_slow_readout_decoder::algo_slow_readout_decoder() :
-    algo_base()
+    algo_base(),
+    _ch_data(DATA::PMTFIFO)
   {
     _name="algo_slow_readout_decoder";
     _last_word=FEM::INVALID_WORD;
@@ -57,7 +58,7 @@ namespace larlight {
     Message::send(MSG::INFO,_buf);
     size_t ctr=0;
     std::string line("");
-    for(pmtfifo::iterator iter(_ch_data.begin());
+    for(fifo::iterator iter(_ch_data.begin());
 	iter!=_ch_data.end();
 	++iter)
       {
@@ -96,7 +97,7 @@ namespace larlight {
 
     // IF data pointer is not set, set
     if(!_event_data) {
-      _event_data=(event_pmtfifo*)(_storage->get_data(DATA::PMTFIFO));
+      _event_data=(event_fifo*)(_storage->get_data(DATA::PMTFIFO));
       if(!_event_data) {
 	Message::send(MSG::ERROR,__FUNCTION__,"Could not retrieve pmt_wf_collection poitner!");
 	return false;
@@ -432,7 +433,7 @@ namespace larlight {
 
   void algo_slow_readout_decoder::apply_beamgate_correction() {
 
-    for(event_pmtfifo::iterator iter(_event_data->begin());
+    for(event_fifo::iterator iter(_event_data->begin());
 	iter!=_event_data->end();
 	++iter){
 

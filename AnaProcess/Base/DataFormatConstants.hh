@@ -33,9 +33,6 @@ namespace larlight{
     enum DATA_TYPE{
       Event=0,
       MCTruth,            ///< MCTruth
-      PMTFIFO,            ///< LArSoft PMT waveform (FIFOChannel)
-      TPCFIFO,            ///< Equivalent FIFOChannel for TPC
-      TRIGGER,            ///< Trigger data
       Wire,               ///< Wire
       Hit,                ///< Hit
       CrawlerHit,         ///< ClusterCrawler Hit algo
@@ -57,6 +54,20 @@ namespace larlight{
       Shower,             ///< Shower
       Calorimetry,        ///< Calorimetry
       UserInfo,           ///< dynamic data container ... this must be the last valid enum element
+
+      /*
+	Following enums are LArLight original except FIFOChannel which
+	is meant to be compatible with LArSoft FIFOChannel
+      */
+      PMTFIFO,            ///< LArSoft PMT waveform (FIFOChannel)
+      TPCFIFO,            ///< Equivalent FIFOChannel for TPC
+      Pulse,              ///< Generic event_pulse
+      PMTPulse_ThresWin,  ///< Reconstructed event_pulse for PMT waveform
+      PMTPulse_FixedWin,  ///< Reconstructed event_pulse for PMT waveform
+      TPCPulse_ThresWin,  ///< reconstructed event_pulse for TPC waveform
+      TPCPulse_FixedWin,  ///< reconstructed event_pulse for TPC waveform
+      Trigger,            ///< Trigger data
+
       DATA_TYPE_MAX
     };
     
@@ -64,9 +75,6 @@ namespace larlight{
     const std::string DATA_TREE_NAME[DATA_TYPE_MAX] = {
       "event",
       "mc",
-      "pmtfifo",
-      "tpcfifo",
-      "trigger",
       "wire",
       "hit",
       "crawlerhit",
@@ -87,7 +95,15 @@ namespace larlight{
       "kalman3dhit",
       "shower",
       "calorimetry",
-      "user"
+      "user",
+      "pmtfifo",
+      "tpcfifo",
+      "pulse",
+      "pmt_threswin",
+      "pmt_fixedwin",
+      "tpc_threswin",
+      "tpc_fixedwin",
+      "trigger"
     };
     
   }

@@ -3,8 +3,8 @@
 #
 
 # specific names for this package
-DICT  = PulseRecoCint
-SHLIB = libPulseReco.so
+DICT  = FEMPulseRecoCint
+SHLIB = libFEMPulseReco.so
 SOURCES = $(wildcard *.cc)
 HEADERS = $(wildcard *.hh)
 OBJECTS = $(SOURCES:.cc=.o)
@@ -20,13 +20,13 @@ OSNAME          = $(shell uname -s)
 HOST            = $(shell uname -n)
 OSNAMEMODE      = $(OSNAME)
 
-include $(PMT_DECODER_DIR)/Makefile/Makefile.${OSNAME}
+include $(ANA_PROC_DIR)/Makefile/Makefile.${OSNAME}
 
 # set compiler options for ROOT
 CXXFLAGS +=  `root-config --cflags`
 
 # call the common GNUmakefile
-include $(PMT_DECODER_DIR)/Makefile/GNUmakefile.CORE
+include $(ANA_PROC_DIR)/Makefile/GNUmakefile.CORE
 
 
 

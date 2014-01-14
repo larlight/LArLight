@@ -34,10 +34,6 @@ rootlibmap libDecoder.rootmap libDecoder.so $DECODER_DIR/Decoder/LinkDef.h \
 rootlibmap libEncoder.rootmap libEncoder.so $DECODER_DIR/Encoder/LinkDef.h \
     libBase.so libDataFormat.so libAlgorithm.so libFileIO.so
 
-######################################################
-# Pulse Reco
-rootlibmap libPulseReco.rootmap libPulseReco.so $DECODER_DIR/PulseReco/LinkDef.h \
-    libBase.so libDataFormat.so libAnalysis.so
 
 
 

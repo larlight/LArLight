@@ -13,10 +13,12 @@
 #include "pulse_reco.hh"
 
 // Class forward declaration here
-class preco_algo_base;
-class algo_fixed_window;
-class algo_threshold;
-class ped_estimator;
-class pulse_reco;
+namespace larlight {
+  class preco_algo_base;
+  class algo_fixed_window;
+  class algo_threshold;
+  class ped_estimator;
+  class pulse_reco;
+}
 #endif
 

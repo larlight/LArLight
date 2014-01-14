@@ -7,7 +7,8 @@ namespace larlight {
 
   //#########################################
   algo_pmt_xmit::algo_pmt_xmit() 
-    : algo_fem_decoder_base() 
+    : algo_fem_decoder_base(),
+      _ch_data(DATA::PMTFIFO)
   {
   //#########################################
 
@@ -116,7 +117,7 @@ namespace larlight {
 
     if(!_event_data)
 
-      _event_data = (event_pmtfifo*)(_storage->get_data(DATA::PMTFIFO));
+      _event_data = (event_fifo*)(_storage->get_data(DATA::PMTFIFO));
 
     else if(get_word_class(last_word) != FEM::EVENT_LAST_WORD){
 

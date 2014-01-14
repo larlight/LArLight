@@ -33,7 +33,7 @@ namespace larlight {
     }
 
     if(!_data){
-      _data=(trigger*)(_storage->get_data(DATA::TRIGGER));
+      _data=(trigger*)(_storage->get_data(DATA::Trigger));
       if(!_data){
 	Message::send(MSG::ERROR,__FUNCTION__,
 		      "Could not retrieve writeable trigger pointer!");

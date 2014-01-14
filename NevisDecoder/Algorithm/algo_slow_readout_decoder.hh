@@ -79,7 +79,7 @@ namespace larlight {
     /** For a possible use, add a function to return currently processing ch_data member pointer.
 	Note that event data member should be available already to the parent class as it is provided.
     */
-    const pmtfifo*   get_current_ch_data(){return &_ch_data;};
+    const fifo*   get_current_ch_data(){return &_ch_data;};
 
     /// Override function to reset the instance
     virtual void reset();
@@ -115,7 +115,7 @@ namespace larlight {
     /// A method to print out ADC values on the stdout stream
     void print_adc_values();
 
-    /// A method to append PMT-wise data (pmtfifo) to event data
+    /// A method to append PMT-wise data (fifo) to event data
     void store_ch_data();
 
     /// A method to a correction to the sample number for beam-gate event.
@@ -135,10 +135,10 @@ namespace larlight {
 
     // variables
     UInt_t  _event_header_words[FEM_HEADER_COUNT]; ///< Event header word holder
-    pmtfifo _ch_data;                               ///< Channel data holder.
-    event_pmtfifo *_event_data;                         ///< Event waveform
-    FEM::DISCRIMINATOR _last_disc_id;                    ///< Holder of last channel data's disc. id
-    UShort_t _last_channel_number;               ///< Holder of last channel data's channel number
+    fifo _ch_data;                                 ///< Channel data holder.
+    event_fifo *_event_data;                       ///< Event waveform
+    FEM::DISCRIMINATOR _last_disc_id;              ///< Holder of last channel data's disc. id
+    UShort_t _last_channel_number;                 ///< Holder of last channel data's channel number
 
     //
     // Run control variable

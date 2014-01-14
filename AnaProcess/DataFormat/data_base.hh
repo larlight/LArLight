@@ -29,11 +29,11 @@ namespace larlight{
   public:
     
     /// Default constructor
-    data_base() : TObject(){};
+    data_base(DATA::DATA_TYPE type=DATA::DATA_TYPE_MAX) : TObject(){ _type=type; };
     
     /// Default copy constructor to avoid memory leak in ROOT streamer
     data_base(const data_base &original) : TObject(original)
-    {};
+    {_type=original._type;};
     
     /// Default destructor
     virtual ~data_base(){};
@@ -54,8 +54,10 @@ namespace larlight{
     UInt_t subrun   () const { return fSubRunNumber; };
     /// event-id getter
     UInt_t event_id () const { return fEventID;      };
-    
-  private:
+    /// data type getter
+    DATA::DATA_TYPE data_type() const {return _type;};
+
+  protected:
     
     /// Run number
     UInt_t fRunNumber;
@@ -65,6 +67,9 @@ namespace larlight{
     
     /// Event ID
     UInt_t fEventID;
+
+    /// DATA_TYPE
+    DATA::DATA_TYPE _type;
     
     ////////////////////////
     ClassDef(data_base,1)

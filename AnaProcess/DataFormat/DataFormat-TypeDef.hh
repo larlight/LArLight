@@ -7,8 +7,8 @@
 
 // Header files included here
 #include "wire.hh"
-#include "pmtfifo.hh"
-#include "tpcfifo.hh"
+#include "fifo.hh"
+#include "pulse.hh"
 #include "trigger.hh"
 #include "hit.hh"
 #include "user_info.hh"
@@ -33,11 +33,11 @@ namespace larlight{
   class cluster;
   class event_cluster;
 
-  class pmtfifo;
-  class event_pmtfifo;
+  class fifo;
+  class event_fifo;
 
-  class tpcfifo;
-  class event_tpcfifo;
+  class pulse;  
+  class event_pulse;
 
   class trigger;
   

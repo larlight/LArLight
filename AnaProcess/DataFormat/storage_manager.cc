@@ -321,12 +321,17 @@ namespace larlight {
       _ptr_data_array[type]=(data_base*)(new event_user);
       break;
     case DATA::PMTFIFO:
-      _ptr_data_array[type]=(data_base*)(new event_pmtfifo);
-      break;
     case DATA::TPCFIFO:
-      _ptr_data_array[type]=(data_base*)(new event_tpcfifo);
+      _ptr_data_array[type]=(data_base*)(new event_fifo(type));
       break;
-    case DATA::TRIGGER:
+    case DATA::Pulse:
+    case DATA::PMTPulse_ThresWin:
+    case DATA::TPCPulse_ThresWin:
+    case DATA::PMTPulse_FixedWin:
+    case DATA::TPCPulse_FixedWin:
+      _ptr_data_array[type]=(data_base*)(new event_pulse(type));
+      break;
+    case DATA::Trigger:
       _ptr_data_array[type]=(data_base*)(new trigger);
       break;
     case DATA::Wire:

@@ -33,6 +33,12 @@ rootlibmap libAnalysis.rootmap libAnalysis.so $ANA_PROC_DIR/Analysis/LinkDef.h \
     libGeom.so libGui.so libHist.so libDataFormat.so 
 
 ######################################################
+# FEMPulse Reco
+rootlibmap libFEMPulseReco.rootmap libFEMPulseReco.so $DECODER_DIR/FEMPulseReco/LinkDef.h \
+    libAnalysis.so
+
+
+######################################################
 # TrackStudy
 rootlibmap libTrackStudy.rootmap libTrackStudy.so $ANA_PROC_DIR/TrackStudy/LinkDef.h \
     libAnalysis.so
