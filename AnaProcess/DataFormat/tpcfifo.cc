@@ -1,29 +1,26 @@
-#ifndef PMTFIFO_CC
-#define PMTFIFO_CC
+#ifndef TPCFIFO_CC
+#define TPCFIFO_CC
 
-#include "pmtfifo.hh"
+#include "tpcfifo.hh"
 
 namespace larlight {
 
-  void pmtfifo::clear_data(){
+  void tpcfifo::clear_data(){
     data_base::clear_data();
     init_vars();
   }
   
-  void pmtfifo::init_vars(){
+  void tpcfifo::init_vars(){
     clear();
     _channel_number=FEM::INVALID_CH;
-    _channel_frame_id=FEM::INVALID_WORD;
-    _disc_id=FEM::DISC_MAX;
-    _timeslice=FEM::INVALID_WORD;
   }
   
-  void event_pmtfifo::clear_data(){
+  void event_tpcfifo::clear_data(){
     data_base::clear_data();
     init_vars();
   }
   
-  void event_pmtfifo::init_vars(){
+  void event_tpcfifo::init_vars(){
     clear();
     _event_frame_id=FEM::INVALID_WORD;
     _module_address=FEM::INVALID_WORD;
@@ -34,6 +31,5 @@ namespace larlight {
     _trigger_frame_id=FEM::INVALID_WORD;
     _trigger_timeslice=FEM::INVALID_WORD;
   }
-
 }
 #endif

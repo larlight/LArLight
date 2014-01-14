@@ -40,7 +40,7 @@ namespace larlight {
   }
   
   //############################################################################
-  void track::get_axis_range(double &max, double &min, const int axis) const
+  void track::get_axis_range(Double_t &max, Double_t &min, const Int_t axis) const
   //############################################################################
   {
     
@@ -52,11 +52,11 @@ namespace larlight {
       
     }
     
-    for(const auto &vtx : fXYZ) {
+    for(size_t i=0; i<fXYZ.size(); ++i) {
       
-      if(vtx[axis] > max) max = vtx[axis];
+      if(fXYZ[i][axis] > max) max = fXYZ[i][axis];
       
-      if(vtx[axis] < min) min = vtx[axis];
+      if(fXYZ[i][axis] < min) min = fXYZ[i][axis];
       
     }
     
@@ -64,20 +64,20 @@ namespace larlight {
   }
   
   //############################################################################
-  void track::get_axis_range(double &xmax, double &xmin,
-			     double &ymax, double &ymin,
-			     double &zmax, double &zmin) const
+  void track::get_axis_range(Double_t &xmax, Double_t &xmin,
+			     Double_t &ymax, Double_t &ymin,
+			     Double_t &zmax, Double_t &zmin) const
   //############################################################################
   {
     
-    for(const auto &vtx : fXYZ) {
+    for(size_t i=0; i<fXYZ.size(); ++i) {
       
-      if(vtx[0] > xmax) xmax = vtx[0];
-      if(vtx[0] < xmin) xmin = vtx[0];
-      if(vtx[1] > ymax) ymax = vtx[1];
-      if(vtx[1] < ymin) ymin = vtx[1];
-      if(vtx[2] > zmax) zmax = vtx[2];
-      if(vtx[2] < zmin) zmin = vtx[2];
+      if(fXYZ[i][0] > xmax) xmax = fXYZ[i][0];
+      if(fXYZ[i][0] < xmin) xmin = fXYZ[i][0];
+      if(fXYZ[i][1] > ymax) ymax = fXYZ[i][1];
+      if(fXYZ[i][1] < ymin) ymin = fXYZ[i][1];
+      if(fXYZ[i][2] > zmax) zmax = fXYZ[i][2];
+      if(fXYZ[i][2] < zmin) zmin = fXYZ[i][2];
       
     }
     
@@ -86,7 +86,7 @@ namespace larlight {
   
   
   //############################################################################
-  void event_track::get_axis_range(double &max, double &min, const int axis) const
+  void event_track::get_axis_range(Double_t &max, Double_t &min, const Int_t axis) const
   //############################################################################
   {
     
@@ -98,23 +98,23 @@ namespace larlight {
       
     }
     
-    for(auto trk : fTrack_v)
+    for(size_t i=0; i<this->size(); ++i)
       
-      trk.get_axis_range(max,min,axis);
+      this->at(i).get_axis_range(max,min,axis);
     
     return;
   }
   
   //############################################################################
-  void event_track::get_axis_range(double &xmax, double &xmin,
-				   double &ymax, double &ymin,
-				   double &zmax, double &zmin) const
+  void event_track::get_axis_range(Double_t &xmax, Double_t &xmin,
+				   Double_t &ymax, Double_t &ymin,
+				   Double_t &zmax, Double_t &zmin) const
   //############################################################################
   {
     
-    for(auto trk : fTrack_v)
+    for(size_t i=0; i<this->size(); ++i)
       
-      trk.get_axis_range(xmax,xmin,ymax,ymin,zmax,zmin);
+      this->at(i).get_axis_range(xmax,xmin,ymax,ymin,zmax,zmin);
     
     return;
   }

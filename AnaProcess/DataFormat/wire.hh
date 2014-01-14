@@ -30,7 +30,7 @@ namespace larlight {
     wire() : data_base(), fSignal() {clear_data();};
     
     /// Alternative constructor
-    wire(const std::vector<float> wf,
+    wire(const std::vector<Float_t> wf,
 	 const UInt_t ch,
 	 const GEO::View_t view,
 	 const GEO::SigType_t sig) 
@@ -55,30 +55,30 @@ namespace larlight {
     void clear_data();
     
     /// Setter for an waveform
-    void set_signal(const std::vector<float> wf) { fSignal=wf; };
+    void set_signal(const std::vector<Float_t> wf) { fSignal=wf; }
     /// Setter for a channel number
-    void set_channel(UInt_t    ch)   { fChannel = ch;   };
+    void set_channel(UInt_t    ch)   { fChannel = ch;   }
     /// Setter for view type
-    void set_view   (GEO::View_t v)    { fView = v;       };
+    void set_view   (GEO::View_t v)    { fView = v;       }
     /// Setter for signal type
-    void set_sigtype(GEO::SigType_t s) { fSignalType = s; };
+    void set_sigtype(GEO::SigType_t s) { fSignalType = s; }
     
     // Get Methods
     /// Getter for waveform
-    const std::vector<float>&  Signal()     const { return fSignal;        };
+    const std::vector<Float_t>&  Signal()     const { return fSignal;        }
     /// Getter for view type
-    GEO::View_t                View()       const { return fView;          };
+    GEO::View_t                View()       const { return fView;          }
     /// Getter for signal type
-    GEO::SigType_t             SignalType() const { return fSignalType;    };
+    GEO::SigType_t             SignalType() const { return fSignalType;    }
     /// Getter for channel number
-    UInt_t                   Channel()    const { return fChannel;       };
+    UInt_t                   Channel()    const { return fChannel;       }
     
   protected:
     
-    std::vector<float>      fSignal;     ///< the calibrated signal waveform
-    GEO::View_t             fView;       ///< view corresponding to the plane of this wire
-    GEO::SigType_t          fSignalType; ///< signal type of the plane for this wire
-    UInt_t                fChannel;    ///< channel number
+    std::vector<Float_t> fSignal;     ///< the calibrated signal waveform
+    GEO::View_t        fView;       ///< view corresponding to the plane of this wire
+    GEO::SigType_t     fSignalType; ///< signal type of the plane for this wire
+    UInt_t             fChannel;    ///< channel number
     
   private:
     
@@ -92,35 +92,28 @@ namespace larlight {
      \class event_wire
      A collection storage class of multiple wires.
   */
-  class event_wire : public data_base {
+  class event_wire : std::vector<larlight::wire>,
+		     public data_base {
     
   public:
     
     /// Default constructor
-    event_wire() : data_base(), fWire_v() {clear_data();};
+    event_wire() : std::vector<larlight::wire>(), data_base() {clear_data();}
     
     /// Default copy constructor
-    event_wire(const event_wire& original) : data_base(original), fWire_v(original.fWire_v)
-    {};
+    event_wire(const event_wire& original) : std::vector<larlight::wire>(original), data_base(original)
+    {}
     
     /// Default destructor
-    ~event_wire(){};
+    ~event_wire(){}
     
     /// Method to clear currently held data contents in the buffer
-    virtual void clear_data(){data_base::clear_data(); fWire_v.clear();};
-    
-    /// Method to add a track
-    inline void  add_wire(const wire w) {fWire_v.push_back(w);};
-    
-    /// Method to get an array of tracks
-    inline const std::vector<larlight::wire>& GetWireCollection() { return fWire_v; };
+    virtual void clear_data(){data_base::clear_data(); clear();}
     
   private:
     
-    std::vector<wire> fWire_v;
-    
     ////////////////////////
-    ClassDef(event_wire,1)
+    ClassDef(event_wire,2)
     ////////////////////////
   };
 };

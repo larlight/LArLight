@@ -4,12 +4,13 @@
 #include "mctruth.hh"
 
 namespace larlight {
+
   //######################################################
   void event_mc::clear_data()
   //######################################################
   {
     data_base::clear_data();
-    fPartList.clear();
+    clear();
     //fMCNeutrino.clear_data();
     fOrigin=MC::kUnknown;
     //fNeutrinoSet=false;
@@ -63,15 +64,19 @@ namespace larlight {
       return;
       
     }
-    
-    for(auto const& part : fPartList) {
+
+    /*
+      In DataFormat package, avoid using C++11 standard to keep this basic package compatible
+      with old server machines.
+    */
+    for(size_t i=0; i<this->size(); ++i) {
       
-      const std::vector<TVector3> vtx_v = part.step_vertex();
+      const std::vector<TVector3> vtx_v = this->at(i).step_vertex();
       
-      for(auto const& vtx : vtx_v) {
+      for(size_t j=0; j<vtx_v.size(); ++j) {
 	
-	if(vtx[axis] > max) max = vtx[axis];
-	if(vtx[axis] < min) min = vtx[axis];
+	if((vtx_v.at(j))[axis] > max) max = (vtx_v.at(j))[axis];
+	if((vtx_v.at(j))[axis] < min) min = (vtx_v.at(j))[axis];
 	
       }
     }
@@ -83,19 +88,23 @@ namespace larlight {
 				 double &zmax, double &zmin) const
   //######################################################
   {
-    
-    for(auto const& part : fPartList) {
+
+    /*
+      In DataFormat package, avoid using C++11 standard to keep this basic package compatible
+      with old server machines.
+    */    
+    for(size_t i=0; i<this->size(); ++i) {
       
-      const std::vector<TVector3> vtx_v = part.step_vertex();
-      
-      for(auto const& vtx : vtx_v) {
+      const std::vector<TVector3> vtx_v = this->at(i).step_vertex();
+
+      for(size_t j=0; j<vtx_v.size(); ++j) {
 	
-	if(vtx[0] > xmax) xmax = vtx[0];
-	if(vtx[0] < xmin) xmin = vtx[0];
-	if(vtx[1] > ymax) ymax = vtx[1];
-	if(vtx[1] < ymin) ymin = vtx[1];
-	if(vtx[2] > zmax) zmax = vtx[2];
-	if(vtx[2] < zmin) zmin = vtx[2];
+	if((vtx_v.at(j))[0] > xmax) xmax = (vtx_v.at(j))[0];
+	if((vtx_v.at(j))[0] < xmin) xmin = (vtx_v.at(j))[0];
+	if((vtx_v.at(j))[1] > ymax) ymax = (vtx_v.at(j))[1];
+	if((vtx_v.at(j))[1] < ymin) ymin = (vtx_v.at(j))[1];
+	if((vtx_v.at(j))[2] > zmax) zmax = (vtx_v.at(j))[2];
+	if((vtx_v.at(j))[2] < zmin) zmin = (vtx_v.at(j))[2];
 	
       }
     }

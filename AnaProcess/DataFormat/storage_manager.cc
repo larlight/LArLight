@@ -320,8 +320,14 @@ namespace larlight {
     case DATA::UserInfo:
       _ptr_data_array[type]=(data_base*)(new event_user);
       break;
-    case DATA::FIFOChannel:
-      _ptr_data_array[type]=(data_base*)(new event_pmt);
+    case DATA::PMTFIFO:
+      _ptr_data_array[type]=(data_base*)(new event_pmtfifo);
+      break;
+    case DATA::TPCFIFO:
+      _ptr_data_array[type]=(data_base*)(new event_tpcfifo);
+      break;
+    case DATA::TRIGGER:
+      _ptr_data_array[type]=(data_base*)(new trigger);
       break;
     case DATA::Wire:
       _ptr_data_array[type]=(data_base*)(new event_wire);
@@ -349,32 +355,6 @@ namespace larlight {
       break;
     case DATA::Seed:
     case DATA::Event:
-      /*
-	case DATA::PMT_WF_COLLECTION:
-	_ptr_data_array[type] = (data_base*)(new pmt_wf_collection());
-	break;
-	case DATA::TRIG_INFO:
-	_ptr_data_array[type] = (data_base*)(new trig_info());
-	break;
-	case DATA::PULSE_COLLECTION:
-	_ptr_data_array[type] = (data_base*)(new pulse_collection());
-	break;
-	case DATA::THRES_WIN_PULSE_COLLECTION:
-	_ptr_data_array[type] = (data_base*)(new pulse_collection());
-	break;
-	case DATA::FIXED_WIN_PULSE_COLLECTION:
-	_ptr_data_array[type] = (data_base*)(new pulse_collection());
-	break;
-	case DATA::SLIDE_WIN_PULSE_COLLECTION:
-	_ptr_data_array[type] = (data_base*)(new pulse_collection());
-	break;
-	case DATA::USER_COLLECTION:
-	_ptr_data_array[type] = (data_base*)(new user_collection());
-	break;
-	case DATA::TPC_WF_COLLECTION:
-	_ptr_data_array[type] = (data_base*)(new tpc_wf_collection());
-	break;
-      */
     case DATA::DATA_TYPE_MAX:
       print(MSG::ERROR,__FUNCTION__,Form("Data identifier not supported: %d",(int)type));
       break;

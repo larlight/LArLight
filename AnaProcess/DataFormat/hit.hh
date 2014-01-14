@@ -27,65 +27,65 @@ namespace larlight{
   public:
     
     /// Default constructor
-    hit() : data_base() , fHitSignal() {clear_data();};
+    hit() : data_base() , fHitSignal() {clear_data();}
     
     /// Copy constructor
     hit(const hit& original);
     
     /// Default destructor
-    virtual ~hit(){};
+    virtual ~hit(){}
     
     void clear_data();
     
     // Set methods
-    void set_waveform  (const std::vector<double>& wf) { fHitSignal = wf;};
-    void set_times     (double start, double peak, double end)
-    {fStartTime = start; fPeakTime = peak; fEndTime = end;};
-    void set_times_err (double start, double peak, double end)
-    {fSigmaStartTime = start; fSigmaPeakTime = peak; fSigmaEndTime = end;};
-    void set_charge    (double q, double q_max)
-    {fCharge=q; fMaxCharge = q_max;};
-    void set_charge_err(double q, double q_max)
-    {fSigmaCharge=q; fSigmaMaxCharge=q_max;};
-    void set_multiplicity(int m){ fMultiplicity=m;};
-    void set_channel (UInt_t ch){ fChannel=ch;};
-    void set_wire    (UInt_t wire) { fWire=wire;};
-    void set_fit_goodness(double v){ fGoodnessOfFit = v;};
-    void set_view(GEO::View_t v){ fView = v;};
-    void set_sigtype(GEO::SigType_t t) {fSignalType=t;};
+    void set_waveform  (const std::vector<Double_t>& wf) { fHitSignal = wf;}
+    void set_times     (Double_t start, Double_t peak, Double_t end)
+    {fStartTime = start; fPeakTime = peak; fEndTime = end;}
+    void set_times_err (Double_t start, Double_t peak, Double_t end)
+    {fSigmaStartTime = start; fSigmaPeakTime = peak; fSigmaEndTime = end;}
+    void set_charge    (Double_t q, Double_t q_max)
+    {fCharge=q; fMaxCharge = q_max;}
+    void set_charge_err(Double_t q, Double_t q_max)
+    {fSigmaCharge=q; fSigmaMaxCharge=q_max;}
+    void set_multiplicity(Int_t m){ fMultiplicity=m;}
+    void set_channel (UInt_t ch){ fChannel=ch;}
+    void set_wire    (UInt_t wire) { fWire=wire;}
+    void set_fit_goodness(Double_t v){ fGoodnessOfFit = v;}
+    void set_view(GEO::View_t v){ fView = v;}
+    void set_sigtype(GEO::SigType_t t) {fSignalType=t;}
     
     // Get Methods 
-    const std::vector<double>& HitSignal()      const { return fHitSignal;      };  
-    double          StartTime()                 const { return fStartTime;      };  
-    double          EndTime()                   const { return fEndTime;        };
-    double          PeakTime()                  const { return fPeakTime;       };
-    double          SigmaStartTime()            const { return fSigmaStartTime; };
-    double          SigmaEndTime()              const { return fSigmaEndTime;   };
-    double          SigmaPeakTime()             const { return fSigmaPeakTime;  };
-    int             Multiplicity()              const { return fMultiplicity;   };
-    UInt_t          Channel()                   const { return fChannel;        };
-    UInt_t          Wire()                      const { return fWire;           };
-    double          Charge(bool max=false)      const { return ( max ? fMaxCharge : fCharge);};
-    double          SigmaCharge(bool max=false) const { return ( max ? fSigmaMaxCharge : fSigmaCharge ); };
-    double          GoodnessOfFit()             const { return fGoodnessOfFit;  };
-    GEO::SigType_t  SignalType()                const { return fSignalType;     };
-    GEO::View_t     View()                      const { return fView;           };
+    const std::vector<Double_t>& HitSignal()      const { return fHitSignal;      }  
+    Double_t          StartTime()                 const { return fStartTime;      }  
+    Double_t          EndTime()                   const { return fEndTime;        }
+    Double_t          PeakTime()                  const { return fPeakTime;       }
+    Double_t          SigmaStartTime()            const { return fSigmaStartTime; }
+    Double_t          SigmaEndTime()              const { return fSigmaEndTime;   }
+    Double_t          SigmaPeakTime()             const { return fSigmaPeakTime;  }
+    Int_t             Multiplicity()              const { return fMultiplicity;   }
+    UInt_t          Channel()                   const { return fChannel;        }
+    UInt_t          Wire()                      const { return fWire;           }
+    Double_t          Charge(bool max=false)      const { return ( max ? fMaxCharge : fCharge);}
+    Double_t          SigmaCharge(bool max=false) const { return ( max ? fSigmaMaxCharge : fSigmaCharge ); }
+    Double_t          GoodnessOfFit()             const { return fGoodnessOfFit;  }
+    GEO::SigType_t  SignalType()                const { return fSignalType;     }
+    GEO::View_t     View()                      const { return fView;           }
     
   protected:
     
-    std::vector<double>     fHitSignal;      ///< vector of ADC values within the hit window
-    double                  fStartTime;      ///< initial tdc tick for hit 
-    double                  fSigmaStartTime; ///< uncertainty on initial tick
-    double                  fPeakTime;       ///< tdc for the peak charge deposition
-    double                  fSigmaPeakTime;  ///< uncertainty for tdc of the peak
-    double                  fEndTime;        ///< final tdc tick for hit
-    double                  fSigmaEndTime;   ///< uncertainty on final tick
-    double                  fCharge;         ///< total charge deposited for hit
-    double                  fSigmaCharge;    ///< uncertainty in total charge deposited
-    double                  fMaxCharge;      ///< maximum ADC value in hit window
-    double                  fSigmaMaxCharge; ///< maximum ADC value in hit window
-    int                     fMultiplicity;   ///< how many hits could this one be shared with
-    double                  fGoodnessOfFit;  ///< how well do we believe we know this hit?
+    std::vector<Double_t>   fHitSignal;      ///< vector of ADC values within the hit window
+    Double_t                fStartTime;      ///< initial tdc tick for hit 
+    Double_t                fSigmaStartTime; ///< uncertainty on initial tick
+    Double_t                fPeakTime;       ///< tdc for the peak charge deposition
+    Double_t                fSigmaPeakTime;  ///< uncertainty for tdc of the peak
+    Double_t                fEndTime;        ///< final tdc tick for hit
+    Double_t                fSigmaEndTime;   ///< uncertainty on final tick
+    Double_t                fCharge;         ///< total charge deposited for hit
+    Double_t                fSigmaCharge;    ///< uncertainty in total charge deposited
+    Double_t                fMaxCharge;      ///< maximum ADC value in hit window
+    Double_t                fSigmaMaxCharge; ///< maximum ADC value in hit window
+    Int_t                   fMultiplicity;   ///< how many hits could this one be shared with
+    Double_t                fGoodnessOfFit;  ///< how well do we believe we know this hit?
     GEO::View_t             fView;           ///< view for the plane of the hit
     GEO::SigType_t          fSignalType;     ///< signal type for the plane of the hit
     UInt_t                  fChannel;        ///< channel number
@@ -93,7 +93,7 @@ namespace larlight{
   private:
     
     ////////////////////////
-    ClassDef(hit,1)
+    ClassDef(hit,2)
     ////////////////////////
       
   };
@@ -102,38 +102,31 @@ namespace larlight{
      \class event_hit
      A collection storage class of multiple hits.
   */
-  class event_hit : public data_base {
+  class event_hit : public std::vector<larlight::hit>, 
+		    public data_base {
     
   public:
     
     /// Default constructor
-    event_hit() : data_base(), fHit_v() {clear_data();};
+    event_hit() : std::vector<larlight::hit>(), data_base() {clear_data();}
     
     /// Default copy constructor
-    event_hit(const event_hit& original) : data_base(original), fHit_v(original.fHit_v)
-    {};
+    event_hit(const event_hit& original) : std::vector<larlight::hit>(original), data_base(original)
+    {}
     
     /// Default destructor
-    ~event_hit(){};
+    ~event_hit(){}
     
     /// Method to clear currently held data contents in the buffer
-    virtual void clear_data(){data_base::clear_data(); fHit_v.clear();};
-    
-    /// Method to add a hit
-    inline void  add_hit(const hit h) {fHit_v.push_back(h);};
-    
-    /// Method to get an array of hit
-    inline const std::vector<larlight::hit>& GetHitCollection() const { return fHit_v; };
+    virtual void clear_data(){data_base::clear_data(); clear();}
     
   private:
     
-    std::vector<hit> fHit_v;
-    
     ////////////////////////
-    ClassDef(event_hit,1)
+    ClassDef(event_hit,2)
     ////////////////////////
   };
-};
+}
 #endif
 
 /** @} */ // end of doxygen group 

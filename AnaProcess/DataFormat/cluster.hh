@@ -33,31 +33,31 @@ namespace larlight{
     /// Default destructor
     virtual ~cluster(){};
     
-    void set_charge   (double q)      { fTotalCharge = q; };
-    void set_dtdw     (double v)      { fdTdW=v; };
-    void set_dqdw     (double v)      { fdQdW=v; };
-    void set_dtdw_err (double v)      { fSigmadTdW=v; };
-    void set_dqdw_err (double v)      { fSigmadQdW=v; };
-    void set_id       (int i)         { fID = i; };
+    void set_charge   (Double_t q)      { fTotalCharge = q; };
+    void set_dtdw     (Double_t v)      { fdTdW=v; };
+    void set_dqdw     (Double_t v)      { fdQdW=v; };
+    void set_dtdw_err (Double_t v)      { fSigmadTdW=v; };
+    void set_dqdw_err (Double_t v)      { fSigmadQdW=v; };
+    void set_id       (Int_t i)         { fID = i; };
     void set_view     (GEO::View_t v) { fView=v; };
-    void set_start_vtx     (const std::vector<double> vtx) { fStartPos=vtx;      };
-    void set_end_vtx       (const std::vector<double> vtx) { fEndPos=vtx;        };
-    void set_start_vtx_err (const std::vector<double> vtx) { fSigmaStartPos=vtx; };
-    void set_end_vtx_err   (const std::vector<double> vtx) { fSigmaEndPos=vtx;   };
+    void set_start_vtx     (const std::vector<Double_t> vtx) { fStartPos=vtx;      };
+    void set_end_vtx       (const std::vector<Double_t> vtx) { fEndPos=vtx;        };
+    void set_start_vtx_err (const std::vector<Double_t> vtx) { fSigmaStartPos=vtx; };
+    void set_end_vtx_err   (const std::vector<Double_t> vtx) { fSigmaEndPos=vtx;   };
     void add_hit           (const hit h)                   { fHitVector.push_back(h); }
     
-    inline double       Charge()    const { return fTotalCharge;   }
-    inline double       dTdW()      const { return fdTdW;          }
-    inline double       dQdW()      const { return fdQdW;          }
-    inline double       SigmadTdW() const { return fSigmadTdW;     }
-    inline double       SigmadQdW() const { return fSigmadQdW;     }
-    inline int          ID()        const { return fID;            }
+    inline Double_t       Charge()    const { return fTotalCharge;   }
+    inline Double_t       dTdW()      const { return fdTdW;          }
+    inline Double_t       dQdW()      const { return fdQdW;          }
+    inline Double_t       SigmadTdW() const { return fSigmadTdW;     }
+    inline Double_t       SigmadQdW() const { return fSigmadQdW;     }
+    inline Int_t          ID()        const { return fID;            }
     inline GEO::View_t  View()      const { return fView;          }
     
-    inline const std::vector<double>& StartPos()      const { return fStartPos;      }
-    inline const std::vector<double>& EndPos()        const { return fEndPos;        }
-    inline const std::vector<double>& SigmaStartPos() const { return fSigmaStartPos; }
-    inline const std::vector<double>& SigmaEndPos()   const { return fSigmaEndPos;   }
+    inline const std::vector<Double_t>& StartPos()      const { return fStartPos;      }
+    inline const std::vector<Double_t>& EndPos()        const { return fEndPos;        }
+    inline const std::vector<Double_t>& SigmaStartPos() const { return fSigmaStartPos; }
+    inline const std::vector<Double_t>& SigmaEndPos()   const { return fSigmaEndPos;   }
     inline const std::vector<hit>&    Hits()          const { return fHitVector;     }
     virtual void clear_data(){
       data_base::clear_data();
@@ -77,25 +77,25 @@ namespace larlight{
        NOTE: the initial max/min values matter. It only modifies max/min if it finds values that is 
        above/below those initial values.
     */
-    void get_axis_range (std::vector<double> &chmax,   std::vector<double> &chmin,
-			 std::vector<double> &wiremax, std::vector<double> &wiremin,
-			 std::vector<double> &timemax, std::vector<double> &timemin) const;
+    void get_axis_range (std::vector<Double_t> &chmax,   std::vector<Double_t> &chmin,
+			 std::vector<Double_t> &wiremax, std::vector<Double_t> &wiremin,
+			 std::vector<Double_t> &timemax, std::vector<Double_t> &timemin) const;
 
 
   private:
     
-    double                     fTotalCharge;    ///< total charge in cluster
-    double                     fdTdW;           ///< slope of cluster in tdc vs wire
-    double                     fdQdW;           ///< slope of cluster in charge vs wire
-    double                     fSigmadTdW;      ///< slope of cluster in tdc vs wire
-    double                     fSigmadQdW;      ///< slope of cluster in charge vs wire
-    std::vector<double>        fStartPos;       ///< start of cluster in (wire, tdc) plane
-    std::vector<double>        fEndPos;         ///< start of cluster in (wire, tdc) plane
-    std::vector<double>        fSigmaStartPos;  ///< start of cluster in (wire, tdc) plane
-    std::vector<double>        fSigmaEndPos;    ///< start of cluster in (wire, tdc) plane
-    std::vector<hit>           fHitVector;      ///< Hit vector
-    int                        fID;             ///< cluster's ID
-    GEO::View_t                fView;           ///< View associated w/ this cluster
+    Double_t              fTotalCharge;    ///< total charge in cluster
+    Double_t              fdTdW;           ///< slope of cluster in tdc vs wire
+    Double_t              fdQdW;           ///< slope of cluster in charge vs wire
+    Double_t              fSigmadTdW;      ///< slope of cluster in tdc vs wire
+    Double_t              fSigmadQdW;      ///< slope of cluster in charge vs wire
+    std::vector<Double_t> fStartPos;       ///< start of cluster in (wire, tdc) plane
+    std::vector<Double_t> fEndPos;         ///< start of cluster in (wire, tdc) plane
+    std::vector<Double_t> fSigmaStartPos;  ///< start of cluster in (wire, tdc) plane
+    std::vector<Double_t> fSigmaEndPos;    ///< start of cluster in (wire, tdc) plane
+    std::vector<hit>      fHitVector;      ///< Hit vector
+    Int_t                 fID;             ///< cluster's ID
+    GEO::View_t           fView;           ///< View associated w/ this cluster
     
     ////////////////////////
     ClassDef(cluster,2)
@@ -107,48 +107,38 @@ namespace larlight{
      \class cluster_collection 
      A collection storage class of multiple clusters.
   */
-  class event_cluster : public data_base {
+  class event_cluster : public std::vector<larlight::cluster>,
+			public data_base {
     
   public:
     
     /// Default constructor
-    event_cluster() : data_base(),fCluster_v() {clear_data();};
+    event_cluster() : std::vector<larlight::cluster>(), data_base() {clear_data();};
     
     /// Default copy constructor
     event_cluster(const event_cluster& original)
-      : data_base(original), fCluster_v(original.fCluster_v)
-    {};
+      : std::vector<larlight::cluster>(original), data_base(original)
+    {}
     
     /// Method to clear currently held data contents in the buffer
-    virtual void clear_data(){data_base::clear_data(); clear_clusters();}
-    
-    /// Method to clear only cluster vector
-    virtual void clear_clusters(){ fCluster_v.clear(); };
-
-    /// Method to add a cluster
-    void add_cluster(const cluster c){fCluster_v.push_back(c);};
-    
-    /// Getter
-    const std::vector<larlight::cluster>& GetClusterCollection() const {return fCluster_v;};
+    virtual void clear_data(){data_base::clear_data(); clear();}
     
     /// Default destructor
-    ~event_cluster(){};
+    ~event_cluster(){}
 
     /**
        A utility function to obtain maximum & minimum of clusters' hits' vertex
        NOTE: the initial max/min values matter. It only modifies max/min if it finds values that is
        above/below those initial values.
     */
-    void get_axis_range (std::vector<double> &chmax,   std::vector<double> &chmin,
-			 std::vector<double> &wiremax, std::vector<double> &wiremin,
-			 std::vector<double> &timemax, std::vector<double> &timemin) const;
+    void get_axis_range (std::vector<Double_t> &chmax,   std::vector<Double_t> &chmin,
+			 std::vector<Double_t> &wiremax, std::vector<Double_t> &wiremin,
+			 std::vector<Double_t> &timemax, std::vector<Double_t> &timemin) const;
     
   private:
     
-    std::vector<cluster> fCluster_v;
-    
     ////////////////////////
-    ClassDef(event_cluster,1)
+    ClassDef(event_cluster,2)
     ////////////////////////
       };
 };

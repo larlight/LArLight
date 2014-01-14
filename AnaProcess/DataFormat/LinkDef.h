@@ -14,7 +14,13 @@
 
 #pragma link C++ class larlight::pmtfifo+;
 #pragma link C++ class std::vector<larlight::pmtfifo>+;
-#pragma link C++ class larlight::event_pmt;
+#pragma link C++ class larlight::event_pmtfifo+;
+
+#pragma link C++ class larlight::tpcfifo+;
+#pragma link C++ class std::vector<larlight::tpcfifo>+;
+#pragma link C++ class larlight::event_tpcfifo+;
+
+#pragma link C++ class larlight::trigger+;
 
 #pragma link C++ class larlight::part_mc+;
 #pragma link C++ class std::vector<larlight::part_mc>+;
@@ -54,14 +60,13 @@
 #pragma link C++ class std::vector<larlight::user_info>+;
 #pragma link C++ class larlight::event_user+;
 
-/*
+
 #pragma link C++ class std::pair<std::string,bool>+;
 #pragma link C++ class std::pair<std::string,std::string>+;
 #pragma link C++ class std::pair<std::string,std::vector<bool> >+;
 #pragma link C++ class std::pair<std::string,std::vector<int> >+;
 #pragma link C++ class std::pair<std::string,std::vector<double> >+;
 #pragma link C++ class std::pair<std::string,std::vector<std::string> >+;
-*/
 
 #pragma link C++ class std::map<std::string,bool>+;
 #pragma link C++ class std::map<std::string,std::string>+;

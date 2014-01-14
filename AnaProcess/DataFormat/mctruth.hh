@@ -33,7 +33,7 @@ namespace larlight {
     part_mc(){clear_data();};
     
     /// Default constructor requires pdgid, track & parent id
-    part_mc(int pdgid, int track, int parent, std::string process);
+    part_mc(Int_t pdgid, Int_t track, Int_t parent, std::string process);
     
     /// Copy constructor
     part_mc(const part_mc& original) : data_base     (original),
@@ -55,48 +55,48 @@ namespace larlight {
     void clear_data();
     
     /// Appender of a particle track
-    void add_track(double x,  double y,  double z,  double t,
-		   double px, double py, double pz);
+    void add_track(Double_t x,  Double_t y,  Double_t z,  Double_t t,
+		   Double_t px, Double_t py, Double_t pz);
     
     /// Appender of a particle's daughter
-    //void add_daughter(int id, int track_id=-1);
-    void add_daughter(int track_id){fDaughters.insert(track_id);};
+    //void add_daughter(Int_t id, Int_t track_id=-1);
+    void add_daughter(Int_t track_id){fDaughters.insert(track_id);};
     
     /// Getter for PDGID
-    inline int pdg_id()    const { return fPDGID;    };
+    inline Int_t pdg_id()    const { return fPDGID;    };
 
     /// Getter for Track ID
-    inline int track_id()  const { return fTrackID;  };
+    inline Int_t track_id()  const { return fTrackID;  };
     
     /// Getter for Parent ID
-    inline int parent_id() const { return fParentID; };
+    inline Int_t parent_id() const { return fParentID; };
     
     /// Getter for step vertex
     inline const std::vector<TVector3>& step_vertex()   const { return fStepVertex;   };
     
     /// Getter for step time
-    inline const std::vector<double>&   step_time()     const { return fStepTime;     };
+    inline const std::vector<Double_t>&   step_time()     const { return fStepTime;     };
     
     /// Getter for step momentum
     inline const std::vector<TVector3>& step_momentum() const { return fStepMomentum; };
     
   private:
     
-    std::vector<double>      fStepTime;     ///< time at each step
+    std::vector<Double_t>    fStepTime;     ///< time at each step
     std::vector<TVector3>    fStepVertex;   ///< vertex at each step
     std::vector<TVector3>    fStepMomentum; ///< momentum at each step
     //std::vector<std::string> fStepProcess;  ///< process name at each step
     std::string              fProcess;      ///< process name for creation
     /// A list of daughters (daughter's particle id, which is unique, & step number)
-    std::set<int>            fDaughters;
-    //std::map<int, int>       fDaughters;
+    std::set<Int_t>          fDaughters;
+    //std::map<Int_t, Int_t>       fDaughters;
     
-    int fParentID; ///< Parent's track id
-    int fTrackID;  ///< Unique tracking ID per particle
-    int fPDGID;    ///< Particle ID code
+    Int_t fParentID; ///< Parent's track id
+    Int_t fTrackID;  ///< Unique tracking ID per particle
+    Int_t fPDGID;    ///< Particle ID code
     
     ////////////////////////
-    ClassDef(part_mc,4)
+    ClassDef(part_mc,5)
     ////////////////////////
       
   };
@@ -105,16 +105,17 @@ namespace larlight {
      \class event_mc
      LArSoft MCTruth class equivalent data container
   */
-  class event_mc : public data_base {
+  class event_mc : public std::vector<larlight::part_mc>,
+		   public data_base {
     
   public:
     
     /// Default constructor
-    event_mc() : data_base() {clear_data();};
+    event_mc() : std::vector<larlight::part_mc>(), data_base() {clear_data();};
     
     /// Copy constructor
-    event_mc(const event_mc& original) : data_base   (original),
-					 fPartList   (original.fPartList),
+    event_mc(const event_mc& original) : std::vector<larlight::part_mc>(original),
+					 data_base   (original),
 					 //fMCNeutrino (original.fMCNeutrino),
 					 fOrigin     (original.fOrigin)
 	    //fNeutrinoSet(original.fNeutrinoSet
@@ -129,18 +130,11 @@ namespace larlight {
     /// Setter for neutrino info
     //void set_nu_mc(nu_mc info) {fMCNeutrino = info;};
     
-    /// Appender for particle info
-    void add_part(part_mc &info) {fPartList.push_back(info); };
-    //void add_part(part_mc &info) {fPartList.push_back(info); fNeutrinoSet=true;};
-    
     /// Setter for generation code
     void set_gen_code(MC::Origin_t info) {fOrigin=info;};
     
     /// Getter for neutrino info
     //inline const nu_mc& nu_mc() {return fMCNeutrino;};
-    
-    /// Getter for particle list
-    inline const std::vector<larlight::part_mc>& GetParticleCollection() const {return fPartList;};
     
     /// Getter for generator id
     inline MC::Origin_t gen_code() const {return fOrigin;};
@@ -153,26 +147,25 @@ namespace larlight {
        NOTE: the initial max/min values matter. It only modifies max/min if it finds values that is 
        above/below those initial values.
     */
-    void get_axis_range (double &max, double &min, const int axis) const;
+    void get_axis_range (Double_t &max, Double_t &min, const Int_t axis) const;
     
     /**
        A utility function to obtain maximum & minimum of spacepoints' vertex along all axis.
        NOTE: the initial max/min values matter. It only modifies max/min if it finds values that is
        above/below those initial values.
     */
-    void get_axis_range (double &xmax, double &xmin,
-			 double &ymax, double &ymin,
-			 double &zmax, double &zmin) const;  
+    void get_axis_range (Double_t &xmax, Double_t &xmin,
+			 Double_t &ymax, Double_t &ymin,
+			 Double_t &zmax, Double_t &zmin) const;  
     
   private:
     
-    std::vector<part_mc> fPartList;    ///< list of particles in this event
     //nu_mc                fMCNeutrino;  ///< reference to neutrino info - null if not a neutrino
     MC::Origin_t         fOrigin;      ///< origin for this event
     //bool                 fNeutrinoSet; ///< flag for whether the neutrino information has been set
     
     ////////////////////////
-    ClassDef(event_mc,3)
+    ClassDef(event_mc,4)
     ////////////////////////
       
   };

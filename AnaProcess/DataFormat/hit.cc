@@ -31,6 +31,7 @@ namespace larlight {
   void hit::clear_data()
   //##########################################################################
   {
+    data_base::clear_data();
     fHitSignal.clear();
     fStartTime = fPeakTime = fEndTime = -1;
     fSigmaStartTime = fSigmaPeakTime = fSigmaEndTime = -1;

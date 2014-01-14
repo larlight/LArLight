@@ -6,7 +6,7 @@
 namespace larlight {
   
   //############################################################################
-  void event_sps::get_axis_range(double &max, double &min, const int axis) const
+  void event_sps::get_axis_range(Double_t &max, Double_t &min, const int axis) const
   //############################################################################
   {
     
@@ -18,10 +18,10 @@ namespace larlight {
       
     }
     
-    for(auto sps : fSpacePoint_v){
+    for(size_t i=0; i<this->size(); ++i) {
       
-      if(sps.XYZ()[axis] > max) max = sps.XYZ()[axis];
-      if(sps.XYZ()[axis] > min) min = sps.XYZ()[axis];
+      if((this->at(i)).XYZ()[axis] > max) max = (this->at(i)).XYZ()[axis];
+      if((this->at(i)).XYZ()[axis] > min) min = (this->at(i)).XYZ()[axis];
       
     }
     
@@ -30,20 +30,20 @@ namespace larlight {
   
   
   //############################################################################
-  void event_sps::get_axis_range(double &xmax, double &xmin,
-				 double &ymax, double &ymin,
-				 double &zmax, double &zmin) const
+  void event_sps::get_axis_range(Double_t &xmax, Double_t &xmin,
+				 Double_t &ymax, Double_t &ymin,
+				 Double_t &zmax, Double_t &zmin) const
   //############################################################################
   {
     
-    for(auto sps : fSpacePoint_v){
+    for(size_t i=0; i<this->size(); ++i) {
       
-      if(sps.XYZ()[0] > xmax) xmax = sps.XYZ()[0];
-      if(sps.XYZ()[0] > xmin) xmin = sps.XYZ()[0];
-      if(sps.XYZ()[1] > ymax) ymax = sps.XYZ()[1];
-      if(sps.XYZ()[1] > ymin) ymin = sps.XYZ()[1];
-      if(sps.XYZ()[2] > zmax) zmax = sps.XYZ()[2];
-      if(sps.XYZ()[2] > zmin) zmin = sps.XYZ()[2];
+      if((this->at(i)).XYZ()[0] > xmax) xmax = (this->at(i)).XYZ()[0];
+      if((this->at(i)).XYZ()[0] > xmin) xmin = (this->at(i)).XYZ()[0];
+      if((this->at(i)).XYZ()[1] > ymax) ymax = (this->at(i)).XYZ()[1];
+      if((this->at(i)).XYZ()[1] > ymin) ymin = (this->at(i)).XYZ()[1];
+      if((this->at(i)).XYZ()[2] > zmax) zmax = (this->at(i)).XYZ()[2];
+      if((this->at(i)).XYZ()[2] > zmin) zmin = (this->at(i)).XYZ()[2];
       
     }
     

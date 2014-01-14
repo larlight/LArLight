@@ -133,41 +133,35 @@ namespace larlight {
      This is what created per-event if user specified to store user's information in an event loop.
      If a user just needs one user_info, it may be an array of length 1.
   */
-  class event_user : public data_base {
+  class event_user : public std::vector<larlight::user_info>,
+		     public data_base {
     
   public:
     
     /// Default constructor
-    event_user() : data_base() {clear_data();};
+    event_user() : std::vector<larlight::user_info>(),
+		   data_base() 
+    {clear_data();}
     
     /// Default copy constructor
-    event_user(const event_user& original)
-      : data_base(original),
-	fUserInfo_v(original.fUserInfo_v)
-    {};
-    
-    /// Appender of a user info
-    void add_user_info(user_info info) {fUserInfo_v.push_back(info);};
-    
-    /// Getter of user info array
-    inline const std::vector<larlight::user_info>& GetUserInfoCollection(){return fUserInfo_v;};
+    event_user(const event_user& original) : std::vector<larlight::user_info>(original),
+					     data_base(original)
+    {}
     
     /// Method to clear currently held data contents in the buffer
-    virtual void clear_data(){data_base::clear_data(); fUserInfo_v.clear();};
+    virtual void clear_data(){data_base::clear_data(); clear();}
     
     /// Default destructor
-    ~event_user(){};
+    ~event_user(){}
     
   private:
     
-    std::vector<user_info> fUserInfo_v;
-    
     ////////////////////////
-    ClassDef(event_user,2)
+    ClassDef(event_user,3)
     ////////////////////////
   };
   
-};
+}
   
 #endif
 /** @} */ // end of doxygen group 

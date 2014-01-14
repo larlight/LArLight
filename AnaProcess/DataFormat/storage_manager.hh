@@ -23,6 +23,8 @@
 #include "user_info.hh"
 #include "spacepoint.hh"
 #include "pmtfifo.hh"
+#include "tpcfifo.hh"
+#include "trigger.hh"
 #include "wire.hh"
 #include "hit.hh"
 #include "cluster.hh"

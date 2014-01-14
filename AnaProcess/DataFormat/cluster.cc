@@ -5,12 +5,12 @@
 
 namespace larlight{
   //############################################################################
-  void cluster::get_axis_range(std::vector<double> &chmax,
-			       std::vector<double> &chmin,
-			       std::vector<double> &wiremax, 
-			       std::vector<double> &wiremin, 
-			       std::vector<double> &timemax, 
-			       std::vector<double> &timemin) const
+  void cluster::get_axis_range(std::vector<Double_t> &chmax,
+			       std::vector<Double_t> &chmin,
+			       std::vector<Double_t> &wiremax, 
+			       std::vector<Double_t> &wiremin, 
+			       std::vector<Double_t> &timemax, 
+			       std::vector<Double_t> &timemin) const
   //############################################################################
   {
 
@@ -23,13 +23,15 @@ namespace larlight{
     timemin.resize((GEO::kW+1),-1);
 
     //vtx is a vector of hits for one cluster?
-    for(const auto &hit : fHitVector) {
+    for(std::vector<larlight::hit>::const_iterator iter(fHitVector.begin());
+	iter!=fHitVector.end();
+	++iter) {
 
-      GEO::View_t  view    =  hit.View();
-      double       wire    =  (double)(hit.Wire());
-      double       ch      =  (double)(hit.Channel());
-      double       tstart  =  hit.StartTime();
-      double       tend    =  hit.EndTime();
+      GEO::View_t  view    =  (*iter).View();
+      Double_t       wire    =  (Double_t)((*iter).Wire());
+      Double_t       ch      =  (Double_t)((*iter).Channel());
+      Double_t       tstart  =  (*iter).StartTime();
+      Double_t       tend    =  (*iter).EndTime();
 
       if( wiremax[view] < 0 || wiremax[view] < wire )  wiremax[view] = wire;
       if( chmax[view]   < 0 || chmax[view]   < ch   )  chmax[view]   = ch;
@@ -46,18 +48,18 @@ namespace larlight{
 
 
   //############################################################################
-  void event_cluster::get_axis_range(std::vector<double> &chmax,
-				     std::vector<double> &chmin,
-				     std::vector<double> &wiremax, 
-				     std::vector<double> &wiremin, 
-				     std::vector<double> &timemax, 
-				     std::vector<double> &timemin) const
+  void event_cluster::get_axis_range(std::vector<Double_t> &chmax,
+				     std::vector<Double_t> &chmin,
+				     std::vector<Double_t> &wiremax, 
+				     std::vector<Double_t> &wiremin, 
+				     std::vector<Double_t> &timemax, 
+				     std::vector<Double_t> &timemin) const
   //############################################################################
   {
     //fCluster_v is a vector of all clusters in the event
-    for(auto const &cluster : fCluster_v){
+    for(size_t i=0; i<this->size(); ++i) {
 
-      cluster.get_axis_range(chmax,chmin,wiremax,wiremin,timemax,timemin);
+      (this->at(i)).get_axis_range(chmax,chmin,wiremax,wiremin,timemax,timemin);
 
     }
 
