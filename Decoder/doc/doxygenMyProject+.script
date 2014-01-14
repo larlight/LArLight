@@ -1,0 +1,11 @@
+# New, simpler script for generating doxygen documentation.
+# It uses the main (maintained) doxygenMyProject.script,
+
+@INCLUDE = $(PMT_DECODER_DIR)/doc/doxygenMyProject.script
+
+OUTPUT_DIRECTORY       = $(PMT_DECODER_DIR)/doc/dOxygenMyProject+
+
+#
+# ROOT
+#
+INPUT +=$(ROOTSYS)/include

@@ -1,0 +1,184 @@
+#################################
+#                               #
+# README for PMTDecoder Package #
+#                               #
+#################################
+
+##############
+#            #
+# Disclaimer #
+#            #
+##############
+
+The original code is maintained within a git repository:
+
+/a/share/westside/kazuhiro/ub_projects.git
+
+The developper branch is called "pmt_decoder_trunk".
+Try listing tagged versions for a stable release.
+
+If you obtained this code from any other source, then it is possible
+that you obtained a non-stable release. Just keep it in mind.
+
+################
+#              #
+# Introduction #
+#              #
+################
+
+This is a simple framework to interpret raw data coming from 
+PMT readout electronics. In particular, the framework include
+following components.
+
+  (0) Basic constants & type definition for the framework
+  (1) File I/O handler to read binary information from raw data.
+  (2) Algorithms to decode binary information into PMT/event wise data format.
+  (3) Simple ROOT data format classes + handler to store data in ROOT file.
+  (4) Simple analysis framework to analyze decoded data.
+  (5) Decoding task manager
+
+Source code for each item above can be found in sub-directories:
+
+  (0) Base
+  (1) FileIO
+  (2) Algorithm
+  (3) DataFormat
+  (4) Analysis
+  (5) Decoder
+
+This package is generated using Kazu's open C++ package template.
+The original features of template are kept same including:
+
+   - Support for Linux, OSX and AIX kernels 
+   - CINT dictionary + rootmap script generation
+   - Shared lib generation for compiled code pottability
+   - New package generation script including makefile, TypeDef & LinkDef.
+   - Doxygen script to generate documentation with class index
+
+################
+#              #
+# How to Build #
+#              #
+################
+
+(a) System requirement
+    
+    - ROOT 5.22 or later
+    - Supported OS: Linux, OSX, or AIX 
+    - doxygen for generating documentation (not necessarily for decoder)
+
+(b) Shell Environment Variables
+
+    1. Set $ROOTSYS point to your ROOT installation
+    2. Set $MAKE_TOP_DIR point to the directory where this README exists.
+    3. After above env. vars. are set, run:
+      
+      > source $MAKE_TOP_DIR/config/setup.sh
+
+      These steps are needed to use the package everytime you logong the 
+      system.
+
+      If you are on Nevis cluster, you can actually ommit 1 & 2 as the 
+      script in step 3 recognize the dns and set those env. vars automatically.
+      The same can be done for other servers if one adds a trivial set of
+      commands in setup.sh.
+
+(c) Build
+
+    > cd $MAKE_TOP_DIR
+    > make 
+
+    You can also use "-j X" option for make if you wish where X should be
+    replaced by an integer suitable for your system.
+
+    You should see a compilation message as it proceeds compiling.
+
+(e) What did I "build"?
+
+    You should see compiled libraries under $MAKE_TOP_DIR/lib. These are
+    compiled with CINT dictionary generated in the build process. Importing
+    these libraries in your CINT or PyROOT macro gives you an access to
+    compiled classes. You should also see rootmap generated under the same
+    directory, which solves an order-sensitive multi-lib loading issue.
+
+(f) Can I run something to see if all is well?
+
+    You can run a sample decoder program and see if you get anything out.
+
+    > cd $MAKE_TOP_DIR/Decoder
+    > python mac/decoder.py dat/xmit_sample.bin
+
+    This script, decoder.py, takes an input file (1st argument) and create
+    an output root file with a name same as the input file but with a replaced
+    extension. The output file is created in your $PWD by default. In this
+    example, therefore, you should see $MAKE_TOP_DIR/Decoder/xmit_sample.root
+    file created.
+
+    See the content of decoder.py to see various config. options.    
+
+    To view a decoded waveform, a simple heavy yet interactive analysis module
+    called reco_wf is prepared under Analysis sub-directory. To run this and
+    see an waveform in the previously created xmit_sample.root file, try:
+
+    > python mac/plot.py xmit_sample.root
+
+(d) Generating class index
+
+    Doxygen class index is not available any more upon downloading the
+    package because it makes the package size large. You have to generate
+    it if you wish to have one. 
+
+    To generate a doxygen class index documentation, try:
+
+    > cd $MAKE_TOP_DIR
+    > make doxygen
+
+    This should generate a following html file.
+    
+    > $MAKE_TOP_DIR/doc/dOxygenMyProject/html/index.html
+
+    Open this file with an web browser. The html files are generated using
+    doxygen. If you further develop your own code under any subdirectories
+    of this package, simply try:
+
+    > cd $MAKE_TOP_DIR
+    > make doxygen
+
+    This will search all header/source code and re-generate the doxygen
+    class index with your comments in the code.
+
+###############
+#             #
+# Data Sample #
+#             #
+###############    
+
+Data sample files can be found under $MAKE_TOP_DIR/Decoder/dat directory.
+
+   - xmit_sample.bin           ... A sample binary file for xmit readout. 
+     			       	   This is the default format to use.
+
+   - slow_readout_sample.bin   ... A sample binary file for slow readout.
+
+   - slow_readout_sample.txt   ... A sample ASCII file for slow readout.
+     			       	   NOTE: DATA is different from the above.
+
+   - trigger_test.bin          ... A sample binary for trigger data words.
+     			       	   Algorithm is to be implemented.
+
+   - trigger_test.txt          ... A sample ASCII for trigger data words.
+     			       	   Algorithm is to be implemented.
+
+
+#################
+#               #
+# Data Analysis #
+#               #
+#################
+
+Analysis package provide analysis framework. See Analysis/README for
+how-to add one's custom analysis class to this package.
+
+
+
+

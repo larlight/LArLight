@@ -1,0 +1,38 @@
+/**
+ * \file Package_Name.hh
+ *
+ * \ingroup Package_Name
+ * 
+ * \brief Class def header for a class Package_Name
+ *
+ * @author SHELL_USER_NAME
+ */
+
+/** \addtogroup Package_Name
+
+    @{*/
+#ifndef PACKAGE_NAME_HH
+#define PACKAGE_NAME_HH
+
+#include <iostream>
+
+/**
+   \class Package_Name
+   User defined class Package_Name ... these comments are used to generate
+   doxygen documentation!
+ */
+class Package_Name{
+
+public:
+
+  /// Default constructor
+  Package_Name(){};
+
+  /// Default destructor
+  virtual ~Package_Name(){};
+
+};
+
+#endif
+/** @} */ // end of doxygen group 
+
