@@ -33,8 +33,13 @@ rootlibmap libAnalysis.rootmap libAnalysis.so $ANA_PROC_DIR/Analysis/LinkDef.h \
     libGeom.so libGui.so libHist.so libDataFormat.so 
 
 ######################################################
-# FEMPulse Reco
-rootlibmap libFEMPulseReco.rootmap libFEMPulseReco.so $DECODER_DIR/FEMPulseReco/LinkDef.h \
+# FEMPulseReco
+rootlibmap libFEMPulseReco.rootmap libFEMPulseReco.so $ANA_PROC_DIR/FEMPulseReco/LinkDef.h \
+    libAnalysis.so
+
+######################################################
+# FEMPulseStudy
+rootlibmap libFEMPulseStudy.rootmap libFEMPulseStudy.so $ANA_PROC_DIR/FEMPulseStudy/LinkDef.h \
     libAnalysis.so
 
 
@@ -56,11 +61,6 @@ rootlibmap libKalekoAna.rootmap libKalekoAna.so $ANA_PROC_DIR/KalekoAna/LinkDef.
 ######################################################
 # KalekoTrackAna gSystem->Load("KalekoTrackAna") loads ALL OF THESE THINGS
 rootlibmap libKalekoTrackAna.rootmap libKalekoTrackAna.so $ANA_PROC_DIR/KalekoTrackAna/LinkDef.h \
-    libAnalysis.so
-
-######################################################
-# Kazu
-rootlibmap libKazu.rootmap libKazu.so $ANA_PROC_DIR/Kazu/LinkDef.h \
     libAnalysis.so
 
 ######################################################
