@@ -12,14 +12,11 @@
 #pragma link C++ class larlight::ana_base+;
 #pragma link C++ class std::vector<larlight::ana_base*>+;
 #pragma link C++ class larlight::ana_processor+;
-#pragma link C++ class larlight::TrackViewer+;
 #pragma link C++ class std::vector<TH3D*>+;
-#pragma link C++ class larlight::ClusterViewer+;
 #pragma link C++ class std::vector<TH2D*>+;
-#pragma link C++ class larlight::ClusterAnaPrep+;
+#pragma link C++ class std::vector<TH1D*>+;
 #pragma link C++ class std::vector<TGraph*>+;
-#pragma link C++ class larlight::ClusterMerge+;
-#pragma link C++ class larlight::ClusterMergeAlg+;
+#pragma link C++ class std::vector<TGraphErrors*>+;
 //ADD_NEW_CLASS ... do not change this line
 #endif
 

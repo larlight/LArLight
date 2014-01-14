@@ -16,6 +16,12 @@
 #define ANA_BASE_HH
 
 #include <TFile.h>
+#include <TGraph.h>
+#include <TH1D.h>
+#include <TH2D.h>
+#include <TH3D.h>
+#include <TGraphErrors.h>
+
 #include "larlight_base.hh"
 #include "DataFormat-TypeDef.hh"
 
@@ -30,22 +36,22 @@ namespace larlight {
   public:
     
     /// Default constructor
-    ana_base() : larlight_base() { _name="ana_base"; _fout=0;};
+    ana_base() : larlight_base() { _name="ana_base"; _fout=0;}
     
     /// Default destructor
-    virtual ~ana_base(){};
+    virtual ~ana_base(){}
     
     /// Initialization method to be called before analyze any data
-    virtual bool initialize()=0;
+    virtual Bool_t initialize()=0;
     
     /// Analyze a data event-by-event  
-    virtual bool analyze(storage_manager* data)=0;
+    virtual Bool_t analyze(storage_manager* data)=0;
     
     /// Finalize method to be called after all events processed.
-    virtual bool finalize()=0;
+    virtual Bool_t finalize()=0;
     
     /// A setter for analysis output file poitner
-    void set_output_file(TFile* fout){_fout=fout;};
+    void set_output_file(TFile* fout){_fout=fout;}
     
   protected:
     

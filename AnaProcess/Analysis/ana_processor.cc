@@ -19,9 +19,11 @@ namespace larlight {
     if(_storage)
       _storage->set_verbosity(level);
     
-    for(auto ana : _analyzers)
-      
-      ana->set_verbosity(level);
+    for(std::vector<ana_base*>::iterator iter(_analyzers.begin());
+	iter!=_analyzers.end();
+	++iter)
+
+      (*iter)->set_verbosity(level);
     
   }
   
@@ -46,7 +48,7 @@ namespace larlight {
     _process=INIT;
   }
   
-  bool ana_processor::initialize(){
+  Bool_t ana_processor::initialize(){
     
     set_verbosity(_verbosity_level);
     
@@ -78,7 +80,7 @@ namespace larlight {
       _fout=TFile::Open(_ofile_name.c_str(),"RECREATE");
     
 
-     bool status = true;
+     Bool_t status = true;
     
     for(std::vector<ana_base*>::iterator iter(_analyzers.begin());
 	iter!=_analyzers.end();
@@ -101,7 +103,7 @@ namespace larlight {
     return status;
   }
   
-  bool ana_processor::process_event(uint32_t index){
+  Bool_t ana_processor::process_event(UInt_t index){
     
     if(_process==INIT) {
       
@@ -116,7 +118,7 @@ namespace larlight {
     if(_process==READY)
       _process=PROCESSING;
     
-    bool event_found = index ? _storage->go_to(index) : _storage->next_event();
+    Bool_t event_found = index ? _storage->go_to(index) : _storage->next_event();
     
     if(event_found){
       
@@ -135,12 +137,12 @@ namespace larlight {
       return finalize();
   }
   
-  bool ana_processor::run(uint32_t start_index, uint32_t nevents){
+  Bool_t ana_processor::run(UInt_t start_index, UInt_t nevents){
     
     if(_verbosity[MSG::DEBUG])
       Message::send(MSG::DEBUG,__PRETTY_FUNCTION__,"called...");
     
-    bool status=true;
+    Bool_t status=true;
     
     if(_process==INIT) status = initialize();
     
@@ -191,7 +193,7 @@ namespace larlight {
     
   }
   
-  bool ana_processor::finalize() {
+  Bool_t ana_processor::finalize() {
     
     if(_verbosity[MSG::DEBUG])
       Message::send(MSG::DEBUG,__PRETTY_FUNCTION__,"called...");
@@ -202,7 +204,7 @@ namespace larlight {
       return false;
     }
     
-    bool status=true;
+    Bool_t status=true;
     for(std::vector<ana_base*>::iterator iter(_analyzers.begin());
 	iter!=_analyzers.end();
 	++iter) {
@@ -217,9 +219,9 @@ namespace larlight {
     return status;  
   }
   
-  bool ana_processor::get_ana_status(ana_base* ptr) const{
+  Bool_t ana_processor::get_ana_status(ana_base* ptr) const{
     
-    std::map<ana_base*,bool>::const_iterator iter(_ana_status.find(ptr));
+    std::map<ana_base*,Bool_t>::const_iterator iter(_ana_status.find(ptr));
     if(iter==_ana_status.end()) return false;
     
     else return (*iter).second;

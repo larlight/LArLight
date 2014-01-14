@@ -42,7 +42,7 @@ namespace larlight {
     ana_processor();
     
     /// Default destructor
-    ~ana_processor(){};
+    ~ana_processor(){}
     
     /// Override a method to set verbosity
     /**
@@ -52,41 +52,41 @@ namespace larlight {
     virtual void set_verbosity(MSG::Level level);
     
     /// Setter for an input DATA file name
-    void add_input_file(std::string name){_storage->add_in_filename(name);};
+    void add_input_file(std::string name){_storage->add_in_filename(name);}
 
     /// Setter for an input ROOT TDirectory name
-    void set_input_rootdir(std::string name) {_storage->set_in_rootdir(name);};
+    void set_input_rootdir(std::string name) {_storage->set_in_rootdir(name);}
     
     /// Setter for an output DATA file name
-    void set_output_file(std::string name){_storage->set_out_filename(name);};
+    void set_output_file(std::string name){_storage->set_out_filename(name);}
     
     /// Setter for an analysis output root file name
-    void set_ana_output_file(std::string name){_ofile_name=name;};
+    void set_ana_output_file(std::string name){_ofile_name=name;}
     
     /// Setter for I/O mode ... READ or WRITE or BOTH 
-    void set_io_mode(storage_manager::MODE mode){_storage->set_io_mode(mode);};
+    void set_io_mode(storage_manager::MODE mode){_storage->set_io_mode(mode);}
     
     /// Setter to specify a certain data class to be read from input
-    void set_data_to_read(DATA::DATA_TYPE type,bool read=true)
-    {_storage->set_data_to_read(type,read);};
+    void set_data_to_read(DATA::DATA_TYPE type,Bool_t read=true)
+    {_storage->set_data_to_read(type,read);}
     
     /// Getter of running analysis status
-    bool get_ana_status(ana_base* ptr) const;
+    Bool_t get_ana_status(ana_base* ptr) const;
     
     /// A method to run a batch process 
-    bool run(UInt_t start_index=0, UInt_t nevents=0);
+    Bool_t run(UInt_t start_index=0, UInt_t nevents=0);
     
     /// A method to process just one event.
-    bool process_event(UInt_t index=0);
+    Bool_t process_event(UInt_t index=0);
     
     /// A method to append analysis class instance. Returns index number.
-    size_t add_process(ana_base* ana){_analyzers.push_back(ana); return _analyzers.size()-1;};
+    Size_t add_process(ana_base* ana){_analyzers.push_back(ana); return _analyzers.size()-1;}
     
     /// A method to inquir attached analysis class instance.
-    ana_base* get_process(size_t loc){return (_analyzers.size() > loc) ? _analyzers[loc] : 0;};
+    ana_base* get_process(Size_t loc){return (_analyzers.size() > loc) ? _analyzers[loc] : 0;}
     
     /// A method to inquire the process status
-    PROCESS_FLAG get_process_status() {return _process;};
+    PROCESS_FLAG get_process_status() {return _process;}
     
   private:
     
@@ -94,13 +94,13 @@ namespace larlight {
     void reset();
     
     /// A method to initialize and prepare for running analysis
-    bool initialize();
+    Bool_t initialize();
     
     /// A method to finalize data processing
-    bool finalize();
+    Bool_t finalize();
     
     std::vector<ana_base*>   _analyzers;  ///< A vector of analysis modules
-    std::map<ana_base*,bool> _ana_status; ///< A map of analysis module status
+    std::map<ana_base*,Bool_t> _ana_status; ///< A map of analysis module status
     
     PROCESS_FLAG _process;       ///< Processing status flag
     UInt_t _nevents;           ///< Number of events being processed
@@ -110,7 +110,7 @@ namespace larlight {
     storage_manager* _storage;   ///< Storage manager pointer
     
   };
-};
+}
 #endif
 
 /** @} */ // end of doxygen group 
