@@ -30,7 +30,7 @@ rootlibmap libDataFormat.rootmap libDataFormat.so $ANA_PROC_DIR/DataFormat/LinkD
 ######################################################
 # Analysis
 rootlibmap libAnalysis.rootmap libAnalysis.so $ANA_PROC_DIR/Analysis/LinkDef.h \
-    libTree.so libGeom.so libGui.so libHist.so  libBase.so libDataFormat.so 
+    libGeom.so libGui.so libHist.so libDataFormat.so 
 
 ######################################################
 # TrackStudy
@@ -45,10 +45,21 @@ rootlibmap libClusterStudy.rootmap libClusterStudy.so $ANA_PROC_DIR/ClusterStudy
 ######################################################
 # KalekoAna gSystem->Load("KalekoAna") loads ALL OF THESE THINGS
 rootlibmap libKalekoAna.rootmap libKalekoAna.so $ANA_PROC_DIR/KalekoAna/LinkDef.h \
-    libTree.so libGeom.so libGui.so libHist.so libBase.so libDataFormat.so libAnalysis.so
+    libAnalysis.so
 
 ######################################################
 # KalekoTrackAna gSystem->Load("KalekoTrackAna") loads ALL OF THESE THINGS
 rootlibmap libKalekoTrackAna.rootmap libKalekoTrackAna.so $ANA_PROC_DIR/KalekoTrackAna/LinkDef.h \
-    libTree.so libGeom.so libGui.so libHist.so libBase.so libDataFormat.so libAnalysis.so
+    libAnalysis.so
+
+######################################################
+# Kazu
+rootlibmap libKazu.rootmap libKazu.so $ANA_PROC_DIR/Kazu/LinkDef.h \
+    libAnalysis.so
+
+######################################################
+# ADD_NEW_ROOTMAP HERE
+
+
+
 
