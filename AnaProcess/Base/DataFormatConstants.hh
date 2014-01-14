@@ -21,6 +21,13 @@ namespace larlight{
   
   /// Defines constants for data structure definition (system utility)
   namespace DATA{
+
+    const UChar_t  INVALID_UCHAR=0xff;
+    const Char_t   INVALID_CHAR=0x7f;
+    const UShort_t INVALID_USHORT=0xffff;
+    const Short_t  INVALID_SHORT=0x7fff;
+    const UInt_t   INVALID_UINT=0xffffffff;
+    const Int_t    INVALID_INT=0x7fffffff;
     
     /// Define identifier for a data container class to be loaded through storage_manager::get_data()
     enum DATA_TYPE{

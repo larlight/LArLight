@@ -39,32 +39,32 @@ namespace larlight{
     virtual ~data_base(){};
     
     /// Clear method
-    virtual void clear_data(){fRunNumber = fSubRunNumber = fEventID = -1;};
+    virtual void clear_data(){fRunNumber = fSubRunNumber = fEventID = DATA::INVALID_UINT;};
     
     /// run number setter
-    void set_run      (int run) { fRunNumber    = run; };
+    void set_run      (UInt_t run) { fRunNumber    = run; };
     /// sub-run number setter
-    void set_subrun   (int run) { fSubRunNumber = run; };
+    void set_subrun   (UInt_t run) { fSubRunNumber = run; };
     /// event-id setter
-    void set_event_id (int id ) { fEventID      = id;  };
+    void set_event_id (UInt_t id ) { fEventID      = id;  };
     
     /// run number getter
-    int run      () const { return fRunNumber;    };
+    UInt_t run      () const { return fRunNumber;    };
     /// sub-run number getter
-    int subrun   () const { return fSubRunNumber; };
+    UInt_t subrun   () const { return fSubRunNumber; };
     /// event-id getter
-    int event_id () const { return fEventID;      };
+    UInt_t event_id () const { return fEventID;      };
     
   private:
     
     /// Run number
-    int fRunNumber;
+    UInt_t fRunNumber;
     
     /// Sub-Run number
-    int fSubRunNumber;
+    UInt_t fSubRunNumber;
     
     /// Event ID
-    int fEventID;
+    UInt_t fEventID;
     
     ////////////////////////
     ClassDef(data_base,1)

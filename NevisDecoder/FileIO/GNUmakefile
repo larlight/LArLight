@@ -12,6 +12,7 @@ OBJECTS = $(SOURCES:.cc=.o)
 # include options for this package
 INCFLAGS  = -I.                       #Include itself
 INCFLAGS += -I$(ANA_PROC_DIR)/Base
+
 # platform-specific options
 OSNAME          = $(shell uname -s)
 HOST            = $(shell uname -n)

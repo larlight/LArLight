@@ -9,6 +9,9 @@
 #include "decoder_manager.hh"
 #include "xmit_event_search.hh"
 // Class forward declaration here
-class larlight::decoder_manager;
-class larlight::xmit_event_search;
+namespace larlight {
+  class decoder_manager;
+  class xmit_event_search;
+}
+
 #endif

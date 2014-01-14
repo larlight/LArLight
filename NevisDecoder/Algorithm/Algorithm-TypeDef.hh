@@ -14,12 +14,16 @@
 #include "algo_pmt_xmit.hh"
 #include "algo_tpc_xmit.hh"
 #include "algo_tpc_huffman.hh"
+
 // Class forward declaration here
-class larlight::algo_slow_readout_decoder;
-class larlight::algo_xmit_decoder;
-class larlight::algo_trig_decoder;
-class larlight::algo_fem_decoder_base;
-class larlight::algo_pmt_xmit;
-class larlight::algo_tpc_xmit;
-class larlight::algo_tpc_huffman;
+namespace larlight{
+  class algo_slow_readout_decoder;
+  class algo_xmit_decoder;
+  class algo_trig_decoder;
+  class algo_fem_decoder_base;
+  class algo_pmt_xmit;
+  class algo_tpc_xmit;
+  class algo_tpc_huffman;
+}
+
 #endif

@@ -11,8 +11,10 @@
 //ADD_NEW_HEADER ... do not change this line
 
 // Class forward declaration here
-class larlight::ana_base;
-class larlight::ana_processor;
+namespace larlight {
+  class ana_base;
+  class ana_processor;
+}
 //ADD_NEW_CLASS ... do not change this line
 
 #endif

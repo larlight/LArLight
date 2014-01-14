@@ -26,6 +26,7 @@ ROOT.gSystem.Load("libDecoder")
 
 # Load decoder class/namespace
 from ROOT import *
+from ROOT import larlight as fmwk
 
 #
 # Four lines to just get the output filename from input file name.
@@ -38,10 +39,10 @@ fname   = fpath.split('/')[len(fpath.split('/'))-1]
 outname = out_dir + fname[0:fname.rfind('.')] + ".root"
 
 # Create the decoder instance
-decoder=decoder_manager()
+decoder=fmwk.decoder_manager()
 
 # Decoder algorithm instance ... currently xmit, slow, or trigger
-algo=algo_xmit_decoder()
+algo=fmwk.algo_xmit_decoder()
 #algo=algo_slow_readout_decoder()
 #algo=algo_trig_decoder()
 
@@ -50,7 +51,7 @@ decoder.set_decoder(algo);
 
 # Set input file format ... ASCII or BINARY
 #decoder.set_format(FORMAT.ASCII)
-decoder.set_format(FORMAT.BINARY)
+decoder.set_format(fmwk.FORMAT.BINARY)
 
 # Set input file path
 decoder.add_input_filename(fpath)
@@ -65,9 +66,9 @@ decoder.set_output_filename(outname)
 #    - WARNING ... suppress NORMAL information
 #    - ERROR   ... suppress WARNING information
 # For the given info level, all lower level information will be suppressed.
-#decoder.set_verbosity(MSG.DEBUG)
-#decoder.set_verbosity(MSG.INFO)
-decoder.set_verbosity(MSG.NORMAL)
+#decoder.set_verbosity(fmwk.MSG.DEBUG)
+#decoder.set_verbosity(fmwk.MSG.INFO)
+decoder.set_verbosity(fmwk.MSG.NORMAL)
 
 # Set debug mode True if you wish to continue in the decoding event
 # loop with exception handling. This avoids saving an event with

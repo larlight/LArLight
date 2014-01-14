@@ -10,6 +10,9 @@
 #include "bin_word_search.hh"
 
 // Class forward declaration here
-class larlight::bin_io_handler;
-class larlight::bin_word_search;
+namespace larlight{
+  class bin_io_handler;
+  class bin_word_search;
+}
+
 #endif

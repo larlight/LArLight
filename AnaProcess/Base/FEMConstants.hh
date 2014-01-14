@@ -14,7 +14,7 @@
 
 #ifndef FEMCONSTANTS_HH
 #define FEMCONSTANTS_HH
-#include <string>
+#include "DataFormatConstants.hh"
 
 /// Namespace of everything in this framework
 namespace larlight{
@@ -22,13 +22,13 @@ namespace larlight{
   /// Defines constants for PMT related electronics
   namespace FEM{
     
-    const UShort_t INVALID_CH=0xffff;       ///< Invalid (or initialized) channel number
-    const UInt_t   INVALID_WORD=0xffffffff; ///< Invalid (or initialized) event word
-    const UInt_t   EMPTY_WORD=0x0;          ///< Empty word
+    const UShort_t INVALID_CH=DATA::INVALID_USHORT; ///< Invalid (or initialized) channel number
+    const UInt_t   INVALID_WORD=DATA::INVALID_UINT; ///< Invalid (or initialized) event word
+    const UInt_t   EMPTY_WORD=0x0;                  ///< Empty word
     
-    const UInt_t   BEAMGATE_NSAMPLE=1500;   ///< # samples in the beamgate
-    const UShort_t NUM_PMT_CHANNEL=48;      ///< # of PMT readout channels
-    const UShort_t MAX_ADC=4095;            ///< Maximum ADC value
+    const UInt_t   BEAMGATE_NSAMPLE=1500;  ///< # samples in the beamgate
+    const UShort_t NUM_PMT_CHANNEL=48;     ///< # of PMT readout channels
+    const UShort_t MAX_ADC=4095;           ///< Maximum ADC value
     
     /// PMT discriminator type
     enum DISCRIMINATOR {
