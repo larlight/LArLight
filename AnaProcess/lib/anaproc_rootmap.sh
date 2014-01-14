@@ -64,7 +64,13 @@ rootlibmap libKalekoTrackAna.rootmap libKalekoTrackAna.so $ANA_PROC_DIR/KalekoTr
     libAnalysis.so
 
 ######################################################
+# Georgia
+rootlibmap libGeorgia.rootmap libGeorgia.so $ANA_PROC_DIR/Georgia/LinkDef.h \
+    libAnalysis.so
+
+######################################################
 # ADD_NEW_ROOTMAP HERE
+
 
 
 

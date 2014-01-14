@@ -277,17 +277,30 @@ namespace larlight {
       Message::send(MSG::ERROR,__FUNCTION__,"Did not find any relevant data tree!");
       status=false;
     }
+
+    size_t min_nevents=_nevents;
     
     for(size_t i=0; i<DATA::DATA_TYPE_MAX; ++i) {
       
       if(nevents_array[i] && _nevents!=nevents_array[i]) {
-	sprintf(_buf,"Different number of entries found on tree: %s (found %ud while previous found %lu)",
-		DATA::DATA_TREE_NAME[(DATA::DATA_TYPE)i].c_str(),
-		_nevents, nevents_array[i]);
-	Message::send(MSG::ERROR,__FUNCTION__,_buf);
-	status=false;
+
+	Message::send(MSG::WARNING,__FUNCTION__,
+		      Form("Different number of entries found on tree: %s (found %ud while previous found %lu)",
+			   DATA::DATA_TREE_NAME[(DATA::DATA_TYPE)i].c_str(),_nevents, nevents_array[i]));
+	if( nevents_array[i] < min_nevents)
+	  
+	  min_nevents = nevents_array[i];
       }
       
+    }
+
+    if(_nevents!=min_nevents) {
+
+      Message::send(MSG::WARNING,__FUNCTION__,
+		    Form("Running the event loop with the smallest TTree's entries (=%zu)",min_nevents));
+
+      _nevents = min_nevents;
+
     }
     
     if(status) _status=READY_IO;

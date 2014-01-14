@@ -29,7 +29,7 @@ namespace larlight {
   public:
 
     /// Default constructor
-    fifo(DATA::DATA_TYPE type=DATA::DATA_TYPE_MAX);
+    fifo(DATA::DATA_TYPE type=DATA::PMTFIFO);
     
     /// Default copy constructor
     fifo(const fifo& original)
