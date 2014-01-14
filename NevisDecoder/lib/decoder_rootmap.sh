@@ -27,7 +27,7 @@ rootlibmap libAlgorithm.rootmap libAlgorithm.so $DECODER_DIR/Algorithm/LinkDef.h
 ######################################################
 # Decoder
 rootlibmap libDecoder.rootmap libDecoder.so $DECODER_DIR/Decoder/LinkDef.h \
-    libBase.so libDataFormat.so libAlgorithm.so libFileIO.so
+    libAlgorithm.so libFileIO.so
 
 ######################################################
 # Encoder

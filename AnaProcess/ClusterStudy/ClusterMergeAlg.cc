@@ -99,10 +99,7 @@ namespace larlight {
 
     const event_cluster* ev_cluster = (const event_cluster*)(storage->get_data(DATA::ShowerAngleCluster));
 
-    const std::vector<cluster> cluster_collection = ev_cluster->GetClusterCollection();
-    //    std::cout<<"this ev_cluster has event_id() = "<<ev_cluster->event_id()<<std::endl;
-
-    for(auto const i_cluster: cluster_collection)
+    for(auto const i_cluster: *ev_cluster)
 
       AppendClusterInfo(i_cluster,i_cluster.Hits());
 

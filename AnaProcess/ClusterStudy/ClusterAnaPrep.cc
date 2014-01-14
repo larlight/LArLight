@@ -125,7 +125,6 @@ namespace larlight {
     }
 
     const event_cluster* ev_cluster = (const event_cluster*)(storage->get_data(DATA::ShowerAngleCluster));
-    const std::vector<cluster> cluster_collection = ev_cluster->GetClusterCollection();
 
     if(same_event((data_base*)(ev_cluster))) return true;
     clear_event_info();
@@ -137,7 +136,7 @@ namespace larlight {
     unsigned short skipped_event_cluster_cnt = 0;
 
     // Loop over clusters
-    for(auto const i_cluster: cluster_collection) {
+    for(auto const i_cluster: *ev_cluster) {
 
       // Check if this cluster should be evaluated or not
       if(i_cluster.SigmaStartPos()[0] > _sigma_cut) {
@@ -241,7 +240,7 @@ namespace larlight {
       print(MSG::NORMAL,__FUNCTION__,
 	    Form("Skipped %d / %zu clusters in event %d",
 		 skipped_event_cluster_cnt,
-		 cluster_collection.size(),
+		 ev_cluster->size(),
 		 _event));
       _skipped_cluster_cnt+=skipped_event_cluster_cnt;
     }

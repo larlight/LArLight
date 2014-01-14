@@ -42,13 +42,13 @@ namespace larlight {
     virtual ~ana_base(){}
     
     /// Initialization method to be called before analyze any data
-    virtual Bool_t initialize()=0;
+    virtual Bool_t initialize(){return true;}
     
     /// Analyze a data event-by-event  
-    virtual Bool_t analyze(storage_manager* data)=0;
+    virtual Bool_t analyze(storage_manager* data){return (data);}
     
     /// Finalize method to be called after all events processed.
-    virtual Bool_t finalize()=0;
+    virtual Bool_t finalize(){return true;}
     
     /// A setter for analysis output file poitner
     void set_output_file(TFile* fout){_fout=fout;}

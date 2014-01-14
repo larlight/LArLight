@@ -16,7 +16,7 @@
 #define CLUSTERMERGER_HH
 
 #include "ana_base.hh"
-#include "ana_info_struct.hh"
+#include "cluster_info_struct.hh"
 
 #include <TH2D.h>
 #include <TH1D.h>

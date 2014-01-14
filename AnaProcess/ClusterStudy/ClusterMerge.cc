@@ -38,7 +38,6 @@ namespace larlight {
     // Preparation
     //
     event_cluster* ev_cluster = (event_cluster*)(storage->get_data(DATA::ShowerAngleCluster));
-    const std::vector<cluster> cluster_collection = ev_cluster->GetClusterCollection();
     
     // cluster_sets is a vector of vector where the inner vector is a set of cluster IDs 
     // to be merged into one. I assume all cluster index to be output are in cluster_sets.
@@ -66,13 +65,13 @@ namespace larlight {
       // Loop over clusters to be merged
       for(auto const& cluster_id : cluster_id_set) {
 
-	const std::vector<hit> original_hit_v = cluster_collection[cluster_id].Hits();
+	const std::vector<hit> original_hit_v = ev_cluster->at(cluster_id).Hits();
 	
 	for(auto const& original_hit : original_hit_v)
 
 	  merged_cluster.add_hit(original_hit);
 	
-	if(view == GEO::kUnknown) view = cluster_collection[cluster_id].View();
+	if(view == GEO::kUnknown) view = ev_cluster->at(cluster_id).View();
 
       } // End of looping over original clusters to be merged
 
@@ -98,11 +97,11 @@ namespace larlight {
 
     // Clear the data holder & overwrite with new cluster set
 
-    ev_cluster->clear_clusters();
+    ev_cluster->clear();
 
     for(auto const& merged_cluster : merged_cluster_v)
 
-      ev_cluster->add_cluster(merged_cluster);
+      ev_cluster->push_back(merged_cluster);
     
     return true;
   }

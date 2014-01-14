@@ -31,7 +31,7 @@ int main(int argc, char** argv){
   // To show how one can run multiple analysis modules at once,
   // we make multiple ana_base instance.
 
-  my_proc.add_process(new larlight::TrackViewer);
+  my_proc.add_process(new larlight::ana_base);
 
   // Let's run it.
 

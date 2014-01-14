@@ -1,7 +1,7 @@
 #ifndef ANA_INFO_STRUCT_HH
 #define ANA_INFO_STRUCT_HH
 
-#include "constants.hh"
+#include "GeoConstants.hh"
 
 namespace larlight {
 

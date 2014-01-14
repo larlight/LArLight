@@ -87,15 +87,13 @@ namespace larlight {
     // Clusters
     if(ev_clus) {
       
-      const std::vector<cluster> clus_v = ev_clus->GetClusterCollection();
-      
       _hHits_0 = Prepare2DHisto("hitshist0",wiremin[0],wiremax[0],timemin[0],timemax[0]);
       _hHits_1 = Prepare2DHisto("hitshist1",wiremin[1],wiremax[1],timemin[1],timemax[1]);
       _hHits_2 = Prepare2DHisto("hitshist2",wiremin[2],wiremax[2],timemin[2],timemax[2]);
 
       int tmpcounter = 0;
       //loop over the clusters in the event
-      for(auto clus : clus_v){
+      for(auto clus : *ev_clus) {
 	tmpcounter++;
 
 	//check from which view the cluster comes
