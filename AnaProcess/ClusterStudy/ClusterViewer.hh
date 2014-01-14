@@ -1,14 +1,14 @@
 /**
  * \file ClusterViewer.hh
  *
- * \ingroup Analysis
+ * \ingroup ClusterStudy
  * 
  * \brief Class def header for a class ClusterViewer
  *
  * @author kazuhiro/kaleko
  */
 
-/** \addtogroup Analysis
+/** \addtogroup ClusterStudy
 
     @{*/
 

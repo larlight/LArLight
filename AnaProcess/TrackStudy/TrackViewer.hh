@@ -1,14 +1,14 @@
 /**
  * \file TrackViewer.hh
  *
- * \ingroup Analysis
+ * \ingroup TrackStudy
  * 
  * \brief Class def header for a class TrackViewer
  *
  * @author kazuhiro
  */
 
-/** \addtogroup Analysis
+/** \addtogroup TrackStudy
 
     @{*/
 

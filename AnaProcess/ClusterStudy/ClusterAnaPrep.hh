@@ -1,14 +1,14 @@
 /**
  * \file ClusterAnaPrep.hh
  *
- * \ingroup Analysis
+ * \ingroup ClusterStudy
  * 
  * \brief Class def header for a class ClusterAnaPrep
  *
  * @author kazuhiro
  */
 
-/** \addtogroup Analysis
+/** \addtogroup ClusterStudy
 
     @{*/
 

@@ -1,14 +1,14 @@
 /**
  * \file ClusterMergeAlg.hh
  *
- * \ingroup Analysis
+ * \ingroup ClusterStudy
  * 
  * \brief Class def header for a class ClusterMergeAlg
  *
  * @author davidkaleko
  */
 
-/** \addtogroup Analysis
+/** \addtogroup ClusterStudy
 
     @{*/
 
@@ -16,7 +16,7 @@
 #define CLUSTERMERGEALG_HH
 
 #include "ana_base.hh"
-#include "ana_info_struct.hh"
+#include "cluster_info_struct.hh"
 #include <cmath> //used for std::abs() absolute value, acos() function
 #include <sstream>
 #include <TH1F.h> //used for histos in RefineStartPoint stuff
