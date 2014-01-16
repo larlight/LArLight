@@ -56,8 +56,8 @@ LFLAGS += -lwdapi1021
 # need also thread support for interrupt handling
 LFLAGS += -lpthread
 
-TARGET = chi_thread_readout
-SRCS = ../$(TARGET).c ../pcie_lib.c $(WD_BASEDIR)/samples/shared/diag_lib.c $(WD_BASEDIR)/samples/shared/wdc_diag_lib.c
+TARGET = thread_readout
+SRCS = ../$(TARGET).c ../pcie_lib.c ../config_reader.c $(WD_BASEDIR)/samples/shared/diag_lib.c $(WD_BASEDIR)/samples/shared/wdc_diag_lib.c 
 
 LD = gcc
 
@@ -72,6 +72,9 @@ $(TARGET) : $(OBJS)
 
 $(TARGET).o : ../$(TARGET).c
 	$(CC) -c $(CFLAGS) -o $@ $< 
+
+config_reader.o : ../config_reader.c
+	$(CC) -c $(CFLAGS) -o $@ $<
 
 pcie_lib.o : ../pcie_lib.c
 	$(CC) -c $(CFLAGS) -o $@ $< 

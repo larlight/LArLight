@@ -23,7 +23,6 @@
 #include "samples/shared/pci_regs.h"
 #include "pcie_lib.h"
 
-
 /*************************************************************
   General definitions
  *************************************************************/
@@ -562,6 +561,7 @@ static void DeviceClose(WDC_DEVICE_HANDLE hDev)
 static void MenuMBtest(WDC_DEVICE_HANDLE hDev, WDC_DEVICE_HANDLE hDev1 ,WDC_DEVICE_HANDLE hDev2, 
 WDC_DEVICE_HANDLE hDev3, WDC_DEVICE_HANDLE hDev4, WDC_DEVICE_HANDLE hDev5)
 {
+
 #include "wdc_defs.h"
 #define poweroff      0x0
 #define poweron       0x1
@@ -883,15 +883,15 @@ WDC_DEVICE_HANDLE hDev3, WDC_DEVICE_HANDLE hDev4, WDC_DEVICE_HANDLE hDev5)
     static int   cos_mult, cos_thres, en_top, en_upper, en_lower;
     static int   irise, ifall, istart_time, use_pmt, pmt_testpulse;
     static int   ich_head, ich_sample, ich_frm,idebug,ntot_rec,nred;
-    static int   ineu,ibusy_send,ibusy_test,ihold_word,ndma_loop;
+    static int   ineu,ineu_tpc,ibusy_send,ibusy_test,ihold_word,ndma_loop;
     static int   irawprint, nwrite_byte,idis_c,idis_c1;
     static int   icomp_index, nword_comp, nk, ilast_check;
     static int   ic_ev, ic_fr, event_save, frame_save,frame_ev,event_ev;
-    static int   imod_fem, imod_st, imod_last, itrig_type, last_dma_loop_size;
+    static int   imod_fem, imod_st, imod_last, itrig_type, itrig_type_tpc, last_dma_loop_size;
     static int   rc_pt, nword_n;
     static int   icom_factor,ifr_c2;
     static int   itrig_pulse,p1_delay,p1_width,p2_delay,p2_width, pulse_trig_delay;
-    static int   isuper, ipr_trig, imonitor;
+    static int   isuper, isuper_tpc, ipr_trig, imonitor;
     static int   ipmt_read, itpc_read, itpc_adc, imod_xmit_tpc, imod_st_tpc,imod_last_tpc;
 //
   struct timeval start;
@@ -940,9 +940,6 @@ WDC_DEVICE_HANDLE hDev3, WDC_DEVICE_HANDLE hDev4, WDC_DEVICE_HANDLE hDev5)
 //
     struct thread_data thread_data_n_m;
 
-
-
-
     nread = 4096*2+6; /*16384 32768, 65536+4;  number of byte to be readout */
     ifr=0;
     iwrite =0;
@@ -951,906 +948,865 @@ WDC_DEVICE_HANDLE hDev3, WDC_DEVICE_HANDLE hDev4, WDC_DEVICE_HANDLE hDev5)
     istop=0;
 
     dwDMABufSize = 1000000;
+    
+    printf(" MicroBoone TPC/PMT data taking \n");
+    
+    struct daq_config_t     daq_config  = get_daq_config();
+    struct trigger_config_t trig_config = get_trigger_config(2);
+    struct pmt_fem_config_t pmt_config  = get_pmt_fem_config(11);
+    struct tpc_fem_config_t tpc_config  = get_tpc_fem_config(9);
 
-     printf(" MicroBoone TPC/PMT data taking \n");
-//     printf(" enter time size \n");
-//     scanf("%d",&timesize);
-//     printf(" number of event\n");
-//     scanf("%d",&nevent);
-//
-     printf(" type 1 to use trigger module as pulser \n");
-     scanf("%d", &itrig_pulse);
-     if (itrig_pulse == 1) {
-      printf(" enter pulse 1 delay \n");
-      scanf("%d", &p1_delay);
-      printf(" enter pulse 1 width \n");
-      scanf("%d", &p1_width);
-      printf(" enter pulse 2 delay \n");
-      scanf("%d", &p2_delay);
-      printf(" enter pulse 2 width \n");
-      scanf("%d", &p2_width);
-      printf(" enter trigger delay (<7)\n");
-      scanf("%d", &pulse_trig_delay);
-     }
+    struct xmit_config_t    tpc_xmit_config = get_xmit_config(8);
+    struct xmit_config_t    pmt_xmit_config = get_xmit_config(10);
 
-//
-     ihuff = 0;
-     printf("type 1 for TPC readout \n");
-     scanf("%d", &itpc_read);
-     if(itpc_read == 1) {
-      printf(" type 1 for ADC raedout \n");
-      scanf("%d", &itpc_adc);
-      if(itpc_adc != 1) {
-       printf(" enter 1 to turn on huffman encoding \n");
-       scanf("%d",&ihuff);
-       printf(" enter compression factor \n");
-       scanf("%d",&icom_factor);
-      }
-     }
-//
-     printf("type 1 for PMT readot \n");
-     scanf("%d", &ipmt_read);
-//
-     printf(" type 1 for Neurino event \n");
-     scanf("%d", &ineu);
-     printf(" type 1 for SuperNova event \n");
-     scanf("%d", &isuper);
-     printf(" type 1 for readout trigger information\n");
-     scanf("%d", &itrig_m);
-     //if(itrig_m == 1) {
-     //printf(" type 1 for detach trigger module read \n");
-     //scanf("%d", &itrig_m_d);
-     //}
-     itrig_m_d=0;
-     printf(" type 1 for filewrite\n");
-     scanf("%d", &ith_fr);
-     printf(" type 1 to run monitor \n");
-     scanf("%d", &imonitor);
-//
-     if(itpc_read == 1) {
-       /*
-       printf(" TPC xmit module address \n");
-       scanf("%d",&imod_xmit_tpc);
-       printf(" TPC slot address of the 1st FEM module \n");
-       scanf("%d",&imod_st_tpc);
-       */
-       // Hard coding the mod address woohoo
-       imod_xmit_tpc=8;
-       imod_st_tpc=9;
-       printf(" TPC number of FEM = %d\n",(imod_st_tpc - imod_xmit_tpc));
+    itrig_pulse = trig_config.param[TRIG_PULSE];
+    p1_delay    = trig_config.param[TRIG_PULSE_DELAY1];
+    p2_delay    = trig_config.param[TRIG_PULSE_DELAY2];
+    p1_width    = trig_config.param[TRIG_PULSE_WIDTH1];
+    p2_width    = trig_config.param[TRIG_PULSE_WIDTH2];
 
-     }
-     if(ipmt_read == 1) {
-       /*
-      printf(" PMT xmit module address \n");
-      scanf("%d",&imod_xmit);
-      printf(" PMT slot address of the 1st FEM module \n");
-      scanf("%d",&imod_st);
-       */
-       imod_xmit = 10;
-       imod_st=11;
-       printf(" PMT number of FEM = %d\n",(imod_st - imod_xmit));
-     }
+    ipmt_read   = (daq_config.param[DAQ_READOUT_PMT_NU] || 
+		   daq_config.param[DAQ_READOUT_TPC_NU]   );
+    ineu        = daq_config.param[DAQ_READOUT_PMT_NU];
+    isuper      = daq_config.param[DAQ_READOUT_PMT_SN];
 
-//
-//
-//
-     imod_trig = 2;
-     imod_shaper =16;
-     itrig_delay = 51;
-//     imod_fem = 11;
-     printf(" PMT ADC module address = %d \n", imod_fem);
-     printf(" Shaper address = %d \n", imod_shaper);
-     printf(" Trigger module address = %d \n", imod_trig);
-//
-//   PMT readout
-//
-     itrig_type =0 ;
-     if(ineu == 1) itrig_type = itrig_type + 0x1;
-     if(isuper == 1) itrig_type = itrig_type + 0x2;
-     ifr_c2 =0;
-//
-//   PMT readout file open
-//
-     if((ith_fr ==1) & (ipmt_read ==1)) {//if writing pmt to file
+    itpc_read   = (daq_config.param[DAQ_READOUT_PMT_NU] || 
+		   daq_config.param[DAQ_READOUT_TPC_NU]   );
+    ineu_tpc    = daq_config.param[DAQ_READOUT_TPC_NU];
+    isuper_tpc  = daq_config.param[DAQ_READOUT_TPC_SN];
+
+    itpc_adc    = tpc_config.param[TPC_ADC_READOUT];
+    ihuff       = tpc_config.param[TPC_SN_HUFFMAN];
+    icom_factor = tpc_config.param[TPC_SN_COMP_FACTOR];
+    timesize    = tpc_config.param[TPC_DRIFT_SIZE];
+
+    itrig_m   = daq_config.param[DAQ_READOUT_TRIGGER];
+    imonitor  = daq_config.param[DAQ_READOUT_MONITOR];
+
+    itrig_m_d=0;
+
+    printf(" type 1 for filewrite\n");
+    scanf("%d", &ith_fr);
+
+    imod_xmit = pmt_xmit_config.slot;
+    imod_st   = pmt_config.slot;
+
+    imod_xmit_tpc = tpc_xmit_config.slot;
+    imod_st_tpc   = pmt_config.slot;
+
+    imod_trig   = trig_config.slot;
+
+    printf(" PMT ADC module address = %d \n", imod_fem);
+    printf(" Trigger module address = %d \n", imod_trig);
+    //
+    //   PMT readout
+    //
+    itrig_type =0 ;
+    if(ineu == 1) itrig_type = itrig_type + 0x1;
+    if(isuper == 1) itrig_type = itrig_type + 0x2;
+    //
+    //   PMT readout file open
+    //
+    if((ith_fr ==1) & (ipmt_read ==1)) {//if writing pmt to file
       if(isuper == 1) {
-       fd_sn_pt = creat("test123_pt_snova.dat",0755);
-       printf("fd_sn_pt = %d\n", fd_sn_pt);
+	fd_sn_pt = creat("test123_pt_snova.dat",0755);
+	printf("fd_sn_pt = %d\n", fd_sn_pt);
       }
       if(ineu == 1) {
-       fd_trig_pt = creat("test123_pt_trig.dat",0755);
-       printf("fd_trig_pt = %d\n", fd_trig_pt);
+	fd_trig_pt = creat("test123_pt_trig.dat",0755);
+	printf("fd_trig_pt = %d\n", fd_trig_pt);
       }
-//      if(itrig_m == 1) {
-//       fd_trig_pt_m = creat("test123_pt_trig_m.dat",0755);
-//       printf("fd_trig_pt_m = %d\n", fd_trig_pt_m);
-//      }
+      //      if(itrig_m == 1) {
+      //       fd_trig_pt_m = creat("test123_pt_trig_m.dat",0755);
+      //       printf("fd_trig_pt_m = %d\n", fd_trig_pt_m);
+      //      }
       if(imonitor == 1) {
-       fd_monitor_pt = creat("test123_pt_monitor.dat",0755);
-       printf("fd_monitor_pt = %d\n", fd_monitor_pt);
+	fd_monitor_pt = creat("test123_pt_monitor.dat",0755);
+	printf("fd_monitor_pt = %d\n", fd_monitor_pt);
       }
-     }
-//
-//   TPC readout file open
-//
-     if((ith_fr ==1) && (itpc_read ==1)) {//if writing tpc to file
-      if(isuper == 1) {
-       fd_sn_pt_tpc = creat("test123_pt_snova_tpc.dat",0755);
-       printf("fd_sn_pt_tpc = %d\n", fd_sn_pt_tpc);
+    }
+
+    //
+    //   TPC readout
+    //
+    itrig_type_tpc =0 ;
+    if(ineu_tpc == 1) itrig_type_tpc = itrig_type_tpc + 0x1;
+    if(isuper_tpc == 1) itrig_type_tpc = itrig_type_tpc + 0x2;
+    //
+    //   TPC readout file open
+    //
+    if((ith_fr ==1) && (itpc_read ==1)) {//if writing tpc to file
+      if(isuper_tpc == 1) {
+	fd_sn_pt_tpc = creat("test123_pt_snova_tpc.dat",0755);
+	printf("fd_sn_pt_tpc = %d\n", fd_sn_pt_tpc);
       }
-      if(ineu == 1) {
-       fd_trig_pt_tpc = creat("test123_pt_trig_tpc.dat",0755);
-       printf("fd_trig_pt_tpc = %d\n", fd_trig_pt_tpc);
+      if(ineu_tpc == 1) {
+	fd_trig_pt_tpc = creat("test123_pt_trig_tpc.dat",0755);
+	printf("fd_trig_pt_tpc = %d\n", fd_trig_pt_tpc);
       }
       if(imonitor == 1) {
-       fd_monitor_pt_tpc = creat("test123_pt_monitor_tpc.dat",0755);
-       printf("fd_monitor_pt_tpc = %d\n", fd_monitor_pt_tpc);
+	fd_monitor_pt_tpc = creat("test123_pt_monitor_tpc.dat",0755);
+	printf("fd_monitor_pt_tpc = %d\n", fd_monitor_pt_tpc);
       }
-     }
-//
-//
-//
-     if(ith_fr == 1) {//if writing trig to file
+    }
+    //
+    //
+    //
+    if(ith_fr == 1) {//if writing trig to file
       if(itrig_m == 1) {
-       fd_trig_pt_m = creat("test123_pt_trig_m.dat",0755);
-       printf("fd_trig_pt_m = %d\n", fd_trig_pt_m);
+	fd_trig_pt_m = creat("test123_pt_trig_m.dat",0755);
+	printf("fd_trig_pt_m = %d\n", fd_trig_pt_m);
       }
-     }
-
-
-//
-/* Initialize and set thread detached attribute */
-//
-//
-//   for PMT superNova
-//
-     if((isuper == 1) && (ipmt_read==1)) {
-//
-/* Initialize and set thread detached attribute */
-//
+    }
+    
+    
+    //
+    /* Initialize and set thread detached attribute */
+    //
+    //
+    //   for PMT superNova
+    //
+    if((isuper == 1) && (ipmt_read==1)) {
+      //
+      /* Initialize and set thread detached attribute */
+      //
       pthread_attr_init(&attr_pt_sn_dma);
       pthread_attr_setdetachstate(&attr_pt_sn_dma, PTHREAD_CREATE_JOINABLE);
       pthread_attr_getstacksize (&attr_pt_sn_dma, &stacksize);
       printf("SuperNova DMA defualt stack size = %li\n", stacksize);
       stacksize = 4*stacksize;
-//      printf("Amount of stack needed per thread = %li\n",stacksize);
+      //      printf("Amount of stack needed per thread = %li\n",stacksize);
       pthread_attr_setstacksize (&attr_pt_sn_dma, stacksize);
-//      printf("Creating threads with stack size = %li bytes\n",stacksize);
-//
-//      superNova file write thread
-//
+      //      printf("Creating threads with stack size = %li bytes\n",stacksize);
+      //
+      //      superNova file write thread
+      //
       if(ith_fr == 1) {
-       pthread_attr_init(&attr_pt_sn);
-       pthread_attr_setdetachstate(&attr_pt_sn, PTHREAD_CREATE_JOINABLE);
-       pthread_attr_getstacksize (&attr_pt_sn, &stacksize);
-       printf("SuperNova filewrite defualt stack size = %li\n", stacksize);
-       stacksize = 4*stacksize;
-//      printf("Amount of stack needed per thread = %li\n",stacksize);
-       pthread_attr_setstacksize (&attr_pt_sn, stacksize);
-//      printf("Creating threads with stack size = %li bytes\n",stacksize);
-//
+	pthread_attr_init(&attr_pt_sn);
+	pthread_attr_setdetachstate(&attr_pt_sn, PTHREAD_CREATE_JOINABLE);
+	pthread_attr_getstacksize (&attr_pt_sn, &stacksize);
+	printf("SuperNova filewrite defualt stack size = %li\n", stacksize);
+	stacksize = 4*stacksize;
+	//      printf("Amount of stack needed per thread = %li\n",stacksize);
+	pthread_attr_setstacksize (&attr_pt_sn, stacksize);
+	//      printf("Creating threads with stack size = %li bytes\n",stacksize);
+	//
       }
-     }
-//
-//   for PMT Neutrino
-//
-     if((ineu ==1 ) & (ipmt_read==1)) {
-//
-//   neutrino data thread
-//
+    }
+    //
+    //   for PMT Neutrino
+    //
+    if((ineu ==1 ) & (ipmt_read==1)) {
+      //
+      //   neutrino data thread
+      //
       pthread_attr_init(&attr_pt_trig_dma);
       pthread_attr_setdetachstate(&attr_pt_trig_dma, PTHREAD_CREATE_JOINABLE);
-//
+      //
       pthread_attr_getstacksize (&attr_pt_trig_dma, &stacksize);
       printf("Trigger Default stack size = %li\n", stacksize);
       stacksize = 4*stacksize;
-//      printf("Amount of stack needed per thread = %li\n",stacksize);
+      //      printf("Amount of stack needed per thread = %li\n",stacksize);
       pthread_attr_setstacksize (&attr_pt_trig_dma, stacksize);
-//      printf("Creating threads with stack size = %li bytes\n",stacksize);
-//
-//    neutrino filewrite thread
-//
+      //      printf("Creating threads with stack size = %li bytes\n",stacksize);
+      //
+      //    neutrino filewrite thread
+      //
       if(ith_fr == 1) {
-       pthread_attr_init(&attr_pt_tr);
-       pthread_attr_setdetachstate(&attr_pt_tr, PTHREAD_CREATE_JOINABLE);
-//
-       pthread_attr_getstacksize (&attr_pt_tr, &stacksize);
-       printf("Trigger Default stack size = %li\n", stacksize);
-       stacksize = 4*stacksize;
-//      printf("Amount of stack needed per thread = %li\n",stacksize);
-       pthread_attr_setstacksize (&attr_pt_tr, stacksize);
-//      printf("Creating threads with stack size = %li bytes\n",stacksize);
-//
+	pthread_attr_init(&attr_pt_tr);
+	pthread_attr_setdetachstate(&attr_pt_tr, PTHREAD_CREATE_JOINABLE);
+	//
+	pthread_attr_getstacksize (&attr_pt_tr, &stacksize);
+	printf("Trigger Default stack size = %li\n", stacksize);
+	stacksize = 4*stacksize;
+	//      printf("Amount of stack needed per thread = %li\n",stacksize);
+	pthread_attr_setstacksize (&attr_pt_tr, stacksize);
+	//      printf("Creating threads with stack size = %li bytes\n",stacksize);
+	//
       }
-     }
-//
-//   for TPC superNova
-//
-     if((isuper == 1) & (itpc_read==1)) {
-//
-/* Initialize and set thread detached attribute */
-//
+    }
+    //
+    //   for TPC superNova
+    //
+    if((isuper_tpc == 1) & (itpc_read==1)) {
+      //
+      /* Initialize and set thread detached attribute */
+      //
       pthread_attr_init(&attr_pt_sn_dma_tpc);
       pthread_attr_setdetachstate(&attr_pt_sn_dma_tpc, PTHREAD_CREATE_JOINABLE);
       pthread_attr_getstacksize (&attr_pt_sn_dma_tpc, &stacksize);
       printf("TPC SuperNova DMA defualt stack size = %li\n", stacksize);
       stacksize = 4*stacksize;
-//      printf("Amount of stack needed per thread = %li\n",stacksize);
+      //      printf("Amount of stack needed per thread = %li\n",stacksize);
       pthread_attr_setstacksize (&attr_pt_sn_dma_tpc, stacksize);
-//      printf("Creating threads with stack size = %li bytes\n",stacksize);
-//
-//      superNova file write thread
-//
+      //      printf("Creating threads with stack size = %li bytes\n",stacksize);
+      //
+      //      superNova file write thread
+      //
       if(ith_fr == 1) {
-       pthread_attr_init(&attr_pt_sn_tpc);
-       pthread_attr_setdetachstate(&attr_pt_sn_tpc, PTHREAD_CREATE_JOINABLE);
-       pthread_attr_getstacksize (&attr_pt_sn_tpc, &stacksize);
-       printf("SuperNova filewrite defualt stack size = %li\n", stacksize);
-       stacksize = 4*stacksize;
-//      printf("Amount of stack needed per thread = %li\n",stacksize);
-       pthread_attr_setstacksize (&attr_pt_sn_tpc, stacksize);
-//      printf("Creating threads with stack size = %li bytes\n",stacksize);
-//
+	pthread_attr_init(&attr_pt_sn_tpc);
+	pthread_attr_setdetachstate(&attr_pt_sn_tpc, PTHREAD_CREATE_JOINABLE);
+	pthread_attr_getstacksize (&attr_pt_sn_tpc, &stacksize);
+	printf("SuperNova filewrite defualt stack size = %li\n", stacksize);
+	stacksize = 4*stacksize;
+	//      printf("Amount of stack needed per thread = %li\n",stacksize);
+	pthread_attr_setstacksize (&attr_pt_sn_tpc, stacksize);
+	//      printf("Creating threads with stack size = %li bytes\n",stacksize);
+	//
       }
-     }
-//
-//   for TPC Neutrino
-//
-     if((ineu ==1 ) & (itpc_read==1)) {
-//
-//   neutrino data thread
-//
+    }
+    //
+    //   for TPC Neutrino
+    //
+    if((ineu_tpc ==1 ) & (itpc_read==1)) {
+      //
+      //   neutrino data thread
+      //
       pthread_attr_init(&attr_pt_trig_dma_tpc);
       pthread_attr_setdetachstate(&attr_pt_trig_dma_tpc, PTHREAD_CREATE_JOINABLE);
-//
+      //
       pthread_attr_getstacksize (&attr_pt_trig_dma_tpc, &stacksize);
       printf("Trigger Default stack size = %li\n", stacksize);
       stacksize = 4*stacksize;
-//      printf("Amount of stack needed per thread = %li\n",stacksize);
+      //      printf("Amount of stack needed per thread = %li\n",stacksize);
       pthread_attr_setstacksize (&attr_pt_trig_dma_tpc, stacksize);
-//      printf("Creating threads with stack size = %li bytes\n",stacksize);
-//
-//    neutrino filewrite thread
-//
+      //      printf("Creating threads with stack size = %li bytes\n",stacksize);
+      //
+      //    neutrino filewrite thread
+      //
       if(ith_fr == 1) {
-       pthread_attr_init(&attr_pt_tr_tpc);
-       pthread_attr_setdetachstate(&attr_pt_tr_tpc, PTHREAD_CREATE_JOINABLE);
-//
-       pthread_attr_getstacksize (&attr_pt_tr_tpc, &stacksize);
-       printf("Trigger Default stack size = %li\n", stacksize);
-       stacksize = 4*stacksize;
-//      printf("Amount of stack needed per thread = %li\n",stacksize);
-       pthread_attr_setstacksize (&attr_pt_tr_tpc, stacksize);
-//      printf("Creating threads with stack size = %li bytes\n",stacksize);
-//
+	pthread_attr_init(&attr_pt_tr_tpc);
+	pthread_attr_setdetachstate(&attr_pt_tr_tpc, PTHREAD_CREATE_JOINABLE);
+	//
+	pthread_attr_getstacksize (&attr_pt_tr_tpc, &stacksize);
+	printf("Trigger Default stack size = %li\n", stacksize);
+	stacksize = 4*stacksize;
+	//      printf("Amount of stack needed per thread = %li\n",stacksize);
+	pthread_attr_setstacksize (&attr_pt_tr_tpc, stacksize);
+	//      printf("Creating threads with stack size = %li bytes\n",stacksize);
+	//
       }
-     }
-////
-//
+    }
+    ////
+    //
+    
+    
+    
 
-
-
-
-//
-//   let trigger module read to be in the main program unless explict detach
-//
-     if((itrig_m ==1) && (itrig_m_d == 1)) {
-       //
-       //   neutrino data thread
-       //
-       pthread_attr_init(&attr_pt_trig_dma_m);
-       pthread_attr_setdetachstate(&attr_pt_trig_dma_m, PTHREAD_CREATE_JOINABLE);
-       //
-       pthread_attr_getstacksize (&attr_pt_trig_dma_m, &stacksize);
-       printf("Trigger module Default stack size = %li\n", stacksize);
-       stacksize = 4*stacksize;
-       //      printf("Amount of stack needed per thread = %li\n",stacksize);
-       pthread_attr_setstacksize (&attr_pt_trig_dma_m, stacksize);
-       //      printf("Creating threads with stack size = %li bytes\n",stacksize);
-       //
-       //    neutrino filewrite thread
-       //
-       if(ith_fr == 1) {
-	 pthread_attr_init(&attr_pt_tr);
-	 pthread_attr_setdetachstate(&attr_pt_tr_m, PTHREAD_CREATE_JOINABLE);
-	 //
-	 pthread_attr_getstacksize (&attr_pt_tr_m, &stacksize);
-	 printf("Trigger Default stack size = %li\n", stacksize);
-	 stacksize = 4*stacksize;
-	 //      printf("Amount of stack needed per thread = %li\n",stacksize);
-	 pthread_attr_setstacksize (&attr_pt_tr_m, stacksize);
-	 //      printf("Creating threads with stack size = %li bytes\n",stacksize);
-	 //
+    //
+    //   let trigger module read to be in the main program unless explict detach
+    //
+    if((itrig_m ==1) && (itrig_m_d == 1)) {
+      //
+      //   neutrino data thread
+      //
+      pthread_attr_init(&attr_pt_trig_dma_m);
+      pthread_attr_setdetachstate(&attr_pt_trig_dma_m, PTHREAD_CREATE_JOINABLE);
+      //
+      pthread_attr_getstacksize (&attr_pt_trig_dma_m, &stacksize);
+      printf("Trigger module Default stack size = %li\n", stacksize);
+      stacksize = 4*stacksize;
+      //      printf("Amount of stack needed per thread = %li\n",stacksize);
+      pthread_attr_setstacksize (&attr_pt_trig_dma_m, stacksize);
+      //      printf("Creating threads with stack size = %li bytes\n",stacksize);
+      //
+      //    neutrino filewrite thread
+      //
+      if(ith_fr == 1) {
+	pthread_attr_init(&attr_pt_tr);
+	pthread_attr_setdetachstate(&attr_pt_tr_m, PTHREAD_CREATE_JOINABLE);
+	//
+	pthread_attr_getstacksize (&attr_pt_tr_m, &stacksize);
+	printf("Trigger Default stack size = %li\n", stacksize);
+	stacksize = 4*stacksize;
+	//      printf("Amount of stack needed per thread = %li\n",stacksize);
+	pthread_attr_setstacksize (&attr_pt_tr_m, stacksize);
+	//      printf("Creating threads with stack size = %li bytes\n",stacksize);
+	//
       }
-     }
-     //
-     //
-     //     iframe_length = 2047;
-     //     iframe_length = 25599;
-     //     timesize = 3000;
-     //     itrig_delay = 200;
-     
-     iframe_length = 2047;
-     timesize = 4;
-     itrig_delay = 10;
-     
-     //     iframe_length = 25599;
-     //     timesize = 3100;
-     //     itrig_delay = 10;
-     
-     //     timesize =4;
-     dwDMABufSize = 1000000;
-     printf(" frame size = %d, timesize = %d\n",iframe_length+1, timesize);
-     printf(" buffer size = %d\n", dwDMABufSize);
-     printf(" trigger delay = %d\n", itrig_delay);
-     iframe = iframe_length;
-
-     //     printf(" 1 for checking the event \n");
-     //     scanf("%d",&icheck);
-     //     printf(" type 1 to use random number \n");
-     //     scanf("%d",&irand);
-     icheck =0;
-     ifr=0;
-     iprint = 1;
-     //     printf(" number event \n");
-     //     scanf("%d",&nevent);
-     
-     //     printf(" enter number of words per packet \n");
-     //     scanf("%d",&nsend);
-     nsend=500;
-     //     imod_xmit=10;
-     
-     // once the fpga is booted we should let system receive fill frame before send any data.
-     // set system with normal transmitter mode
-
-     //
-     // STEP ... PCI-E card initialization for PMT
-     //
-     // PMT section of busy initialization
-     //
-     printf("Initializing PCIE-card for PMT ... ");
-     if(ipmt_read == 1) {
-       dwAddrSpace =2;
-       u32Data = 0x20000000;    // initial transmitter, no hold
-       dwOffset = 0x18;
-       WDC_WriteAddr32(hDev2, dwAddrSpace, dwOffset, u32Data);
-       dwAddrSpace =2;
-       u32Data = 0x20000000;    // initial transmitter, no hold
-       dwOffset = 0x20;
-       WDC_WriteAddr32(hDev2, dwAddrSpace, dwOffset, u32Data);
-       
-       dwAddrSpace =2;
-       u32Data = 0x20000000;    // initial receiver
-       dwOffset = 0x1c;
-       WDC_WriteAddr32(hDev2, dwAddrSpace, dwOffset, u32Data);
-       dwAddrSpace =2;
-       u32Data = 0x20000000;   // initial receiver
-       dwOffset = 0x24;
-       WDC_WriteAddr32(hDev2, dwAddrSpace, dwOffset, u32Data);
-       
-       
-       dwAddrSpace =2;
-       u32Data = 0xfff;    // set mode off with 0xfff...
-       dwOffset = 0x28;
-       WDC_WriteAddr32(hDev2, dwAddrSpace, dwOffset, u32Data);
-       
-       dwAddrSpace =2;
-       u32Data = 0x20000000;    // initial transmitter, no hold
-       dwOffset = 0x18;
-       WDC_WriteAddr32(hDev1, dwAddrSpace, dwOffset, u32Data);
-       dwAddrSpace =2;
-       u32Data = 0x20000000;    // initial transmitter, no hold
-       dwOffset = 0x20;
-       WDC_WriteAddr32(hDev1, dwAddrSpace, dwOffset, u32Data);
-       
-       dwAddrSpace =2;
-       u32Data = 0x20000000;    // initial receiver
-       dwOffset = 0x1c;
-       WDC_WriteAddr32(hDev1, dwAddrSpace, dwOffset, u32Data);
-       dwAddrSpace =2;
-       u32Data = 0x20000000;   // initial receiver
-       dwOffset = 0x24;
-       WDC_WriteAddr32(hDev1, dwAddrSpace, dwOffset, u32Data);
-       
-       
-       dwAddrSpace =2;
-       u32Data = 0xfff;    // set mode off with 0xfff...
-       dwOffset = 0x28;
-       WDC_WriteAddr32(hDev1, dwAddrSpace, dwOffset, u32Data);
-     }
-     printf("done!\n");
-
-     //
-     // STEP ... PCI-E card initialization for TPC
-     // TPC section of busy initialization
-     //
-     printf("Initializing PCIE-card for TPC ... ");
-     if(itpc_read == 1) {
-       dwAddrSpace =2;
-       u32Data = 0x20000000;    // initial transmitter, no hold
-       dwOffset = 0x18;
-       WDC_WriteAddr32(hDev5, dwAddrSpace, dwOffset, u32Data);
-       dwAddrSpace =2;
-       u32Data = 0x20000000;    // initial transmitter, no hold
-       dwOffset = 0x20;
-       WDC_WriteAddr32(hDev5, dwAddrSpace, dwOffset, u32Data);
-       
-       dwAddrSpace =2;
-       u32Data = 0x20000000;    // initial receiver
-       dwOffset = 0x1c;
-       WDC_WriteAddr32(hDev5, dwAddrSpace, dwOffset, u32Data);
-       dwAddrSpace =2;
-       u32Data = 0x20000000;   // initial receiver
-       dwOffset = 0x24;
-       WDC_WriteAddr32(hDev5, dwAddrSpace, dwOffset, u32Data);
-       
-       
-       dwAddrSpace =2;
-       u32Data = 0xfff;    // set mode off with 0xfff...
-       dwOffset = 0x28;
-       WDC_WriteAddr32(hDev5, dwAddrSpace, dwOffset, u32Data);
-       
-       dwAddrSpace =2;
-       u32Data = 0x20000000;    // initial transmitter, no hold
-       dwOffset = 0x18;
-       WDC_WriteAddr32(hDev4, dwAddrSpace, dwOffset, u32Data);
-       dwAddrSpace =2;
-       u32Data = 0x20000000;    // initial transmitter, no hold
-       dwOffset = 0x20;
-       WDC_WriteAddr32(hDev4, dwAddrSpace, dwOffset, u32Data);
-       
-       dwAddrSpace =2;
-       u32Data = 0x20000000;    // initial receiver
-       dwOffset = 0x1c;
-       WDC_WriteAddr32(hDev4, dwAddrSpace, dwOffset, u32Data);
-       dwAddrSpace =2;
-       u32Data = 0x20000000;   // initial receiver
-       dwOffset = 0x24;
-       WDC_WriteAddr32(hDev4, dwAddrSpace, dwOffset, u32Data);
-       
-       
-       dwAddrSpace =2;
-       u32Data = 0xfff;    // set mode off with 0xfff...
-       dwOffset = 0x28;
-       WDC_WriteAddr32(hDev4, dwAddrSpace, dwOffset, u32Data);
-     }
-     printf("done!\n");
-
-
-     //
-     // STEP ... PMT's controller initialization
-     //
-     printf("Initializing Controller module for PMT crate ... ");
-     px = &buf_send;
-     py = &read_array;
-
-     imod =0;  /* controller module */
-     /** initialize **/
-     buf_send[0]=0x0;
-     buf_send[1]=0x0;
-     i=1;
-     k=1;
-     i = pcie_send(hDev, i, k, px);
-     // set offline test
-     imod=0;
-     ichip=1;
-     buf_send[0]=(imod<<11)+(ichip<<8)+(mb_cntrl_test_on)+(0x0<<16); //enable offline run on
-     i=1;
-     k=1;
-     i = pcie_send(hDev, i, k, px);
-     //disable the run command
-     imod=0;
-     ichip=1;
-     buf_send[0]=(imod<<11)+(ichip<<8)+(mb_cntrl_set_run_off)+(0x0<<16); //trun off run
-     i=1;
-     k=1;
-     i = pcie_send(hDev, i, k, px);
-     // set offline test
-     imod=0;
-     ichip=1;
-     buf_send[0]=(imod<<11)+(ichip<<8)+(mb_cntrl_test_off)+(0x0<<16); //set controller test off
-     i=1;
-     k=1;
-     i = pcie_send(hDev, i, k, px);
-     printf("done!\n");     
-
-     //
-     // STEP ... TPC controller initialization
-     //
-     if (itpc_read==1){
-       printf("Initializing Controller module for TPC crate ... ");
-       imod =0;  /* controller module */
-       /** initialize **/
-       buf_send[0]=0x0;
-       buf_send[1]=0x0;
-       i=1;
-       k=1;
-       i = pcie_send(hDev3, i, k, px);
-       // set offline test
-       imod=0;
-       ichip=1;
-       buf_send[0]=(imod<<11)+(ichip<<8)+(mb_cntrl_test_on)+(0x0<<16); //enable offline run on
-       i=1;
-       k=1;
-       i = pcie_send(hDev3, i, k, px);
-       //disable the run command
-       imod=0;
-       ichip=1;
-       buf_send[0]=(imod<<11)+(ichip<<8)+(mb_cntrl_set_run_off)+(0x0<<16); //trun off run
-       i=1;
-       k=1;
-       i = pcie_send(hDev3, i, k, px);
-       // set offline test
-       imod=0;
-       ichip=1;
-       buf_send[0]=(imod<<11)+(ichip<<8)+(mb_cntrl_test_off)+(0x0<<16); //set controller test off
-       i=1;
-       k=1;
-       i = pcie_send(hDev3, i, k, px);
-       printf("done!\n");            
-     }
-
-     //
-     // STEP ... Initialize Trigger module & configure
-     //
-     //
-     //  set trigger module run off
-     //
-     imod=imod_trig;
-     buf_send[0]=(imod<<11)+(mb_trig_run)+((0x0)<<16); //set up run off
-     i=1;
-     k=1;
-     i = pcie_send(hDev, i, k, px);
-     //
-     //  set trigger module dead time size
-     //
-     imod=imod_trig;
-     buf_send[0]=(imod<<11)+(mb_trig_deadtime_size)+(0x1<<16); //set trigger module deadtime size
-     i=1;
-     k=1;
-     i = pcie_send(hDev, i, k, px);
-     //
-     //  set trigger module to disable triggers
-     //
-     imod=imod_trig;
-     buf_send[0]=(imod<<11)+(mb_trig_enable)+(0x0<<16); //disable all triggers
-     i=1;
-     k=1;
-     i = pcie_send(hDev, i, k, px);
-     //
-     //
-     if(itrig_pulse == 1) {
-       imod = imod_trig;
-       buf_send[0]=(imod<<11)+(mb_trig_output_select)+((0x1)<<16); // select test pulse output
-       i=1;
-       k=1;
-       i = pcie_send(hDev, i, k, px);
-     }
-     else {
-       imod = imod_trig;
-       buf_send[0]=(imod<<11)+(mb_trig_output_select)+((0x2)<<16); // select test pulse output
-       i=1;
-       k=1;
-       i = pcie_send(hDev, i, k, px);
-     }
-     
-     
-     printf("about to boot\n");
-
-     //
-     // STEP ... PMT FEM boot & configuration
-     //
-
-     //
-     //    boot up xmit module 1st
-     //
-     
-     printf("I made it to before xmit boot\n");
-     if(ipmt_read == 1) {
-       printf(" boot xmit module \n");
-       inpf = fopen("/home/ub/xmit_fpga_link_header","r");
-       imod=imod_xmit;
-       ichip=mb_xmit_conf_add;
-       buf_send[0]=(imod<<11)+(ichip<<8)+0x0+(0x0<<16);  // turn conf to be on
-       i=1;
-       k=1;
-       i = pcie_send(hDev, i, k, px);
-       //      for (i=0; i<100000; i++) {
-       //          ik= i%2;
-       //          dummy1= (ik+i)*(ik+i);
-       //      }
-       
-       
-       /* read data as characters (28941) */
-       usleep(1000);   // wait fior a while
-       count = 0;
-       counta= 0;
-       ichip_c = 7; // set ichip_c to stay away from any other command in the
-       dummy1 =0;
-       while (fread(&charchannel,sizeof(char),1,inpf)==1) {
-	 carray[count] = charchannel;
-	 count++;
-	 counta++;
-	 if((count%(nsend*2)) == 0) {
-	   //        printf(" loop = %d\n",dummy1);
-	   buf_send[0] = (imod <<11) +(ichip_c <<8)+ (carray[0]<<16);
-	   send_array[0] =buf_send[0];
-	   if(dummy1 <= 5 ) printf(" counta = %d, first word = %x, %x, %x %x %x \n",counta,buf_send[0], carray[0], carray[1]
-				   ,carray[2], carray[3]);
-	   for (ij=0; ij< nsend; ij++) {
-	     if(ij== (nsend-1)) buf_send[ij+1] = carray[2*ij+1]+(0x0<<16);
-	     else buf_send[ij+1] = carray[2*ij+1]+ (carray[2*ij+2]<<16);
-	     //         buf_send[ij+1] = carray[2*ij+1]+ (carray[2*ij+2]<<16);
-	     send_array[ij+1] = buf_send[ij+1];
-	   }
-	   nword =nsend+1;
-	   i=1;
-	   //       if(dummy1 == 0)
-	   ij = pcie_send(hDev, i, nword, px);
-	   nanosleep(&tim , &tim2);
-	   dummy1 = dummy1+1;
-	   count =0;
+    }
+    //
+    //
+    //     iframe_length = 2047;
+    //     iframe_length = 25599;
+    
+    iframe_length = 2047;
+    
+    //     iframe_length = 25599;
+    //     timesize = 3100;
+    //     itrig_delay = 10;
+    
+    //     timesize =4;
+    dwDMABufSize = 1000000;
+    printf(" frame size = %d, timesize = %d\n",iframe_length+1, timesize);
+    printf(" buffer size = %d\n", dwDMABufSize);
+    iframe = iframe_length;
+    
+    //     printf(" 1 for checking the event \n");
+    //     scanf("%d",&icheck);
+    //     printf(" type 1 to use random number \n");
+    //     scanf("%d",&irand);
+    icheck =0;
+    ifr=0;
+    iprint = 1;
+    //     printf(" number event \n");
+    //     scanf("%d",&nevent);
+    
+    //     printf(" enter number of words per packet \n");
+    //     scanf("%d",&nsend);
+    nsend=500;
+    //     imod_xmit=10;
+    
+    // once the fpga is booted we should let system receive fill frame before send any data.
+    // set system with normal transmitter mode
+    
+    //
+    // STEP ... PCI-E card initialization for PMT
+    //
+    // PMT section of busy initialization
+    //
+    printf("Initializing PCIE-card for PMT ... ");
+    if(ipmt_read == 1) {
+      dwAddrSpace =2;
+      u32Data = 0x20000000;    // initial transmitter, no hold
+      dwOffset = 0x18;
+      WDC_WriteAddr32(hDev2, dwAddrSpace, dwOffset, u32Data);
+      dwAddrSpace =2;
+      u32Data = 0x20000000;    // initial transmitter, no hold
+      dwOffset = 0x20;
+      WDC_WriteAddr32(hDev2, dwAddrSpace, dwOffset, u32Data);
+      
+      dwAddrSpace =2;
+      u32Data = 0x20000000;    // initial receiver
+      dwOffset = 0x1c;
+      WDC_WriteAddr32(hDev2, dwAddrSpace, dwOffset, u32Data);
+      dwAddrSpace =2;
+      u32Data = 0x20000000;   // initial receiver
+      dwOffset = 0x24;
+      WDC_WriteAddr32(hDev2, dwAddrSpace, dwOffset, u32Data);
+      
+      
+      dwAddrSpace =2;
+      u32Data = 0xfff;    // set mode off with 0xfff...
+      dwOffset = 0x28;
+      WDC_WriteAddr32(hDev2, dwAddrSpace, dwOffset, u32Data);
+      
+      dwAddrSpace =2;
+      u32Data = 0x20000000;    // initial transmitter, no hold
+      dwOffset = 0x18;
+      WDC_WriteAddr32(hDev1, dwAddrSpace, dwOffset, u32Data);
+      dwAddrSpace =2;
+      u32Data = 0x20000000;    // initial transmitter, no hold
+      dwOffset = 0x20;
+      WDC_WriteAddr32(hDev1, dwAddrSpace, dwOffset, u32Data);
+      
+      dwAddrSpace =2;
+      u32Data = 0x20000000;    // initial receiver
+      dwOffset = 0x1c;
+      WDC_WriteAddr32(hDev1, dwAddrSpace, dwOffset, u32Data);
+      dwAddrSpace =2;
+      u32Data = 0x20000000;   // initial receiver
+      dwOffset = 0x24;
+      WDC_WriteAddr32(hDev1, dwAddrSpace, dwOffset, u32Data);
+      
+      
+      dwAddrSpace =2;
+      u32Data = 0xfff;    // set mode off with 0xfff...
+      dwOffset = 0x28;
+      WDC_WriteAddr32(hDev1, dwAddrSpace, dwOffset, u32Data);
+    }
+    printf("done!\n");
+    
+    //
+    // STEP ... PCI-E card initialization for TPC
+    // TPC section of busy initialization
+    //
+    printf("Initializing PCIE-card for TPC ... ");
+    if(itpc_read == 1) {
+      dwAddrSpace =2;
+      u32Data = 0x20000000;    // initial transmitter, no hold
+      dwOffset = 0x18;
+      WDC_WriteAddr32(hDev5, dwAddrSpace, dwOffset, u32Data);
+      dwAddrSpace =2;
+      u32Data = 0x20000000;    // initial transmitter, no hold
+      dwOffset = 0x20;
+      WDC_WriteAddr32(hDev5, dwAddrSpace, dwOffset, u32Data);
+      
+      dwAddrSpace =2;
+      u32Data = 0x20000000;    // initial receiver
+      dwOffset = 0x1c;
+      WDC_WriteAddr32(hDev5, dwAddrSpace, dwOffset, u32Data);
+      dwAddrSpace =2;
+      u32Data = 0x20000000;   // initial receiver
+      dwOffset = 0x24;
+      WDC_WriteAddr32(hDev5, dwAddrSpace, dwOffset, u32Data);
+      
+      
+      dwAddrSpace =2;
+      u32Data = 0xfff;    // set mode off with 0xfff...
+      dwOffset = 0x28;
+      WDC_WriteAddr32(hDev5, dwAddrSpace, dwOffset, u32Data);
+      
+      dwAddrSpace =2;
+      u32Data = 0x20000000;    // initial transmitter, no hold
+      dwOffset = 0x18;
+      WDC_WriteAddr32(hDev4, dwAddrSpace, dwOffset, u32Data);
+      dwAddrSpace =2;
+      u32Data = 0x20000000;    // initial transmitter, no hold
+      dwOffset = 0x20;
+      WDC_WriteAddr32(hDev4, dwAddrSpace, dwOffset, u32Data);
+      
+      dwAddrSpace =2;
+      u32Data = 0x20000000;    // initial receiver
+      dwOffset = 0x1c;
+      WDC_WriteAddr32(hDev4, dwAddrSpace, dwOffset, u32Data);
+      dwAddrSpace =2;
+      u32Data = 0x20000000;   // initial receiver
+      dwOffset = 0x24;
+      WDC_WriteAddr32(hDev4, dwAddrSpace, dwOffset, u32Data);
+      
+      
+      dwAddrSpace =2;
+      u32Data = 0xfff;    // set mode off with 0xfff...
+      dwOffset = 0x28;
+      WDC_WriteAddr32(hDev4, dwAddrSpace, dwOffset, u32Data);
+    }
+    printf("done!\n");
+    
+    
+    //
+    // STEP ... PMT's controller initialization
+    //
+    printf("Initializing Controller module for PMT crate ... ");
+    px = &buf_send;
+    py = &read_array;
+    
+    imod =0;  /* controller module */
+    /** initialize **/
+    buf_send[0]=0x0;
+    buf_send[1]=0x0;
+    i=1;
+    k=1;
+    i = pcie_send(hDev, i, k, px);
+    // set offline test
+    imod=0;
+    ichip=1;
+    buf_send[0]=(imod<<11)+(ichip<<8)+(mb_cntrl_test_on)+(0x0<<16); //enable offline run on
+    i=1;
+    k=1;
+    i = pcie_send(hDev, i, k, px);
+    //disable the run command
+    imod=0;
+    ichip=1;
+    buf_send[0]=(imod<<11)+(ichip<<8)+(mb_cntrl_set_run_off)+(0x0<<16); //trun off run
+    i=1;
+    k=1;
+    i = pcie_send(hDev, i, k, px);
+    // set offline test
+    imod=0;
+    ichip=1;
+    buf_send[0]=(imod<<11)+(ichip<<8)+(mb_cntrl_test_off)+(0x0<<16); //set controller test off
+    i=1;
+    k=1;
+    i = pcie_send(hDev, i, k, px);
+    printf("done!\n");     
+    
+    //
+    // STEP ... TPC controller initialization
+    //
+    if (itpc_read==1){
+      printf("Initializing Controller module for TPC crate ... ");
+      imod =0;  /* controller module */
+      /** initialize **/
+      buf_send[0]=0x0;
+      buf_send[1]=0x0;
+      i=1;
+      k=1;
+      i = pcie_send(hDev3, i, k, px);
+      // set offline test
+      imod=0;
+      ichip=1;
+      buf_send[0]=(imod<<11)+(ichip<<8)+(mb_cntrl_test_on)+(0x0<<16); //enable offline run on
+      i=1;
+      k=1;
+      i = pcie_send(hDev3, i, k, px);
+      //disable the run command
+      imod=0;
+      ichip=1;
+      buf_send[0]=(imod<<11)+(ichip<<8)+(mb_cntrl_set_run_off)+(0x0<<16); //trun off run
+      i=1;
+      k=1;
+      i = pcie_send(hDev3, i, k, px);
+      // set offline test
+      imod=0;
+      ichip=1;
+      buf_send[0]=(imod<<11)+(ichip<<8)+(mb_cntrl_test_off)+(0x0<<16); //set controller test off
+      i=1;
+      k=1;
+      i = pcie_send(hDev3, i, k, px);
+      printf("done!\n");            
+    }
+    
+    //
+    // STEP ... Initialize Trigger module & configure
+    //
+    //
+    //  set trigger module run off
+    //
+    imod=imod_trig;
+    buf_send[0]=(imod<<11)+(mb_trig_run)+((0x0)<<16); //set up run off
+    i=1;
+    k=1;
+    i = pcie_send(hDev, i, k, px);
+    //
+    //  set trigger module dead time size
+    //
+    imod=imod_trig;
+    buf_send[0]=(imod<<11)+(mb_trig_deadtime_size)+(0x1<<16); //set trigger module deadtime size
+    i=1;
+    k=1;
+    i = pcie_send(hDev, i, k, px);
+    //
+    //  set trigger module to disable triggers
+    //
+    imod=imod_trig;
+    buf_send[0]=(imod<<11)+(mb_trig_enable)+(0x0<<16); //disable all triggers
+    i=1;
+    k=1;
+    i = pcie_send(hDev, i, k, px);
+    //
+    //
+    if(itrig_pulse == 1) {
+      imod = imod_trig;
+      buf_send[0]=(imod<<11)+(mb_trig_output_select)+((0x1)<<16); // select test pulse output
+      i=1;
+      k=1;
+      i = pcie_send(hDev, i, k, px);
+    }
+    else {
+      imod = imod_trig;
+      buf_send[0]=(imod<<11)+(mb_trig_output_select)+((0x2)<<16); // select test pulse output
+      i=1;
+      k=1;
+      i = pcie_send(hDev, i, k, px);
+    }
+    
+    
+    printf("about to boot\n");
+    
+    //
+    // STEP ... PMT FEM boot & configuration
+    //
+    
+    //
+    //    boot up xmit module 1st
+    //
+    printf("I made it to before xmit boot\n");
+    if(ipmt_read == 1) {
+      printf(" boot xmit module \n");
+      inpf = fopen("/home/ub/xmit_fpga_link_header","r");
+      imod=imod_xmit;
+      ichip=mb_xmit_conf_add;
+      buf_send[0]=(imod<<11)+(ichip<<8)+0x0+(0x0<<16);  // turn conf to be on
+      i=1;
+      k=1;
+      i = pcie_send(hDev, i, k, px);
+      //      for (i=0; i<100000; i++) {
+      //          ik= i%2;
+      //          dummy1= (ik+i)*(ik+i);
+      //      }
+      
+      
+      /* read data as characters (28941) */
+      usleep(1000);   // wait fior a while
+      count = 0;
+      counta= 0;
+      ichip_c = 7; // set ichip_c to stay away from any other command in the
+      dummy1 =0;
+      while (fread(&charchannel,sizeof(char),1,inpf)==1) {
+	carray[count] = charchannel;
+	count++;
+	counta++;
+	if((count%(nsend*2)) == 0) {
+	  //        printf(" loop = %d\n",dummy1);
+	  buf_send[0] = (imod <<11) +(ichip_c <<8)+ (carray[0]<<16);
+	  send_array[0] =buf_send[0];
+	  if(dummy1 <= 5 ) printf(" counta = %d, first word = %x, %x, %x %x %x \n",counta,buf_send[0], carray[0], carray[1]
+				  ,carray[2], carray[3]);
+	  for (ij=0; ij< nsend; ij++) {
+	    if(ij== (nsend-1)) buf_send[ij+1] = carray[2*ij+1]+(0x0<<16);
+	    else buf_send[ij+1] = carray[2*ij+1]+ (carray[2*ij+2]<<16);
+	    //         buf_send[ij+1] = carray[2*ij+1]+ (carray[2*ij+2]<<16);
+	    send_array[ij+1] = buf_send[ij+1];
+	  }
+	  nword =nsend+1;
+	  i=1;
+	  //       if(dummy1 == 0)
+	  ij = pcie_send(hDev, i, nword, px);
+	  nanosleep(&tim , &tim2);
+	  dummy1 = dummy1+1;
+	  count =0;
+	}
+      }
+      if(feof(inpf)) {
+	printf("You have reached the end-of-file word count= %d %d\n", counta, count);
+	buf_send[0] = (imod <<11) +(ichip_c <<8)+ (carray[0]<<16);
+	if ( count > 1) {
+	  if( ((count-1)%2) ==0) {
+	    ik =(count-1)/2;
+	  }
+	  else {
+	    ik =(count-1)/2+1;
+	  }
+	  ik=ik+2;   // add one more for safety
+	  printf("ik= %d\n",ik);
+	  for (ij=0; ij<ik; ij++){
+	    if(ij == (ik-1)) buf_send[ij+1] = carray[(2*ij)+1]+(((imod<<11)+(ichip<<8)+0x0)<<16);
+	    else buf_send[ij+1] = carray[(2*ij)+1]+ (carray[(2*ij)+2]<<16);
+	    send_array[ij+1] = buf_send[ij+1];
+	  }
+	}
+	else ik=1;
+	for (ij=ik-10; ij< ik+1; ij++) {
+	  printf("Last data = %d, %x\n",ij,buf_send[ij]);
+	}
+	nword =ik+1;
+	i=1;
+	i = pcie_send(hDev, i, nword, px);
+      }
+      usleep(2000);    // wait for 2ms to cover the packet time plus fpga init time
+      fclose(inpf);
+      
+      //
+      printf(" xmit done, booting FEM \n");
+      scanf("%d",&ik);
+      //
+      //   *********************************************************************************
+      //
+      
+      //
+      // CONFIGURATION: PMT FEM configuration called here
+      //
+      imod_last = imod_xmit+1;
+      for (imod_fem = imod_last; imod_fem< (imod_st+1); imod_fem++) {
+	printf(" booting FEM module %d \n",imod_fem);
+	scanf("%d",&ik);
+	ik=pmt_adc_setup(hDev,imod_fem,iframe);
+      }
+      
+      //
+      // PMT:   both FEM and XMIT bootted.
+      //
+      //
+      
+      //   /* set tx mode register */
+      //
+      u32Data = 0x00003fff;  // set up number of words hold coming back from the XMIT module
+      printf(" number of words for hold be send back = %x\n",u32Data);
+      dwOffset = 0x28;
+      dwAddrSpace =2;
+      WDC_WriteAddr32(hDev2, dwAddrSpace, dwOffset, u32Data);
+      //
+      //   set up hold
+      //
+      printf(" set up the hold condition \n");
+      dwAddrSpace =2;
+      u32Data = 0x8000000;    // set up transmitter to return the hold -- upper transciever
+      dwOffset = 0x18;
+      WDC_WriteAddr32(hDev2, dwAddrSpace, dwOffset, u32Data);
+      dwAddrSpace =2;
+      u32Data = 0x8000000;    // set up transmitter to return the hold -- lower transciever
+      dwOffset = 0x20;
+      WDC_WriteAddr32(hDev2, dwAddrSpace, dwOffset, u32Data);
+      
+      //
+      if((ineu ==1) & (ith_fr ==1)) {
+	//
+	/* set tx mode register */
+	//
+	u32Data = 0x00003fff;  // set up number of words hold coming back from the XMIT module
+	printf(" number of words for hold be send back -- trigger = %x\n",u32Data);
+	dwOffset = 0x28;
+	dwAddrSpace =2;
+	WDC_WriteAddr32(hDev1, dwAddrSpace, dwOffset, u32Data);
+	//
+	//   set up hold
+	//
+	printf(" set up the hold condition \n");
+	dwAddrSpace =2;
+	u32Data = 0x8000000;    // set up transmitter to return the hold -- upper transciever
+	dwOffset = 0x18;
+	WDC_WriteAddr32(hDev1, dwAddrSpace, dwOffset, u32Data);
+	dwAddrSpace =2;
+	u32Data = 0x8000000;    // set up transmitter to return the hold -- lower transciever
+	dwOffset = 0x20;
+	WDC_WriteAddr32(hDev1, dwAddrSpace, dwOffset, u32Data);
+      }
+    }
+    
+    //
+    // STEP ... TPC FEM boot & configuration
+    //
+    
+    //
+    //  boot up xmit module 1st
+    //
+    if(itpc_read == 1) {
+      printf(" boot xmit module \n");
+      inpf = fopen("/home/ub/xmit_fpga_link_header","r");
+      imod=imod_xmit_tpc;
+      ichip=mb_xmit_conf_add;
+      buf_send[0]=(imod<<11)+(ichip<<8)+0x0+(0x0<<16);  // turn conf to be on
+      i=1;
+      k=1;
+      i = pcie_send(hDev3, i, k, px);
+      //      for (i=0; i<100000; i++) {
+      //          ik= i%2;
+      //          dummy1= (ik+i)*(ik+i);
+      //      }
+      
+      
+      /* read data as characters (28941) */
+      usleep(1000);   // wait fior a while
+      count = 0;
+      counta= 0;
+      ichip_c = 7; // set ichip_c to stay away from any other command in the
+      dummy1 =0;
+      while (fread(&charchannel,sizeof(char),1,inpf)==1) {
+	carray[count] = charchannel;
+	count++;
+	counta++;
+	if((count%(nsend*2)) == 0) {
+	  //        printf(" loop = %d\n",dummy1);
+	  buf_send[0] = (imod <<11) +(ichip_c <<8)+ (carray[0]<<16);
+	  send_array[0] =buf_send[0];
+	  if(dummy1 <= 5 ) printf(" counta = %d, first word = %x, %x, %x %x %x \n",counta,buf_send[0], carray[0], carray[1]
+				  ,carray[2], carray[3]);
+	  for (ij=0; ij< nsend; ij++) {
+	    if(ij== (nsend-1)) buf_send[ij+1] = carray[2*ij+1]+(0x0<<16);
+	    else buf_send[ij+1] = carray[2*ij+1]+ (carray[2*ij+2]<<16);
+	    //         buf_send[ij+1] = carray[2*ij+1]+ (carray[2*ij+2]<<16);
+	    send_array[ij+1] = buf_send[ij+1];
+	  }
+	  nword =nsend+1;
+	  i=1;
+	  //       if(dummy1 == 0)
+	  ij = pcie_send(hDev3, i, nword, px);
+	  nanosleep(&tim , &tim2);
+	  dummy1 = dummy1+1;
+	  count =0;
+	}
+      }
+      if(feof(inpf)) {
+	printf("You have reached the end-of-file word count= %d %d\n", counta, count);
+	buf_send[0] = (imod <<11) +(ichip_c <<8)+ (carray[0]<<16);
+	if ( count > 1) {
+	  if( ((count-1)%2) ==0) {
+	    ik =(count-1)/2;
+	  }
+	  else {
+	    ik =(count-1)/2+1;
+	  }
+	  ik=ik+2;   // add one more for safety
+	  printf("ik= %d\n",ik);
+	  for (ij=0; ij<ik; ij++){
+	    if(ij == (ik-1)) buf_send[ij+1] = carray[(2*ij)+1]+(((imod<<11)+(ichip<<8)+0x0)<<16);
+	    else buf_send[ij+1] = carray[(2*ij)+1]+ (carray[(2*ij)+2]<<16);
+	    send_array[ij+1] = buf_send[ij+1];
+	  }
+	}
+	else ik=1;
+	for (ij=ik-10; ij< ik+1; ij++) {
+	  printf("Last data = %d, %x\n",ij,buf_send[ij]);
 	 }
-       }
-       if(feof(inpf)) {
-	 printf("You have reached the end-of-file word count= %d %d\n", counta, count);
-	 buf_send[0] = (imod <<11) +(ichip_c <<8)+ (carray[0]<<16);
-	 if ( count > 1) {
-	   if( ((count-1)%2) ==0) {
-	     ik =(count-1)/2;
-	   }
-	   else {
-	     ik =(count-1)/2+1;
-	   }
-	   ik=ik+2;   // add one more for safety
-	   printf("ik= %d\n",ik);
-	   for (ij=0; ij<ik; ij++){
-	     if(ij == (ik-1)) buf_send[ij+1] = carray[(2*ij)+1]+(((imod<<11)+(ichip<<8)+0x0)<<16);
-	     else buf_send[ij+1] = carray[(2*ij)+1]+ (carray[(2*ij)+2]<<16);
-	     send_array[ij+1] = buf_send[ij+1];
-	   }
-	 }
-	 else ik=1;
-	 for (ij=ik-10; ij< ik+1; ij++) {
-	   printf("Last data = %d, %x\n",ij,buf_send[ij]);
-	 }
-	 nword =ik+1;
-	 i=1;
-	 i = pcie_send(hDev, i, nword, px);
-       }
-       usleep(2000);    // wait for 2ms to cover the packet time plus fpga init time
-       fclose(inpf);
-       
-       //
-       printf(" xmit done, booting FEM \n");
-       scanf("%d",&ik);
-       //
-       //   *********************************************************************************
-       //
-
-       //
-       // CONFIGURATION: PMT FEM configuration called here
-       //
-       imod_last = imod_xmit+1;
-       for (imod_fem = imod_last; imod_fem< (imod_st+1); imod_fem++) {
-	 printf(" booting FEM module %d \n",imod_fem);
-	 scanf("%d",&ik);
-	 ik=pmt_adc_setup(hDev,imod_fem,iframe);
-       }
-     
-       //
-       // PMT:   both FEM and XMIT bootted.
-       //
-       //
-
-       //   /* set tx mode register */
-       //
-       u32Data = 0x00003fff;  // set up number of words hold coming back from the XMIT module
-       printf(" number of words for hold be send back = %x\n",u32Data);
-       dwOffset = 0x28;
-       dwAddrSpace =2;
-       WDC_WriteAddr32(hDev2, dwAddrSpace, dwOffset, u32Data);
-       //
-       //   set up hold
-       //
-       printf(" set up the hold condition \n");
-       dwAddrSpace =2;
-       u32Data = 0x8000000;    // set up transmitter to return the hold -- upper transciever
-       dwOffset = 0x18;
-       WDC_WriteAddr32(hDev2, dwAddrSpace, dwOffset, u32Data);
-       dwAddrSpace =2;
-       u32Data = 0x8000000;    // set up transmitter to return the hold -- lower transciever
-       dwOffset = 0x20;
-       WDC_WriteAddr32(hDev2, dwAddrSpace, dwOffset, u32Data);
-       
-       //
-       if((ineu ==1) & (ith_fr ==1)) {
-	 //
-	 /* set tx mode register */
-	 //
-	 u32Data = 0x00003fff;  // set up number of words hold coming back from the XMIT module
-	 printf(" number of words for hold be send back -- trigger = %x\n",u32Data);
-	 dwOffset = 0x28;
-	 dwAddrSpace =2;
-	 WDC_WriteAddr32(hDev1, dwAddrSpace, dwOffset, u32Data);
-	 //
-	 //   set up hold
-	 //
-	 printf(" set up the hold condition \n");
-	 dwAddrSpace =2;
-	 u32Data = 0x8000000;    // set up transmitter to return the hold -- upper transciever
-	 dwOffset = 0x18;
-	 WDC_WriteAddr32(hDev1, dwAddrSpace, dwOffset, u32Data);
-	 dwAddrSpace =2;
-	 u32Data = 0x8000000;    // set up transmitter to return the hold -- lower transciever
-	 dwOffset = 0x20;
-	 WDC_WriteAddr32(hDev1, dwAddrSpace, dwOffset, u32Data);
-       }
-     }
-
-     //
-     // STEP ... TPC FEM boot & configuration
-     //
-
-     //
-     //  boot up xmit module 1st
-     //
-     if(itpc_read == 1) {
-       printf(" boot xmit module \n");
-       inpf = fopen("/home/ub/xmit_fpga_link_header","r");
-       imod=imod_xmit_tpc;
-       ichip=mb_xmit_conf_add;
-       buf_send[0]=(imod<<11)+(ichip<<8)+0x0+(0x0<<16);  // turn conf to be on
-       i=1;
-       k=1;
-       i = pcie_send(hDev3, i, k, px);
-       //      for (i=0; i<100000; i++) {
-       //          ik= i%2;
-       //          dummy1= (ik+i)*(ik+i);
-       //      }
-       
-       
-       /* read data as characters (28941) */
-       usleep(1000);   // wait fior a while
-       count = 0;
-       counta= 0;
-       ichip_c = 7; // set ichip_c to stay away from any other command in the
-       dummy1 =0;
-       while (fread(&charchannel,sizeof(char),1,inpf)==1) {
-	 carray[count] = charchannel;
-	 count++;
-	 counta++;
-	 if((count%(nsend*2)) == 0) {
-	   //        printf(" loop = %d\n",dummy1);
-	   buf_send[0] = (imod <<11) +(ichip_c <<8)+ (carray[0]<<16);
-	   send_array[0] =buf_send[0];
-	   if(dummy1 <= 5 ) printf(" counta = %d, first word = %x, %x, %x %x %x \n",counta,buf_send[0], carray[0], carray[1]
-				   ,carray[2], carray[3]);
-	   for (ij=0; ij< nsend; ij++) {
-	     if(ij== (nsend-1)) buf_send[ij+1] = carray[2*ij+1]+(0x0<<16);
-	     else buf_send[ij+1] = carray[2*ij+1]+ (carray[2*ij+2]<<16);
-	     //         buf_send[ij+1] = carray[2*ij+1]+ (carray[2*ij+2]<<16);
-	     send_array[ij+1] = buf_send[ij+1];
-	   }
-	   nword =nsend+1;
-	   i=1;
-	   //       if(dummy1 == 0)
-	   ij = pcie_send(hDev3, i, nword, px);
-	   nanosleep(&tim , &tim2);
-	   dummy1 = dummy1+1;
-	   count =0;
-	 }
-       }
-       if(feof(inpf)) {
-	 printf("You have reached the end-of-file word count= %d %d\n", counta, count);
-	 buf_send[0] = (imod <<11) +(ichip_c <<8)+ (carray[0]<<16);
-	 if ( count > 1) {
-	   if( ((count-1)%2) ==0) {
-	     ik =(count-1)/2;
-	   }
-	   else {
-	     ik =(count-1)/2+1;
-	   }
-	   ik=ik+2;   // add one more for safety
-	   printf("ik= %d\n",ik);
-	   for (ij=0; ij<ik; ij++){
-	     if(ij == (ik-1)) buf_send[ij+1] = carray[(2*ij)+1]+(((imod<<11)+(ichip<<8)+0x0)<<16);
-	     else buf_send[ij+1] = carray[(2*ij)+1]+ (carray[(2*ij)+2]<<16);
-	     send_array[ij+1] = buf_send[ij+1];
-	   }
-	 }
-	 else ik=1;
-	 for (ij=ik-10; ij< ik+1; ij++) {
-	   printf("Last data = %d, %x\n",ij,buf_send[ij]);
-	 }
-	 nword =ik+1;
-	 i=1;
-	 i = pcie_send(hDev3, i, nword, px);
-       }
-       usleep(2000);    // wait for 2ms to cover the packet time plus fpga init time
-       fclose(inpf);
-       
-       //
-       printf(" TPC xmit done, booting TPC FEM \n");
-       scanf("%d",&ik);
-       //
-       //  *********************************************************************************
-       //
-
-       //
-       // CONFIGURATION: TPC FEM configuration done here
-       //
-       imod_last_tpc = imod_xmit_tpc+1;
-       for (imod_fem = imod_last_tpc; imod_fem< (imod_st_tpc+1); imod_fem++) {
-	 printf(" booting FEM module %d \n",imod_fem);
-	 scanf("%d",&ik);
-	 ik=tpc_adc_setup(hDev3, imod_fem, iframe, itpc_adc, ihuff, icom_factor, timesize);
-       }
-
-       //
-       // both FEM and XMIT bootted.
-       //
-       //
-       // /* set tx mode register */
-       //
-       u32Data = 0x00003fff;  // set up number of words hold coming back from the XMIT module
-       printf(" number of words for hold be send back = %x\n",u32Data);
-       dwOffset = 0x28;
-       dwAddrSpace =2;
-       WDC_WriteAddr32(hDev5, dwAddrSpace, dwOffset, u32Data);
-       //
-       // set up hold
-       //
-       printf(" set up the hold condition \n");
-       dwAddrSpace =2;
-       u32Data = 0x8000000;    // set up transmitter to return the hold -- upper transciever
-       dwOffset = 0x18;
-       WDC_WriteAddr32(hDev5, dwAddrSpace, dwOffset, u32Data);
-       dwAddrSpace =2;
-       u32Data = 0x8000000;    // set up transmitter to return the hold -- lower transciever
-       dwOffset = 0x20;
-       WDC_WriteAddr32(hDev5, dwAddrSpace, dwOffset, u32Data);
-       
-       //
-       if((ineu ==1) & (ith_fr ==1)) {
-	 //
-	 /* set tx mode register */
-	 //
-	 u32Data = 0x00003fff;  // set up number of words hold coming back from the XMIT module
-	 printf(" number of words for hold be send back -- trigger = %x\n",u32Data);
-	 dwOffset = 0x28;
-	 dwAddrSpace =2;
-	 WDC_WriteAddr32(hDev4, dwAddrSpace, dwOffset, u32Data);
-	 //
-	 //   set up hold
-	 //
-	 printf(" set up the hold condition \n");
-	 dwAddrSpace =2;
-	 u32Data = 0x8000000;    // set up transmitter to return the hold -- upper transciever
-	 dwOffset = 0x18;
-	 WDC_WriteAddr32(hDev4, dwAddrSpace, dwOffset, u32Data);
-	 dwAddrSpace =2;
-	 u32Data = 0x8000000;    // set up transmitter to return the hold -- lower transciever
-	 dwOffset = 0x20;
-	 WDC_WriteAddr32(hDev4, dwAddrSpace, dwOffset, u32Data);
-       }
-     }
-
-     //
-     // STEP ... Trigger module configuration
-     //
-     
-     //
-     //
-     imod=imod_trig;
-     //      iframe= 511;    //1023
-     buf_send[0]=(imod<<11)+(mb_trig_frame_size)+((iframe & 0xffff)<<16); //set up frame size.
-     i=1;
-     k=1;
-     i = pcie_send(hDev, i, k, px);
-     //
-     // set mask1 bit 3 high
-     //
+	nword =ik+1;
+	i=1;
+	i = pcie_send(hDev3, i, nword, px);
+      }
+      usleep(2000);    // wait for 2ms to cover the packet time plus fpga init time
+      fclose(inpf);
+      
+      //
+      printf(" TPC xmit done, booting TPC FEM \n");
+      scanf("%d",&ik);
+      //
+      //  *********************************************************************************
+      //
+      
+      //
+      // CONFIGURATION: TPC FEM configuration done here
+      //
+      imod_last_tpc = imod_xmit_tpc+1;
+      for (imod_fem = imod_last_tpc; imod_fem< (imod_st_tpc+1); imod_fem++) {
+	printf(" booting FEM module %d \n",imod_fem);
+	scanf("%d",&ik);
+	ik=tpc_adc_setup(hDev3, imod_fem, iframe, itpc_adc, ihuff, icom_factor, timesize);
+      }
+      
+      //
+      // both FEM and XMIT bootted.
+      //
+      //
+      // /* set tx mode register */
+      //
+      u32Data = 0x00003fff;  // set up number of words hold coming back from the XMIT module
+      printf(" number of words for hold be send back = %x\n",u32Data);
+      dwOffset = 0x28;
+      dwAddrSpace =2;
+      WDC_WriteAddr32(hDev5, dwAddrSpace, dwOffset, u32Data);
+      //
+      // set up hold
+      //
+      printf(" set up the hold condition \n");
+      dwAddrSpace =2;
+      u32Data = 0x8000000;    // set up transmitter to return the hold -- upper transciever
+      dwOffset = 0x18;
+      WDC_WriteAddr32(hDev5, dwAddrSpace, dwOffset, u32Data);
+      dwAddrSpace =2;
+      u32Data = 0x8000000;    // set up transmitter to return the hold -- lower transciever
+      dwOffset = 0x20;
+      WDC_WriteAddr32(hDev5, dwAddrSpace, dwOffset, u32Data);
+      
+      //
+      if((ineu_tpc ==1) & (ith_fr ==1)) {
+	//
+	/* set tx mode register */
+	//
+	u32Data = 0x00003fff;  // set up number of words hold coming back from the XMIT module
+	printf(" number of words for hold be send back -- trigger = %x\n",u32Data);
+	dwOffset = 0x28;
+	dwAddrSpace =2;
+	WDC_WriteAddr32(hDev4, dwAddrSpace, dwOffset, u32Data);
+	//
+	//   set up hold
+	//
+	printf(" set up the hold condition \n");
+	dwAddrSpace =2;
+	u32Data = 0x8000000;    // set up transmitter to return the hold -- upper transciever
+	dwOffset = 0x18;
+	WDC_WriteAddr32(hDev4, dwAddrSpace, dwOffset, u32Data);
+	dwAddrSpace =2;
+	u32Data = 0x8000000;    // set up transmitter to return the hold -- lower transciever
+	dwOffset = 0x20;
+	WDC_WriteAddr32(hDev4, dwAddrSpace, dwOffset, u32Data);
+      }
+    }
+    
+    //
+    // STEP ... Trigger module configuration
+    //
+    
+    //
+    //
+    imod=imod_trig;
+    //      iframe= 511;    //1023
+    buf_send[0]=(imod<<11)+(mb_trig_frame_size)+((iframe & 0xffff)<<16); //set up frame size.
+    i=1;
+    k=1;
+    i = pcie_send(hDev, i, k, px);
+    //
+    // set mask1 bit 3 high
+    //
      imod=imod_trig;
      buf_send[0]=(imod<<11)+(mb_trig_mask1)+(0x8<<16); //set mask1[3] on.
      i=1;
@@ -2272,7 +2228,7 @@ WDC_DEVICE_HANDLE hDev3, WDC_DEVICE_HANDLE hDev4, WDC_DEVICE_HANDLE hDev5)
      // STEP ... TPC thread setup
      //
      if(itpc_read == 1) {
-       if(ineu == 1) {
+       if(ineu_tpc == 1) {
 	 thread_data_n_tpc.id = 0;
 	 thread_data_n_tpc.hdev = hDev4;
 	 thread_data_n_tpc.hdevc = hDev;
@@ -2287,7 +2243,7 @@ WDC_DEVICE_HANDLE hDev3, WDC_DEVICE_HANDLE hDev4, WDC_DEVICE_HANDLE hDev5)
        //
        //
        //
-       if(isuper ==1 ) {
+       if(isuper_tpc ==1 ) {
 	 thread_data_sn_tpc.id = 1;
 	 thread_data_sn_tpc.hdev = hDev5;
 	 thread_data_sn_tpc.hdevc = hDev;
