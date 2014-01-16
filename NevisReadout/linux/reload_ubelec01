@@ -1,0 +1,2 @@
+/sbin/rmmod windrvr6
+/home/ub/WinDriver/redist/wdreg /dev/windrvr6 auto
