@@ -69,13 +69,16 @@ namespace larlight {
     TH1D *pmt_nu_nrd;
     TH2D *pmt_nu_rdtype;
     
+    TGraph *pmt_nu_frdiff;
+    TGraph *pmt_nu_slcdiff;
+
     //trig stream
     TH1D *trig_trfrm;
     TH1D *trig_trslc;
     TH1D *trig_trid;
     TH1D *trig_pmid;
     TH1D *trig_trpc;
-    TH1D *trig_ext;
+    TH1D *trig_extrn;
     TH1D *trig_actv;
     TH1D *trig_gate1;
     TH1D *trig_gate2;
@@ -83,8 +86,18 @@ namespace larlight {
     TH1D *trig_calib;
     TH1D *trig_rem64;
     TH1D *trig_rem16;
-    
+
+    TGraph *trig_frdiff;
+    TGraph *trig_slcdiff;
+
     int _nch;
+    int _nrd;
+
+    int k;
+
+    int pmt_nu_evtno;
+    int trig_evtno;
+
   };
 }
 
