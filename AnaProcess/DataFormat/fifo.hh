@@ -36,31 +36,43 @@ namespace larlight {
       : std::vector<UShort_t>(original),
 	data_base(original),
 	_channel_number(original._channel_number),
-	_channel_frame_id(original._channel_frame_id),
-	_timeslice(original._timeslice),
+	_readout_frame_number(original._readout_frame_number),
+	_readout_sample_number(original._readout_sample_number),
 	_disc_id(original._disc_id)
     {}
     
     /// Setter for the channel number
-    void set_channel_number   (UShort_t ch)   {_channel_number=ch;}
+    void set_channel_number (UShort_t ch)     {_channel_number=ch;}
 
     /// Setter for the channel frame ID number
-    void set_channel_frame_id (UInt_t id)        {_channel_frame_id=id;};
+    void set_readout_frame_number (UInt_t id) {_readout_frame_number=id;}
     
     /// Setter for the channel discriminator ID number
-    void set_disc_id          (FEM::DISCRIMINATOR id) {_disc_id=id;};
+    void set_disc_id (FEM::DISCRIMINATOR id)  {_disc_id=id;}
     
-    /// Setter for the timeslice number
-    void set_timeslice        (UInt_t t)         {_timeslice=t;};
+    /// Setter for the readout_sample_number number
+    void set_readout_sample_number (UInt_t t) {_readout_sample_number=t;}
     
     /// Getter for the channel frame ID number
-    UInt_t channel_frame_id()    const {return _channel_frame_id;};
+    UInt_t readout_frame_number() const {return _readout_frame_number;}
     
     /// Getter for the discriminator ID number
-    FEM::DISCRIMINATOR disc_id()      const {return _disc_id;};
+    FEM::DISCRIMINATOR disc_id() const  {return _disc_id;}
+
+    /// Getter for a RAW readout sample number
+    UInt_t readout_sample_number_RAW() const { return _readout_sample_number; }
     
-    /// Getter for the timeslice number
-    UInt_t timeslice()           const {return _timeslice;};
+    /// Getter for the readout_sample_number number
+    inline UInt_t readout_sample_number_2MHz() const  
+    {return (_type==DATA::PMTFIFO ? _readout_sample_number/32 : _readout_sample_number   ); }
+
+    /// Getter for the readout_sample_number number
+    inline UInt_t readout_sample_number_16MHz() const  
+    {return (_type==DATA::PMTFIFO ? _readout_sample_number/4  : _readout_sample_number*8 ); }
+
+    /// Getter for the readout_sample_number number
+    inline UInt_t readout_sample_number_64MHz() const  
+    {return (_type==DATA::PMTFIFO ? _readout_sample_number    : _readout_sample_number*32 ); }
     
     /// Getter for the channel number
     UShort_t channel_number() const {return _channel_number;}
@@ -77,13 +89,13 @@ namespace larlight {
     /// Internal function to reset variables.
     virtual void init_vars();
 
-    UShort_t _channel_number;    ///< Channel number
-    UInt_t   _channel_frame_id;  ///< Channel frame ID
-    UInt_t   _timeslice;         ///< Timeslice number
+    UShort_t _channel_number;            ///< Channel number
+    UInt_t   _readout_frame_number;      ///< Frame number
+    UInt_t   _readout_sample_number;     ///< Sample number
     FEM::DISCRIMINATOR _disc_id; ///< Discriminator ID 
     
     ////////////////////////
-    ClassDef(fifo,3)
+    ClassDef(fifo,4)
     ////////////////////////
   };
   
@@ -97,28 +109,33 @@ namespace larlight {
   public:
     
     /// Default constructor ... provide an option to set the length of ch-wise data
-    event_fifo(DATA::DATA_TYPE type=DATA::DATA_TYPE_MAX) : std::vector<larlight::fifo>(), data_base(type)
-    {}
+    event_fifo(DATA::DATA_TYPE type=DATA::DATA_TYPE_MAX);
     
     /// Default copy constructor needed to avoid memory leak in ROOT streamer
     event_fifo(const event_fifo& original)
       : std::vector<larlight::fifo>(original),
 	data_base(original),
-	_event_frame_id(original._event_frame_id),
+	_event_number(original._event_number),
+	_event_frame_number(original._event_frame_number),
 	_module_address(original._module_address),
 	_module_id(original._module_id),
+	_fem_trig_frame_number(original._fem_trig_frame_number),
+	_fem_trig_sample_number(original._fem_trig_sample_number),
 	_checksum(original._checksum),
 	_nwords(original._nwords)
     {}
     
     /// Default destructor
     ~event_fifo(){}
+
+    /// Setter for the evnet number
+    void set_event_number(UInt_t n) { _event_number = n; }
     
     /// Setter for the event frame number
-    void set_event_frame_id(UInt_t id) {_event_frame_id=id;}
+    void set_event_frame_number(UInt_t n) {_event_frame_number=n;}
     
     /// Setter for the module address from which this event is read-out
-    void set_module_address(UInt_t id) {_module_address=id;}
+    void set_module_address(UInt_t n) {_module_address=n;}
     
     /// Setter for the module ID
     void set_module_id(UInt_t id)      {_module_id=id;}
@@ -130,13 +147,16 @@ namespace larlight {
     void set_nwords(UInt_t n)          {_nwords=n;}
     
     /// Setter for the trigger frame id
-    void set_trigger_frame_id(UInt_t id) {_trigger_frame_id=id;}
+    void set_fem_trig_frame_number(UInt_t n) {_fem_trig_frame_number=n;}
     
     /// Setter for the trigger timeslice
-    void set_trigger_timeslice(UInt_t n) {_trigger_timeslice=n;}
+    void set_fem_trig_sample_number(UInt_t n) {_fem_trig_sample_number=n;}
+
+    /// Getter for the event number
+    UInt_t event_number() const { return _event_number;}
     
     /// Getter for the frame ID
-    UInt_t event_frame_id() const {return _event_frame_id;}
+    UInt_t event_frame_number() const {return _event_frame_number;}
     
     /// Getter for the module address
     UInt_t module_address() const {return _module_address;}
@@ -150,11 +170,17 @@ namespace larlight {
     /// Getter for the number of read words
     UInt_t nwords()         const {return _nwords;}
     
-    /// Getter for the trigger frame id
-    UInt_t trigger_frame_id() const {return _trigger_frame_id;}
+    /// Getter for the trigger frame number
+    UInt_t fem_trig_frame_number() const {return _fem_trig_frame_number;}
     
-    /// Getter for the trigger time slice
-    UInt_t trigger_timeslice() const {return _trigger_timeslice;}
+    /// Getter for the fem trigger sample number in 2 MHz
+    inline UInt_t fem_trig_sample_number_2MHz() const {return _fem_trig_sample_number/8;}    
+
+    /// Getter for the fem trigger sample number in 16 MHz
+    inline UInt_t fem_trig_sample_number_16MHz() const {return _fem_trig_sample_number;}
+
+    /// Getter for the fem trigger sample number in 64 MHz
+    inline UInt_t fem_trig_sample_number_64MHz() const {return _fem_trig_sample_number*4;}
     
     /// A function to reset data member variables
     virtual void clear_data();
@@ -164,19 +190,19 @@ namespace larlight {
     
     virtual void init_vars();
     /// Actual implementation function of resetting variables
+    UInt_t _event_number;              ///< event number counter
+    UInt_t _event_frame_number;        ///< event frame ID number
+    UInt_t _module_address;            ///< module address number
+    UInt_t _module_id;                 ///< module ID number
     
-    UInt_t _event_frame_id;       ///< event frame ID number
-    UInt_t _module_address;       ///< module address number
-    UInt_t _module_id;            ///< module ID number
+    UInt_t _fem_trig_frame_number;     ///< trigger frame id
+    UInt_t _fem_trig_sample_number;    ///< trigger time slice
     
-    UInt_t _trigger_frame_id;     ///< trigger frame id
-    UInt_t _trigger_timeslice;    ///< trigger time slice
-    
-    UInt_t _checksum;             ///< checksum of readout events
-    UInt_t _nwords;               ///< # of event words readout
+    UInt_t _checksum;                  ///< checksum of readout events
+    UInt_t _nwords;                    ///< # of event words readout
     
     ///////////////////////////
-    ClassDef(event_fifo,3)
+    ClassDef(event_fifo,4)
     //////////////////////////
   };
 }

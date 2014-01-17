@@ -13,9 +13,9 @@ namespace larlight {
   
   trigger::trigger(const trigger &original) : 
     data_base(original),
-    _trig_timeslice(original._trig_timeslice),
-    _trig_frame_id(original._trig_frame_id),
-    _trig_id(original._trig_id),
+    _trig_sample_number(original._trig_sample_number),
+    _trig_frame_number(original._trig_frame_number),
+    _trig_number(original._trig_number),
     _pmt_data(original._pmt_data),
     _trig_pc(original._trig_pc),
     _trig_ext(original._trig_ext),
@@ -24,15 +24,15 @@ namespace larlight {
     _gate2_in(original._gate2_in),
     _veto_in(original._veto_in),
     _calib(original._calib),
-    _reminder_64MHz(original._reminder_64MHz),
-    _reminder_16MHz(original._reminder_16MHz)
+    _remainder_64MHz(original._remainder_64MHz),
+    _remainder_16MHz(original._remainder_16MHz)
   {};
   
   void trigger::init_vars(){
     
-    _trig_timeslice = 0xffff;
-    _trig_frame_id  = FEM::INVALID_WORD;
-    _trig_id        = FEM::INVALID_WORD;
+    _trig_sample_number = 0xffff;
+    _trig_frame_number  = FEM::INVALID_WORD;
+    _trig_number        = FEM::INVALID_WORD;
     _pmt_data       = 0xffff;
     _trig_pc        = false;
     _trig_ext       = false;
@@ -41,8 +41,8 @@ namespace larlight {
     _gate2_in       = false;
     _veto_in        = false;
     _calib          = false;
-    _reminder_16MHz = 0xffff;
-    _reminder_64MHz = 0xffff;
+    _remainder_16MHz = 0xffff;
+    _remainder_64MHz = 0xffff;
   }
 
 }

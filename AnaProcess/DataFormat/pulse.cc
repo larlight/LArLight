@@ -27,8 +27,8 @@ namespace larlight {
 
     data_base::clear_data();
     _disc_id=FEM::DISC_MAX;
-    _channel_frame_id=FEM::INVALID_WORD;
-    _timeslice=FEM::INVALID_WORD;
+    _readout_frame_number=FEM::INVALID_WORD;
+    _readout_sample_number=FEM::INVALID_WORD;
     _channel_number=FEM::INVALID_CH;
     _ped_mean=-1;
     _ped_rms=-1;

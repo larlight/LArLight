@@ -38,8 +38,8 @@ namespace larlight {
 					     _start_time(original._start_time),
 					     _end_time(original._end_time),
 					     _max_time(original._max_time),
-					     _channel_frame_id(original._channel_frame_id),
-					     _timeslice(original._timeslice),
+					     _readout_frame_number(original._readout_frame_number),
+					     _readout_sample_number(original._readout_sample_number),
                                              _disc_id(original._disc_id)
     {};
 
@@ -71,19 +71,19 @@ namespace larlight {
     void set_disc_id(FEM::DISCRIMINATOR id) { _disc_id=id; }
 
     /// Setter for original waveform's frame number
-    void set_channel_frame_id(UInt_t id) { _channel_frame_id=id; }
+    void set_readout_frame_number(UInt_t id) { _readout_frame_number=id; }
 
     /// Setter for original waveform's sample time-slice
-    void set_timeslice(UInt_t t) { _timeslice=t; }
+    void set_readout_sample_number(UInt_t t) { _readout_sample_number=t; }
 
     /// Getter for discriminator id
     FEM::DISCRIMINATOR disc_id() const { return _disc_id;}
 
     /// Getter for original waveform's frame number
-    UInt_t frame_id() const { return _channel_frame_id;}
+    UInt_t readout_frame_number() const { return _readout_frame_number;}
 
     /// Getter for original waveform's sample time-slice
-    UInt_t timeslice() const { return _timeslice;}
+    UInt_t readout_sample_number() const { return _readout_sample_number;}
 
     /// Getter for the channel number
     UShort_t channel_number() const {return _channel_number;};
@@ -122,16 +122,16 @@ namespace larlight {
     void init_vars();
 
     UShort_t _channel_number; ///< Channel number
-    double   _ped_mean;          ///< pedestal mean
-    double   _ped_rms;           ///< pedestal std. deviation
-    double   _pulse_peak;        ///< peak height  
-    double   _charge;            ///< charge sum (integral)
-    double   _start_time;        ///< pulse start time
-    double   _end_time;          ///< pulse end time
-    double   _max_time;          ///< pulse max time (where highestpeak is)
-    UInt_t   _channel_frame_id;  ///< original waveofrm's readout frame id
-    UInt_t   _timeslice;         ///< original waveform's sample number
-    FEM::DISCRIMINATOR _disc_id; ///< original waveform's discriminator id
+    double   _ped_mean;              ///< pedestal mean
+    double   _ped_rms;               ///< pedestal std. deviation
+    double   _pulse_peak;            ///< peak height  
+    double   _charge;                ///< charge sum (integral)
+    double   _start_time;            ///< pulse start time
+    double   _end_time;              ///< pulse end time
+    double   _max_time;              ///< pulse max time (where highestpeak is)
+    UInt_t   _readout_frame_number;  ///< original waveofrm's readout frame id
+    UInt_t   _readout_sample_number; ///< original waveform's sample number in 64 MHz
+    FEM::DISCRIMINATOR _disc_id;     ///< original waveform's discriminator id
 
     ////////////////////////
     ClassDef(pulse,4)

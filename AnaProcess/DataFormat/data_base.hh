@@ -55,7 +55,7 @@ namespace larlight{
     /// event-id getter
     UInt_t event_id () const { return fEventID;      };
     /// data type getter
-    DATA::DATA_TYPE data_type() const {return _type;};
+    DATA::DATA_TYPE data_type() const {return _type; };
 
   protected:
     
