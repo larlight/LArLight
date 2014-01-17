@@ -42,9 +42,10 @@ outname = out_dir + fname[0:fname.rfind('.')] + ".root"
 decoder=fmwk.decoder_manager()
 
 # Decoder algorithm instance ... currently xmit, slow, or trigger
-algo=fmwk.algo_xmit_decoder()
-#algo=algo_slow_readout_decoder()
-#algo=algo_trig_decoder()
+algo=fmwk.algo_pmt_xmit()
+#algo=fmwk.algo_tpc_xmit()
+#algo=fmwk.algo_trig_decoder()
+#algo=fmwk.algo_tpc_huffman()
 
 # Attach algorithm to the decoder.
 decoder.set_decoder(algo);
