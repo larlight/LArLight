@@ -206,18 +206,18 @@ namespace larlight {
 
 	Message::send(MSG::INFO,__FUNCTION__,
 		      Form("Storing event %u with %zu channel entries...",
-			   _event_data->event_id(), _event_data->size()));
+			   _event_data->event_number(), _event_data->size()));
 
       }
 
-      _event_data->set_module_address    ( _header_info.module_address    );
-      _event_data->set_module_id         ( _header_info.module_id         );
-      _event_data->set_event_id          ( _header_info.event_id          );
-      _event_data->set_event_frame_id    ( _header_info.event_frame_id    );
-      _event_data->set_trigger_frame_id  ( _header_info.trigger_frame_id  );
-      _event_data->set_trigger_timeslice ( _header_info.trigger_timeslice );
-      _event_data->set_nwords            ( _header_info.nwords            );
-      _event_data->set_checksum          ( _header_info.checksum          );
+      _event_data->set_module_address         ( _header_info.module_address    );
+      _event_data->set_module_id              ( _header_info.module_id         );
+      _event_data->set_event_number           ( _header_info.event_number          );
+      _event_data->set_event_frame_number     ( _header_info.event_frame_number    );
+      _event_data->set_fem_trig_frame_number  ( _header_info.fem_trig_frame_number  );
+      _event_data->set_fem_trig_sample_number ( _header_info.fem_trig_sample_number );
+      _event_data->set_nwords                 ( _header_info.nwords            );
+      _event_data->set_checksum               ( _header_info.checksum          );
 
       status = _storage->next_event();
 
@@ -225,7 +225,7 @@ namespace larlight {
     else
 
       Message::send(MSG::ERROR,__FUNCTION__,
-		    Form("Skipping to store event %d...",_header_info.event_id));
+		    Form("Skipping to store event %d...",_header_info.event_number));
 
     clear_event();
 
@@ -312,7 +312,7 @@ namespace larlight {
 	  if(_verbosity[MSG::NORMAL])
 	    Message::send(MSG::NORMAL,__FUNCTION__,
 			  Form("Found consecutively readout data arrays @ event %d (missing channel very first header)!",
-			       _header_info.event_id)
+			       _header_info.event_number)
 			  );
 	}
 
@@ -337,23 +337,23 @@ namespace larlight {
 	}else if(last_word_class==FEM::CHANNEL_HEADER   ) {
 	  // First of 2 channel header words. Record the values.
 
-	  // This gives upper 8 bits of 20-bit timeslice number
-	  _ch_data.set_timeslice( (word & 0x1f)<<12 );       
+	  // This gives upper 8 bits of 20-bit readout_sample_number number
+	  _ch_data.set_readout_sample_number( (word & 0x1f)<<12 );       
 
 	  // Lower 3 of 8 bits is the channel frame ID
-	  _ch_data.set_channel_frame_id( ((word & 0xff)>>5) +
-					 (((_event_data->event_frame_id())>>3)<<3) ); 
-
+	  _ch_data.set_readout_frame_number( ((word & 0xff)>>5) +
+					     (((_event_data->event_frame_number())>>3)<<3) ); 
+	  
 	  // Correct channel frame id roll-over w.r.t. event frame id
-	  _ch_data.set_channel_frame_id(round_diff(_event_data->event_frame_id(),
-						   _ch_data.channel_frame_id(),
-						   0x7));
+	  _ch_data.set_readout_frame_number(round_diff(_event_data->event_frame_number(),
+						       _ch_data.readout_frame_number(),
+						       0x7));
 	  _channel_header_count++;
-	}else if(last_word_class==FEM::CHANNEL_WORD     ) {
+	}else if(last_word_class==FEM::CHANNEL_WORD) {
 	  // Second of 2 channel header words. Record the values & inspect them.
-	  _ch_data.set_timeslice(_ch_data.timeslice() + (word & 0xfff)); // This gives lower 12 bits of 20-bit timeslice number
+	  _ch_data.set_readout_sample_number(_ch_data.readout_sample_number_64MHz() + (word & 0xfff)); // This gives lower 12 bits of 20-bit readout_sample_number number
 	  _channel_header_count++;
-
+	  
 	  if(_verbosity[MSG::INFO]){
 	    sprintf(_buf,"Read-in headers for Ch. %-3d!",_ch_data.channel_number());
 	    Message::send(MSG::INFO,_buf);
@@ -365,13 +365,13 @@ namespace larlight {
 	  if(_verbosity[MSG::INFO]){
 	    sprintf(_buf,"Encountered the last word (%x) for channel %d",word,_ch_data.channel_number());
 	    Message::send(MSG::INFO,_buf);
-	    sprintf(_buf,"Event frame  : %d",_event_data->event_frame_id());
+	    sprintf(_buf,"Event frame  : %d",_event_data->event_frame_number());
 	    Message::send(MSG::INFO,_buf);
-	    sprintf(_buf,"PMT frame    : %d",_ch_data.channel_frame_id());
+	    sprintf(_buf,"PMT frame    : %d",_ch_data.readout_frame_number());
 	    Message::send(MSG::INFO,_buf);
 	    sprintf(_buf,"Disc. ID     : %d",_ch_data.disc_id());
 	    Message::send(MSG::INFO,_buf);
-	    sprintf(_buf,"Start Time   : %d",_ch_data.timeslice());
+	    sprintf(_buf,"Start Time   : %d",_ch_data.readout_sample_number_64MHz());
 	    Message::send(MSG::INFO,_buf);
 	    sprintf(_buf,"# ADC sample : %zd",_ch_data.size());
 	    Message::send(MSG::INFO,_buf);

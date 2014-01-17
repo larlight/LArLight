@@ -52,7 +52,7 @@ namespace larlight {
 
     /// A method to inquire if the local data holder is empty or not
     virtual bool is_event_empty(){
-      if(_data) return (_data->trig_id()==FEM::INVALID_WORD);
+      if(_data) return (_data->trig_number()==FEM::INVALID_WORD);
       else return true;
     };
 

@@ -248,10 +248,10 @@ namespace larlight {
 
       status = false;
 
-    }else if(_header_info.event_id!=FEM::INVALID_WORD){
+    }else if(_header_info.event_number!=FEM::INVALID_WORD){
 
       Message::send(MSG::ERROR,__FUNCTION__,
-		    Form("End of event (%x) ... but buffer holds data for event %d!",word,_header_info.event_id));
+		    Form("End of event (%x) ... but buffer holds data for event %d!",word,_header_info.event_number));
 
       status = false;
 

@@ -39,28 +39,28 @@ namespace larlight {
 
     /// A local data holder struct for FEM header information
     struct InfoFEM_t {
-
-      UInt_t module_address;      ///< Module address
-      UInt_t module_id;           ///< Module id number
-      UInt_t event_id;            ///< Event counter 
-      UInt_t event_frame_id;      ///< Data packet frame number
-      UInt_t trigger_frame_id;    ///< Trigger frame number
-      UInt_t trigger_timeslice;   ///< Trigger sample number
-      UInt_t nwords;              ///< Number of words in an event
-      UInt_t checksum;            ///< Data checksum
-      bool        quality;             ///< Event-wise quality check
+  
+      UInt_t module_address;         ///< Module address
+      UInt_t module_id;              ///< Module id number
+      UInt_t event_number;           ///< Event counter 
+      UInt_t event_frame_number;     ///< Data packet frame number
+      UInt_t fem_trig_frame_number;  ///< Trigger frame number
+      UInt_t fem_trig_sample_number; ///< Trigger sample number
+      UInt_t nwords;                 ///< Number of words in an event
+      UInt_t checksum;               ///< Data checksum
+      bool   quality;                ///< Event-wise quality check
 
       void clear_event(){
 
-	module_address    = FEM::INVALID_WORD;
-	module_id         = FEM::INVALID_WORD;
-	event_id          = FEM::INVALID_WORD;
-	event_frame_id    = FEM::INVALID_WORD;
-	trigger_frame_id  = FEM::INVALID_WORD;
-	trigger_timeslice = FEM::INVALID_WORD;
-	nwords            = 0;
-	checksum          = 0;
-	quality           = true;
+	module_address         = FEM::INVALID_WORD;
+	module_id              = FEM::INVALID_WORD;
+	event_number           = FEM::INVALID_WORD;
+	event_frame_number     = FEM::INVALID_WORD;
+	fem_trig_frame_number  = FEM::INVALID_WORD;
+	fem_trig_sample_number = FEM::INVALID_WORD;
+	nwords                 = 0;
+	checksum               = 0;
+	quality                = true;
       }
 
       InfoFEM_t(){ clear_event(); }
@@ -106,7 +106,7 @@ namespace larlight {
     UInt_t round_diff(UInt_t ref_id, UInt_t subject_id, UInt_t diff) const;
 
     /// A simple method to inquire if the data storage buffer is currently empty or not
-    virtual bool is_event_empty(){ return (_header_info.event_id == FEM::INVALID_WORD);};
+    virtual bool is_event_empty(){ return (_header_info.event_number == FEM::INVALID_WORD);};
 
   protected:
 

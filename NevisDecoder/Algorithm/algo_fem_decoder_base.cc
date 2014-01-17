@@ -169,9 +169,9 @@ namespace larlight {
 
       if(_debug_mode) {
 
-	if(_header_info.event_id>0)
+	if(_header_info.event_number>0)
 
-	  Message::send(MSG::WARNING,__FUNCTION__,Form("Failed decoding event %d ...",_header_info.event_id));
+	  Message::send(MSG::WARNING,__FUNCTION__,Form("Failed decoding event %d ...",_header_info.event_number));
 
 	Message::send(MSG::WARNING,__FUNCTION__,"DEBUG MODE => Continue to the next event...\n");
 
@@ -325,24 +325,24 @@ namespace larlight {
 
     // (5) get event ID
     // Lower 12 bits of two 16-bit words.
-    _header_info.event_id       = ( (((event_header[2]>>16) & 0xfff) + ((event_header[2] & 0xfff)<<12)));
+    _header_info.event_number       = ( (((event_header[2]>>16) & 0xfff) + ((event_header[2] & 0xfff)<<12)));
 
     // (6) get frame ID
     // Lower 12 bits of two 16-bit words.
-    _header_info.event_frame_id = ( (((event_header[3]>>16) & 0xfff) + ((event_header[3] & 0xfff)<<12)));
+    _header_info.event_frame_number = ( (((event_header[3]>>16) & 0xfff) + ((event_header[3] & 0xfff)<<12)));
 
     // (7) get checksum
     _header_info.checksum       = ( (((event_header[4]>>16) & 0xfff) + ((event_header[4] & 0xfff)<<12)));
 
 
   #ifdef INCLUDE_EXTRA_HEADER
-    _header_info.trigger_frame_id  = ( ((event_header[5] & 0xfff)>>4 & 0xf) +
-				       (((_header_info.event_frame_id)>>4)<<4)); 
+    _header_info.fem_trig_frame_number  = ( ((event_header[5] & 0xfff)>>4 & 0xf) +
+				       (((_header_info.event_frame_number)>>4)<<4)); 
 
     // Correct for a roll over
-    _header_info.trigger_frame_id  = round_diff(_header_info.event_frame_id, _header_info.trigger_frame_id, 0x7);
+    _header_info.fem_trig_frame_number  = round_diff(_header_info.event_frame_number, _header_info.fem_trig_frame_number, 0x7);
 
-    _header_info.trigger_timeslice = ((((event_header[5]>>16) & 0xf)<<8) + (event_header[5] & 0xff));
+    _header_info.fem_trig_sample_number = ((((event_header[5]>>16) & 0xf)<<8) + (event_header[5] & 0xff));
 
   #endif
 
@@ -350,12 +350,12 @@ namespace larlight {
     if(_verbosity[MSG::INFO])
       {
 	Message::send(MSG::INFO,Form("Module %d (ID=%d)", _header_info.module_address, _header_info.module_id));
-	Message::send(MSG::INFO,Form("Event ID %d",_header_info.event_id));
-	Message::send(MSG::INFO,Form("Frame ID %d",_header_info.event_frame_id));
+	Message::send(MSG::INFO,Form("Event ID %d",_header_info.event_number));
+	Message::send(MSG::INFO,Form("Frame ID %d",_header_info.event_frame_number));
 	Message::send(MSG::INFO,Form("Number of Words = %d",_header_info.nwords));
 	Message::send(MSG::INFO,Form("Checksum = %x", _header_info.checksum));
-	Message::send(MSG::INFO,Form("Trigger Frame %d",_header_info.trigger_frame_id));
-	Message::send(MSG::INFO,Form("Trigger Sample %d",_header_info.trigger_timeslice));
+	Message::send(MSG::INFO,Form("Trigger Frame %d",_header_info.fem_trig_frame_number));
+	Message::send(MSG::INFO,Form("Trigger Sample %d",_header_info.fem_trig_sample_number));
       }
 
     _checksum=0;

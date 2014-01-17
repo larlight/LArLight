@@ -303,25 +303,25 @@ namespace larlight {
 
 	Message::send(MSG::INFO,__FUNCTION__,
 		      Form("Storing event %u with %zu channel entries...",
-			   _event_data->event_id(), _event_data->size()));
+			   _event_data->event_number(), _event_data->size()));
 
       }
 
-      _event_data->set_module_address    ( _header_info.module_address    );
-      _event_data->set_module_id         ( _header_info.module_id         );
-      _event_data->set_event_id          ( _header_info.event_id          );
-      _event_data->set_event_frame_id    ( _header_info.event_frame_id    );
-      _event_data->set_trigger_frame_id  ( _header_info.trigger_frame_id  );
-      _event_data->set_trigger_timeslice ( _header_info.trigger_timeslice );
-      _event_data->set_nwords            ( _header_info.nwords            );
-      _event_data->set_checksum          ( _header_info.checksum          );
+      _event_data->set_module_address         ( _header_info.module_address    );
+      _event_data->set_module_id              ( _header_info.module_id         );
+      _event_data->set_event_number           ( _header_info.event_number          );
+      _event_data->set_event_frame_number     ( _header_info.event_frame_number    );
+      _event_data->set_fem_trig_frame_number  ( _header_info.fem_trig_frame_number  );
+      _event_data->set_fem_trig_sample_number ( _header_info.fem_trig_sample_number );
+      _event_data->set_nwords                 ( _header_info.nwords            );
+      _event_data->set_checksum               ( _header_info.checksum          );
 
       status = _storage->next_event();
 
     }else{
 
       Message::send(MSG::ERROR,__FUNCTION__,
-		    Form("Skipping to store event %d...",_header_info.event_id));
+		    Form("Skipping to store event %d...",_header_info.event_number));
 
       status = false;
 

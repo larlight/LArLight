@@ -53,7 +53,7 @@ namespace larlight {
   void algo_slow_readout_decoder::print_adc_values()
   {
     sprintf(_buf,"Printing ADC values for Event=%d Channel=%d",
-	    _event_data->event_id(),
+	    _event_data->event_number(),
 	    _ch_data.channel_number());
     Message::send(MSG::INFO,_buf);
     size_t ctr=0;
@@ -132,10 +132,10 @@ namespace larlight {
 	  init_event_info();
 	  // Process this as a header 
 	  if(!status){
-	    sprintf(_buf,"DEBUG mode-> continue ... but Skip saving event: %d ",_event_data->event_id());
+	    sprintf(_buf,"DEBUG mode-> continue ... but Skip saving event: %d ",_event_data->event_number());
 	    Message::send(MSG::WARNING,__FUNCTION__,_buf);
 	  }else{
-	    sprintf(_buf,"DEBUG mode-> continue ... Good checksum -> stored previous event: %d",_event_data->event_id());
+	    sprintf(_buf,"DEBUG mode-> continue ... Good checksum -> stored previous event: %d",_event_data->event_number());
 	    Message::send(MSG::WARNING,__FUNCTION__,_buf);
 	    _storage->next_event();
 	  }
@@ -285,24 +285,24 @@ namespace larlight {
 
     // (5) get event ID
     // Lower 12 bits of two 16-bit words.
-    _event_data->set_event_id( (( (event_header[2]>>16) & 0xfff ) + ((event_header[2] & 0xfff)<<12)));
+    _event_data->set_event_number( (( (event_header[2]>>16) & 0xfff ) + ((event_header[2] & 0xfff)<<12)));
 
     // (6) get frame ID
     // Lower 12 bits of two 16-bit words.
-    _event_data->set_event_frame_id((( (event_header[3]>>16) & 0xfff ) + ((event_header[3] & 0xfff)<<12)));
+    _event_data->set_event_frame_number((( (event_header[3]>>16) & 0xfff ) + ((event_header[3] & 0xfff)<<12)));
 
     // (7) get checksum
     _event_data->set_checksum( (( (event_header[4]>>16) & 0xfff ) + ((event_header[4] & 0xfff)<<12)) );
 
 
   #ifdef INCLUDE_EXTRA_HEADER
-    _event_data->set_trigger_frame_id( (((event_header[5]>>16) & 0xfff)>>4 & 0xf) +
-				       (((_event_data->event_frame_id())>>4)<<4) ); 
+    _event_data->set_fem_trig_frame_number( (((event_header[5]>>16) & 0xfff)>>4 & 0xf) +
+				       (((_event_data->event_frame_number())>>4)<<4) ); 
     // Correct for a roll over
-    _event_data->set_trigger_frame_id( round_diff(_event_data->event_frame_id(), 
-						  _event_data->trigger_frame_id(),
+    _event_data->set_fem_trig_frame_number( round_diff(_event_data->event_frame_number(), 
+						  _event_data->fem_trig_frame_number(),
 						  0x7));
-    _event_data->set_trigger_timeslice( (((event_header[5]>>16) & 0xf)<<8) + (event_header[5] & 0xff) );
+    _event_data->set_fem_trig_sample_number( (((event_header[5]>>16) & 0xf)<<8) + (event_header[5] & 0xff) );
   #endif
 
     // Report if verbosity is set.
@@ -310,17 +310,17 @@ namespace larlight {
       {
 	sprintf(_buf,"Module %d (ID=%d)", _event_data->module_address(), _event_data->module_id());
 	Message::send(MSG::INFO,_buf);
-	sprintf(_buf,"Event ID %d",_event_data->event_id());
+	sprintf(_buf,"Event ID %d",_event_data->event_number());
 	Message::send(MSG::INFO,_buf);
-	sprintf(_buf,"Frame ID %d",_event_data->event_frame_id());
+	sprintf(_buf,"Frame ID %d",_event_data->event_frame_number());
 	Message::send(MSG::INFO,_buf);
 	sprintf(_buf,"Number of Words = %d",_event_data->nwords());
 	Message::send(MSG::INFO,_buf);
 	sprintf(_buf,"Checksum = %x", _event_data->checksum());
 	Message::send(MSG::INFO,_buf);
-	sprintf(_buf,"Trigger Frame %d",_event_data->trigger_frame_id());
+	sprintf(_buf,"Trigger Frame %d",_event_data->fem_trig_frame_number());
 	Message::send(MSG::INFO,_buf);
-	sprintf(_buf,"Trigger Sample %d",_event_data->trigger_timeslice());
+	sprintf(_buf,"Trigger Sample %d",_event_data->fem_trig_sample_number_16MHz());
 	Message::send(MSG::INFO,_buf);
       }
 
@@ -375,7 +375,7 @@ namespace larlight {
 	if(status)
 	  _storage->next_event();
 	else if(_debug_mode){
-	  sprintf(_buf,"DEBUG mode-> continue ... but Skip saving event: %d ",_event_data->event_id());
+	  sprintf(_buf,"DEBUG mode-> continue ... but Skip saving event: %d ",_event_data->event_number());
 	  Message::send(MSG::WARNING,__FUNCTION__,_buf);
 	  status=true;
 	}
@@ -420,10 +420,10 @@ namespace larlight {
     // But I don't think this works right. 
     // -Kazu Aug. 12 2013
     /*
-    UInt_t correct_frame= ( ( event_frame_id & (~0x7) ) | ( channel_frame_id & 0x7 ) );
-    if( (correct_frame-event_frame_id)<-1 )
+    UInt_t correct_frame= ( ( event_frame_number & (~0x7) ) | ( readout_frame_number & 0x7 ) );
+    if( (correct_frame-event_frame_number)<-1 )
       return correct_frame+8;
-    else if( (correct_frame-event_frame_id)>2 )
+    else if( (correct_frame-event_frame_number)>2 )
       return correct_frame-8;
     else 
       return correct_frame;
@@ -442,23 +442,23 @@ namespace larlight {
 	//
 	// Case 1: pulse comes before the beamgate but in the same frame
 	//
-	if( (*iter).timeslice() < _beam_ref_sample && (*iter).channel_frame_id() == _beam_ref_frame )
+	if( (*iter).readout_sample_number_64MHz() < _beam_ref_sample && (*iter).readout_frame_number() == _beam_ref_frame )
 
 	  // shift the sample number by diff of the sample size
-	  (*iter).set_timeslice( _beam_ref_sample + _beam_ref_nwords - (*iter).size() );
+	  (*iter).set_readout_sample_number( _beam_ref_sample + _beam_ref_nwords - (*iter).size() );
 
 	//
 	// Case 2: pulse comes before the beamgate and in the previous frame
 	//
-	if( (*iter).channel_frame_id() < _beam_ref_frame ) {
+	if( (*iter).readout_frame_number() < _beam_ref_frame ) {
 
 	  // shift the sample number by diff of the sample size first
-	  (*iter).set_timeslice( _beam_ref_sample + _beam_ref_nwords - (*iter).size() );
+	  (*iter).set_readout_sample_number( _beam_ref_sample + _beam_ref_nwords - (*iter).size() );
 
 	  // if this sample number is exceeding the frame edge, change the frame number
-	  if((*iter).timeslice() >= FRAME_WIDTH) {
-	    (*iter).set_timeslice((*iter).timeslice() - FRAME_WIDTH);
-	    (*iter).set_channel_frame_id((*iter).channel_frame_id() + 1);
+	  if((*iter).readout_sample_number_64MHz() >= FRAME_WIDTH) {
+	    (*iter).set_readout_sample_number((*iter).readout_sample_number_64MHz() - FRAME_WIDTH);
+	    (*iter).set_readout_frame_number((*iter).readout_frame_number() + 1);
 	  }
 	}
 
@@ -473,7 +473,7 @@ namespace larlight {
   bool algo_slow_readout_decoder::check_event_quality() {
 
     if(_verbosity[MSG::INFO]){
-      sprintf(_buf,"Exiting ch-loop in event: %d",_event_data->event_id());
+      sprintf(_buf,"Exiting ch-loop in event: %d",_event_data->event_number());
       Message::send(MSG::INFO,__FUNCTION__,_buf);
       sprintf(_buf,"Number of channels read : %zd",_event_data->size());
       Message::send(MSG::INFO,__FUNCTION__,_buf);
@@ -579,7 +579,7 @@ namespace larlight {
 	  if(_verbosity[MSG::NORMAL])
 	    Message::send(MSG::NORMAL,__FUNCTION__,
 			  Form("Found consecutively readout data arrays @ event %d (missing channel very first header)!",
-			       _event_data->event_id())
+			       _event_data->event_number())
 			  );
 	}
 
@@ -593,21 +593,21 @@ namespace larlight {
 	}else if(last_word_class==FEM::CHANNEL_HEADER   ) {
 	  // First of 2 channel header words. Record the values.
 
-	  // This gives upper 8 bits of 20-bit timeslice number
-	  _ch_data.set_timeslice( (word & 0x1f)<<12 );       
+	  // This gives upper 8 bits of 20-bit sample_number number
+	  _ch_data.set_readout_sample_number( (word & 0x1f)<<12 );       
 
 	  // Lower 3 of 8 bits is the channel frame ID
-	  _ch_data.set_channel_frame_id( ((word & 0xff)>>5) +
-					 (((_event_data->event_frame_id())>>3)<<3) ); 
+	  _ch_data.set_readout_frame_number( ((word & 0xff)>>5) +
+					 (((_event_data->event_frame_number())>>3)<<3) ); 
 
 	  // Correct channel frame id roll-over w.r.t. event frame id
-	  _ch_data.set_channel_frame_id(round_diff(_event_data->event_frame_id(),
-						   _ch_data.channel_frame_id(),
+	  _ch_data.set_readout_frame_number(round_diff(_event_data->event_frame_number(),
+						   _ch_data.readout_frame_number(),
 						   0x7));
 	  _channel_header_count++;
 	}else if(last_word_class==FEM::CHANNEL_WORD     ) {
 	  // Second of 2 channel header words. Record the values & inspect them.
-	  _ch_data.set_timeslice(_ch_data.timeslice() + (word & 0xfff)); // This gives lower 12 bits of 20-bit timeslice number
+	  _ch_data.set_readout_sample_number(_ch_data.readout_sample_number_64MHz() + (word & 0xfff)); // This gives lower 12 bits of 20-bit sample_number number
 	  _channel_header_count++;
 
 	  if(_verbosity[MSG::INFO]){
@@ -621,13 +621,13 @@ namespace larlight {
 	  if(_verbosity[MSG::INFO]){
 	    sprintf(_buf,"Encountered the last word (%x) for channel %d",word,_ch_data.channel_number());
 	    Message::send(MSG::INFO,_buf);
-	    sprintf(_buf,"Event frame  : %d",_event_data->event_frame_id());
+	    sprintf(_buf,"Event frame  : %d",_event_data->event_frame_number());
 	    Message::send(MSG::INFO,_buf);
-	    sprintf(_buf,"PMT frame    : %d",_ch_data.channel_frame_id());
+	    sprintf(_buf,"PMT frame    : %d",_ch_data.readout_frame_number());
 	    Message::send(MSG::INFO,_buf);
 	    sprintf(_buf,"Disc. ID     : %d",_ch_data.disc_id());
 	    Message::send(MSG::INFO,_buf);
-	    sprintf(_buf,"Start Time   : %d",_ch_data.timeslice());
+	    sprintf(_buf,"Start Time   : %d",_ch_data.readout_sample_number_64MHz());
 	    Message::send(MSG::INFO,_buf);
 	    sprintf(_buf,"# ADC sample : %zd",_ch_data.size());
 	    Message::send(MSG::INFO,_buf);
@@ -653,8 +653,8 @@ namespace larlight {
       _beam_event = (_beam_event || _ch_data.size() > BEAM_NWORDS);
       if(_beam_event){
 	_beam_ref_nwords=(UInt_t)(_ch_data.size());
-	_beam_ref_sample=_ch_data.timeslice();
-	_beam_ref_frame=_ch_data.channel_frame_id();
+	_beam_ref_sample=_ch_data.readout_sample_number_64MHz();
+	_beam_ref_frame=_ch_data.readout_frame_number();
       }
     }
     _event_data->push_back(_ch_data);

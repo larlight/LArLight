@@ -96,22 +96,22 @@ namespace larlight {
 
   bool algo_trig_decoder::decode_trigger_words(UInt_t *trigger_words){
 
-    _data->set_trig_timeslice( (trigger_words[0]>>4) & 0xfff );
-    _data->set_trig_frame_id( ((trigger_words[1] & 0xff)<<16) + (trigger_words[0]>>16) );
-    _data->set_trig_id( (trigger_words[1]>>8) );
+    _data->set_trig_sample_number( (trigger_words[0]>>4) & 0xfff );
+    _data->set_trig_frame_number( ((trigger_words[1] & 0xff)<<16) + (trigger_words[0]>>16) );
+    _data->set_trig_number( (trigger_words[1]>>8) );
     _data->set_pmt_data( trigger_words[2] & 0xff );
 
-    _data->set_trigger_bits( (trigger_words[2]>>8  & 0x1),   // pc
-			     (trigger_words[2]>>9  & 0x1),   // ext
-			     (trigger_words[2]>>10 & 0x1),   // active
-			     (trigger_words[2]>>12 & 0x1),   // gate1
-			     (trigger_words[2]>>11 & 0x1),   // gate2
-			     (trigger_words[2]>>13 & 0x1),   // veto
-			     (trigger_words[2]>>14 & 0x1) ); // calib
-
-    _data->set_reminder_64MHz((trigger_words[2]>>15 & 0x3));
-    _data->set_reminder_16MHz((trigger_words[0]>>1  & 0x7));
-
+    _data->set_trig_bits( (trigger_words[2]>>8  & 0x1),   // pc
+			  (trigger_words[2]>>9  & 0x1),   // ext
+			  (trigger_words[2]>>10 & 0x1),   // active
+			  (trigger_words[2]>>12 & 0x1),   // gate1
+			  (trigger_words[2]>>11 & 0x1),   // gate2
+			  (trigger_words[2]>>13 & 0x1),   // veto
+			  (trigger_words[2]>>14 & 0x1) ); // calib
+    
+    _data->set_remainder_64MHz((trigger_words[2]>>15 & 0x3));
+    _data->set_remainder_16MHz((trigger_words[0]>>1  & 0x7));
+    
     if(_verbosity[MSG::INFO]){
       std::ostringstream msg;
       msg << std::endl << "Decoded words: ";
@@ -119,29 +119,29 @@ namespace larlight {
 	msg << Form("0x%08x ",trigger_words[i]) ;
       msg 
 	<< std::endl
-	<< Form("Trigger id : %d",_data->trig_id()) << std::endl
-	<< Form("Frame  id  : %d",_data->trig_frame_id()) << std::endl
-	<< Form("Sample id  : %d",_data->trig_timeslice()) << std::endl
+	<< Form("Trigger id : %d",_data->trig_number()) << std::endl
+	<< Form("Frame  id  : %d",_data->trig_frame_number()) << std::endl
+	<< Form("Sample id  : %d",_data->trig_sample_number_2MHz()) << std::endl
 	<< Form("PC     : %d",_data->trig_pc()) << std::endl
 	<< Form("EXT    : %d",_data->trig_ext()) << std::endl
 	<< Form("Active : %d",_data->active()) << std::endl
-	<< Form("Gate 1 : %d",_data->gate1()) << std::endl
-	<< Form("Gate 2 : %d",_data->gate2()) << std::endl
+	<< Form("Gate 1 : %d",_data->gate1_in()) << std::endl
+	<< Form("Gate 2 : %d",_data->gate2_in()) << std::endl
 	<< Form("Veto   : %d",_data->veto_in()) << std::endl
 	<< Form("Calib  : %d",_data->calib()) << std::endl
 	<< std::endl;
       Message::send(MSG::INFO,__FUNCTION__,msg.str());
     }
 
-    if(_data->trig_id() && _data->trig_id() != (_last_event_id+1))
+    if(_data->trig_number() && _data->trig_number() != (_last_event_id+1))
 
       Message::send(MSG::WARNING,__FUNCTION__,
 		    Form("Processed event %d while the last event ID was %d ... missing %d!",
-			 _data->trig_id(),
+			 _data->trig_number(),
 			 _last_event_id,
 			 (_last_event_id+1)));
 
-    _last_event_id = _data->trig_id();
+    _last_event_id = _data->trig_number();
 
     return true;
   }
