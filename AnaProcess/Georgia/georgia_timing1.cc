@@ -71,20 +71,22 @@ namespace larlight {
     //
     
     const event_fifo *event_wf = (event_fifo*)(storage->get_data(DATA::PMTFIFO));
-    //    std::cout << Form("Event ID: %d",event_wf->event_id()) << std::endl;
-    pmt_nu_evtno = event_wf->event_id();
+    //    std::cout << Form("Event ID: %d",event_wf->event_number()) << std::endl;
+    pmt_nu_evtno = event_wf->event_number();
 
-    pmt_nu_evno->Fill(event_wf->event_id());
-    pmt_nu_evfrm->Fill(event_wf->event_frame_id());
+    pmt_nu_evno->Fill(event_wf->event_number());
+    pmt_nu_evfrm->Fill(event_wf->event_frame_number());
     pmt_nu_add->Fill(event_wf->module_address());
     pmt_nu_mod->Fill(event_wf->module_id());
-    pmt_nu_trfrm->Fill(event_wf->trigger_frame_id());
-    pmt_nu_trslc->Fill(event_wf->trigger_timeslice());
+    pmt_nu_trfrm->Fill(event_wf->fem_trig_frame_number());
+    pmt_nu_trslc->Fill(event_wf->fem_trig_sample_number_64MHz());
 
-    pmt_nu_frdiff->SetPoint(k,event_wf->event_id(),double(event_wf->event_frame_id())-double(event_wf->trigger_frame_id()));
+    pmt_nu_frdiff->SetPoint(k,event_wf->event_number(),double(event_wf->event_frame_number())-double(event_wf->fem_trig_frame_number()));
 
-    pmt_nu_slcdiff->SetPoint(k,event_wf->event_id(),
-			     double(event_wf->event_frame_id())*102400 - (double(event_wf->trigger_frame_id())*102400+double(event_wf->trigger_timeslice())*4));
+    pmt_nu_slcdiff->SetPoint( k,
+			      event_wf->event_number(),
+			      double(event_wf->event_frame_number())*102400 - 
+			      (double(event_wf->fem_trig_frame_number())*102400+double(event_wf->fem_trig_sample_number_64MHz())) );
 
     _nch=0;
     _nrd=0;
@@ -95,7 +97,7 @@ namespace larlight {
       const fifo* pmt_data = (&(event_wf->at(i)));
       if(pmt_data->size()<1){
 	Message::send(MSG::ERROR,__FUNCTION__,
-		      Form("Found 0-length waveform: Event %d ... Ch. %d",event_wf->event_id(),pmt_data->channel_number()));
+		      Form("Found 0-length waveform: Event %d ... Ch. %d",event_wf->event_number(),pmt_data->channel_number()));
 	continue;
       }
       _nch++;
@@ -108,39 +110,40 @@ namespace larlight {
 
     const trigger* trig_data = (trigger*)(storage->get_data(DATA::Trigger));
 
-    //    std::cout << Form("Event ID: %d",trig_data->trig_id()) << std::endl;
-    trig_evtno = trig_data->trig_id();
+    //    std::cout << Form("Event ID: %d",trig_data->trig_number()) << std::endl;
+    trig_evtno = trig_data->trig_number();
     
-    trig_trfrm->Fill(trig_data->trig_frame_id());
-    trig_trslc->Fill(trig_data->trig_timeslice());
-    trig_trid->Fill(trig_data->trig_id());
+    trig_trfrm->Fill(trig_data->trig_frame_number());
+    trig_trslc->Fill(trig_data->trig_sample_number_2MHz());
+    trig_trid->Fill(trig_data->trig_number());
     trig_pmid->Fill(trig_data->pmt_data());
     trig_trpc->Fill(trig_data->trig_pc());
     trig_extrn->Fill(trig_data->trig_ext());
     trig_actv->Fill(trig_data->active());
-    trig_gate1->Fill(trig_data->gate1());
-    trig_gate2->Fill(trig_data->gate2());
+    trig_gate1->Fill(trig_data->gate1_in());
+    trig_gate2->Fill(trig_data->gate2_in());
     trig_veto->Fill(trig_data->veto_in());
     trig_calib->Fill(trig_data->calib());
-    trig_rem64->Fill(trig_data->reminder_64MHz());
-    trig_rem16->Fill(trig_data->reminder_16MHz());
+    trig_rem64->Fill(trig_data->remainder_64MHz());
+    trig_rem16->Fill(trig_data->remainder_16MHz());
 
     if (trig_evtno==pmt_nu_evtno){
 
       //compare trigger frame numbers
       trig_frdiff->SetPoint(k,
-			    event_wf->event_id(),
-			    double(trig_data->trig_frame_id())-double(event_wf->trigger_frame_id()));
+			    event_wf->event_number(),
+			    double(trig_data->trig_frame_number())-double(event_wf->fem_trig_frame_number()));
 
-      trig_slcdiff->SetPoint(k,
-			     event_wf->event_id(),
-			     (double(trig_data->trig_frame_id())*102400+double(trig_data->trig_timeslice()*32)+double(trig_data->reminder_16MHz())*4+double(trig_data->reminder_64MHz()))-(double(event_wf->trigger_frame_id())*102400+double(event_wf->trigger_timeslice())*4));
+      trig_slcdiff->SetPoint( k,
+			      event_wf->event_number(),
+			      (double(trig_data->trig_frame_number())*102400+double(trig_data->trig_sample_number_64MHz())) - 
+			      (double(event_wf->fem_trig_frame_number())*102400+double(event_wf->fem_trig_sample_number_64MHz())) );
       
     }
     else {
       std::cout << "WARNING! event numbers from PMT and Trigger streams don't match!" << std::endl;
-      std::cout << "  PMT Event ID: " << event_wf->event_id() << std::endl;
-      std::cout << "  TRG Event ID: " << trig_data->trig_id() << std::endl;
+      std::cout << "  PMT Event ID: " << event_wf->event_number() << std::endl;
+      std::cout << "  TRG Event ID: " << trig_data->trig_number() << std::endl;
     }
 
     k++;

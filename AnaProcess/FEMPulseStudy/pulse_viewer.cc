@@ -90,8 +90,8 @@ namespace larlight {
 
   void pulse_viewer::clear_map(){
 
-    _pulse_frame_id.clear();
-    _pulse_sample_number.clear();
+    _pulse_frame.clear();
+    _pulse_sample.clear();
     _pulse_tstart.clear();
     _pulse_tend.clear();
     _pulse_amp.clear();
@@ -107,8 +107,8 @@ namespace larlight {
   void pulse_viewer::add_channel_entry(UShort_t ch){
 
     _channels.insert(ch);
-    _pulse_frame_id[ch]=std::vector<UInt_t>();
-    _pulse_sample_number[ch]=std::vector<UInt_t>();
+    _pulse_frame[ch]=std::vector<UInt_t>();
+    _pulse_sample[ch]=std::vector<UInt_t>();
     _pulse_tstart[ch]=std::vector<double>();
     _pulse_tend[ch]=std::vector<double>();
     _pulse_amp[ch]=std::vector<double>();
@@ -171,14 +171,14 @@ namespace larlight {
 	++iter){
 
       UShort_t ch((*iter).channel_number());
-      UInt_t sample   = (*iter).timeslice();
-      UInt_t frame    = (*iter).frame_id();
-      double      t_start  = (*iter).start_time();
-      double      t_end    = (*iter).end_time();
-      double      charge   = (*iter).charge();
-      double      amp      = (*iter).pulse_peak();
-      double      ped_base = (*iter).ped_mean();
-      double      ped_rms  = (*iter).ped_rms();
+      UInt_t   sample   = (*iter).readout_sample_number();
+      UInt_t   frame    = (*iter).readout_frame_number();
+      double   t_start  = (*iter).start_time();
+      double   t_end    = (*iter).end_time();
+      double   charge   = (*iter).charge();
+      double   amp      = (*iter).pulse_peak();
+      double   ped_base = (*iter).ped_mean();
+      double   ped_rms  = (*iter).ped_rms();
 
       // Check if this pulse passes the criteria
       if(ch < _cut_channels.first || _cut_channels.second < ch)
@@ -199,8 +199,8 @@ namespace larlight {
       if(_channels.find(ch)==_channels.end())
 	add_channel_entry(ch);
 
-      _pulse_frame_id[ch].push_back(frame);
-      _pulse_sample_number[ch].push_back(sample);
+      _pulse_frame[ch].push_back(frame);
+      _pulse_sample[ch].push_back(sample);
       _pulse_tstart[ch].push_back(t_start);
       _pulse_tend[ch].push_back(t_end);
       _pulse_amp[ch].push_back(amp);
@@ -223,19 +223,19 @@ namespace larlight {
 	ch_iter!=wfs->end();
 	++ch_iter){
       UShort_t ch        = (*ch_iter).channel_number();
-      UInt_t this_timeslice = (*ch_iter).timeslice();
-      UInt_t this_frame_id  = (*ch_iter).channel_frame_id();
-
+      UInt_t this_sample = (*ch_iter).readout_sample_number_RAW();
+      UInt_t this_frame  = (*ch_iter).readout_frame_number();
+      
       if(_waveforms.find(ch) == _waveforms.end())
 	continue;
-      if(_waveforms[ch].find(this_frame_id)==_waveforms[ch].end())
+      if(_waveforms[ch].find(this_frame)==_waveforms[ch].end())
 	continue;
-      if(_waveforms[ch][this_frame_id].find(this_timeslice) == _waveforms[ch][this_frame_id].end())
+      if(_waveforms[ch][this_frame].find(this_sample) == _waveforms[ch][this_frame].end())
 	continue;
 
-      if(_waveforms[ch][this_frame_id][this_timeslice].size()) {
+      if(_waveforms[ch][this_frame][this_sample].size()) {
 	sprintf(_buf,"Found already filled waveform (ch=%d, frame=%d, sample=%d)",
-		ch,this_frame_id,this_timeslice);
+		ch,this_frame,this_sample);
 	Message::send(MSG::ERROR,__FUNCTION__,_buf);
 	continue;
       }
@@ -244,7 +244,7 @@ namespace larlight {
       for(fifo::const_iterator adc_iter((*ch_iter).begin());
 	  adc_iter!=(*ch_iter).end();
 	  ++adc_iter){      
-	_waveforms[ch][this_frame_id][this_timeslice].push_back((*adc_iter));
+	_waveforms[ch][this_frame][this_sample].push_back((*adc_iter));
       }
 
     } // Finieh processing for this channel.
@@ -375,8 +375,8 @@ namespace larlight {
     gStyle->SetOptStat(0);
 
     bool is_wf_stored=true;
-    UInt_t sample=_pulse_sample_number[ch][index];
-    UInt_t frame =_pulse_frame_id[ch][index];
+    UInt_t sample=_pulse_sample[ch][index];
+    UInt_t frame =_pulse_frame[ch][index];
 
     if(_waveforms.find(ch)==_waveforms.end())
       is_wf_stored=false;
@@ -444,8 +444,8 @@ namespace larlight {
     //
     _fNote->Clear();
     _fNote->AddText(Form("Event ID       : %d",_event_id));
-    _fNote->AddText(Form("Frame  Number  : %d",_pulse_frame_id[ch][index]));
-    _fNote->AddText(Form("Sample Number  : %d\n",_pulse_sample_number[ch][index]));
+    _fNote->AddText(Form("Frame  Number  : %d",_pulse_frame[ch][index]));
+    _fNote->AddText(Form("Sample Number  : %d\n",_pulse_sample[ch][index]));
     _fNote->AddText(Form("Start T        : %g",_pulse_tstart[ch][index]));
     _fNote->AddText(Form("End T          : %g",_pulse_tend[ch][index]));
     _fNote->AddText(Form("Ped. Mean      : %g",_pulse_pedbase[ch][index]));

@@ -14,18 +14,18 @@ namespace larlight {
 
   void pulse_selector_simple::reset_cuts() {
 
-    _cut_tstart      = std::make_pair(-1,2000);
-    _cut_tend        = std::make_pair(-1,2000);
-    _cut_amp         = std::make_pair(-1,4096);
-    _cut_charge      = std::make_pair(-1,4096*2000);
-    _cut_pedbase     = std::make_pair(-1,4096);
-    _cut_pedrms      = std::make_pair(0,4096);
-    _cut_channels    = std::make_pair(0,FEM::INVALID_CH);
-    _cut_frame_id    = std::make_pair(0,0xffffffff);
-    _cut_timeslice   = std::make_pair(0,0xffffffff);
-    _cut_npulse      = std::make_pair(0,0xffffffff);
-    _cut_sum_charge  = std::make_pair(0,4096*2000*FEM::NUM_PMT_CHANNEL);
-    _cut_sum_peak    = std::make_pair(0,4096*FEM::NUM_PMT_CHANNEL);
+    _cut_tstart        = std::make_pair(-1,2000);
+    _cut_tend          = std::make_pair(-1,2000);
+    _cut_amp           = std::make_pair(-1,4096);
+    _cut_charge        = std::make_pair(-1,4096*2000);
+    _cut_pedbase       = std::make_pair(-1,4096);
+    _cut_pedrms        = std::make_pair(0,4096);
+    _cut_channels      = std::make_pair(0,FEM::INVALID_CH);
+    _cut_frame_number  = std::make_pair(0,0xffffffff);
+    _cut_sample_number = std::make_pair(0,0xffffffff);
+    _cut_npulse        = std::make_pair(0,0xffffffff);
+    _cut_sum_charge    = std::make_pair(0,4096*2000*FEM::NUM_PMT_CHANNEL);
+    _cut_sum_peak      = std::make_pair(0,4096*FEM::NUM_PMT_CHANNEL);
 
   }
 
@@ -34,8 +34,8 @@ namespace larlight {
 
       UShort_t ch(data->channel_number());
 
-      UInt_t sample   = data->timeslice();
-      UInt_t frame    = data->frame_id();
+      UInt_t sample   = data->readout_sample_number();
+      UInt_t frame    = data->readout_frame_number();
       double t_start  = data->start_time();
       double t_end    = data->end_time();
       double charge   = data->charge();
@@ -44,9 +44,9 @@ namespace larlight {
       double ped_rms  = data->ped_rms();
 
       // Check if this pulse passes the criteria
-      if(frame < _cut_frame_id.first || _cut_frame_id.second < frame)
+      if(frame < _cut_frame_number.first || _cut_frame_number.second < frame)
 	return false;
-      if(sample < _cut_timeslice.first || _cut_timeslice.second < sample)
+      if(sample < _cut_sample_number.first || _cut_sample_number.second < sample)
 	return false;
       if(ch < _cut_channels.first || _cut_channels.second < ch)
 	return false;

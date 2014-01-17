@@ -202,15 +202,15 @@ namespace larlight {
     /** Map of pulse count: the first element in the pair holds the total reco-ed pulse count while the second
 	element holds the internal index to be updated by pulse_viewer::next_pulse() and pulse_viewer::previous_pulse() methods.
     */
-    std::map<UShort_t,std::pair<short,short> >   _pulse_count;          
-    std::map<UShort_t,std::vector<UInt_t> > _pulse_frame_id;       ///< a set of frame id
-    std::map<UShort_t,std::vector<UInt_t> > _pulse_sample_number;  ///< a set of sample numbers
-    std::map<UShort_t,std::vector<double> >      _pulse_tstart;         ///< a set of reco-ed pulse start time
-    std::map<UShort_t,std::vector<double> >      _pulse_tend;           ///< a set of reco-ed pulse end time
-    std::map<UShort_t,std::vector<double> >      _pulse_amp;            ///< a set of reco-ed pulse amplitude
-    std::map<UShort_t,std::vector<double> >      _pulse_charge;         ///< a set of reco-ed pulse charge
-    std::map<UShort_t,std::vector<double> >      _pulse_pedbase;        ///< a set of reco-ed pulse pedestal baseline mean
-    std::map<UShort_t,std::vector<double> >      _pulse_pedrms;         ///< a set of reco-ed pulse pedestal baseline standard deviation
+    std::map<UShort_t,std::pair<short,short> > _pulse_count;          
+    std::map<UShort_t,std::vector<UInt_t> >    _pulse_frame;   ///< a set of frame id
+    std::map<UShort_t,std::vector<UInt_t> >    _pulse_sample;  ///< a set of sample numbers
+    std::map<UShort_t,std::vector<double> >    _pulse_tstart;  ///< a set of reco-ed pulse start time
+    std::map<UShort_t,std::vector<double> >    _pulse_tend;    ///< a set of reco-ed pulse end time
+    std::map<UShort_t,std::vector<double> >    _pulse_amp;     ///< a set of reco-ed pulse amplitude
+    std::map<UShort_t,std::vector<double> >    _pulse_charge;  ///< a set of reco-ed pulse charge
+    std::map<UShort_t,std::vector<double> >    _pulse_pedbase; ///< a set of reco-ed pulse pedestal baseline mean
+    std::map<UShort_t,std::vector<double> >    _pulse_pedrms;  ///< a set of reco-ed pulse pedestal baseline standard deviation
     std::map<UShort_t,std::map<UInt_t,std::map<UInt_t,std::vector<UShort_t> > > > _waveforms; ///< waveform containers
 
     /// Local (yet main) canvas poitner

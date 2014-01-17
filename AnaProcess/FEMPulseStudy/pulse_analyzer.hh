@@ -68,13 +68,13 @@ namespace larlight {
   private:
 
     UInt_t _event_id;       ///< event id holder
-    UInt_t _ch_frame_id;
-    UInt_t _ch_sample_id;
+    UInt_t _frame;
+    UInt_t _sample;
     UInt_t _disc_id;
 
     DATA::DATA_TYPE _pulse_type;
 
-    TTree *_ch_tree;
+    TTree *_tree;
 
     int _ch, _nsample;
 

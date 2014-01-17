@@ -46,7 +46,7 @@ namespace larlight {
 
     event_pulse *pulses = (event_pulse*)(storage->get_data(_selector->pulse_type()));
 
-    event_fifo   *wfs    = (event_fifo*)(storage->get_data(DATA::PMTFIFO));
+    event_fifo  *wfs    = (event_fifo*)(storage->get_data(DATA::PMTFIFO));
 
     if(!pulses){
 
@@ -78,8 +78,8 @@ namespace larlight {
       if(!(_selector->select_pulse(&pulse))) continue;
 
       UShort_t ch     = pulse.channel_number();
-      UInt_t      frame  = pulse.frame_id();
-      UInt_t      sample = pulse.timeslice();
+      UInt_t   frame  = pulse.readout_frame_number();
+      UInt_t   sample = pulse.readout_sample_number();
 
       if(_sel_info.find(ch)==_sel_info.end()) 
 
@@ -101,8 +101,8 @@ namespace larlight {
     for(auto wf : *wfs){
 
       UShort_t ch     = wf.channel_number();
-      UInt_t      frame  = wf.channel_frame_id();
-      UInt_t      sample = wf.timeslice();
+      UInt_t   frame  = wf.readout_frame_number();
+      UInt_t   sample = wf.readout_sample_number_RAW();
 
       if(_sel_info.find(ch) == _sel_info.end()) continue;
 
@@ -120,8 +120,8 @@ namespace larlight {
 	++iter){
 
       UShort_t ch     = (*iter).channel_number();
-      UInt_t      frame  = (*iter).channel_frame_id();
-      UInt_t      sample = (*iter).timeslice();
+      UInt_t      frame  = (*iter).readout_frame_number();
+      UInt_t      sample = (*iter).readout_sample_number_RAW();
 
       if(_sel_info.find(ch) == _sel_info.end()) continue;
 

@@ -75,10 +75,10 @@ namespace larlight {
     void set_range_ped_rms(double v1, double v2)            {_cut_pedrms.first=v1;   _cut_pedrms.second=v2;   };
 
     /// Setter for the range of frame id to select pulses of interest.
-    void set_range_frame_id(UInt_t v1, UInt_t v2) {_cut_frame_id.first=v1; _cut_frame_id.second=v2; };
+    void set_range_frame_number(UInt_t v1, UInt_t v2) {_cut_frame_number.first=v1; _cut_frame_number.second=v2; };
 
-    /// Setter for the range of timeslice to select pulses of interest.
-    void set_range_timeslice(UInt_t v1, UInt_t v2) {_cut_timeslice.first=v1; _cut_timeslice.second=v2; };
+    /// Setter for the range of sample_number to select pulses of interest.
+    void set_range_sample_number(UInt_t v1, UInt_t v2) {_cut_sample_number.first=v1; _cut_sample_number.second=v2; };
 
     /// Setter for the range of channel numbers to select pulses of interest.
     void set_range_channel(UShort_t v1, UShort_t v2) {_cut_channels.first=v1; _cut_channels.second=v2;};
@@ -116,10 +116,10 @@ namespace larlight {
     const std::pair<double,double> range_ped_rms() const            {return _cut_pedrms;};
 
     /// Getter for the range of frame number to select pulses of interest.
-    const std::pair<UInt_t,UInt_t> range_frame_id() const {return _cut_frame_id;};
+    const std::pair<UInt_t,UInt_t> range_frame_number() const {return _cut_frame_number;};
 
-    /// Getter for the range of timeslice to select pulses of interest.
-    const std::pair<UInt_t,UInt_t> range_timeslice() const {return _cut_timeslice;};
+    /// Getter for the range of sample_number to select pulses of interest.
+    const std::pair<UInt_t,UInt_t> range_sample_number() const {return _cut_sample_number;};
 
     /// Getter for the range of channel numbers to select pulses of interest.
     const std::pair<UInt_t,UInt_t> range_channel() const  {return _cut_channels;};
@@ -141,8 +141,8 @@ namespace larlight {
     /// pairs to define a range of event parameters for displaying pulses.
     std::pair<UInt_t,UInt_t> _cut_npulse;  
 
-    /// a pair to define a range of frame number and sample number for displaying pulses.
-    std::pair<UInt_t,UInt_t>  _cut_frame_id, _cut_timeslice;
+    /// a pair to define a range of frame number and sample_number number for displaying pulses.
+    std::pair<UInt_t,UInt_t>  _cut_frame_number, _cut_sample_number;
 
     /// a pair to define a range of channel numbers for displaying pulses.
     std::pair<UShort_t,UShort_t> _cut_channels;

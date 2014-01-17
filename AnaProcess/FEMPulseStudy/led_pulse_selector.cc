@@ -70,7 +70,7 @@ namespace larlight {
 	  ++iter){
 	if((*iter).channel_number() != _ref_ch) continue;
 
-	_ref_time.insert((*iter).frame_id() * _frame_size + (*iter).timeslice());
+	_ref_time.insert((*iter).readout_frame_number() * _frame_size + (*iter).readout_sample_number());
 
       }
 
@@ -88,7 +88,7 @@ namespace larlight {
     if(!store) return store;
 
     store= false;
-    UInt_t time_stamp = data->frame_id() * _frame_size + data->timeslice();
+    UInt_t time_stamp = data->readout_frame_number() * _frame_size + data->readout_sample_number();
     for(auto ts : _ref_time){
 
       if(ts > time_stamp) {

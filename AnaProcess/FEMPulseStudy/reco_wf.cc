@@ -69,11 +69,11 @@ namespace larlight {
 	continue;
       }
 
-      if(!(_ref_frame) || _ref_frame>pmt_data->channel_frame_id())
-	_ref_frame = pmt_data->channel_frame_id();
+      if(!(_ref_frame) || _ref_frame>pmt_data->readout_frame_number())
+	_ref_frame = pmt_data->readout_frame_number();
 
-      rel_frame = pmt_data->channel_frame_id() - _ref_frame;
-      rel_slice = rel_frame * _frame_width + pmt_data->timeslice();
+      rel_frame = pmt_data->readout_frame_number() - _ref_frame;
+      rel_slice = rel_frame * _frame_width + pmt_data->readout_sample_number_RAW();
 
       if(!(_ref_slice) || _ref_slice>rel_slice)
 	_ref_slice=rel_slice;
@@ -105,8 +105,8 @@ namespace larlight {
 
       for(size_t j=0; j<pmt_data->size(); ++j){
 
-	rel_frame = pmt_data->channel_frame_id() - _ref_frame;
-	rel_slice = rel_frame * _frame_width + pmt_data->timeslice() + j;
+	rel_frame = pmt_data->readout_frame_number() - _ref_frame;
+	rel_slice = rel_frame * _frame_width + pmt_data->readout_sample_number_RAW() + j;
 
 	_wf_map[ch][rel_slice - _ref_slice] = pmt_data->at(j);
       }

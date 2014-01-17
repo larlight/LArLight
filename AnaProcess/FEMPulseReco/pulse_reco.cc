@@ -147,11 +147,12 @@ namespace larlight {
 	  my_pulse.set_channel_number   ( (*iter).channel_number()   );
 
 	  if(waveforms->data_type()==DATA::PMTFIFO) {
-	    my_pulse.set_timeslice        ( (*iter).timeslice()        );
-	    my_pulse.set_channel_frame_id ( (*iter).channel_frame_id() );
-	    my_pulse.set_disc_id          ( (*iter).disc_id()          );
-	  }
 
+	    my_pulse.set_readout_sample_number ( (*iter).readout_sample_number_64MHz() );
+	    my_pulse.set_readout_frame_number  ( (*iter).readout_frame_number()        );
+	    my_pulse.set_disc_id               ( (*iter).disc_id()                     );
+	  }
+	  
 	  my_pulse.set_ped_mean   ( reco_algo->ped_mean()            );
 	  my_pulse.set_ped_rms    ( reco_algo->ped_rms()             );
 	  my_pulse.set_charge     ( reco_algo->get_pulse(i)->area    );
