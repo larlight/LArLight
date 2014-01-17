@@ -38,14 +38,17 @@ fpath   = argv[1]
 fname   = fpath.split('/')[len(fpath.split('/'))-1]
 outname = out_dir + fname[0:fname.rfind('.')] + ".root"
 
-# Create the decoder instance
-decoder=fmwk.decoder_manager()
-
 # Decoder algorithm instance ... currently xmit, slow, or trigger
 algo=fmwk.algo_pmt_xmit()
 #algo=fmwk.algo_tpc_xmit()
 #algo=fmwk.algo_trig_decoder()
 #algo=fmwk.algo_tpc_huffman()
+
+# Set algorithm's back-trace mode with positive int argument (=# words to be backtraced)
+algo.set_backtrace_mode(200)
+
+# Create the decoder instance
+decoder=fmwk.decoder_manager()
 
 # Attach algorithm to the decoder.
 decoder.set_decoder(algo);
@@ -53,6 +56,12 @@ decoder.set_decoder(algo);
 # Set input file format ... ASCII or BINARY
 #decoder.set_format(FORMAT.ASCII)
 decoder.set_format(fmwk.FORMAT.BINARY)
+
+# Set whether or not to ready by block 
+#decoder.set_read_by_block(True)
+
+# Set read-block size 
+#decoder.set_read_block_size(200)
 
 # Set input file path
 decoder.add_input_filename(fpath)
