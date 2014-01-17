@@ -24,7 +24,7 @@ else
 
     if [[ -z $ROOTSYS ]]; then
 	case `uname -n` in
-	    (*nevis.columbia.edu)
+	    (houston.nevis.columbia.edu)
 	    if [[ -z ${ROOTSYS} ]]; then
 		source /usr/nevis/adm/nevis-init.sh
 		setup root
