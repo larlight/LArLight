@@ -29,7 +29,7 @@ namespace larlight {
   public:
     
     /// Default constructor
-    spacepoint() : data_base() {clear_data();}
+    spacepoint() : data_base(DATA::SpacePoint) {clear_data();}
     
     spacepoint(Int_t id, 
 	       Double_t x,  Double_t y,  Double_t z,
@@ -106,7 +106,7 @@ namespace larlight {
   public:
     
     /// Default constructor
-    event_sps() : std::vector<larlight::spacepoint>(), data_base() {clear_data();}
+    event_sps() : std::vector<larlight::spacepoint>(), data_base(DATA::SpacePoint) {clear_data();}
     
     /// Default copy constructor
     event_sps(const event_sps& original) : std::vector<larlight::spacepoint>(original),

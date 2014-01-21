@@ -27,7 +27,7 @@ namespace larlight{
   public:
     
     /// Default constructor
-    calorimetry() : data_base() {};
+    calorimetry() : data_base(DATA::Calorimetry) {clear_data();};
     
     /// Copy constructor
     calorimetry(const calorimetry& original) : data_base(original),
@@ -91,28 +91,24 @@ namespace larlight{
      \class event_calorimetry
      A collection storage class of multiple calorimetrys.
   */
-  class event_calorimetry : public data_base {
+  class event_calorimetry : public std::vector<larlight::calorimetry>,
+			    public data_base {
     
   public:
     
     /// Default constructor
-    event_calorimetry() : data_base() {clear_data();};
+    event_calorimetry() : data_base(DATA::Calorimetry) {clear_data();}
     
     /// Default copy constructor
-    event_calorimetry(const event_calorimetry& original) : data_base(original), fCalorimetry_v(original.fCalorimetry_v)
-    {};
+    event_calorimetry(const event_calorimetry& original) : std::vector<larlight::calorimetry>(original),
+							   data_base(original)
+    {}
     
     /// Default destructor
-    ~event_calorimetry(){};
+    ~event_calorimetry(){}
     
     /// Method to clear currently held data contents in the buffer
-    virtual void clear_data(){data_base::clear_data(); fCalorimetry_v.clear();}
-
-    /// Method to add calorimetry
-    inline void add_calorimetry(calorimetry c) { fCalorimetry_v.push_back(c); }
-
-    /// Method to get a vector of calorimetry
-    inline const std::vector<larlight::calorimetry>& GetCalorimetryCollection() const { return fCalorimetry_v; }
+    virtual void clear_data(){data_base::clear_data(); clear();}
 
   protected:
     

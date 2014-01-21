@@ -21,7 +21,7 @@ namespace larlight {
 
     }
     clear_data();
-  };
+  }
 
   void pulse::clear_data() {
 
@@ -39,6 +39,24 @@ namespace larlight {
 
   }
 
+  event_pulse::event_pulse(DATA::DATA_TYPE type) : std::vector<larlight::pulse>(),
+						   data_base(type) 
+  {
+    if(_type!=DATA::PMTPulse_FixedWin && 
+       _type!=DATA::TPCPulse_FixedWin &&
+       _type!=DATA::PMTPulse_ThresWin &&
+       _type!=DATA::TPCPulse_ThresWin &&
+       _type!=DATA::Pulse ) {
+      
+      Message::send(MSG::ERROR,__FUNCTION__,Form("Invalid data type specification (=%d)!",_type));
+
+      Message::send(MSG::ERROR,__FUNCTION__,"Assuming Generic EventPulse...");
+
+      _type=DATA::Pulse;
+
+    }
+    clear_data();
+  };			   
 
   void event_pulse::clear_data(){
 

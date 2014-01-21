@@ -4,6 +4,28 @@
 #include "cluster.hh"
 
 namespace larlight{
+
+  //############################################################################
+  cluster::cluster(DATA::DATA_TYPE type) : data_base(type)
+  //############################################################################
+  {
+    if( _type != DATA::Cluster &&
+	_type != DATA::FuzzyCluster &&
+	_type != DATA::DBCluster &&
+	_type != DATA::CrawlerCluster &&
+	_type != DATA::HoughCluster &&
+	_type != DATA::ShowerAngleCluster )
+
+      {
+	Message::send(MSG::ERROR,__FUNCTION__,
+		      Form("Provided data type (%d) not a valid cluster data type! Setting it to DATA::Hit...",_type));
+	
+	_type = DATA::Cluster;
+      }
+
+    clear_data();
+  }
+
   //############################################################################
   void cluster::get_axis_range(std::vector<Double_t> &chmax,
 			       std::vector<Double_t> &chmin,
@@ -46,6 +68,28 @@ namespace larlight{
     return;
   }
 
+  //####################################################################################
+  event_cluster::event_cluster(DATA::DATA_TYPE type) : std::vector<larlight::cluster>(), 
+						       data_base(type) 
+  //####################################################################################
+  {
+    if( _type != DATA::Cluster &&
+	_type != DATA::FuzzyCluster &&
+	_type != DATA::DBCluster &&
+	_type != DATA::CrawlerCluster &&
+	_type != DATA::HoughCluster &&
+	_type != DATA::ShowerAngleCluster )
+
+      {
+	Message::send(MSG::ERROR,__FUNCTION__,
+		      Form("Provided data type (%d) not a valid cluster data type! Setting it to DATA::Hit...",_type));
+	
+	_type = DATA::Cluster;
+      }
+
+    clear_data();
+
+  }
 
   //############################################################################
   void event_cluster::get_axis_range(std::vector<Double_t> &chmax,

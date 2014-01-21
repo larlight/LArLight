@@ -29,11 +29,16 @@ namespace larlight{
   public:
     
     /// Default constructor
-    data_base(DATA::DATA_TYPE type=DATA::DATA_TYPE_MAX) : TObject(){ _type=type; };
+    data_base(DATA::DATA_TYPE type=DATA::DATA_TYPE_MAX) : TObject(){ clear_data(); _type=type; };
     
     /// Default copy constructor to avoid memory leak in ROOT streamer
-    data_base(const data_base &original) : TObject(original)
-    {_type=original._type;};
+    data_base(const data_base &original) : TObject(original),
+					   fRunNumber(original.fRunNumber),
+					   fSubRunNumber(original.fSubRunNumber),
+					   fEventID(original.fEventID),
+					   _type(original._type)
+    {}
+
     
     /// Default destructor
     virtual ~data_base(){};
@@ -72,7 +77,7 @@ namespace larlight{
     DATA::DATA_TYPE _type;
     
     ////////////////////////
-    ClassDef(data_base,1)
+    ClassDef(data_base,2)
     ////////////////////////
       
   };

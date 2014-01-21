@@ -29,7 +29,7 @@ namespace larlight {
   public:
     
     /// Default constructor
-    track();
+    track(DATA::DATA_TYPE type=DATA::Track);
     
     /// Copy constructor
     track(const track& original);
@@ -121,7 +121,7 @@ namespace larlight {
   public:
     
     /// Default constructor
-    event_track() : std::vector<larlight::track>(), data_base() {clear_data();}
+    event_track(DATA::DATA_TYPE type=DATA::Track);
     
     /// Default copy constructor
     event_track(const event_track& original) : std::vector<larlight::track>(original),

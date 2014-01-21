@@ -27,14 +27,14 @@ namespace larlight {
   public:
     
     /// Default constructor
-    wire() : data_base(), fSignal() {clear_data();};
+    wire() : data_base(DATA::Wire), fSignal() {clear_data();};
     
     /// Alternative constructor
     wire(const std::vector<Float_t> wf,
 	 const UInt_t ch,
 	 const GEO::View_t view,
 	 const GEO::SigType_t sig) 
-      : data_base(), 
+      : data_base(DATA::Wire), 
 	fSignal(wf),
 	fView(view),
 	fSignalType(sig),
@@ -92,13 +92,13 @@ namespace larlight {
      \class event_wire
      A collection storage class of multiple wires.
   */
-  class event_wire : std::vector<larlight::wire>,
+  class event_wire : public std::vector<larlight::wire>,
 		     public data_base {
     
   public:
     
     /// Default constructor
-    event_wire() : std::vector<larlight::wire>(), data_base() {clear_data();}
+    event_wire() : std::vector<larlight::wire>(), data_base(DATA::Wire) {clear_data();}
     
     /// Default copy constructor
     event_wire(const event_wire& original) : std::vector<larlight::wire>(original), data_base(original)
@@ -116,7 +116,7 @@ namespace larlight {
     ClassDef(event_wire,2)
     ////////////////////////
   };
-};
+}
 #endif
 
 /** @} */ // end of doxygen group 
