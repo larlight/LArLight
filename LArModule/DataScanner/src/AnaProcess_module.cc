@@ -84,34 +84,34 @@ namespace datascanner {
   private:
 
     /// Function to read & store calibrated wire data
-    void ReadWire(const art::Event& evt, const std::string mod_name, larlight::event_wire* data_ptr);
+    void ReadWire(const art::Event& evt, larlight::DATA::DATA_TYPE type, const std::string mod_name, larlight::event_wire* data_ptr);
 
     /// Function to read & store reconstructed hit data
-    void ReadHit(const art::Event& evt, const std::string mod_name, larlight::event_hit* data_ptr);
+    void ReadHit(const art::Event& evt, larlight::DATA::DATA_TYPE type, const std::string mod_name, larlight::event_hit* data_ptr);
 
     /// Function to read & store reconstructed hit data
-    void ReadCluster(const art::Event& evt, const std::string mod_name, larlight::event_cluster* data_ptr);
+    void ReadCluster(const art::Event& evt, larlight::DATA::DATA_TYPE type, const std::string mod_name, larlight::event_cluster* data_ptr);
 
     /// Function to read & store spacepoints
-    void ReadPMT(const art::Event& evt, const std::string mod_name, larlight::event_pmt* data_ptr);
+    void ReadPMT(const art::Event& evt, larlight::DATA::DATA_TYPE type, const std::string mod_name, larlight::event_fifo* data_ptr);
 
     /// Function to read & store spacepoints
-    void ReadSPS(const art::Event& evt, const std::string mod_name, larlight::event_sps* data_ptr);
+    void ReadSPS(const art::Event& evt, larlight::DATA::DATA_TYPE type, const std::string mod_name, larlight::event_sps* data_ptr);
 
     /// Function to read & store Tracking information
-    void ReadTrack(const art::Event& evt, const std::string mod_name, larlight::event_track* data_ptr);
+    void ReadTrack(const art::Event& evt, larlight::DATA::DATA_TYPE type, const std::string mod_name, larlight::event_track* data_ptr);
 
     /// Function to read & store MCTruth information
-    void ReadMCTruth(const art::Event& evt, const std::string mod_name, larlight::event_mc* data_ptr);
+    void ReadMCTruth(const art::Event& evt, larlight::DATA::DATA_TYPE type, const std::string mod_name, larlight::event_mc* data_ptr);
 
     /// Function to read & store MCTruth information
-    void ReadMCPartArray(const art::Event& evt, const std::string mod_name, larlight::event_mc* data_ptr);
+    void ReadMCPartArray(const art::Event& evt, larlight::DATA::DATA_TYPE type, const std::string mod_name, larlight::event_mc* data_ptr);
 
     /// Function to read & store Shower variables
-    void ReadShower(const art::Event& evt, const std::string mod_name, larlight::event_shower* data_ptr);
+    void ReadShower(const art::Event& evt, larlight::DATA::DATA_TYPE type, const std::string mod_name, larlight::event_shower* data_ptr);
 
     /// Function to read & store Calorimetry variables
-    void ReadCalorimetry(const art::Event& evt, const std::string mod_name, larlight::event_calorimetry* data_ptr);
+    void ReadCalorimetry(const art::Event& evt, larlight::DATA::DATA_TYPE type, const std::string mod_name, larlight::event_calorimetry* data_ptr);
 
     /// Function to store user specific variables
     void StoreUserInfo(const art::Event& evt, larlight::event_user* data_ptr);
@@ -156,6 +156,8 @@ namespace datascanner {
   //#######################################################################################################
   {
 
+    fCParamsAlg.reconfigure(pset.get< fhicl::ParameterSet >("ClusterParamsAlg"));
+
     // Initialize module name container
     for(size_t i=0; i<(size_t)(larlight::DATA::DATA_TYPE_MAX); i++)
       
@@ -168,7 +170,7 @@ namespace datascanner {
     ParseModuleName ( _mod_names[larlight::DATA::Kalman3DHit],          pset.get<std::string>("fModName_Kalman3DHit")          );
     ParseModuleName ( _mod_names[larlight::DATA::MCTruth],              pset.get<std::string>("fModName_MCTruth")              );
     ParseModuleName ( _mod_names[larlight::DATA::SpacePoint],           pset.get<std::string>("fModName_SpacePoint")           );
-    ParseModuleName ( _mod_names[larlight::DATA::FIFOChannel],          pset.get<std::string>("fModName_FIFOChannel")          );
+    ParseModuleName ( _mod_names[larlight::DATA::PMTFIFO],              pset.get<std::string>("fModName_FIFOChannel")          );
     ParseModuleName ( _mod_names[larlight::DATA::Wire],                 pset.get<std::string>("fModName_CalData")              );
     ParseModuleName ( _mod_names[larlight::DATA::CrawlerHit],           pset.get<std::string>("fModName_CrawlerHit")           );
     ParseModuleName ( _mod_names[larlight::DATA::GausHit],              pset.get<std::string>("fModName_GausHit")              );
@@ -203,20 +205,20 @@ namespace datascanner {
 	case larlight::DATA::Kalman3DSPS:
 	case larlight::DATA::Kalman3DHit:
 	case larlight::DATA::Bezier:
-	  _data_ptr[i]=(larlight::data_base*)(new larlight::event_track);
+	  _data_ptr[i]=(larlight::data_base*)(new larlight::event_track(type));
 	  break;
 	case larlight::DATA::SpacePoint:
 	  _data_ptr[i]=(larlight::data_base*)(new larlight::event_sps);
 	  break;
-	case larlight::DATA::FIFOChannel:
-	  _data_ptr[i]=(larlight::data_base*)(new larlight::event_pmt);
+	case larlight::DATA::PMTFIFO:
+	  _data_ptr[i]=(larlight::data_base*)(new larlight::event_fifo(type));
 	  break;
 	case larlight::DATA::Hit:
 	case larlight::DATA::CrawlerHit:
 	case larlight::DATA::GausHit:
 	case larlight::DATA::APAHit:
 	case larlight::DATA::FFTHit:
-	  _data_ptr[i]=(larlight::data_base*)(new larlight::event_hit);
+	  _data_ptr[i]=(larlight::data_base*)(new larlight::event_hit(type));
 	  break;
 	case larlight::DATA::Wire:
 	  _data_ptr[i]=(larlight::data_base*)(new larlight::event_wire);
@@ -227,7 +229,7 @@ namespace datascanner {
 	case larlight::DATA::FuzzyCluster:
 	case larlight::DATA::HoughCluster:
 	case larlight::DATA::ShowerAngleCluster:
-	  _data_ptr[i]=(larlight::data_base*)(new larlight::event_cluster);
+	  _data_ptr[i]=(larlight::data_base*)(new larlight::event_cluster(type));
 	  break;
 	case larlight::DATA::UserInfo:
 	  _data_ptr[i]=(larlight::data_base*)(new larlight::event_user);
@@ -240,6 +242,13 @@ namespace datascanner {
 	  break;
 	case larlight::DATA::Event:
 	case larlight::DATA::Seed:
+	case larlight::DATA::TPCFIFO:
+	case larlight::DATA::Pulse:
+	case larlight::DATA::PMTPulse_FixedWin:
+	case larlight::DATA::PMTPulse_ThresWin:
+	case larlight::DATA::TPCPulse_FixedWin:
+	case larlight::DATA::TPCPulse_ThresWin:
+	case larlight::DATA::Trigger:
 	case larlight::DATA::DATA_TYPE_MAX:
 	  mf::LogError("DataScanner")<<Form("Data type %d not supported!",type);
 	  break;
@@ -315,33 +324,33 @@ namespace datascanner {
       case larlight::DATA::Bezier:
 	// Data types to be stored in event_track class
 	for(size_t j=0; j<_mod_names[i].size(); ++j)
-	  ReadTrack(evt, _mod_names[i][j], (larlight::event_track*)(_data_ptr[i]));
+	  ReadTrack(evt, type, _mod_names[i][j], (larlight::event_track*)(_data_ptr[i]));
 	break;
 
       case larlight::DATA::MCTruth:
 	// Data type to be stored in event_mc class
 	for(size_t j=0; j<_mod_names[i].size(); ++j){
-	  ReadMCTruth     (evt, _mod_names[i][j], (larlight::event_mc*)(_data_ptr[i]));
-	  ReadMCPartArray (evt, _mod_names[i][j], (larlight::event_mc*)(_data_ptr[i]));
+	  ReadMCTruth     (evt, type, _mod_names[i][j], (larlight::event_mc*)(_data_ptr[i]));
+	  ReadMCPartArray (evt, type, _mod_names[i][j], (larlight::event_mc*)(_data_ptr[i]));
 	}
 	break;
 
       case larlight::DATA::SpacePoint:
  	// Data type to be stored in event_sps class
 	for(size_t j=0; j<_mod_names[i].size(); ++j)
-	  ReadSPS(evt,_mod_names[i][j], (larlight::event_sps*)(_data_ptr[i]));
+	  ReadSPS(evt,type, _mod_names[i][j], (larlight::event_sps*)(_data_ptr[i]));
 	break;
 
-      case larlight::DATA::FIFOChannel:
-	// Data type to be stored in event_pmt class
+      case larlight::DATA::PMTFIFO:
+	// Data type to be stored in event_fifo class
 	for(size_t j=0; j<_mod_names[i].size(); ++j)
-	  ReadPMT(evt,_mod_names[i][j], (larlight::event_pmt*)(_data_ptr[i]));
+	  ReadPMT(evt,type, _mod_names[i][j], (larlight::event_fifo*)(_data_ptr[i]));
 	break;
 
       case larlight::DATA::Wire:
 	// Data type to be stored in event_wire class
 	for(size_t j=0; j<_mod_names[i].size(); ++j)
-	  ReadWire(evt,_mod_names[i][j],(larlight::event_wire*)(_data_ptr[i]));
+	  ReadWire(evt,type, _mod_names[i][j],(larlight::event_wire*)(_data_ptr[i]));
 	break;
 
       case larlight::DATA::Hit:
@@ -351,7 +360,7 @@ namespace datascanner {
       case larlight::DATA::FFTHit:
 	// Data type to be stored in event_wire class
 	for(size_t j=0; j<_mod_names[i].size(); ++j)
-	  ReadHit(evt,_mod_names[i][j],(larlight::event_hit*)(_data_ptr[i]));
+	  ReadHit(evt,type, _mod_names[i][j],(larlight::event_hit*)(_data_ptr[i]));
 	break;
 
       case larlight::DATA::Cluster:
@@ -362,7 +371,7 @@ namespace datascanner {
       case larlight::DATA::ShowerAngleCluster:
 	// Data type to be stored in event_cluster class
 	for(size_t j=0; j<_mod_names[i].size(); ++j)
-	  ReadCluster(evt,_mod_names[i][j],(larlight::event_cluster*)(_data_ptr[i]));
+	  ReadCluster(evt,type, _mod_names[i][j],(larlight::event_cluster*)(_data_ptr[i]));
 	break;
 
       case larlight::DATA::UserInfo:
@@ -372,16 +381,23 @@ namespace datascanner {
 
       case larlight::DATA::Shower:
 	for(size_t j=0; j<_mod_names[i].size(); ++j)
-	  ReadShower(evt,_mod_names[i][j],(larlight::event_shower*)(_data_ptr[i]));
+	  ReadShower(evt,type, _mod_names[i][j],(larlight::event_shower*)(_data_ptr[i]));
 	break;
 
       case larlight::DATA::Calorimetry:
 	for(size_t j=0; j<_mod_names[i].size(); ++j)
-	  ReadCalorimetry(evt,_mod_names[i][j],(larlight::event_calorimetry*)(_data_ptr[i]));
+	  ReadCalorimetry(evt,type, _mod_names[i][j],(larlight::event_calorimetry*)(_data_ptr[i]));
 	break;
 	
       case larlight::DATA::Event:
       case larlight::DATA::Seed:
+      case larlight::DATA::TPCFIFO:
+      case larlight::DATA::Pulse:
+      case larlight::DATA::PMTPulse_FixedWin:
+      case larlight::DATA::PMTPulse_ThresWin:
+      case larlight::DATA::TPCPulse_FixedWin:
+      case larlight::DATA::TPCPulse_ThresWin:
+      case larlight::DATA::Trigger:
       case larlight::DATA::DATA_TYPE_MAX:
 	break;
       }
@@ -392,7 +408,10 @@ namespace datascanner {
   }
 
   //#######################################################################################################
-  void DataScanner::ReadWire(const art::Event& evt, const std::string mod_name, larlight::event_wire* data_ptr){
+  void DataScanner::ReadWire(const art::Event& evt, 
+			     larlight::DATA::DATA_TYPE type, 
+			     const std::string mod_name, 
+			     larlight::event_wire* data_ptr){
   //#######################################################################################################
 
     std::vector<const recob::Wire*> wireArray;
@@ -415,14 +434,17 @@ namespace datascanner {
 				(larlight::GEO::View_t)(wire_ptr->View()),
 				(larlight::GEO::SigType_t)(wire_ptr->SignalType()));
       
-      data_ptr->add_wire(wire_light);
+      data_ptr->push_back(wire_light);
       
     }
 
   }
 
   //#######################################################################################################
-  void DataScanner::ReadHit(const art::Event& evt, const std::string mod_name, larlight::event_hit* data_ptr){
+  void DataScanner::ReadHit(const art::Event& evt, 
+			    larlight::DATA::DATA_TYPE type, 
+			    const std::string mod_name, 
+			    larlight::event_hit* data_ptr){
   //#######################################################################################################
 
     std::vector<const recob::Hit*> hitArray;
@@ -440,7 +462,7 @@ namespace datascanner {
       
       const recob::Hit* hit_ptr(hitArray.at(i));
 
-      larlight::hit hit_light;
+      larlight::hit hit_light(type);
 
       hit_light.set_waveform(hit_ptr->fHitSignal);
       hit_light.set_times(hit_ptr->StartTime(),
@@ -458,12 +480,15 @@ namespace datascanner {
       hit_light.set_view((larlight::GEO::View_t)(hit_ptr->View()));
       hit_light.set_sigtype((larlight::GEO::SigType_t)(hit_ptr->SignalType()));
 
-      data_ptr->add_hit(hit_light);
+      data_ptr->push_back(hit_light);
     }
   }
 
   //#######################################################################################################
-  void DataScanner::ReadCluster(const art::Event& evt, const std::string mod_name, larlight::event_cluster* data_ptr){
+  void DataScanner::ReadCluster(const art::Event& evt, 
+				larlight::DATA::DATA_TYPE type, 
+				const std::string mod_name, 
+				larlight::event_cluster* data_ptr){
   //#######################################################################################################
 
     std::vector<const recob::Cluster*> clusterArray;
@@ -486,7 +511,7 @@ namespace datascanner {
 
       const recob::Cluster* cluster_ptr(clusterArray.at(i));
       
-      larlight::cluster cluster_light;
+      larlight::cluster cluster_light(type);
       cluster_light.set_charge(cluster_ptr->Charge());
       cluster_light.set_dtdw(cluster_ptr->dTdW());
       cluster_light.set_dqdw(cluster_ptr->dQdW());
@@ -525,12 +550,16 @@ namespace datascanner {
 	
       }
 
-      data_ptr->add_cluster(cluster_light);
+      data_ptr->push_back(cluster_light);
     }
+
   }
 
   //#######################################################################################################
-  void DataScanner::ReadPMT(const art::Event& evt, const std::string mod_name, larlight::event_pmt* data_ptr){
+  void DataScanner::ReadPMT(const art::Event& evt, 
+			    larlight::DATA::DATA_TYPE type, 
+			    const std::string mod_name, 
+			    larlight::event_fifo* data_ptr){
   //#######################################################################################################
     
     std::vector<const optdata::FIFOChannel*> pmtArray;
@@ -549,39 +578,43 @@ namespace datascanner {
       const optdata::FIFOChannel* fifo_ptr(pmtArray.at(i));
 
       optdata::Optical_Category_t cat(fifo_ptr->Category());
-      larlight::PMT::DISCRIMINATOR disc_id = larlight::PMT::DISC_MAX;
+      larlight::FEM::DISCRIMINATOR disc_id = larlight::FEM::DISC_MAX;
       switch(cat){
       case optdata::kFEMCosmicHighGain:
       case optdata::kFEMCosmicLowGain:
       case optdata::kCosmicPMTTrigger:
-	disc_id = larlight::PMT::COSMIC_DISC;
+	disc_id = larlight::FEM::COSMIC_DISC;
 	break;
       case optdata::kFEMBeamHighGain:
       case optdata::kFEMBeamLowGain:
       case optdata::kBeamPMTTrigger:
-	disc_id = larlight::PMT::BEAM_DISC;
+	disc_id = larlight::FEM::BEAM_DISC;
 	break;
       case optdata::kUndefined:
       case optdata::kHighGain:
       case optdata::kLowGain:
       default:
-	disc_id = larlight::PMT::DISC_MAX;
+	disc_id = larlight::FEM::DISC_MAX;
       }
 
-      larlight::pmtfifo fifo_light(fifo_ptr->ChannelNumber(),
-				   fifo_ptr->Frame(),
-				   fifo_ptr->TimeSlice(),
-				   disc_id,
-				   *fifo_ptr);
+      larlight::fifo fifo_light(fifo_ptr->ChannelNumber(),
+				fifo_ptr->Frame(),
+				fifo_ptr->TimeSlice(),
+				disc_id,
+				type,
+				*fifo_ptr);
       
-      data_ptr->add_fifo(fifo_light);
+      data_ptr->push_back(fifo_light);
     }
     
   }
 
 
   //#######################################################################################################
-  void DataScanner::ReadSPS(const art::Event& evt, const std::string mod_name, larlight::event_sps* data_ptr){
+  void DataScanner::ReadSPS(const art::Event& evt, 
+			    larlight::DATA::DATA_TYPE type, 
+			    const std::string mod_name, 
+			    larlight::event_sps* data_ptr){
   //#######################################################################################################
 
     std::vector<const recob::SpacePoint* > spsArray;
@@ -603,14 +636,17 @@ namespace datascanner {
 				     sps_ptr->XYZ()[0],    sps_ptr->XYZ()[1],    sps_ptr->XYZ()[2],
 				     sps_ptr->ErrXYZ()[0], sps_ptr->ErrXYZ()[1], sps_ptr->ErrXYZ()[2],
 				     sps_ptr->Chisq());
-      data_ptr->add_sps(sps_light);
+      data_ptr->push_back(sps_light);
 
     }
 
   }
 
   //#######################################################################################################
-  void DataScanner::ReadMCPartArray(const art::Event& evt, const std::string mod_name, larlight::event_mc* data_ptr){
+  void DataScanner::ReadMCPartArray(const art::Event& evt, 
+				    larlight::DATA::DATA_TYPE type, 
+				    const std::string mod_name, 
+				    larlight::event_mc* data_ptr){
   //#######################################################################################################
     
     std::vector<const simb::MCParticle*> mciArray;
@@ -640,13 +676,16 @@ namespace datascanner {
 	
 	part_light.add_daughter(part->Daughter(k));
       
-      data_ptr->add_part(part_light);
+      data_ptr->push_back(part_light);
       
     }
   }
 
   //#######################################################################################################
-  void DataScanner::ReadMCTruth(const art::Event& evt, const std::string mod_name, larlight::event_mc* data_ptr){
+  void DataScanner::ReadMCTruth(const art::Event& evt, 
+				larlight::DATA::DATA_TYPE type, 
+				const std::string mod_name, 
+				larlight::event_mc* data_ptr){
   //#######################################################################################################
 
     std::vector<const simb::MCTruth*> mciArray;
@@ -687,13 +726,16 @@ namespace datascanner {
 	  
 	  part_light.add_daughter(part.Daughter(k));
 	
-	data_ptr->add_part(part_light);
+	data_ptr->push_back(part_light);
       }
     }
   }
 
   //#######################################################################################################
-  void DataScanner::ReadShower(const art::Event& evt, const std::string mod_name, larlight::event_shower* data_ptr){
+  void DataScanner::ReadShower(const art::Event& evt, 
+			       larlight::DATA::DATA_TYPE type, 
+			       const std::string mod_name, 
+			       larlight::event_shower* data_ptr){
   //#######################################################################################################
     
     std::vector<const recob::Shower*> showerArray;
@@ -723,14 +765,14 @@ namespace datascanner {
       light_shower.set_total_charge(shower_ptr->TotalCharge());
       light_shower.set_direction(shower_ptr->Direction());
       light_shower.set_direction_err(shower_ptr->DirectionErr());
-      //light_shower.set_max_width(shower_ptr->MaxWidthX(),shower_ptr->MaxWidthY());
-      //light_shower.set_distance_max_width(shower_ptr->DistanceMaxWidth());
+      light_shower.set_max_width(shower_ptr->MaxWidthX(),shower_ptr->MaxWidthY());
+      light_shower.set_distance_max_width(shower_ptr->DistanceMaxWidth());
 
       const std::vector<art::Ptr<recob::Cluster> > cluster_v = cluster_m.at(i);
 
       for(auto const cluster_ptr : cluster_v){
 	
-	larlight::cluster cluster_light;
+	larlight::cluster cluster_light(larlight::DATA::Cluster);
 	cluster_light.set_charge(cluster_ptr->Charge());
 	cluster_light.set_dtdw(cluster_ptr->dTdW());
 	cluster_light.set_dqdw(cluster_ptr->dQdW());
@@ -746,13 +788,16 @@ namespace datascanner {
 	light_shower.add_cluster(cluster_light);
       }
 
-      data_ptr->add_shower(light_shower);
+      data_ptr->push_back(light_shower);
     }
 
   }
 
   //##########################################################################################################################
-  void DataScanner::ReadCalorimetry(const art::Event& evt, const std::string mod_name, larlight::event_calorimetry* data_ptr){
+  void DataScanner::ReadCalorimetry(const art::Event& evt, 
+				    larlight::DATA::DATA_TYPE type, 
+				    const std::string mod_name, 
+				    larlight::event_calorimetry* data_ptr){
   //##########################################################################################################################
 
     std::vector<const anab::Calorimetry*> caloArray;
@@ -781,14 +826,17 @@ namespace datascanner {
       light_calo.set_range(calo_ptr->Range());
       light_calo.set_track_pitch(calo_ptr->TrkPitchVec());
 
-      data_ptr->add_calorimetry(light_calo);
+      data_ptr->push_back(light_calo);
 
     }
 
   }
 
   //#######################################################################################################
-  void DataScanner::ReadTrack(const art::Event& evt, const std::string mod_name, larlight::event_track* data_ptr){
+  void DataScanner::ReadTrack(const art::Event& evt, 
+			      larlight::DATA::DATA_TYPE type, 
+			      const std::string mod_name, 
+			      larlight::event_track* data_ptr){
   //#######################################################################################################
 
     std::vector<const recob::Track*> trackArray;
@@ -809,7 +857,7 @@ namespace datascanner {
       const recob::Track* track_ptr(trackArray.at(i));
 
       // Prepare storage track object
-      larlight::track track_light;
+      larlight::track track_light(type);
       
       //
       // Start copying data
@@ -841,7 +889,7 @@ namespace datascanner {
 	track_light.add_momentum   (track_ptr->MomentumAtPoint(i));
      
       // Store this track
-      data_ptr->add_track(track_light);
+      data_ptr->push_back(track_light);
 
     }
 
@@ -856,7 +904,7 @@ namespace datascanner {
 
     larlight::user_info my_ui;
 
-    // Block to fill isShower() cut variables
+    // Block to fill ShowerAngleCluster related variables
     if(_data_ptr[larlight::DATA::ShowerAngleCluster]) {
 
       for(auto const mod_name : _mod_names[larlight::DATA::ShowerAngleCluster]) {
@@ -868,14 +916,12 @@ namespace datascanner {
 	  if (e.categoryCode() != art::errors::ProductNotFound ) throw;
 	  continue;
 	}
-	//
-	// Obtain input clusters
-	//
+
+	// Loop over individual clusters. In this loop, we fill:
+	// (1) variables calculated by ClusterParamsAlg::isShower() function	
 	art::Handle< std::vector<recob::Cluster> > clusterListHandle;
 	evt.getByLabel(mod_name,clusterListHandle);
-
 	art::FindManyP<recob::Hit> fmh(clusterListHandle, evt, mod_name);
-      
 	for(size_t i=0; i < clusterListHandle->size(); i++){
 
 	  art::Ptr<recob::Cluster> iCluster (clusterListHandle,i);
@@ -890,18 +936,19 @@ namespace datascanner {
 
 	  // Do an equivalent calculation as ClusterParamsAlg::isShower()
 	  
-	  double length = TMath::Sqrt( pow((start_wire - end_wire),2) * CONV_WIRE2CM * 
+	  double length = TMath::Sqrt( pow((start_wire - end_wire),2) * CONV_WIRE2CM + 
 				       pow((start_time - end_time),2) * CONV_TIME2CM );
+
 	  double xangle = fCParamsAlg.Get2DAngleForHit(start_wire, start_time, iHitList);
 
 	  if(xangle >  90) xangle -= 180;
 	  if(xangle < -90) xangle += 180;
 
-	  double HighBin,LowBin,invHighBin,invLowBin,altWeight=0.;
+	  double HighBin,LowBin,invHighBin,invLowBin,altWeight;
 	  double PrincipalEigenvalue=1.,ModPV=-900;
 	  double multihit=0; 
 	  double ModHitDensity=0;
-	  
+
 	  // OffAxisHits calculation
 	  fCParamsAlg.FindDirectionWeights(lineslope, 
 					   start_wire, start_time,
@@ -911,9 +958,9 @@ namespace datascanner {
 	  altWeight /= length;
 	  
 	  // Principal value calculation
-	  TPrincipal pc(2,"D");
-	  fCParamsAlg.GetPrincipal(iHitList,&pc);
-	  PrincipalEigenvalue = (*pc.GetEigenValues())[0];
+	  TPrincipal mypc(2,"D");
+	  fCParamsAlg.GetPrincipal(iHitList,&mypc);
+	  PrincipalEigenvalue = (*mypc.GetEigenValues())[0];
 	  ModPV = TMath::Log(1-PrincipalEigenvalue);
 
 	  // MultiHit calculation
@@ -929,11 +976,68 @@ namespace datascanner {
 	  my_ui.append("vPrincipalHD",ModPV);
 	  my_ui.append("vOffAxisHit",altWeight);
 	} // end of cluster loop
+
+	// Loop over a set of clusters. In this loop, we store:
+	// (1) matched cluster combination indexes
+	// (2) spacepoint associated with matching
+	art::Handle< std::vector<art::PtrVector<recob::Cluster> > >    clusterAssociationHandle;	
+	art::Handle< std::vector<art::PtrVector<recob::SpacePoint> > > spsAssociationHandle;
+	evt.getByLabel(mod_name,clusterAssociationHandle);
+	evt.getByLabel(mod_name,spsAssociationHandle);
+
+	bool sps_exist = spsAssociationHandle.isValid();
+
+	// Check both vector have the same length
+	if(sps_exist &&
+	   clusterAssociationHandle->size() && 
+	   (spsAssociationHandle->size() != clusterAssociationHandle->size())) {
+	  
+	  mf::LogError(__PRETTY_FUNCTION__) << "Stored cluster & SPS vector size for shower different!";
+	  
+	  continue;
+	}
+
+	// Store number of showers
+	my_ui.store("numShower",(int)(clusterAssociationHandle->size()));
+	for(size_t i=0; i < clusterAssociationHandle->size(); ++i){
+
+	  const art::PtrVector<recob::Cluster>    cluster_set = clusterAssociationHandle->at(i);
+
+	  // Store cluster ID
+	  for(size_t j=0; j<cluster_set.size(); ++j) {
+
+	    const art::Ptr<recob::Cluster> cluster = cluster_set.at(j);
+
+	    my_ui.append("vShowerClusterID",(int)(cluster->ID()));
+	    
+	  }
+
+	  // Store # of SPS in THIS shower, then loop over SPS and append to a grand vector
+	  if(sps_exist){
+	    const art::PtrVector<recob::SpacePoint> sps_set     = spsAssociationHandle->at(i);
+	    my_ui.append("vNumShowerSPS",(int)(sps_set.size()));
+	    for(size_t j=0; j<sps_set.size(); ++j) {
+	      
+	      const art::Ptr<recob::SpacePoint> sps = sps_set.at(j);
+	      
+	      my_ui.append("vShowerSPS_X",(double)(sps->XYZ()[0]));
+	      my_ui.append("vShowerSPS_Y",(double)(sps->XYZ()[1]));
+	      my_ui.append("vShowerSPS_Z",(double)(sps->XYZ()[2]));
+	      
+	      my_ui.append("vShowerSPS_Xe",(double)(sps->ErrXYZ()[0]));
+	      my_ui.append("vShowerSPS_Ye",(double)(sps->ErrXYZ()[1]));
+	      my_ui.append("vShowerSPS_Ze",(double)(sps->ErrXYZ()[2]));
+
+	      my_ui.append("vShowerSPS_Chi2",(double)(sps->Chisq()));
+	    }
+	  }
+	}
+
       } // end of input module loop
     }
 
     // store user_info
-    data_ptr->add_user_info(my_ui);
+    data_ptr->push_back(my_ui);
   }
 
 } // namespace 
