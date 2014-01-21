@@ -40,7 +40,22 @@ namespace larlight {
 	_readout_sample_number(original._readout_sample_number),
 	_disc_id(original._disc_id)
     {}
+
+    /// Fast vector copy constructor
+    fifo(UShort_t ch,
+	 UInt_t   frame,
+	 UInt_t   sample,
+	 FEM::DISCRIMINATOR disc,
+	 DATA::DATA_TYPE type,
+	 std::vector<UShort_t> wf) : std::vector<UShort_t>(wf),
+				     data_base(type),
+				     _channel_number(ch),
+				     _readout_frame_number(frame),
+				     _readout_sample_number(sample),
+				     _disc_id(disc)
+    {}
     
+
     /// Setter for the channel number
     void set_channel_number (UShort_t ch)     {_channel_number=ch;}
 
@@ -172,15 +187,18 @@ namespace larlight {
     
     /// Getter for the trigger frame number
     UInt_t fem_trig_frame_number() const {return _fem_trig_frame_number;}
+
+    /// Getter for the fem trigger sample number RAW
+    inline UInt_t fem_trig_sample_number_RAW() const {return _fem_trig_sample_number;}
     
     /// Getter for the fem trigger sample number in 2 MHz
-    inline UInt_t fem_trig_sample_number_2MHz() const {return _fem_trig_sample_number/8;}    
+    inline UInt_t fem_trig_sample_number_2MHz() const {return _fem_trig_sample_number;}    
 
     /// Getter for the fem trigger sample number in 16 MHz
-    inline UInt_t fem_trig_sample_number_16MHz() const {return _fem_trig_sample_number;}
+    inline UInt_t fem_trig_sample_number_16MHz() const {return _fem_trig_sample_number*8;}
 
     /// Getter for the fem trigger sample number in 64 MHz
-    inline UInt_t fem_trig_sample_number_64MHz() const {return _fem_trig_sample_number*4;}
+    inline UInt_t fem_trig_sample_number_64MHz() const {return _fem_trig_sample_number*32;}
     
     /// A function to reset data member variables
     virtual void clear_data();
