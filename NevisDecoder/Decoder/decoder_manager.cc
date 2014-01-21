@@ -89,7 +89,7 @@ namespace larlight {
     return status;
   }
 
-  bool decoder_manager::decode() {
+  bool decoder_manager::decode(UInt_t limit) {
 
     if(_verbosity[MSG::DEBUG])
       Message::send(MSG::DEBUG,__FUNCTION__," begins...");
@@ -97,6 +97,7 @@ namespace larlight {
     bool status=true;
     UInt_t word = (_read_by_block) ? _fin.read_multi_word(_read_block_size) : _fin.read_word();
     UInt_t ctr=0;
+    UInt_t index=0;
     time_t watch;
     while(status) {
 
@@ -126,15 +127,20 @@ namespace larlight {
 	}
       }
 
-      word = (_read_by_block) ? _fin.read_multi_word(_read_block_size) : _fin.read_word();
-      if(_storage->get_index()==(ctr*2000)){
+      index = _storage->get_index();
+
+      if(limit && index>limit) break;
+      
+      if(index==(ctr*2000)){
 	time(&watch);
 	sprintf(_buf,"  ... processed %-6d events : %s",ctr*2000,ctime(&watch));
 	Message::send(MSG::NORMAL,__FUNCTION__,_buf);
 	ctr+=1;
       }
-    }
 
+      word = (_read_by_block) ? _fin.read_multi_word(_read_block_size) : _fin.read_word();
+    }
+    
     if(!status && !_debug_mode){
 
       Message::send(MSG::ERROR,__FUNCTION__,Form("Event loop terminated. Stored: %d events",_storage->get_entries()));
@@ -175,14 +181,14 @@ namespace larlight {
     return true;
   }
 
-  bool decoder_manager::run() {
+  bool decoder_manager::run(UInt_t limit) {
 
     if(_verbosity[MSG::DEBUG])
       Message::send(MSG::DEBUG,__FUNCTION__," begins...");
 
     bool status=true;
     if(initialize())
-      status=decode();
+      status=decode(limit);
     return (finalize() && status);
 
   }

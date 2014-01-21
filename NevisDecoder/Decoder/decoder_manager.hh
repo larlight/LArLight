@@ -58,8 +58,8 @@ namespace larlight {
     /// Setter for the debug mode
     void debug_mode(bool debug){_debug_mode=debug;};
 
-    /// A method to start a batch decoding process
-    bool run();
+    /// A method to start a batch decoding process with specified # of events to be decoded
+    bool run(UInt_t limit=0);
 
     /// A method to initialize members for new decoding process.
     void reset();
@@ -81,7 +81,7 @@ namespace larlight {
     bool initialize();
 
     /// A method 
-    bool decode();
+    bool decode(UInt_t limit=0);
 
     /// A method to finalize decoding process, to be called after all is done.
     bool finalize();
