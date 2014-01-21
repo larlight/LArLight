@@ -60,13 +60,12 @@
 #pragma link C++ class std::vector<larlight::user_info>+;
 #pragma link C++ class larlight::event_user+;
 
-
 #pragma link C++ class std::pair<std::string,bool>+;
 #pragma link C++ class std::pair<std::string,std::string>+;
 #pragma link C++ class std::pair<std::string,std::vector<bool> >+;
-#pragma link C++ class std::pair<std::string,std::vector<int> >+;
-#pragma link C++ class std::pair<std::string,std::vector<double> >+;
-#pragma link C++ class std::pair<std::string,std::vector<std::string> >+;
+//#pragma link C++ class std::pair<std::string,std::vector<int> >+;
+//#pragma link C++ class std::pair<std::string,std::vector<double> >+;
+//#pragma link C++ class std::pair<std::string,std::vector<std::string> >+;
 
 #pragma link C++ class std::map<std::string,bool>+;
 #pragma link C++ class std::map<std::string,std::string>+;
