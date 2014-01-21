@@ -9,16 +9,17 @@
 #pragma link off all classes;
 #pragma link off all functions;
 
-#pragma link C++ namespace DB;
-#pragma link C++ namespace ProcDB;
-#pragma link C++ namespace QCDB;
-#pragma link C++ class ProcessDBI+;
-#pragma link C++ class ProcessDBIManager+;
-#pragma link C++ class TableBase+;
-#pragma link C++ class JobQueueTable+;
-#pragma link C++ class QCTableBase+;
-#pragma link C++ class RunQCTable+;
-#pragma link C++ class TimeQCTable+;
-#pragma link C++ class ChQCTable+;
-//#pragma link C++ class QCTableBase+;
+#pragma link C++ namespace procdb;
+//#pragma link C++ namespace procdb::DB;
+//#pragma link C++ namespace procdb::ProcDB;
+//#pragma link C++ namespace procdb::QCDB;
+#pragma link C++ class procdb::ProcessDBI+;
+#pragma link C++ class procdb::ProcessDBIManager+;
+#pragma link C++ class procdb::TableBase+;
+#pragma link C++ class procdb::JobQueueTable+;
+#pragma link C++ class procdb::QCTableBase+;
+#pragma link C++ class procdb::RunQCTable+;
+#pragma link C++ class procdb::TimeQCTable+;
+#pragma link C++ class procdb::ChQCTable+;
+//#pragma link C++ class procdb::QCTableBase+;
 #endif

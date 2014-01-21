@@ -17,12 +17,15 @@
 #include "ChQCTable.hh"
 
 // Class forward declaration here
-class ProcessDBI;
-class ProcessDBIManager;
-class TableBase;
-class JobQueueTable;
-class QCTableBase;
-class RunQCTable;
-class TimeQCTable;
-class ChQCTable;
+namespace procdb {
+  class ProcessDBI;
+  class ProcessDBIManager;
+  class TableBase;
+  class JobQueueTable;
+  class QCTableBase;
+  class RunQCTable;
+  class TimeQCTable;
+  class ChQCTable;
+}
 #endif
+

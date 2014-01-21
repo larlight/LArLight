@@ -17,11 +17,13 @@
 
 #include "data_base.hh"
 #include "hit.hh"
-/**
-   \class cluster
-   LArSoft Cluster class equivalent data container
-*/
+
 namespace larlight{
+
+  /**
+     \class cluster
+     LArSoft Cluster class equivalent data container
+  */
 
   class cluster : public data_base {
 
@@ -104,7 +106,7 @@ namespace larlight{
       };
   
   /**
-     \class cluster_collection 
+     \class event_cluster
      A collection storage class of multiple clusters.
   */
   class event_cluster : public std::vector<larlight::cluster>,

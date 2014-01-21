@@ -17,7 +17,7 @@ namespace larlight {
   }
   
   //######################################################
-  part_mc::part_mc(int pdgid, int track, int parent, std::string process) 
+  part_mc::part_mc(Int_t pdgid, Int_t track, Int_t parent, std::string process) 
     : data_base(),
       fProcess(process),
       fParentID(parent),
@@ -43,8 +43,8 @@ namespace larlight {
   }
   
   //######################################################
-  void part_mc::add_track(double x,  double y,  double z,  double t,
-			  double px, double py, double pz)
+  void part_mc::add_track(Double_t x,  Double_t y,  Double_t z,  Double_t t,
+			  Double_t px, Double_t py, Double_t pz)
   //######################################################
   {
     fStepTime.push_back(t);
@@ -52,9 +52,9 @@ namespace larlight {
     fStepMomentum.push_back(TVector3(px,py,pz));
   }
   
-  //######################################################
-  void event_mc::get_axis_range (double &max, double &min, const int axis) const
-  //######################################################
+  //###################################################################################
+  void event_mc::get_axis_range (Double_t &max, Double_t &min, const Int_t axis) const
+  //###################################################################################
   {
     
     if(axis < 0 || axis>2) {
@@ -83,9 +83,9 @@ namespace larlight {
   }
   
   //######################################################
-  void event_mc::get_axis_range (double &xmax, double &xmin,
-				 double &ymax, double &ymin,
-				 double &zmax, double &zmin) const
+  void event_mc::get_axis_range (Double_t &xmax, Double_t &xmin,
+				 Double_t &ymax, Double_t &ymin,
+				 Double_t &zmax, Double_t &zmin) const
   //######################################################
   {
 

@@ -3,18 +3,21 @@
 
 #include "TableBase.hh"
 
-class JobQueueTable : public TableBase {
+namespace procdb {
 
-public:
-
-  JobQueueTable(){};
-
-  virtual ~JobQueueTable(){};
-
-  /// A function to return table definition string
-  virtual const std::string GetTableDef(DB::DB_t type) const;
-  
-
-};
+  class JobQueueTable : public TableBase {
+    
+  public:
+    
+    JobQueueTable(){};
+    
+    virtual ~JobQueueTable(){};
+    
+    /// A function to return table definition string
+    virtual const std::string GetTableDef(DB::DB_t type) const;
+    
+    
+  };
+}
 
 #endif

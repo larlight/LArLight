@@ -59,8 +59,9 @@ namespace larlight{
 	Following enums are LArLight original except FIFOChannel which
 	is meant to be compatible with LArSoft FIFOChannel
       */
-      PMTFIFO,            ///< LArSoft PMT waveform (FIFOChannel)
-      TPCFIFO,            ///< Equivalent FIFOChannel for TPC
+      FIFO,               ///< LArSoft waveform 
+      PMTFIFO,            ///< PMT channel waveform data
+      TPCFIFO,            ///< TPC channel waveform data
       Pulse,              ///< Generic event_pulse
       PMTPulse_ThresWin,  ///< Reconstructed event_pulse for PMT waveform
       PMTPulse_FixedWin,  ///< Reconstructed event_pulse for PMT waveform

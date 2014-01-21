@@ -1,5 +1,5 @@
 /**
- * \file DataScanner_module.cc
+ * \file AnaProcess_module.cc
  *
  * \ingroup DataScanner
  * 

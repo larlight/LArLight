@@ -59,10 +59,10 @@ endif
 #
 doxygen:
 	@echo 'dOxygenising your code...'
-	@doxygen $(ANA_PROC_DIR)/doc/doxygenMyProject.script
+	@doxygen $(MAKE_TOP_DIR)/doc/doxygenMyProject.script
 
 doxygen+:
 	@echo 'dOxygenising MyProject + local-ROOT...'
-	@doxygen $(ANA_PROC_DIR)/doc/doxygenMyProject+.script
+	@doxygen $(MAKE_TOP_DIR)/doc/doxygenMyProject+.script
 #
 #####################################################################################

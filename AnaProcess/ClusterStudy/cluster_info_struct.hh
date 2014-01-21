@@ -6,7 +6,7 @@
 namespace larlight {
 
   /**
-     \struct cluster_match_info
+     \struct cluster_ana_info
      A utility struct for cluster-wise analysis information for matching     
    */
   struct cluster_ana_info {
