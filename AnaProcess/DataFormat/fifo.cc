@@ -8,16 +8,6 @@ namespace larlight {
   fifo::fifo(DATA::DATA_TYPE type) : std::vector<UShort_t>(),
 				     data_base(type)
   {
-    if(_type!=DATA::PMTFIFO && _type!=DATA::TPCFIFO) {
-      
-      Message::send(MSG::WARNING,__FUNCTION__,Form("Invalid data type specification (=%d)!",_type));
-      
-      Message::send(MSG::WARNING,__FUNCTION__,"Assuming PMT FIFOChannel...");
-      
-      _type=DATA::PMTFIFO;
-      
-    }
-    
     clear_data();
   }
 
@@ -38,16 +28,6 @@ namespace larlight {
 
   event_fifo::event_fifo(DATA::DATA_TYPE type) : std::vector<larlight::fifo>(), data_base(type)
   { 
-    if(_type!=DATA::PMTFIFO && _type!=DATA::TPCFIFO) {
-      
-      Message::send(MSG::WARNING,__FUNCTION__,Form("Invalid data type specification (=%d)!",_type));
-      
-      Message::send(MSG::WARNING,__FUNCTION__,"Assuming PMT FIFOChannel...");
-      
-      _type=DATA::PMTFIFO;
-      
-    }
-
     clear_data();
   }
   
