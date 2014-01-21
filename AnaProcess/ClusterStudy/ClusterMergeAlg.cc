@@ -15,8 +15,8 @@ namespace larlight {
 
     SetSquaredDistanceCut(1e9);
 
-    _min_hits_to_consider = 200;
-
+    _min_hits_to_consider = 0;
+    SetQTotalCut(0);
     _min_distance_unit = -1;
 
     _det_params_prepared = false;
@@ -99,6 +99,8 @@ namespace larlight {
 
     const event_cluster* ev_cluster = (const event_cluster*)(storage->get_data(DATA::ShowerAngleCluster));
 
+    //    std::cout<<"this ev_cluster has event_id() = "<<ev_cluster->event_id()<<std::endl;
+
     for(auto const i_cluster: *ev_cluster)
 
       AppendClusterInfo(i_cluster,i_cluster.Hits());
@@ -115,8 +117,9 @@ namespace larlight {
 
     PrepareDetParams();
 
+    //don't bother looping over hits if there are too few
     if(in_hit_v.size() <= _min_hits_to_consider) return;
-
+    
     cluster_merge_info ci;
     ci.cluster_index = cl.ID();
     ci.view       = cl.View();
@@ -126,12 +129,29 @@ namespace larlight {
     ci.end_time   = cl.EndPos()[1];
     ci.angle      = cl.dTdW();
     ci.n_hits     = (int)cl.Hits().size();
+    ci.q_total    = 0;
 
     AppendHitInfo(ci, in_hit_v);
-    
-    if(ci.view == GEO::kU) _u_clusters.push_back(ci);
-    else if(ci.view == GEO::kV) _v_clusters.push_back(ci);
-    else if(ci.view == GEO::kW) _w_clusters.push_back(ci);
+
+    //don't consider the cluster if its charge is too low
+    if(ci.q_total < _min_q_total_to_consider) return;
+
+    if(ci.view == GEO::kU){
+      _u_clusters.push_back(ci);
+      u_q_tot  += ci.q_total;
+      //have to use .size() here b/c n_hits might be -1 if swapped
+      u_n_hits += (int)cl.Hits().size();
+    }
+    else if(ci.view == GEO::kV){
+      _v_clusters.push_back(ci);
+      v_q_tot  += ci.q_total;
+      v_n_hits += (int)cl.Hits().size();
+    }
+    else if(ci.view == GEO::kW){
+      _w_clusters.push_back(ci);
+      w_q_tot  += ci.q_total;
+      w_n_hits += (int)cl.Hits().size();
+    }
     else print(MSG::ERROR,__FUNCTION__,Form("Invalid plane ID: %d",ci.view));
 
     if(_cluster_merged_index.size() <= (size_t)(ci.cluster_index)) {
@@ -145,6 +165,7 @@ namespace larlight {
 
   void ClusterMergeAlg::AppendHitInfo(cluster_merge_info &ci, const std::vector<larlight::hit> &in_hit_v)
   {
+    //This function does the loop over hits (also calculates q_total)
     RefineStartPointsShowerShape(ci,in_hit_v);
   }
   
@@ -156,66 +177,67 @@ namespace larlight {
     _hit_angles_backwards-> Reset();
 
 
-    if((int)in_hit_v.size() >= _min_hits_to_consider){
-      double cosangle = 99999999.;
+    double clus_q = 0;
+    
+    double cosangle = 99999999.;
+    
+    //vector from start point to end point is SEPvec
+    //vector from start point to hit is SHITvec ;)
+    
+    //loop over hits
+    for(auto const i_hit: in_hit_v){
+      clus_q += i_hit.Charge();
       
-      //vector from start point to end point is SEPvec
-      //vector from start point to hit is SHITvec ;)
+      double SEP_x  = (ci.end_wire      - ci.start_wire) * _wire_2_cm;
+      double SEP_y  = (ci.end_time      - ci.start_time) * _time_2_cm;
+      double SHIT_x = (i_hit.Wire()     - ci.start_wire) * _wire_2_cm;
+      double SHIT_y = (i_hit.PeakTime() - ci.start_time) * _time_2_cm;    
       
-      //loop over hits
-      for(auto const i_hit: in_hit_v){
-	
-	double SEP_x  = (ci.end_wire      - ci.start_wire) * _wire_2_cm;
-	double SEP_y  = (ci.end_time      - ci.start_time) * _time_2_cm;
-	double SHIT_x = (i_hit.Wire()     - ci.start_wire) * _wire_2_cm;
-	double SHIT_y = (i_hit.PeakTime() - ci.start_time) * _time_2_cm;    
-	
-	cosangle = ( SEP_x*SHIT_x + SEP_y*SHIT_y );
-	cosangle = cosangle / (
-			       pow( pow(SEP_x,2)+ pow(SEP_y,2) ,0.5) *
-			       pow( pow(SHIT_x,2)+pow(SHIT_y,2),0.5)
-			       );
-	
-	_hit_angles_forwards->Fill(cosangle,i_hit.Charge());
-	
-	//now switch the vector to be from end point to start point and re-do
-	SEP_x  = (ci.start_wire    - ci.end_wire) * _wire_2_cm;
-	SEP_y  = (ci.start_time    - ci.end_time) * _time_2_cm;
-	SHIT_x = (i_hit.Wire()     - ci.end_wire) * _wire_2_cm;
-	SHIT_y = (i_hit.PeakTime() - ci.end_time) * _time_2_cm;        
-
-	cosangle = ( SEP_x*SHIT_x + SEP_y*SHIT_y );
-	cosangle = cosangle / (
-			       pow( pow(SEP_x,2)+ pow(SEP_y,2) ,0.5) *
-			       pow( pow(SHIT_x,2)+pow(SHIT_y,2),0.5)
-			       );
-	
-	_hit_angles_backwards->Fill(cosangle,i_hit.Charge());
-      }
+      cosangle = ( SEP_x*SHIT_x + SEP_y*SHIT_y );
+      cosangle = cosangle / (
+			     pow( pow(SEP_x,2)+ pow(SEP_y,2) ,0.5) *
+			     pow( pow(SHIT_x,2)+pow(SHIT_y,2),0.5)
+			     );
       
-      //decide if you want to switch the start and end point
-      //for now, use biggest mean && smallest RMS to decide
-      if(_hit_angles_forwards->GetMean() < _hit_angles_backwards->GetMean() &&
-	 _hit_angles_forwards->GetRMS()  > _hit_angles_backwards->GetRMS() ){
-	//if(_hit_angles_forwards->GetRMS()  > _hit_angles_backwards->GetRMS() ){
-	//if(_hit_angles_forwards->GetMean() < _hit_angles_backwards->GetMean()){
-	double new_end_wire   = ci.start_wire;
-	double new_end_time   = ci.start_time;
-	double new_start_wire = ci.end_wire;
-	double new_start_time = ci.end_time;
-	//double new_angle = something?!! not trivial to switch it
-	ci.start_wire = new_start_wire;
-	ci.end_wire   = new_end_wire;
-	ci.start_time = new_start_time;
-	ci.end_time   = new_end_time;
-	//if swapped, for now, set n_hits = -1 to ignore it in multiplicity stuff
-	ci.n_hits = -1;
-
-      }
-
+      _hit_angles_forwards->Fill(cosangle,i_hit.Charge());
       
-    } //end if more than _min_hits_to_consider hits
-
+      //now switch the vector to be from end point to start point and re-do
+      SEP_x  = (ci.start_wire    - ci.end_wire) * _wire_2_cm;
+      SEP_y  = (ci.start_time    - ci.end_time) * _time_2_cm;
+      SHIT_x = (i_hit.Wire()     - ci.end_wire) * _wire_2_cm;
+      SHIT_y = (i_hit.PeakTime() - ci.end_time) * _time_2_cm;        
+      
+      cosangle = ( SEP_x*SHIT_x + SEP_y*SHIT_y );
+      cosangle = cosangle / (
+			     pow( pow(SEP_x,2)+ pow(SEP_y,2) ,0.5) *
+			     pow( pow(SHIT_x,2)+pow(SHIT_y,2),0.5)
+			     );
+      
+      _hit_angles_backwards->Fill(cosangle,i_hit.Charge());
+    }
+    
+    //decide if you want to switch the start and end point
+    //for now, use biggest mean && smallest RMS to decide
+    if(_hit_angles_forwards->GetMean() < _hit_angles_backwards->GetMean() &&
+       _hit_angles_forwards->GetRMS()  > _hit_angles_backwards->GetRMS() ){
+      //if(_hit_angles_forwards->GetRMS()  > _hit_angles_backwards->GetRMS() ){
+      //if(_hit_angles_forwards->GetMean() < _hit_angles_backwards->GetMean()){
+      double new_end_wire   = ci.start_wire;
+      double new_end_time   = ci.start_time;
+      double new_start_wire = ci.end_wire;
+      double new_start_time = ci.end_time;
+      //double new_angle = something?!! not trivial to switch it
+      ci.start_wire = new_start_wire;
+      ci.end_wire   = new_end_wire;
+      ci.start_time = new_start_time;
+      ci.end_time   = new_end_time;
+      //if swapped, for now, set n_hits = -1 to ignore it in multiplicity stuff
+      ci.n_hits = -1;
+      
+    }
+   
+    //append q_total to the cluster info
+    ci.q_total = clus_q;
     
   }//end RefineStart shit
   
@@ -231,6 +253,12 @@ namespace larlight {
       _merge_tree->Branch("u_angles", "std::vector<double>", &u_angles);
       _merge_tree->Branch("v_angles", "std::vector<double>", &v_angles);
       _merge_tree->Branch("w_angles", "std::vector<double>", &w_angles);
+      _merge_tree->Branch("u_q_tot",     &u_q_tot,     "u_q_tot/D"    );
+      _merge_tree->Branch("v_q_tot",     &v_q_tot,     "v_q_tot/D"    );
+      _merge_tree->Branch("w_q_tot",     &w_q_tot,     "w_q_tot/D"    );
+      _merge_tree->Branch("u_n_hits",    &u_n_hits,    "u_n_hits/I"   );
+      _merge_tree->Branch("v_n_hits",    &v_n_hits,    "v_n_hits/I"   );
+      _merge_tree->Branch("w_n_hits",    &w_n_hits,    "w_n_hits/I"   );
 
     }
   }
@@ -333,6 +361,12 @@ namespace larlight {
     u_angles.clear();
     v_angles.clear();
     w_angles.clear();
+    u_q_tot     = 0;
+    v_q_tot     = 0;
+    w_q_tot     = 0;
+    u_n_hits    = 0;
+    v_n_hits    = 0;
+    w_n_hits    = 0;
 
   }
 
@@ -431,7 +465,7 @@ namespace larlight {
     
     //if RefineStart shit decided to swap the start/end points (IE it set n_hits = -1),
     //then allow the +/- 180 degree ambiguity, for now
-    
+    /*
     if(cluster_a.n_hits == -1 || cluster_b.n_hits == -1)
       compatible = ( abs(angle1-angle2)     < _max_allowed_2D_angle_diff ||
 		     abs(angle1-angle2-180) < _max_allowed_2D_angle_diff ||
@@ -439,7 +473,10 @@ namespace larlight {
     
     else
       compatible = ( abs(angle1-angle2)     < _max_allowed_2D_angle_diff );
-    
+    */
+    compatible = ( abs(angle1-angle2)     < _max_allowed_2D_angle_diff ||
+		   abs(angle1-angle2-180) < _max_allowed_2D_angle_diff ||
+		   abs(angle1-angle2+180) < _max_allowed_2D_angle_diff   );
     
     if(_verbose) {
       

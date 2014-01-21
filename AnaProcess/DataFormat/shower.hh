@@ -28,7 +28,7 @@ namespace larlight{
   public:
     
     /// Default constructor
-    shower() : data_base(), fClusters_v() {clear_data();}
+    shower() : data_base(DATA::Shower), fClusters_v() {clear_data();}
     
     /// Copy constructor
     shower(const shower& original) : data_base(original),
@@ -95,7 +95,7 @@ namespace larlight{
   public:
     
     /// Default constructor
-    event_shower() : std::vector<larlight::shower>(), data_base() {clear_data();}
+    event_shower() : std::vector<larlight::shower>(), data_base(DATA::Shower) {clear_data();}
     
     /// Default copy constructor
     event_shower(const event_shower& original) : std::vector<larlight::shower>(original), data_base(original)

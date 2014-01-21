@@ -4,15 +4,29 @@
 #include "track.hh"
 
 namespace larlight {
-  //########################################
-  track::track() : data_base(),
-		   fXYZ(),
-		   fDir(),
-		   fCov(),
-		   fdQdx(),
-		   fFitMomentum()
-  //########################################
-  { clear_data(); }
+  //###################################################
+  track::track(DATA::DATA_TYPE type) : data_base(type),
+				       fXYZ(),
+				       fDir(),
+				       fCov(),
+				       fdQdx(),
+				       fFitMomentum()
+  //###################################################
+  { 
+    if( _type != DATA::Track &&
+	_type != DATA::Bezier &&
+	_type != DATA::Kalman3DSPS &&
+	_type != DATA::Kalman3DHit ) {
+
+      Message::send(MSG::ERROR,__FUNCTION__,
+		    Form("Provided data type (%d) not a valid track data type! Setting it to DATA::Hit...",_type));
+
+      _type = DATA::Track;
+
+    }
+	
+    clear_data(); 
+  }
   
   
   //########################################
@@ -84,7 +98,24 @@ namespace larlight {
     return;
   }
   
-  
+  event_track::event_track(DATA::DATA_TYPE type) : std::vector<larlight::track>(), 
+						   data_base(type) 
+  {
+    if( _type != DATA::Track &&
+	_type != DATA::Bezier &&
+	_type != DATA::Kalman3DSPS &&
+	_type != DATA::Kalman3DHit ) {
+      
+      Message::send(MSG::ERROR,__FUNCTION__,
+		    Form("Provided data type (%d) not a valid track data type! Setting it to DATA::Hit...",_type));
+
+      _type = DATA::Track;
+
+    }
+	
+    clear_data(); 
+  }
+
   //############################################################################
   void event_track::get_axis_range(Double_t &max, Double_t &min, const Int_t axis) const
   //############################################################################

@@ -1,14 +1,14 @@
 /**
  * \file ClusterMergeAlg.hh
  *
- * \ingroup ClusterStudy
+ * \ingroup Analysis
  * 
  * \brief Class def header for a class ClusterMergeAlg
  *
  * @author davidkaleko
  */
 
-/** \addtogroup ClusterStudy
+/** \addtogroup Analysis
 
     @{*/
 
@@ -64,6 +64,9 @@ namespace larlight {
 
     /// Method to set cut value in cm^2 for distance compatibility test
     void SetSquaredDistanceCut(double d) { _max_2D_dist2 = d; }
+
+    /// Method to set minimum q_total for a cluster to consider it
+    void SetQTotalCut(double qt) { _min_q_total_to_consider = qt; }
 
     /// Method to clear event-wise information (both input cluster info & output merged cluster sets)
     void ClearEventInfo();
@@ -224,7 +227,8 @@ namespace larlight {
     double _max_allowed_2D_angle_diff; //in degrees
     double _max_2D_dist2;              //in cm^2
     double _min_distance_unit;         //in cm^2
-    int    _min_hits_to_consider; ///< Minimum # of hits to bother trying to refine start/endpoints
+    unsigned int  _min_hits_to_consider; ///< Minimum # of hits to bother trying to refine start/endpoints
+    double _min_q_total_to_consider; ///<Minimum total charge in cluster to consider that cluster
 
     /// Angle histgrams used in RefineStartPointShowerShape stuff
     TH1F *_hit_angles_forwards, *_hit_angles_backwards;
@@ -233,6 +237,8 @@ namespace larlight {
     /// These go into quality control TTree
     int u_clus_mult, v_clus_mult, w_clus_mult;
     std::vector<double> u_angles, v_angles, w_angles;
+    double u_q_tot, v_q_tot, w_q_tot;
+    int u_n_hits, v_n_hits, w_n_hits;
   };
 }
 #endif

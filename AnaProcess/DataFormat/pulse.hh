@@ -26,7 +26,7 @@ namespace larlight {
   public:
 
     /// Default constructor
-    pulse(DATA::DATA_TYPE type=DATA::DATA_TYPE_MAX);
+    pulse(DATA::DATA_TYPE type=DATA::Pulse);
 
     /// Default copy constructor
     pulse(const pulse& original) : data_base(original),
@@ -142,18 +142,17 @@ namespace larlight {
    \class event_pulse 
    PMT-wise data member class to hold a collection of ADC samples.
   */
-  class event_pulse : public std::vector<pulse>,
+  class event_pulse : public std::vector<larlight::pulse>,
 		      public data_base {
 
   public:
 
     /// Default constructor
-    event_pulse(DATA::DATA_TYPE type=DATA::DATA_TYPE_MAX) 
-      : data_base(type) {clear_data();}
+    event_pulse(DATA::DATA_TYPE type=DATA::Pulse);
 
     /// Default copy constructor
     event_pulse(const event_pulse& original)
-      : std::vector<pulse>(original),
+      : std::vector<larlight::pulse>(original),
 	data_base(original),
 	_sum_charge(original._sum_charge),
 	_sum_peak(original._sum_peak),

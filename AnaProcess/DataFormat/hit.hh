@@ -27,7 +27,7 @@ namespace larlight{
   public:
     
     /// Default constructor
-    hit() : data_base() , fHitSignal() {clear_data();}
+    hit(DATA::DATA_TYPE type=DATA::Hit);
     
     /// Copy constructor
     hit(const hit& original);
@@ -108,7 +108,7 @@ namespace larlight{
   public:
     
     /// Default constructor
-    event_hit() : std::vector<larlight::hit>(), data_base() {clear_data();}
+    event_hit(DATA::DATA_TYPE type=DATA::Hit);
     
     /// Default copy constructor
     event_hit(const event_hit& original) : std::vector<larlight::hit>(original), data_base(original)

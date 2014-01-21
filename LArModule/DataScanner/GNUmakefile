@@ -24,4 +24,4 @@ override CPPFLAGS += -I$(NUTOOLS_INC)
 # For example, if you had to read in raw::RawDigit objects from an event
 # record, you'd add -lRawData to the end of the line, since raw::RawDigit
 # is defined in package RawData.
-override LIBLIBS += $(LOADLIBES) -L$(ART_LIB) -lart_Framework_Services_Optional_TFileService_service -L$(NUTOOLS_LIB) -lSimulationBase -L$(SRT_PRIVATE_CONTEXT)/lib/$(SRT_SUBDIR) -L$(SRT_PUBLIC_CONTEXT)/lib/$(SRT_SUBDIR) -L$(LARSOFT)/lib/$(SRT_SUBDIR) -lSimulation -lGeometry -lRecoBase  -lBase -lDataFormat -lRecoAlg
+override LIBLIBS += $(LOADLIBES) -L$(ART_LIB) -lart_Framework_Services_Optional_TFileService_service -L$(NUTOOLS_LIB) -lSimulationBase -L$(SRT_PRIVATE_CONTEXT)/lib/$(SRT_SUBDIR) -lBase -lDataFormat -lDataScanner -L$(SRT_PUBLIC_CONTEXT)/lib/$(SRT_SUBDIR) -L$(LARSOFT)/lib/$(SRT_SUBDIR) -lSimulation -lGeometry -lRecoBase -lRecoAlg 

@@ -30,7 +30,7 @@ namespace larlight{
   public:
     
     /// Default constructor
-    cluster() : data_base() {clear_data();};
+    cluster(DATA::DATA_TYPE type=DATA::Cluster);
     
     /// Default destructor
     virtual ~cluster(){};
@@ -115,7 +115,7 @@ namespace larlight{
   public:
     
     /// Default constructor
-    event_cluster() : std::vector<larlight::cluster>(), data_base() {clear_data();};
+    event_cluster(DATA::DATA_TYPE type=DATA::Cluster);
     
     /// Default copy constructor
     event_cluster(const event_cluster& original)

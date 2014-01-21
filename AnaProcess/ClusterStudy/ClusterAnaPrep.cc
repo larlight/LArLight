@@ -36,9 +36,9 @@ namespace larlight {
     _vclusters.clear(); 
     _wclusters.clear(); 
 
-    _run    = -1;
-    _subrun = -1;
-    _event  = -1;
+    _run    = DATA::INVALID_UINT;
+    _subrun = DATA::INVALID_UINT;
+    _event  = DATA::INVALID_UINT;
   }
 
   //********************************************************************************************

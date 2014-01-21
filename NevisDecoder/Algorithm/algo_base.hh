@@ -16,6 +16,7 @@
 #define ALGO_BASE
 
 #include "storage_manager.hh"
+#include <sstream>
 #include <deque>
 
 namespace larlight {

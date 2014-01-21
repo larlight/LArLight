@@ -6,7 +6,8 @@
 namespace larlight {
 
   void trigger::clear_data(){
-    
+
+    data_base::clear_data();
     init_vars();
     
   }
