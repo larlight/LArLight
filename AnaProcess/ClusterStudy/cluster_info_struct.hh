@@ -1,7 +1,7 @@
-#ifndef ANA_INFO_STRUCT_HH
-#define ANA_INFO_STRUCT_HH
+#ifndef CLUSTER_INFO_STRUCT_HH
+#define CLUSTER_INFO_STRUCT_HH
 
-#include "GeoConstants.hh"
+#include "Base-TypeDef.hh"
 
 namespace larlight {
 
@@ -86,6 +86,8 @@ namespace larlight {
 
     int n_hits;                 ///< Total number of hits in cluster
 
+    double q_total;             ///< Total charge of all hits in cluster
+
     /// Default constructor
     cluster_merge_info() {
       
@@ -94,6 +96,7 @@ namespace larlight {
       start_wire = start_time = end_wire = end_time = -1;
       start_wire_err = start_time_err = end_wire_err =end_time_err = -1;
       n_hits = -1;
+      q_total = 0;
 
     };
 

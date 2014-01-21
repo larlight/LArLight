@@ -111,7 +111,7 @@ namespace larlight {
     bool _initialized, _finalized;
 
     /// integers used to identify an event
-    Int_t _run, _subrun, _event;
+    UInt_t _run, _subrun, _event;
     
     /// Cluster multiplicity histograms for U/V/W planes
     TH1D *_hMultU, *_hMultV, *_hMultW;
