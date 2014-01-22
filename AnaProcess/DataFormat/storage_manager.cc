@@ -444,9 +444,12 @@ namespace larlight {
     
     if(status) {
       
-      sprintf(_buf,"Closing the output: %s",_out_fname.c_str());
-      Message::send(MSG::NORMAL,__FUNCTION__,_buf);
-      if(_fout) _fout->Close();
+      if(_fout) {
+
+	Message::send(MSG::NORMAL,__FUNCTION__,Form("Closing the output: %s",_out_fname.c_str()));
+	_fout->Close();
+
+      }
       _fout=0;
       
       for(size_t i=0; i<DATA::DATA_TYPE_MAX; ++i) {
