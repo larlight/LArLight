@@ -60,6 +60,26 @@ namespace larlight {
   }
   
   bool georgia_timing1::analyze(storage_manager* storage) {
+
+    //
+    // First check if data exists
+    //
+    // PMT data
+    const event_fifo *event_wf = (event_fifo*)(storage->get_data(DATA::PMTFIFO));    
+    const trigger* trig_data = (trigger*)(storage->get_data(DATA::Trigger));
+    if(!trig_data) {
+
+      print(MSG::ERROR,__FUNCTION__,"Trigger data not found!");
+
+      return false;
+
+    }else if(!event_wf) {
+
+      print(MSG::ERROR,__FUNCTION__,"PMT data not found!");
+
+      return false;
+
+    }
     
     //
     // Do your event-by-event analysis here. This function is called for 
@@ -70,7 +90,7 @@ namespace larlight {
     // Example to print out event id on screen...
     //
     
-    const event_fifo *event_wf = (event_fifo*)(storage->get_data(DATA::PMTFIFO));
+
     //    std::cout << Form("Event ID: %d",event_wf->event_number()) << std::endl;
     pmt_nu_evtno = event_wf->event_number();
 
@@ -108,7 +128,6 @@ namespace larlight {
     pmt_nu_nch->Fill(_nch);
     pmt_nu_nrd->Fill(_nrd);
 
-    const trigger* trig_data = (trigger*)(storage->get_data(DATA::Trigger));
 
     //    std::cout << Form("Event ID: %d",trig_data->trig_number()) << std::endl;
     trig_evtno = trig_data->trig_number();
@@ -126,14 +145,14 @@ namespace larlight {
     trig_calib->Fill(trig_data->calib());
     trig_rem64->Fill(trig_data->remainder_64MHz());
     trig_rem16->Fill(trig_data->remainder_16MHz());
-
+    
     if (trig_evtno==pmt_nu_evtno){
-
+      
       //compare trigger frame numbers
       trig_frdiff->SetPoint(k,
 			    event_wf->event_number(),
 			    double(trig_data->trig_frame_number())-double(event_wf->fem_trig_frame_number()));
-
+      
       trig_slcdiff->SetPoint( k,
 			      event_wf->event_number(),
 			      (double(trig_data->trig_frame_number())*102400+double(trig_data->trig_sample_number_64MHz())) - 
