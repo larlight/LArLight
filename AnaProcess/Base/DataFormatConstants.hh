@@ -97,6 +97,7 @@ namespace larlight{
       "shower",
       "calorimetry",
       "user",
+      "fifo",
       "pmtfifo",
       "tpcfifo",
       "pulse",
