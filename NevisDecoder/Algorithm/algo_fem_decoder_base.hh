@@ -40,20 +40,20 @@ namespace larlight {
     /// A local data holder struct for FEM header information
     struct InfoFEM_t {
   
-      UInt_t module_address;         ///< Module address
-      UInt_t module_id;              ///< Module id number
-      UInt_t event_number;           ///< Event counter 
-      UInt_t event_frame_number;     ///< Data packet frame number
-      UInt_t fem_trig_frame_number;  ///< Trigger frame number
-      UInt_t fem_trig_sample_number; ///< Trigger sample number
-      UInt_t nwords;                 ///< Number of words in an event
-      UInt_t checksum;               ///< Data checksum
-      bool   quality;                ///< Event-wise quality check
+      UChar_t module_address;         ///< Module address
+      UChar_t module_id;              ///< Module id number
+      UInt_t  event_number;           ///< Event counter 
+      UInt_t  event_frame_number;     ///< Data packet frame number
+      UInt_t  fem_trig_frame_number;  ///< Trigger frame number
+      UInt_t  fem_trig_sample_number; ///< Trigger sample number
+      UInt_t  nwords;                 ///< Number of words in an event
+      UInt_t  checksum;               ///< Data checksum
+      bool    quality;                ///< Event-wise quality check
 
       void clear_event(){
 
-	module_address         = FEM::INVALID_WORD;
-	module_id              = FEM::INVALID_WORD;
+	module_address         = DATA::INVALID_UCHAR;
+	module_id              = DATA::INVALID_UCHAR;
 	event_number           = FEM::INVALID_WORD;
 	event_frame_number     = FEM::INVALID_WORD;
 	fem_trig_frame_number  = FEM::INVALID_WORD;

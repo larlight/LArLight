@@ -35,6 +35,11 @@ rootlibmap libEncoder.rootmap libEncoder.so $DECODER_DIR/Encoder/LinkDef.h \
     libBase.so libDataFormat.so libAlgorithm.so libFileIO.so
 
 
+######################################################
+# EventBuilder
+rootlibmap libEventBuilder.rootmap libEventBuilder.so $DECODER_DIR/EventBuilder/LinkDef.h \
+    libAnalysis.so
+
 
 
 

@@ -19,6 +19,8 @@ namespace larlight {
   
   void fifo::init_vars(){
     _channel_number=FEM::INVALID_CH;
+    _module_address=DATA::INVALID_UCHAR;
+    _module_id=DATA::INVALID_UCHAR;
     _readout_frame_number=FEM::INVALID_WORD;
     _readout_sample_number=FEM::INVALID_WORD;
     _disc_id=FEM::DISC_MAX;
@@ -39,8 +41,8 @@ namespace larlight {
   
   void event_fifo::init_vars(){
     _event_frame_number=FEM::INVALID_WORD;
-    _module_address=FEM::INVALID_WORD;
-    _module_id=FEM::INVALID_WORD;
+    _module_address=DATA::INVALID_UCHAR;
+    _module_id=DATA::INVALID_UCHAR;
     _checksum=FEM::INVALID_WORD;
     _nwords=FEM::INVALID_WORD;
     _fem_trig_frame_number=FEM::INVALID_WORD;

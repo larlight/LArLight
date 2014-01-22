@@ -657,6 +657,9 @@ namespace larlight {
 	_beam_ref_frame=_ch_data.readout_frame_number();
       }
     }
+
+    _ch_data.set_module_id(_event_data->module_id());
+    _ch_data.set_module_address(_event_data->module_address());
     _event_data->push_back(_ch_data);
 
     // Store this waveform's channel number and discriminator id.

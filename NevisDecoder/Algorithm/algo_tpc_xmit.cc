@@ -95,6 +95,8 @@ namespace larlight {
 			       _ch_data.size(),_ch_data.channel_number()));
 
 	  // Store
+	  _ch_data.set_module_id(_header_info.module_id);
+	  _ch_data.set_module_address(_header_info.module_address);
 	  _event_data->push_back(_ch_data);
 
 	  _ch_data.clear_data();
