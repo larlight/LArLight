@@ -13,16 +13,6 @@ namespace larlight {
     // If you need, you have an output root file pointer "_fout".
     
     pmt_nu_evno = new TH1D("pmt_nu_evno","Event number",100,0,100);
-    //FIFO absolute trigger sample
-    fifo_trig_abs = new TH1D("fifo_trigger_abs","Absolute Trigger Sample",10000,0,10000000);
-    //PMT absolute trigger sample
-    ch2_trig_abs = new TH1D("ch2_trigger_abs","Ch2 Absolute Trigger Sample", 10000,0,10000000);
-    //FIFO-PMT frame difference
-    frame_diff_1 = new TH1D("frame_diff_1","Frame Difference: PMT readout - FEM trig", 15, -5, 10);
-    frame_diff_2 = new TH1D("frame_diff_2","Frame Difference: PMT readout - FEM event", 15, -5, 10);
-    ch2_readout = new TH1D("ch2_readout", "Ch2 Readout Sample Number", 100,0,1.6);
-    ch2_readout_mod = new TH1D("ch2_readout_mod", "Ch2 Readout Sample Number", 100,0,1.6);
-    fifo_femtrig_samplenum = new TH1D("fifo_femtrig_samplenum", "FIFO FEM Trig Sample Num", 100, 0, 1.6); 
 
     //Waveform
     hWF = new TH1D("hWF", "Waveform", 1500, 0, 1500);
@@ -33,6 +23,7 @@ namespace larlight {
     //Start Times
     reco_start = new TH1D("reco_start", "Reco Start Times", 30, 5, 7);
     reco_start_cut = new TH1D("reco_start_cut", "Reco Start Times < 2275 ADC", 30, 5, 7);
+    reco_start_fit = new TH1D("reco_start_fit", "Reco Start Times - 3 Points", 30, 5, 7);
 
     for (Int_t y=0; y<1500; ++y){
       ADCs[y] = 0.0;
@@ -73,8 +64,11 @@ namespace larlight {
 
     //Create temp histogram
     char c[15];
+    char d[15];
     strcpy(c,Form("fff%d",event_wf->event_number()));
     TH1D* temphist = new TH1D(c,"pulse",50,0,50); 
+    strcpy(d,Form("ggg%d",event_wf->event_number()));
+    TH1D* fitslope = new TH1D(d,"fit",50,0,50);
     
    
     //loop over all channels
@@ -94,7 +88,7 @@ namespace larlight {
 	//variables to find start time
 	Double_t start_time;
 	Double_t x1, x2, y1, y2, x3, y3;
-	Int_t found_begin = 0; //Set to 1 if found first count > 5 ADC
+	Int_t found_begin = 0; //Set to 1 if found first count > 4 ADC
 	Double_t baseline = 0;
 		
 	//Figure out baseline
@@ -110,20 +104,25 @@ namespace larlight {
 	  //1) Find first hit that is >5 ADC above baseline
 	  //2) Find slope for 2 points starting from this first one
 	  //3) Trace back to baseline. That is the starting time
-	  if ((pmt_data->at(adc_index) > (baseline+5)) & (found_begin < 2)){
+	  if ((pmt_data->at(adc_index) > (baseline+4)) & (found_begin < 3)){
 	    if (found_begin == 0){
 	      x1 = adc_index+0.5;  //add 0.5 to center in bin
 	      y1 = pmt_data->at(adc_index);
 	      found_begin += 1;
 	    }
-	    else{
+	    else if(found_begin == 1){
 	      x2 = adc_index+0.5;  //add 0.5 to center in bin
 	      y2 = pmt_data->at(adc_index);
 	      found_begin += 1;
 	    }
+	    else if(found_begin == 2){
+	      x3 = adc_index+0.5;  //add 0.5 to center in bin
+	      y3 = pmt_data->at(adc_index);
+	      found_begin += 1;
+	    }
 	  }
 	    
-
+	  //Keep track of sum of all ADC counts for Ch2 for all events
 	  ADCs[adc_index] += ((pmt_data->at(adc_index))-baseline);
 	  temphist->SetBinContent(adc_index+1,pmt_data->at(adc_index));
 
@@ -146,20 +145,33 @@ namespace larlight {
 	//first find b
 	Double_t b = y2-slope*x2;
 	start_time = (baseline-b)/slope;
-	std::cout << start_time << std::endl;
 	reco_start->Fill(start_time);
 	temphist->GetXaxis()->SetTitle(Form("%f",start_time));
 	//Apply cut based on first bin ADC value
 	if (y1 < 2275){
 	  reco_start_cut->Fill(start_time);
 	}
+
 	//If 3 points, reconstruct start time
 	//create temporary histogram of 3 data points
-	//TH1D* fitpoint = new TH1D("fitpoint","fit", 50, 0, 50);
-	//fitpoint->AddBinContent(x1,y1);
-	//fitpoint->AddBinContent(x2,y2);
-	//fitpoint->AddBinContent(x3,y3);
-	//  fitpoint->Fit("pol1");
+	if (y3 < 4095){
+	  fitslope->SetBinContent(x1+1,y1);
+	  fitslope->SetBinContent(x2+1,y2);
+	  fitslope->SetBinContent(x3+1,y3);
+	  temphist->Fit("pol1","","",x1,x3);
+	  TF1 *fitparam = temphist->GetFunction("pol1");
+	  //std::cout << r << std::endl;
+	  Double_t b2 = fitparam->GetParameter(0);
+	  Double_t slope2 = fitparam->GetParameter(1);
+	  //find x-value for y = baseline
+	  Double_t start_fit = (baseline-b2)/slope2;
+	  std::cout << start_fit << std::endl;
+	  reco_start_fit->Fill(start_fit);
+	}
+	else{
+	  reco_start_fit->Fill(start_time);
+	}
+	//Write individual histogram for waveform
 	temphist->Write();
 	
 	
@@ -203,7 +215,7 @@ namespace larlight {
       saturation_histo->Write();
       pulse_start->Write();
       reco_start->Write();
-      //reco_start_cut->Write();
+      reco_start_fit->Write();
 
     }
     return true;

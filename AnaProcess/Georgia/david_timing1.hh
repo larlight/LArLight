@@ -26,6 +26,8 @@
 #include <sstream>
 #include <stdio.h>
 #include <string.h>
+#include <TFitResultPtr.h>
+#include <TF1.h>
 
 namespace larlight {
 
@@ -76,6 +78,7 @@ namespace larlight {
     TH1D *saturation_histo;
     TH1D *pulse_start;
     TH1D *reco_start;
+    TH1D *reco_start_fit;
     TH1D *reco_start_cut;
 
     int _nch;
