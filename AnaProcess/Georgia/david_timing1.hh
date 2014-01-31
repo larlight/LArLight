@@ -67,6 +67,7 @@ namespace larlight {
     Double_t ADCs[1500];
     
     TH1D *pmt_nu_evno;
+    TH1D *baseline_histo;
     TH1D *fifo_trig_abs;
     TH1D *ch2_trig_abs;
     TH1D *frame_diff_1;
