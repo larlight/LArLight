@@ -333,6 +333,7 @@ namespace larlight {
     case DATA::UserInfo:
       _ptr_data_array[type]=(data_base*)(new event_user);
       break;
+    case DATA::FIFO:
     case DATA::PMTFIFO:
     case DATA::TPCFIFO:
       _ptr_data_array[type]=(data_base*)(new event_fifo(type));
