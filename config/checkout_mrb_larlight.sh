@@ -2,7 +2,7 @@
 
 command -v mrb >/dev/null 2>&1 || { echo >&2 "MRB seems not set up (required!). Aborting."; return; }
 
-local_repo_name=$USER
+local_repo_name=kazu
 
 if [ -z $MRB_TOP ]; then
     echo You have not set local mrb! Exiting...
