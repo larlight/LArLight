@@ -31,15 +31,26 @@ This repository includes two sub-repositories:
 
     - Ask Kazu for further details.
 
-(*) LArModule
+(*) NevisDecoder
 
-    - Include LArSoft analyzer/producer modules.
+    - Include toolkit for decoding raw binary files output by Nevis readout 
+      code (CAUTION: not by UB event builder)
 
-    - In particular, DataScanner package shows a comprehensive example
-      of LArSoft data container access method. It is a core code to convert
-      LArSoft data into LArLight data format (see AnaProcess for details).
+    - Binary file I/O is handled by classes defined under FileIO. The class,
+      bin_io_handler, can handle a block-read by specifying number of words
+      to access at once. If this is enabled but # of words (a block size) is
+      not specified, then a standard procedure is taken in which the 1st word
+      is assumed to suggest # of words to be read as a block.      
 
-    - For code development guideline, refer to LArModule/README.
+    - Decoding algorithms are defined under Algorithm package. Currently 
+      xmit readout for PMT/TPC (an option of huffman) + Trigger decoding
+      algorithms are implemented. More possible upon request.
+
+    - Decoding algorithm + bin file I/O + output ROOT storage I/O are
+      handled by decode_manager class defined under Decoder directory. The
+      idea is a user attaching different algorithm to this manager class
+      to decode different binary files while file I/O interface can stay same.
+
 
 ################
 #              # 
@@ -57,18 +68,21 @@ assuming you are in the same directory where this README exists:
 This build AnaProcess package with basic components including Basic,
 DataFormat, and Analysis sub-directories. 
 
-If $SRT_LOCAL is specified, then above command also build LArModule
-sub-directories under $SRT_LOCAL. For this to happen, however,
-one has to specify LArModule sub-directories to be built. This is
-to avoid building all sub-directories which can take long time and
-likely unnecessary. Specification of sub-directories is done through
-defining LAR_MODULE env. var:
+It also buildds NevisDecoder directory with the minimal set of packages
+including FileIO, Algorithm, Decoder. 
 
-> export LAR_MODULE="DataScanner Example"
+If one does not want to compile anything under NevisDecoder, do:
 
-The above line configures to compile DataScanner and Example sub-directories
-under LArModule upon sourcing "config/setup.sh". Note that the compilation
-process proceeds in the specified ordering of sub-directories.
+export DECODER_MODULE=IGNORE
+
+prior to calling "source config/setup.sh". This will make the build system
+to ignore the NevisDecoder sub directories.
+
+###########################
+#                         # 
+# How To Build (Advanced) #
+#                         #
+###########################
 
 One can also explicitly specify AnaProcess sub packages to compile.
 
@@ -84,10 +98,28 @@ script to be run upon ssh login.
 
 > export MAKE_TOP_DIR=$HOME/LArLight
 > export ANA_PROC_MODULE="Base DataFormat Analysis"
-> export LAR_MODULE="DataScanner Example"
 > source $MAKE_TOP_DIR/config/setup.sh
 > make --directory=$MAKE_TOP_DIR
 
+##########################
+#                        #
+# More on Config Scripts #
+#                        #
+##########################
+
+There are number of config scripts that can be found under config directory.
+Other than "setup.sh" which usage is explained above, you can refer to 
+
+  config/README.txt
+
+to use other config scripts that are useful to:
+
+  (*) set up mrb+git LArSoft environment
+  (*) checkout / set up local LArSoft development environment
+  (*) checkout / set up LArLight compatible LArSoft modules
+
+
 Contact kazu for further details.
+
 
 
