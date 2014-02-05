@@ -7,33 +7,6 @@ if not 'MAKE_TOP_DIR' in os.environ:
 # read in template GNUmakefile
 makefile=open('%s/config/TopMakefile.tmp' % os.environ['MAKE_TOP_DIR'],'r').read()
 
-# if SRT_LOCAL is not defined, generate makefile w/o LAR_PACKAGE definition
-if not 'SRT_LOCAL' in os.environ or not 'LAR_MODULE' in os.environ:
-
-    makefile=makefile.replace('LAR_MODULE','')
-
-else:
-
-    packages = [x for x in os.environ['LAR_MODULE'].split(None)]
-
-    print ("\033[93m" + "Specified LArSoft packages to be compiled by a user:")
-    valid_packages=''
-    not_found=[]
-    for package in packages:
-
-        if os.path.isdir('%s/%s' % (os.environ['LAR_MODULE_DIR'],package)):
-            print ("\033[95m" + package + "\033[0m")
-            valid_packages += ' %s' % package
-        else:
-            not_found.append(package)
-
-    if not_found:
-        print
-        print 'Packages not found:'
-        for x in not_found:
-            print x
-    makefile=makefile.replace('LAR_MODULE',valid_packages)
-
 fout=open('%s/GNUmakefile' % os.environ['MAKE_TOP_DIR'],'w')
 fout.write(makefile)
 fout.close()

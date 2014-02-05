@@ -8,7 +8,7 @@ if not 'MAKE_TOP_DIR' in os.environ:
 makefile=open('%s/config/DecoderMakefile.tmp' % os.environ['MAKE_TOP_DIR'],'r').read()
 
 # if SRT_LOCAL is not defined, generate makefile w/o LAR_PACKAGE definition
-if not 'DECODER_DIR' in os.environ or not 'DECODER_MODULE' in os.environ:
+if not 'DECODER_MODULE' in os.environ.keys() or os.environ['DECODER_MODULE']=='IGNORE':
 
     makefile=makefile.replace('DECODER_MODULE','')
 
