@@ -5,23 +5,23 @@ if not 'MAKE_TOP_DIR' in os.environ:
     sys.exit(1)
 
 # read in template GNUmakefile
-makefile=open('%s/config/DecoderMakefile.tmp' % os.environ['MAKE_TOP_DIR'],'r').read()
+makefile=open('%s/config/template/AnaMakefile.tmp' % os.environ['MAKE_TOP_DIR'],'r').read()
 
 # if SRT_LOCAL is not defined, generate makefile w/o LAR_PACKAGE definition
-if not 'DECODER_MODULE' in os.environ.keys() or os.environ['DECODER_MODULE']=='IGNORE':
+if not 'ANA_PROC_DIR' in os.environ or not 'ANA_PROC_MODULE' in os.environ:
 
-    makefile=makefile.replace('DECODER_MODULE','')
+    makefile=makefile.replace('ANA_PROC_MODULE','')
 
 else:
 
-    packages = [x for x in os.environ['DECODER_MODULE'].split(None)]
+    packages = [x for x in os.environ['ANA_PROC_MODULE'].split(None)]
 
-    print ("\033[93m" + "Specified " + os.environ['DECODER_RELPATH'] + " packages to be compiled by a user:" )
+    print ("\033[93m" + "Specified " + os.environ['ANA_PROC_RELPATH'] + " packages to be compiled by a user:" )
     valid_packages=''
     not_found=[]
     for package in packages:
 
-        if os.path.isdir('%s/%s' % (os.environ['DECODER_DIR'],package)):
+        if os.path.isdir('%s/%s' % (os.environ['ANA_PROC_DIR'],package)):
             print ("\033[95m" + package + "\033[0m")
             valid_packages += ' %s' % package
         else:
@@ -32,8 +32,8 @@ else:
         print ('\033[93m' + 'Packages not found:' + '\033[0m')
         for x in not_found:
             print x
-    makefile=makefile.replace('DECODER_MODULE',valid_packages)
+    makefile=makefile.replace('ANA_PROC_MODULE',valid_packages)
 
-fout=open('%s/GNUmakefile' % os.environ['DECODER_DIR'],'w')
+fout=open('%s/GNUmakefile' % os.environ['ANA_PROC_DIR'],'w')
 fout.write(makefile)
 fout.close()

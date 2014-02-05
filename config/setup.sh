@@ -45,9 +45,9 @@ else
 	echo Failed to set up ROOTSYS. Contact kazuhiro@nevis.columbia.edu
 	echo
     else
-	python $MAKE_TOP_DIR/config/gen_anamakefile.py
-	python $MAKE_TOP_DIR/config/gen_decodermakefile.py
-	python $MAKE_TOP_DIR/config/gen_topmakefile.py
+	python $MAKE_TOP_DIR/config/python/gen_anamakefile.py
+	python $MAKE_TOP_DIR/config/python/gen_decodermakefile.py
+	python $MAKE_TOP_DIR/config/python/gen_topmakefile.py
 	export LD_LIBRARY_PATH=$ANA_PROC_LIBDIR:$DECODER_LIBDIR:$LD_LIBRARY_PATH
 	export DYLD_LIBRARY_PATH=$ANA_PROC_LIBDIR:$DECODER_LIBDIR:$DYLD_LIBRARY_PATH
 	export PYTHONPATH=$PYTHONPATH:$ROOTSYS/lib
