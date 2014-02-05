@@ -33,19 +33,19 @@ namespace larlight{
     cluster(DATA::DATA_TYPE type=DATA::Cluster);
     
     /// Default destructor
-    virtual ~cluster(){};
+    virtual ~cluster(){}
     
-    void set_charge   (Double_t q)      { fTotalCharge = q; };
-    void set_dtdw     (Double_t v)      { fdTdW=v; };
-    void set_dqdw     (Double_t v)      { fdQdW=v; };
-    void set_dtdw_err (Double_t v)      { fSigmadTdW=v; };
-    void set_dqdw_err (Double_t v)      { fSigmadQdW=v; };
-    void set_id       (Int_t i)         { fID = i; };
-    void set_view     (GEO::View_t v) { fView=v; };
-    void set_start_vtx     (const std::vector<Double_t> vtx) { fStartPos=vtx;      };
-    void set_end_vtx       (const std::vector<Double_t> vtx) { fEndPos=vtx;        };
-    void set_start_vtx_err (const std::vector<Double_t> vtx) { fSigmaStartPos=vtx; };
-    void set_end_vtx_err   (const std::vector<Double_t> vtx) { fSigmaEndPos=vtx;   };
+    void set_charge   (Double_t q)      { fTotalCharge = q; }
+    void set_dtdw     (Double_t v)      { fdTdW=v; }
+    void set_dqdw     (Double_t v)      { fdQdW=v; }
+    void set_dtdw_err (Double_t v)      { fSigmadTdW=v; }
+    void set_dqdw_err (Double_t v)      { fSigmadQdW=v; }
+    void set_id       (Int_t i)         { fID = i; }
+    void set_view     (GEO::View_t v) { fView=v; }
+    void set_start_vtx     (const std::vector<Double_t> vtx) { fStartPos=vtx;      }
+    void set_end_vtx       (const std::vector<Double_t> vtx) { fEndPos=vtx;        }
+    void set_start_vtx_err (const std::vector<Double_t> vtx) { fSigmaStartPos=vtx; }
+    void set_end_vtx_err   (const std::vector<Double_t> vtx) { fSigmaEndPos=vtx;   }
     void add_hit           (const hit h)                   { fHitVector.push_back(h); }
     
     inline Double_t       Charge()    const { return fTotalCharge;   }
@@ -143,7 +143,7 @@ namespace larlight{
     ClassDef(event_cluster,2)
     ////////////////////////
       };
-};
+}
 #endif
   
   /** @} */ // end of doxygen group 

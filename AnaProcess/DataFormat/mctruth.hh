@@ -30,7 +30,7 @@ namespace larlight {
   public:
     
     /// Default constructor w/o arguments set to private (not-to-be-used)
-    part_mc(){clear_data();};
+    part_mc(){clear_data();}
     
     /// Default constructor requires pdgid, track & parent id
     part_mc(Int_t pdgid, Int_t track, Int_t parent, std::string process);
@@ -46,10 +46,10 @@ namespace larlight {
 				       fParentID     (original.fParentID),
 				       fTrackID      (original.fTrackID),
 				       fPDGID        (original.fPDGID)
-    {};
+    {}
     
     /// Default destructor
-    virtual ~part_mc(){};
+    virtual ~part_mc(){}
     
     /// Clear method
     void clear_data();
@@ -60,25 +60,25 @@ namespace larlight {
     
     /// Appender of a particle's daughter
     //void add_daughter(Int_t id, Int_t track_id=-1);
-    void add_daughter(Int_t track_id){fDaughters.insert(track_id);};
+    void add_daughter(Int_t track_id){fDaughters.insert(track_id);}
     
     /// Getter for PDGID
-    inline Int_t pdg_id()    const { return fPDGID;    };
+    inline Int_t pdg_id()    const { return fPDGID;    }
 
     /// Getter for Track ID
-    inline Int_t track_id()  const { return fTrackID;  };
+    inline Int_t track_id()  const { return fTrackID;  }
     
     /// Getter for Parent ID
-    inline Int_t parent_id() const { return fParentID; };
+    inline Int_t parent_id() const { return fParentID; }
     
     /// Getter for step vertex
-    inline const std::vector<TVector3>& step_vertex()   const { return fStepVertex;   };
+    inline const std::vector<TVector3>& step_vertex()   const { return fStepVertex;   }
     
     /// Getter for step time
-    inline const std::vector<Double_t>&   step_time()     const { return fStepTime;     };
+    inline const std::vector<Double_t>&   step_time()     const { return fStepTime;     }
     
     /// Getter for step momentum
-    inline const std::vector<TVector3>& step_momentum() const { return fStepMomentum; };
+    inline const std::vector<TVector3>& step_momentum() const { return fStepMomentum; }
     
   private:
     
@@ -111,7 +111,7 @@ namespace larlight {
   public:
     
     /// Default constructor
-    event_mc() : std::vector<larlight::part_mc>(), data_base() {clear_data();};
+    event_mc() : std::vector<larlight::part_mc>(), data_base() {clear_data();}
     
     /// Copy constructor
     event_mc(const event_mc& original) : std::vector<larlight::part_mc>(original),
@@ -119,28 +119,28 @@ namespace larlight {
 					 //fMCNeutrino (original.fMCNeutrino),
 					 fOrigin     (original.fOrigin)
 	    //fNeutrinoSet(original.fNeutrinoSet
-    {};
+    {}
     
     /// Default destructor
-    virtual ~event_mc(){};
+    virtual ~event_mc(){}
     
     /// Clear method
     void clear_data();
     
     /// Setter for neutrino info
-    //void set_nu_mc(nu_mc info) {fMCNeutrino = info;};
+    //void set_nu_mc(nu_mc info) {fMCNeutrino = info;}
     
     /// Setter for generation code
-    void set_gen_code(MC::Origin_t info) {fOrigin=info;};
+    void set_gen_code(MC::Origin_t info) {fOrigin=info;}
     
     /// Getter for neutrino info
-    //inline const nu_mc& nu_mc() {return fMCNeutrino;};
+    //inline const nu_mc& nu_mc() {return fMCNeutrino;}
     
     /// Getter for generator id
-    inline MC::Origin_t gen_code() const {return fOrigin;};
+    inline MC::Origin_t gen_code() const {return fOrigin;}
     
     /// Getter for a boolean to suggest if neutrinos were generated or not
-    //inline const bool nu_info_set() {return fNeutrinoSet;};
+    //inline const bool nu_info_set() {return fNeutrinoSet;}
     
     /**
        A utility function to obtain maximum & minimum of spacepoints' vertex along the specified axis.
@@ -169,7 +169,7 @@ namespace larlight {
     ////////////////////////
       
   };
-};
+}
 #endif
 
 /** @} */ // end of doxygen group 

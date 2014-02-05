@@ -27,7 +27,7 @@ namespace larlight{
   public:
     
     /// Default constructor
-    calorimetry() : data_base(DATA::Calorimetry) {clear_data();};
+    calorimetry() : data_base(DATA::Calorimetry) {clear_data();}
     
     /// Copy constructor
     calorimetry(const calorimetry& original) : data_base(original),
@@ -120,7 +120,7 @@ namespace larlight{
     ClassDef(event_calorimetry,1)
     ////////////////////////
   };
-};
+}
 #endif
 
 /** @} */ // end of doxygen group 

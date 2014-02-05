@@ -61,36 +61,36 @@ namespace larlight {
     storage_manager(MODE mode=UNDEFINED);
     
     /// Default destructor.
-    virtual ~storage_manager(){};
+    virtual ~storage_manager(){}
     
     /// Setter to specify a certain data class to be read from input
     void set_data_to_read(DATA::DATA_TYPE type,bool read=true)
-    {_read_data_array[type]=read;};
+    {_read_data_array[type]=read;}
     
     /// Setter for I/O mode.
-    void set_io_mode(MODE mode)         {_mode=mode;};
+    void set_io_mode(MODE mode)         {_mode=mode;}
     
     /// Setter for input filename
-    //void set_in_filename(std::string name) {_in_fname=name;};
-    void add_in_filename(std::string name) {_in_fnames.push_back(name);};
+    //void set_in_filename(std::string name) {_in_fname=name;}
+    void add_in_filename(std::string name) {_in_fnames.push_back(name);}
     
     /// Setter for input file's TDirectory name
-    void set_in_rootdir(std::string name){_name_tdirectory=name;};
+    void set_in_rootdir(std::string name){_name_tdirectory=name;}
     
     /// Setter for output filename
-    void set_out_filename(std::string name) {_out_fname=name;};
+    void set_out_filename(std::string name) {_out_fname=name;}
     
     /// Getter for I/O mode.
-    MODE io_mode() const         {return _mode;};
+    MODE io_mode() const         {return _mode;}
     
     /// Getter for an array of input files set by the user
-    std::vector<std::string> input_filename() const {return _in_fnames;};
+    std::vector<std::string> input_filename() const {return _in_fnames;}
     
     /// Getter for I/O file name.
-    std::string output_filename() const {return _out_fname;};
+    std::string output_filename() const {return _out_fname;}
     
     /// Getter for process status stamp. See storage_manager::STATUS
-    STATUS status() const        {return _status;};
+    STATUS status() const        {return _status;}
     
     /// Reset variables and I/O process to prepare for a new I/O.
     void reset();
@@ -120,23 +120,23 @@ namespace larlight {
     
     /// Getter for a shared object instance pointer. Not limited to be a singleton.
     static storage_manager* get() 
-    { if(!me) me= new storage_manager(); return me; };
+    { if(!me) me= new storage_manager(); return me; }
     
     /// killer for a shared object instance.
     static void kill() 
-    { if(me) delete me;};
+    { if(me) delete me;}
     
     /// Getter for a number of events in the file.
-    inline UInt_t get_entries() const {return _nevents;};
+    inline UInt_t get_entries() const {return _nevents;}
     
     /// Getter for a TTree index
-    inline UInt_t get_index()   const {return _index;};
+    inline UInt_t get_index()   const {return _index;}
     
     /// Getter for a counter of read-out events
-    inline UInt_t get_entries_read() const {return _nevents_read;};
+    inline UInt_t get_entries_read() const {return _nevents_read;}
     
     /// Getter for a counter of written-out events
-    inline UInt_t get_entires_written() const {return _nevents_written;};
+    inline UInt_t get_entires_written() const {return _nevents_written;}
     
   private:
     
@@ -195,6 +195,6 @@ namespace larlight {
     TTree  *_out_ch[DATA::DATA_TYPE_MAX];
     
   };
-};
+}
 #endif
 /** @} */ // end of doxygen group storage_manager

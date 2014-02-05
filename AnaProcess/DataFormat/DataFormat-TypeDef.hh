@@ -60,7 +60,7 @@ namespace larlight{
   class event_calorimetry;
   
   class storage_manager;
-};
+}
 #endif
 
 
