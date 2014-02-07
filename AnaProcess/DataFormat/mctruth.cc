@@ -65,12 +65,11 @@ namespace larlight {
 	}
       }//done looping over particles
 
-      /*
+
       fMCNeutrino = mcnu(nu, lep,
 			 CCNC, mode, interactionType,
 			 target, nucleon, quark,
 			 w, x, y, qsqr);
-      */
 
     } // end if mcnu is not already set
 

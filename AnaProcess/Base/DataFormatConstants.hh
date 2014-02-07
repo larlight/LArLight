@@ -14,8 +14,11 @@
 
 #ifndef DATAFORMATCONSTANTS_HH
 #define DATAFORMATCONSTANTS_HH
+
 #include <string>
+#include <limits>
 #include <climits>
+#include <Rtypes.h>
 
 /// Namespace of everything in this framework
 namespace larlight{

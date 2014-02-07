@@ -30,11 +30,11 @@ namespace larlight {
   {
     clear_data();
     ftrackId = trackId;
-    fstatus  = status;
     fpdgCode = pdgid;
-    fmother  = mother;
     fprocess = process;
-    
+    fmother  = mother;
+    fmass    = mass;
+    fstatus  = status;    
   }
 
   //***********************
