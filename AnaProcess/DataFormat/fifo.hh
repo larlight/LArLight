@@ -29,7 +29,7 @@ namespace larlight {
   public:
 
     /// Default constructor
-    fifo(DATA::DATA_TYPE type=DATA::DATA_TYPE_MAX);
+    fifo(DATA::DATA_TYPE type=DATA::FIFO);
     
     /// Default copy constructor
     fifo(const fifo& original)
@@ -144,7 +144,7 @@ namespace larlight {
   public:
     
     /// Default constructor ... provide an option to set the length of ch-wise data
-    event_fifo(DATA::DATA_TYPE type=DATA::DATA_TYPE_MAX);
+    event_fifo(DATA::DATA_TYPE type=DATA::FIFO);
     
     /// Default copy constructor needed to avoid memory leak in ROOT streamer
     event_fifo(const event_fifo& original)

@@ -9,8 +9,11 @@
 #pragma link off all classes;
 #pragma link off all functions;
 
-#pragma link C++ class larlight::data_base+;
 #pragma link C++ class std::vector<TVector3>+;
+#pragma link C++ class std::vector<TMatrixD>+;
+#pragma link C++ class std::vector<TLorentzVector>+;
+
+#pragma link C++ class larlight::data_base+;
 
 #pragma link C++ class larlight::fifo+;
 #pragma link C++ class std::vector<larlight::fifo>+;
@@ -22,9 +25,20 @@
 
 #pragma link C++ class larlight::trigger+;
 
-#pragma link C++ class larlight::part_mc+;
-#pragma link C++ class std::vector<larlight::part_mc>+;
-#pragma link C++ class larlight::event_mc+;
+#pragma link C++ class larlight::mctruth+;
+#pragma link C++ class std::vector<larlight::mctruth>+;
+#pragma link C++ class larlight::event_mctruth+;
+
+#pragma link C++ class larlight::mcstep+;
+#pragma link C++ class std::vector<larlight::mcstep>+;
+#pragma link C++ class larlight::mctrack+;
+
+#pragma link C++ class larlight::mcpart+;
+#pragma link C++ class std::vector<larlight::mcpart>+;
+#pragma link C++ class larlight::event_mcpart+;
+
+#pragma link C++ class larlight::mcnu+;
+#pragma link C++ class std::vector<larlight::mcnu>+;
 
 #pragma link C++ class larlight::wire+;
 #pragma link C++ class std::vector<larlight::wire>+;
@@ -34,8 +48,6 @@
 #pragma link C++ class std::vector<larlight::hit>+;
 #pragma link C++ class larlight::event_hit+;
 
-#pragma link C++ class std::vector<TVector3>+;
-#pragma link C++ class std::vector<TMatrixD>+;
 #pragma link C++ class larlight::cluster+;
 #pragma link C++ class std::vector<larlight::cluster>+;
 #pragma link C++ class larlight::event_cluster+;

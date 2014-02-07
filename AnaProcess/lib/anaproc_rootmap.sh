@@ -25,7 +25,7 @@ rootlibmap libBase.rootmap libBase.so $ANA_PROC_DIR/Base/LinkDef.h
 ######################################################
 # DataFormat
 rootlibmap libDataFormat.rootmap libDataFormat.so $ANA_PROC_DIR/DataFormat/LinkDef.h \
-    libTree.so libBase.so libMatrix.so libGenVector.so
+    libGenVector.so libMatrix.so libTree.so libBase.so
 
 ######################################################
 # Analysis

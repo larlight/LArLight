@@ -26,26 +26,28 @@ namespace larlight {
     // If data class object does not exist, and if it's either WRITE or BOTH mode, create it.
     if(!_ptr_data_array[type] && _mode != READ){
       
-      _fout->cd();
-      
-      _out_ch[(size_t)type]=new TTree(Form("%s_tree",DATA::DATA_TREE_NAME[type].c_str()),
-				      Form("%s Tree",DATA::DATA_TREE_NAME[type].c_str()));
-      _out_ch[(size_t)type]->SetMaxTreeSize    (1024*1024*1024);
-      _out_ch[(size_t)type]->SetMaxVirtualSize (1024*1024*1024);
-      
       create_data_ptr(type);
-      
-      _out_ch[(size_t)type]->Branch(Form("%s_branch",DATA::DATA_TREE_NAME[type].c_str()),
-				    _ptr_data_array[(size_t)type]->GetName(),
-				    &(_ptr_data_array[(size_t)type]));
-      
-      Message::send(MSG::WARNING,__FUNCTION__,
-		    Form("Requested tree %s which does not exists yet. Created a new one.", 
-			 _out_ch[(size_t)type]->GetName())
-		    );
-      
-      _write_data_array[(size_t)type]=true;
-      
+
+      if(_ptr_data_array[(size_t)type]) {
+	
+	_fout->cd();
+	
+	_out_ch[(size_t)type]=new TTree(Form("%s_tree",DATA::DATA_TREE_NAME[type].c_str()),
+					Form("%s Tree",DATA::DATA_TREE_NAME[type].c_str()));
+	_out_ch[(size_t)type]->SetMaxTreeSize    (1024*1024*1024);
+	_out_ch[(size_t)type]->SetMaxVirtualSize (1024*1024*1024);      
+	
+	_out_ch[(size_t)type]->Branch(Form("%s_branch",DATA::DATA_TREE_NAME[type].c_str()),
+				      _ptr_data_array[(size_t)type]->GetName(),
+				      &(_ptr_data_array[(size_t)type]));
+	
+	Message::send(MSG::WARNING,__FUNCTION__,
+		      Form("Requested tree %s which does not exists yet. Created a new one.", 
+			   _out_ch[(size_t)type]->GetName())
+		      );
+	
+	_write_data_array[(size_t)type]=true;
+      }
     }
     
     return _ptr_data_array[type];
@@ -195,7 +197,7 @@ namespace larlight {
     
     bool status=true;
     
-    std::vector<uint64_t> nevents_array(DATA::DATA_TYPE_MAX,0);
+    std::vector<size_t> nevents_array(DATA::DATA_TYPE_MAX,0);
     
     if(_verbosity[MSG::DEBUG])
       Message::send(MSG::DEBUG,__PRETTY_FUNCTION__,"called ...");
@@ -233,7 +235,7 @@ namespace larlight {
 	if(nevents_array[i]) { 
 	  
 	  print(MSG::DEBUG,__FUNCTION__,
-		Form("Found %lu events found in TTree %s ...",nevents_array[i],tree_name.c_str()));
+		Form("Found %zu events found in TTree %s ...",nevents_array[i],tree_name.c_str()));
 	  
 	  create_data_ptr((DATA::DATA_TYPE)i);
 	  
@@ -285,7 +287,7 @@ namespace larlight {
       if(nevents_array[i] && _nevents!=nevents_array[i]) {
 
 	Message::send(MSG::WARNING,__FUNCTION__,
-		      Form("Different number of entries found on tree: %s (found %ud while previous found %lu)",
+		      Form("Different number of entries found on tree: %s (found %ud while previous found %zu)",
 			   DATA::DATA_TREE_NAME[(DATA::DATA_TYPE)i].c_str(),_nevents, nevents_array[i]));
 	if( nevents_array[i] < min_nevents)
 	  
@@ -322,16 +324,19 @@ namespace larlight {
     case DATA::Bezier:
     case DATA::Kalman3DHit:
     case DATA::Kalman3DSPS:
-      _ptr_data_array[type]=(data_base*)(new event_track);
+      _ptr_data_array[type]=(data_base*)(new event_track(type));
       break;
     case DATA::MCTruth:
-      _ptr_data_array[type]=(data_base*)(new event_mc);
+      _ptr_data_array[type]=(data_base*)(new event_mctruth(type));
+      break;
+    case DATA::MCParticle:
+      _ptr_data_array[type]=(data_base*)(new event_mcpart(type));
       break;
     case DATA::SpacePoint:
-      _ptr_data_array[type]=(data_base*)(new event_sps);
+      _ptr_data_array[type]=(data_base*)(new event_sps(type));
       break;
     case DATA::UserInfo:
-      _ptr_data_array[type]=(data_base*)(new event_user);
+      _ptr_data_array[type]=(data_base*)(new event_user(type));
       break;
     case DATA::FIFO:
     case DATA::PMTFIFO:
@@ -346,17 +351,17 @@ namespace larlight {
       _ptr_data_array[type]=(data_base*)(new event_pulse(type));
       break;
     case DATA::Trigger:
-      _ptr_data_array[type]=(data_base*)(new trigger);
+      _ptr_data_array[type]=(data_base*)(new trigger(type));
       break;
     case DATA::Wire:
-      _ptr_data_array[type]=(data_base*)(new event_wire);
+      _ptr_data_array[type]=(data_base*)(new event_wire(type));
       break;
     case DATA::Hit:
     case DATA::CrawlerHit:
     case DATA::GausHit:
     case DATA::APAHit:
     case DATA::FFTHit:
-      _ptr_data_array[type]=(data_base*)(new event_hit);
+      _ptr_data_array[type]=(data_base*)(new event_hit(type));
       break;
     case DATA::Cluster:
     case DATA::CrawlerCluster:
@@ -364,13 +369,19 @@ namespace larlight {
     case DATA::FuzzyCluster:
     case DATA::HoughCluster:
     case DATA::ShowerAngleCluster:
-      _ptr_data_array[type]=(data_base*)(new event_cluster);
+      _ptr_data_array[type]=(data_base*)(new event_cluster(type));
       break;
     case DATA::Shower:
-      _ptr_data_array[type]=(data_base*)(new event_shower);
+      _ptr_data_array[type]=(data_base*)(new event_shower(type));
       break;
     case DATA::Calorimetry:
-      _ptr_data_array[type]=(data_base*)(new event_calorimetry);
+      _ptr_data_array[type]=(data_base*)(new event_calorimetry(type));
+      break;
+    case DATA::MCNeutrino:
+      print(MSG::ERROR,__FUNCTION__,Form("MCNeutrino is stored within MCTruth! Retrieve MCTruth instead."));
+      break;
+    case DATA::MCTrajectory:
+      print(MSG::ERROR,__FUNCTION__,Form("MCTrajectory is stored within MCParticle! Retrieve MCParticle instead."));
       break;
     case DATA::Seed:
     case DATA::Event:

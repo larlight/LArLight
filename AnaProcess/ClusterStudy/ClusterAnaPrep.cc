@@ -125,6 +125,11 @@ namespace larlight {
     }
 
     const event_cluster* ev_cluster = (const event_cluster*)(storage->get_data(DATA::ShowerAngleCluster));
+    const event_hit* hits = (const event_hit*)(storage->get_data(ev_cluster->get_hit_type()));
+    if(!hits) {
+      print(MSG::ERROR,__FUNCTION__,"Did not find any associated (and supported) hits!");
+      return false;
+    }
 
     if(same_event((data_base*)(ev_cluster))) return true;
     clear_event_info();
@@ -137,6 +142,9 @@ namespace larlight {
 
     // Loop over clusters
     for(auto const i_cluster: *ev_cluster) {
+
+      // Check if hit association is available or not
+      std::vector<unsigned short> hit_index(i_cluster.association(hits->data_type()));
 
       // Check if this cluster should be evaluated or not
       if(i_cluster.SigmaStartPos()[0] > _sigma_cut) {
@@ -164,14 +172,13 @@ namespace larlight {
       // Get Hit array & loop over. Note we include a subset of hits
       // ordered from high charge to low charge up to the point that
       // hits' sum charge exceeds set fraction.
-      const std::vector<hit> hits = i_cluster.Hits();
       std::map<double,size_t> hits_qsort;
       double sum_charge = 0;
-      for(size_t i=0; i<hits.size(); i++) {
+      for(size_t i=0; i<hit_index.size(); i++) {
 	
-	hits_qsort[1./(hits[i].Charge())] = i;
+	hits_qsort[1./(hits->at(hit_index[i]).Charge())] = hit_index[i];
 
-	sum_charge += hits[i].Charge();
+	sum_charge += hits->at(hit_index[i]).Charge();
 
       }
 
@@ -190,15 +197,15 @@ namespace larlight {
 
 	size_t hit_index = (*iter).second;
 	
-	if( ci.start_time_min < 0 || ci.start_time_min > hits[hit_index].StartTime() ) ci.start_time_min = hits[hit_index].StartTime();
-	if( ci.peak_time_min  < 0 || ci.peak_time_min  > hits[hit_index].PeakTime()  ) ci.peak_time_min  = hits[hit_index].PeakTime();
-	if( ci.end_time_min   < 0 || ci.end_time_min   > hits[hit_index].EndTime()   ) ci.end_time_min   = hits[hit_index].EndTime();
+	if( ci.start_time_min < 0 || ci.start_time_min > hits->at(hit_index).StartTime() ) ci.start_time_min = hits->at(hit_index).StartTime();
+	if( ci.peak_time_min  < 0 || ci.peak_time_min  > hits->at(hit_index).PeakTime()  ) ci.peak_time_min  = hits->at(hit_index).PeakTime();
+	if( ci.end_time_min   < 0 || ci.end_time_min   > hits->at(hit_index).EndTime()   ) ci.end_time_min   = hits->at(hit_index).EndTime();
 
-	if( ci.start_time_max < 0 || ci.start_time_max < hits[hit_index].StartTime() ) ci.start_time_max = hits[hit_index].StartTime();
-	if( ci.peak_time_max  < 0 || ci.peak_time_max  < hits[hit_index].PeakTime()  ) ci.peak_time_max  = hits[hit_index].PeakTime();
-	if( ci.end_time_max   < 0 || ci.end_time_max   < hits[hit_index].EndTime()   ) ci.end_time_max   = hits[hit_index].EndTime();
+	if( ci.start_time_max < 0 || ci.start_time_max < hits->at(hit_index).StartTime() ) ci.start_time_max = hits->at(hit_index).StartTime();
+	if( ci.peak_time_max  < 0 || ci.peak_time_max  < hits->at(hit_index).PeakTime()  ) ci.peak_time_max  = hits->at(hit_index).PeakTime();
+	if( ci.end_time_max   < 0 || ci.end_time_max   < hits->at(hit_index).EndTime()   ) ci.end_time_max   = hits->at(hit_index).EndTime();
 
-	ci.sum_charge += hits[hit_index].Charge();
+	ci.sum_charge += hits->at(hit_index).Charge();
 	
 	// Break if summed charge reach the set fraction of the total charge
 	if( (ci.sum_charge / sum_charge) > _q_frac_cut ) break;

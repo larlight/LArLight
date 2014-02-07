@@ -4,6 +4,24 @@
 #include "user_info.hh"
 
 namespace larlight {
+
+  //**********************************************************
+  user_info::user_info(DATA::DATA_TYPE type) : data_base(type) 
+  //**********************************************************
+  {
+    if(_type!=DATA::UserInfo) {
+      
+      Message::send(MSG::ERROR,__FUNCTION__,
+		    Form("Provided data type (%s) not supported! Reset to default.",DATA::DATA_TREE_NAME[_type].c_str()));
+      
+      _type=DATA::UserInfo;
+
+    }
+
+    clear_data();
+  }
+
+  //**********************************************************
   user_info::user_info(const user_info &original) :
     data_base(original),
     _d_map(original._d_map),
@@ -14,9 +32,13 @@ namespace larlight {
     _iarray_map(original._iarray_map),
     _sarray_map(original._sarray_map),
     _barray_map(original._barray_map)
+  //**********************************************************
   {};
-  
-  void user_info::clear_data(){
+
+  //**********************************************************  
+  void user_info::clear_data()
+  //**********************************************************
+  {
     _d_map.clear();
     _i_map.clear();
     _s_map.clear();
@@ -27,7 +49,10 @@ namespace larlight {
     _barray_map.clear();
   }
   
-  void user_info::dump_contents(){
+  //**********************************************************
+  void user_info::dump_contents()
+  //**********************************************************
+  {
     
     Message::get()->send(MSG::NORMAL,__FUNCTION__," Start contents dump...");
     std::string msg("");
@@ -149,32 +174,47 @@ namespace larlight {
     }
     Message::get()->send(MSG::NORMAL,__FUNCTION__," End of dump...");
   }
-  
-  void user_info::append(std::string key, double value){
+
+  //**********************************************************  
+  void user_info::append(std::string key, double value)
+  //**********************************************************
+  {
     if(_darray_map.find(key)==_darray_map.end()) 
       _darray_map[key]=std::vector<double>();
     _darray_map[key].push_back(value);
   }
   
-  void user_info::append(std::string key, int value){
+  //**********************************************************
+  void user_info::append(std::string key, int value)
+  //**********************************************************
+  {
     if(_iarray_map.find(key)==_iarray_map.end())
       _iarray_map[key]=std::vector<int>();
     _iarray_map[key].push_back(value);
   }
   
-  void user_info::append(std::string key, std::string value){
+  //**********************************************************
+  void user_info::append(std::string key, std::string value)
+  //**********************************************************
+  {
     if(_sarray_map.find(key)==_sarray_map.end())
       _sarray_map[key]=std::vector<std::string>();
     _sarray_map[key].push_back(value);
   }
   
-  void user_info::append(std::string key, bool value){
+  //**********************************************************
+  void user_info::append(std::string key, bool value)
+  //**********************************************************
+  {
     if(_barray_map.find(key)==_barray_map.end())
       _barray_map[key]=std::vector<bool>();
     _barray_map[key].push_back(value);
   }
   
-  double user_info::get_double(std::string key) const {  
+  //**********************************************************
+  double user_info::get_double(std::string key) const 
+  //**********************************************************
+  {  
     std::map<std::string,double>::const_iterator item(_d_map.find(key));
     if(item==_d_map.end()){
       Message::get()->send(MSG::ERROR,__FUNCTION__,Form("Key \"%s\" does not exist!", key.c_str()));
@@ -182,8 +222,11 @@ namespace larlight {
     }
     return (*item).second;
   }
-  
-  int user_info::get_int(std::string key) const {
+
+  //**********************************************************
+  int user_info::get_int(std::string key) const 
+  //**********************************************************
+  {
     std::map<std::string,int>::const_iterator item(_i_map.find(key));
     if(item==_i_map.end()){
       Message::get()->send(MSG::ERROR,__FUNCTION__,Form("Key \"%s\" does not exist!", key.c_str()));
@@ -191,8 +234,11 @@ namespace larlight {
     }
     return (*item).second;
   }
-  
-  std::string user_info::get_string(std::string key) const {
+
+  //**********************************************************  
+  std::string user_info::get_string(std::string key) const 
+  //**********************************************************
+  {
     std::map<std::string,std::string>::const_iterator item(_s_map.find(key));
     if(item==_s_map.end()){
       Message::get()->send(MSG::ERROR,__FUNCTION__,Form("Key \"%s\" does not exist!", key.c_str()));
@@ -201,8 +247,10 @@ namespace larlight {
     return (*item).second;
   }
   
-  
-  bool user_info::get_bool(std::string key) const {
+  //**********************************************************  
+  bool user_info::get_bool(std::string key) const 
+  //**********************************************************
+  {
     std::map<std::string,bool>::const_iterator item(_b_map.find(key));
     if(item==_b_map.end()){
       Message::get()->send(MSG::ERROR,__FUNCTION__,Form("Key \"%s\" does not exist!", key.c_str()));
@@ -210,8 +258,11 @@ namespace larlight {
     }
     return (*item).second;
   }
-  
-  std::vector<double>* user_info::get_darray(std::string key)  {
+
+  //**********************************************************  
+  std::vector<double>* user_info::get_darray(std::string key)  
+  //**********************************************************
+  {
     std::map<std::string,std::vector<double> >::iterator item(_darray_map.find(key));
     if(item==_darray_map.end()){
       Message::get()->send(MSG::ERROR,__FUNCTION__,Form("Key \"%s\" does not exist!", key.c_str()));
@@ -219,8 +270,11 @@ namespace larlight {
     }
     return &((*item).second);
   }
-  
-  std::vector<int>* user_info::get_iarray(std::string key)  {
+
+  //**********************************************************  
+  std::vector<int>* user_info::get_iarray(std::string key)  
+  //**********************************************************
+  {
     std::map<std::string,std::vector<int> >::iterator item(_iarray_map.find(key));
     if(item==_iarray_map.end()){
       Message::get()->send(MSG::ERROR,__FUNCTION__,Form("Key \"%s\" does not exist!", key.c_str()));
@@ -228,8 +282,11 @@ namespace larlight {
     }
     return &((*item).second);
   }
-  
-  std::vector<std::string>* user_info::get_sarray(std::string key)  {
+
+  //**********************************************************  
+  std::vector<std::string>* user_info::get_sarray(std::string key)  
+  //**********************************************************
+  {
     std::map<std::string,std::vector<std::string> >::iterator item(_sarray_map.find(key));
     if(item==_sarray_map.end()){
       Message::get()->send(MSG::ERROR,__FUNCTION__,Form("Key \"%s\" does not exist!", key.c_str()));
@@ -237,14 +294,33 @@ namespace larlight {
     }
     return &((*item).second);
   }
-  
-  std::vector<bool>* user_info::get_barray(std::string key)  {
+
+  //**********************************************************  
+  std::vector<bool>* user_info::get_barray(std::string key)  
+  //**********************************************************
+  {
     std::map<std::string,std::vector<bool> >::iterator item(_barray_map.find(key));
     if(item==_barray_map.end()){
       Message::get()->send(MSG::ERROR,__FUNCTION__,Form("Key \"%s\" does not exist!", key.c_str()));
       return 0;
     }
     return &((*item).second);
+  }
+
+  //********************************************************************************
+  event_user::event_user(DATA::DATA_TYPE type) : std::vector<larlight::user_info>(),
+						 data_base(type)
+  //********************************************************************************
+  {
+    if(_type!=DATA::UserInfo) {
+
+      Message::send(MSG::ERROR,__FUNCTION__,
+		    Form("Provided data type (%s) not supported! Reset to default.",DATA::DATA_TREE_NAME[_type].c_str()));
+      
+      _type=DATA::UserInfo;
+    }
+
+    clear_data();
   }
 }
   

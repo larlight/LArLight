@@ -16,6 +16,7 @@
 
 #include "Base-TypeDef.hh"
 #include <vector>
+#include <map>
 #include <limits>
 #include <TObject.h>
 
@@ -36,7 +37,8 @@ namespace larlight{
 					   fRunNumber(original.fRunNumber),
 					   fSubRunNumber(original.fSubRunNumber),
 					   fEventID(original.fEventID),
-					   _type(original._type)
+					   _type(original._type),
+					   _ass(original._ass)
     {}
 
     
@@ -62,6 +64,15 @@ namespace larlight{
     /// data type getter
     DATA::DATA_TYPE data_type() const {return _type; }
 
+    /// Adder for a set of association
+    void add_association(DATA::DATA_TYPE type, const std::vector<unsigned short> ass);
+
+    /// Getter for # of associations
+    size_t size_association(DATA::DATA_TYPE type) const;
+     
+    /// Getter of an association
+    const std::vector<unsigned short> association(DATA::DATA_TYPE type, size_t index=0) const;
+
   protected:
     
     /// Run number
@@ -75,6 +86,9 @@ namespace larlight{
 
     /// DATA_TYPE
     DATA::DATA_TYPE _type;
+
+    /// Association storage ... allow multiple set of associations
+    std::map<DATA::DATA_TYPE,std::vector<std::vector<unsigned short> > > _ass;
     
     ////////////////////////
     ClassDef(data_base,2)

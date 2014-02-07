@@ -99,11 +99,18 @@ namespace larlight {
 
     const event_cluster* ev_cluster = (const event_cluster*)(storage->get_data(DATA::ShowerAngleCluster));
 
+    const event_hit* ev_hits = (const event_hit*)(storage->get_data(ev_cluster->get_hit_type()));
+    
+    if(!ev_hits) {
+      print(MSG::ERROR,__FUNCTION__,"Data storage did not find associated hit collection!");
+      return false;
+    }
+
     //    std::cout<<"this ev_cluster has event_id() = "<<ev_cluster->event_id()<<std::endl;
 
     for(auto const i_cluster: *ev_cluster)
 
-      AppendClusterInfo(i_cluster,i_cluster.Hits());
+      AppendClusterInfo(i_cluster,ev_hits);
 
     // Step (2) ... Run algorithm
     ProcessMergeAlg();
@@ -113,12 +120,15 @@ namespace larlight {
   }
 
   void ClusterMergeAlg::AppendClusterInfo(const cluster &cl, 
-					   const std::vector<larlight::hit> &in_hit_v) {
+					  const event_hit* ev_hits)
+  {
 
     PrepareDetParams();
 
+    std::vector<unsigned short> hit_index(cl.association(ev_hits->data_type()));
+
     //don't bother looping over hits if there are too few
-    if(in_hit_v.size() <= _min_hits_to_consider) return;
+    if(hit_index.size() <= _min_hits_to_consider) return;
     
     cluster_merge_info ci;
     ci.cluster_index = cl.ID();
@@ -128,10 +138,15 @@ namespace larlight {
     ci.end_wire   = cl.EndPos()[0];
     ci.end_time   = cl.EndPos()[1];
     ci.angle      = cl.dTdW();
-    ci.n_hits     = (int)cl.Hits().size();
+    ci.n_hits     = (int)hit_index.size();
     ci.q_total    = 0;
 
-    AppendHitInfo(ci, in_hit_v);
+    std::vector<larlight::hit> hits(hit_index.size());
+    for(auto const &index : hit_index)
+
+      hits.push_back(ev_hits->at(index));
+
+    AppendHitInfo(ci, hits);
 
     //don't consider the cluster if its charge is too low
     if(ci.q_total < _min_q_total_to_consider) return;
@@ -140,17 +155,17 @@ namespace larlight {
       _u_clusters.push_back(ci);
       u_q_tot  += ci.q_total;
       //have to use .size() here b/c n_hits might be -1 if swapped
-      u_n_hits += (int)cl.Hits().size();
+      u_n_hits += (int)hit_index.size();
     }
     else if(ci.view == GEO::kV){
       _v_clusters.push_back(ci);
       v_q_tot  += ci.q_total;
-      v_n_hits += (int)cl.Hits().size();
+      v_n_hits += (int)hit_index.size();
     }
     else if(ci.view == GEO::kW){
       _w_clusters.push_back(ci);
       w_q_tot  += ci.q_total;
-      w_n_hits += (int)cl.Hits().size();
+      w_n_hits += (int)hit_index.size();
     }
     else print(MSG::ERROR,__FUNCTION__,Form("Invalid plane ID: %d",ci.view));
 

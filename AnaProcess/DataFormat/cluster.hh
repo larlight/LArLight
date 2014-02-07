@@ -16,7 +16,6 @@
 #define CLUSTER_HH
 
 #include "data_base.hh"
-#include "hit.hh"
 
 namespace larlight{
 
@@ -46,7 +45,6 @@ namespace larlight{
     void set_end_vtx       (const std::vector<Double_t> vtx) { fEndPos=vtx;        }
     void set_start_vtx_err (const std::vector<Double_t> vtx) { fSigmaStartPos=vtx; }
     void set_end_vtx_err   (const std::vector<Double_t> vtx) { fSigmaEndPos=vtx;   }
-    void add_hit           (const hit h)                   { fHitVector.push_back(h); }
     
     inline Double_t       Charge()    const { return fTotalCharge;   }
     inline Double_t       dTdW()      const { return fdTdW;          }
@@ -60,7 +58,6 @@ namespace larlight{
     inline const std::vector<Double_t>& EndPos()        const { return fEndPos;        }
     inline const std::vector<Double_t>& SigmaStartPos() const { return fSigmaStartPos; }
     inline const std::vector<Double_t>& SigmaEndPos()   const { return fSigmaEndPos;   }
-    inline const std::vector<hit>&    Hits()          const { return fHitVector;     }
     virtual void clear_data(){
       data_base::clear_data();
       fTotalCharge = -1;
@@ -69,20 +66,11 @@ namespace larlight{
       fEndPos.clear();
       fSigmaStartPos.clear();
       fSigmaEndPos.clear();
-      fHitVector.clear();
       fID = -1;
       fView = GEO::kUnknown;
     }
     
-    /**
-       A utility function to obtain maximum & minimum of clusters' hits' vertex
-       NOTE: the initial max/min values matter. It only modifies max/min if it finds values that is 
-       above/below those initial values.
-    */
-    void get_axis_range (std::vector<Double_t> &chmax,   std::vector<Double_t> &chmin,
-			 std::vector<Double_t> &wiremax, std::vector<Double_t> &wiremin,
-			 std::vector<Double_t> &timemax, std::vector<Double_t> &timemin) const;
-
+    DATA::DATA_TYPE get_hit_type() const;
 
   private:
     
@@ -95,7 +83,6 @@ namespace larlight{
     std::vector<Double_t> fEndPos;         ///< start of cluster in (wire, tdc) plane
     std::vector<Double_t> fSigmaStartPos;  ///< start of cluster in (wire, tdc) plane
     std::vector<Double_t> fSigmaEndPos;    ///< start of cluster in (wire, tdc) plane
-    std::vector<hit>      fHitVector;      ///< Hit vector
     Int_t                 fID;             ///< cluster's ID
     GEO::View_t           fView;           ///< View associated w/ this cluster
     
@@ -128,15 +115,8 @@ namespace larlight{
     /// Default destructor
     ~event_cluster(){}
 
-    /**
-       A utility function to obtain maximum & minimum of clusters' hits' vertex
-       NOTE: the initial max/min values matter. It only modifies max/min if it finds values that is
-       above/below those initial values.
-    */
-    void get_axis_range (std::vector<Double_t> &chmax,   std::vector<Double_t> &chmin,
-			 std::vector<Double_t> &wiremax, std::vector<Double_t> &wiremin,
-			 std::vector<Double_t> &timemax, std::vector<Double_t> &timemin) const;
-    
+    DATA::DATA_TYPE get_hit_type() const;
+
   private:
     
     ////////////////////////

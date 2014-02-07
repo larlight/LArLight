@@ -15,6 +15,7 @@
 #ifndef DATAFORMATCONSTANTS_HH
 #define DATAFORMATCONSTANTS_HH
 #include <string>
+#include <climits>
 
 /// Namespace of everything in this framework
 namespace larlight{
@@ -22,17 +23,22 @@ namespace larlight{
   /// Defines constants for data structure definition (system utility)
   namespace DATA{
 
-    const UChar_t  INVALID_UCHAR=0xff;
-    const Char_t   INVALID_CHAR=0x7f;
-    const UShort_t INVALID_USHORT=0xffff;
-    const Short_t  INVALID_SHORT=0x7fff;
-    const UInt_t   INVALID_UINT=0xffffffff;
-    const Int_t    INVALID_INT=0x7fffffff;
+    const UChar_t  INVALID_UCHAR  = std::numeric_limits<UChar_t>::max();
+    const Char_t   INVALID_CHAR   = std::numeric_limits<Char_t>::max();
+    const UShort_t INVALID_USHORT = std::numeric_limits<UShort_t>::max();
+    const Short_t  INVALID_SHORT  = std::numeric_limits<Short_t>::max();
+    const UInt_t   INVALID_UINT   = std::numeric_limits<UInt_t>::max();
+    const Int_t    INVALID_INT    = std::numeric_limits<Int_t>::max();
+
+    const Double_t INVALID_DOUBLE = std::numeric_limits<Double_t>::max();
     
     /// Define identifier for a data container class to be loaded through storage_manager::get_data()
     enum DATA_TYPE{
       Event=0,
-      MCTruth,            ///< MCTruth
+      MCTruth,            ///< MCTruth 
+      MCParticle,         ///< MCParticle
+      MCTrajectory,       ///< MCTrajectory
+      MCNeutrino,         ///< MCNeutrino
       Wire,               ///< Wire
       Hit,                ///< Hit
       CrawlerHit,         ///< ClusterCrawler Hit algo
@@ -75,7 +81,10 @@ namespace larlight{
     /// Define tree name
     const std::string DATA_TREE_NAME[DATA_TYPE_MAX] = {
       "event",
-      "mc",
+      "mctruth",
+      "mcpart",
+      "mctrack",
+      "mcnu",
       "wire",
       "hit",
       "crawlerhit",

@@ -13,9 +13,8 @@ namespace larlight {
        _type!=DATA::TPCPulse_ThresWin &&
        _type!=DATA::Pulse ) {
       
-      Message::send(MSG::ERROR,__FUNCTION__,Form("Invalid data type specification (=%d)!",_type));
-
-      Message::send(MSG::ERROR,__FUNCTION__,"Assuming Generic EventPulse...");
+      Message::send(MSG::ERROR,__FUNCTION__,
+		    Form("Provided data type (%s) not supported! Reset to default.",DATA::DATA_TREE_NAME[_type].c_str()));     
 
       _type=DATA::Pulse;
 
@@ -47,10 +46,9 @@ namespace larlight {
        _type!=DATA::PMTPulse_ThresWin &&
        _type!=DATA::TPCPulse_ThresWin &&
        _type!=DATA::Pulse ) {
-      
-      Message::send(MSG::ERROR,__FUNCTION__,Form("Invalid data type specification (=%d)!",_type));
 
-      Message::send(MSG::ERROR,__FUNCTION__,"Assuming Generic EventPulse...");
+      Message::send(MSG::ERROR,__FUNCTION__,
+		    Form("Provided data type (%s) not supported! Reset to default.",DATA::DATA_TREE_NAME[_type].c_str()));           
 
       _type=DATA::Pulse;
 

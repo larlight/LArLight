@@ -27,8 +27,8 @@ namespace larlight {
   public:
     
     /// Default constructor
-    wire() : data_base(DATA::Wire), fSignal() {clear_data();};
-    
+    wire(DATA::DATA_TYPE type=DATA::Wire);
+
     /// Alternative constructor
     wire(const std::vector<Float_t> wf,
 	 const UInt_t ch,
@@ -98,7 +98,7 @@ namespace larlight {
   public:
     
     /// Default constructor
-    event_wire() : std::vector<larlight::wire>(), data_base(DATA::Wire) {clear_data();}
+    event_wire(DATA::DATA_TYPE type=DATA::Wire);
     
     /// Default copy constructor
     event_wire(const event_wire& original) : std::vector<larlight::wire>(original), data_base(original)

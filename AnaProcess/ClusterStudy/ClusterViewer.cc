@@ -61,15 +61,17 @@ namespace larlight {
     //
     //  event_mc*      ev_mc   = (event_mc*)      ( storage->get_data(DATA::MCTruth)            );
     event_cluster* ev_clus = (event_cluster*) ( storage->get_data(DATA::ShowerAngleCluster) );
-    
+    event_hit*     ev_hit  = (event_hit*) ( storage->get_data(ev_clus->get_hit_type()));
     // Define utility variables to hold max/min of each axis range, for each of 3 views
     //vector of length 3 initialized to -1
     std::vector<double> chmax, chmin, wiremax, wiremin, timemax, timemin;
     
     // Find max/min boundary for all axis (clusters)
     
-    if(ev_clus)
-      ev_clus->get_axis_range(chmax, chmin, wiremax, wiremin, timemax, timemin);
+    if(ev_clus && ev_clus->size_association(ev_clus->get_hit_type())) {
+      ev_hit->get_axis_range(chmax, chmin, wiremax, wiremin, timemax, timemin, 
+			     ev_clus->association(ev_clus->get_hit_type()));
+    }
     
     // Proceed only if minimum/maximum are set to some values other than the defaults
     if(wiremax[0] == -1) {
@@ -119,21 +121,21 @@ namespace larlight {
 	g_end->SetPoint(0,clus.EndPos()[0],clus.EndPos()[1]);
 
 	//then loop through its hits, and plot wire/time for each hit in the right _hRecoCluster_v_blah histo
-	ihit_v = clus.Hits();
-
-	for(auto hit : ihit_v){
+	for(auto const index :clus.association(clus.get_hit_type())) {
 	  
-	  if (hit.View() != iview) std::cout<<"diff views? dunno what's going on."<<std::endl;
+
+	  
+	  if ((ev_hit->at(index)).View() != iview) std::cout<<"diff views? dunno what's going on."<<std::endl;
 	  //fill those hits into the cluster plot
-	  h->Fill(hit.Wire(),hit.PeakTime());
+	  h->Fill((ev_hit->at(index)).Wire(),(ev_hit->at(index)).PeakTime());
 	  
 	  //fill the hits histogram, weight is the charge of the hit
-	  if(hit.View() == 0)
-	    _hHits_0->Fill(hit.Wire(),hit.PeakTime(),hit.Charge());
-	  if(hit.View() == 1)
-	    _hHits_1->Fill(hit.Wire(),hit.PeakTime(),hit.Charge());
-	  if(hit.View() == 2)
-	    _hHits_2->Fill(hit.Wire(),hit.PeakTime(),hit.Charge());
+	  if((ev_hit->at(index)).View() == 0)
+	    _hHits_0->Fill((ev_hit->at(index)).Wire(),(ev_hit->at(index)).PeakTime(),(ev_hit->at(index)).Charge());
+	  if((ev_hit->at(index)).View() == 1)
+	    _hHits_1->Fill((ev_hit->at(index)).Wire(),(ev_hit->at(index)).PeakTime(),(ev_hit->at(index)).Charge());
+	  if((ev_hit->at(index)).View() == 2)
+	    _hHits_2->Fill((ev_hit->at(index)).Wire(),(ev_hit->at(index)).PeakTime(),(ev_hit->at(index)).Charge());
 
 	} //end looping over hits
 

@@ -116,12 +116,12 @@ namespace kaleko{
 	larlight::event_sps* my_event_sps = (larlight::event_sps*)(my_storage.get_data(larlight::DATA::SpacePoint));
 	
 	//MC stuff
-	larlight::event_mc* my_event_mc = (larlight::event_mc*)(my_storage.get_data(larlight::DATA::MCTruth));
+	larlight::event_mcpart* my_event_mcpart = (larlight::event_mcpart*)(my_storage.get_data(larlight::DATA::MCParticle));
 	
 	//only loop over this event if mc object AND track reco object exists
 	//note, it still enters loop even if the reco object is an empty vector
 	//(IE no tracks were reconstructed). This is good.
-	if(!my_event_track || !my_event_mc) continue;
+	if(!my_event_track || !my_event_mcpart) continue;
 	
 	else{
 	  
@@ -180,11 +180,13 @@ namespace kaleko{
 	    double de_dx = -1.;
 	    
 	    tmplength = 0;
-	    for(size_t j=0; j < my_event_mc->at(0).step_vertex().size()-1; j++){
-	      TVector3 vtx_j = my_event_mc->at(0).step_vertex().at(j);	
-	      TVector3 vtx_jp1 = my_event_mc->at(0).step_vertex().at(j+1);
-	      TVector3 mom_j = my_event_mc->at(0).step_momentum().at(j);
-	      TVector3 mom_jp1 = my_event_mc->at(0).step_momentum().at(j+1);
+	    const larlight::mctrack my_mctrack = my_event_mcpart->at(0).Trajectory();
+
+	    for(size_t j=0; j < my_mctrack.size()-1; j++) {
+	      TVector3 vtx_j   = my_mctrack.at(j).Position().Vect();
+	      TVector3 vtx_jp1 = my_mctrack.at(j+1).Position().Vect();
+	      TVector3 mom_j   = my_mctrack.at(j).Momentum().Vect();
+	      TVector3 mom_jp1 = my_mctrack.at(j+1).Momentum().Vect();
 	      
 	      //only add to MC tracklength, calculate dedx, etc
 	      //only if both points j and j+1 of muon are within the detector volume

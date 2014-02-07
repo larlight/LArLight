@@ -27,7 +27,7 @@ namespace larlight {
   public:
     
     /// Default constructor
-    trigger() : data_base(DATA::Trigger) {clear_data();}
+    trigger(DATA::DATA_TYPE type=DATA::Trigger);
     
     /// Default copy constructor to avoid memory leak in ROOT streamer
     trigger(const trigger &original);

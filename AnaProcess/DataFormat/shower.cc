@@ -5,6 +5,20 @@
 
 namespace larlight {
 
+  //****************************************************
+  shower::shower(DATA::DATA_TYPE type) : data_base(type) 
+  //****************************************************
+  {
+    if(_type!=DATA::Shower) {
+
+      Message::send(MSG::ERROR,__FUNCTION__,
+		    Form("Provided data type (%s) not supported! Reset to default.",DATA::DATA_TREE_NAME[_type].c_str()));
+
+      _type = DATA::Shower;
+    }    
+    clear_data();
+  }
+  
   //*******************************************
   void shower::clear_data()
   //******************************************* 
@@ -17,7 +31,21 @@ namespace larlight {
     fMaxWidthX = fMaxWidthY = -1;
     fDistanceMaxWidth=-1;
     fTotalCharge=-1;
-    fClusters_v.clear();
+  }
+
+  //*********************************************************************************
+  event_shower::event_shower(DATA::DATA_TYPE type) : std::vector<larlight::shower>(), 
+						     data_base(type) 
+  //*********************************************************************************
+  {
+    if(_type!=DATA::Shower) {
+
+      Message::send(MSG::ERROR,__FUNCTION__,
+		    Form("Provided data type (%s) not supported! Reset to default.",DATA::DATA_TREE_NAME[_type].c_str()));
+
+      _type = DATA::Shower;
+    }    
+    clear_data();
   }
 
 }

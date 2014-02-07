@@ -27,7 +27,7 @@ namespace larlight{
   public:
     
     /// Default constructor
-    calorimetry() : data_base(DATA::Calorimetry) {clear_data();}
+    calorimetry(DATA::DATA_TYPE type=DATA::Calorimetry);
     
     /// Copy constructor
     calorimetry(const calorimetry& original) : data_base(original),
@@ -97,7 +97,7 @@ namespace larlight{
   public:
     
     /// Default constructor
-    event_calorimetry() : data_base(DATA::Calorimetry) {clear_data();}
+    event_calorimetry(DATA::DATA_TYPE type=DATA::Calorimetry);
     
     /// Default copy constructor
     event_calorimetry(const event_calorimetry& original) : std::vector<larlight::calorimetry>(original),
