@@ -22,6 +22,9 @@
 #include <sstream>
 #include <stdio.h>
 #include <string.h>
+#include <cmath>
+#include <deque>
+
 
 namespace larlight {
   /**
@@ -55,7 +58,10 @@ namespace larlight {
 
     protected:
 
-    TH1D *tpc_evno;
+    TH1D *failure;
+    int event_num;
+    int _NSamples;
+    int _VarCut;
 
   };
 }
