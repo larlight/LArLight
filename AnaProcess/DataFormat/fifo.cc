@@ -28,7 +28,8 @@ namespace larlight {
 
   ////////////////////////////////////////////////////////
 
-  event_fifo::event_fifo(DATA::DATA_TYPE type) : std::vector<larlight::fifo>(), data_base(type)
+  event_fifo::event_fifo(DATA::DATA_TYPE type) : std::vector<larlight::fifo>(), 
+						 data_base(type)
   { 
     clear_data();
   }

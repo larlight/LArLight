@@ -5,6 +5,19 @@
 
 namespace larlight {
 
+  trigger::trigger(DATA::DATA_TYPE type) : data_base(type)
+  {
+    if(_type!=DATA::Trigger) {
+
+      Message::send(MSG::ERROR,__FUNCTION__,
+		    Form("Provided data type (%s) not supported! Reset to default.",DATA::DATA_TREE_NAME[_type].c_str()));
+
+      _type=DATA::Trigger;
+    }
+
+    clear_data();
+  }
+  
   void trigger::clear_data(){
 
     data_base::clear_data();

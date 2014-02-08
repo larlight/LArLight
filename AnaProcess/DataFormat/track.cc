@@ -4,6 +4,7 @@
 #include "track.hh"
 
 namespace larlight {
+
   //###################################################
   track::track(DATA::DATA_TYPE type) : data_base(type),
 				       fXYZ(),
@@ -19,8 +20,7 @@ namespace larlight {
 	_type != DATA::Kalman3DHit ) {
 
       Message::send(MSG::ERROR,__FUNCTION__,
-		    Form("Provided data type (%d) not a valid track data type! Setting it to DATA::Hit...",_type));
-
+		    Form("Provided data type (%s) not supported! Reset to default.",DATA::DATA_TREE_NAME[_type].c_str()));
       _type = DATA::Track;
 
     }
@@ -105,9 +105,9 @@ namespace larlight {
 	_type != DATA::Bezier &&
 	_type != DATA::Kalman3DSPS &&
 	_type != DATA::Kalman3DHit ) {
-      
+
       Message::send(MSG::ERROR,__FUNCTION__,
-		    Form("Provided data type (%d) not a valid track data type! Setting it to DATA::Hit...",_type));
+		    Form("Provided data type (%s) not supported! Reset to default.",DATA::DATA_TREE_NAME[_type].c_str())); 
 
       _type = DATA::Track;
 

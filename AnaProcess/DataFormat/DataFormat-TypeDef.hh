@@ -14,7 +14,11 @@
 #include "user_info.hh"
 #include "track.hh"
 #include "cluster.hh"
+#include "mctrack.hh"
+#include "mcpart.hh"
+#include "mcnu.hh"
 #include "mctruth.hh"
+#include "mcnu.hh"
 #include "spacepoint.hh"
 #include "shower.hh"
 #include "calorimetry.hh"
@@ -40,9 +44,17 @@ namespace larlight{
   class event_pulse;
 
   class trigger;
-  
-  class part_mc;
-  class event_mc;
+
+  class mcstep;
+  class mctrack;
+
+  class mcpart;
+  class event_mcpart;
+
+  class mcnu;
+
+  class mctruth;
+  class event_mctruth;
   
   class spacepoint;
   class event_sps;

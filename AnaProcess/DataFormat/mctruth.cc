@@ -5,111 +5,97 @@
 
 namespace larlight {
 
-  //######################################################
-  void event_mc::clear_data()
-  //######################################################
+  //********************************************************************
+  mctruth::mctruth(DATA::DATA_TYPE type) : data_base(type),
+					   fMCNeutrino(DATA::MCNeutrino)
+  //********************************************************************
+  {
+
+    if(_type!=DATA::MCTruth) {
+
+      Message::send(MSG::ERROR,__FUNCTION__,
+		    Form("Provided data type (%s) not supported! Reset to default.",DATA::DATA_TREE_NAME[_type].c_str()));
+      
+      _type=DATA::MCTruth;
+    }
+    
+    clear_data();
+  }
+
+  //***************************************************
+  void mctruth::clear_data()
+  //***************************************************
   {
     data_base::clear_data();
-    clear();
-    //fMCNeutrino.clear_data();
+    fPartList.clear();
+    fMCNeutrino.clear_data();
+    fNeutrinoSet=false;
     fOrigin=MC::kUnknown;
-    //fNeutrinoSet=false;
   }
-  
-  //######################################################
-  part_mc::part_mc(Int_t pdgid, Int_t track, Int_t parent, std::string process) 
-    : data_base(),
-      fProcess(process),
-      fParentID(parent),
-      fTrackID(track),
-      fPDGID(pdgid)
-  //######################################################
-  {}
-  
-  //######################################################
-  void part_mc::clear_data()
-  //######################################################
-  {
-    data_base::clear_data();
-    fStepTime.clear();
-    fStepVertex.clear();
-    fStepMomentum.clear();
-    //fStepProcess.clear();
-    fDaughters.clear();
-    fProcess  = "DEFAULG";
-    fParentID = -11;
-    fTrackID  = -11;
-    fPDGID    = -11;
-  }
-  
-  //######################################################
-  void part_mc::add_track(Double_t x,  Double_t y,  Double_t z,  Double_t t,
-			  Double_t px, Double_t py, Double_t pz)
-  //######################################################
-  {
-    fStepTime.push_back(t);
-    fStepVertex.push_back(TVector3(x,y,z));
-    fStepMomentum.push_back(TVector3(px,py,pz));
-  }
-  
-  //###################################################################################
-  void event_mc::get_axis_range (Double_t &max, Double_t &min, const Int_t axis) const
-  //###################################################################################
-  {
-    
-    if(axis < 0 || axis>2) {
-      
-      Message::get()->send(MSG::ERROR,__FUNCTION__,Form("Invalid axis index: %d",axis));
-      
-      return;
-      
-    }
 
-    /*
-      In DataFormat package, avoid using C++11 standard to keep this basic package compatible
-      with old server machines.
-    */
-    for(size_t i=0; i<this->size(); ++i) {
-      
-      const std::vector<TVector3> vtx_v = this->at(i).step_vertex();
-      
-      for(size_t j=0; j<vtx_v.size(); ++j) {
-	
-	if((vtx_v.at(j))[axis] > max) max = (vtx_v.at(j))[axis];
-	if((vtx_v.at(j))[axis] < min) min = (vtx_v.at(j))[axis];
-	
-      }
-    }
-  }
-  
-  //######################################################
-  void event_mc::get_axis_range (Double_t &xmax, Double_t &xmin,
-				 Double_t &ymax, Double_t &ymin,
-				 Double_t &zmax, Double_t &zmin) const
-  //######################################################
+  //*************************************
+  void mctruth::SetNeutrino(Int_t CCNC,
+			    Int_t mode,
+			    Int_t interactionType,
+			    Int_t target,
+			    Int_t nucleon,
+			    Int_t quark,
+			    Double_t w,
+			    Double_t x,
+			    Double_t y,
+			    Double_t qsqr)
+  //*************************************
   {
 
-    /*
-      In DataFormat package, avoid using C++11 standard to keep this basic package compatible
-      with old server machines.
-    */    
-    for(size_t i=0; i<this->size(); ++i) {
-      
-      const std::vector<TVector3> vtx_v = this->at(i).step_vertex();
+    if( !fNeutrinoSet ){
+      fNeutrinoSet = true;
+      // loop over the mcpart list and get the outgoing lepton
+      // assume this is a neutral current interaction to begin with
+      // which means the outgoing lepton is the incoming neutrino
+      mcpart nu  = fPartList[0];
+      mcpart lep = fPartList[0];
 
-      for(size_t j=0; j<vtx_v.size(); ++j) {
-	
-	if((vtx_v.at(j))[0] > xmax) xmax = (vtx_v.at(j))[0];
-	if((vtx_v.at(j))[0] < xmin) xmin = (vtx_v.at(j))[0];
-	if((vtx_v.at(j))[1] > ymax) ymax = (vtx_v.at(j))[1];
-	if((vtx_v.at(j))[1] < ymin) ymin = (vtx_v.at(j))[1];
-	if((vtx_v.at(j))[2] > zmax) zmax = (vtx_v.at(j))[2];
-	if((vtx_v.at(j))[2] < zmin) zmin = (vtx_v.at(j))[2];
-	
-      }
-    }
-    
+      // start at i = 1 because i = 0 is the incoming neutrino
+      for(unsigned int i = 1; i < fPartList.size(); ++i){
+        if(fPartList[i].Mother() == nu.TrackId() &&
+           (fPartList[i].PdgCode()  == nu.PdgCode() ||
+            abs(fPartList[i].PdgCode()) == abs(nu.PdgCode())-1) ){
+          lep = fPartList[i];
+          break;
+	}
+      }//done looping over particles
+
+
+      fMCNeutrino = mcnu(nu, lep,
+			 CCNC, mode, interactionType,
+			 target, nucleon, quark,
+			 w, x, y, qsqr);
+
+    } // end if mcnu is not already set
+
+    else
+
+      Message::send(MSG::ERROR,__FUNCTION__,"Attempt to set neutrino when already set");
+
+    return;
+
   }
+
+  //************************************************************************************
+  event_mctruth::event_mctruth(DATA::DATA_TYPE type) : std::vector<larlight::mctruth>(),
+						       data_base(type)
+  //************************************************************************************
+  {
+    if(_type!=DATA::MCTruth) {
+
+      Message::send(MSG::ERROR,__FUNCTION__,
+		    Form("Provided data type (%s) not supported! Reset to default.",DATA::DATA_TREE_NAME[_type].c_str()));
+      
+      _type=DATA::MCTruth;
+    }
+    clear_data();
+  }
+
 }
 #endif
   

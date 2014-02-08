@@ -142,7 +142,7 @@ namespace larlight {
 	for(size_t i=0; i < reco_algo->get_npulse(); ++i) {
 
 	  // Fill output data product for waveform-wise info
-	  pulse my_pulse;
+	  pulse my_pulse(pulses->data_type());
 
 	  my_pulse.set_channel_number   ( (*iter).channel_number()   );
 

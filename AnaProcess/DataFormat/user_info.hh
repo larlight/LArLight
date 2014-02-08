@@ -44,7 +44,7 @@ namespace larlight {
     void dump_contents();
     
     /// Default constructor
-    user_info() : data_base(DATA::UserInfo) { clear_data(); };
+    user_info(DATA::DATA_TYPE type=DATA::UserInfo);
     
     /// Default copy constructor to avoid memory leak in ROOT streamer
     user_info(const user_info &original);
@@ -139,9 +139,7 @@ namespace larlight {
   public:
     
     /// Default constructor
-    event_user() : std::vector<larlight::user_info>(),
-		   data_base(DATA::UserInfo) 
-    {clear_data();}
+    event_user(DATA::DATA_TYPE type=DATA::UserInfo);
     
     /// Default copy constructor
     event_user(const event_user& original) : std::vector<larlight::user_info>(original),

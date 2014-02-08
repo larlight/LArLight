@@ -38,7 +38,7 @@ namespace larlight {
     // Preparation
     //
     event_cluster* ev_cluster = (event_cluster*)(storage->get_data(DATA::ShowerAngleCluster));
-    
+
     // cluster_sets is a vector of vector where the inner vector is a set of cluster IDs 
     // to be merged into one. I assume all cluster index to be output are in cluster_sets.
     // Say you have clusters A, B, and C, and we decide to merge A and B (call it D=A+B).
@@ -54,26 +54,66 @@ namespace larlight {
     std::vector<cluster>       merged_cluster_v;
     merged_cluster_v.reserve(cluster_sets.size());
 
+    // Original hit container
+    event_hit* hits=0;
+    DATA::DATA_TYPE  hit_type=DATA::Hit;
+
+    // hit association
+    std::vector<unsigned short> merged_hit_ass;
+
     // Loop over set of IDs to be merged
     for(auto const& cluster_id_set : cluster_sets) {
 
       // Declare output cluster
-      cluster merged_cluster;
+      cluster merged_cluster(ev_cluster->data_type());
 
       GEO::View_t view = GEO::kUnknown;
 
       // Loop over clusters to be merged
       for(auto const& cluster_id : cluster_id_set) {
 
-	const std::vector<hit> original_hit_v = ev_cluster->at(cluster_id).Hits();
-	
-	for(auto const& original_hit : original_hit_v)
+	const cluster i_cluster = ev_cluster->at(cluster_id);
 
-	  merged_cluster.add_hit(original_hit);
+	std::vector<unsigned short> hit_index;
+
+	// One time only operation
+	if(!hits) {
+	
+	  if(i_cluster.size_association(DATA::Hit)) {
+	    hit_index = i_cluster.association(DATA::Hit);
+	    hits      = (event_hit*)(storage->get_data(DATA::Hit));
+	    hit_type  = DATA::Hit;
+	  }
+	  else if(i_cluster.size_association(DATA::FFTHit)) {
+	    hit_index = i_cluster.association(DATA::FFTHit);
+	    hits      = (event_hit*)(storage->get_data(DATA::FFTHit));
+	    hit_type  = DATA::FFTHit;
+	  }
+	  else if(i_cluster.size_association(DATA::CrawlerHit)) {
+	    hit_index = i_cluster.association(DATA::CrawlerHit);
+	    hits      = (event_hit*)(storage->get_data(DATA::CrawlerHit));
+	    hit_type  = DATA::CrawlerHit;
+	  }
+	  else {
+	    print(MSG::ERROR,__FUNCTION__,"Did not find any associated (and supported) hits!");
+	    return false;
+	  }
+
+	  if(!hits) {
+	    print(MSG::ERROR,__FUNCTION__,"Data storage did not find associated hit collection!");
+	    return false;
+	  }
+	}
+
+	for(auto const& index : hit_index) 
+
+	  merged_hit_ass.push_back(index);
 	
 	if(view == GEO::kUnknown) view = ev_cluster->at(cluster_id).View();
 
       } // End of looping over original clusters to be merged
+
+      merged_cluster.add_association(hit_type,merged_hit_ass);
 
       merged_cluster.set_charge(-1);
       merged_cluster.set_dtdw(-1);

@@ -28,7 +28,7 @@ namespace larlight{
   public:
     
     /// Default constructor
-    shower() : data_base(DATA::Shower), fClusters_v() {clear_data();}
+    shower(DATA::DATA_TYPE type=DATA::Shower);
     
     /// Copy constructor
     shower(const shower& original) : data_base(original),
@@ -38,8 +38,7 @@ namespace larlight{
 				     fMaxWidthX(original.fMaxWidthX),
 				     fMaxWidthY(original.fMaxWidthY),
 				     fDistanceMaxWidth(original.fDistanceMaxWidth),
-				     fTotalCharge(original.fTotalCharge),
-				     fClusters_v(original.fClusters_v)
+				     fTotalCharge(original.fTotalCharge)
     {}
     
     /// Default destructor
@@ -55,7 +54,6 @@ namespace larlight{
     void set_max_width     (Double_t x, Double_t y) 
     { fMaxWidthX=x; fMaxWidthY=y; }
     void set_distance_max_width (Double_t d)       { fDistanceMaxWidth = d;   }
-    void add_cluster       (larlight::cluster c) { fClusters_v.push_back(c);}
 
     // Get Methods 
     inline Double_t TotalCharge()      const { return fTotalCharge;      }
@@ -65,7 +63,6 @@ namespace larlight{
     inline Double_t DistanceMaxWidth() const { return fDistanceMaxWidth; }
     inline const TVector3& Direction()    const { return fDCosStart;          }
     inline const TVector3& DirectionErr() const { return fSigmaDCosStart;     }
-    inline const std::vector<larlight::cluster>& Clusters() const { return fClusters_v; }
 
   protected:
 
@@ -76,7 +73,6 @@ namespace larlight{
     Double_t fMaxWidthY;             ///< maximum width of the prong in the y(0)
     Double_t fDistanceMaxWidth;      ///< distance from the start of the prong to its maximum width
     Double_t fTotalCharge;           ///< total charge of hits in the shower
-    std::vector<larlight::cluster> fClusters_v;  ///< associated clusters
 
   private:
     
@@ -95,7 +91,7 @@ namespace larlight{
   public:
     
     /// Default constructor
-    event_shower() : std::vector<larlight::shower>(), data_base(DATA::Shower) {clear_data();}
+    event_shower(DATA::DATA_TYPE type=DATA::Shower);
     
     /// Default copy constructor
     event_shower(const event_shower& original) : std::vector<larlight::shower>(original), data_base(original)

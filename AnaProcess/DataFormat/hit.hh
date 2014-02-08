@@ -119,6 +119,23 @@ namespace larlight{
     
     /// Method to clear currently held data contents in the buffer
     virtual void clear_data(){data_base::clear_data(); clear();}
+
+    /**
+       A utility function to obtain maximum & minimum of hits' vertex
+       NOTE: the initial max/min values matter. It only modifies max/min if it finds values that is 
+       above/below those initial values.
+    */
+    void get_axis_range (std::vector<Double_t> &chmax,   std::vector<Double_t> &chmin,
+			 std::vector<Double_t> &wiremax, std::vector<Double_t> &wiremin,
+			 std::vector<Double_t> &timemax, std::vector<Double_t> &timemin) const;
+
+    /**
+       Yet another utility function with an optional input to specify index of hits to be considered.
+     */
+    void get_axis_range (std::vector<Double_t> &chmax,   std::vector<Double_t> &chmin,
+			 std::vector<Double_t> &wiremax, std::vector<Double_t> &wiremin,
+			 std::vector<Double_t> &timemax, std::vector<Double_t> &timemin,
+			 std::vector<unsigned short> hit_index) const;
     
   private:
     

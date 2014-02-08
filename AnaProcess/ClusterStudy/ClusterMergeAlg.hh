@@ -73,7 +73,7 @@ namespace larlight {
 
     /// Method to add a cluster information for processing
     void AppendClusterInfo(const cluster &cl,
-			   const std::vector<larlight::hit> &in_hit_v);
+			   const event_hit* ev_hits);
 
     /**
        Method to execute the algorithm. All parameter configuration + adding input cluster information

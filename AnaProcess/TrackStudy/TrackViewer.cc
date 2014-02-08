@@ -40,9 +40,9 @@ namespace larlight {
     //
     // Obtain event-wise data object pointers
     //
-    event_sps*   ev_sps    = (event_sps*)   ( storage->get_data(DATA::SpacePoint)  );
-    event_track* ev_track = (event_track*)  ( storage->get_data(fDataType) );
-    event_mc*    ev_mc     = (event_mc*)    ( storage->get_data(DATA::MCTruth)     );
+    event_sps*    ev_sps    = (event_sps*)    ( storage->get_data(DATA::SpacePoint)  );
+    event_track*  ev_track  = (event_track*)  ( storage->get_data(fDataType)         );
+    event_mcpart* ev_mcpart = (event_mcpart*) ( storage->get_data(DATA::MCParticle)  );
     
     // Define utility variables to hold max/min of each axis range
     double xmax, ymax, zmax;
@@ -59,9 +59,9 @@ namespace larlight {
       
       ev_track->get_axis_range(xmax, xmin, ymax, ymin, zmax, zmin);
     
-    //if(ev_mc)
+    //if(ev_mcpart)
     
-    //ev_mc->get_axis_range(xmax, xmin, ymax, ymin, zmax, zmin);
+    //ev_mcpart->get_axis_range(xmax, xmin, ymax, ymin, zmax, zmin);
     
     // Proceed only if minimum/maximum are set to some values other than the defaults
     if(xmax == -1) {
@@ -118,23 +118,21 @@ namespace larlight {
     }
     
     // MC trajectory points
-    if(ev_mc){
+    if(ev_mcpart){
       
-      for(auto const& part : *ev_mc){
+      for(auto const part : *ev_mcpart){
 	
 	// Only care about a primary particle
-	if(part.track_id() != 1)
+	if(part.TrackId() != 1)
 	  
 	  continue;
 	
-	const std::vector<TVector3> vertex_v = part.step_vertex();
-	
 	_hMCStep = Prepare3DHisto("_hMCStep",
 				  zmin, zmax, xmin, xmax, ymin, ymax);
-	
-	for(auto const& vtx : vertex_v) 
-	  
-	  _hMCStep->Fill(vtx[2],vtx[0],vtx[1]);
+
+	for(auto const step : part.Trajectory()) 
+
+	  _hMCStep->Fill(step.Z(), step.X(), step.Y());
 	
 	_hMCStep->SetMarkerStyle(20);
 	_hMCStep->SetMarkerColor(kCyan);
