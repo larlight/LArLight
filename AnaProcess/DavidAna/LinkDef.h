@@ -10,6 +10,8 @@
 #pragma link off all functions;
 
 #pragma link C++ class larlight::DavidAna+;
+#pragma link C++ class larlight::EvtDisplay+;
 //ADD_NEW_CLASS ... do not change this line
 
 #endif
+
