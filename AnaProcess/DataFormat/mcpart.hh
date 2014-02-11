@@ -144,7 +144,7 @@ namespace larlight {
     ////////////////////////
       
   };
-};
+}
 #endif
 
 /** @} */ // end of doxygen group 

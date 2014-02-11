@@ -6,6 +6,7 @@
 #define DATAFORMAT_TYPEDEF_HH
 
 // Header files included here
+#include "data_base.hh"
 #include "wire.hh"
 #include "fifo.hh"
 #include "pulse.hh"
@@ -24,6 +25,7 @@
 #include "calorimetry.hh"
 #include "storage_manager.hh"
 // Class forward declaration here
+
 namespace larlight{
 
   class data_base;

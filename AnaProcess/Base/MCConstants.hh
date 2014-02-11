@@ -92,7 +92,7 @@ namespace larlight{
       kInverseMuDecay            = kNuanceOffset + 99   ///< inverse muon decay
     };
   
-  };
+  }
 }
 #endif
 /** @} */ // end of doxygen group

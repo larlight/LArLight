@@ -17,7 +17,6 @@
 #include "Base-TypeDef.hh"
 #include <vector>
 #include <map>
-#include <limits>
 #include <TObject.h>
 
 namespace larlight{
@@ -46,7 +45,7 @@ namespace larlight{
     virtual ~data_base(){}
     
     /// Clear method
-    virtual void clear_data(){fRunNumber = fSubRunNumber = fEventID = DATA::INVALID_UINT;}
+    virtual void clear_data();
     
     /// run number setter
     void set_run      (UInt_t run) { fRunNumber    = run; }
@@ -88,10 +87,10 @@ namespace larlight{
     DATA::DATA_TYPE _type;
 
     /// Association storage ... allow multiple set of associations
-    std::map<DATA::DATA_TYPE,std::vector<std::vector<unsigned short> > > _ass;
+    std::map<larlight::DATA::DATA_TYPE,std::vector<std::vector<unsigned short> > > _ass;
     
     ////////////////////////
-    ClassDef(data_base,2)
+    ClassDef(data_base,3)
     ////////////////////////
       
   };

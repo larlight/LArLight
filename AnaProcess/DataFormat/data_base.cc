@@ -5,6 +5,14 @@
 
 namespace larlight {
 
+  //**************************
+  void data_base::clear_data()
+  //**************************
+  {
+    fRunNumber = fSubRunNumber = fEventID = DATA::INVALID_UINT;
+    _ass.clear();
+  }
+
   //*******************************************************************************************
   void data_base::add_association(DATA::DATA_TYPE type, const std::vector<unsigned short> ass)
   //*******************************************************************************************
