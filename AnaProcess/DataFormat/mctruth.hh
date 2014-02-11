@@ -15,7 +15,6 @@
 #ifndef MCTRUTH_HH
 #define MCTRUTH_HH
 
-#include "mcpart.hh"
 #include "mcnu.hh"
 
 namespace larlight {
@@ -66,9 +65,9 @@ namespace larlight {
     Bool_t                               NeutrinoSet()  const { return fNeutrinoSet; }
 
   private:
-
+    
     std::vector<larlight::mcpart> fPartList;    ///< list of particles in this event
-    larlight::mcnu                fMCNeutrino;  ///< reference to neutrino info - null if not a neutrino
+    mcnu                          fMCNeutrino;  ///< reference to neutrino info - null if not a neutrino
     MC::Origin_t                  fOrigin;      ///< origin for this event
     Bool_t                        fNeutrinoSet; ///< flag for whether the neutrino information has been set
     

@@ -29,10 +29,6 @@
 
 #pragma link C++ class larlight::trigger+;
 
-#pragma link C++ class larlight::mctruth+;
-#pragma link C++ class std::vector<larlight::mctruth>+;
-#pragma link C++ class larlight::event_mctruth+;
-
 #pragma link C++ class larlight::mcstep+;
 #pragma link C++ class std::vector<larlight::mcstep>+;
 #pragma link C++ class larlight::mctrack+;
@@ -43,6 +39,10 @@
 
 #pragma link C++ class larlight::mcnu+;
 #pragma link C++ class std::vector<larlight::mcnu>+;
+
+#pragma link C++ class larlight::mctruth+;
+#pragma link C++ class std::vector<larlight::mctruth>+;
+#pragma link C++ class larlight::event_mctruth+;
 
 #pragma link C++ class larlight::wire+;
 #pragma link C++ class std::vector<larlight::wire>+;

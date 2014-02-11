@@ -20,8 +20,9 @@ OSNAMEMODE      = $(OSNAME)
 include $(ANA_PROC_DIR)/Makefile/Makefile.${OSNAME}
 
 # set compiler options for ROOT
-CXXFLAGS +=  `root-config --cflags`
+INCFLAGS +=  `root-config --cflags`
 
 # call the common GNUmakefile
 include $(ANA_PROC_DIR)/Makefile/GNUmakefile.CORE
+
 
