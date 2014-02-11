@@ -9,6 +9,16 @@
 #pragma link off all classes;
 #pragma link off all functions;
 
+#pragma link C++ class std::pair<size_t,size_t>+;
+#pragma link C++ class std::pair<std::string,bool>+;
+#pragma link C++ class std::pair<std::string,std::string>+;
+
+#pragma link C++ class std::map<std::string,bool>+;
+#pragma link C++ class std::map<std::string,std::string>+;
+#pragma link C++ class std::map<std::string,std::vector<bool> >+;
+#pragma link C++ class std::map<std::string,std::vector<int > >+;
+#pragma link C++ class std::map<std::string,std::vector<double> >+;
+#pragma link C++ class std::map<std::string,std::vector<std::string> >+;
 
 //#pragma link C++ class TVector3+;
 //#pragma link C++ class TLorentzVector+;
@@ -75,21 +85,6 @@
 #pragma link C++ class larlight::user_info+;
 #pragma link C++ class std::vector<larlight::user_info>+;
 #pragma link C++ class larlight::event_user+;
-
-#pragma link C++ class std::pair<std::string,bool>+;
-#pragma link C++ class std::pair<std::string,std::string>+;
-#pragma link C++ class std::pair<std::string,std::vector<bool> >+;
-//#pragma link C++ class std::pair<std::string,std::vector<int> >+;
-//#pragma link C++ class std::pair<std::string,std::vector<double> >+;
-//#pragma link C++ class std::pair<std::string,std::vector<std::string> >+;
-
-#pragma link C++ class std::map<std::string,bool>+;
-#pragma link C++ class std::map<std::string,std::string>+;
-#pragma link C++ class std::map<std::string,std::vector<bool> >+;
-#pragma link C++ class std::map<std::string,std::vector<int > >+;
-#pragma link C++ class std::map<std::string,std::vector<double> >+;
-#pragma link C++ class std::map<std::string,std::vector<std::string> >+;
-
 
 #pragma link C++ class larlight::storage_manager+;
 

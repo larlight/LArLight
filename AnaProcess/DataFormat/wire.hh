@@ -93,7 +93,7 @@ namespace larlight {
      A collection storage class of multiple wires.
   */
   class event_wire : public std::vector<larlight::wire>,
-		     public data_base {
+		     public event_base {
     
   public:
     
@@ -101,14 +101,14 @@ namespace larlight {
     event_wire(DATA::DATA_TYPE type=DATA::Wire);
     
     /// Default copy constructor
-    event_wire(const event_wire& original) : std::vector<larlight::wire>(original), data_base(original)
+    event_wire(const event_wire& original) : std::vector<larlight::wire>(original), event_base(original)
     {}
     
     /// Default destructor
     ~event_wire(){}
     
     /// Method to clear currently held data contents in the buffer
-    virtual void clear_data(){data_base::clear_data(); clear();}
+    virtual void clear_data(){event_base::clear_data(); clear();}
     
   private:
     

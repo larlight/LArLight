@@ -114,7 +114,7 @@ namespace larlight {
     std::vector<std::pair<size_t,size_t> > ftrackFiducial; ///< mctrack indexes for a trajectory inside fiducial volume
    
     ////////////////////////
-    ClassDef(mcpart,0)
+    ClassDef(mcpart,1)
     ////////////////////////
       
   };
@@ -141,6 +141,7 @@ namespace larlight {
     
     /// Clear method
     virtual void clear_data() {event_base::clear_data(); clear();}
+
     
   private:
     

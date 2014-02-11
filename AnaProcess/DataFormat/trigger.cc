@@ -5,7 +5,7 @@
 
 namespace larlight {
 
-  trigger::trigger(DATA::DATA_TYPE type) : data_base(type)
+  trigger::trigger(DATA::DATA_TYPE type) : event_base(type)
   {
     if(_type!=DATA::Trigger) {
 
@@ -20,13 +20,13 @@ namespace larlight {
   
   void trigger::clear_data(){
 
-    data_base::clear_data();
+    event_base::clear_data();
     init_vars();
     
   }
   
   trigger::trigger(const trigger &original) : 
-    data_base(original),
+    event_base(original),
     _trig_sample_number(original._trig_sample_number),
     _trig_frame_number(original._trig_frame_number),
     _trig_number(original._trig_number),
