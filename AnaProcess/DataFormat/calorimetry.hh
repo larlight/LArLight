@@ -92,7 +92,7 @@ namespace larlight{
      A collection storage class of multiple calorimetrys.
   */
   class event_calorimetry : public std::vector<larlight::calorimetry>,
-			    public data_base {
+			    public event_base {
     
   public:
     
@@ -101,14 +101,14 @@ namespace larlight{
     
     /// Default copy constructor
     event_calorimetry(const event_calorimetry& original) : std::vector<larlight::calorimetry>(original),
-							   data_base(original)
+							   event_base(original)
     {}
     
     /// Default destructor
     ~event_calorimetry(){}
     
     /// Method to clear currently held data contents in the buffer
-    virtual void clear_data(){data_base::clear_data(); clear();}
+    virtual void clear_data(){event_base::clear_data(); clear();}
 
   protected:
     
@@ -117,7 +117,7 @@ namespace larlight{
   private:
     
     ////////////////////////
-    ClassDef(event_calorimetry,1)
+    ClassDef(event_calorimetry,2)
     ////////////////////////
   };
 }

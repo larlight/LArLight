@@ -66,7 +66,7 @@ namespace larlight {
 
   //#################################################################################
   event_hit::event_hit(DATA::DATA_TYPE type) : std::vector<larlight::hit>(), 
-					       data_base(type) 
+					       event_base(type) 
   //#################################################################################
   {
     if( _type != DATA::Hit &&

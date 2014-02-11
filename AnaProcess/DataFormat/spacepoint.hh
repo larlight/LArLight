@@ -101,7 +101,7 @@ namespace larlight {
      A collection storage class of multiple spacepoints
   */
   class event_sps : public std::vector<larlight::spacepoint>,
-		    public data_base {
+		    public event_base {
     
   public:
     
@@ -110,14 +110,14 @@ namespace larlight {
     
     /// Default copy constructor
     event_sps(const event_sps& original) : std::vector<larlight::spacepoint>(original),
-					   data_base(original)
+					   event_base(original)
     {}
     
     /// Default destructor
     ~event_sps(){}
     
     /// Method to clear currently held data contents in the buffer
-    virtual void clear_data(){data_base::clear_data(); clear();}
+    virtual void clear_data(){event_base::clear_data(); clear();}
     
     /**
        A utility function to obtain maximum & minimum of spacepoints' vertex along the specified axis.
@@ -138,7 +138,7 @@ namespace larlight {
   private:
     
     ////////////////////////
-    ClassDef(event_sps,2)
+    ClassDef(event_sps,3)
     ////////////////////////
   };
 }

@@ -83,7 +83,7 @@ namespace larlight {
 
   //************************************************************************************
   event_mctruth::event_mctruth(DATA::DATA_TYPE type) : std::vector<larlight::mctruth>(),
-						       data_base(type)
+						       event_base(type)
   //************************************************************************************
   {
     if(_type!=DATA::MCTruth) {

@@ -29,7 +29,7 @@ namespace larlight{
 
   //####################################################################################
   event_cluster::event_cluster(DATA::DATA_TYPE type) : std::vector<larlight::cluster>(), 
-						       data_base(type) 
+						       event_base(type) 
   //####################################################################################
   {
     if( _type != DATA::Cluster &&

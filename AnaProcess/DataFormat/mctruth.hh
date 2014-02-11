@@ -83,7 +83,7 @@ namespace larlight {
      LArSoft MCTruth class equivalent data container
   */
   class event_mctruth : public std::vector<larlight::mctruth>,
-			public data_base {
+			public event_base {
     
   public:
     
@@ -92,19 +92,19 @@ namespace larlight {
     
     /// Copy constructor
     event_mctruth(const event_mctruth& original) : std::vector<larlight::mctruth>(original),
-						   data_base   (original)
+						   event_base   (original)
     {}
     
     /// Default destructor
     virtual ~event_mctruth(){}
     
     /// Clear method
-    virtual void clear_data() {data_base::clear_data(); clear();}
+    virtual void clear_data() {event_base::clear_data(); clear();}
     
   private:
     
     ////////////////////////
-    ClassDef(event_mctruth,1)
+    ClassDef(event_mctruth,2)
     ////////////////////////
       
   };

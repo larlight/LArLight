@@ -57,7 +57,7 @@ namespace larlight {
 
   //*********************************************************************************
   event_mcpart::event_mcpart(DATA::DATA_TYPE type) : std::vector<larlight::mcpart>(),
-						     data_base(type) 
+						     event_base(type) 
   //*********************************************************************************
   {
     if(_type!=DATA::MCParticle) {

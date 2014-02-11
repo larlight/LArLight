@@ -119,7 +119,7 @@ namespace larlight {
      A collection of MCParticles
   */
   class event_mcpart : public std::vector<larlight::mcpart>,
-		       public data_base {
+		       public event_base {
     
   public:
     
@@ -128,19 +128,19 @@ namespace larlight {
     
     /// Copy constructor
     event_mcpart(const event_mcpart& original) : std::vector<larlight::mcpart>(original),
-						 data_base   (original)
+						 event_base(original)
     {};
     
     /// Default destructor
     virtual ~event_mcpart(){};
     
     /// Clear method
-    virtual void clear_data() {data_base::clear_data(); clear();}
+    virtual void clear_data() {event_base::clear_data(); clear();}
     
   private:
     
     ////////////////////////
-    ClassDef(event_mcpart,0)
+    ClassDef(event_mcpart,1)
     ////////////////////////
       
   };

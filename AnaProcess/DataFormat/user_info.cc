@@ -309,7 +309,7 @@ namespace larlight {
 
   //********************************************************************************
   event_user::event_user(DATA::DATA_TYPE type) : std::vector<larlight::user_info>(),
-						 data_base(type)
+						 event_base(type)
   //********************************************************************************
   {
     if(_type!=DATA::UserInfo) {

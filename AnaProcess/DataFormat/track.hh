@@ -116,7 +116,7 @@ namespace larlight {
      \class event_track 
      A collection storage class of multiple tracks.
   */
-  class event_track : public std::vector<larlight::track>, public data_base {
+  class event_track : public std::vector<larlight::track>, public event_base {
     
   public:
     
@@ -125,14 +125,14 @@ namespace larlight {
     
     /// Default copy constructor
     event_track(const event_track& original) : std::vector<larlight::track>(original),
-					       data_base(original)
+					       event_base(original)
     {}
     
     /// Default destructor
     ~event_track(){}
     
     /// Method to clear currently held data contents in the buffer
-    virtual void clear_data(){data_base::clear_data(); clear();}
+    virtual void clear_data(){event_base::clear_data(); clear();}
     
     /**
        A utility function to obtain maximum & minimum of spacepoints' vertex along the specified axis.
@@ -153,7 +153,7 @@ namespace larlight {
   private:
     
     ////////////////////////
-    ClassDef(event_track,2)
+    ClassDef(event_track,3)
     ////////////////////////
   };
 }

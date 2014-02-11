@@ -90,14 +90,14 @@ namespace larlight{
     ClassDef(cluster,2)
     ////////////////////////
       
-      };
+  };
   
   /**
      \class event_cluster
      A collection storage class of multiple clusters.
   */
   class event_cluster : public std::vector<larlight::cluster>,
-			public data_base {
+			public event_base {
     
   public:
     
@@ -106,11 +106,11 @@ namespace larlight{
     
     /// Default copy constructor
     event_cluster(const event_cluster& original)
-      : std::vector<larlight::cluster>(original), data_base(original)
+      : std::vector<larlight::cluster>(original), event_base(original)
     {}
     
     /// Method to clear currently held data contents in the buffer
-    virtual void clear_data(){data_base::clear_data(); clear();}
+    virtual void clear_data(){event_base::clear_data(); clear();}
     
     /// Default destructor
     ~event_cluster(){}
@@ -120,9 +120,9 @@ namespace larlight{
   private:
     
     ////////////////////////
-    ClassDef(event_cluster,2)
+    ClassDef(event_cluster,3)
     ////////////////////////
-      };
+  };
 }
 #endif
   

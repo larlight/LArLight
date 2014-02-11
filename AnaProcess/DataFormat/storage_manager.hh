@@ -79,6 +79,9 @@ namespace larlight {
     
     /// Setter for output filename
     void set_out_filename(std::string name) {_out_fname=name;}
+
+    /// Setter to disable event alignment check
+    void enable_event_alignment(bool doit=true) {_check_alignment=doit;}
     
     /// Getter for I/O mode.
     MODE io_mode() const         {return _mode;}
@@ -116,7 +119,7 @@ namespace larlight {
     /** Universal data pointer getter to return data_base* pointer for specified data type.
 	A user then cast the pointer type to whatever the relevant data class pointer type to access members.
     */
-    data_base* get_data(DATA::DATA_TYPE type);
+    event_base* get_data(DATA::DATA_TYPE type);
     
     /// Getter for a shared object instance pointer. Not limited to be a singleton.
     static storage_manager* get() 
@@ -173,9 +176,12 @@ namespace larlight {
     
     /// Boolean to record what data to be written out from a file
     bool _write_data_array[DATA::DATA_TYPE_MAX];
+
+    /// Boolean to enable event alignment check
+    bool _check_alignment;
     
     /// Data pointer array for reading
-    data_base *_ptr_data_array[DATA::DATA_TYPE_MAX];
+    event_base *_ptr_data_array[DATA::DATA_TYPE_MAX];
     
     /// I/O filename
     std::string _out_fname;

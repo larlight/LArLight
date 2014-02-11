@@ -35,7 +35,7 @@ namespace larlight {
 
   //************************************************************************************************
   event_calorimetry::event_calorimetry(DATA::DATA_TYPE type) : std::vector<larlight::calorimetry>(),
-							       data_base(type)
+							       event_base(type)
   //************************************************************************************************
   {
     if(_type!=DATA::Calorimetry) {

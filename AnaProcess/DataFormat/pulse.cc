@@ -39,7 +39,7 @@ namespace larlight {
   }
 
   event_pulse::event_pulse(DATA::DATA_TYPE type) : std::vector<larlight::pulse>(),
-						   data_base(type) 
+						   event_base(type) 
   {
     if(_type!=DATA::PMTPulse_FixedWin && 
        _type!=DATA::TPCPulse_FixedWin &&
@@ -58,7 +58,7 @@ namespace larlight {
 
   void event_pulse::clear_data(){
 
-    data_base::clear_data();
+    event_base::clear_data();
     clear();
     _sum_charge=-1;
     _sum_peak=-1;

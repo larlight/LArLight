@@ -103,7 +103,7 @@ namespace larlight{
      A collection storage class of multiple hits.
   */
   class event_hit : public std::vector<larlight::hit>, 
-		    public data_base {
+		    public event_base {
     
   public:
     
@@ -111,14 +111,14 @@ namespace larlight{
     event_hit(DATA::DATA_TYPE type=DATA::Hit);
     
     /// Default copy constructor
-    event_hit(const event_hit& original) : std::vector<larlight::hit>(original), data_base(original)
+    event_hit(const event_hit& original) : std::vector<larlight::hit>(original), event_base(original)
     {}
     
     /// Default destructor
     ~event_hit(){}
     
     /// Method to clear currently held data contents in the buffer
-    virtual void clear_data(){data_base::clear_data(); clear();}
+    virtual void clear_data(){event_base::clear_data(); clear();}
 
     /**
        A utility function to obtain maximum & minimum of hits' vertex
@@ -140,7 +140,7 @@ namespace larlight{
   private:
     
     ////////////////////////
-    ClassDef(event_hit,2)
+    ClassDef(event_hit,3)
     ////////////////////////
   };
 }
