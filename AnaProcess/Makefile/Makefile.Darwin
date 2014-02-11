@@ -5,8 +5,8 @@ LINKER          = libtool
 SOMAKER         = libtool 
 
 #######"-O" FLAG: (not always ideal with debugging info)
-CFLAGS          += -O2
-CXXFLAGS        += -O2
+CFLAGS          += -O3
+CXXFLAGS        += -O3
 #SOFLAGS         += -O
 #AFLAGS          += -O
 #DLLFLAGS        += -O
@@ -53,9 +53,9 @@ DLLFLAGS        += -fPIC
 #COMPILER FLAGS
 ##########
 CFLAGS          += -fsigned-char -pipe -DHAVE_LONG_LONG  
-CFLAGS          += -fno-common -O2 -D_CORE_$(shell uname -s)_
+CFLAGS          += -fno-common -O3 -D_CORE_$(shell uname -s)_
 CXXFLAGS        += -fsigned-char -pipe -DHAVE_LONG_LONG  
-CXXFLAGS        += -fno-common -O2 -Wno-deprecated -D_CORE_$(shell uname -s)_
+CXXFLAGS        += -fno-common -O3 -Wno-deprecated -D_CORE_$(shell uname -s)_
 
 
 ##########
