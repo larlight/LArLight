@@ -23,7 +23,6 @@ namespace larlight {
   //********************************
   {
 
-    std::cout << "Here we go!" << std::endl;
     return true;
   }
   
@@ -54,24 +53,17 @@ namespace larlight {
     //Find axis boundary
     hits->get_axis_range(chmax, chmin, wiremax, wiremin, timemax, timemin);
     //proceed only if values actually reset
-    /*    if ( wiremax[0] == -1 )
+    if ( wiremax[0] <= -1 )
       {
 	print(MSG::WARNING,__FUNCTION__,
 	      "Did not find any reconstructed hits in view 0. Skipping this event...");
-	
 	return true;
-	}
-    */
-
+      }
+    
     //if all ok, plot wire vs. time for hits
     _hHits_U = Prepare2DHisto("HitHistU", wiremin[0], wiremax[0], timemin[0], timemax[0]);
     _hHits_V = Prepare2DHisto("HitHistV", wiremin[1], wiremax[1], timemin[1], timemax[1]);
     _hHits_Z = Prepare2DHisto("HitHistZ", wiremin[2], wiremax[2], timemin[2], timemax[2]);
-    //_hHits_U = Prepare2DHisto("HitHistU", 0, 2000, 0, 3000);
-    //_hHits_V = Prepare2DHisto("HitHistV", 0, 2000, 0, 3000);
-    //_hHits_Z = Prepare2DHisto("HitHistZ", 0, 2000, 0, 3000);
-    
-
 
     //loop over hits
     for (size_t i=0; i<hits->size(); i++)
@@ -109,8 +101,8 @@ namespace larlight {
     int timewidth = (int)mytimemax-mytimemin; 
 
     h = new TH2D(name.c_str(),"2D Viewer; Wire; Time;",
-		 wirewidth,  mywiremin, mywiremax,
-		 timewidth,  mytimemin, mytimemax);
+		 50,  mywiremin, mywiremax,
+		 50,  mytimemin, mytimemax);
     
     return h;
   }

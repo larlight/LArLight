@@ -46,7 +46,9 @@ while my_proc.process_event():
         c.Update()
     
 
-    print "Hit Enter to continue to next evt..."
-    sys.stdin.readline()
+    usrinput = raw_input("Hit Enter: next evt  ||  q: exit viewer\n")
+    if ( usrinput == "q" ):
+        break
+    
 
 # done!
