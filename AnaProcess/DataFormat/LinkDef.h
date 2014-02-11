@@ -9,11 +9,15 @@
 #pragma link off all classes;
 #pragma link off all functions;
 
+
+//#pragma link C++ class TVector3+;
+//#pragma link C++ class TLorentzVector+;
 #pragma link C++ class std::vector<TVector3>+;
 #pragma link C++ class std::vector<TMatrixD>+;
 #pragma link C++ class std::vector<TLorentzVector>+;
 
 #pragma link C++ class larlight::data_base+;
+#pragma link C++ class larlight::event_base+;
 
 #pragma link C++ class larlight::fifo+;
 #pragma link C++ class std::vector<larlight::fifo>+;
