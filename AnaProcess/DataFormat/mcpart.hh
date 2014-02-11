@@ -62,10 +62,15 @@ namespace larlight {
 
     ///--- Setters ---///
 
-    inline void AddDaughter     (const int trackID) { fdaughters.insert(trackID); }
-    inline void SetPolarization (TVector3 const& p) { fpolarization = p;          }
-    inline void SetRescatter    (Int_t code)        { frescatter    = code;       }
-    inline void SetWeight       (Double_t wt)       { fWeight       = wt;         }
+    inline void AddDaughter     (const int trackID)   { fdaughters.insert(trackID);  }
+    inline void SetPolarization (TVector3 const& p)   { fpolarization = p;           }
+    inline void SetRescatter    (Int_t code)          { frescatter    = code;        }
+    inline void SetWeight       (Double_t wt)         { fWeight       = wt;          }
+    inline void SetTrajectory   (const mctrack steps) { ftrajectory   = steps;       }
+    inline void AddTrajectory   (const mcstep step)   { ftrajectory.push_back(step); }
+    inline void AddTrajectory   (const TLorentzVector& position,
+				 const TLorentzVector& momentum)
+    { ftrajectory.push_back(position,momentum); }
 
     inline void AddFiducialTrack(size_t start, size_t end)
     { ftrackFiducial.push_back(std::pair<size_t,size_t>(start,end)); }
