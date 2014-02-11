@@ -58,10 +58,12 @@ namespace larlight {
 
     protected:
 
-    TH1D *failure;
-    int event_num;
-    int _NSamples;
-    int _VarCut;
+    TH1D      *compression;
+    TH1D            *noise;
+    int          event_num;
+    int          _NSamples;
+    double         _VarCut;
+    int          _baseline;
 
   };
 }
