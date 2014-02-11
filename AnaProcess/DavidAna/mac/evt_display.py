@@ -41,7 +41,7 @@ my_proc.set_ana_output_file("tpcout.root")
 # To show how one can run multiple analysis modules at once,
 # we make multiple ana_base instance.
 
-my_ana_1=fmwk.DavidAna()
+my_ana_1=fmwk.EvtDisplay()
 #my_ana_2=ana_base()
 #my_ana_3=ana_base()
 

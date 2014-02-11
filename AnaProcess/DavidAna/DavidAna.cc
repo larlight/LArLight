@@ -12,11 +12,22 @@ namespace larlight {
     // Do all variable initialization you wish to do here.
     // If you need, you have an output root file pointer "_fout".
 
-    failure =       new TH1D("failure",     "channel number",    9000, 0, 9000);
-    event_num = 0;
+    compression    = new TH1D("compression", "fraction of bins written",  30,  0,0.1);
+    noise          = new TH1D(      "noise",             "ADC-baseline",  20,-10, 10);  
+    event_num      =   0;
+
+    //ask for variance cut:
+    double varask;
+    std::cout << "What variance/bin value to use?" << std::endl;
+    std::cin >> varask;
     //Number of samples to use for baseline+variance calculation
-    _NSamples = 10;
-    _VarCut = 10;
+    std::cout << "Number of samples to write?" << std::endl;
+    std::cin >> _NSamples;
+    _VarCut        =  _NSamples*varask;
+    _baseline      =   0;
+
+    std::cout << "The cut on variance is: " << _VarCut << std::endl;
+
     return true;
   }
   
@@ -37,6 +48,8 @@ namespace larlight {
     
     //waveform counter
     int wfnum = 0;
+
+
     //Loop over all waveforms
     for (size_t i=0; i<event_wf->size(); i++){
       
@@ -53,13 +66,17 @@ namespace larlight {
       //***************************
       //Start Compression Algorithm
       //***************************
+
+      //determine collection plane
+      //(for now by looking at value of first adc)
+      if ( tpc_data->at(0) > 2000 )
+	_baseline = 2048;
+      else
+	_baseline = 400;
       
       //Here allow for selection of 1 channel
       if ( (tpc_data->channel_number())%10==0 ){
 	
-	//variable for interesting events
-	bool interesting=false;
-
 	//create temporary histogram
 	char c[25];
 	char d[25];
@@ -73,19 +90,25 @@ namespace larlight {
 	//set variable for baseline
 	double baseline_tot = 0;
 	//initially just set baseline to first point
-	double baseline = tpc_data->at(0);
+	double baseline     = tpc_data->at(0);
 	//initially se variance to 0
-	double variance = 0;
+	double variance     = 0;
+	//interesting?
+	bool interesting    = false;
+	//calculate compression
+	double written_bins    = 0;
 
 	//Get Waveform
 	for (Int_t adc_index=0; adc_index<tpc_data->size(); adc_index++){
 	  
 	  int adcs = tpc_data->at(adc_index);
 	  
-	  //interesting?
-	  if ( (adcs-baseline) > 10)
+	  //determine if something interesting happens
+	  if ( (adcs-baseline > 10) || (baseline-adcs > 10) )
 	    interesting = true;
-
+	  else
+	    noise->Fill(adcs-baseline); //enter noise in noise histo
+	  
 	  //IF before _NSamples don't do anything
 	  if ( adc_index < _NSamples)
 	    {
@@ -106,17 +129,18 @@ namespace larlight {
 	      //calculate variance:
 	      for (int i=0; i<last_few.size(); i++)
 		variance += pow((last_few.at(i)-baseline),2);
+
 	      //Apply filter
 	      //currently setting bins that don't pass cut to previous value
-	      if (variance>_VarCut)
-		newpulse->SetBinContent(adc_index+1-_NSamples/2.0,tpc_data->at(adc_index-_NSamples/2));
-	      else{
-		//		std::cout << "Index:     " << adc_index+1 << std::endl;
-		//		std::cout << "Writing @: " << adc_index+1-_NSamples/2 << std::endl;
-		//		std::cout << "Value:     " << newpulse->GetBinContent(adc_index-_NSamples/2) << std::endl << std::endl;
-		newpulse->SetBinContent(adc_index+1-_NSamples/2.0,newpulse->GetBinContent(adc_index-_NSamples/2));
-	      }
-	      
+
+	      //if we pass the cut
+	      if ( variance > _VarCut )
+		{
+		  newpulse->SetBinContent(adc_index+1-_NSamples/2,tpc_data->at(adc_index-_NSamples/2));
+		  written_bins += 1;
+		}
+	      else
+		newpulse->SetBinContent(adc_index+1-_NSamples/2,_baseline);
 	    }
 
 	  temphist->SetBinContent(adc_index+1,adcs);
@@ -127,6 +151,10 @@ namespace larlight {
 	  temphist->Write();
 	  newpulse->Write();
 	}
+
+	//compression calculation:
+	double compression_factor = written_bins/tpc_data->size();
+	compression->Fill(compression_factor);
 	
       }//End IF correct channel #
       
@@ -144,7 +172,8 @@ namespace larlight {
     // If you need, you can store your ROOT class instance in the output
     // file. You have an access to the output file through "_fout" pointer.
 
-    failure->Write();
+    compression->Write();
+    noise->Write();
   
     return true;
   }

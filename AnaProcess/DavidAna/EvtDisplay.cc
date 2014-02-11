@@ -75,7 +75,6 @@ namespace larlight {
       std::cout << this_hit->Channel() << std::endl;
       
 
-      /*
       channels.push_back    (  this_hit->Channel() );
 
       //determine boundaries
@@ -120,10 +119,8 @@ namespace larlight {
 	if (this_hit->PeakTime() > max_time_pl2 )
 	  max_time_pl2 = this_hit->PeakTime();
       }
-      */
     }
 
-    /*
 
     std::cout << "min time pl0: " << min_time_pl0 << std::endl;
     std::cout << "max time pl0: " << max_time_pl0 << std::endl;
@@ -162,7 +159,6 @@ namespace larlight {
     evt_pl1->Write("COLZ");
     evt_pl2->Write("COLZ");
 
-    */
 
     return true;
   }
