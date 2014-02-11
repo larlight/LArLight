@@ -62,15 +62,23 @@ namespace larlight {
     //  event_mc*      ev_mc   = (event_mc*)      ( storage->get_data(DATA::MCTruth)            );
     event_cluster* ev_clus = (event_cluster*) ( storage->get_data(DATA::ShowerAngleCluster) );
     event_hit*     ev_hit  = (event_hit*) ( storage->get_data(ev_clus->get_hit_type()));
+
     // Define utility variables to hold max/min of each axis range, for each of 3 views
     //vector of length 3 initialized to -1
     std::vector<double> chmax, chmin, wiremax, wiremin, timemax, timemin;
     
     // Find max/min boundary for all axis (clusters)
     
-    if(ev_clus && ev_clus->size_association(ev_clus->get_hit_type())) {
-      ev_hit->get_axis_range(chmax, chmin, wiremax, wiremin, timemax, timemin, 
-			     ev_clus->association(ev_clus->get_hit_type()));
+    if(ev_clus && ev_hit) {
+      ev_hit->get_axis_range(chmax, chmin, wiremax, wiremin, timemax, timemin);
+    }
+
+    if(!wiremax.size()) {
+
+      print(MSG::ERROR,__FUNCTION__,
+	    "Something went wrong. Did not find hit or not even event_hit... Aborting!");
+
+      return false;
     }
     
     // Proceed only if minimum/maximum are set to some values other than the defaults

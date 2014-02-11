@@ -135,7 +135,7 @@ namespace larlight{
     void get_axis_range (std::vector<Double_t> &chmax,   std::vector<Double_t> &chmin,
 			 std::vector<Double_t> &wiremax, std::vector<Double_t> &wiremin,
 			 std::vector<Double_t> &timemax, std::vector<Double_t> &timemin,
-			 std::vector<unsigned short> hit_index) const;
+			 const std::vector<unsigned short>& hit_index) const;
     
   private:
     

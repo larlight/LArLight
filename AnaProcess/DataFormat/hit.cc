@@ -133,7 +133,7 @@ namespace larlight {
 				 std::vector<Double_t> &wiremin, 
 				 std::vector<Double_t> &timemax, 
 				 std::vector<Double_t> &timemin,
-				 std::vector<unsigned short> hit_index) const
+				 const std::vector<unsigned short>& hit_index) const
   //############################################################################
   {
     
