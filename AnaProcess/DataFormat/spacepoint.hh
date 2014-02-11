@@ -34,7 +34,7 @@ namespace larlight {
     spacepoint(Int_t id, 
 	       Double_t x,  Double_t y,  Double_t z,
 	       Double_t ex, Double_t ey, Double_t ez,
-	       Double_t chi2) : data_base()
+	       Double_t chi2) : data_base(DATA::SpacePoint)
     {
       clear_data();
       fID=id;

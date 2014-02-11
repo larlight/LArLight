@@ -29,6 +29,7 @@
 namespace larlight{
 
   class data_base;
+  class event_base;
   
   class wire;
   class event_wire;
