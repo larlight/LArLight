@@ -9,6 +9,8 @@
 #include "DavidAna.hh"
 #include "EvtDisplay.hh"
 #include "HitViewer.hh"
+#include "WFCompress.hh"
+#include "ChargeAna.hh"
 //ADD_NEW_HEADER ... do not change this comment line
 
 // Class forward declaration here
@@ -17,9 +19,13 @@ namespace larlight {
   class DavidAna;
   class EvtDisplay;
   class HitViewer;
+  class WFCompress;
+  class ChargeAna;
 //ADD_NEW_CLASS ... do not change this comment line
 
 }
 #endif
+
+
 
 

@@ -12,8 +12,12 @@
 #pragma link C++ class larlight::DavidAna+;
 #pragma link C++ class larlight::EvtDisplay+;
 #pragma link C++ class larlight::HitViewer+;
+#pragma link C++ class larlight::WFCompress+;
+#pragma link C++ class larlight::ChargeAna+;
 //ADD_NEW_CLASS ... do not change this line
 
 #endif
+
+
 
 
