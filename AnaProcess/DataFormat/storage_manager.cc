@@ -489,10 +489,11 @@ namespace larlight {
       Message::send(MSG::ERROR,__FUNCTION__,
 		    "Cannot move the data pointer back/forth in WRITE mode.");
       status=false;
-    }else if(_nevents && _nevents<index){
-      sprintf(_buf,"Requested index, %d, exceeds the total entries, %d!",
-	      index,_nevents);
-      Message::send(MSG::ERROR,__FUNCTION__,_buf);
+    }else if(_nevents) {
+      Message::send(MSG::WARNING,__FUNCTION__,"Input file empty!");
+      status=false;
+    }else if(!(index<_nevents)){
+      Message::send(MSG::WARNING,__FUNCTION__,"Reached EOF");
       status=false;
     }else
       _index=index;
@@ -534,6 +535,7 @@ namespace larlight {
       status=false;
       break;
     }
+
     return status;
   }
   
