@@ -41,7 +41,7 @@ c.Divide(2,3)
 
 c_graph=TCanvas("csub","Individual cluster start/end points",500,300)
 
-while my_proc.process_event():
+while my_proc.process_event() and my_proc.get_process_status() == my_proc.PROCESSING:
     currentview = 0;
     #First fill the 6 pads on the main canvas with stuff
     for pad in xrange(1,7,2):
