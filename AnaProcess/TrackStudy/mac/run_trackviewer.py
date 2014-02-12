@@ -38,7 +38,10 @@ my_proc.add_process(my_ana)
 
 ctr=0
 c=TCanvas("c","",600,500)
-while my_proc.process_event():
+
+while my_proc.process_event() and my_proc.get_process_status() == my_proc.PROCESSING:
+
+    print "Process status:",my_proc.get_process_status()
 
     hMC   = my_ana.GetHisto_MC()
     hSPS  = my_ana.GetHisto_SPS()
@@ -68,7 +71,6 @@ while my_proc.process_event():
 
         sys.stdin.readline()
 
-    print
     ctr+=1
 
 # done!

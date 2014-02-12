@@ -22,7 +22,7 @@ namespace larlight {
      \class trigger
      A class to hold trigger module output data
   */
-  class trigger : public data_base {
+  class trigger : public event_base {
     
   public:
     

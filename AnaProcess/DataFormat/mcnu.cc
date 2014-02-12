@@ -6,7 +6,7 @@
 namespace larlight {
 
   //***********************************************************
-  mcnu::mcnu(DATA::DATA_TYPE type)  : data_base(type), 
+  mcnu::mcnu(DATA::DATA_TYPE type)  : data_base(type),
 				      fNu(DATA::MCParticle), 
 				      fLepton(DATA::MCParticle)
   //***********************************************************
@@ -39,7 +39,7 @@ namespace larlight {
       fW(w),
       fX(x),
       fY(y),
-    fQSqr(qsqr)
+      fQSqr(qsqr)
   //***********************************************************
   {}
 

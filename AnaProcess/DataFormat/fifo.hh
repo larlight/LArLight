@@ -139,7 +139,7 @@ namespace larlight {
      \class event_fifo 
      Event-wise data member class to hold a collection of ch-wise data members
   */
-  class event_fifo : public std::vector<larlight::fifo>, public data_base {
+  class event_fifo : public std::vector<larlight::fifo>, public event_base {
     
   public:
     
@@ -149,7 +149,7 @@ namespace larlight {
     /// Default copy constructor needed to avoid memory leak in ROOT streamer
     event_fifo(const event_fifo& original)
       : std::vector<larlight::fifo>(original),
-	data_base(original),
+	event_base(original),
 	_event_number(original._event_number),
 	_event_frame_number(original._event_frame_number),
 	_module_address(original._module_address),
@@ -240,7 +240,7 @@ namespace larlight {
     UInt_t _nwords;                    ///< # of event words readout
     
     ///////////////////////////
-    ClassDef(event_fifo,5)
+    ClassDef(event_fifo,6)
     //////////////////////////
   };
 }

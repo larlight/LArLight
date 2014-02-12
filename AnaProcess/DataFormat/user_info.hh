@@ -134,7 +134,7 @@ namespace larlight {
      If a user just needs one user_info, it may be an array of length 1.
   */
   class event_user : public std::vector<larlight::user_info>,
-		     public data_base {
+		     public event_base {
     
   public:
     
@@ -143,11 +143,11 @@ namespace larlight {
     
     /// Default copy constructor
     event_user(const event_user& original) : std::vector<larlight::user_info>(original),
-					     data_base(original)
+					     event_base(original)
     {}
     
     /// Method to clear currently held data contents in the buffer
-    virtual void clear_data(){data_base::clear_data(); clear();}
+    virtual void clear_data(){event_base::clear_data(); clear();}
     
     /// Default destructor
     ~event_user(){}
@@ -155,7 +155,7 @@ namespace larlight {
   private:
     
     ////////////////////////
-    ClassDef(event_user,3)
+    ClassDef(event_user,4)
     ////////////////////////
   };
   

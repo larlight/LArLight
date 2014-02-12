@@ -15,6 +15,7 @@ namespace larlight {
     _fout     = 0;
     _hRecoSPS = 0;
     _hMCStep  = 0;
+    fDataType = DATA::Kalman3DSPS;
   }
   
   //################################################################
@@ -59,8 +60,8 @@ namespace larlight {
       
       ev_track->get_axis_range(xmax, xmin, ymax, ymin, zmax, zmin);
     
-    //if(ev_mcpart)
-    
+    //    if(ev_mcpart)
+      
     //ev_mcpart->get_axis_range(xmax, xmin, ymax, ymin, zmax, zmin);
     
     // Proceed only if minimum/maximum are set to some values other than the defaults
@@ -119,9 +120,9 @@ namespace larlight {
     
     // MC trajectory points
     if(ev_mcpart){
-      
+
       for(auto const part : *ev_mcpart){
-	
+
 	// Only care about a primary particle
 	if(part.TrackId() != 1)
 	  

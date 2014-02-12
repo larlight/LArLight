@@ -101,7 +101,7 @@ namespace larlight {
     ClusterAnaPrep();
 
     /// A utility function to check if the provided event is already processed or not.
-    bool same_event(data_base* ptr)
+    bool same_event(event_base* ptr)
     { return (_run == ptr->run() && _subrun == ptr->subrun() && _event == ptr->event_id()); }
 
     /// Static self-pointer

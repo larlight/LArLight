@@ -131,7 +131,7 @@ namespace larlight {
       return false;
     }
 
-    if(same_event((data_base*)(ev_cluster))) return true;
+    if(same_event((event_base*)(ev_cluster))) return true;
     clear_event_info();
     _run    = ev_cluster->run();
     _subrun = ev_cluster->subrun();

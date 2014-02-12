@@ -66,7 +66,7 @@ namespace larlight {
 
   //#################################################################################
   event_hit::event_hit(DATA::DATA_TYPE type) : std::vector<larlight::hit>(), 
-					       data_base(type) 
+					       event_base(type) 
   //#################################################################################
   {
     if( _type != DATA::Hit &&
@@ -133,7 +133,7 @@ namespace larlight {
 				 std::vector<Double_t> &wiremin, 
 				 std::vector<Double_t> &timemax, 
 				 std::vector<Double_t> &timemin,
-				 std::vector<unsigned short> hit_index) const
+				 const std::vector<unsigned short>& hit_index) const
   //############################################################################
   {
     

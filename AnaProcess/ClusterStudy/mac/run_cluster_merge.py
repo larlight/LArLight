@@ -25,7 +25,7 @@ ana_proc.add_process(my_merge_alg)
 
 ana_proc.add_process(my_merger)
 
-while ana_proc.process_event():
+while ana_proc.process_event() and my_proc.get_process_status() == my_proc.PROCESSING:
     
     print my_merge_alg.GetMergeTree()
 

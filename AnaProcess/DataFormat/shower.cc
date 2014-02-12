@@ -35,7 +35,7 @@ namespace larlight {
 
   //*********************************************************************************
   event_shower::event_shower(DATA::DATA_TYPE type) : std::vector<larlight::shower>(), 
-						     data_base(type) 
+						     event_base(type) 
   //*********************************************************************************
   {
     if(_type!=DATA::Shower) {

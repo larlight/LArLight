@@ -62,10 +62,15 @@ namespace larlight {
 
     ///--- Setters ---///
 
-    inline void AddDaughter     (const int trackID) { fdaughters.insert(trackID); }
-    inline void SetPolarization (TVector3 const& p) { fpolarization = p;          }
-    inline void SetRescatter    (Int_t code)        { frescatter    = code;       }
-    inline void SetWeight       (Double_t wt)       { fWeight       = wt;         }
+    inline void AddDaughter     (const int trackID)   { fdaughters.insert(trackID);  }
+    inline void SetPolarization (TVector3 const& p)   { fpolarization = p;           }
+    inline void SetRescatter    (Int_t code)          { frescatter    = code;        }
+    inline void SetWeight       (Double_t wt)         { fWeight       = wt;          }
+    inline void SetTrajectory   (const mctrack steps) { ftrajectory   = steps;       }
+    inline void AddTrajectory   (const mcstep step)   { ftrajectory.push_back(step); }
+    inline void AddTrajectory   (const TLorentzVector& position,
+				 const TLorentzVector& momentum)
+    { ftrajectory.push_back(position,momentum); }
 
     inline void AddFiducialTrack(size_t start, size_t end)
     { ftrackFiducial.push_back(std::pair<size_t,size_t>(start,end)); }
@@ -109,7 +114,7 @@ namespace larlight {
     std::vector<std::pair<size_t,size_t> > ftrackFiducial; ///< mctrack indexes for a trajectory inside fiducial volume
    
     ////////////////////////
-    ClassDef(mcpart,0)
+    ClassDef(mcpart,1)
     ////////////////////////
       
   };
@@ -119,7 +124,7 @@ namespace larlight {
      A collection of MCParticles
   */
   class event_mcpart : public std::vector<larlight::mcpart>,
-		       public data_base {
+		       public event_base {
     
   public:
     
@@ -128,19 +133,20 @@ namespace larlight {
     
     /// Copy constructor
     event_mcpart(const event_mcpart& original) : std::vector<larlight::mcpart>(original),
-						 data_base   (original)
+						 event_base(original)
     {};
     
     /// Default destructor
     virtual ~event_mcpart(){};
     
     /// Clear method
-    virtual void clear_data() {data_base::clear_data(); clear();}
+    virtual void clear_data() {event_base::clear_data(); clear();}
+
     
   private:
     
     ////////////////////////
-    ClassDef(event_mcpart,0)
+    ClassDef(event_mcpart,1)
     ////////////////////////
       
   };

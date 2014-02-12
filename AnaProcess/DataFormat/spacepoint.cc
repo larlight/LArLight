@@ -22,7 +22,7 @@ namespace larlight {
 
   //************************************************************
   event_sps::event_sps(DATA::DATA_TYPE type) : std::vector<larlight::spacepoint>(),
-					       data_base(type)
+					       event_base(type)
   //************************************************************
   {
     if(_type!=DATA::SpacePoint) {

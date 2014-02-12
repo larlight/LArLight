@@ -20,17 +20,18 @@ rootlibmap libsimple.rootmap libsimple.so $ANA_PROC_DIR/simple/LinkDef.h
 
 ######################################################
 # Base
-rootlibmap libBase.rootmap libBase.so $ANA_PROC_DIR/Base/LinkDef.h 
+rootlibmap libBase.rootmap libBase.so $ANA_PROC_DIR/Base/LinkDef.h
 
 ######################################################
 # DataFormat
 rootlibmap libDataFormat.rootmap libDataFormat.so $ANA_PROC_DIR/DataFormat/LinkDef.h \
-    libGenVector.so libMatrix.so libTree.so libBase.so
+    libBase.so libPhysics.so 
 
 ######################################################
 # Analysis
 rootlibmap libAnalysis.rootmap libAnalysis.so $ANA_PROC_DIR/Analysis/LinkDef.h \
-    libGeom.so libGui.so libHist.so libDataFormat.so 
+    libDataFormat.so libHist.so  libTree.so 
+#    libDataFormat.so libGeom.so libHist.so libMatrix.so libMathCore.so libGenVector.so  libTree.so 
 
 ######################################################
 # FEMPulseReco
@@ -69,7 +70,13 @@ rootlibmap libGeorgia.rootmap libGeorgia.so $ANA_PROC_DIR/Georgia/LinkDef.h \
     libAnalysis.so
 
 ######################################################
+# Play
+rootlibmap libPlay.rootmap libPlay.so $ANA_PROC_DIR/Play/LinkDef.h \
+    libAnalysis.so
+
+######################################################
 # ADD_NEW_ROOTMAP HERE
+
 
 
 

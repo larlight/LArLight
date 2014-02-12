@@ -61,7 +61,7 @@ namespace larlight {
     TLorentzVector _momentum;
 
     ////////////////////////
-    ClassDef(mcstep,0)
+    ClassDef(mcstep,1)
     ////////////////////////
 
   };
@@ -84,6 +84,8 @@ namespace larlight {
     virtual void clear_data() {data_base::clear_data(); clear();}
     
     ///--- Setter/Adders ---//
+    void push_back(const larlight::mcstep& step){ std::vector<larlight::mcstep>::push_back(step);}
+
     void push_back(const TLorentzVector p,
 		   const TLorentzVector m)
     { std::vector<larlight::mcstep>::push_back(larlight::mcstep(p,m));}
@@ -91,7 +93,7 @@ namespace larlight {
   private:
 
     ////////////////////////
-    ClassDef(mctrack,0)
+    ClassDef(mctrack,1)
     ////////////////////////    
       
   };

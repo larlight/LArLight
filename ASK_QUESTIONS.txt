@@ -1,0 +1,35 @@
+Feel absolutely free to ask questions. We mean it. Nothing can be stupid (even physicists' coding).
+I selfishly summarize here a list of question categories and name of people who might be able to answer.
+
+(*) General questions about the framework, any question about build/run-time error for any package
+
+    - Kazu
+    - Knowledgeable experts listed below
+
+(*) Base DataFormat Analysis FEMPulseStudy FEMPulseReco
+    
+    - Kazu
+
+(*) KalekoAna ClusterStudy TrackStudy
+    
+    - David Kaleko
+    - Kazu
+
+(*) DavidAna
+
+    - David Caratelli
+
+(*) Georgia
+
+    - Georgia
+
+(*) ProcessDB
+
+    - Kazu
+
+(*) NevisDecoder (FileIO, Algorithm, Decoder, Encoder)
+
+    - Kazu
+
+
+

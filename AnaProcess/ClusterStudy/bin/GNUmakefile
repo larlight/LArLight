@@ -1,4 +1,7 @@
 
+OSNAME = $(shell uname -s)
+include $(ANA_PROC_DIR)/Makefile/Makefile.${OSNAME}
+
 LD := $(subst build/,$(ROOTSYS)/build/,$(LD))
 LIBDIR  = $(ANA_PROC_DIR)/lib
 LDFLAGS  += -L$(ROOTSYS)/lib  $(shell root-config --libs) -g

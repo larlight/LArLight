@@ -143,7 +143,7 @@ namespace larlight {
    PMT-wise data member class to hold a collection of ADC samples.
   */
   class event_pulse : public std::vector<larlight::pulse>,
-		      public data_base {
+		      public event_base {
 
   public:
 
@@ -153,7 +153,7 @@ namespace larlight {
     /// Default copy constructor
     event_pulse(const event_pulse& original)
       : std::vector<larlight::pulse>(original),
-	data_base(original),
+	event_base(original),
 	_sum_charge(original._sum_charge),
 	_sum_peak(original._sum_peak),
 	_npulse(original._npulse)
@@ -203,7 +203,7 @@ namespace larlight {
     UInt_t _npulse;      ///< summed number of pulses stored
 
     ////////////////////////
-    ClassDef(event_pulse,1)
+    ClassDef(event_pulse,2)
     ////////////////////////
   };
 

@@ -22,7 +22,7 @@
 namespace larlight{
   /**
      \class data_base
-     A base coass for PMT-wise & event-wise data holder class
+     A base coass for all data objects in LArLight
   */
   class data_base : public TObject {
     
@@ -33,9 +33,6 @@ namespace larlight{
     
     /// Default copy constructor to avoid memory leak in ROOT streamer
     data_base(const data_base &original) : TObject(original),
-					   fRunNumber(original.fRunNumber),
-					   fSubRunNumber(original.fSubRunNumber),
-					   fEventID(original.fEventID),
 					   _type(original._type),
 					   _ass(original._ass)
     {}
@@ -43,6 +40,57 @@ namespace larlight{
     
     /// Default destructor
     virtual ~data_base(){}
+    
+    /// Clear method
+    virtual void clear_data() {_ass.clear();}
+    
+    /// data type getter
+    DATA::DATA_TYPE data_type() const {return _type; }
+
+    /// Adder for a set of association
+    void add_association(DATA::DATA_TYPE type, const std::vector<unsigned short> ass);
+
+    /// Getter for # of associations
+    size_t size_association(DATA::DATA_TYPE type) const;
+     
+    /// Getter of an association
+    const std::vector<unsigned short> association(DATA::DATA_TYPE type, size_t index=0) const;
+
+  protected:
+    
+    /// DATA_TYPE
+    DATA::DATA_TYPE _type;
+
+    /// Association storage ... allow multiple set of associations
+    std::map<larlight::DATA::DATA_TYPE,std::vector<std::vector<unsigned short> > > _ass;
+    
+    ////////////////////////
+    ClassDef(data_base,4)
+    ////////////////////////
+      
+  };
+
+  /**
+     \class event_base
+     A base coass for event-wise data holder class
+  */
+  class event_base : public data_base {
+    
+  public:
+    
+    /// Default constructor
+    event_base(DATA::DATA_TYPE type=DATA::DATA_TYPE_MAX) : data_base(type) { clear_data(); }
+    
+    /// Default copy constructor to avoid memory leak in ROOT streamer
+    event_base(const event_base &original) : data_base(original),
+					     fRunNumber(original.fRunNumber),
+					     fSubRunNumber(original.fSubRunNumber),
+					     fEventID(original.fEventID)
+    {}
+
+    
+    /// Default destructor
+    virtual ~event_base(){}
     
     /// Clear method
     virtual void clear_data();
@@ -63,15 +111,6 @@ namespace larlight{
     /// data type getter
     DATA::DATA_TYPE data_type() const {return _type; }
 
-    /// Adder for a set of association
-    void add_association(DATA::DATA_TYPE type, const std::vector<unsigned short> ass);
-
-    /// Getter for # of associations
-    size_t size_association(DATA::DATA_TYPE type) const;
-     
-    /// Getter of an association
-    const std::vector<unsigned short> association(DATA::DATA_TYPE type, size_t index=0) const;
-
   protected:
     
     /// Run number
@@ -83,14 +122,8 @@ namespace larlight{
     /// Event ID
     UInt_t fEventID;
 
-    /// DATA_TYPE
-    DATA::DATA_TYPE _type;
-
-    /// Association storage ... allow multiple set of associations
-    std::map<larlight::DATA::DATA_TYPE,std::vector<std::vector<unsigned short> > > _ass;
-    
     ////////////////////////
-    ClassDef(data_base,3)
+    ClassDef(event_base,3)
     ////////////////////////
       
   };

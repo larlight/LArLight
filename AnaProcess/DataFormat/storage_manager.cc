@@ -15,13 +15,14 @@ namespace larlight {
     _out_fname="";
     _name_tdirectory="";
     _status=INIT;
-    
+    _check_alignment=true;
+
     reset();
     _mode=mode;
     
   };
   
-  data_base* storage_manager::get_data(DATA::DATA_TYPE type){
+  event_base* storage_manager::get_data(DATA::DATA_TYPE type){
     
     // If data class object does not exist, and if it's either WRITE or BOTH mode, create it.
     if(!_ptr_data_array[type] && _mode != READ){
@@ -50,7 +51,7 @@ namespace larlight {
       }
     }
     
-    return _ptr_data_array[type];
+    return (event_base*)(_ptr_data_array[type]);
     
   }
   
@@ -324,44 +325,44 @@ namespace larlight {
     case DATA::Bezier:
     case DATA::Kalman3DHit:
     case DATA::Kalman3DSPS:
-      _ptr_data_array[type]=(data_base*)(new event_track(type));
+      _ptr_data_array[type]=(event_base*)(new event_track(type));
       break;
     case DATA::MCTruth:
-      _ptr_data_array[type]=(data_base*)(new event_mctruth(type));
+      _ptr_data_array[type]=(event_base*)(new event_mctruth(type));
       break;
     case DATA::MCParticle:
-      _ptr_data_array[type]=(data_base*)(new event_mcpart(type));
+      _ptr_data_array[type]=(event_base*)(new event_mcpart(type));
       break;
     case DATA::SpacePoint:
-      _ptr_data_array[type]=(data_base*)(new event_sps(type));
+      _ptr_data_array[type]=(event_base*)(new event_sps(type));
       break;
     case DATA::UserInfo:
-      _ptr_data_array[type]=(data_base*)(new event_user(type));
+      _ptr_data_array[type]=(event_base*)(new event_user(type));
       break;
     case DATA::FIFO:
     case DATA::PMTFIFO:
     case DATA::TPCFIFO:
-      _ptr_data_array[type]=(data_base*)(new event_fifo(type));
+      _ptr_data_array[type]=(event_base*)(new event_fifo(type));
       break;
     case DATA::Pulse:
     case DATA::PMTPulse_ThresWin:
     case DATA::TPCPulse_ThresWin:
     case DATA::PMTPulse_FixedWin:
     case DATA::TPCPulse_FixedWin:
-      _ptr_data_array[type]=(data_base*)(new event_pulse(type));
+      _ptr_data_array[type]=(event_base*)(new event_pulse(type));
       break;
     case DATA::Trigger:
-      _ptr_data_array[type]=(data_base*)(new trigger(type));
+      _ptr_data_array[type]=(event_base*)(new trigger(type));
       break;
     case DATA::Wire:
-      _ptr_data_array[type]=(data_base*)(new event_wire(type));
+      _ptr_data_array[type]=(event_base*)(new event_wire(type));
       break;
     case DATA::Hit:
     case DATA::CrawlerHit:
     case DATA::GausHit:
     case DATA::APAHit:
     case DATA::FFTHit:
-      _ptr_data_array[type]=(data_base*)(new event_hit(type));
+      _ptr_data_array[type]=(event_base*)(new event_hit(type));
       break;
     case DATA::Cluster:
     case DATA::CrawlerCluster:
@@ -369,13 +370,13 @@ namespace larlight {
     case DATA::FuzzyCluster:
     case DATA::HoughCluster:
     case DATA::ShowerAngleCluster:
-      _ptr_data_array[type]=(data_base*)(new event_cluster(type));
+      _ptr_data_array[type]=(event_base*)(new event_cluster(type));
       break;
     case DATA::Shower:
-      _ptr_data_array[type]=(data_base*)(new event_shower(type));
+      _ptr_data_array[type]=(event_base*)(new event_shower(type));
       break;
     case DATA::Calorimetry:
-      _ptr_data_array[type]=(data_base*)(new event_calorimetry(type));
+      _ptr_data_array[type]=(event_base*)(new event_calorimetry(type));
       break;
     case DATA::MCNeutrino:
       print(MSG::ERROR,__FUNCTION__,Form("MCNeutrino is stored within MCTruth! Retrieve MCTruth instead."));
@@ -488,10 +489,11 @@ namespace larlight {
       Message::send(MSG::ERROR,__FUNCTION__,
 		    "Cannot move the data pointer back/forth in WRITE mode.");
       status=false;
-    }else if(_nevents && _nevents<index){
-      sprintf(_buf,"Requested index, %d, exceeds the total entries, %d!",
-	      index,_nevents);
-      Message::send(MSG::ERROR,__FUNCTION__,_buf);
+    }else if(_nevents) {
+      Message::send(MSG::WARNING,__FUNCTION__,"Input file empty!");
+      status=false;
+    }else if(!(index<_nevents)){
+      Message::send(MSG::WARNING,__FUNCTION__,"Reached EOF");
       status=false;
     }else
       _index=index;
@@ -533,6 +535,7 @@ namespace larlight {
       status=false;
       break;
     }
+
     return status;
   }
   
@@ -540,13 +543,30 @@ namespace larlight {
     
     if(_index>=_nevents)
       return false;
-    
+
+    UInt_t event_id = DATA::INVALID_UINT;
+
     for(size_t i=0; i<DATA::DATA_TYPE_MAX; ++i) { 
       
-      if(_in_ch[i])
+      if(_in_ch[i]) {
+
 	_in_ch[i]->GetEntry(_index);
-      
-    }
+
+	if(_mode != WRITE && _read_data_array[i] &&  _check_alignment) {
+
+	  if(event_id == DATA::INVALID_UINT) event_id = _ptr_data_array[i]->event_id();
+
+	  else if(event_id != _ptr_data_array[i]->event_id()) {
+
+	    print(MSG::ERROR,__FUNCTION__,
+		  Form("Detected event-alignment mismatch! (%d != %d)",event_id,_ptr_data_array[i]->event_id()));
+
+	    return false;
+
+	  }
+	} // end check event alignment
+      } // end read-in data @ _index
+    } // end looping over data types
     
     _index++;
     _nevents_read++;

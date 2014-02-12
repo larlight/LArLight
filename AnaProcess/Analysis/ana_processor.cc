@@ -121,7 +121,7 @@ namespace larlight {
     Bool_t event_found = index ? _storage->go_to(index) : _storage->next_event();
     
     if(event_found){
-      
+
       for(std::vector<ana_base*>::iterator iter(_analyzers.begin());
 	  iter!=_analyzers.end();
 	  ++iter)

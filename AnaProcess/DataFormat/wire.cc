@@ -33,7 +33,7 @@ namespace larlight {
 
   //***************************************************************************
   event_wire::event_wire(DATA::DATA_TYPE type) : std::vector<larlight::wire>(), 
-						 data_base(type)
+						 event_base(type)
   //***************************************************************************
   {
     if(_type!=DATA::Wire) {

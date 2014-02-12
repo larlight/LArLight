@@ -99,7 +99,7 @@ namespace larlight {
   }
   
   event_track::event_track(DATA::DATA_TYPE type) : std::vector<larlight::track>(), 
-						   data_base(type) 
+						   event_base(type) 
   {
     if( _type != DATA::Track &&
 	_type != DATA::Bezier &&

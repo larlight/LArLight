@@ -5,7 +5,12 @@
 
 namespace larlight {
 
-  mcpart::mcpart(DATA::DATA_TYPE type) : data_base(type) 
+  mcpart::mcpart(DATA::DATA_TYPE type) : data_base(type), 
+					 ftrajectory(DATA::MCTrajectory),
+					 fpolarization(),
+					 fdaughters(),
+					 fGvtx(),
+					 ftrackFiducial()
   {
     if(_type!=DATA::MCParticle) {
 
@@ -16,6 +21,7 @@ namespace larlight {
     }
 
     clear_data();
+
   }
 
   //********************************************
@@ -25,7 +31,12 @@ namespace larlight {
 		 const Int_t       mother,
 		 const Double_t    mass,
 		 const Int_t       status)
-    : data_base(DATA::MCParticle) 
+    : data_base(DATA::MCParticle), 
+      ftrajectory(DATA::MCTrajectory),
+      fpolarization(),
+      fdaughters(),
+      fGvtx(),
+      ftrackFiducial()
   //********************************************
   {
     clear_data();
@@ -34,7 +45,7 @@ namespace larlight {
     fprocess = process;
     fmother  = mother;
     fmass    = mass;
-    fstatus  = status;    
+    fstatus  = status;
   }
 
   //***********************
@@ -53,11 +64,12 @@ namespace larlight {
     fdaughters.clear();
     fWeight  = DATA::INVALID_DOUBLE;
     fGvtx.Clear();
+    ftrackFiducial.clear();
   }
 
   //*********************************************************************************
   event_mcpart::event_mcpart(DATA::DATA_TYPE type) : std::vector<larlight::mcpart>(),
-						     data_base(type) 
+						     event_base(type) 
   //*********************************************************************************
   {
     if(_type!=DATA::MCParticle) {

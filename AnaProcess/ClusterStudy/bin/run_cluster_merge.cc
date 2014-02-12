@@ -18,7 +18,11 @@ int main(int argc, char** argv) {
 
   ana_proc.set_ana_output_file("");
   
-  ana_proc.add_process((larlight::ana_base*)(new larlight::ClusterMerge));
+  auto merger = new larlight::ClusterMerge;
+
+  merger->set_mergealg(new larlight::ClusterMergeAlg);
+
+  ana_proc.add_process(merger);
 
   ana_proc.run();
 

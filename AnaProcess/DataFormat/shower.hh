@@ -86,7 +86,7 @@ namespace larlight{
      \class event_shower
      A collection storage class of multiple showers.
   */
-  class event_shower : public std::vector<larlight::shower>, public data_base {
+  class event_shower : public std::vector<larlight::shower>, public event_base {
     
   public:
     
@@ -94,21 +94,21 @@ namespace larlight{
     event_shower(DATA::DATA_TYPE type=DATA::Shower);
     
     /// Default copy constructor
-    event_shower(const event_shower& original) : std::vector<larlight::shower>(original), data_base(original)
+    event_shower(const event_shower& original) : std::vector<larlight::shower>(original), event_base(original)
     {}
     
     /// Default destructor
     ~event_shower(){}
     
     /// Method to clear currently held data contents in the buffer
-    virtual void clear_data(){data_base::clear_data(); clear();}
+    virtual void clear_data(){event_base::clear_data(); clear();}
 
   protected:
     
   private:
     
     ////////////////////////
-    ClassDef(event_shower,2)
+    ClassDef(event_shower,3)
     ////////////////////////
   };
 }
