@@ -78,11 +78,12 @@ namespace larlight {
       if ( (tpc_data->channel_number())%10==0 ){
 	
 	//create temporary histogram
+	
 	char c[25];
 	char d[25];
-	sprintf(c,"fff_ev_%d_wf_%d",event_num,tpc_data->channel_number());
+	sprintf(c,"fff_ev_%d_wf_%d_%d",event_num,tpc_data->channel_number(),i);
 	TH1D* temphist = new TH1D(c,"pulse",tpc_data->size(),0,tpc_data->size());
-	sprintf(d,"ggg_ev_%d_wf_%d",event_num,tpc_data->channel_number());
+	sprintf(d,"ggg_ev_%d_wf_%d_%d",event_num,tpc_data->channel_number(),i);
 	TH1D* newpulse = new TH1D(d,"newpulse",tpc_data->size()-_NSamples/2,0,tpc_data->size()-_NSamples/2);
 	
 	//short vector containing last few samples
