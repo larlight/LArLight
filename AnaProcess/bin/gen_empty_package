@@ -10,7 +10,7 @@ if not 'ANA_PROC_DIR' in os.environ.keys():
 
 name=sys.argv[1]
 target_dir='%s/%s' % (os.environ['ANA_PROC_DIR'],name)
-source_dir='%s/bin/tmp_ana' % os.environ['ANA_PROC_DIR']
+source_dir='%s/bin/tmp_empty' % os.environ['ANA_PROC_DIR']
 
 if not os.path.exists(target_dir):
    try:
@@ -35,6 +35,7 @@ src_list = { in_makefile : '%s/GNUmakefile'   % target_dir,
              in_typedef  : '%s/%s-TypeDef.hh' % (target_dir,name),
              in_source   : '%s/%s.cc'         % (target_dir,name),
              in_header   : '%s/%s.hh'         % (target_dir,name) }
+
 for src in src_list.keys():
    contents=open(src,'r').read()
    contents=contents.replace('PACKAGE_NAME',name.upper())
@@ -44,6 +45,22 @@ for src in src_list.keys():
    fout=open(src_list[src],'w')
    fout.write(contents)
    fout.close()
+
+# modify rootmap script
+contents=open('%s/lib/anaproc_rootmap.sh' % os.environ["ANA_PROC_DIR"], 'r').read().split('\n')
+out_contents=""
+for line in contents:
+   line=line + '\n'
+   if line.find('ADD_NEW_ROOTMAP')>=0:
+      line  = "# %s\n" % name
+      line += "rootlibmap lib%s.rootmap lib%s.so $ANA_PROC_DIR/%s/LinkDef.h \\\n" % (name,name,name)
+      line += "    libAnalysis.so\n\n" 
+      line += "######################################################\n"
+      line += "# ADD_NEW_ROOTMAP HERE\n"
+   out_contents+=line
+fout=open('%s/lib/anaproc_rootmap.sh' % os.environ["ANA_PROC_DIR"],"w")
+fout.write(out_contents)
+fout.close()
 
 print
 print 'Generated the followings under %s.' % target_dir
