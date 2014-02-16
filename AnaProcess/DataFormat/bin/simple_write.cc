@@ -14,7 +14,7 @@ int main(){
 
   // If you wish, change the message level to DEBUG.
   // Commented out by default.
-  my_storage.set_verbosity(larlight::MSG::DEBUG);
+  //my_storage.set_verbosity(larlight::MSG::DEBUG);
 
   // Step 0: Set I/O mode: we are reading in, so "READ"
   my_storage.set_io_mode(larlight::storage_manager::WRITE);
