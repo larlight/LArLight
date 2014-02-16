@@ -14,7 +14,7 @@ LDFLAGS += -L$(LIBDIR) -lBase -lDataFormat -lAnalysis
 
 # Add your program below with a space after the previous one.
 # This makefile compiles all binaries specified below.
-PROGRAMS = simple_loop
+PROGRAMS = test_simple_ana
 
 all:		$(PROGRAMS)
 	@rm -rf *.dSYM

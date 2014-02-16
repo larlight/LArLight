@@ -8,34 +8,53 @@
 
 int main(int argc, char** argv){
 
+  if(argc<2) {
+
+    std::cerr
+      << std::endl
+      << Form("Usage 1: %s $INPUT_ROOT_FILE",argv[0]) << std::endl
+      << Form("Usage 2: %s $INPUT_ROOT_FILE $TDIRECTORY_NAME",argv[0]) << std::endl
+      << std::endl;
+
+    return 1;
+  }
+
+  std::cout
+    << std::endl
+    << "This is \"Analysis\" package simple test routine." << std::endl
+    << std::endl;
+
   // Create ana_processor instance
   larlight::ana_processor my_proc;
 
-  // Set input root file: this is decoder output root file.
-  // This time, we use a sample file prepared.
+  // Set input root file
   my_proc.add_input_file(argv[1]);
 
   // Specify IO mode
   my_proc.set_io_mode(larlight::storage_manager::READ);
 
-  my_proc.set_data_to_read(larlight::DATA::Kalman3DSPS);
-  my_proc.set_data_to_read(larlight::DATA::SpacePoint);
-  my_proc.set_data_to_read(larlight::DATA::MCTruth);
-  
-  larlight::storage_manager::get()->set_in_rootdir("scanner");
-  // Set output root file: this is a separate root file in which your
-  // analysis module can store anything such as histograms, your own TTree, etc.
-  my_proc.set_ana_output_file("myout.root");
+  // Specify input TDirectory name if given
+  if(argc>2)
+    my_proc.set_input_rootdir(argv[2]);
 
-  // Create analysis class instance. For this example, ana_base.
-  // To show how one can run multiple analysis modules at once,
-  // we make multiple ana_base instance.
+  // Specify output root file name
+  my_proc.set_ana_output_file("from_test_ana_you_can_remove_me.root");
 
+  // Attach a template process
   my_proc.add_process(new larlight::ana_base);
 
-  // Let's run it.
+  std::cout
+    << std::endl
+    << "Finished configuring ana_processor. Start event loop!"<< std::endl
+    << std::endl;
 
+  // Let's run it.
   my_proc.run();
 
   // done!
+  std::cout
+    << std::endl
+    << "Finished running ana_processor event loop!" << std::endl
+    << std::endl;
+  return 0;
 }
