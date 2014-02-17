@@ -70,6 +70,8 @@ namespace larlight {
     int    _event_num;
     double _VarCut;
     int    _baseline;
+    double _compressfctr;
+
   };
 }
 #endif

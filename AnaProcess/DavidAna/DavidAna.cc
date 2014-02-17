@@ -49,6 +49,7 @@ namespace larlight {
     //waveform counter
     int wfnum = 0;
 
+    int multiplicity = 0;
 
     //Loop over all waveforms
     for (size_t i=0; i<event_wf->size(); i++){
@@ -73,18 +74,24 @@ namespace larlight {
 	_baseline = 2048;
       else
 	_baseline = 400;
-      
+
+      //count how many waveforms from same channel
+      if ( i > 0 ){
+	if ( (&event_wf->at(i))->channel_number() == (&event_wf->at(i-1))->channel_number() ) {multiplicity += 1; }
+	else { multiplicity = 0; }
+      }
+
       //Here allow for selection of 1 channel
-      if ( (tpc_data->channel_number())%10==0 ){
+      if ( (tpc_data->channel_number())%1==0 ){
 	
 	//create temporary histogram
 	
 	char c[25];
-	char d[25];
-	sprintf(c,"fff_ev_%d_wf_%d_%d",event_num,tpc_data->channel_number(),i);
+	//char d[25];
+	sprintf(c,"fff_ev_%d_wf_%d_%d",event_num,tpc_data->channel_number(),multiplicity);
 	TH1D* temphist = new TH1D(c,"pulse",tpc_data->size(),0,tpc_data->size());
-	sprintf(d,"ggg_ev_%d_wf_%d_%d",event_num,tpc_data->channel_number(),i);
-	TH1D* newpulse = new TH1D(d,"newpulse",tpc_data->size()-_NSamples/2,0,tpc_data->size()-_NSamples/2);
+	//sprintf(d,"ggg_ev_%d_wf_%d_%d",event_num,tpc_data->channel_number(),i);
+	//TH1D* newpulse = new TH1D(d,"newpulse",tpc_data->size()-_NSamples/2,0,tpc_data->size()-_NSamples/2);
 	
 	//short vector containing last few samples
 	std::deque<int> last_few;
@@ -105,11 +112,11 @@ namespace larlight {
 	  int adcs = tpc_data->at(adc_index);
 	  
 	  //determine if something interesting happens
-	  if ( (adcs-baseline > 10) || (baseline-adcs > 10) )
+	  if ( (adcs-_baseline > 4) || (_baseline-adcs > 4) )
 	    interesting = true;
-	  else
-	    noise->Fill(adcs-baseline); //enter noise in noise histo
-	  
+	  //else
+	  //noise->Fill(adcs-baseline); //enter noise in noise histo
+	  /*
 	  //IF before _NSamples don't do anything
 	  if ( adc_index < _NSamples)
 	    {
@@ -143,19 +150,20 @@ namespace larlight {
 	      else
 		newpulse->SetBinContent(adc_index+1-_NSamples/2,_baseline);
 	    }
-
+	  */
 	  temphist->SetBinContent(adc_index+1,adcs);
+
 
 	}
 	
-	if (interesting){
+	if (interesting)
 	  temphist->Write();
-	  newpulse->Write();
-	}
+	interesting = false;
 
+	//interesting = false;
 	//compression calculation:
-	double compression_factor = written_bins/tpc_data->size();
-	compression->Fill(compression_factor);
+	//double compression_factor = written_bins/tpc_data->size();
+	//compression->Fill(compression_factor);
 	
       }//End IF correct channel #
       
@@ -173,8 +181,8 @@ namespace larlight {
     // If you need, you can store your ROOT class instance in the output
     // file. You have an access to the output file through "_fout" pointer.
 
-    compression->Write();
-    noise->Write();
+    //compression->Write();
+    //noise->Write();
   
     return true;
   }

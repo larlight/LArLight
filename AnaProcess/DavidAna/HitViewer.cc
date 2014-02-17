@@ -7,7 +7,7 @@ namespace larlight {
 
 
   //********************************
-  HitViewer::HitViewer(): ana_base(), _hHits_U(), _hHits_V(), _hHits_Z()
+  HitViewer::HitViewer(): ana_base(), _hHits_U(), _hHits_V(), _hHits_Y()
   //********************************
   {
     //Class Name
@@ -15,7 +15,7 @@ namespace larlight {
     //set initialization for pointers
     _hHits_U = 0;
     _hHits_V = 0;
-    _hHits_Z = 0;
+    _hHits_Y = 0;
   }
 
   //********************************
@@ -37,7 +37,7 @@ namespace larlight {
     //clean up histograms if they already exist (from previous event)
     if (_hHits_U) {delete _hHits_U; _hHits_U = 0;};  
     if (_hHits_V) {delete _hHits_V; _hHits_V = 0;};  
-    if (_hHits_Z) {delete _hHits_Z; _hHits_Z = 0;};  
+    if (_hHits_Y) {delete _hHits_Y; _hHits_Y = 0;};  
 
 
     //Get Hits
@@ -63,7 +63,7 @@ namespace larlight {
     //if all ok, plot wire vs. time for hits
     _hHits_U = Prepare2DHisto("HitHistU", wiremin[0], wiremax[0], timemin[0], timemax[0]);
     _hHits_V = Prepare2DHisto("HitHistV", wiremin[1], wiremax[1], timemin[1], timemax[1]);
-    _hHits_Z = Prepare2DHisto("HitHistZ", wiremin[2], wiremax[2], timemin[2], timemax[2]);
+    _hHits_Y = Prepare2DHisto("HitHistZ", wiremin[2], wiremax[2], timemin[2], timemax[2]);
 
     //loop over hits
     for (size_t i=0; i<hits->size(); i++)
@@ -75,7 +75,7 @@ namespace larlight {
 	if ( this_hit->View()==1 )
 	  _hHits_V->Fill( this_hit->Wire(), this_hit->PeakTime(), this_hit->Charge() );
 	if ( this_hit->View()==2 )
-	  _hHits_Z->Fill( this_hit->Wire(), this_hit->PeakTime(), this_hit->Charge() );
+	  _hHits_Y->Fill( this_hit->Wire(), this_hit->PeakTime(), this_hit->Charge() );
       }//end loop over hits
     
     

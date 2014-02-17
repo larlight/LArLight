@@ -14,6 +14,8 @@ namespace larlight {
     _merge_tree->Branch("tpcfifo_branch", new_event_wf.GetName(), (&new_event_wf));
     _merge_tree->Branch("event_num", &_event_num, "_event_num/I");    
     _event_num      =   0;
+    _compressfctr   =   0;
+
 
     //ask for variance cut:
     double varask;
@@ -36,6 +38,10 @@ namespace larlight {
     _event_num += 1;
     std::cout << "New Event!   ...event number: " << _event_num <<  std::endl;
 
+    char c[25];
+    sprintf(c,"compression_%d",_event_num);
+    TH1D*  hCompress  = new TH1D(c, "ratio", 30, 0, 0.1);
+
     //get vector of waveforms
     larlight::event_fifo *event_wf = (event_fifo*)(storage->get_data(DATA::TPCFIFO));
     //create new vector of waveforms to write
@@ -53,7 +59,7 @@ namespace larlight {
 
       //get tpc_data
       larlight::fifo* tpc_data = (&(event_wf->at(i)));      
-
+      //      std::cout << "wf number: " << wfnum << std::endl;
       wfnum += 1;
       //Check for empty waveforms!
       if(tpc_data->size()<1){
@@ -61,9 +67,14 @@ namespace larlight {
 		      Form("Found 0-length waveform: Event %d ... Ch. %d",event_wf->event_number(),tpc_data->channel_number()));
 	continue;
       }
-
+      
+      _compressfctr = 0;
       //Apply Compression algorithm
       Compress( tpc_data, &new_event_wf);
+      double wf_original_size = 2+10+1+tpc_data->size()+1+2;
+      _compressfctr = _compressfctr/wf_original_size;
+      //std::cout << "compression factor: " << _compressfctr << std::endl;
+      hCompress->Fill(_compressfctr);
 
     }//loop over all waveofmrs
 
@@ -74,7 +85,8 @@ namespace larlight {
 	_merge_tree->Fill();
       }
     
-  
+    hCompress->Write();
+
     return true;
   }
 
@@ -88,13 +100,13 @@ namespace larlight {
 
       //determine collection plane
       //(for now by looking at value of first adc)
-      if ( tpc_data->at(0) > 2000 )
+      if ( tpc_data->at(1) > 2000 )
 	_baseline = 2048;
       else
 	_baseline = 400;
-      
+
       //Here allow for selection of 1 channel
-      if ( (tpc_data->channel_number())%30000!=0 ){
+      //if ( (tpc_data->channel_number())%30000!=0 ){
 	
 	//short vector containing last few samples
 	std::deque<int> last_few;
@@ -107,6 +119,9 @@ namespace larlight {
 	//interesting?
 	bool begin          = false;
 	int begin_sample, end_sample;
+	//previously recorded?
+	//set to last bin recorded by prev waveform
+	int prev_recorded = 0;
 
 	//std::cout << "  New Waveform!" << std::endl;
 
@@ -138,7 +153,8 @@ namespace larlight {
 	      //currently setting bins that don't pass cut to previous value
 
 	      //if we pass the cut
-	      if ( variance > _VarCut )
+	      //AND we are past previously recorded event
+	      if ( (variance > _VarCut) && (adc_index > prev_recorded) )
 		{
 		  //and it's the first time
 		  if (!begin) { begin_sample = adc_index; }
@@ -155,20 +171,29 @@ namespace larlight {
 		      //std::cout << "     Compressing!" << std::endl;
 		      begin = false;
 		      end_sample = adc_index;
+		      prev_recorded = adc_index+_NSamples;
 		      //can now write waveform and surroundings
 		      //DO THAT HERE!
+		      //std::cout << "Fount interesting waveform! of size: " << end_sample-begin_sample+2*_NSamples << std::endl;
         	      make_new_wf(tpc_data, begin_sample, end_sample, new_event_wf);
+		      //now calculate compression factor
+		      _compressfctr += 2;    //1  32-bit event header begin word
+		      _compressfctr += 10;   //10 16-bit FEM header words
+		      _compressfctr += 1;    //1  16-bit ADC begin data word
+		      _compressfctr += ((end_sample-begin_sample)+2*_NSamples);  //1 16-bit word per ADC sample 
+		      _compressfctr += 1;    //1  16-bit ADC end data word
+		      _compressfctr += 2;    //1  32-bit event header end word
 		    }
 		}
 	      
 	    }//if not at beginning of wf
 	  
 	}//for all adc bins
+
+	//divide compression factor by original # of bits
+	//original number of bits: 2+10+1+size of wf+1+2
 	
-      }//possibility of selecting channels
-
-
-
+	//}//possibility of selecting channels
   }
       
   void WFCompress::make_new_wf(larlight::fifo* wf, int start, int stop, larlight::event_fifo* new_event_wf) {
