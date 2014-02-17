@@ -51,9 +51,9 @@ namespace larlight {
 
     int _event_num;
     int _coll_baseline;
-    TH1D *TotCharge;
-    TH1D *ChargePerWire;
-    TH1D *ChargePerPulse;
+    //TH1D *TotCharge;
+    //TH1D *ChargePerWire;
+    //TH1D *ChargePerPulse;
 
   };
 }

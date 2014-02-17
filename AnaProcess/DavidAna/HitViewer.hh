@@ -65,7 +65,7 @@ namespace larlight {
       else if(view==1)
 	return _hHits_V;
       else if(view==2)
-	return _hHits_Z;
+	return _hHits_Y;
       else {
 	std::cout<<"*******************you screwed something up. view should be 0 1 or 2!"<<std::endl;
 	std::cout<<"returning _hHits_U because i don't know what else to return"<<std::endl;
@@ -84,7 +84,7 @@ namespace larlight {
     /// Hit histograms to sit next to cluster ones,
     TH2D* _hHits_U;   
     TH2D* _hHits_V;    
-    TH2D* _hHits_Z;
+    TH2D* _hHits_Y;
 
     GEO::View_t iview;
     std::vector<hit> ihit_v;
