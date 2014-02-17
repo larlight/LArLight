@@ -88,7 +88,11 @@
 
 #pragma link C++ class larlight::vertex+;
 #pragma link C++ class std::vector<larlight::vertex>+;
-#pragma link C++ class larlight::vertex+;
+#pragma link C++ class larlight::event_vertex+;
+
+#pragma link C++ class larlight::endpoint2d+;
+#pragma link C++ class std::vector<larlight::endpoint2d>+;
+#pragma link C++ class larlight::event_endpoint2d+;
 
 #pragma link C++ class larlight::storage_manager+;
 

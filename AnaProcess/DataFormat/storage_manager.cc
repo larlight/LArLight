@@ -380,6 +380,11 @@ namespace larlight {
     case DATA::HarrisVertex:
       _ptr_data_array[type]=(event_base*)(new event_vertex(type));
       break;
+    case DATA::EndPoint2D:
+    case DATA::FeatureEndPoint2D:
+    case DATA::HarrisEndPoint2D:
+      _ptr_data_array[type]=(event_base*)(new event_endpoint2d(type));
+      break;
     case DATA::Calorimetry:
       _ptr_data_array[type]=(event_base*)(new event_calorimetry(type));
       break;

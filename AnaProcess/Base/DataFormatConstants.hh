@@ -64,6 +64,9 @@ namespace larlight{
       Vertex,             ///< Vertex
       FeatureVertex,      ///< FeatureVertex
       HarrisVertex,       ///< HarrisVertex
+      EndPoint2D,         ///< EndPoint2D
+      FeatureEndPoint2D,  ///< EndPoint2D from Feature Vertex Finder
+      HarrisEndPoint2D,   ///< EndPoint2D from Harris Vertex Finder 
       Calorimetry,        ///< Calorimetry
       UserInfo,           ///< dynamic data container ... this must be the last valid enum element
 
@@ -113,6 +116,9 @@ namespace larlight{
       "vertex",
       "feature_vtx",
       "harris_vtx",
+      "end2d",
+      "feature_end2d",
+      "harris_end2d",
       "calorimetry",
       "user",
       "fifo",

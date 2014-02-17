@@ -1,3 +1,7 @@
+
+
+
+
 #ifndef VERTEX_CC
 #define VERTEX_CC
 
@@ -30,6 +34,15 @@ namespace larlight {
       fID(id)
   //************************************************************
   {
+    if(_type!=DATA::Vertex &&
+       _type!=DATA::FeatureVertex &&
+       _type!=DATA::HarrisVertex) {
+      
+      Message::send(MSG::ERROR,__FUNCTION__,
+		    Form("Provided data type (%s) not supported! Reset to default.",DATA::DATA_TREE_NAME[_type].c_str()));
+      _type=DATA::Vertex;
+    }
+
     fXYZ[0] = xyz[0];
     fXYZ[1] = xyz[1];
     fXYZ[2] = xyz[2];
@@ -56,12 +69,14 @@ namespace larlight {
   }
 
 
-  //************************************************************
+  //**********************************************************************************
   event_vertex::event_vertex(DATA::DATA_TYPE type) : std::vector<larlight::vertex>(),
-					       event_base(type)
-  //************************************************************
+						     event_base(type)
+  //**********************************************************************************
   {
-    if(_type!=DATA::Vertex) {
+    if(_type!=DATA::Vertex &&
+       _type!=DATA::FeatureVertex &&
+       _type!=DATA::HarrisVertex) {
 
       Message::send(MSG::ERROR,__FUNCTION__,
 		    Form("Provided data type (%s) not supported! Reset to default.",DATA::DATA_TREE_NAME[_type].c_str()));

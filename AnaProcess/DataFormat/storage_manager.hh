@@ -31,6 +31,7 @@
 #include "calorimetry.hh"
 #include "pulse.hh"
 #include "vertex.hh"
+#include "endpoint2d.hh"
 
 namespace larlight {
   /**
