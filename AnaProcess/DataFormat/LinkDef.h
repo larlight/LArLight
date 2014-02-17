@@ -86,6 +86,10 @@
 #pragma link C++ class std::vector<larlight::user_info>+;
 #pragma link C++ class larlight::event_user+;
 
+#pragma link C++ class larlight::vertex+;
+#pragma link C++ class std::vector<larlight::vertex>+;
+#pragma link C++ class larlight::vertex+;
+
 #pragma link C++ class larlight::storage_manager+;
 
 #endif

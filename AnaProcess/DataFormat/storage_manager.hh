@@ -30,6 +30,7 @@
 #include "shower.hh"
 #include "calorimetry.hh"
 #include "pulse.hh"
+#include "vertex.hh"
 
 namespace larlight {
   /**

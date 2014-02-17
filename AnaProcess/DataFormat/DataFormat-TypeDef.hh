@@ -22,6 +22,7 @@
 #include "spacepoint.hh"
 #include "shower.hh"
 #include "calorimetry.hh"
+#include "vertex.hh"
 #include "storage_manager.hh"
 // Class forward declaration here
 
@@ -72,6 +73,9 @@ namespace larlight{
 
   class calorimetry;
   class event_calorimetry;
+
+  class vertex;
+  class event_vertex;
   
   class storage_manager;
 }

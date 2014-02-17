@@ -61,6 +61,9 @@ namespace larlight{
       Kalman3DSPS,        ///< Track (Kalman3DSPS)
       Kalman3DHit,        ///< Track (Kalman3DHit)
       Shower,             ///< Shower
+      Vertex,             ///< Vertex
+      FeatureVertex,      ///< FeatureVertex
+      HarrisVertex,       ///< HarrisVertex
       Calorimetry,        ///< Calorimetry
       UserInfo,           ///< dynamic data container ... this must be the last valid enum element
 
@@ -107,6 +110,9 @@ namespace larlight{
       "kalman3dsps",
       "kalman3dhit",
       "shower",
+      "vertex",
+      "feature_vtx",
+      "harris_vtx",
       "calorimetry",
       "user",
       "fifo",
