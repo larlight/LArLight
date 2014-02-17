@@ -5,6 +5,8 @@
 #############################
 
 This directory contains I/O testing routines.
+Here's a list of binaries + explanation + usage.
+But hey, please first compile!
 
 ##############
 #            #
@@ -16,48 +18,38 @@ Try:
 
 > make
 
-#######################
-#                     #
-# Add my test routine #
-#                     #
-#######################
+###################################
+#                                 #
+# What They Are + How To Use Them #
+#                                 #
+###################################
 
-Write your routine source code with ".cc" extension.
-Then add your source code name without ".cc" extension to the 
-PROGRAMS variable in GNUmakefile. The makefile in this directory
-will compile all codes defined in PROGRAMS variable.
+(*) test_simple_io ... You can use this executable to run a simple I/O test.
+    		       This routine first writes out a sample LArLight data
+		       file with all kinds of event-wise data containers.
+		       After that, it attempts to read what was written on
+		       the root file. When doing this, it compares number
+		       of events written per data type vs. number of events
+		       read to make sure all went OK. Here's usage:
 
-After that, simply try:
-
-> make
-
-Try to solve all compiler warnings before comitting :)
-
-#####################
-#                   #
-# What's Available? #
-#                   #
-#####################
+    > test_simple_io
 
 
-Currently available:
 
-(*) simple_io.cc 
+(*) simple_write ... You can use this executable to create a LArLight root 
+    		     file with 100 events containing larlight::DATA::Track 
+		     object. The output file name is trial.root. Here's how
+		     to run it.
 
-    Creates event_waveform class instance, add it to a TTree, and
-    write into an output file. Then it retrieves this written TTree
-    by opening the writen output file, and retrieves the written 
-    event_waveform class instance. It's adumb I/O test to make sure
-    class object I/O is handled correctly over ROOT streamer.
+    > simple_write
 
-(*) simple_loop.cc
+(*) simple_read ... You can use this executable to read what you created in 
+    		    simple_write. Here is how to run it (assuming you have
+		    "trial.root" file).
 
-    A storage_manager class test routine. It performs a simple
-    example event loop using dat/sample.root file. You may take
-    this routine as an example event-loop method to perform your
-    analysis. HOWEVER, try to use Analysis package instead especially
-    if you want this analysis code to be portable. "Portable" means
-    to share your analysis code with someone. For details, read 
-    Analysis/README.
-    
+    > simple_read trial.root
+
+
+
+
     

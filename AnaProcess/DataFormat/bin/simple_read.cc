@@ -24,7 +24,6 @@ int main(int argc, char** argv){
   // Commented out by default.
   my_storage.set_verbosity(larlight::MSG::DEBUG);
   
-
   // Step 0: Set I/O mode: we are reading in, so "READ"
   my_storage.set_io_mode(larlight::storage_manager::READ);
 
@@ -51,9 +50,20 @@ int main(int argc, char** argv){
   // Let's loop over!
   while(my_storage.next_event()){
 
-    larlight::event_track* my_event_track = (larlight::event_track*)(my_storage.get_data(larlight::DATA::Track));
+    larlight::event_track* my_track_v = (larlight::event_track*)(my_storage.get_data(larlight::DATA::Track));
 
-    
+    if(!my_track_v) {
+
+      std::cout << "No event_track found!" << std::endl;
+
+      break;
+    }
+
+    // Check if pointer is valid
+    std::cout 
+      << Form("Found event %d ... %zu tracks! ", my_track_v->event_id(), my_track_v->size())
+      << std::endl;
+
   }
 
   my_storage.close();

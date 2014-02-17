@@ -16,8 +16,10 @@ if not os.path.exists(target_dir):
    try:
       os.makedirs(target_dir)
       os.makedirs('%s/bin' % target_dir)
+      os.makedirs('%s/mac' % target_dir)
       # Copy analysis code generator
-      os.system("scp -r %s/bin %s" % (source_dir,target_dir))
+      os.system("scp -r %s/bin/tmp %s/bin/" % (source_dir,target_dir))
+
    except OSError:
       sys.stderr.write('Failed to create a dir: %s\n' % target_dir)
       sys.stderr.write('Maybe lacking a permission?\n\n')
@@ -32,14 +34,20 @@ in_linkdef='%s/LinkDef.tmp' % source_dir
 in_typedef='%s/TypeDef.tmp' % source_dir
 in_source='%s/cc.tmp' % source_dir
 in_header='%s/hh.tmp' % source_dir
-in_script='%s/bin/gen_newana' % source_dir
+in_bin_script='%s/bin/gen_newana' % source_dir
+in_bin_makefile='%s/bin/GNUmakefile.tmp' % source_dir
+in_bin_source='%s/bin/example.tmp' % source_dir
+in_mac_script='%s/mac/tmp.py' % source_dir
 
-src_list = { in_makefile : '%s/GNUmakefile'    % target_dir,
-             in_linkdef  : '%s/LinkDef.h'      % target_dir,
-             in_typedef  : '%s/%s-TypeDef.hh'  % (target_dir,name),
-             in_source   : '%s/%s.cc'          % (target_dir,name),
-             in_header   : '%s/%s.hh'          % (target_dir,name),
-             in_script   : '%s/bin/gen_newana' % target_dir        }
+src_list = { in_makefile : '%s/GNUmakefile'     % target_dir,
+             in_linkdef  : '%s/LinkDef.h'       % target_dir,
+             in_typedef  : '%s/%s-TypeDef.hh'   % (target_dir,name),
+             in_source   : '%s/%s.cc'           % (target_dir,name),
+             in_header   : '%s/%s.hh'           % (target_dir,name),
+             in_bin_script   : '%s/bin/gen_newana'  % target_dir,
+             in_bin_makefile : '%s/bin/GNUmakefile' % target_dir,
+             in_bin_source   : '%s/bin/example.cc'  % target_dir,
+             in_mac_script   : '%s/mac/example.py'  % target_dir  }
 
 for src in src_list.keys():
    contents=open(src,'r').read()
