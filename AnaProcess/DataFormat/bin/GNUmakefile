@@ -13,7 +13,7 @@ include $(ANA_PROC_DIR)/Makefile/Makefile.${OSNAME}
 
 # Add your program below with a space after the previous one.
 # This makefile compiles all binaries specified below.
-PROGRAMS = simple_read simple_write test_simple_io
+PROGRAMS = simple_read simple_write test_simple_io gen_sample_wf
 
 TARGETS = $(addsuffix .cc, $(PROGRAMS))
 #all:		$(PROGRAMS)
