@@ -153,7 +153,6 @@ namespace larlight {
 	  */
 	  temphist->SetBinContent(adc_index+1,adcs);
 
-
 	}
 	
 	if (interesting)

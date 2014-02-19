@@ -10,7 +10,11 @@ namespace larlight {
     //Define Variables
     _event_num = 0;
     _coll_baseline = 400;
-    
+    //Define Histograms
+    TotCharge      = new TH1D("TotCharge",      "Tot Charge in Evt.; Charge [ADCs]",        100,     0, 100000);
+    ChargePerWire  = new TH1D("ChargePerWire",  "Charge on Wire; Wire num; Charge [ADCs]", 8000,     0,   8000);
+    ChargePerPulse = new TH1D("ChargePerPulse", "Charge on Pulse; Charge[ADCs]",             30,     0,   3000); 
+    NumHits        = new TH1D("NumHits",        "Number of Hits for Event",                  50,     0,    300);
 
     return true;
   }
@@ -20,6 +24,7 @@ namespace larlight {
     _event_num += 1;
 
     //Define Histograms
+    /*
     char c[25];
     sprintf(c,"ChargePerWire_%d",_event_num);
     char d[25];
@@ -32,7 +37,7 @@ namespace larlight {
     TH1D* ChargePerPulse = new TH1D(d, "ADCs on each pulse; ADCs",            30,    0,  3000);
     TH1D* TotCharge      = new TH1D(e, "Tot Charge"           ,              100,    0,100000);
     TH1D* NumHits        = new TH1D(f,      "Number of Hits",                 50,    0,   300);
-
+    */
 
     //Total Charge on this event
     int tot_ADCs    = 0;
@@ -62,10 +67,9 @@ namespace larlight {
 
       //determine if collection plane
       //(do this better...)
-      if ( tpc_data->at(0) < 2000 )
+      if ( tpc_data->at(0) < 1500 )
 	{
 
-	  std::cout << "Counting up charge for wf: " << i << std::endl;
 	  bool found_pulse = false;
 
 	  for (Int_t adc_index=0; adc_index<tpc_data->size(); adc_index++)
@@ -90,7 +94,7 @@ namespace larlight {
 
 	    }//for all bins in this waveform
 	  
-	  ChargePerWire->SetBinContent(tpc_data->channel_number(),wire_ADCs);
+	  ChargePerWire->AddBinContent(tpc_data->channel_number(),wire_ADCs);
 	  wire_ADCs = 0;
 
 	}//if collection plane
@@ -98,19 +102,20 @@ namespace larlight {
     }//loop over all waveforms in event      
     
     NumHits->Fill(num_hits);
-    NumHits->Write();
+    num_hits = 0;
 
     TotCharge->Fill(tot_ADCs);    
-    TotCharge->Write();
-
-    ChargePerWire->Write();
-    ChargePerPulse->Write();
+    tot_ADCs = 0;
 
     return true;
   }
 
   bool ChargeAna::finalize() {
 
+    NumHits->Write();
+    TotCharge->Write();
+    ChargePerPulse->Write();
+    ChargePerWire->Write();
     return true;
   }
 }

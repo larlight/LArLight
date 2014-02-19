@@ -10,9 +10,13 @@ namespace larlight {
     //larlight::event_fifo new_event_wf;  //can I just create like this? How does it know all its properties?
 
     //_merge_tree     =   0;
+    // _mc_tree        = new TTree("mctruth_tree", "");
+    //_mc_tree->Branch("mctruth_branch", event_mc.GetName(), (&event_mc));
+
     _merge_tree     = new TTree("tpcfifo_tree", "");
     _merge_tree->Branch("tpcfifo_branch", new_event_wf.GetName(), (&new_event_wf));
     _merge_tree->Branch("event_num", &_event_num, "_event_num/I");    
+
     _event_num      =   0;
     _compressfctr   =   0;
 
@@ -41,6 +45,15 @@ namespace larlight {
     char c[25];
     sprintf(c,"compression_%d",_event_num);
     TH1D*  hCompress  = new TH1D(c, "ratio", 30, 0, 0.1);
+
+    //get MC data
+    larlight::mctruth *event_mc = (mctruth*)(storage->get_data(DATA::MCTruth));
+
+    //make sure MC data is there
+    if(!event_mc) {
+      print(MSG::ERROR,__FUNCTION__,"Data storage did not find associated MCTruth");
+      return false;
+    }
 
     //get vector of waveforms
     larlight::event_fifo *event_wf = (event_fifo*)(storage->get_data(DATA::TPCFIFO));
@@ -71,7 +84,8 @@ namespace larlight {
       _compressfctr = 0;
       //Apply Compression algorithm
       Compress( tpc_data, &new_event_wf);
-      double wf_original_size = 2+10+1+tpc_data->size()+1+2;
+      //original waveform: if counting header info: +2+10+1+1+2
+      double wf_original_size = tpc_data->size();
       _compressfctr = _compressfctr/wf_original_size;
       //std::cout << "compression factor: " << _compressfctr << std::endl;
       hCompress->Fill(_compressfctr);
@@ -85,6 +99,7 @@ namespace larlight {
 	_merge_tree->Fill();
       }
     
+    //_mc_tree->Fill();
     hCompress->Write();
 
     return true;
@@ -152,6 +167,23 @@ namespace larlight {
 	      //Apply filter
 	      //currently setting bins that don't pass cut to previous value
 
+	      //THIS ALGORITHM FIND NEW PULSE BY FINDING A POINT ABOVE
+	      //VARIANCE AND THEN SAVING +- _NSamples TO NEW WAVEFORM
+	      //******************************************************
+	      //if we pass the cut
+	      //AND we are past previously recorded event
+	      if ( (variance > _VarCut) && (adc_index > prev_recorded) )
+		{
+		  make_new_wf_simple(tpc_data, adc_index, new_event_wf);
+		  prev_recorded = adc_index+_NSamples+10;
+		  //calculate compresson
+		  _compressfctr += (1+2*_NSamples);  //1 16-bit word per ADC sample 
+		}
+
+	      //THIS ALGORITHM FIND NEW PULSE BY FINDING WHEN WE FIRST
+	      //PASS THRESHOLD AND WHEN WE AGAIN DIP UNDER THRESHOLD
+	      //WE THEN RECORD THE WINDOW ABOVE THRESHOLD +- _NSamples
+	      /*********************************************************
 	      //if we pass the cut
 	      //AND we are past previously recorded event
 	      if ( (variance > _VarCut) && (adc_index > prev_recorded) )
@@ -185,6 +217,8 @@ namespace larlight {
 		      _compressfctr += 2;    //1  32-bit event header end word
 		    }
 		}
+              /*******************************************************
+	      */
 	      
 	    }//if not at beginning of wf
 	  
@@ -226,9 +260,41 @@ namespace larlight {
 
   }
 
+  void WFCompress::make_new_wf_simple(larlight::fifo* wf, int start, larlight::event_fifo* new_event_wf) {
+
+    //create vector where to store ADCs
+    std::vector<UShort_t> new_wf_bins;
+  
+    //make sure not overflowing before or after original waveform
+    int start_record = start-_NSamples;
+    if (start_record < 0) { start_record = 0; }
+    int end_record   = start + _NSamples+10;
+    if (end_record > wf->size()) { end_record = wf->size(); }
+  
+    //get interesting samples +- _NSamples
+    for (int i=start_record; i<end_record; i++)
+      new_wf_bins.push_back(wf->at(i));
+
+    //print compression
+    //std::cout << "Compressing WF of size: " << wf->size() << std::endl;
+    //std::cout << "Into WF of size:        " << new_wf_bins.size() << std::endl;
+    
+    //create new waveform
+    larlight::fifo new_wf( wf->channel_number(), wf->readout_frame_number(),
+			  wf->readout_sample_number_RAW(), wf->module_address(),
+			   wf->module_id(), wf->disc_id(), DATA::TPCFIFO, new_wf_bins);
+
+    //std::cout << "NEW WF: " << (&new_wf)->channel_number() << std::endl;
+    //write new waveform
+    new_event_wf->push_back(new_wf);
+
+  }
+
+
   bool WFCompress::finalize() {
 
-    _merge_tree->Write();
+    // _mc_tree->Write();
+    //_merge_tree->Write();
   
     return true;
   }

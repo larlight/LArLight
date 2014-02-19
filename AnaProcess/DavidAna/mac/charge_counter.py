@@ -22,6 +22,7 @@ my_proc.set_io_mode(fmwk.storage_manager.READ)
 
 # Specify what data to read
 my_proc.set_data_to_read(fmwk.DATA.TPCFIFO)
+my_proc.set_data_to_read(fmwk.DATA.MCTruth)
 #my_proc.set_data_to_read(fmwk.DATA.Trigger)
 
 # Set input root file: this is decoder output root file.
