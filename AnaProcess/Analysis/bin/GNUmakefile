@@ -5,7 +5,7 @@ CXXFLAGS += -I$(ANA_PROC_DIR)/Analysis
 CXXFLAGS += -I. $(shell root-config --cflags) -g
 
 # Include your shared object lib location
-LDFLAGS += -L$(ANA_PROC_DIR)/lib -lBase -lDataFormat -lAnalysis
+LDFLAGS += -L$(ANA_PROC_DIR)/lib -lAnalysis -lDataFormat -lBase 
 LDFLAGS += $(shell root-config --libs) -lPhysics -lMatrix -g
 
 # platform-specific options
