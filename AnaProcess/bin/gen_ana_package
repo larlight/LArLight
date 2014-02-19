@@ -35,6 +35,7 @@ in_typedef='%s/TypeDef.tmp' % source_dir
 in_source='%s/cc.tmp' % source_dir
 in_header='%s/hh.tmp' % source_dir
 in_bin_script='%s/bin/gen_newana' % source_dir
+in_header_tmp='%s/bin/tmp/hh' % source_dir
 in_bin_makefile='%s/bin/GNUmakefile.tmp' % source_dir
 in_bin_source='%s/bin/example.tmp' % source_dir
 in_mac_script='%s/mac/tmp.py' % source_dir
@@ -45,6 +46,7 @@ src_list = { in_makefile : '%s/GNUmakefile'     % target_dir,
              in_source   : '%s/%s.cc'           % (target_dir,name),
              in_header   : '%s/%s.hh'           % (target_dir,name),
              in_bin_script   : '%s/bin/gen_newana'  % target_dir,
+             in_header_tmp   : '%s/bin/tmp/hh'      % target_dir,
              in_bin_makefile : '%s/bin/GNUmakefile' % target_dir,
              in_bin_source   : '%s/bin/example.cc'  % target_dir,
              in_mac_script   : '%s/mac/example.py'  % target_dir  }

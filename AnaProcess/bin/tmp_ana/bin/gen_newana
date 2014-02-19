@@ -9,6 +9,7 @@ if not 'ANA_PROC_DIR' in os.environ.keys():
    sys.exit(1)
 
 name=sys.argv[1]
+working_package='Package_Name'
 target_dir='%s/Package_Name' % os.environ['ANA_PROC_DIR']
 source_dir='%s/Package_Name/bin/tmp' % os.environ['ANA_PROC_DIR']
 
@@ -29,6 +30,7 @@ for src in src_list.keys():
    contents=contents.replace('ana_class_name',name.lower())
    contents=contents.replace('Ana_Class_Name',name)
    contents=contents.replace('SHELL_USER_NAME',os.environ['USER'])
+   contents=contents.replace('Working_Package',working_package)
    fout=open(src_list[src],'w')
    fout.write(contents)
    fout.close()
