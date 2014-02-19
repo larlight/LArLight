@@ -12,7 +12,8 @@ gSystem.Load("libDavidAna")
 # Now import ana_processor & your class. For this example, ana_base.
 from ROOT import larlight as fmwk
 
-filename = sys.argv[1]
+infilename = sys.argv[1]
+outfilename = "WF_output.root"
 
 # Create ana_processor instance
 my_proc=fmwk.ana_processor()
@@ -29,9 +30,9 @@ my_proc.set_data_to_read(fmwk.DATA.MCTruth)
 # Set input root file: this is decoder output root file.
 # This time, we use a sample file prepared.
 #my_proc.add_input_file("./../../../NevisDecoder/Decoder/mac/xmit_subrun_2014_01_13_1_trigger.root")
-my_proc.add_input_file(filename)
+my_proc.add_input_file(infilename)
 #set output data file
-my_proc.set_output_file("WF_output.root")
+my_proc.set_output_file(outfilename)
 
 # Specify ROOT TDirectory in the file if such structure is present (which is the case for DataScanner output)
 my_proc.set_input_rootdir("scanner")

@@ -64,10 +64,9 @@ namespace larlight {
 
     protected:
 
-    TTree *_merge_tree;
-    TTree *_mc_tree;
+    TH1D* hCompress;
     int _wfnumber;
-    larlight::mctruth event_mc;
+    //larlight::mctruth event_mc;
     larlight::event_fifo new_event_wf;
     int    _NVarSamples;
     int    _NSamples;
