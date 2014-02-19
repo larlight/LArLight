@@ -19,9 +19,9 @@ else
     fi
     export DECODER_DIR=$MAKE_TOP_DIR/$DECODER_RELPATH
     export DECODER_LIBDIR=$DECODER_DIR/lib
-    if [[ -z $DECODER_MODULE ]]; then
-	export DECODER_MODULE="FileIO Algorithm Decoder"
-    fi
+#    if [[ -z $DECODER_MODULE ]]; then
+#	export DECODER_MODULE="FileIO Algorithm Decoder"
+ #   fi
 
     if [[ -z $ROOTSYS ]]; then
 	case `uname -n` in

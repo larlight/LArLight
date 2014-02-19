@@ -13,8 +13,8 @@ working_package='Package_Name'
 target_dir='%s/Package_Name' % os.environ['ANA_PROC_DIR']
 source_dir='%s/Package_Name/bin/tmp' % os.environ['ANA_PROC_DIR']
 
-in_source='%s/ana.cc' % source_dir
-in_header='%s/ana.hh' % source_dir
+in_source='%s/empty.cc' % source_dir
+in_header='%s/empty.hh' % source_dir
 
 src_list = { in_source   : '%s/%s.cc'         % (target_dir,name),
              in_header   : '%s/%s.hh'         % (target_dir,name) }
@@ -26,9 +26,9 @@ for src in src_list.keys():
       
 for src in src_list.keys():
    contents=open(src,'r').read()
-   contents=contents.replace('ANA_CLASS_NAME',name.upper())
-   contents=contents.replace('ana_class_name',name.lower())
-   contents=contents.replace('Ana_Class_Name',name)
+   contents=contents.replace('EMPTY_CLASS_NAME',name.upper())
+   contents=contents.replace('empty_class_name',name.lower())
+   contents=contents.replace('Empty_Class_Name',name)
    contents=contents.replace('SHELL_USER_NAME',os.environ['USER'])
    contents=contents.replace('Working_Package',working_package)
    fout=open(src_list[src],'w')
@@ -41,7 +41,7 @@ fout=open('%s/LinkDef.h' % target_dir,'w')
 for line in contents:
    line=line + '\n'
    if line.find('ADD_NEW_CLASS')>=0:
-      line='#pragma link C++ class larlight::%s+;\n%s' % (name,line)
+      line='#pragma link C++ class %s+;\n%s' % (name,line)
    fout.write(line)
 
 # modify TypeDef
@@ -49,7 +49,7 @@ contents=open('%s/Package_Name-TypeDef.hh' % target_dir, 'r').read().split('\n')
 fout=open('%s/Package_Name-TypeDef.hh' % target_dir,'w')
 for line in contents:
    line=line + '\n'
-   if line.find('ADD_ANA_CLASS')>=0:
+   if line.find('ADD_EMPTY_CLASS')>=0:
       line='  class %s;\n%s' % (name,line)
    if line.find('ADD_NEW_HEADER')>=0:
       line='#include \"%s.hh\"\n%s' % (name,line)
