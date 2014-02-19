@@ -14,7 +14,9 @@ namespace larlight {
 
   class Package_Name;
 
-//ADD_NEW_CLASS ... do not change this comment line
+//ADD_ANA_CLASS ... do not change this comment line
 
 }
+
+//ADD_EMPTY_CLASS ... do not change this comment line
 #endif
