@@ -27,7 +27,7 @@ namespace larlight {
   public:
 
     /// Default constructor
-    Package_Name(){ _name="Package_Name"; _fout=0;};
+    Package_Name() : ana_base() { _name="Package_Name"; }
 
     /// Default destructor
     virtual ~Package_Name(){};

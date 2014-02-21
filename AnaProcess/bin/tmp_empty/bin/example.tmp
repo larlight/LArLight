@@ -1,0 +1,15 @@
+//
+// Example C++ routine to run your analysis module, Package_Name.
+//
+
+#include "Package_Name-TypeDef.hh"
+#include <iostream>
+
+int main(int argc, char** argv){
+
+   Package_Name my_clss_object;
+
+   std::cout << "Hello World with My Object!" << std::endl;    
+
+  return 0;
+}

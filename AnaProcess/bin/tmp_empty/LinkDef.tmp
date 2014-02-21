@@ -10,5 +10,5 @@
 #pragma link off all functions;
 
 #pragma link C++ class Package_Name+;
-
+//ADD_NEW_CLASS ... do not change this line
 #endif
