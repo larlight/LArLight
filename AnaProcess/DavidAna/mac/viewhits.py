@@ -16,7 +16,7 @@ my_proc.set_io_mode(larlight.storage_manager.READ)
 
 my_proc.add_input_file(filename)
 
-larlight.storage_manager.get().set_in_rootdir("scanner")
+#larlight.storage_manager.get().set_in_rootdir("scanner")
 larlight.storage_manager.get().set_data_to_read(larlight.DATA.FFTHit)
 larlight.storage_manager.get().set_data_to_read(larlight.DATA.UserInfo,False)
 

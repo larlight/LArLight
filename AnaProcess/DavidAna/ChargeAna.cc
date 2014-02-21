@@ -11,10 +11,10 @@ namespace larlight {
     _event_num = 0;
     _coll_baseline = 400;
     //Define Histograms
-    TotCharge      = new TH1D("TotCharge",      "Tot Charge in Evt.; Charge [ADCs]",        100,     0, 100000);
+    TotCharge      = new TH1D("TotCharge",      "Tot Charge in Evt.; Charge [ADCs]",        100, 10000,  30000);
     ChargePerWire  = new TH1D("ChargePerWire",  "Charge on Wire; Wire num; Charge [ADCs]", 8000,     0,   8000);
     ChargePerPulse = new TH1D("ChargePerPulse", "Charge on Pulse; Charge[ADCs]",             30,     0,   3000); 
-    NumHits        = new TH1D("NumHits",        "Number of Hits for Event",                  50,     0,    300);
+    NumHits        = new TH1D("NumHits",        "Number of Hits for Event",                  20,     0,    100);
 
     return true;
   }
@@ -51,6 +51,8 @@ namespace larlight {
     
     //waveform counter
     int wfnum = 0;
+    //time counted
+    int time_counted = 0;
 
     //Loop over all waveforms
     for (size_t i=0; i<event_wf->size(); i++){
@@ -65,6 +67,14 @@ namespace larlight {
 	continue;
       }
 
+      //reset charge counted if new channel number (new wire)
+      if ( i > 0 ){
+	if ( (event_wf->at(i)).channel_number() != (event_wf->at(i-1)).channel_number() ){
+	  time_counted = 0;
+	}
+      }
+
+      UInt_t wf_time = tpc_data->readout_sample_number_RAW();
       //determine if collection plane
       //(do this better...)
       if ( tpc_data->at(0) < 1500 )
@@ -74,17 +84,22 @@ namespace larlight {
 
 	  for (Int_t adc_index=0; adc_index<tpc_data->size(); adc_index++)
 	    {
-
 	      int adcs = tpc_data->at(adc_index);
 
 	      //find pulse and count ADCs
 	      //for now if 2 ADCs above baseline then we found a pulse
-	      if ( (adcs-_coll_baseline) >= 3 )
+	      //AND if not double counted (by looking at time)
+	      if ( ((adcs-_coll_baseline) >= 3) )
 		{
-		  found_pulse = true;
-		  tot_ADCs    += (adcs-_coll_baseline);
-		  wire_ADCs   += (adcs-_coll_baseline);
-		  pulse_ADCs  += (adcs-_coll_baseline);
+		  if ( adc_index+wf_time > time_counted )
+		    {
+		      //update time that has been counted
+		      time_counted = adc_index+wf_time;
+		      found_pulse = true;
+		      tot_ADCs    += (adcs-_coll_baseline);
+		      wire_ADCs   += (adcs-_coll_baseline);
+		      pulse_ADCs  += (adcs-_coll_baseline);
+		    }
 		}
 	      else //not a pulse...if was before write new pulse
 		{

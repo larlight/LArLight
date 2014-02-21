@@ -16,6 +16,7 @@ namespace larlight {
     _hHits_U = 0;
     _hHits_V = 0;
     _hHits_Y = 0;
+    
   }
 
   //********************************
@@ -64,7 +65,7 @@ namespace larlight {
     _hHits_U = Prepare2DHisto("HitHistU", wiremin[0], wiremax[0], timemin[0], timemax[0]);
     _hHits_V = Prepare2DHisto("HitHistV", wiremin[1], wiremax[1], timemin[1], timemax[1]);
     _hHits_Y = Prepare2DHisto("HitHistZ", wiremin[2], wiremax[2], timemin[2], timemax[2]);
-
+    
     //loop over hits
     for (size_t i=0; i<hits->size(); i++)
       {
@@ -76,6 +77,7 @@ namespace larlight {
 	  _hHits_V->Fill( this_hit->Wire(), this_hit->PeakTime(), this_hit->Charge() );
 	if ( this_hit->View()==2 )
 	  _hHits_Y->Fill( this_hit->Wire(), this_hit->PeakTime(), this_hit->Charge() );
+	
       }//end loop over hits
     
     
@@ -97,12 +99,12 @@ namespace larlight {
     double mytimemin=0.9*timemin;
     double mytimemax=1.1*timemax;
 
-    int wirewidth = (int)mywiremax-mywiremin;
-    int timewidth = (int)mytimemax-mytimemin; 
+    int wirewidth = (int)(mywiremax-mywiremin)/6;
+    int timewidth = (int)(mytimemax-mytimemin)/6; 
 
     h = new TH2D(name.c_str(),"2D Viewer; Wire; Time;",
-		 50,  mywiremin, mywiremax,
-		 50,  mytimemin, mytimemax);
+		 wirewidth,  mywiremin, mywiremax,
+		 timewidth,  mytimemin, mytimemax);
     
     return h;
   }

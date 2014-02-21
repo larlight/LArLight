@@ -69,7 +69,8 @@ namespace larlight {
     //larlight::mctruth event_mc;
     larlight::event_fifo new_event_wf;
     int    _NVarSamples;
-    int    _NSamples;
+    int    _NSamplesante;
+    int    _NSamplespost;
     int    _event_num;
     double _VarCut;
     int    _baseline;

@@ -13,7 +13,7 @@ gSystem.Load("libDavidAna")
 from ROOT import larlight as fmwk
 
 infilename = sys.argv[1]
-outfilename = "WF_output.root"
+outfilename = "hits.root"
 
 # Create ana_processor instance
 my_proc=fmwk.ana_processor()
@@ -25,6 +25,7 @@ my_proc.set_io_mode(fmwk.storage_manager.BOTH)
 
 # Specify what data to read
 my_proc.set_data_to_read(fmwk.DATA.TPCFIFO)
+#my_proc.set_data_to_read(fmwk.DATA.FFTHit)
 #my_proc.set_data_to_read(fmwk.DATA.MCTruth)
 
 # Set input root file: this is decoder output root file.
@@ -35,7 +36,7 @@ my_proc.add_input_file(infilename)
 my_proc.set_output_file(outfilename)
 
 # Specify ROOT TDirectory in the file if such structure is present (which is the case for DataScanner output)
-my_proc.set_input_rootdir("scanner")
+#my_proc.set_input_rootdir("scanner")
 
 # Set output root file: this is a separate root file in which your
 # analysis module can store anything such as histograms, your own TTree, etc.
@@ -46,7 +47,7 @@ my_proc.set_ana_output_file("compressed_wfs.root")
 # To show how one can run multiple analysis modules at once,
 # we make multiple ana_base instance.
 
-my_ana_1=fmwk.WFCompress()
+my_ana_1=fmwk.HitMaker()
 #my_ana_2=ana_base()
 #my_ana_3=ana_base()
 

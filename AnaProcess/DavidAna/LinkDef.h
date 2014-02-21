@@ -14,9 +14,11 @@
 #pragma link C++ class larlight::HitViewer+;
 #pragma link C++ class larlight::WFCompress+;
 #pragma link C++ class larlight::ChargeAna+;
+#pragma link C++ class larlight::HitMaker+;
 //ADD_NEW_CLASS ... do not change this line
 
 #endif
+
 
 
 
