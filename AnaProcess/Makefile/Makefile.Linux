@@ -1,5 +1,5 @@
 
-CXX		= g++
+CXX		= $(LARLIGHT_CXX)
 LD              = g++
 LDFLAGS         += -Wl,-rpath,$(MAKE_TOP_DIR)/lib
 FFLAGS          += -Wall
