@@ -13,7 +13,7 @@ else
 	echo
 	return;
     fi
-
+    LARLIGHT_OS=`uname -s`
     # Set for AnaProcess build
     if [[ -z $ANA_PROC_RELPATH ]]; then
 	export ANA_PROC_RELPATH=AnaProcess
@@ -45,7 +45,8 @@ else
 	    return;
 	fi
 	export LARLIGHT_CXX;
-	if [ `uname -s`="Darwin" ]; then
+	if [ $LARLIGHT_OS = 'Darwin' ]; then
+	    echo $LARLIGHT_OS
 	    echo
 	    echo "***************** COMPILER WARNING *******************"
 	    echo "*                                                    *"
@@ -93,7 +94,7 @@ else
     python $MAKE_TOP_DIR/config/python/gen_decodermakefile.py
     python $MAKE_TOP_DIR/config/python/gen_topmakefile.py
     export LD_LIBRARY_PATH=$ANA_PROC_LIBDIR:$DECODER_LIBDIR:$LD_LIBRARY_PATH
-    if [ `uname -s`="Darwin" ]; then
+    if [ $LARLIGHT_OS = 'Darwin' ]; then
 	export DYLD_LIBRARY_PATH=$ANA_PROC_LIBDIR:$DECODER_LIBDIR:$DYLD_LIBRARY_PATH
     fi
     echo

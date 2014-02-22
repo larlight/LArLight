@@ -146,7 +146,11 @@ namespace larlight {
     timemin.resize((GEO::kW+1),-1);
 
     //vtx is a vector of hits for one cluster?
-    for(auto const index : hit_index) {
+    for(std::vector<unsigned short>::const_iterator iter(hit_index.begin());
+	iter!=hit_index.end();
+	++iter) {
+      
+      unsigned short index = (*iter);
 
       if( index < this->size() ) {
 
