@@ -29,6 +29,7 @@ namespace larutil {
     LArUtilException(std::string msg="") : std::exception(), _msg(msg)
     {}
 
+    virtual ~LArUtilException() throw();
     virtual const char* msg() const throw() 
     {return _msg.c_str(); }
 
