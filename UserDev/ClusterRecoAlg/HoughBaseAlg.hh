@@ -23,9 +23,9 @@ namespace larreco {
 
   struct houghCorner
   {
-    Double_t strength=0;
-    Double_t p0=0;
-    Double_t p1=0;
+    Double_t strength;
+    Double_t p0;
+    Double_t p1;
     houghCorner(Double_t strengthTemp=0,
 		Double_t p0Temp=0,
 		Double_t p1Temp=0)
@@ -45,13 +45,13 @@ namespace larreco {
   // This stores information about merged lines
   struct mergedLines
   {
-    Double_t totalQ=0;
-    Double_t pMin0=0;
-    Double_t pMin1=0;
-    Double_t pMax0=0;
-    Double_t pMax1=0;
-    Int_t clusterNumber=-999999;
-    Double_t showerLikeness=0;
+    Double_t totalQ;
+    Double_t pMin0;
+    Double_t pMin1;
+    Double_t pMax0;
+    Double_t pMax1;
+    Int_t clusterNumber;
+    Double_t showerLikeness;
     mergedLines (Double_t totalQTemp=0,
 		 Double_t pMin0Temp=0,
 		 Double_t pMin1Temp=0,
@@ -72,25 +72,25 @@ namespace larreco {
   
   struct protoTrack
   {
-    Int_t clusterNumber=999999;
-    Int_t oldClusterNumber=999999;
-    Float_t clusterSlope=999999;
-    Float_t clusterIntercept=999999;
-    Float_t totalQ=-999999;
-    Float_t pMin0=999999;
-    Float_t pMin1=999999;
-    Float_t pMax0=-999999;
-    Float_t pMax1=-999999;
-    Float_t iMinWire=999999;
-    Float_t iMaxWire=-999999;
-    Float_t minWire=999999;
-    Float_t maxWire=-999999;
-    Float_t isolation=-999999;
-    Float_t showerLikeness=-999999;
-    bool merged=false;
-    bool showerMerged=false;
-    bool mergedLeft=false;
-    bool mergedRight=false;
+    Int_t clusterNumber;
+    Int_t oldClusterNumber;
+    Float_t clusterSlope;
+    Float_t clusterIntercept;
+    Float_t totalQ;
+    Float_t pMin0;
+    Float_t pMin1;
+    Float_t pMax0;
+    Float_t pMax1;
+    Float_t iMinWire;
+    Float_t iMaxWire;
+    Float_t minWire;
+    Float_t maxWire;
+    Float_t isolation;
+    Float_t showerLikeness;
+    bool merged;
+    bool showerMerged;
+    bool mergedLeft;
+    bool mergedRight;
     std::vector<larlight::hit> hits;
     protoTrack(){
     }

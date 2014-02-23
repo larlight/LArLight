@@ -23,10 +23,10 @@ namespace larutil {
   void DetectorProperties::ClearData()
   {
     fSamplingRate = larlight::DATA::INVALID_DOUBLE;
-    fTriggerOffset = larlight::DATA::INVALID_DOUBLE;
+    fTriggerOffset = larlight::DATA::INVALID_INT;
     fElectronsToADC = larlight::DATA::INVALID_DOUBLE;
-    fNumberTimeSamples = larlight::DATA::INVALID_DOUBLE;
-    fReadOutWindowSize = larlight::DATA::INVALID_DOUBLE;
+    fNumberTimeSamples = larlight::DATA::INVALID_UINT;
+    fReadOutWindowSize = larlight::DATA::INVALID_UINT;
 
     fTimeOffsetU = larlight::DATA::INVALID_DOUBLE;
     fTimeOffsetV = larlight::DATA::INVALID_DOUBLE;
