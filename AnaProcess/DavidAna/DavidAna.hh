@@ -60,6 +60,7 @@ namespace larlight {
 
     TH1D      *compression;
     TH1D            *noise;
+    TH1D              *rms;
     int          event_num;
     int          _NSamples;
     double         _VarCut;

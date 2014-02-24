@@ -39,6 +39,7 @@ namespace larlight {
     larlight::event_hit *hits = (event_hit*)(storage->get_data(DATA::FFTHit));
     hits->clear();
     hits->set_event_id(_event_num);
+    int adcs_over = 0;
     //make sure not empty...if so report
     //if(!hits) {
     // print(MSG::ERROR,__FUNCTION__,"Data storage did not find associated hits!");
@@ -84,8 +85,10 @@ namespace larlight {
 	for (UShort_t adc_index=0; adc_index<tpc_data->size(); adc_index++)
 	  {
 	    int adcs = tpc_data->at(adc_index);
-	    if ( ((adcs-_baseline) >= 3) )
+	    if ( ((adcs-_baseline) >= 10) ) {
 	      pulse_ADCs   += (adcs-_baseline);
+	      adcs_over += 1;
+	    }
 	    //find if pulse peak
 	    if ( pulse_ADCs > peak_time )
 	      peak_time = tpc_data->readout_sample_number_RAW()+adc_index;
@@ -132,8 +135,8 @@ namespace larlight {
       }//if collection plane
       
     }//loop over waveforms in event
-
-    std::cout << "Hits in event: " << hits->size() << std::endl;
+    //std::cout << adcs_over << std::endl;
+    std::cout << "Hits on Coll. Plane: " << (int)((hits->size())/3) << std::endl;
     
     //eliminate waveform
     //event_wf->clear();

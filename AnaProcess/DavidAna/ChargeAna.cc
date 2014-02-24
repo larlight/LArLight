@@ -14,6 +14,7 @@ namespace larlight {
     TotCharge      = new TH1D("TotCharge",      "Tot Charge in Evt.; Charge [ADCs]",        100, 10000,  30000);
     ChargePerWire  = new TH1D("ChargePerWire",  "Charge on Wire; Wire num; Charge [ADCs]", 8000,     0,   8000);
     ChargePerPulse = new TH1D("ChargePerPulse", "Charge on Pulse; Charge[ADCs]",             30,     0,   3000); 
+    LowEnPulses    = new TH1D("LowEnPulses",    "Charge on Pulse; Charge[ADCs]",             15,     0,    100); 
     NumHits        = new TH1D("NumHits",        "Number of Hits for Event",                  20,     0,    100);
 
     return true;
@@ -74,7 +75,7 @@ namespace larlight {
 	}
       }
 
-      UInt_t wf_time = tpc_data->readout_sample_number_RAW();
+      int wf_time = tpc_data->readout_sample_number_RAW();
       //determine if collection plane
       //(do this better...)
       if ( tpc_data->at(0) < 1500 )
@@ -82,7 +83,7 @@ namespace larlight {
 
 	  bool found_pulse = false;
 
-	  for (Int_t adc_index=0; adc_index<tpc_data->size(); adc_index++)
+	  for (int adc_index=0; adc_index<tpc_data->size(); adc_index++)
 	    {
 	      int adcs = tpc_data->at(adc_index);
 
@@ -103,7 +104,12 @@ namespace larlight {
 		}
 	      else //not a pulse...if was before write new pulse
 		{
-		  if (found_pulse) { ChargePerPulse->Fill(pulse_ADCs); num_hits+=1; pulse_ADCs = 0; }
+		  if (found_pulse) {
+		    ChargePerPulse->Fill(pulse_ADCs);
+		    if ( pulse_ADCs < 100 ) { LowEnPulses->Fill(pulse_ADCs); }
+		    num_hits+=1;
+		    pulse_ADCs = 0;
+		  }
 		  found_pulse = false;
 		}
 
@@ -115,7 +121,8 @@ namespace larlight {
 	}//if collection plane
 
     }//loop over all waveforms in event      
-    
+
+    std::cout << "Num Hits: " << num_hits << std::endl;
     NumHits->Fill(num_hits);
     num_hits = 0;
 
@@ -130,6 +137,7 @@ namespace larlight {
     NumHits->Write();
     TotCharge->Write();
     ChargePerPulse->Write();
+    LowEnPulses->Write();
     ChargePerWire->Write();
     return true;
   }

@@ -54,6 +54,7 @@ namespace larlight {
     TH1D *TotCharge;
     TH1D *ChargePerWire;
     TH1D *ChargePerPulse;
+    TH1D *LowEnPulses;
     TH1D *NumHits;
 
   };

@@ -2,11 +2,15 @@
 #define DAVIDANA_CC
 
 #include "DavidAna.hh"
+#include "math.h"
 
 namespace larlight {
 
   bool DavidAna::initialize() {
 
+
+    noise = new TH1D("noise", "Noise RMS; ADC-baseline; freq." , 10, -5, 5);
+    rms   = new TH1D("rms",   "RMS; ADC-baseline" ,              10,  0,10);
     _baseline      =   0;
     event_num      =   0;
 
@@ -19,7 +23,7 @@ namespace larlight {
     event_num += 1;
     bool interesting = false;
 
-    if (event_num == 1){
+    if (event_num != 100){
 
     const event_fifo *event_wf = (event_fifo*)(storage->get_data(DATA::TPCFIFO));
     
@@ -67,20 +71,24 @@ namespace larlight {
 	//TH1D* newpulse = new TH1D(d,"newpulse",tpc_data->size()-_NSamples/2,0,tpc_data->size()-_NSamples/2);
 	
 	//Get Waveform
-	for (UShort_t adc_index=0; adc_index<tpc_data->size(); adc_index++){
+	for ( int adc_index=0; adc_index<tpc_data->size(); adc_index++){
 	  
 	  int adcs = tpc_data->at(adc_index);
 	  
 	  //determine if something interesting happens
 	  if ( (adcs-_baseline > 4) || (_baseline-adcs > 4) )
 	    interesting = true;
-	  
+	  else {
+	    noise->Fill(adcs-_baseline);
+	    double rmsbin = sqrt((adcs-_baseline)*(adcs-_baseline));
+	    rms->Fill(rmsbin);
+	  }
 	  temphist->SetBinContent(adc_index+1,adcs);
 
 	}
 	
-	if (interesting)
-	  temphist->Write();
+	//if (interesting)
+	// temphist->Write();
 	interesting = false;
 
       }//End IF correct channel #
@@ -96,6 +104,8 @@ namespace larlight {
   
   bool DavidAna::finalize() {
     
+    noise->Write();
+    rms->Write();
     return true;
   }
 }

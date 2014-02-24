@@ -10,7 +10,7 @@ namespace larlight {
 
     _event_num      =   0;
     _compressfctr   =   0;
-    hCompress = new TH1D("Compression", "Compression Factor [1/%]", 30, 0, 0.1);
+    hCompress = new TH1D("Compression", "Compression Factor [1/%]", 30, 0, 1);
     
     //ask for variance cut:
     double varask;
@@ -42,7 +42,7 @@ namespace larlight {
     if(!event_mc) {
       print(MSG::ERROR,__FUNCTION__,"Data storage did not find associated MCTruth");
       return false;
-    }
+      }
 
     //get vector of waveforms
     larlight::event_fifo *event_wf = (event_fifo*)(storage->get_data(DATA::TPCFIFO));
