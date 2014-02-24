@@ -70,12 +70,13 @@ rootlibmap libGeorgia.rootmap libGeorgia.so $ANA_PROC_DIR/Georgia/LinkDef.h \
     libAnalysis.so
 
 ######################################################
-# Play
-rootlibmap libPlay.rootmap libPlay.so $ANA_PROC_DIR/Play/LinkDef.h \
+# TriggerSim
+rootlibmap libTriggerSim.rootmap libTriggerSim.so $ANA_PROC_DIR/TriggerSim/LinkDef.h \
     libAnalysis.so
 
 ######################################################
 # ADD_NEW_ROOTMAP HERE
+
 
 
 
