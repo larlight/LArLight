@@ -27,7 +27,7 @@ int main(){
   }
 
   // Let's fill event_fifo for 100 events.
-  larlight::event_fifo* my_event_fifo = (larlight::event_fifo*)(my_storage.get_data(larlight::DATA::PMTFIFO));
+  larlight::event_pmtfifo* my_event_fifo = (larlight::event_pmtfifo*)(my_storage.get_data(larlight::DATA::PMTFIFO));
   int run_id = 1;
   int subrun_id = 1;
 
@@ -43,10 +43,10 @@ int main(){
     my_event_fifo->reserve(n_channels);
     for( int ch=0; ch<n_channels; ++ch) {
 
-      larlight::fifo wf(my_event_fifo->data_type());
+      larlight::pmtfifo wf();
       
       wf.set_channel_number(ch);
-      wf.set_disc_id(larlight::FEM::COSMIC_DISC);
+      //wf.set_disc_id(larlight::FEM::COSMIC_DISC);
       wf.reserve(20);
       for(size_t wf_index=0; wf_index<20; ++wf_index)
 

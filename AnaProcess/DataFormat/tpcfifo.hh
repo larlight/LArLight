@@ -1,21 +1,22 @@
 /**
- * \file fifo.hh
+ * \file tpcfifo.hh
  *
  * \ingroup DataFormat
  * 
  * \brief Class def header for base FEM data container
  *
- * @author Kazu - Nevis 2013
+ * @author David Caratelli - 02/2014
  */
 
 /** \addtogroup DataFormat
 
     @{*/
 
-#ifndef FIFO_HH
-#define FIFO_HH
+#ifndef TPCFIFO_HH
+#define TPCFIFO_HH
 
 #include "data_base.hh"
+#include "fifo.hh"
 
 namespace larlight {
 
@@ -23,89 +24,54 @@ namespace larlight {
      \class fifo 
      Channel-wise data member class to hold a collection of ADC samples.
   */
-  class fifo : public std::vector<UShort_t>, 
-	       public data_base {
+  class tpcfifo : public fifo {
     
   public:
 
     /// Default constructor
-    fifo(DATA::DATA_TYPE type=DATA::FIFO);
+    tpcfifo();
     
     /// Default copy constructor
-    fifo(const fifo& original)
-      : std::vector<UShort_t>(original),
-	data_base(original),
-	_channel_number(original._channel_number),
-	_module_address(original._module_address),
-	_module_id(original._module_id),
-	_readout_frame_number(original._readout_frame_number),
-	_readout_sample_number(original._readout_sample_number)
-    {}
+    tpcfifo(const tpcfifo& original)
+      : fifo::fifo(original)
+    { _plane = original._plane ; _signal = original._signal; }
 
     /// Fast vector copy constructor
-    fifo(UShort_t ch,
-	 UInt_t   frame,
-	 UInt_t   sample,
-	 UChar_t  module_address,
-	 UChar_t  module_id,
-	 DATA::DATA_TYPE type,
-	 std::vector<UShort_t> wf) : std::vector<UShort_t>(wf),
-				     data_base(type),
-				     _channel_number(ch),
-				     _module_address(module_address),
-				     _module_id(module_id),
-				     _readout_frame_number(frame),
-				     _readout_sample_number(sample)
-    {}
+    tpcfifo(UShort_t ch,
+	    UInt_t   frame,
+	    UInt_t   sample,
+	    UChar_t  module_address,
+	    UChar_t  module_id,
+	    larlight::GEO::View_t plane,
+	    larlight::GEO::SigType_t signaltype,
+	    DATA::DATA_TYPE type,
+	    std::vector<UShort_t> wf) : fifo::fifo(ch,
+					     frame,
+					     sample,
+					     module_address,
+					     module_id,
+					     type,
+					     wf)
+    { _plane = plane;  _signal = signaltype; }
     
 
-    /// Setter for the channel number
-    void set_channel_number (UShort_t ch)     {_channel_number=ch;}
+    /// plane info setter
+    void set_plane ( larlight::GEO::View_t plane ) { _plane=plane;}
 
-    /// Setter for the channel frame ID number
-    void set_readout_frame_number (UInt_t id) {_readout_frame_number=id;}
-    
-    /// Setter for the readout_sample_number number
-    void set_readout_sample_number (UInt_t t) {_readout_sample_number=t;}
+    /// signal type setter
+    void set_signal ( larlight::GEO::SigType_t signal ) { _signal=signal;}
 
-    /// Setter for the module address
-    void set_module_address(UChar_t n) { _module_address = n;}
+    /// plane info getter
+    larlight::GEO::View_t plane() const { return _plane; }
+    
+    /// signal type getter
+    larlight::GEO::SigType_t signal() const {return _signal; }
 
-    /// Setter for the module id
-    void set_module_id(UChar_t n) { _module_id = n;}
-    
-    /// Getter for the channel frame ID number
-    UInt_t readout_frame_number() const {return _readout_frame_number;}
-    
-    /// Getter for a RAW readout sample number
-    UInt_t readout_sample_number_RAW() const { return _readout_sample_number; }
-    
-    /// Getter for the readout_sample_number number
-    inline UInt_t readout_sample_number_2MHz() const  
-    {return (_type==DATA::PMTFIFO ? _readout_sample_number/32 : _readout_sample_number   ); }
-
-    /// Getter for the readout_sample_number number
-    inline UInt_t readout_sample_number_16MHz() const  
-    {return (_type==DATA::PMTFIFO ? _readout_sample_number/4  : _readout_sample_number*8 ); }
-
-    /// Getter for the readout_sample_number number
-    inline UInt_t readout_sample_number_64MHz() const  
-    {return (_type==DATA::PMTFIFO ? _readout_sample_number    : _readout_sample_number*32 ); }
-    
-    /// Getter for the channel number
-    UShort_t channel_number() const {return _channel_number;}
-
-    /// Getter for the module address
-    UChar_t module_address() const { return _module_address; }
-    
-    /// Getter for the module id
-    UChar_t module_id() const {return _module_id;}
-    
     /// Method to clear currently held data contents in the buffer
     virtual void clear_data();
     
     /// Default destructor
-    ~fifo(){}
+    ~tpcfifo(){}
     
     
   protected:
@@ -113,14 +79,11 @@ namespace larlight {
     /// Internal function to reset variables.
     virtual void init_vars();
 
-    UShort_t _channel_number;            ///< Channel number
-    UChar_t  _module_address;            ///< Module number
-    UChar_t  _module_id;                 ///< Module ID
-    UInt_t   _readout_frame_number;      ///< Frame number
-    UInt_t   _readout_sample_number;     ///< Sample number
+    larlight::GEO::View_t      _plane;    ///< Plane Projection
+    larlight::GEO::SigType_t   _signal;   ///< Signal Type
     
     ////////////////////////
-    ClassDef(fifo,5)
+    ClassDef(tpcfifo,5)
     ////////////////////////
   };
   
@@ -129,16 +92,16 @@ namespace larlight {
      \class event_fifo 
      Event-wise data member class to hold a collection of ch-wise data members
   */
-  class event_fifo : public std::vector<larlight::fifo>, public event_base {
+  class event_tpcfifo : public std::vector<larlight::tpcfifo>, public event_base {
     
   public:
     
     /// Default constructor ... provide an option to set the length of ch-wise data
-    event_fifo(DATA::DATA_TYPE type=DATA::FIFO);
+    event_tpcfifo(DATA::DATA_TYPE type=DATA::FIFO);
     
     /// Default copy constructor needed to avoid memory leak in ROOT streamer
-    event_fifo(const event_fifo& original)
-      : std::vector<larlight::fifo>(original),
+    event_tpcfifo(const event_tpcfifo& original)
+      : std::vector<larlight::tpcfifo>(original),
 	event_base(original),
 	_event_number(original._event_number),
 	_event_frame_number(original._event_frame_number),
@@ -151,7 +114,7 @@ namespace larlight {
     {}
     
     /// Default destructor
-    ~event_fifo(){}
+    ~event_tpcfifo(){}
 
     /// Setter for the evnet number
     void set_event_number(UInt_t n) { _event_number = n; }
@@ -230,7 +193,7 @@ namespace larlight {
     UInt_t _nwords;                    ///< # of event words readout
     
     ///////////////////////////
-    ClassDef(event_fifo,6)
+    ClassDef(event_tpcfifo,6)
     //////////////////////////
   };
 }

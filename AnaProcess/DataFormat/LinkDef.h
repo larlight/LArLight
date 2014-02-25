@@ -33,6 +33,14 @@
 #pragma link C++ class std::vector<larlight::fifo>+;
 #pragma link C++ class larlight::event_fifo+;
 
+#pragma link C++ class larlight::pmtfifo+;
+#pragma link C++ class std::vector<larlight::pmtfifo>+;
+#pragma link C++ class larlight::event_pmtfifo+;
+
+#pragma link C++ class larlight::tpcfifo+;
+#pragma link C++ class std::vector<larlight::tpcfifo>+;
+#pragma link C++ class larlight::event_tpcfifo+;
+
 #pragma link C++ class larlight::pulse+;
 #pragma link C++ class std::vector<larlight::pulse>+;
 #pragma link C++ class larlight::event_pulse+;

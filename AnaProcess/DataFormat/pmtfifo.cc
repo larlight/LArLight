@@ -1,30 +1,26 @@
 #ifndef FIFO_CC
 #define FIFO_CC
 
-#include "fifo.hh"
+#include "pmtfifo.hh"
 
 namespace larlight {
 
   //***************************************************************************
-  fifo::fifo(DATA::DATA_TYPE type) : std::vector<UShort_t>(),
-				     data_base(type)
+  pmtfifo::pmtfifo() : fifo::fifo(DATA::PMTFIFO)
   //***************************************************************************
   {
-    
-    std::cout << "made fifo wf!" << std::endl;
-    
-    if(_type!=DATA::FIFO) {
+    if(_type!=DATA::PMTFIFO) {
       
       Message::send(MSG::ERROR,__FUNCTION__,
 		    Form("Provided data type (%s) not supported! Reset to default.",DATA::DATA_TREE_NAME[_type].c_str()));
       _type=DATA::SpacePoint;
     }
-
+    
     clear_data();
   }
 
   //***************************************************************************
-  void fifo::clear_data()
+  void pmtfifo::clear_data()
   //***************************************************************************
   {
 
@@ -34,28 +30,25 @@ namespace larlight {
   }
 
   //***************************************************************************  
-  void fifo::init_vars()
+  void pmtfifo::init_vars() 
   //***************************************************************************
   {
-    _channel_number=FEM::INVALID_CH;
-    _module_address=DATA::INVALID_UCHAR;
-    _module_id=DATA::INVALID_UCHAR;
-    _readout_frame_number=FEM::INVALID_WORD;
-    _readout_sample_number=FEM::INVALID_WORD;
+    fifo::init_vars();
+    _disc_id=FEM::DISC_MAX;
   }
 
   ////////////////////////////////////////////////////////
 
   //***************************************************************************
-  event_fifo::event_fifo(DATA::DATA_TYPE type) : std::vector<larlight::fifo>(), 
-						 event_base(type)
+  event_pmtfifo::event_pmtfifo(DATA::DATA_TYPE type) : std::vector<larlight::pmtfifo>(), 
+				   event_base(type)
   //***************************************************************************
   { 
     clear_data();
   }
 
   //***************************************************************************  
-  void event_fifo::clear_data(){
+  void event_pmtfifo::clear_data(){
   //***************************************************************************
     event_base::clear_data();
     clear();
@@ -63,7 +56,7 @@ namespace larlight {
   }
 
   //***************************************************************************
-  void event_fifo::init_vars(){
+  void event_pmtfifo::init_vars(){
   //***************************************************************************
     _event_frame_number=FEM::INVALID_WORD;
     _module_address=DATA::INVALID_UCHAR;

@@ -1,111 +1,71 @@
 /**
- * \file fifo.hh
+ * \file pmtfifo.hh
  *
  * \ingroup DataFormat
  * 
  * \brief Class def header for base FEM data container
  *
- * @author Kazu - Nevis 2013
+ * @author David Caratelli - 02/2014
  */
 
 /** \addtogroup DataFormat
 
     @{*/
 
-#ifndef FIFO_HH
-#define FIFO_HH
+#ifndef PMTFIFO_HH
+#define PMTFIFO_HH
 
 #include "data_base.hh"
+#include "fifo.hh"
 
 namespace larlight {
 
   /**
-     \class fifo 
+     \class pmtfifo 
      Channel-wise data member class to hold a collection of ADC samples.
   */
-  class fifo : public std::vector<UShort_t>, 
-	       public data_base {
+  class pmtfifo : public fifo {
     
   public:
 
     /// Default constructor
-    fifo(DATA::DATA_TYPE type=DATA::FIFO);
+    pmtfifo();
     
     /// Default copy constructor
-    fifo(const fifo& original)
-      : std::vector<UShort_t>(original),
-	data_base(original),
-	_channel_number(original._channel_number),
-	_module_address(original._module_address),
-	_module_id(original._module_id),
-	_readout_frame_number(original._readout_frame_number),
-	_readout_sample_number(original._readout_sample_number)
-    {}
+    pmtfifo(const pmtfifo& original)
+      : fifo::fifo(original)
+
+    { _disc_id = original._disc_id; }
 
     /// Fast vector copy constructor
-    fifo(UShort_t ch,
+    pmtfifo(UShort_t ch,
 	 UInt_t   frame,
 	 UInt_t   sample,
 	 UChar_t  module_address,
 	 UChar_t  module_id,
+	 FEM::DISCRIMINATOR disc,
 	 DATA::DATA_TYPE type,
-	 std::vector<UShort_t> wf) : std::vector<UShort_t>(wf),
-				     data_base(type),
-				     _channel_number(ch),
-				     _module_address(module_address),
-				     _module_id(module_id),
-				     _readout_frame_number(frame),
-				     _readout_sample_number(sample)
-    {}
-    
+	    std::vector<UShort_t> wf) : fifo::fifo(ch,
+					     frame,
+					     sample,
+					     module_address,
+					     module_id,
+					     type,
+					     wf)
 
-    /// Setter for the channel number
-    void set_channel_number (UShort_t ch)     {_channel_number=ch;}
+    { _disc_id = disc; }
+    
+    /// Setter for the channel discriminator ID number
+    void set_disc_id (FEM::DISCRIMINATOR id)  {_disc_id=id;}
+    
+    /// Getter for the discriminator ID number
+    FEM::DISCRIMINATOR disc_id() const  {return _disc_id;}
 
-    /// Setter for the channel frame ID number
-    void set_readout_frame_number (UInt_t id) {_readout_frame_number=id;}
-    
-    /// Setter for the readout_sample_number number
-    void set_readout_sample_number (UInt_t t) {_readout_sample_number=t;}
-
-    /// Setter for the module address
-    void set_module_address(UChar_t n) { _module_address = n;}
-
-    /// Setter for the module id
-    void set_module_id(UChar_t n) { _module_id = n;}
-    
-    /// Getter for the channel frame ID number
-    UInt_t readout_frame_number() const {return _readout_frame_number;}
-    
-    /// Getter for a RAW readout sample number
-    UInt_t readout_sample_number_RAW() const { return _readout_sample_number; }
-    
-    /// Getter for the readout_sample_number number
-    inline UInt_t readout_sample_number_2MHz() const  
-    {return (_type==DATA::PMTFIFO ? _readout_sample_number/32 : _readout_sample_number   ); }
-
-    /// Getter for the readout_sample_number number
-    inline UInt_t readout_sample_number_16MHz() const  
-    {return (_type==DATA::PMTFIFO ? _readout_sample_number/4  : _readout_sample_number*8 ); }
-
-    /// Getter for the readout_sample_number number
-    inline UInt_t readout_sample_number_64MHz() const  
-    {return (_type==DATA::PMTFIFO ? _readout_sample_number    : _readout_sample_number*32 ); }
-    
-    /// Getter for the channel number
-    UShort_t channel_number() const {return _channel_number;}
-
-    /// Getter for the module address
-    UChar_t module_address() const { return _module_address; }
-    
-    /// Getter for the module id
-    UChar_t module_id() const {return _module_id;}
-    
     /// Method to clear currently held data contents in the buffer
     virtual void clear_data();
     
     /// Default destructor
-    ~fifo(){}
+    ~pmtfifo(){}
     
     
   protected:
@@ -113,14 +73,10 @@ namespace larlight {
     /// Internal function to reset variables.
     virtual void init_vars();
 
-    UShort_t _channel_number;            ///< Channel number
-    UChar_t  _module_address;            ///< Module number
-    UChar_t  _module_id;                 ///< Module ID
-    UInt_t   _readout_frame_number;      ///< Frame number
-    UInt_t   _readout_sample_number;     ///< Sample number
+    FEM::DISCRIMINATOR _disc_id; ///< Discriminator ID 
     
     ////////////////////////
-    ClassDef(fifo,5)
+    ClassDef(pmtfifo,5)
     ////////////////////////
   };
   
@@ -129,16 +85,16 @@ namespace larlight {
      \class event_fifo 
      Event-wise data member class to hold a collection of ch-wise data members
   */
-  class event_fifo : public std::vector<larlight::fifo>, public event_base {
+  class event_pmtfifo : public std::vector<larlight::pmtfifo>, public event_base {
     
   public:
     
     /// Default constructor ... provide an option to set the length of ch-wise data
-    event_fifo(DATA::DATA_TYPE type=DATA::FIFO);
+    event_pmtfifo(DATA::DATA_TYPE type=DATA::PMTFIFO);
     
     /// Default copy constructor needed to avoid memory leak in ROOT streamer
-    event_fifo(const event_fifo& original)
-      : std::vector<larlight::fifo>(original),
+    event_pmtfifo(const event_pmtfifo& original)
+      : std::vector<larlight::pmtfifo>(original),
 	event_base(original),
 	_event_number(original._event_number),
 	_event_frame_number(original._event_frame_number),
@@ -151,7 +107,7 @@ namespace larlight {
     {}
     
     /// Default destructor
-    ~event_fifo(){}
+    ~event_pmtfifo(){}
 
     /// Setter for the evnet number
     void set_event_number(UInt_t n) { _event_number = n; }
@@ -230,7 +186,7 @@ namespace larlight {
     UInt_t _nwords;                    ///< # of event words readout
     
     ///////////////////////////
-    ClassDef(event_fifo,6)
+    ClassDef(event_pmtfifo,6)
     //////////////////////////
   };
 }

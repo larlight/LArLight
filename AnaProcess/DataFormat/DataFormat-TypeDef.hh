@@ -13,6 +13,8 @@
 #include "mctruth.hh"
 #include "wire.hh"
 #include "fifo.hh"
+#include "pmtfifo.hh"
+#include "tpcfifo.hh"
 #include "pulse.hh"
 #include "trigger.hh"
 #include "hit.hh"
@@ -53,6 +55,12 @@ namespace larlight{
 
   class fifo;
   class event_fifo;
+
+  class tpcfifo;
+  class event_tpcfifo;
+
+  class pmtfifo;
+  class event_pmtfifo;
 
   class pulse;  
   class event_pulse;
