@@ -48,7 +48,7 @@ namespace larlight {
     //Total number of hits
     int num_hits    = 0;
     
-    const event_fifo *event_wf = (event_fifo*)(storage->get_data(DATA::TPCFIFO));
+    const event_tpcfifo *event_wf = (event_tpcfifo*)(storage->get_data(DATA::TPCFIFO));
     
     //waveform counter
     int wfnum = 0;
@@ -61,7 +61,7 @@ namespace larlight {
       wfnum += 1;
       
       //Check for empty waveforms!
-      const fifo* tpc_data = (&(event_wf->at(i)));
+      const tpcfifo* tpc_data = (&(event_wf->at(i)));
       if(tpc_data->size()<1){
 	Message::send(MSG::ERROR,__FUNCTION__,
 		      Form("Found 0-length waveform: Event %d ... Ch. %d",event_wf->event_number(),tpc_data->channel_number()));

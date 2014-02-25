@@ -47,7 +47,7 @@ namespace larlight {
     //}
 
     //read waveforms from event
-    larlight::event_fifo *event_wf = (event_fifo*)(storage->get_data(DATA::TPCFIFO));
+    larlight::event_tpcfifo *event_wf = (event_tpcfifo*)(storage->get_data(DATA::TPCFIFO));
     //make sure not empty...if so report
     if(!event_wf) {
       print(MSG::ERROR,__FUNCTION__,"Data storage did not find associated waveforms!");
@@ -61,7 +61,7 @@ namespace larlight {
       Double_t pulse_ADCs = 0;
       Double_t peak_time  = 0;
       //get tpc_data
-      larlight::fifo* tpc_data = (&(event_wf->at(i)));      
+      larlight::tpcfifo* tpc_data = (&(event_wf->at(i)));      
 
       //Check for empty waveforms!
       if(tpc_data->size()<1){

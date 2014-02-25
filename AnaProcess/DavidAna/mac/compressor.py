@@ -13,7 +13,7 @@ gSystem.Load("libDavidAna")
 from ROOT import larlight as fmwk
 
 infilename = sys.argv[1]
-outfilename = "WF_output.root"
+outfilename = "/uboone/data/users/davidc1/WF_output.root"
 
 # Create ana_processor instance
 my_proc=fmwk.ana_processor()

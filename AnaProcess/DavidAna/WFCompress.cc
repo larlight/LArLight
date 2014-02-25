@@ -45,7 +45,7 @@ namespace larlight {
       }
 
     //get vector of waveforms
-    larlight::event_fifo *event_wf = (event_fifo*)(storage->get_data(DATA::TPCFIFO));
+    larlight::event_tpcfifo *event_wf = (event_tpcfifo*)(storage->get_data(DATA::TPCFIFO));
     //create new vector of waveforms to write
     new_event_wf.clear();
 
@@ -60,7 +60,7 @@ namespace larlight {
     for (size_t i=0; i<event_wf->size(); i++){
 
       //get tpc_data
-      larlight::fifo* tpc_data = (&(event_wf->at(i)));      
+      larlight::tpcfifo* tpc_data = (&(event_wf->at(i)));      
       wfnum += 1;
       //Check for empty waveforms!
       if(tpc_data->size()<1){
@@ -93,7 +93,7 @@ namespace larlight {
   }
 
   //****************************************************************************************
-  void WFCompress::Compress( larlight::fifo* tpc_data, larlight::event_fifo* new_event_wf) {
+  void WFCompress::Compress( larlight::tpcfifo* tpc_data, larlight::event_tpcfifo* new_event_wf) {
   //****************************************************************************************
       
       //***************************
@@ -207,7 +207,7 @@ namespace larlight {
       
   }
       
-  void WFCompress::make_new_wf(larlight::fifo* wf, int start, int stop, larlight::event_fifo* new_event_wf) {
+  void WFCompress::make_new_wf(larlight::tpcfifo* wf, int start, int stop, larlight::event_tpcfifo* new_event_wf) {
     
     //create vector where to store ADCs
     std::vector<UShort_t> new_wf_bins;
@@ -227,9 +227,10 @@ namespace larlight {
     //std::cout << "Into WF of size:        " << new_wf_bins.size() << std::endl;
     
     //create new waveform
-    larlight::fifo new_wf( wf->channel_number(), wf->readout_frame_number(),
+    larlight::tpcfifo new_wf( wf->channel_number(), wf->readout_frame_number(),
 			  wf->readout_sample_number_RAW(), wf->module_address(),
-			   wf->module_id(), wf->disc_id(), DATA::TPCFIFO, new_wf_bins);
+			      wf->module_id(), larlight::GEO::kUnknown,
+			      larlight::GEO::kMysteryType, DATA::TPCFIFO, new_wf_bins);
 
     //std::cout << "NEW WF: " << (&new_wf)->channel_number() << std::endl;
     //write new waveform
@@ -237,7 +238,7 @@ namespace larlight {
 
   }
 
-  void WFCompress::make_new_wf_simple(larlight::fifo* wf, int start, larlight::event_fifo* new_event_wf) {
+  void WFCompress::make_new_wf_simple(larlight::tpcfifo* wf, int start, larlight::event_tpcfifo* new_event_wf) {
 
     UInt_t wf_time = wf->readout_sample_number_2MHz();
     wf_time = start-_NSamplesante;
@@ -260,9 +261,10 @@ namespace larlight {
     //std::cout << "Into WF of size:        " << new_wf_bins.size() << std::endl;
     
     //create new waveform
-    larlight::fifo new_wf( wf->channel_number(), wf->readout_frame_number(),
+    larlight::tpcfifo new_wf( wf->channel_number(), wf->readout_frame_number(),
 			  wf_time, wf->module_address(),
-			   wf->module_id(), wf->disc_id(), DATA::TPCFIFO, new_wf_bins);
+			      wf->module_id(), larlight::GEO::kUnknown,
+			      larlight::GEO::kMysteryType, DATA::TPCFIFO, new_wf_bins);
 
     //std::cout << "NEW WF: " << (&new_wf)->channel_number() << std::endl;
     //write new waveform

@@ -56,18 +56,18 @@ namespace larlight {
     */
     virtual bool finalize();
 
-    void Compress(larlight::fifo* tpc_data, larlight::event_fifo* new_event_wf);
+    void Compress(larlight::tpcfifo* tpc_data, larlight::event_tpcfifo* new_event_wf);
 
-    void make_new_wf(larlight::fifo* wf, int start, int stop, larlight::event_fifo* new_event_wf);
+    void make_new_wf(larlight::tpcfifo* wf, int start, int stop, larlight::event_tpcfifo* new_event_wf);
 
-    void make_new_wf_simple(larlight::fifo* wf, int start, larlight::event_fifo* new_event_wf);
+    void make_new_wf_simple(larlight::tpcfifo* wf, int start, larlight::event_tpcfifo* new_event_wf);
 
     protected:
 
     TH1D* hCompress;
     int _wfnumber;
     //larlight::mctruth event_mc;
-    larlight::event_fifo new_event_wf;
+    larlight::event_tpcfifo new_event_wf;
     int    _NVarSamples;
     int    _NSamplesante;
     int    _NSamplespost;
