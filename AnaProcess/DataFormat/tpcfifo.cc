@@ -10,15 +10,14 @@ namespace larlight {
   //***************************************************************************
   {
 
-    std::cout << "HELLO" << std::endl;
     if(_type!=DATA::TPCFIFO) {
       
       Message::send(MSG::ERROR,__FUNCTION__,
 		    Form("Provided data type (%s) not supported! Reset to default.",DATA::DATA_TREE_NAME[_type].c_str()));
-      _type=DATA::SpacePoint;
+      _type=DATA::TPCFIFO;
     }
 
-    std::cout << "CREATED TPCFIFO" << std::endl;
+    clear_data();
   }
 
   //***************************************************************************
@@ -38,7 +37,6 @@ namespace larlight {
     fifo::init_vars();
     _plane=larlight::GEO::kUnknown;
     _signal=larlight::GEO::kMysteryType;
-    
   }
 
   ////////////////////////////////////////////////////////

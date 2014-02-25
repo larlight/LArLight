@@ -39,19 +39,19 @@ namespace larlight {
 
     /// Fast vector copy constructor
     pmtfifo(UShort_t ch,
-	 UInt_t   frame,
-	 UInt_t   sample,
-	 UChar_t  module_address,
-	 UChar_t  module_id,
-	 FEM::DISCRIMINATOR disc,
-	 DATA::DATA_TYPE type,
+	    UInt_t   frame,
+	    UInt_t   sample,
+	    UChar_t  module_address,
+	    UChar_t  module_id,
+	    FEM::DISCRIMINATOR disc,
+	    DATA::DATA_TYPE type,
 	    std::vector<UShort_t> wf) : fifo::fifo(ch,
-					     frame,
-					     sample,
-					     module_address,
-					     module_id,
-					     type,
-					     wf)
+						   frame,
+						   sample,
+						   module_address,
+						   module_id,
+						   type,
+						   wf)
 
     { _disc_id = disc; }
     

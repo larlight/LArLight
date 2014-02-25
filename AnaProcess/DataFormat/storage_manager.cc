@@ -340,9 +340,13 @@ namespace larlight {
       _ptr_data_array[type]=(event_base*)(new event_user(type));
       break;
     case DATA::FIFO:
-    case DATA::PMTFIFO:
-    case DATA::TPCFIFO:
       _ptr_data_array[type]=(event_base*)(new event_fifo(type));
+      break;
+    case DATA::PMTFIFO:
+      _ptr_data_array[type]=(event_base*)(new event_pmtfifo(type));
+      break;
+    case DATA::TPCFIFO:
+      _ptr_data_array[type]=(event_base*)(new event_tpcfifo(type));
       break;
     case DATA::Pulse:
     case DATA::PMTPulse_ThresWin:

@@ -11,13 +11,13 @@ namespace larlight {
   //***************************************************************************
   {
     
-    std::cout << "made fifo wf!" << std::endl;
-    
-    if(_type!=DATA::FIFO) {
+    if(_type!=DATA::FIFO &&
+       _type!=DATA::PMTFIFO &&
+       _type!=DATA::TPCFIFO) {
       
       Message::send(MSG::ERROR,__FUNCTION__,
 		    Form("Provided data type (%s) not supported! Reset to default.",DATA::DATA_TREE_NAME[_type].c_str()));
-      _type=DATA::SpacePoint;
+      _type=DATA::FIFO;
     }
 
     clear_data();
@@ -51,6 +51,14 @@ namespace larlight {
 						 event_base(type)
   //***************************************************************************
   { 
+    if(_type!=DATA::FIFO &&
+       _type!=DATA::PMTFIFO &&
+       _type!=DATA::TPCFIFO) {
+      
+      Message::send(MSG::ERROR,__FUNCTION__,
+		    Form("Provided data type (%s) not supported! Reset to default.",DATA::DATA_TREE_NAME[_type].c_str()));
+      _type=DATA::FIFO;
+    }    
     clear_data();
   }
 

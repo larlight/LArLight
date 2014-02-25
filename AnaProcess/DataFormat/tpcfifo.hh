@@ -46,18 +46,18 @@ namespace larlight {
 	    larlight::GEO::SigType_t signaltype,
 	    DATA::DATA_TYPE type,
 	    std::vector<UShort_t> wf) : fifo::fifo(ch,
-					     frame,
-					     sample,
-					     module_address,
-					     module_id,
-					     type,
-					     wf)
+						   frame,
+						   sample,
+						   module_address,
+						   module_id,
+						   type,
+						   wf)
     { _plane = plane;  _signal = signaltype; }
     
-
+    
     /// plane info setter
     void set_plane ( larlight::GEO::View_t plane ) { _plane=plane;}
-
+    
     /// signal type setter
     void set_signal ( larlight::GEO::SigType_t signal ) { _signal=signal;}
 

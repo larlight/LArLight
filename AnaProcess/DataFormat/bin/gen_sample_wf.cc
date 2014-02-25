@@ -43,7 +43,7 @@ int main(){
     my_event_fifo->reserve(n_channels);
     for( int ch=0; ch<n_channels; ++ch) {
 
-      larlight::pmtfifo wf();
+      larlight::pmtfifo wf;
       
       wf.set_channel_number(ch);
       //wf.set_disc_id(larlight::FEM::COSMIC_DISC);

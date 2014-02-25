@@ -13,7 +13,7 @@ namespace larlight {
       
       Message::send(MSG::ERROR,__FUNCTION__,
 		    Form("Provided data type (%s) not supported! Reset to default.",DATA::DATA_TREE_NAME[_type].c_str()));
-      _type=DATA::SpacePoint;
+      _type=DATA::PMTFIFO;
     }
     
     clear_data();
