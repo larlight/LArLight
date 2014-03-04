@@ -1,0 +1,91 @@
+# Jungo Confidential. Copyright (c) 2011 Jungo Ltd.  http://www.jungo.com
+
+# TODO: Set WD_BASEDIR to the location of your WinDriver installation directory.
+#       For example: WD_BASEDIR=/home/john/WinDriver
+
+# Make sure that WD_BASEDIR points to the right place
+ifeq ($(WD_BASEDIR),)
+        WD_BASEDIR=$(WINDRIVER_DIR)
+endif
+
+WD_BASEDIR:=$(wildcard $(WD_BASEDIR))
+
+ifeq ($(wildcard $(WD_BASEDIR)/include/windrvr.h),)
+        $(error Please edit the makefile and set the WD_BASEDIR variable \
+        to point to the location of your WinDriver installation directory)
+endif
+
+# Comment/uncomment to enable/disable debugging code
+DEBUG = 1
+
+ifeq ($(DEBUG),1)
+	DEBFLAGS = -g -O -DDEBUG 
+else
+	DEBFLAGS = -O2
+endif
+
+ifndef TARGET_CPU
+	TARGET_CPU=$(shell uname -m | sed 's/i.86/i386/' | sed 's/ppc/PPC/' | sed 's/ia64/IA64/')
+endif
+ifeq ("$(TARGET_CPU)", "PPC")
+	CFLAGS += -DPOWERPC
+endif
+ifeq ("$(TARGET_CPU)", "IA64")
+	CFLAGS += -DKERNEL_64BIT
+endif
+ifeq ("$(TARGET_CPU)", "PPC64")
+	CFLAGS += -DKERNEL_64BIT
+	ifndef USER_BITS
+		USER_BITS = 64
+	endif
+	CFLAGS += -m$(USER_BITS)
+	LFLAGS += -m$(USER_BITS)
+endif
+ifeq ("$(TARGET_CPU)", "x86_64")
+	CFLAGS += -DKERNEL_64BIT
+	ifndef USER_BITS
+		USER_BITS = 64
+	endif
+	CFLAGS += -m$(USER_BITS)
+	LFLAGS += -m$(USER_BITS)
+endif
+
+CFLAGS += -DLINUX $(DEBFLAGS) -Wall -I$(WD_BASEDIR)/include -I$(WD_BASEDIR)
+CFLAGS += -DWD_DRIVER_NAME_CHANGE
+LFLAGS += -L$(WINDRIVER_LIB) -lwdapi1100
+# need also thread support for interrupt handling
+LFLAGS += -lpthread
+
+TARGET = mbtest
+SRCS = ../$(TARGET).c ../pcie_lib.c
+#SRCS +=$(WD_BASEDIR)/source/wizard/nevispcie/pcie_lib.c
+SRCS +=$(WD_BASEDIR)/source/samples/shared/diag_lib.c $(WD_BASEDIR)/source/samples/shared/wdc_diag_lib.c
+
+LD = gcc
+
+OD = ./
+OBJS = $(addsuffix .o, $(addprefix $(OD)/, $(basename $(notdir $(SRCS)))))
+
+
+all : $(TARGET)
+
+$(TARGET) : $(OBJS)
+	$(LD) $(LFLAGS) -o $@ $(OBJS) $(ADDITIONAL_LIBS) 
+
+$(TARGET).o : ../$(TARGET).c
+	$(CC) -c $(CFLAGS) -o $@ $< 
+
+#pcie_lib.o : $(WD_BASEDIR)/source/wizard/nevispcie/nevispcie_lib.c
+pcie_lib.o : ../pcie_lib.c
+	$(CC) -c $(CFLAGS) -o $@ $< 
+
+diag_lib.o : $(WD_BASEDIR)/source/samples/shared/diag_lib.c
+	$(CC) -c $(CFLAGS) -o $@ $< 
+
+wdc_diag_lib.o : $(WD_BASEDIR)/source/samples/shared/wdc_diag_lib.c
+	$(CC) -c $(CFLAGS) -o $@ $< 
+
+
+clean :
+	rm -f *~ core $(OBJS) $(TARGET) $(ARCH)
+
