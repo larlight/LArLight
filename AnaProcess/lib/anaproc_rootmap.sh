@@ -75,7 +75,13 @@ rootlibmap libTriggerSim.rootmap libTriggerSim.so $ANA_PROC_DIR/TriggerSim/LinkD
     libAnalysis.so
 
 ######################################################
+# UBOnlineDBI
+rootlibmap libUBOnlineDBI.rootmap libUBOnlineDBI.so $ANA_PROC_DIR/UBOnlineDBI/LinkDef.h \
+    libpq
+
+######################################################
 # ADD_NEW_ROOTMAP HERE
+
 
 
 
