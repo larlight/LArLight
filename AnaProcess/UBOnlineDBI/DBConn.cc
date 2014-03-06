@@ -1,13 +1,13 @@
-#ifndef DBIHANDLER_CC
-#define DBIHANDLER_CC
+#ifndef DBCONN_CC
+#define DBCONN_CC
 
-#include "DBIHandler.hh"
+#include "DBConn.hh"
 
 namespace ubpsql{
 
-  std::vector<DBIHandler*> DBIHandler::_me_v(kDBI_USER_MAX,NULL);
+  std::vector<DBConn*> DBConn::_me_v(kDBI_USER_MAX,NULL);
 
-  DBIHandler::DBIHandler(DBI_USER_t user_type)
+  DBConn::DBConn(DBI_USER_t user_type)
   { 
     if(user_type == kDBI_USER_MAX) throw InvalidUser();
 
@@ -16,11 +16,12 @@ namespace ubpsql{
     _retrial_period  = 5;
     _retrial_number  = 5;
     _query_timeout   = 20;
-    _conn_config = DBI_CONFIG[_user_type];
     _user_shell = getenv("USER");
+
+    Configure( DBI_CONFIG[_user_type] );
   }
 
-  bool DBIHandler::Connect()
+  bool DBConn::Connect()
   {
     if(_conn) {
 
@@ -90,7 +91,7 @@ namespace ubpsql{
     return IsConnected();
   }
 
-  bool DBIHandler::IsConnected(bool verbose)
+  bool DBConn::IsConnected(bool verbose)
   {
     if(!_conn) return false;
 
@@ -120,7 +121,7 @@ namespace ubpsql{
     return connected;
   }
 
-  bool DBIHandler::Close()
+  bool DBConn::Close()
   {
     if(_conn) {
       PQfinish(_conn);
@@ -131,7 +132,7 @@ namespace ubpsql{
     return true;
   }
 
-  PGresult* DBIHandler::Execute(const std::string &cmd)
+  PGresult* DBConn::Execute(const std::string &cmd)
   {
     if(!IsConnected() && !Connect()) return 0;
     

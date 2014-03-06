@@ -14,7 +14,7 @@
 #ifndef RCREADER_HH
 #define RCREADER_HH
 
-#include "DBIHandler.hh"
+#include "DBAppBase.hh"
 
 namespace ubpsql {
   /**
@@ -22,25 +22,16 @@ namespace ubpsql {
      RunControl DB interface class for reading from the database.
      To write something into the database, one should use RCWriter.
   */
-  class RCReader{
+  class RCReader : public DBAppBase {
     
   public:
     
     /// Default constructor
-    RCReader(){ _user_type = kUBDAQ_READER; _conn=0; };
+    RCReader() : DBAppBase() { _user_type = kUBDAQ_READER; };
     
     /// Default destructor
     virtual ~RCReader(){};
 
-    /// Method to make a connection to the database
-    bool Connect();
-
-  protected:
-
-    DBI_USER_t _user_type;
-
-    DBIHandler* _conn;
-    
   };
 }
 

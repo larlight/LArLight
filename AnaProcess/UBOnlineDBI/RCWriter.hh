@@ -31,7 +31,18 @@ namespace ubpsql {
     
     /// Default destructor
     virtual ~RCWriter(){};
+
+    /**
+       Create New Configuration Type, i.e. PMTFEM, TPCFEM, Laser... to be used sparingly.
+       Needs list of defined hstore keys that will later be checked via triggers when inserting new configs
+       takes list of strings that it then converts to hstore values. Needs to know the total number of channels 
+     */
+    bool CreateConfigType(const std::string config_type,
+			  const unsigned int nchannels,
+			  const std::vector<std::string> stringkeylist);
     
+    
+
   };
 }
 

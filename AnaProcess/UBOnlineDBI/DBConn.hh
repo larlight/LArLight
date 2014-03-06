@@ -1,9 +1,9 @@
 /**
- * \file DBIHandler.hh
+ * \file DBConn.hh
  *
  * \ingroup UBOnlineDBI
  * 
- * \brief Class def header for a class DBIHandler
+ * \brief Class def header for a class DBConn
  *
  * @author kazuhiro
  */
@@ -11,8 +11,8 @@
 /** \addtogroup UBOnlineDBI
 
     @{*/
-#ifndef DBIHANDLER_HH
-#define DBIHANDLER_HH
+#ifndef DBCONN_HH
+#define DBCONN_HH
 
 #include <vector>
 #include <libpq-fe.h>
@@ -24,38 +24,39 @@
 namespace ubpsql {
 
   /**
-     \class DBIHandler
+     \class DBConn
      Utility class for handling database connection
   */
-  class DBIHandler : public DBBase{
+  class DBConn : public DBBase{
 
   private:
 
     /// Default constructor is private (pseudo-singleton)
-    DBIHandler(DBI_USER_t user_type=kDBI_USER_MAX);
+    DBConn(DBI_USER_t user_type=kDBI_USER_MAX);
 
     /// Instance pointers holder
-    static std::vector<DBIHandler*> _me_v;
+    static std::vector<DBConn*> _me_v;
     
   public:
 
     /// Instance pointer getter ... one can get an instance per user type
-    static const DBIHandler* GetME(DBI_USER_t user_type) {
+    static const DBConn* GetME(DBI_USER_t user_type) {
 
-      if(!_me_v.at(user_type)) _me_v[user_type] = new DBIHandler(user_type);
+      if(!_me_v.at(user_type)) _me_v[user_type] = new DBConn(user_type);
       return _me_v.at(user_type);
 
     }
     
     /// Default destructor
-    virtual ~DBIHandler(){};
+    virtual ~DBConn(){};
 
     /**
        Setter for configuration string (configure host, database, user, and password in 1 string).
        Note you do not have to configure if the default connection info suffices except for
        kCUSTOM_USER which has no default connection info.
     */
-    void Configure(const std::string config_string);
+    void Configure(const std::string config_string)
+    { _conn_config = config_string; }
 
     /// Connection (re)open
     bool Connect();
