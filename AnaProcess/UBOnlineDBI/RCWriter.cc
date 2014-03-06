@@ -9,11 +9,7 @@ namespace ubpsql {
 				  const unsigned int nchannels,
 				  const std::vector<std::string> stringkeylist)
   {
-    if(!Connect()) {
-      Print(MSG::kERROR,__FUNCTION__,
-	    "Failed to connect to the database...");
-      return false;
-    }
+    if(!Connect()) return false;
 
     // Form a command string
     std::string cmd(Form("SELECT CreateConfigurationType('%s',",config_type.c_str()));
@@ -28,6 +24,27 @@ namespace ubpsql {
     
     PGresult* res = _conn->Execute(cmd);
     if(!res) return false;
+    PQclear(res);
+    return true;
+  }
+
+
+  bool RCWriter::InsertNewRun(unsigned int config_id)
+  {
+    if(!Connect()) return false;
+    PGresult* res = _conn->Execute(Form("SELECT InsertNewRun(%d);",config_id));
+    if(!res) return false;
+
+    PQclear(res);
+    return true;
+  }
+
+  bool RCWriter::InsertNewSubRun(unsigned int config_id, unsigned int run)
+  {
+    if(!Connect()) return false;
+    PGresult* res = _conn->Execute(Form("SELECT InsertNewSubRun(%d,%d);",config_id,run));
+    if(!res) return false;
+    
     PQclear(res);
     return true;
   }

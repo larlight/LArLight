@@ -32,6 +32,12 @@ namespace ubpsql {
     /// Default destructor
     virtual ~RCReader(){};
 
+    /// Getter for last run number
+    unsigned int GetLastRun();
+
+    /// Getter for last sub-run number
+    unsigned int GetLastSubRun(unsigned int run);
+
   };
 }
 
