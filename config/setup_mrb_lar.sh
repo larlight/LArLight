@@ -31,7 +31,7 @@ export EDITOR=emacs
 # (*) Define MRB_PROJECT value
 #     > export MRB_PROJECT=larsoft
 #
-source /grid/fermiapp/uboone/software/setup_uboone.sh
+source /grid/fermiapp/products/uboone/setup_uboone.sh
 
 # List available versions of UBooNE software
 #ups list -aK+ uboonecode
