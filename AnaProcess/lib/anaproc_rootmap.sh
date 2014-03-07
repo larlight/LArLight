@@ -80,7 +80,13 @@ rootlibmap libUBOnlineDBI.rootmap libUBOnlineDBI.so $ANA_PROC_DIR/UBOnlineDBI/Li
     libpq
 
 ######################################################
+# CoreyAna
+rootlibmap libCoreyAna.rootmap libCoreyAna.so $ANA_PROC_DIR/CoreyAna/LinkDef.h \
+    libAnalysis.so
+
+######################################################
 # ADD_NEW_ROOTMAP HERE
+
 
 
 
