@@ -15,9 +15,13 @@
 #pragma link C++ class larlight::WFCompress+;
 #pragma link C++ class larlight::ChargeAna+;
 #pragma link C++ class larlight::HitMaker+;
+#pragma link C++ class larlight::BaselineAna+;
+#pragma link C++ class larlight::NoiseAna+;
 //ADD_NEW_CLASS ... do not change this line
 
 #endif
+
+
 
 
 
