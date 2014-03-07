@@ -76,7 +76,7 @@ namespace larlight {
 	  int adcs = tpc_data->at(adc_index);
 	  
 	  //determine if something interesting happens
-	  if ( (adcs-_baseline > 4) || (_baseline-adcs > 4) )
+	  if ( (adcs-_baseline > 20) || (_baseline-adcs > 20) )
 	    interesting = true;
 	  else {
 	    noise->Fill(adcs-_baseline);
@@ -87,7 +87,7 @@ namespace larlight {
 
 	}
 	
-	if (interesting)
+	if (wfnum<100)
 	  temphist->Write();
 	interesting = false;
 

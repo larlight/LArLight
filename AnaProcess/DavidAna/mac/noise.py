@@ -35,13 +35,13 @@ my_proc.set_input_rootdir("scanner")
 
 # Set output root file: this is a separate root file in which your
 # analysis module can store anything such as histograms, your own TTree, etc.
-my_proc.set_ana_output_file("tpcout.root")
+my_proc.set_ana_output_file("noisestudy.root")
 
 # Create analysis class instance. For this example, ana_base.
 # To show how one can run multiple analysis modules at once,
 # we make multiple ana_base instance.
 
-my_ana_1=fmwk.DavidAna()
+my_ana_1=fmwk.NoiseAna()
 #my_ana_2=ana_base()
 #my_ana_3=ana_base()
 
