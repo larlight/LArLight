@@ -17,6 +17,11 @@
 #pragma link C++ namespace larlight::MC;
 #pragma link C++ namespace larlight::FORMAT;
 
+#pragma link C++ enum larlight::GEO::SigType_t;
+#pragma link C++ enum larlight::GEO::View_t;
+
+#pragma link C++ enum larlight::DATA::DATA_TYPE;
+
 #pragma link C++ class larlight::Message+;
 #pragma link C++ class larlight::larlight_base+;
 

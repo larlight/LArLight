@@ -28,6 +28,11 @@ rootlibmap libDataFormat.rootmap libDataFormat.so $ANA_PROC_DIR/DataFormat/LinkD
     libBase.so libPhysics.so 
 
 ######################################################
+# LArUtil
+rootlibmap libLArUtil.rootmap libLArUtil.so $ANA_PROC_DIR/LArUtil/LinkDef.h \
+    libBase
+
+######################################################
 # Analysis
 rootlibmap libAnalysis.rootmap libAnalysis.so $ANA_PROC_DIR/Analysis/LinkDef.h \
     libDataFormat.so libHist.so  libTree.so 
