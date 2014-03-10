@@ -41,7 +41,7 @@ namespace larutil {
     if(!(_data_tree->GetBranch("fXTicksOffsets")))     error_msg += "      fXTicksOffsets\n";
     if(!error_msg.empty()) {
 
-      throw LArUtilException(Form("Missing following TBranches...%s",error_msg.c_str()));
+      throw LArUtilException(Form("Missing following TBranches...\n%s",error_msg.c_str()));
 
       return;
     }

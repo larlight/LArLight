@@ -221,10 +221,10 @@ namespace larutil {
     std::vector<larlight::GEO::SigType_t> *fSignalType;
     std::vector<larlight::GEO::View_t>    *fViewType;
     std::vector<Double_t> *fPlanePitch;
-
-    // Vectors with length = view
     std::vector<std::vector<Double_t> > *fFirstWireStartVtx;
     std::vector<std::vector<Double_t> > *fFirstWireEndVtx;
+
+    // Vectors with length = view
     std::vector<Double_t> *fWirePitch;
     std::vector<Double_t> *fWireAngle;
 

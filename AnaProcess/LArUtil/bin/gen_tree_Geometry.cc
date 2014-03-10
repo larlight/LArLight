@@ -36,20 +36,20 @@ int main(int argc, char** argv){
   tree->Branch("fPlaneWireToChannelMap","std::vector<std::vector<UShort_t> >",&fPlaneWireToChannelMap);
   
   // Vectors with length = # planes
-  std::vector<UChar_t> fSignalType;
-  std::vector<UChar_t> fViewType;
+  std::vector<larlight::GEO::SigType_t> fSignalType;
+  std::vector<larlight::GEO::View_t> fViewType;
   std::vector<Double_t> fPlanePitch;
+  std::vector<std::vector<Double_t> > fFirstWireStartVtx;
+  std::vector<std::vector<Double_t> > fFirstWireEndVtx;
+  tree->Branch("fFirstWireStartVtx","std::vector<std::vector<Double_t> >",&fFirstWireStartVtx);
+  tree->Branch("fFirstWireEndVtx","std::vector<std::vector<Double_t> >",&fFirstWireEndVtx);
   tree->Branch("fSignalType","std::vector<larlight::GEO::SigType_t>",&fSignalType);
   tree->Branch("fViewType","std::vector<larlight::GEO::View_t>",&fViewType);
   tree->Branch("fPlanePitch","std::vector<Double_t>",&fPlanePitch);
   
   // Vectors with length = view
-  std::vector<std::vector<Double_t> > fFirstWireStartVtx;
-  std::vector<std::vector<Double_t> > fFirstWireEndVtx;
   std::vector<Double_t> fWirePitch;
   std::vector<Double_t> fWireAngle;
-  tree->Branch("fFirstWireStartVtx","std::vector<std::vector<Double_t> >",&fFirstWireStartVtx);
-  tree->Branch("fFirstWireEndVtx","std::vector<std::vector<Double_t> >",&fFirstWireEndVtx);
   tree->Branch("fWirePitch","std::vector<Double_t>",&fWirePitch);
   tree->Branch("fWireAngle","std::vector<Double_t>",&fWireAngle);
   

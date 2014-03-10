@@ -86,7 +86,7 @@ namespace larutil {
 
     if(!error_msg.empty()) {
 
-      throw LArUtilException(Form("Missing following TBranches...%s",error_msg.c_str()));
+      throw LArUtilException(Form("Missing following TBranches...\n%s",error_msg.c_str()));
 
       return;
     }

@@ -50,7 +50,7 @@ namespace larutil {
 
     if(!error_msg.empty()) {
 
-      throw LArUtilException(Form("Missing following TBranches...%s",error_msg.c_str()));
+      throw LArUtilException(Form("Missing following TBranches...\n%s",error_msg.c_str()));
 
       return;
     }
@@ -197,14 +197,17 @@ namespace larutil {
 			       const UInt_t wire, 
 			       Double_t *xyzStart, Double_t *xyzEnd) const
   {
-    xyzStart[0] = fFirstWireStartVtx->at(fViewType->at(plane)).at(0);
-    xyzStart[1] = fFirstWireStartVtx->at(fViewType->at(plane)).at(1);
-    xyzStart[2] = fFirstWireStartVtx->at(fViewType->at(plane)).at(2);
-    xyzEnd[0]   = fFirstWireEndVtx->at(fViewType->at(plane)).at(0);
-    xyzEnd[1]   = fFirstWireEndVtx->at(fViewType->at(plane)).at(1);
-    xyzEnd[2]   = fFirstWireEndVtx->at(fViewType->at(plane)).at(2);
+    xyzStart[0] = fFirstWireStartVtx->at(plane).at(0);
+    xyzStart[1] = fFirstWireStartVtx->at(plane).at(1);
+    xyzStart[2] = fFirstWireStartVtx->at(plane).at(2);
+    xyzEnd[0]   = fFirstWireEndVtx->at(plane).at(0);
+    xyzEnd[1]   = fFirstWireEndVtx->at(plane).at(1);
+    xyzEnd[2]   = fFirstWireEndVtx->at(plane).at(2);
 
-    Double_t dz = wire * fWirePitch->at(fViewType->at(plane)) / TMath::Sin(fWireAngle->at(fViewType->at(plane)));
+    Double_t angle_z = fWireAngle->at(fViewType->at(plane));
+    if(angle_z > TMath::Pi()/2) angle_z -= TMath::Pi()/2;
+
+    Double_t dz = wire * fWirePitch->at(fViewType->at(plane)) * TMath::Cos(angle_z);
     xyzStart[2] += dz;
     xyzEnd[2]   += dz;
   }

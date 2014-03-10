@@ -5,14 +5,14 @@
 namespace larutil{
 
   // Geometry default data file
-  const std::string kFILENAME_GEOMETRY = "tree_Geometry.root";
-  const std::string kTREENAME_GEOMETRY = "Geometry";
+  const std::string kFILENAME_GEOMETRY = "larutil.root";
+  const std::string kTREENAME_GEOMETRY = "scanner/Geometry";
 
-  const std::string kFILENAME_DETECTORPROPERTIES = "tree_DetectorProperties.root";
-  const std::string kTREENAME_DETECTORPROPERTIES = "DetectorProperties";
+  const std::string kFILENAME_DETECTORPROPERTIES = "larutil.root";
+  const std::string kTREENAME_DETECTORPROPERTIES = "scanner/DetectorProperties";
 
-  const std::string kFILENAME_LARPROPERTIES = "tree_LArProperties.root";
-  const std::string kTREENAME_LARPROPERTIES = "LArProperties";
+  const std::string kFILENAME_LARPROPERTIES = "larutil.root";
+  const std::string kTREENAME_LARPROPERTIES = "scanner/LArProperties";
   
   //--- LArSoft parameters ---//
 
