@@ -20,6 +20,9 @@
 #pragma link C++ enum larlight::GEO::SigType_t;
 #pragma link C++ enum larlight::GEO::View_t;
 
+#pragma link C++ class std::vector<larlight::GEO::SigType_t>+;
+#pragma link C++ class std::vector<larlight::GEO::View_t>+;
+
 #pragma link C++ enum larlight::DATA::DATA_TYPE;
 
 #pragma link C++ class larlight::Message+;
