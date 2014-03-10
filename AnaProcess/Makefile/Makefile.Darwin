@@ -1,13 +1,12 @@
 #COMPILER:
 CC              = gcc
 CXX             = $(LARLIGHT_CXX)
-
 LINKER          = libtool
 SOMAKER         = libtool 
 
 #######"-O" FLAG: (not always ideal with debugging info)
 CFLAGS          += -O3
-CXXFLAGS        += -O3 -std=c++11
+CXXFLAGS        += -O3 
 #SOFLAGS         += -O
 #AFLAGS          += -O
 #DLLFLAGS        += -O
