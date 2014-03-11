@@ -39,7 +39,7 @@ namespace ubpsql {
      */
     bool CreateConfigType(const std::string config_type,
 			  const unsigned int nchannels,
-			  const std::vector<std::string> stringkeylist);
+			  const std::vector<std::string> &stringkeylist);
 
     /// Create a new run number in the database
     bool InsertNewRun(unsigned int config_id);
@@ -47,6 +47,11 @@ namespace ubpsql {
     /// Create a new sub run number in the database
     bool InsertNewSubRun(unsigned int config_id, unsigned int run);
 
+    bool InsertSubConfigValuesPerCrate(const std::string  config_type,
+				       const unsigned int config_id,
+				       const unsigned int crate,
+				       const std::map<std::string,std::string> &hstore_values);
+      
   };
 }
 

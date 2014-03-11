@@ -7,7 +7,7 @@ namespace ubpsql {
 
   bool RCWriter::CreateConfigType(const std::string config_type,
 				  const unsigned int nchannels,
-				  const std::vector<std::string> stringkeylist)
+				  const std::vector<std::string> &stringkeylist)
   {
     if(!Connect()) return false;
 
@@ -49,6 +49,32 @@ namespace ubpsql {
     return true;
   }
 
+  bool RCWriter::InsertSubConfigValuesPerCrate(const std::string  config_type,
+					       const unsigned int config_id,
+					       const unsigned int crate,
+					       const std::map<std::string,std::string> &hstore_values)
+  {
+    if(!Connect()) return false;
+    std::string cmd(Form("SELECT InsertConfigurationSet('%s', %d, %d, 0, ",
+			 config_type.c_str(),
+			 config_id,
+			 crate));
+    cmd += "'";
+
+    for(auto hstore_iter = hstore_values.begin();
+	hstore_iter != hstore_values.end();
+	++hstore_iter)
+
+      cmd += Form(" \"%s\"=>\"%s\"", (*hstore_iter).first.c_str(), (*hstore_iter).second.c_str());
+
+    cmd += " ');";
+
+    PGresult* res = _conn->Execute(cmd);
+    if(!res) return false;
+    
+    PQclear(res);
+    return true;
+  }
 }
 
 #endif
