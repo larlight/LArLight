@@ -30,7 +30,7 @@ rootlibmap libDataFormat.rootmap libDataFormat.so $ANA_PROC_DIR/DataFormat/LinkD
 ######################################################
 # LArUtil
 rootlibmap libLArUtil.rootmap libLArUtil.so $ANA_PROC_DIR/LArUtil/LinkDef.h \
-    libBase
+    libBase.so libHist.so libTree.so 
 
 ######################################################
 # Analysis
@@ -91,6 +91,7 @@ rootlibmap libCoreyAna.rootmap libCoreyAna.so $ANA_PROC_DIR/CoreyAna/LinkDef.h \
 
 ######################################################
 # ADD_NEW_ROOTMAP HERE
+
 
 
 
