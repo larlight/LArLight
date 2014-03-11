@@ -34,7 +34,7 @@ else
     # Check compiler availability for clang++ and g++
     LARLIGHT_CXX=clang++
     if [ `command -v $LARLIGHT_CXX` ]; then
-	export LARLIGHT_CXX;
+	export LARLIGHT_CXX="clang++ -std=c++11";
     else
 	LARLIGHT_CXX=g++
 	if [[ -z `command -v $LARLIGHT_CXX` ]]; then
