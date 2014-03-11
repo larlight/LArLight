@@ -75,8 +75,14 @@ namespace larutil {
     /// return the signal type for a given channel
     larlight::GEO::SigType_t SignalType(const UInt_t channel)  const; 
 
+    /// return the signal type for a given plane
+    larlight::GEO::SigType_t PlaneToSignalType(const UChar_t plane)  const; 
+
     /// return the view type for a given channel
     larlight::GEO::View_t View(const UInt_t channel)  const; 
+
+    /// return the view type for a given plane
+    larlight::GEO::View_t PlaneToView(const UChar_t plane) const;
 
     /// return vector of possible views in the detector
     std::set<larlight::GEO::View_t>  const Views() const; 
@@ -217,8 +223,13 @@ namespace larutil {
     /// Return optical channel vertex
     void GetOpChannelPosition(const UInt_t i, Double_t *xyz) const;
 
+    const std::vector<Double_t>& PlaneOriginVtx(UChar_t plane) const;
+
+    void PlaneOriginVtx(UChar_t plane, Double_t *vtx) const;
+
   private:
-    
+
+    // Vectors with length = # channels
     std::vector<UChar_t>                *fChannelToPlaneMap;
     std::vector<UShort_t>               *fChannelToWireMap;
     std::vector<std::vector<UShort_t> > *fPlaneWireToChannelMap;
@@ -229,6 +240,7 @@ namespace larutil {
     std::vector<Double_t> *fPlanePitch;
     std::vector<std::vector<Double_t> > *fFirstWireStartVtx;
     std::vector<std::vector<Double_t> > *fFirstWireEndVtx;
+    std::vector<std::vector<Double_t> > *fPlaneOriginVtx;
 
     // Vectors with length = view
     std::vector<Double_t> *fWirePitch;

@@ -47,6 +47,8 @@ namespace larutil {
     if(!(_data_tree->GetBranch("fWirePitch")))    error_msg += "      fWirePitch\n";
     if(!(_data_tree->GetBranch("fWireAngle")))    error_msg += "      fWireAngle\n";
     if(!(_data_tree->GetBranch("fOpChannelVtx"))) error_msg += "      fOpChannelVtx\n";
+    
+    if(!(_data_tree->GetBranch("fPlaneOriginVtx"))) error_msg += "      fPlaneOriginVtx\n";
 
     if(!error_msg.empty()) {
 
@@ -77,6 +79,8 @@ namespace larutil {
     _data_tree->SetBranchAddress("fWireAngle",&fWireAngle);
 
     _data_tree->SetBranchAddress("fOpChannelVtx",&fOpChannelVtx);
+
+    _data_tree->SetBranchAddress("fPlaneOriginVtx",&fPlaneOriginVtx);
 
   }
 
@@ -119,6 +123,16 @@ namespace larutil {
     return fSignalType->at(fChannelToPlaneMap->at(ch));
   }
 
+  larlight::GEO::SigType_t Geometry::PlaneToSignalType(const UChar_t plane) const
+  {
+    if(plane >= fSignalType->size()) {
+      throw LArUtilException(Form("Invalid Plane number: %d",plane));
+      return larlight::GEO::kMysteryType;
+    }
+
+    return fSignalType->at(plane);
+  }
+
   larlight::GEO::View_t Geometry::View(const UInt_t ch) const
   {
     if(ch >= fChannelToPlaneMap->size()) {
@@ -127,6 +141,16 @@ namespace larutil {
     }
     
     return fViewType->at(fChannelToPlaneMap->at(ch));
+  }
+
+  larlight::GEO::View_t Geometry::PlaneToView(const UChar_t plane) const
+  {
+    if(plane >= fViewType->size()) {
+      throw LArUtilException(Form("Invalid Plane number: %d",plane));
+      return larlight::GEO::kUnknown;
+    }
+
+    return fViewType->at(plane);
   }
 
   std::set<larlight::GEO::View_t> const Geometry::Views() const
@@ -456,6 +480,7 @@ namespace larutil {
   void Geometry::GetOpChannelPosition(const UInt_t i, Double_t *xyz) const
   {
     if( i >= fOpChannelVtx->size() ) {
+      throw LArUtilException(Form("Invalid PMT channel number: %d",i));
       xyz[0] = larlight::DATA::INVALID_DOUBLE;
       xyz[0] = larlight::DATA::INVALID_DOUBLE;
       xyz[0] = larlight::DATA::INVALID_DOUBLE;
@@ -467,7 +492,24 @@ namespace larutil {
     xyz[2] = fOpChannelVtx->at(i).at(2);
     return;
   }
-  
+
+  const std::vector<Double_t>& Geometry::PlaneOriginVtx(UChar_t plane) const
+  {
+    if(plane >= fPlaneOriginVtx->size()) {
+      throw LArUtilException(Form("Invalid plane number: %d",plane));
+      fPlaneOriginVtx->push_back(std::vector<Double_t>(3,larlight::DATA::INVALID_DOUBLE));
+      return fPlaneOriginVtx->at(this->Nplanes());
+    }
+
+    return fPlaneOriginVtx->at(plane);
+  }
+
+  void Geometry::PlaneOriginVtx(UChar_t plane, Double_t *vtx) const
+  {
+    vtx[0] = fPlaneOriginVtx->at(plane)[0];
+    vtx[1] = fPlaneOriginVtx->at(plane)[1];
+    vtx[2] = fPlaneOriginVtx->at(plane)[2];
+  }  
 
 }
 

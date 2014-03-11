@@ -12,6 +12,7 @@ OBJECTS = $(SOURCES:.cc=.o)
 # include options for this package
 INCFLAGS = -I.                       #Include itself
 INCFLAGS += -I$(LARLIGHT_CORE_DIR)/Base
+INCFLAGS += -I$(LARLIGHT_CORE_DIR)/DataFormat
 
 # platform-specific options
 OSNAME          = $(shell uname -s)

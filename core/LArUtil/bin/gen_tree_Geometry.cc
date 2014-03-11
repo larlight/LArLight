@@ -56,6 +56,9 @@ int main(int argc, char** argv){
   std::vector<std::vector<Float_t> > fOpChannelVtx;
   tree->Branch("fOpChannelVtx","std::vector<std::vector<Float_t> >",&fOpChannelVtx);
 
+  std::vector<std::vector<Double_t> > fPlaneOriginVtx;
+  tree->Branch("fPlaneOriginVtx","std::vector<std::vector<Double_t> >",&fPlaneOriginVtx);
+
   tree->Fill();
   tree->Write();
   fout->Close();
