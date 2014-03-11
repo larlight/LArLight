@@ -1,5 +1,5 @@
-#ifndef COREYANA_HH
-#define COREYANA_HH
+#ifndef COREYANA_CC
+#define COREYANA_CC
 
 #include "CoreyAna.hh"
 
