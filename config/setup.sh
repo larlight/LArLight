@@ -14,14 +14,18 @@ else
 	return;
     fi
     LARLIGHT_OS=`uname -s`
-    # Set for AnaProcess build
-    if [[ -z $ANA_PROC_RELPATH ]]; then
-	export ANA_PROC_RELPATH=AnaProcess
+    # Set for core build
+    export LARLIGHT_LIBDIR=$MAKE_TOP_DIR/lib
+    export LARLIGHT_CORE_DIR=$MAKE_TOP_DIR/core
+
+    # Set for user dev build
+    if [[ -z $USER_DEV_RELPATH ]]; then
+	export USER_DEV_RELPATH=UserDev
     fi
-    export ANA_PROC_DIR=$MAKE_TOP_DIR/$ANA_PROC_RELPATH
-    export ANA_PROC_LIBDIR=$ANA_PROC_DIR/lib
-    if [[ -z $ANA_PROC_MODULE ]]; then
-	export ANA_PROC_MODULE="Base DataFormat Analysis"
+    export USER_DEV_DIR=$MAKE_TOP_DIR/$USER_DEV_RELPATH
+
+    if [[ -z $USER_MODULE ]]; then
+	export USER_MODULE=""
     fi
 
     # Set for NevisDecoder build
@@ -29,7 +33,6 @@ else
 	export DECODER_RELPATH=NevisDecoder
     fi
     export DECODER_DIR=$MAKE_TOP_DIR/$DECODER_RELPATH
-    export DECODER_LIBDIR=$DECODER_DIR/lib
 
     # Check compiler availability for clang++ and g++
     LARLIGHT_CXX=clang++
@@ -90,12 +93,12 @@ else
 	export PYTHONPATH=$ROOTSYS/lib:$PYTHONPATH;
     fi
 
-    python $MAKE_TOP_DIR/config/python/gen_anamakefile.py
+    python $MAKE_TOP_DIR/config/python/gen_usermakefile.py
     python $MAKE_TOP_DIR/config/python/gen_decodermakefile.py
     python $MAKE_TOP_DIR/config/python/gen_topmakefile.py
-    export LD_LIBRARY_PATH=$ANA_PROC_LIBDIR:$DECODER_LIBDIR:$LD_LIBRARY_PATH
+    export LD_LIBRARY_PATH=$LARLIGHT_LIBDIR:$DECODER_DIR/lib:$LD_LIBRARY_PATH
     if [ $LARLIGHT_OS = 'Darwin' ]; then
-	export DYLD_LIBRARY_PATH=$ANA_PROC_LIBDIR:$DECODER_LIBDIR:$DYLD_LIBRARY_PATH
+	export DYLD_LIBRARY_PATH=$LARLIGHT_LIBDIR:$DECODER_LIBDIR:$DYLD_LIBRARY_PATH
     fi
     echo
     echo "Finish configuration. To build, type:"

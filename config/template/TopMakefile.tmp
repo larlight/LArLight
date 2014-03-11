@@ -24,8 +24,11 @@ endif
 export MAKE_TOP_DIR
 
 all:
-	@echo "Start building AnaProcess"
-	@make --directory=$(ANA_PROC_DIR)
+	@echo "Start building core"
+	@make --directory=$(LARLIGHT_CORE_DIR)
+	@echo
+	@echo "Start building UserDev"
+	@make --directory=$(USER_DEV_DIR)
 	@echo 
 	@echo "Start building Decoder"
 	@make --directory=$(DECODER_DIR)
@@ -33,8 +36,11 @@ all:
 	@echo "Exiting"
 
 clean:
-	@echo "Cleaning AnaProcess"
-	@make clean --directory=$(ANA_PROC_DIR)
+	@echo "Cleaning core"
+	@make clean --directory=$(LARLIGHT_CORE_DIR)
+	@echo
+	@echo "Cleaning UserDev"
+	@make clean --directory=$(USER_DEV_DIR)
 	@echo
 	@echo "Cleaning Decoder"
 	@make clean --directory=$(DECODER_DIR)

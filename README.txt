@@ -4,9 +4,43 @@
 #                 #
 ###################
 
-This repository includes two sub-repositories:
+LArLight is a simple C++/ROOT code development framework.
+Design goals include:
+    
+    (*) Simple configuration method
 
-(*) AnaProcess
+    	- single configuration script
+
+    (*) Fast build
+
+    	- nothing special: simple dependency & build system
+
+    (*) Simple template generation
+
+    	- One line command to generate an empty package w/ build system
+
+    (*) Interpreter support
+
+    	- Allows accessing compiled librari from python and CINT interpreter
+
+A reason why it got a prefix "LAr" is because above features are used to
+develop an extension that allows ala LArSoft data analysis.
+
+    (*) ala LArSoft analysis framework
+
+    	- Data products capable to store LArSoft data
+	- Analysis framework ala EDAnalyzer/EDProducer
+	- Utility classes include LArSoft's Geometry, LArProperties, DetectorProperties
+
+########################################
+#                                      #
+# What you get under the top directory #
+#                                      #
+########################################
+
+This repository includes two important sub-repositories:
+
+(*) core ... contains framework building blocks
 
     - Defines data structure equivalent or close to that of LArSoft.
       The purpose is to store full details of LArSoft data while eliminating
@@ -14,49 +48,43 @@ This repository includes two sub-repositories:
       perform simple ROOT analysis on one's laptop. A shared data strcuture
       allows easier application code sharing among analyzers.
 
-    - Provides I/O framework for simple yet efficient event loop data access
+    - Provides ala LArSoft utility class such as Geometry, DetectorProperties,
+      and LArProperties.
 
-    - Provides flexible data structure which allows storage of int, string,
-      bool, double, and std::vector of those at run time, which means one
-      does not need to create a new data container class nor TTree branch to
-      store values in their code. This allows a simple and quick code development.
+    - Provides I/O framework (like art::Event) for simple yet efficient event 
+      loop data access
 
-    - Provides C++ code development environment that can be set independent
-      of the rest of the package. Provides a library generation scheme such
-      that you can refer/use developed your function/class from anywhere,
-      even from inside your LArSoft code or simple CINT/PyROOT interactive
-      session.
-
-    - For code development guideline, refer to AnaProcess/README.
+    - Provides Analysis framework (like art::EDAnalyzer/EDProducer) for 
+      systematic event processing.
 
     - Ask Kazu for further details.
 
-(*) NevisDecoder
+(*) UserDev ... packages developped by users
 
-    - Include toolkit for decoding raw binary files output by Nevis readout 
-      code (CAUTION: not by UB event builder)
+    - Contains packages developped by various users
 
-    - Binary file I/O is handled by classes defined under FileIO. The class,
-      bin_io_handler, can handle a block-read by specifying number of words
-      to access at once. If this is enabled but # of words (a block size) is
-      not specified, then a standard procedure is taken in which the 1st word
-      is assumed to suggest # of words to be read as a block.      
+    - Contains a template package generation script which comes with a build
+      system. One can execute a single line command, and type "make": taht's it.
 
-    - Decoding algorithms are defined under Algorithm package. Currently 
-      xmit readout for PMT/TPC (an option of huffman) + Trigger decoding
-      algorithms are implemented. More possible upon request.
+(*) config ... contains scripts to configure your shell for using LArLight
 
-    - Decoding algorithm + bin file I/O + output ROOT storage I/O are
-      handled by decode_manager class defined under Decoder directory. The
-      idea is a user attaching different algorithm to this manager class
-      to decode different binary files while file I/O interface can stay same.
+    - all you need is setup.sh 
 
+(*) lib ... where your compiled libraries will be gathered and become visible
 
-################
-#              # 
-# How To Build #
-#              #
-################
+(*) doc ... documentation directory
+
+    - contains doxygen script to generate html documentation of all codes
+
+(*) NevisDecoder ... a custom binary file decoder framework for Nevis readout code
+    
+    - If you are not from Columbia University, just ignore it...
+
+#################################
+#                               # 
+# Building the Framework (core) #
+#                               #
+#################################
 
 If this is your first time ever, the default compilation is shown below
 assuming you are in the same directory where this README exists:
@@ -65,41 +93,37 @@ assuming you are in the same directory where this README exists:
 > source config/setup.sh
 > make 
 
-This build AnaProcess package with basic components including Basic,
+This build core package with basic components including Basic,
 DataFormat, and Analysis sub-directories. 
 
-It also buildds NevisDecoder directory with the minimal set of packages
-including FileIO, Algorithm, Decoder. 
+####################
+#                  #
+# Building UserDev # 
+#                  #
+####################
 
-If one does not want to compile anything under NevisDecoder, do:
+Under UserDev directory, you find various packages from various users.
+That is where everyone is suggested to do his/her code development.
+LArLight supports a user to specify which package under UserDev to be
+compiled through a shell environment variable.
 
-export DECODER_MODULE=IGNORE
+> export USER_MODULE="FEMPulseStudy FEMPulseReco"
+
+The above line configures to compile three sub-directories unser UserDev
+upon sourcing "config/setup.sh".
+
+#########################
+#                       #
+# Building NevisDecoder #
+#                       #
+#########################
+
+If one needs to compile NevisDecoder extension, set
+
+export DECODER_MODULE="FileIO Algorithm Decoder"
 
 prior to calling "source config/setup.sh". This will make the build system
-to ignore the NevisDecoder sub directories.
-
-###########################
-#                         # 
-# How To Build (Advanced) #
-#                         #
-###########################
-
-One can also explicitly specify AnaProcess sub packages to compile.
-
-> export ANA_PROC_MODULE="Base DataFormat Analysis"
-
-The above line configures to compile three sub-directories
-under AnaProcess upon sourcing "config/setup.sh".
-
-As a summary example, one can have the following lines in a configuration
-script to be run upon ssh login.
-
-(I assume you downloaded LArLight under $HOME/LArLIght)
-
-> export MAKE_TOP_DIR=$HOME/LArLight
-> export ANA_PROC_MODULE="Base DataFormat Analysis"
-> source $MAKE_TOP_DIR/config/setup.sh
-> make --directory=$MAKE_TOP_DIR
+to include NevisDecoder.
 
 ##########################
 #                        #

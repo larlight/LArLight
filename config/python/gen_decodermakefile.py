@@ -16,7 +16,7 @@ else:
 
     packages = [x for x in os.environ['DECODER_MODULE'].split(None)]
 
-    print ("\033[93m" + "Specified " + os.environ['DECODER_RELPATH'] + " packages to be compiled by a user:" )
+    print ("\033[93m" + "Specified " + os.environ['DECODER_RELPATH'] + " packages to be compiled by a user:" + "\033[0m" )
     valid_packages=''
     not_found=[]
     for package in packages:
