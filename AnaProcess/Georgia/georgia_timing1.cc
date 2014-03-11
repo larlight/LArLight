@@ -65,7 +65,7 @@ namespace larlight {
     // First check if data exists
     //
     // PMT data
-    const event_fifo *event_wf = (event_fifo*)(storage->get_data(DATA::PMTFIFO));    
+    const event_pmtfifo *event_wf = (event_pmtfifo*)(storage->get_data(DATA::PMTFIFO));    
     const trigger* trig_data = (trigger*)(storage->get_data(DATA::Trigger));
     if(!trig_data) {
 
@@ -114,7 +114,7 @@ namespace larlight {
     //loop over all channels
     for (size_t i=0; i<event_wf->size(); ++i){
       
-      const fifo* pmt_data = (&(event_wf->at(i)));
+      const pmtfifo* pmt_data = (&(event_wf->at(i)));
       if(pmt_data->size()<1){
 	Message::send(MSG::ERROR,__FUNCTION__,
 		      Form("Found 0-length waveform: Event %d ... Ch. %d",event_wf->event_number(),pmt_data->channel_number()));
