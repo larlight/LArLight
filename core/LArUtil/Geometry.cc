@@ -91,6 +91,24 @@ namespace larutil {
     return fPlaneWireToChannelMap->at(p).size();
   }
 
+  UChar_t  Geometry::ChannelToPlane(const UInt_t ch) const
+  {
+    if(ch >= fChannelToPlaneMap->size()) {
+      throw LArUtilException(Form("Invalid channel number: %d",ch));
+      return larlight::DATA::INVALID_CHAR;
+    }
+    return fChannelToPlaneMap->at(ch);
+  }
+
+  UInt_t   Geometry::ChannelToWire(const UInt_t ch)const
+  {
+    if(ch >= fChannelToWireMap->size()) {
+      throw LArUtilException(Form("Invalid channel number: %d",ch));
+      return larlight::DATA::INVALID_CHAR;
+    }
+    return fChannelToWireMap->at(ch);
+  }
+
   larlight::GEO::SigType_t Geometry::SignalType(const UInt_t ch) const
   {
     if(ch >= fChannelToPlaneMap->size()) {
