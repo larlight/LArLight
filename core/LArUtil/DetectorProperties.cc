@@ -12,7 +12,7 @@ namespace larutil {
   {
     if(_file_name.empty())
       _file_name = Form("%s/LArUtil/dat/%s",
-			getenv("ANA_PROC_DIR"),
+			getenv("LARLIGHT_CORE_DIR"),
 			kFILENAME_DETECTORPROPERTIES.c_str());
     if(_tree_name.empty())
       _tree_name = kTREENAME_DETECTORPROPERTIES;

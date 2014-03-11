@@ -10,7 +10,7 @@ namespace larutil {
   LArProperties::LArProperties(std::string file_name, std::string tree_name) : LArUtilBase(file_name,tree_name)
   {
     if(_file_name.empty())
-      _file_name = Form("%s/LArUtil/dat/%s",getenv("ANA_PROC_DIR"),kFILENAME_LARPROPERTIES.c_str());
+      _file_name = Form("%s/LArUtil/dat/%s",getenv("LARLIGHT_CORE_DIR"),kFILENAME_LARPROPERTIES.c_str());
     if(_tree_name.empty())
       _tree_name = kTREENAME_LARPROPERTIES;
     _name = "LArProperties";
