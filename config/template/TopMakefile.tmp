@@ -24,6 +24,7 @@ endif
 export MAKE_TOP_DIR
 
 all:
+	@mkdir -p $(MAKE_TOP_DIR)/lib
 	@echo "Start building core"
 	@make --directory=$(LARLIGHT_CORE_DIR)
 	@echo
