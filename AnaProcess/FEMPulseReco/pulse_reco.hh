@@ -88,10 +88,18 @@ namespace larlight {
     PED_METHOD _ped_method;
 
     /// A method to judge whether the subject waveform corresponds to a beam readout or not
-    inline bool is_beam(const fifo *wf){return (wf->size() > 1000);};
+    inline bool is_beam(const std::vector<UShort_t>* wf){return (wf->size() > 1000);};
 
     /// Analyzing waveform data type
     DATA::DATA_TYPE _input_type;
+    
+  private:
+
+    bool run_reco(const std::vector<UShort_t>* wf);
+
+    void store_reco(storage_manager* storage,
+		    const fifo* wf,
+		    FEM::DISCRIMINATOR disc_id);
 
   };
 }
