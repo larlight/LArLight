@@ -50,7 +50,7 @@ endif
 # "make clean" target
 clean:
 	@echo '<< cleaning all >>'
-	@rm -f $(DICT).* *.o lib*.so *~ .depend ./lib/*.o lib/lib*.so
+	@rm -f $(DICT).* *.o lib*.so *~ .depend ./lib/*.o lib/lib*.so lib/lib*.rootmap $(DECODER_DIR)/lib/$(SHLIB) $(DECODER_DIR)/lib/$(SHLIB:.so=.rootmap)
 
 ###################################################
 libclean:

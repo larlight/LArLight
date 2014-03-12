@@ -114,9 +114,9 @@ namespace larlight {
 
   protected:
 
-    fifo _ch_data;
+    pmtfifo _ch_data;
 
-    event_fifo* _event_data;
+    event_pmtfifo* _event_data;
 
     static const size_t CHANNEL_HEADER_COUNT=3; ///< Number of channel header words
     FEM::DISCRIMINATOR _last_disc_id;           ///< Holder of last channel data's disc. id

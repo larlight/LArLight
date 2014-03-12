@@ -135,8 +135,8 @@ namespace larlight {
 
     // variables
     UInt_t  _event_header_words[FEM_HEADER_COUNT]; ///< Event header word holder
-    fifo _ch_data;                                 ///< Channel data holder.
-    event_fifo *_event_data;                       ///< Event waveform
+    pmtfifo _ch_data;                              ///< Channel data holder.
+    event_pmtfifo *_event_data;                    ///< Event waveform
     FEM::DISCRIMINATOR _last_disc_id;              ///< Holder of last channel data's disc. id
     UShort_t _last_channel_number;                 ///< Holder of last channel data's channel number
 
