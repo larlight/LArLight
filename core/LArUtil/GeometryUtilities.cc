@@ -855,11 +855,43 @@ namespace larutil{
       
       
     }
+  }
+
+  void GeometryUtilities::SelectLocalHitlist(const std::vector< larlight::hit> &hitlist, 
+					     std::vector<larlight::hit> &hitlistlocal,
+					     Double_t  wire_start,Double_t time_start, 
+					     Double_t linearlimit,   Double_t ortlimit, 
+					     Double_t lineslopetest)
+  {
     
-} 
-  
-  
-  
+    Double_t locintercept=time_start-wire_start*lineslopetest;
+    
+    for(size_t i=0; i<hitlist.size(); ++i) {
+
+      Double_t time = hitlist.at(i).PeakTime();
+      UInt_t plane,wire;
+      GetPlaneAndTPC(hitlist.at(i),plane,wire);
+      
+      Double_t wonline=wire,tonline=time;
+      //gser.GetPointOnLine(lineslopetest,lineinterctest,wire,time,wonline,tonline);
+      GetPointOnLine(lineslopetest,locintercept,wire,time,wonline,tonline);
+      
+      //calculate linear distance from start point and orthogonal distance from axis
+      Double_t lindist=Get2DDistance(wonline,tonline,wire_start,time_start);
+      Double_t ortdist=Get2DDistance(wire,time,wonline,tonline);
+      
+      ////////std::cout << " w,t: " << wire << " " << time << " ws,ts " << wonline << " "<< tonline <<" "<< lindist << " " << ortdist << std::endl;
+      
+      if(lindist<linearlimit && ortdist<ortlimit)
+
+	{ hitlistlocal.push_back(hitlist.at(i));
+	  //std::cout << " w,t: " << wire << " " << time << " calc time: " << wire*lineslopetest + locintercept  << " ws,ts " << wonline << " "<< tonline <<" "<< lindist << " " << ortdist  << " plane: " << plane << std::endl;
+	}
+      
+      
+    }
+    
+  } 
 
 
 } // namespace

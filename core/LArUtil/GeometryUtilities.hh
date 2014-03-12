@@ -19,28 +19,28 @@
 ///General LArSoft Utilities
 namespace larutil{
   
-class pxpoint;
-class pxline;
-
-class GeometryUtilities : public larlight::larlight_base {
-
+  class pxpoint;
+  class pxline;
+  
+  class GeometryUtilities : public larlight::larlight_base {
+    
   private:
     /// Default constructor = private for singleton
     GeometryUtilities();
-
+    
     static GeometryUtilities* _me;
-
+    
   public:
-
+    
     /// Singleton getter
-    const GeometryUtilities* GetME(){
+    static const GeometryUtilities* GetME(){
       if(!_me) _me = new GeometryUtilities;
       return _me;
     }
-
+    
     /// Default destructor
     ~GeometryUtilities();
-      
+    
     
     Int_t Get3DaxisN(Int_t iplane0,
 		   Int_t iplane1,
@@ -145,12 +145,20 @@ class GeometryUtilities : public larlight::larlight_base {
 			     Double_t *dirs) const;
 			     
     void SelectLocalHitlist(const std::vector<larlight::hit>& hitlist, 
+			    std::vector <larlight::hit> &hitlistlocal_index,
+			    Double_t wire_start,
+			    Double_t time_start, 
+			    Double_t linearlimit,   
+			    Double_t ortlimit, 
+			    Double_t lineslopetest);
+
+    void SelectLocalHitlist(const std::vector<larlight::hit>& hitlist, 
 			    std::vector <UInt_t> &hitlistlocal_index,
 			    Double_t wire_start,
 			    Double_t time_start, 
 			    Double_t linearlimit,   
 			    Double_t ortlimit, 
-			    Double_t lineslopetest);			     
+			    Double_t lineslopetest);
 	
    Double_t TimeToCm() {return fTimetoCm;};
    Double_t WireToCm() {return fWiretoCm;};			     

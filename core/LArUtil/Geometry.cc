@@ -176,7 +176,7 @@ namespace larutil {
     return PlaneWireToChannel(PlaneNo,NearestWire(worldLoc,PlaneNo));
   }
 
-  UInt_t Geometry::NearestChannel(const std::vector<Double_t> worldLoc,
+  UInt_t Geometry::NearestChannel(const std::vector<Double_t> &worldLoc,
 				  const UInt_t PlaneNo) const
   {
     return PlaneWireToChannel(PlaneNo,NearestWire(worldLoc,PlaneNo));
@@ -191,19 +191,56 @@ namespace larutil {
   UInt_t Geometry::NearestWire(const Double_t worldLoc[3],
 			       const UInt_t PlaneNo) const
   {
-    return larlight::DATA::INVALID_UINT;
+    TVector3 loc(worldLoc);
+    return NearestWire(loc,PlaneNo);
   }
   
-  UInt_t Geometry::NearestWire(const std::vector<Double_t> worldLoc,
+  UInt_t Geometry::NearestWire(const std::vector<Double_t> &worldLoc,
 			       const UInt_t PlaneNo) const
   {
-    return larlight::DATA::INVALID_UINT;
+    TVector3 loc(&worldLoc[0]);
+    return NearestWire(loc,PlaneNo);
   }
   
   UInt_t Geometry::NearestWire(const TVector3 &worldLoc,
 			       const UInt_t PlaneNo) const
   {
-    return larlight::DATA::INVALID_UINT;
+    if(PlaneNo > fFirstWireStartVtx->size()) {
+
+      throw LArUtilException(Form("Invalid plane number: %d",PlaneNo));
+      return larlight::DATA::INVALID_UINT;
+
+    }
+
+    Double_t point_y = worldLoc[1];
+    Double_t point_z = worldLoc[2];
+
+    Double_t wire_upper_y = fFirstWireStartVtx->at(PlaneNo).at(1);
+    Double_t wire_lower_y = fFirstWireEndVtx->at(PlaneNo).at(1);
+
+    Double_t wire_upper_z = fFirstWireStartVtx->at(PlaneNo).at(2);
+    Double_t wire_lower_z = fFirstWireEndVtx->at(PlaneNo).at(2);
+
+    if(wire_upper_y < wire_lower_y) {
+      std::swap(wire_upper_y,wire_lower_y);
+      std::swap(wire_upper_z,wire_lower_z);
+    }
+
+    if(point_y > wire_upper_y) point_y = wire_upper_y;
+    if(point_y < wire_lower_y) point_y = wire_lower_y;
+
+    Double_t dx = (point_z - wire_lower_z) - 
+      TMath::Abs(point_y - wire_lower_y)/TMath::Tan(fWireAngle->at(fViewType->at(PlaneNo)));
+
+    if(dx < 0) return 0;
+
+    if(dx > (wire_lower_z + fWirePitch->at(fViewType->at(PlaneNo)) * (this->Nwires(PlaneNo))) ) 
+      return ( this->Nwires(PlaneNo) - 1 );
+
+    dx /= fWirePitch->at(fViewType->at(PlaneNo)) + 0.5;
+
+    return (UInt_t)(dx);
+
   }
 
   // distance between planes p1 < p2

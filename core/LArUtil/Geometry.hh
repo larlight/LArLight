@@ -102,7 +102,7 @@ namespace larutil {
 			    const UInt_t   PlaneNo) const;
 
     /// find the nearest channel to input world coordinates 
-    UInt_t   NearestChannel(const std::vector<Double_t> worldLoc,
+    UInt_t   NearestChannel(const std::vector<Double_t> &worldLoc,
 			    const UInt_t PlaneNo) const;
 
     /// find the nearest channel to input world coordinates
@@ -114,7 +114,7 @@ namespace larutil {
 		       const UInt_t   PlaneNo) const;
 
     /// nearest wire to input world coordinate
-    UInt_t NearestWire(std::vector<Double_t> worldLoc,
+    UInt_t NearestWire(const std::vector<Double_t> &worldLoc,
 		       const UInt_t  PlaneNo) const;
 
     /// nearest wire to input world coordinates
