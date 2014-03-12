@@ -36,7 +36,8 @@ namespace larutil {
 
   protected:
 
-    virtual void SetBranchAddress();
+    virtual void ClearData();
+    virtual bool ReadTree();
     
   public:
 
@@ -116,7 +117,7 @@ namespace larutil {
 
   private:
     
-    std::vector< Double_t >         *fEfield;           ///< kV/cm 
+    std::vector< Double_t >          fEfield;           ///< kV/cm 
     Double_t                         fTemperature;      ///< kelvin
     Double_t                         fElectronlifetime; ///< microseconds
     Double_t                         fRadiationLength;  ///< g/cm^2
@@ -135,16 +136,16 @@ namespace larutil {
     
     
     // Optical parameters for LAr 
-    std::vector<Double_t> *fFastScintSpectrum;
-    std::vector<Double_t> *fFastScintEnergies;
-    std::vector<Double_t> *fSlowScintSpectrum;
-    std::vector<Double_t> *fSlowScintEnergies;
-    std::vector<Double_t> *fRIndexSpectrum;
-    std::vector<Double_t> *fRIndexEnergies;
-    std::vector<Double_t> *fAbsLengthSpectrum;
-    std::vector<Double_t> *fAbsLengthEnergies;
-    std::vector<Double_t> *fRayleighSpectrum;
-    std::vector<Double_t> *fRayleighEnergies;
+    std::vector<Double_t> fFastScintSpectrum;
+    std::vector<Double_t> fFastScintEnergies;
+    std::vector<Double_t> fSlowScintSpectrum;
+    std::vector<Double_t> fSlowScintEnergies;
+    std::vector<Double_t> fRIndexSpectrum;
+    std::vector<Double_t> fRIndexEnergies;
+    std::vector<Double_t> fAbsLengthSpectrum;
+    std::vector<Double_t> fAbsLengthEnergies;
+    std::vector<Double_t> fRayleighSpectrum;
+    std::vector<Double_t> fRayleighEnergies;
     
     bool fScintByParticleType;
     
@@ -170,10 +171,10 @@ namespace larutil {
     
     bool fEnableCerenkovLight;
     
-    std::vector<std::string>            *fReflectiveSurfaceNames;
-    std::vector<Double_t>               *fReflectiveSurfaceEnergies;
-    std::vector<std::vector<Double_t> > *fReflectiveSurfaceReflectances;
-    std::vector<std::vector<Double_t> > *fReflectiveSurfaceDiffuseFractions;
+    std::vector<std::string>            fReflectiveSurfaceNames;
+    std::vector<Double_t>               fReflectiveSurfaceEnergies;
+    std::vector<std::vector<Double_t> > fReflectiveSurfaceReflectances;
+    std::vector<std::vector<Double_t> > fReflectiveSurfaceDiffuseFractions;
     
   };
 }

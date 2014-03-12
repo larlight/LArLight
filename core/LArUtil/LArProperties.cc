@@ -17,136 +17,263 @@ namespace larutil {
     LoadData();
   }
 
-  void LArProperties::SetBranchAddress()
+  void LArProperties::ClearData()
   {
+    fEfield.clear();
+    fTemperature = larlight::DATA::INVALID_DOUBLE;
+    fElectronlifetime = larlight::DATA::INVALID_DOUBLE;
+    fRadiationLength = larlight::DATA::INVALID_DOUBLE;
+    fArgon39DecayRate = larlight::DATA::INVALID_DOUBLE;
+    fZ = larlight::DATA::INVALID_DOUBLE;
+    fA = larlight::DATA::INVALID_DOUBLE;
+    fI = larlight::DATA::INVALID_DOUBLE;
+    fSa = larlight::DATA::INVALID_DOUBLE;
+    fSx0 = larlight::DATA::INVALID_DOUBLE;
+    fSx1 = larlight::DATA::INVALID_DOUBLE;
+    fScbar = larlight::DATA::INVALID_DOUBLE;
+    fFastScintSpectrum.clear();
+    fFastScintEnergies.clear();
+    fSlowScintSpectrum.clear();
+    fSlowScintEnergies.clear();
+    fRIndexSpectrum.clear();
+    fRIndexEnergies.clear();
+    fAbsLengthSpectrum.clear();
+    fAbsLengthEnergies.clear();
+    fRayleighSpectrum.clear();
+    fRayleighEnergies.clear();
+    fScintByParticleType=false;
+    fProtonScintYield=larlight::DATA::INVALID_DOUBLE;
+    fProtonScintYieldRatio=larlight::DATA::INVALID_DOUBLE;
+    fPionScintYield=larlight::DATA::INVALID_DOUBLE;
+    fPionScintYieldRatio=larlight::DATA::INVALID_DOUBLE;
+    fMuonScintYield=larlight::DATA::INVALID_DOUBLE;
+    fMuonScintYieldRatio=larlight::DATA::INVALID_DOUBLE;
+    fKaonScintYield=larlight::DATA::INVALID_DOUBLE;
+    fKaonScintYieldRatio=larlight::DATA::INVALID_DOUBLE;
+    fElectronScintYield=larlight::DATA::INVALID_DOUBLE;
+    fElectronScintYieldRatio=larlight::DATA::INVALID_DOUBLE;
+    fAlphaScintYield=larlight::DATA::INVALID_DOUBLE;
+    fAlphaScintYieldRatio=larlight::DATA::INVALID_DOUBLE;
+    fScintYield = larlight::DATA::INVALID_DOUBLE;
+    fScintResolutionScale = larlight::DATA::INVALID_DOUBLE;
+    fScintFastTimeConst = larlight::DATA::INVALID_DOUBLE;
+    fScintSlowTimeConst = larlight::DATA::INVALID_DOUBLE;
+    fScintYieldRatio = larlight::DATA::INVALID_DOUBLE;
+    fScintBirksConstant = larlight::DATA::INVALID_DOUBLE;
+    fEnableCerenkovLight = false;
+    fReflectiveSurfaceNames.clear();
+    fReflectiveSurfaceEnergies.clear();
+    fReflectiveSurfaceReflectances.clear();    
+    fReflectiveSurfaceDiffuseFractions.clear();
+  }
 
-    if(!_data_tree) {
-      throw LArUtilException(Form("DataTree has to be specified prior to %s function call",__FUNCTION__));
-      return;
-    }
+  bool LArProperties::ReadTree()
+  {
+    ClearData();
+
+    TChain* ch = new TChain(_tree_name.c_str());
+    ch->AddFile(_file_name.c_str());
 
     std::string error_msg("");
-    if(!(_data_tree->GetBranch("fEfield")))           error_msg += "      fEfield\n";
-    if(!(_data_tree->GetBranch("fTemperature")))      error_msg += "      fTemperature\n";
-    if(!(_data_tree->GetBranch("fElectronlifetime"))) error_msg += "      fElectronlifetime\n";
-    if(!(_data_tree->GetBranch("fRadiationLength")))  error_msg += "      fRadiationLength\n";
-    if(!(_data_tree->GetBranch("fArgon39DecayRate"))) error_msg += "      fArgon39DecayRate\n";
+    if(!(ch->GetBranch("fEfield")))           error_msg += "      fEfield\n";
+    if(!(ch->GetBranch("fTemperature")))      error_msg += "      fTemperature\n";
+    if(!(ch->GetBranch("fElectronlifetime"))) error_msg += "      fElectronlifetime\n";
+    if(!(ch->GetBranch("fRadiationLength")))  error_msg += "      fRadiationLength\n";
+    if(!(ch->GetBranch("fArgon39DecayRate"))) error_msg += "      fArgon39DecayRate\n";
 
-    if(!(_data_tree->GetBranch("fZ")))     error_msg += "      fZ\n";
-    if(!(_data_tree->GetBranch("fA")))     error_msg += "      fA\n";
-    if(!(_data_tree->GetBranch("fI")))     error_msg += "      fI\n";
-    if(!(_data_tree->GetBranch("fSa")))    error_msg += "      fSa\n";
-    if(!(_data_tree->GetBranch("fSx0")))   error_msg += "      fSx0\n";
-    if(!(_data_tree->GetBranch("fSx1")))   error_msg += "      fSx1\n";
-    if(!(_data_tree->GetBranch("fScbar"))) error_msg += "      fScbar\n";
+    if(!(ch->GetBranch("fZ")))     error_msg += "      fZ\n";
+    if(!(ch->GetBranch("fA")))     error_msg += "      fA\n";
+    if(!(ch->GetBranch("fI")))     error_msg += "      fI\n";
+    if(!(ch->GetBranch("fSa")))    error_msg += "      fSa\n";
+    if(!(ch->GetBranch("fSx0")))   error_msg += "      fSx0\n";
+    if(!(ch->GetBranch("fSx1")))   error_msg += "      fSx1\n";
+    if(!(ch->GetBranch("fScbar"))) error_msg += "      fScbar\n";
 
-    if(!(_data_tree->GetBranch("fFastScintSpectrum"))) error_msg += "      fFastScintSpectrum\n";
-    if(!(_data_tree->GetBranch("fFastScintEnergies"))) error_msg += "      fFastScintEnergies\n";
-    if(!(_data_tree->GetBranch("fSlowScintSpectrum"))) error_msg += "      fSlowScintSpectrum\n";
-    if(!(_data_tree->GetBranch("fSlowScintEnergies"))) error_msg += "      fSlowScintEnergies\n";
-    if(!(_data_tree->GetBranch("fRIndexSpectrum")))    error_msg += "      fRIndexSpectrum\n";
-    if(!(_data_tree->GetBranch("fRIndexEnergies")))    error_msg += "      fRIndexEnergies\n";
-    if(!(_data_tree->GetBranch("fAbsLengthSpectrum"))) error_msg += "      fAbsLengthSpectrum\n";
-    if(!(_data_tree->GetBranch("fAbsLengthEnergies"))) error_msg += "      fAbsLengthEnergies\n";
-    if(!(_data_tree->GetBranch("fRayleighSpectrum")))  error_msg += "      fRayleighSpectrum\n";
-    if(!(_data_tree->GetBranch("fRayleighEnergies")))  error_msg += "      fRayleighEnergies\n";
+    if(!(ch->GetBranch("fFastScintSpectrum"))) error_msg += "      fFastScintSpectrum\n";
+    if(!(ch->GetBranch("fFastScintEnergies"))) error_msg += "      fFastScintEnergies\n";
+    if(!(ch->GetBranch("fSlowScintSpectrum"))) error_msg += "      fSlowScintSpectrum\n";
+    if(!(ch->GetBranch("fSlowScintEnergies"))) error_msg += "      fSlowScintEnergies\n";
+    if(!(ch->GetBranch("fRIndexSpectrum")))    error_msg += "      fRIndexSpectrum\n";
+    if(!(ch->GetBranch("fRIndexEnergies")))    error_msg += "      fRIndexEnergies\n";
+    if(!(ch->GetBranch("fAbsLengthSpectrum"))) error_msg += "      fAbsLengthSpectrum\n";
+    if(!(ch->GetBranch("fAbsLengthEnergies"))) error_msg += "      fAbsLengthEnergies\n";
+    if(!(ch->GetBranch("fRayleighSpectrum")))  error_msg += "      fRayleighSpectrum\n";
+    if(!(ch->GetBranch("fRayleighEnergies")))  error_msg += "      fRayleighEnergies\n";
 
-    if(!(_data_tree->GetBranch("fScintByParticleType"))) error_msg += "      fScintByParticleType\n";
+    if(!(ch->GetBranch("fScintByParticleType"))) error_msg += "      fScintByParticleType\n";
 
-    if(!(_data_tree->GetBranch("fProtonScintYield")))        error_msg += "      fProtonScintYield\n";
-    if(!(_data_tree->GetBranch("fProtonScintYieldRatio")))   error_msg += "      fProtonScintYieldRatio\n";
-    if(!(_data_tree->GetBranch("fMuonScintYield")))          error_msg += "      fMuonScintYield\n";
-    if(!(_data_tree->GetBranch("fMuonScintYieldRatio")))     error_msg += "      fMuonScintYieldRatio\n";
-    if(!(_data_tree->GetBranch("fPionScintYield")))          error_msg += "      fPionScintYield\n";
-    if(!(_data_tree->GetBranch("fPionScintYieldRatio")))     error_msg += "      fPionScintYieldRatio\n";
-    if(!(_data_tree->GetBranch("fKaonScintYield")))          error_msg += "      fKaonScintYield\n";
-    if(!(_data_tree->GetBranch("fKaonScintYieldRatio")))     error_msg += "      fKaonScintYieldRatio\n";
-    if(!(_data_tree->GetBranch("fElectronScintYield")))      error_msg += "      fElectronScintYield\n";
-    if(!(_data_tree->GetBranch("fElectronScintYieldRatio"))) error_msg += "      fElectronScintYieldRatio\n";
-    if(!(_data_tree->GetBranch("fAlphaScintYield")))         error_msg += "      fAlphaScintYield\n";
-    if(!(_data_tree->GetBranch("fAlphaScintYieldRatio")))    error_msg += "      fAlphaScintYieldRatio\n";
+    if(!(ch->GetBranch("fProtonScintYield")))        error_msg += "      fProtonScintYield\n";
+    if(!(ch->GetBranch("fProtonScintYieldRatio")))   error_msg += "      fProtonScintYieldRatio\n";
+    if(!(ch->GetBranch("fMuonScintYield")))          error_msg += "      fMuonScintYield\n";
+    if(!(ch->GetBranch("fMuonScintYieldRatio")))     error_msg += "      fMuonScintYieldRatio\n";
+    if(!(ch->GetBranch("fPionScintYield")))          error_msg += "      fPionScintYield\n";
+    if(!(ch->GetBranch("fPionScintYieldRatio")))     error_msg += "      fPionScintYieldRatio\n";
+    if(!(ch->GetBranch("fKaonScintYield")))          error_msg += "      fKaonScintYield\n";
+    if(!(ch->GetBranch("fKaonScintYieldRatio")))     error_msg += "      fKaonScintYieldRatio\n";
+    if(!(ch->GetBranch("fElectronScintYield")))      error_msg += "      fElectronScintYield\n";
+    if(!(ch->GetBranch("fElectronScintYieldRatio"))) error_msg += "      fElectronScintYieldRatio\n";
+    if(!(ch->GetBranch("fAlphaScintYield")))         error_msg += "      fAlphaScintYield\n";
+    if(!(ch->GetBranch("fAlphaScintYieldRatio")))    error_msg += "      fAlphaScintYieldRatio\n";
 
-    if(!(_data_tree->GetBranch("fScintYield")))           error_msg += "      fScintYield\n";
-    if(!(_data_tree->GetBranch("fScintResolutionScale"))) error_msg += "      fScintResolutionScale\n";
-    if(!(_data_tree->GetBranch("fScintFastTimeConst")))   error_msg += "      fScintFastTimeConst\n";
-    if(!(_data_tree->GetBranch("fScintSlowTimeConst")))   error_msg += "      fScintSlowTimeConst\n";
-    if(!(_data_tree->GetBranch("fScintYieldRatio")))      error_msg += "      fScintYieldRatio\n";
-    if(!(_data_tree->GetBranch("fScintBirksConstant")))   error_msg += "      fScintBirksConstant\n";
+    if(!(ch->GetBranch("fScintYield")))           error_msg += "      fScintYield\n";
+    if(!(ch->GetBranch("fScintResolutionScale"))) error_msg += "      fScintResolutionScale\n";
+    if(!(ch->GetBranch("fScintFastTimeConst")))   error_msg += "      fScintFastTimeConst\n";
+    if(!(ch->GetBranch("fScintSlowTimeConst")))   error_msg += "      fScintSlowTimeConst\n";
+    if(!(ch->GetBranch("fScintYieldRatio")))      error_msg += "      fScintYieldRatio\n";
+    if(!(ch->GetBranch("fScintBirksConstant")))   error_msg += "      fScintBirksConstant\n";
 
-    if(!(_data_tree->GetBranch("fEnableCerenkovLight")))  error_msg += "      fEnableCerenkovLight\n";
+    if(!(ch->GetBranch("fEnableCerenkovLight")))  error_msg += "      fEnableCerenkovLight\n";
 
-    if(!(_data_tree->GetBranch("fReflectiveSurfaceNames")))
+    if(!(ch->GetBranch("fReflectiveSurfaceNames")))
       error_msg += "      fReflectiveSurfaceNames\n";
-    if(!(_data_tree->GetBranch("fReflectiveSurfaceEnergies")))
+    if(!(ch->GetBranch("fReflectiveSurfaceEnergies")))
       error_msg += "      fReflectiveSurfaceEnergies\n";
-    if(!(_data_tree->GetBranch("fReflectiveSurfaceReflectances")))
+    if(!(ch->GetBranch("fReflectiveSurfaceReflectances")))
       error_msg += "      fReflectiveSurfaceReflectances\n";
-    if(!(_data_tree->GetBranch("fReflectiveSurfaceDiffuseFractions")))
+    if(!(ch->GetBranch("fReflectiveSurfaceDiffuseFractions")))
       error_msg += "      fReflectiveSurfaceDiffuseFractions\n";
 
     if(!error_msg.empty()) {
 
       throw LArUtilException(Form("Missing following TBranches...\n%s",error_msg.c_str()));
 
-      return;
+      return false;
     }
 
-    _data_tree->SetBranchAddress("fEfield",&fEfield);
-    _data_tree->SetBranchAddress("fTemperature",&fTemperature);
-    _data_tree->SetBranchAddress("fElectronlifetime",&fElectronlifetime);
-    _data_tree->SetBranchAddress("fRadiationLength",&fRadiationLength);
-    _data_tree->SetBranchAddress("fArgon39DecayRate",&fArgon39DecayRate);
+    std::vector<Double_t> *pEfield=nullptr;
+    ch->SetBranchAddress("fEfield",&pEfield);
 
-    _data_tree->SetBranchAddress("fZ",&fZ);
-    _data_tree->SetBranchAddress("fA",&fA);
-    _data_tree->SetBranchAddress("fI",&fI);
-    _data_tree->SetBranchAddress("fSa",&fSa);
-    _data_tree->SetBranchAddress("fSk",&fSk);
-    _data_tree->SetBranchAddress("fSx0",&fSx0);
-    _data_tree->SetBranchAddress("fSx1",&fSx1);
-    _data_tree->SetBranchAddress("fScbar",&fScbar);
+    ch->SetBranchAddress("fTemperature",&fTemperature);
+    ch->SetBranchAddress("fElectronlifetime",&fElectronlifetime);
+    ch->SetBranchAddress("fRadiationLength",&fRadiationLength);
+    ch->SetBranchAddress("fArgon39DecayRate",&fArgon39DecayRate);
+
+    ch->SetBranchAddress("fZ",&fZ);
+    ch->SetBranchAddress("fA",&fA);
+    ch->SetBranchAddress("fI",&fI);
+    ch->SetBranchAddress("fSa",&fSa);
+    ch->SetBranchAddress("fSk",&fSk);
+    ch->SetBranchAddress("fSx0",&fSx0);
+    ch->SetBranchAddress("fSx1",&fSx1);
+    ch->SetBranchAddress("fScbar",&fScbar);
+
+    // Optical parameters for LAr 
+    std::vector<Double_t> *pFastScintSpectrum=nullptr;
+    std::vector<Double_t> *pFastScintEnergies=nullptr;
+    std::vector<Double_t> *pSlowScintSpectrum=nullptr;
+    std::vector<Double_t> *pSlowScintEnergies=nullptr;
+    std::vector<Double_t> *pRIndexSpectrum=nullptr;
+    std::vector<Double_t> *pRIndexEnergies=nullptr;
+    std::vector<Double_t> *pAbsLengthSpectrum=nullptr;
+    std::vector<Double_t> *pAbsLengthEnergies=nullptr;
+    std::vector<Double_t> *pRayleighSpectrum=nullptr;
+    std::vector<Double_t> *pRayleighEnergies=nullptr;
+
+    ch->SetBranchAddress("fFastScintSpectrum",&pFastScintSpectrum);
+    ch->SetBranchAddress("fFastScintEnergies",&pFastScintEnergies);
+    ch->SetBranchAddress("fSlowScintSpectrum",&pSlowScintSpectrum);
+    ch->SetBranchAddress("fSlowScintEnergies",&pSlowScintEnergies);
+    ch->SetBranchAddress("fRIndexSpectrum",&pRIndexSpectrum);
+    ch->SetBranchAddress("fRIndexEnergies",&pRIndexEnergies);
+    ch->SetBranchAddress("fAbsLengthSpectrum",&pAbsLengthSpectrum);
+    ch->SetBranchAddress("fAbsLengthEnergies",&pAbsLengthEnergies);
+    ch->SetBranchAddress("fRayleighSpectrum",&pRayleighSpectrum);
+    ch->SetBranchAddress("fRayleighEnergies",&pRayleighEnergies);
+
+    ch->SetBranchAddress("fScintByParticleType",&fScintByParticleType);
+
+    ch->SetBranchAddress("fProtonScintYield", &fProtonScintYield);
+    ch->SetBranchAddress("fProtonScintYieldRatio", &fProtonScintYieldRatio);
+    ch->SetBranchAddress("fMuonScintYield", &fMuonScintYield);
+    ch->SetBranchAddress("fMuonScintYieldRatio", &fMuonScintYieldRatio);
+    ch->SetBranchAddress("fPionScintYield", &fPionScintYield);
+    ch->SetBranchAddress("fPionScintYieldRatio", &fPionScintYieldRatio);
+    ch->SetBranchAddress("fKaonScintYield", &fKaonScintYield);
+    ch->SetBranchAddress("fKaonScintYieldRatio", &fKaonScintYieldRatio);
+    ch->SetBranchAddress("fElectronScintYield", &fElectronScintYield);
+    ch->SetBranchAddress("fElectronScintYieldRatio", &fElectronScintYieldRatio);
+    ch->SetBranchAddress("fAlphaScintYield", &fAlphaScintYield);
+    ch->SetBranchAddress("fAlphaScintYieldRatio", &fAlphaScintYieldRatio);
     
-    _data_tree->SetBranchAddress("fFastScintSpectrum",&fFastScintSpectrum);
-    _data_tree->SetBranchAddress("fFastScintEnergies",&fFastScintEnergies);
-    _data_tree->SetBranchAddress("fSlowScintSpectrum",&fSlowScintSpectrum);
-    _data_tree->SetBranchAddress("fSlowScintEnergies",&fSlowScintEnergies);
-    _data_tree->SetBranchAddress("fRIndexSpectrum",&fRIndexSpectrum);
-    _data_tree->SetBranchAddress("fRIndexEnergies",&fRIndexEnergies);
-    _data_tree->SetBranchAddress("fAbsLengthSpectrum",&fAbsLengthSpectrum);
-    _data_tree->SetBranchAddress("fAbsLengthEnergies",&fAbsLengthEnergies);
-    _data_tree->SetBranchAddress("fRayleighSpectrum",&fRayleighSpectrum);
-    _data_tree->SetBranchAddress("fRayleighEnergies",&fRayleighEnergies);
-
-    _data_tree->SetBranchAddress("fScintByParticleType",&fScintByParticleType);
-
-    _data_tree->SetBranchAddress("fProtonScintYield", &fProtonScintYield);
-    _data_tree->SetBranchAddress("fProtonScintYieldRatio", &fProtonScintYieldRatio);
-    _data_tree->SetBranchAddress("fMuonScintYield", &fMuonScintYield);
-    _data_tree->SetBranchAddress("fMuonScintYieldRatio", &fMuonScintYieldRatio);
-    _data_tree->SetBranchAddress("fPionScintYield", &fPionScintYield);
-    _data_tree->SetBranchAddress("fPionScintYieldRatio", &fPionScintYieldRatio);
-    _data_tree->SetBranchAddress("fKaonScintYield", &fKaonScintYield);
-    _data_tree->SetBranchAddress("fKaonScintYieldRatio", &fKaonScintYieldRatio);
-    _data_tree->SetBranchAddress("fElectronScintYield", &fElectronScintYield);
-    _data_tree->SetBranchAddress("fElectronScintYieldRatio", &fElectronScintYieldRatio);
-    _data_tree->SetBranchAddress("fAlphaScintYield", &fAlphaScintYield);
-    _data_tree->SetBranchAddress("fAlphaScintYieldRatio", &fAlphaScintYieldRatio);
+    ch->SetBranchAddress("fScintYield", &fScintYield);
+    ch->SetBranchAddress("fScintResolutionScale", &fScintResolutionScale);
+    ch->SetBranchAddress("fScintFastTimeConst", &fScintFastTimeConst);
+    ch->SetBranchAddress("fScintSlowTimeConst", &fScintSlowTimeConst);
+    ch->SetBranchAddress("fScintYieldRatio", &fScintYieldRatio);
+    ch->SetBranchAddress("fScintBirksConstant", &fScintBirksConstant);
     
-    _data_tree->SetBranchAddress("fScintYield", &fScintYield);
-    _data_tree->SetBranchAddress("fScintResolutionScale", &fScintResolutionScale);
-    _data_tree->SetBranchAddress("fScintFastTimeConst", &fScintFastTimeConst);
-    _data_tree->SetBranchAddress("fScintSlowTimeConst", &fScintSlowTimeConst);
-    _data_tree->SetBranchAddress("fScintYieldRatio", &fScintYieldRatio);
-    _data_tree->SetBranchAddress("fScintBirksConstant", &fScintBirksConstant);
+    ch->SetBranchAddress("fEnableCerenkovLight", &fEnableCerenkovLight);
+
+    std::vector<std::string>            *pReflectiveSurfaceNames=nullptr;
+    std::vector<Double_t>               *pReflectiveSurfaceEnergies=nullptr;
+    std::vector<std::vector<Double_t> > *pReflectiveSurfaceReflectances=nullptr;
+    std::vector<std::vector<Double_t> > *pReflectiveSurfaceDiffuseFractions=nullptr;
+
+    ch->SetBranchAddress("fReflectiveSurfaceNames", &pReflectiveSurfaceNames);
+    ch->SetBranchAddress("fReflectiveSurfaceEnergies", &pReflectiveSurfaceEnergies);
+    ch->SetBranchAddress("fReflectiveSurfaceReflectances", &pReflectiveSurfaceReflectances);
+    ch->SetBranchAddress("fReflectiveSurfaceDiffuseFractions", &pReflectiveSurfaceDiffuseFractions);
+
+    ch->GetEntry(0);
     
-    _data_tree->SetBranchAddress("fEnableCerenkovLight", &fEnableCerenkovLight);
+    // Copy vector contents
 
-    _data_tree->SetBranchAddress("fReflectiveSurfaceNames", &fReflectiveSurfaceNames);
-    _data_tree->SetBranchAddress("fReflectiveSurfaceEnergies", &fReflectiveSurfaceEnergies);
-    _data_tree->SetBranchAddress("fReflectiveSurfaceReflectances", &fReflectiveSurfaceReflectances);
-    _data_tree->SetBranchAddress("fReflectiveSurfaceDiffuseFractions", &fReflectiveSurfaceDiffuseFractions);
+    for(size_t i=0; i<pEfield->size(); ++i)
+      fEfield.push_back(pEfield->at(i));
+
+    size_t n_entries = pFastScintSpectrum->size();
+    fFastScintSpectrum.reserve(n_entries);
+    fFastScintEnergies.reserve(n_entries);
+    for(size_t i=0; i<n_entries; ++i) {
+      fFastScintSpectrum.push_back(pFastScintSpectrum->at(i));
+      fFastScintEnergies.push_back(pFastScintEnergies->at(i));
+    }
+    n_entries = pSlowScintSpectrum->size();
+    fSlowScintSpectrum.reserve(n_entries);
+    fSlowScintEnergies.reserve(n_entries);
+    for(size_t i=0; i<n_entries; ++i) {
+      fSlowScintSpectrum.push_back(pSlowScintSpectrum->at(i));
+      fSlowScintEnergies.push_back(pSlowScintEnergies->at(i));
+    }
+    n_entries = pRIndexSpectrum->size();
+    fRIndexSpectrum.reserve(n_entries);
+    fRIndexEnergies.reserve(n_entries);
+    for(size_t i=0; i<n_entries; ++i) {
+      fRIndexSpectrum.push_back(pRIndexSpectrum->at(i));
+      fRIndexEnergies.push_back(pRIndexEnergies->at(i));
+    }
+    n_entries = pAbsLengthSpectrum->size();
+    fAbsLengthSpectrum.reserve(n_entries);
+    fAbsLengthEnergies.reserve(n_entries);
+    for(size_t i=0; i<n_entries; ++i) {
+      fAbsLengthSpectrum.push_back(pAbsLengthSpectrum->at(i));
+      fAbsLengthEnergies.push_back(pAbsLengthEnergies->at(i));
+    }
+    n_entries = pRayleighSpectrum->size();
+    fRayleighSpectrum.reserve(n_entries);
+    fRayleighEnergies.reserve(n_entries);
+    for(size_t i=0; i<n_entries; ++i) {
+      fRayleighSpectrum.push_back(pRayleighSpectrum->at(i));
+      fRayleighEnergies.push_back(pRayleighEnergies->at(i));
+    }
 
 
+    size_t n_surface = pReflectiveSurfaceNames->size();
+    fReflectiveSurfaceNames.reserve(n_surface);
+    fReflectiveSurfaceEnergies.reserve(n_surface);
+    fReflectiveSurfaceReflectances.reserve(n_surface);
+    fReflectiveSurfaceDiffuseFractions.reserve(n_surface);
+    for(size_t i=0; i<n_surface; ++i) {
+
+      fReflectiveSurfaceNames.push_back(pReflectiveSurfaceNames->at(i));
+      fReflectiveSurfaceEnergies.push_back(pReflectiveSurfaceEnergies->at(i));
+      fReflectiveSurfaceReflectances.push_back(pReflectiveSurfaceReflectances->at(i));
+      fReflectiveSurfaceDiffuseFractions.push_back(pReflectiveSurfaceDiffuseFractions->at(i));
+
+    }
+    
+    delete ch;
+    return true;
   }
 
   Double_t LArProperties::Density(Double_t temperature) const
@@ -162,10 +289,10 @@ namespace larutil {
 
   Double_t LArProperties::Efield(UInt_t planegap) const
   {
-    if(planegap >= fEfield->size())
+    if(planegap >= fEfield.size())
       throw LArUtilException("requesting Electric field in a plane gap that is not defined");
     
-    return fEfield->at(planegap);
+    return fEfield.at(planegap);
   }
 
   //------------------------------------------------------------------------------------//
@@ -393,17 +520,17 @@ namespace larutil {
   //---------------------------------------------------------------------------------
   std::map<Double_t,Double_t> LArProperties::FastScintSpectrum() const
   {
-    if(fFastScintSpectrum->size()!=fFastScintEnergies->size()){
+    if(fFastScintSpectrum.size()!=fFastScintEnergies.size()){
       std::ostringstream msg;
       msg << "The vectors specifying the fast scintillation spectrum are "
-	  << " different sizes - " << fFastScintSpectrum->size()
-	  << " " << fFastScintEnergies->size();
+	  << " different sizes - " << fFastScintSpectrum.size()
+	  << " " << fFastScintEnergies.size();
       throw LArUtilException(msg.str());
     }
     
     std::map<Double_t, Double_t> ToReturn;
-    for(size_t i=0; i!=fFastScintSpectrum->size(); ++i)
-      ToReturn[fFastScintEnergies->at(i)]=fFastScintSpectrum->at(i);
+    for(size_t i=0; i!=fFastScintSpectrum.size(); ++i)
+      ToReturn[fFastScintEnergies.at(i)]=fFastScintSpectrum.at(i);
     
     return ToReturn;
   }
@@ -411,17 +538,17 @@ namespace larutil {
   //---------------------------------------------------------------------------------
   std::map<Double_t, Double_t> LArProperties::SlowScintSpectrum() const
   {
-    if(fSlowScintSpectrum->size()!=fSlowScintEnergies->size()){
+    if(fSlowScintSpectrum.size()!=fSlowScintEnergies.size()){
       std::ostringstream msg;
       msg << "The vectors specifying the slow scintillation spectrum are "
-	  << " different sizes - " << fFastScintSpectrum->size()
-	  << " " << fFastScintEnergies->size();
+	  << " different sizes - " << fFastScintSpectrum.size()
+	  << " " << fFastScintEnergies.size();
       throw LArUtilException(msg.str());
     }
     
     std::map<Double_t, Double_t> ToReturn;
-    for(size_t i=0; i!=fSlowScintSpectrum->size(); ++i)
-      ToReturn[fSlowScintEnergies->at(i)]=fSlowScintSpectrum->at(i);
+    for(size_t i=0; i!=fSlowScintSpectrum.size(); ++i)
+      ToReturn[fSlowScintEnergies.at(i)]=fSlowScintSpectrum.at(i);
     
     return ToReturn;
   }
@@ -429,17 +556,17 @@ namespace larutil {
   //---------------------------------------------------------------------------------
   std::map<Double_t, Double_t> LArProperties::RIndexSpectrum() const
   {
-    if(fRIndexSpectrum->size()!=fRIndexEnergies->size()){
+    if(fRIndexSpectrum.size()!=fRIndexEnergies.size()){
       std::ostringstream msg;
       msg << "The vectors specifying the RIndex spectrum are "
-	  << " different sizes - " << fRIndexSpectrum->size()
-	  << " " << fRIndexEnergies->size();
+	  << " different sizes - " << fRIndexSpectrum.size()
+	  << " " << fRIndexEnergies.size();
       throw LArUtilException(msg.str());
     }
     
     std::map<Double_t, Double_t> ToReturn;
-    for(size_t i=0; i!=fRIndexSpectrum->size(); ++i)
-      ToReturn[fRIndexEnergies->at(i)]=fRIndexSpectrum->at(i);
+    for(size_t i=0; i!=fRIndexSpectrum.size(); ++i)
+      ToReturn[fRIndexEnergies.at(i)]=fRIndexSpectrum.at(i);
     
     return ToReturn;
   }
@@ -448,17 +575,17 @@ namespace larutil {
   //---------------------------------------------------------------------------------
   std::map<Double_t, Double_t> LArProperties::AbsLengthSpectrum() const
   {
-    if(fAbsLengthSpectrum->size()!=fAbsLengthEnergies->size()){
+    if(fAbsLengthSpectrum.size()!=fAbsLengthEnergies.size()){
       std::ostringstream msg;
       msg << "The vectors specifying the Abs Length spectrum are "
-	  << " different sizes - " << fAbsLengthSpectrum->size()
-	  << " " << fAbsLengthEnergies->size();
+	  << " different sizes - " << fAbsLengthSpectrum.size()
+	  << " " << fAbsLengthEnergies.size();
       throw LArUtilException(msg.str());
     }
     
     std::map<Double_t, Double_t> ToReturn;
-    for(size_t i=0; i!=fAbsLengthSpectrum->size(); ++i)
-      ToReturn[fAbsLengthEnergies->at(i)]=fAbsLengthSpectrum->at(i);
+    for(size_t i=0; i!=fAbsLengthSpectrum.size(); ++i)
+      ToReturn[fAbsLengthEnergies.at(i)]=fAbsLengthSpectrum.at(i);
     
     return ToReturn;
   }
@@ -466,17 +593,17 @@ namespace larutil {
   //---------------------------------------------------------------------------------
   std::map<Double_t, Double_t> LArProperties::RayleighSpectrum() const
   {
-    if(fRayleighSpectrum->size()!=fRayleighEnergies->size()){
+    if(fRayleighSpectrum.size()!=fRayleighEnergies.size()){
       std::ostringstream msg;
       msg << "The vectors specifying the rayleigh spectrum are "
-	  << " different sizes - " << fRayleighSpectrum->size()
-	  << " " << fRayleighEnergies->size();
+	  << " different sizes - " << fRayleighSpectrum.size()
+	  << " " << fRayleighEnergies.size();
       throw LArUtilException(msg.str());
     }
     
     std::map<Double_t, Double_t> ToReturn;
-    for(size_t i=0; i!=fRayleighSpectrum->size(); ++i)
-      ToReturn[fRayleighEnergies->at(i)]=fRayleighSpectrum->at(i);
+    for(size_t i=0; i!=fRayleighSpectrum.size(); ++i)
+      ToReturn[fRayleighEnergies.at(i)]=fRayleighSpectrum.at(i);
     
     return ToReturn;
   }
@@ -486,22 +613,22 @@ namespace larutil {
   {
     std::map<std::string, std::map<Double_t, Double_t> > ToReturn;
     
-    if(fReflectiveSurfaceNames->size()!=fReflectiveSurfaceReflectances->size()){
+    if(fReflectiveSurfaceNames.size()!=fReflectiveSurfaceReflectances.size()){
       std::ostringstream msg;
 	msg << "The vectors specifying the surface reflectivities "
 	    << "do not have consistent sizes";
 	throw LArUtilException(msg.str());
     }
-    for(size_t i=0; i!=fReflectiveSurfaceNames->size(); ++i){
-      if(fReflectiveSurfaceEnergies->size()!=fReflectiveSurfaceReflectances->at(i).size()){
+    for(size_t i=0; i!=fReflectiveSurfaceNames.size(); ++i){
+      if(fReflectiveSurfaceEnergies.size()!=fReflectiveSurfaceReflectances.at(i).size()){
 	std::ostringstream msg;
 	msg << "The vectors specifying the surface reflectivities do not have consistent sizes";
 	throw LArUtilException(msg.str());
       }
     }
-    for(size_t iName=0; iName!=fReflectiveSurfaceNames->size(); ++iName)
-      for(size_t iEnergy=0; iEnergy!=fReflectiveSurfaceEnergies->size(); ++iEnergy)
-	ToReturn[fReflectiveSurfaceNames->at(iName)][fReflectiveSurfaceEnergies->at(iEnergy)]=fReflectiveSurfaceReflectances->at(iName)[iEnergy];
+    for(size_t iName=0; iName!=fReflectiveSurfaceNames.size(); ++iName)
+      for(size_t iEnergy=0; iEnergy!=fReflectiveSurfaceEnergies.size(); ++iEnergy)
+	ToReturn[fReflectiveSurfaceNames.at(iName)][fReflectiveSurfaceEnergies.at(iEnergy)]=fReflectiveSurfaceReflectances.at(iName)[iEnergy];
     
     return ToReturn;
     
@@ -512,21 +639,21 @@ namespace larutil {
   {
     std::map<std::string, std::map<Double_t, Double_t> > ToReturn;
     
-    if(fReflectiveSurfaceNames->size()!=fReflectiveSurfaceDiffuseFractions->size()){
+    if(fReflectiveSurfaceNames.size()!=fReflectiveSurfaceDiffuseFractions.size()){
       std::ostringstream msg;
       msg << "The vectors specifying the surface reflectivities do not have consistent sizes";
       LArUtilException(msg.str());
     }
-    for(size_t i=0; i!=fReflectiveSurfaceNames->size(); ++i){
-      if(fReflectiveSurfaceEnergies->size()!=fReflectiveSurfaceDiffuseFractions->at(i).size()){
+    for(size_t i=0; i!=fReflectiveSurfaceNames.size(); ++i){
+      if(fReflectiveSurfaceEnergies.size()!=fReflectiveSurfaceDiffuseFractions.at(i).size()){
 	std::ostringstream msg;
 	msg << "The vectors specifying the surface reflectivities do not have consistent sizes";
 	throw LArUtilException(msg.str());
       }
     }
-    for(size_t iName=0; iName!=fReflectiveSurfaceNames->size(); ++iName)
-      for(size_t iEnergy=0; iEnergy!=fReflectiveSurfaceEnergies->size(); ++iEnergy)
-	ToReturn[fReflectiveSurfaceNames->at(iName)][fReflectiveSurfaceEnergies->at(iEnergy)]=fReflectiveSurfaceDiffuseFractions->at(iName)[iEnergy];
+    for(size_t iName=0; iName!=fReflectiveSurfaceNames.size(); ++iName)
+      for(size_t iEnergy=0; iEnergy!=fReflectiveSurfaceEnergies.size(); ++iEnergy)
+	ToReturn[fReflectiveSurfaceNames.at(iName)][fReflectiveSurfaceEnergies.at(iEnergy)]=fReflectiveSurfaceDiffuseFractions.at(iName)[iEnergy];
     
     return ToReturn;
   }

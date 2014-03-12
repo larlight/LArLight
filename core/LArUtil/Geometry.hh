@@ -46,25 +46,23 @@ namespace larutil {
     /// Default destructor
     virtual ~Geometry(){};
 
-    virtual void SetBranchAddress();    
-
     //--- LArSoft Implementation ---//
 
     /// Number of readout channels in the detector 
     UInt_t     Nchannels() const
-    { return fChannelToWireMap->size(); }
+    { return fChannelToWireMap.size(); }
 
     /// Number of OpChannels in the detector
     UInt_t NOpChannels() const
-    { return fOpChannelVtx->size(); }
+    { return fOpChannelVtx.size(); }
 
     /// Number of views (different wire orientations) in the detector
     UInt_t Nviews() const
-    { return fWirePitch->size(); }
+    { return fWirePitch.size(); }
 
     /// Number of wire planes in TPC "tpc" of cryostat "cstat".
     UInt_t Nplanes() const
-    { return fPlanePitch->size(); }
+    { return fPlanePitch.size(); }
 
     /// Number of wires in plane "p" of TPC "tpc" of cryostat "cstat".
     UInt_t Nwires(UInt_t p) const;
@@ -164,17 +162,15 @@ namespace larutil {
     Double_t   PlanePitch(const UChar_t p1 = 0,const UChar_t p2 = 1) const;
 
     /// distance between wires on the same plane w1 < w2
-    Double_t   WirePitch(const UInt_t  w1 = 0,                   
-			 const UInt_t  w2 = 1, 
+    Double_t   WirePitch(const UInt_t  w1=0,
+			 const UInt_t  w2=1,
 			 const UChar_t plane = 0) const;
 
     /// assumes all planes in a view have the same pitch
-    Double_t   WirePitch(const larlight::GEO::View_t view) const
-    { return fWirePitch->at(view); }
+    Double_t   WirePitch(const larlight::GEO::View_t view) const;
 
     /// assumes all wires in the view have the same angle
-    Double_t   WireAngleToVertical(larlight::GEO::View_t view) const
-    { return fWireAngle->at(view); }
+    Double_t   WireAngleToVertical(larlight::GEO::View_t view) const;
 
     /// volume box
     void  WorldBox(Double_t* xlo,
@@ -223,30 +219,36 @@ namespace larutil {
     /// Return optical channel vertex
     void GetOpChannelPosition(const UInt_t i, Double_t *xyz) const;
 
-    const std::vector<Double_t>& PlaneOriginVtx(UChar_t plane) const;
+    const std::vector<Double_t>& PlaneOriginVtx(UChar_t plane);
 
     void PlaneOriginVtx(UChar_t plane, Double_t *vtx) const;
+
+  protected:
+    
+    virtual bool ReadTree();
+
+    virtual void ClearData();
 
   private:
 
     // Vectors with length = # channels
-    std::vector<UChar_t>                *fChannelToPlaneMap;
-    std::vector<UShort_t>               *fChannelToWireMap;
-    std::vector<std::vector<UShort_t> > *fPlaneWireToChannelMap;
+    std::vector<UChar_t>                fChannelToPlaneMap;
+    std::vector<UShort_t>               fChannelToWireMap;
+    std::vector<std::vector<UShort_t> > fPlaneWireToChannelMap;
 
     // Vectors with length = # planes
-    std::vector<larlight::GEO::SigType_t> *fSignalType;
-    std::vector<larlight::GEO::View_t>    *fViewType;
-    std::vector<Double_t> *fPlanePitch;
-    std::vector<std::vector<Double_t> > *fFirstWireStartVtx;
-    std::vector<std::vector<Double_t> > *fFirstWireEndVtx;
-    std::vector<std::vector<Double_t> > *fPlaneOriginVtx;
+    std::vector<larlight::GEO::SigType_t> fSignalType;
+    std::vector<larlight::GEO::View_t>    fViewType;
+    std::vector<Double_t> fPlanePitch;
+    std::vector<std::vector<Double_t> > fFirstWireStartVtx;
+    std::vector<std::vector<Double_t> > fFirstWireEndVtx;
+    std::vector<std::vector<Double_t> > fPlaneOriginVtx;
 
     // Vectors with length = view
-    std::vector<Double_t> *fWirePitch;
-    std::vector<Double_t> *fWireAngle;
+    std::vector<Double_t> fWirePitch;
+    std::vector<Double_t> fWireAngle;
 
-    std::vector<std::vector<Float_t> > *fOpChannelVtx;
+    std::vector<std::vector<Float_t> > fOpChannelVtx;
 
   };
 }

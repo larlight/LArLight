@@ -16,7 +16,7 @@
 // Class forward declaration here
 namespace larutil {
   class LArUtilException;
-  class LArUtilBase;
+  //  class LArUtilBase;
   class Geometry;
   class LArProperties;
   class DetectorProperties;

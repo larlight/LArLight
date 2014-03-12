@@ -13,15 +13,15 @@ namespace larutil {
       _tree_name(tree_name)
   //-----------------------------------------------------
   { 
-    _data_tree = 0;
     _name      = "LArUtilBase";
+    _loaded = false;
   }
 
   //-----------------------------------------------------
   bool LArUtilBase::LoadData(bool force_reload)
   //-----------------------------------------------------
   {
-    if(!force_reload && _data_tree) return true;
+    if(!force_reload && _loaded) return true;
 
     print(larlight::MSG::INFO,__FUNCTION__,
 	  Form("Reading-in data for %s",_name.c_str()));
@@ -33,23 +33,15 @@ namespace larutil {
       return false;
     }
 
-    if(_data_tree){
-
-      print(larlight::MSG::NORMAL,__FUNCTION__,"Data already loaded before. Removing it...");	   
-      delete _data_tree;
-
-    }
-
-    _data_tree = new TChain(_tree_name.c_str());
-    _data_tree->AddFile(_file_name.c_str());
-
+    bool status=false;
     try {
 
-      SetBranchAddress();
-      _data_tree->GetEntry(0);
       print(larlight::MSG::NORMAL, __FUNCTION__,
 	    Form("Loading data for %s...\n     file=%s ", _name.c_str(), _file_name.c_str()));
-      
+      ClearData();
+      status = ReadTree();
+      if(!status)
+	throw LArUtilException("Failed to load !");
     }
     catch (LArUtilException &e) {
 
@@ -59,13 +51,11 @@ namespace larutil {
       print(larlight::MSG::ERROR, __FUNCTION__,
 	    e.msg());
       
-      delete _data_tree;
-      _data_tree = 0;
       throw e;
-      return false;
+      status = false;
     }
 
-    return true;
+    return status;
   }
   
 }
