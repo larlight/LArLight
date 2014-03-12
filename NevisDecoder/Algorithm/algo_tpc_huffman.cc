@@ -170,7 +170,7 @@ namespace larlight {
 
     if(!_event_data)
 
-      _event_data = (event_fifo*)(_storage->get_data(DATA::TPCFIFO));
+      _event_data = (event_tpcfifo*)(_storage->get_data(DATA::TPCFIFO));
 
     else if(get_word_class(last_word)!=FEM::EVENT_LAST_WORD){
 

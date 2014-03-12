@@ -47,9 +47,7 @@ all:
 # CLEANs...
 #
 clean:
-	@for i in $(SUBDIRS); do ( echo "" && echo "Cleaning $$i..." && cd $$i && $(MAKE) clean ) || exit $$?; done
-	@rm -f $(DECODER_LIBDIR)/lib*.so
-	@rm -f $(DECODER_LIBDIR)/lib*.rootmap
+	@for i in $(SUBDIRS); do ( echo "" && echo "Cleaning $$i..." && cd $$i && $(MAKE) clean && rm -f $(DECODER_DIR)/lib/$$i.* ) || exit $$?; done
 
 #####################################################################################
 #

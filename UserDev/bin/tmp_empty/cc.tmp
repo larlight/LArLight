@@ -1,0 +1,6 @@
+#ifndef PACKAGE_NAME_CC
+#define PACKAGE_NAME_CC
+
+#include "Package_Name.hh"
+
+#endif

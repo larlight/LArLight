@@ -106,9 +106,9 @@ namespace larlight {
 
   protected:
 
-    fifo _ch_data;
+    tpcfifo _ch_data;
 
-    event_fifo* _event_data;
+    event_tpcfifo* _event_data;
 
   };
 }
