@@ -46,8 +46,6 @@ namespace larutil {
     /// Default destructor
     virtual ~DetectorProperties(){};
 
-    virtual void SetBranchAddress();
-
     //--- LArSoft Function Implementations ---//
     
     Double_t SamplingRate()      const { return fSamplingRate;   }
@@ -60,15 +58,15 @@ namespace larutil {
     Double_t TimeOffsetZ()       const { return fTimeOffsetZ; }
     
     Double_t ConvertXToTicks(Double_t X,     Int_t p) {
-      return (X / fXTicksCoefficient +  fXTicksOffsets->at(p));
+      return (X / fXTicksCoefficient +  fXTicksOffsets.at(p));
     }
 
     Double_t ConvertTicksToX(Double_t ticks, Int_t p) {
-      return (ticks - fXTicksOffsets->at(p) ) * fXTicksCoefficient;
+      return (ticks - fXTicksOffsets.at(p) ) * fXTicksCoefficient;
     }
     
     Double_t GetXTicksOffset(Int_t p) {
-      return fXTicksOffsets->at(p);
+      return fXTicksOffsets.at(p);
     }
 
     Double_t GetXTicksCoefficient() {
@@ -87,6 +85,9 @@ namespace larutil {
 
   protected:
 
+    virtual bool ReadTree();
+    virtual void ClearData();
+
     Double_t fSamplingRate;      ///< in ns
     Int_t    fTriggerOffset;     ///< in # of clock ticks
     Double_t fElectronsToADC;    ///< conversion factor for # of ionization electrons to 1 ADC count
@@ -101,7 +102,7 @@ namespace larutil {
     
     Double_t fXTicksCoefficient; ///< Parameters for x<-->ticks
     bool     fXTicksParamsLoaded;///<  calculations
-    std::vector<Double_t> *fXTicksOffsets;
+    std::vector<Double_t> fXTicksOffsets;
 
   };
 }

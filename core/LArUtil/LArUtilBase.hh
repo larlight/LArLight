@@ -43,10 +43,6 @@ namespace larutil {
     void SetFileName(const std::string filename)
     { _file_name = filename; }
 
-    /// Method to store TTree in TFile
-    const TTree* GetDataTree() const
-    { return (TTree*)_data_tree; }
-
     /// Method to set data TTree name
     void SetTreeName(const std::string treename)
     { _tree_name = treename; }
@@ -56,13 +52,13 @@ namespace larutil {
 
   protected:
 
-    /// Method to generate data TTree
-    virtual void SetBranchAddress(){};
+    virtual bool ReadTree()=0;
+
+    virtual void ClearData()=0;
 
     std::string _file_name;
     std::string _tree_name;
-    TChain *_data_tree;
-    
+    bool _loaded;
   };
 }
 

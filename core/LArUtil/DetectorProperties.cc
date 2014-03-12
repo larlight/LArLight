@@ -20,43 +20,68 @@ namespace larutil {
     LoadData();
   }
 
-  void DetectorProperties::SetBranchAddress()
+  void DetectorProperties::ClearData()
+  {
+    fSamplingRate = larlight::DATA::INVALID_DOUBLE;
+    fTriggerOffset = larlight::DATA::INVALID_DOUBLE;
+    fElectronsToADC = larlight::DATA::INVALID_DOUBLE;
+    fNumberTimeSamples = larlight::DATA::INVALID_DOUBLE;
+    fReadOutWindowSize = larlight::DATA::INVALID_DOUBLE;
+
+    fTimeOffsetU = larlight::DATA::INVALID_DOUBLE;
+    fTimeOffsetV = larlight::DATA::INVALID_DOUBLE;
+    fTimeOffsetZ = larlight::DATA::INVALID_DOUBLE;
+
+    fXTicksCoefficient = larlight::DATA::INVALID_DOUBLE;
+    fXTicksOffsets.clear();    
+
+  }
+
+  bool DetectorProperties::ReadTree()
   {
 
-    if(!_data_tree) {
-      throw LArUtilException(Form("DataTree has to be specified prior to %s function call",__FUNCTION__));
-      return;
-    }
+    ClearData();
+    TChain *ch = new TChain(_tree_name.c_str());
+    ch->AddFile(_file_name.c_str());
 
     std::string error_msg("");
-    if(!(_data_tree->GetBranch("fSamplingRate")))      error_msg += "      fSamplingRate\n";
-    if(!(_data_tree->GetBranch("fTriggerOffset")))     error_msg += "      fTriggerOffset\n";
-    if(!(_data_tree->GetBranch("fElectronsToADC")))    error_msg += "      fElectronsToADC\n";
-    if(!(_data_tree->GetBranch("fNumberTimeSamples"))) error_msg += "      fNumberTimeSamples\n";
-    if(!(_data_tree->GetBranch("fReadOutWindowSize"))) error_msg += "      fReadOutWindowSize\n";
-    if(!(_data_tree->GetBranch("fTimeOffsetU")))       error_msg += "      fTimeOffsetU\n";
-    if(!(_data_tree->GetBranch("fTimeOffsetV")))       error_msg += "      fTimeOffsetV\n";
-    if(!(_data_tree->GetBranch("fTimeOffsetZ")))       error_msg += "      fTimeOffsetZ\n";
-    if(!(_data_tree->GetBranch("fXTicksCoefficient"))) error_msg += "      fXTicksCoefficient\n";
-    if(!(_data_tree->GetBranch("fXTicksOffsets")))     error_msg += "      fXTicksOffsets\n";
+    if(!(ch->GetBranch("fSamplingRate")))      error_msg += "      fSamplingRate\n";
+    if(!(ch->GetBranch("fTriggerOffset")))     error_msg += "      fTriggerOffset\n";
+    if(!(ch->GetBranch("fElectronsToADC")))    error_msg += "      fElectronsToADC\n";
+    if(!(ch->GetBranch("fNumberTimeSamples"))) error_msg += "      fNumberTimeSamples\n";
+    if(!(ch->GetBranch("fReadOutWindowSize"))) error_msg += "      fReadOutWindowSize\n";
+    if(!(ch->GetBranch("fTimeOffsetU")))       error_msg += "      fTimeOffsetU\n";
+    if(!(ch->GetBranch("fTimeOffsetV")))       error_msg += "      fTimeOffsetV\n";
+    if(!(ch->GetBranch("fTimeOffsetZ")))       error_msg += "      fTimeOffsetZ\n";
+    if(!(ch->GetBranch("fXTicksCoefficient"))) error_msg += "      fXTicksCoefficient\n";
+    if(!(ch->GetBranch("fXTicksOffsets")))     error_msg += "      fXTicksOffsets\n";
     if(!error_msg.empty()) {
 
       throw LArUtilException(Form("Missing following TBranches...\n%s",error_msg.c_str()));
 
-      return;
+      return false;
     }
 
-    _data_tree->SetBranchAddress("fSamplingRate",&fSamplingRate);
-    _data_tree->SetBranchAddress("fTriggerOffset",&fTriggerOffset);
-    _data_tree->SetBranchAddress("fElectronsToADC",&fElectronsToADC);
-    _data_tree->SetBranchAddress("fNumberTimeSamples",&fNumberTimeSamples);
-    _data_tree->SetBranchAddress("fReadOutWindowSize",&fReadOutWindowSize);
-    _data_tree->SetBranchAddress("fTimeOffsetU",&fTimeOffsetU);
-    _data_tree->SetBranchAddress("fTimeOffsetV",&fTimeOffsetV);
-    _data_tree->SetBranchAddress("fTimeOffsetZ",&fTimeOffsetZ);
-    _data_tree->SetBranchAddress("fXTicksCoefficient",&fXTicksCoefficient);
-    _data_tree->SetBranchAddress("fXTicksOffsets",&fXTicksOffsets);
+    ch->SetBranchAddress("fSamplingRate",&fSamplingRate);
+    ch->SetBranchAddress("fTriggerOffset",&fTriggerOffset);
+    ch->SetBranchAddress("fElectronsToADC",&fElectronsToADC);
+    ch->SetBranchAddress("fNumberTimeSamples",&fNumberTimeSamples);
+    ch->SetBranchAddress("fReadOutWindowSize",&fReadOutWindowSize);
+    ch->SetBranchAddress("fTimeOffsetU",&fTimeOffsetU);
+    ch->SetBranchAddress("fTimeOffsetV",&fTimeOffsetV);
+    ch->SetBranchAddress("fTimeOffsetZ",&fTimeOffsetZ);
+    ch->SetBranchAddress("fXTicksCoefficient",&fXTicksCoefficient);
 
+    std::vector<Double_t> *pXTicksOffsets=nullptr;
+    ch->SetBranchAddress("fXTicksOffsets",&pXTicksOffsets);
+
+    ch->GetEntry(0);
+
+    for(size_t i=0; i<pXTicksOffsets->size(); ++i)
+      fXTicksOffsets.push_back(pXTicksOffsets->at(i));
+
+    delete ch;
+    return true;
   }
 
 }
