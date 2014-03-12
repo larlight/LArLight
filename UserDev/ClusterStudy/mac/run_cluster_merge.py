@@ -14,6 +14,7 @@ parser.add_argument("-s","--source",help="Name of input file")
 parser.add_argument("-o","--data-output",help="Output data file, if event is changed")
 parser.add_argument("-a","--ana-output",help="Analysis output file")
 parser.add_argument("-n", "--num-events",help="Number of events to process")
+parser.add_argument("-d","--display",help="Turn on the display to see each view before and after." )
 args = parser.parse_args()
 
 if len(sys.argv) == 1:
@@ -72,10 +73,42 @@ ana_proc.add_process(my_merge_alg)
 
 ana_proc.add_process(my_merger)
 
-while ana_proc.process_event() and ana_proc.get_process_status() == ana_proc.PROCESSING:
-    
-    print my_merge_alg.GetMergeTree()
+c=TCanvas("c","Wire v. Time Cluster Viewer",900,600)
 
+
+
+while ana_proc.process_event() and ana_proc.get_process_status() == ana_proc.PROCESSING:
+    currentview = 0;
+    print my_merge_alg.GetMergeTree()
+    for iview in xrange(0,3):
+        for iclus in xrange(ana_proc.GetClusterGraph_Reco(int(iview),bool(true)).size()):
+            gstart=ana_proc.GetClusterGraph_Reco(int(iview),bool(true)).at(iclus)
+            gend  =ana_proc.GetClusterGraph_Reco(int(iview),bool(false)).at(iclus)
+            xmin=ana_proc.GetHisto_Hits(int(iview)).GetXaxis().GetXmin()
+            xmax=ana_proc.GetHisto_Hits(int(iview)).GetXaxis().GetXmax()
+            ymin=ana_proc.GetHisto_Hits(int(iview)).GetYaxis().GetXmin()
+            ymax=ana_proc.GetHisto_Hits(int(iview)).GetYaxis().GetXmax()
+            gstart.GetXaxis().SetLimits(xmin,xmax)
+            gend.GetXaxis().SetLimits(xmin,xmax)       
+            gstart.GetYaxis().SetRangeUser(ymin,ymax)
+            gend.GetYaxis().SetRangeUser(ymin,ymax)
+            gstart.SetTitle("View: %d, Cluster: %d"%(iview+1,iclus))
+            gstart.SetMarkerSize(3)
+            gstart.SetMarkerStyle(30)
+            gend.SetMarkerSize(3)
+            gend.SetMarkerStyle(29)
+            gstart.Draw("ALP")
+            gend.Draw("LP")
+            ana_proc.GetHisto_Reco(int(iview)).at(iclus).Draw("same")
+            leg = TLegend(0.6,0.65,0.88,0.85)
+            leg.AddEntry(gstart,"Start Point","p")
+            leg.AddEntry(gend,"End Point","p")
+            leg.Draw()
+            c_graph.Update()
+            print "Drawing cluster %d out of %d for view %d. To look at the next cluster hit enter." % (iclus,ana_proc.GetClusterGraph_Reco(int(iview),bool(true)).size()-1,iview+1)
+            sys.stdin.readline()
+
+    print "Hit Enter to continue to next evt..."
     sys.stdin.readline()
 
 #ana_proc.run()
