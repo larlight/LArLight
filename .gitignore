@@ -1,0 +1,7 @@
+*.o
+*Cint.h
+*Cint.cc
+.depend
+*.rootmap
+*.so
+*.dylib
