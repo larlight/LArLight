@@ -20,6 +20,7 @@
 #include "TVirtualFFT.h"
 #include "TF1.h"
 #include "TMath.h"
+#include "TRandom.h"
 
 namespace larlight {
   /**
@@ -60,13 +61,29 @@ namespace larlight {
     //maximum channel number used
     int _ChMax;
     int event_num;
+    int maxevt;
     TH1D *AllRMS;
     TH1D *ChannelRMS;
-    TH1D *RMSperChan[30000];
+    TH1D *RMSperChan[100];
+    //ChanRMS[Chan#][evt#] = RMS for that chan for that event
+    double ChanRMS[20000][100];
+    //ChanBaseline[Chan#][evt#] = Baseline for that chan for that event
+    double ChanBaseline[20000][100];
+    int BaselineTrend[20000];
+    int RMSTrend[20000];
+    double BaselineMean[20000];
+    double BaselineRMS[20000];
     TH1D *AllChan;
     TH1D *NoiseSpec;
     TH1D *SineExmpl;
     TH1D *sine;
+    TH1D *RandExmpl;
+    TH1D *rand;
+    TH1D *BaseTrendHisto;
+    TH1D *RMSTrendHisto;
+    TH1D *BaseMeanHisto;
+    TH1D *BaseRMSHisto;
+    TH1D *MaxADCsHisto;
 
   };
 }
