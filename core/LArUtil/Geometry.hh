@@ -75,65 +75,77 @@ namespace larutil {
     /// return the signal type for a given channel
     larlight::GEO::SigType_t SignalType(const UInt_t channel)  const; 
 
+    /// return the signal type for a given plane
+    larlight::GEO::SigType_t PlaneToSignalType(const UChar_t plane)  const; 
+
     /// return the view type for a given channel
     larlight::GEO::View_t View(const UInt_t channel)  const; 
+
+    /// return the view type for a given plane
+    larlight::GEO::View_t PlaneToView(const UChar_t plane) const;
 
     /// return vector of possible views in the detector
     std::set<larlight::GEO::View_t>  const Views() const; 
 
-    // convert plane, wire to channel 
+    /// convert plane, wire to channel 
     UInt_t   PlaneWireToChannel(const UInt_t plane,
 				const UInt_t wire) const;
     
-    // find the nearest channel to input world coordinates
+    /// convert channel to plane
+    UChar_t  ChannelToPlane(const UInt_t ch) const;
+
+    /// Convert channel to wire
+    UInt_t   ChannelToWire(const UInt_t ch)const;
+    
+    /// find the nearest channel to input world coordinates
     UInt_t   NearestChannel(const Double_t worldLoc[3],
 			    const UInt_t   PlaneNo) const;
 
-    // find the nearest channel to input world coordinates 
-    UInt_t   NearestChannel(const std::vector<Double_t> worldLoc,
+    /// find the nearest channel to input world coordinates 
+    UInt_t   NearestChannel(const std::vector<Double_t> &worldLoc,
 			    const UInt_t PlaneNo) const;
 
-    // find the nearest channel to input world coordinates
+    /// find the nearest channel to input world coordinates
     UInt_t   NearestChannel(const TVector3& worldLoc,
 			    const UInt_t    PlaneNo) const;
 
-    // nearest wire to input world coordinates
+    /// nearest wire to input world coordinates
     UInt_t NearestWire(const Double_t worldLoc[3],
 		       const UInt_t   PlaneNo) const;
 
-    // nearest wire to input world coordinate
-    UInt_t NearestWire(std::vector<Double_t> worldLoc,
+    /// nearest wire to input world coordinate
+    UInt_t NearestWire(const std::vector<Double_t> &worldLoc,
 		       const UInt_t  PlaneNo) const;
 
-    // nearest wire to input world coordinates
+    /// nearest wire to input world coordinates
     UInt_t NearestWire(const TVector3& worldLoc,
 		       const UInt_t PlaneNo) const;
 
-    // half width of the TPC
+    /// half width of the TPC
     Double_t   DetHalfWidth() const
     { return fDetHalfWidth; }
 
-    // half height of the TPC 
+    /// half height of the TPC 
     Double_t   DetHalfHeight() const
     { return fDetHalfHeight; }
 
-    // length of the TPC 
+    /// length of the TPC 
     Double_t   DetLength() const
     { return fDetLength; }
 
-    // half width of the cryostat
+    /// half width of the cryostat
     Double_t   CryostatHalfWidth() const
     { return fCryoHalfWidth; }
 
-    // half height of the cryostat
+    /// half height of the cryostat
     Double_t   CryostatHalfHeight() const
     { return fCryoHalfHeight; }
 
-    // length of the cryostat 
+    /// length of the cryostat 
     Double_t   CryostatLength() const
     { return fCryoLength; }
 
-    // boundaries of cryostat, 3 pairs of +/- coord
+    /// boundaries of cryostat, 3 pairs of +/- coord
     //void     CryostatBoundaries(Double_t* boundaries) const;
 
   private:
@@ -148,23 +160,23 @@ namespace larutil {
 
   public:
 
-    // distance between planes p1 < p2
+    /// distance between planes p1 < p2
     Double_t   PlanePitch(const UChar_t p1 = 0,const UChar_t p2 = 1) const;
 
-    // distance between wires on the same plane w1 < w2
+    /// distance between wires on the same plane w1 < w2
     Double_t   WirePitch(const UInt_t  w1 = 0,                   
 			 const UInt_t  w2 = 1, 
 			 const UChar_t plane = 0) const;
 
-    // assumes all planes in a view have the same pitch
+    /// assumes all planes in a view have the same pitch
     Double_t   WirePitch(const larlight::GEO::View_t view) const
     { return fWirePitch->at(view); }
 
-    // assumes all wires in the view have the same angle
+    /// assumes all wires in the view have the same angle
     Double_t   WireAngleToVertical(larlight::GEO::View_t view) const
     { return fWireAngle->at(view); }
 
-    // volume box
+    /// volume box
     void  WorldBox(Double_t* xlo,
 		   Double_t* xhi,
 		   Double_t* ylo,
@@ -211,8 +223,13 @@ namespace larutil {
     /// Return optical channel vertex
     void GetOpChannelPosition(const UInt_t i, Double_t *xyz) const;
 
+    const std::vector<Double_t>& PlaneOriginVtx(UChar_t plane) const;
+
+    void PlaneOriginVtx(UChar_t plane, Double_t *vtx) const;
+
   private:
-    
+
+    // Vectors with length = # channels
     std::vector<UChar_t>                *fChannelToPlaneMap;
     std::vector<UShort_t>               *fChannelToWireMap;
     std::vector<std::vector<UShort_t> > *fPlaneWireToChannelMap;
@@ -223,6 +240,7 @@ namespace larutil {
     std::vector<Double_t> *fPlanePitch;
     std::vector<std::vector<Double_t> > *fFirstWireStartVtx;
     std::vector<std::vector<Double_t> > *fFirstWireEndVtx;
+    std::vector<std::vector<Double_t> > *fPlaneOriginVtx;
 
     // Vectors with length = view
     std::vector<Double_t> *fWirePitch;

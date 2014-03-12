@@ -47,6 +47,8 @@ namespace larutil {
     if(!(_data_tree->GetBranch("fWirePitch")))    error_msg += "      fWirePitch\n";
     if(!(_data_tree->GetBranch("fWireAngle")))    error_msg += "      fWireAngle\n";
     if(!(_data_tree->GetBranch("fOpChannelVtx"))) error_msg += "      fOpChannelVtx\n";
+    
+    if(!(_data_tree->GetBranch("fPlaneOriginVtx"))) error_msg += "      fPlaneOriginVtx\n";
 
     if(!error_msg.empty()) {
 
@@ -78,6 +80,8 @@ namespace larutil {
 
     _data_tree->SetBranchAddress("fOpChannelVtx",&fOpChannelVtx);
 
+    _data_tree->SetBranchAddress("fPlaneOriginVtx",&fPlaneOriginVtx);
+
   }
 
 
@@ -91,6 +95,24 @@ namespace larutil {
     return fPlaneWireToChannelMap->at(p).size();
   }
 
+  UChar_t  Geometry::ChannelToPlane(const UInt_t ch) const
+  {
+    if(ch >= fChannelToPlaneMap->size()) {
+      throw LArUtilException(Form("Invalid channel number: %d",ch));
+      return larlight::DATA::INVALID_CHAR;
+    }
+    return fChannelToPlaneMap->at(ch);
+  }
+
+  UInt_t   Geometry::ChannelToWire(const UInt_t ch)const
+  {
+    if(ch >= fChannelToWireMap->size()) {
+      throw LArUtilException(Form("Invalid channel number: %d",ch));
+      return larlight::DATA::INVALID_CHAR;
+    }
+    return fChannelToWireMap->at(ch);
+  }
+
   larlight::GEO::SigType_t Geometry::SignalType(const UInt_t ch) const
   {
     if(ch >= fChannelToPlaneMap->size()) {
@@ -101,6 +123,16 @@ namespace larutil {
     return fSignalType->at(fChannelToPlaneMap->at(ch));
   }
 
+  larlight::GEO::SigType_t Geometry::PlaneToSignalType(const UChar_t plane) const
+  {
+    if(plane >= fSignalType->size()) {
+      throw LArUtilException(Form("Invalid Plane number: %d",plane));
+      return larlight::GEO::kMysteryType;
+    }
+
+    return fSignalType->at(plane);
+  }
+
   larlight::GEO::View_t Geometry::View(const UInt_t ch) const
   {
     if(ch >= fChannelToPlaneMap->size()) {
@@ -109,6 +141,16 @@ namespace larutil {
     }
     
     return fViewType->at(fChannelToPlaneMap->at(ch));
+  }
+
+  larlight::GEO::View_t Geometry::PlaneToView(const UChar_t plane) const
+  {
+    if(plane >= fViewType->size()) {
+      throw LArUtilException(Form("Invalid Plane number: %d",plane));
+      return larlight::GEO::kUnknown;
+    }
+
+    return fViewType->at(plane);
   }
 
   std::set<larlight::GEO::View_t> const Geometry::Views() const
@@ -134,7 +176,7 @@ namespace larutil {
     return PlaneWireToChannel(PlaneNo,NearestWire(worldLoc,PlaneNo));
   }
 
-  UInt_t Geometry::NearestChannel(const std::vector<Double_t> worldLoc,
+  UInt_t Geometry::NearestChannel(const std::vector<Double_t> &worldLoc,
 				  const UInt_t PlaneNo) const
   {
     return PlaneWireToChannel(PlaneNo,NearestWire(worldLoc,PlaneNo));
@@ -149,19 +191,56 @@ namespace larutil {
   UInt_t Geometry::NearestWire(const Double_t worldLoc[3],
 			       const UInt_t PlaneNo) const
   {
-    return larlight::DATA::INVALID_UINT;
+    TVector3 loc(worldLoc);
+    return NearestWire(loc,PlaneNo);
   }
   
-  UInt_t Geometry::NearestWire(const std::vector<Double_t> worldLoc,
+  UInt_t Geometry::NearestWire(const std::vector<Double_t> &worldLoc,
 			       const UInt_t PlaneNo) const
   {
-    return larlight::DATA::INVALID_UINT;
+    TVector3 loc(&worldLoc[0]);
+    return NearestWire(loc,PlaneNo);
   }
   
   UInt_t Geometry::NearestWire(const TVector3 &worldLoc,
 			       const UInt_t PlaneNo) const
   {
-    return larlight::DATA::INVALID_UINT;
+    if(PlaneNo > fFirstWireStartVtx->size()) {
+
+      throw LArUtilException(Form("Invalid plane number: %d",PlaneNo));
+      return larlight::DATA::INVALID_UINT;
+
+    }
+
+    Double_t point_y = worldLoc[1];
+    Double_t point_z = worldLoc[2];
+
+    Double_t wire_upper_y = fFirstWireStartVtx->at(PlaneNo).at(1);
+    Double_t wire_lower_y = fFirstWireEndVtx->at(PlaneNo).at(1);
+
+    Double_t wire_upper_z = fFirstWireStartVtx->at(PlaneNo).at(2);
+    Double_t wire_lower_z = fFirstWireEndVtx->at(PlaneNo).at(2);
+
+    if(wire_upper_y < wire_lower_y) {
+      std::swap(wire_upper_y,wire_lower_y);
+      std::swap(wire_upper_z,wire_lower_z);
+    }
+
+    if(point_y > wire_upper_y) point_y = wire_upper_y;
+    if(point_y < wire_lower_y) point_y = wire_lower_y;
+
+    Double_t dx = (point_z - wire_lower_z) - 
+      TMath::Abs(point_y - wire_lower_y)/TMath::Tan(fWireAngle->at(fViewType->at(PlaneNo)));
+
+    if(dx < 0) return 0;
+
+    if(dx > (wire_lower_z + fWirePitch->at(fViewType->at(PlaneNo)) * (this->Nwires(PlaneNo))) ) 
+      return ( this->Nwires(PlaneNo) - 1 );
+
+    dx /= fWirePitch->at(fViewType->at(PlaneNo)) + 0.5;
+
+    return (UInt_t)(dx);
+
   }
 
   // distance between planes p1 < p2
@@ -438,6 +517,7 @@ namespace larutil {
   void Geometry::GetOpChannelPosition(const UInt_t i, Double_t *xyz) const
   {
     if( i >= fOpChannelVtx->size() ) {
+      throw LArUtilException(Form("Invalid PMT channel number: %d",i));
       xyz[0] = larlight::DATA::INVALID_DOUBLE;
       xyz[0] = larlight::DATA::INVALID_DOUBLE;
       xyz[0] = larlight::DATA::INVALID_DOUBLE;
@@ -449,7 +529,24 @@ namespace larutil {
     xyz[2] = fOpChannelVtx->at(i).at(2);
     return;
   }
-  
+
+  const std::vector<Double_t>& Geometry::PlaneOriginVtx(UChar_t plane) const
+  {
+    if(plane >= fPlaneOriginVtx->size()) {
+      throw LArUtilException(Form("Invalid plane number: %d",plane));
+      fPlaneOriginVtx->push_back(std::vector<Double_t>(3,larlight::DATA::INVALID_DOUBLE));
+      return fPlaneOriginVtx->at(this->Nplanes());
+    }
+
+    return fPlaneOriginVtx->at(plane);
+  }
+
+  void Geometry::PlaneOriginVtx(UChar_t plane, Double_t *vtx) const
+  {
+    vtx[0] = fPlaneOriginVtx->at(plane)[0];
+    vtx[1] = fPlaneOriginVtx->at(plane)[1];
+    vtx[2] = fPlaneOriginVtx->at(plane)[2];
+  }  
 
 }
 

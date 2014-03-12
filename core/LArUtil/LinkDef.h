@@ -18,6 +18,10 @@
 #pragma link C++ class larutil::Geometry+;
 #pragma link C++ class larutil::LArProperties+;
 #pragma link C++ class larutil::DetectorProperties+;
+#pragma link C++ class larutil::GeometryUtilities+;
+
+#pragma link C++ class larutil::pxpoint+;
+#pragma link C++ class larutil::pxline+;
 
 //ADD_NEW_CLASS ... do not change this line
 #endif

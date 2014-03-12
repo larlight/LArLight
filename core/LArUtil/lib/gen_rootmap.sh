@@ -17,7 +17,7 @@ rootlibmap() {
 ######################################################
 # LArUtil
 rootlibmap libLArUtil.rootmap libLArUtil.so $LARLIGHT_CORE_DIR/LArUtil/LinkDef.h \
-    libBase.so libHist.so libTree.so 
+    libTree.so libDataFormat.so
 
 
 
