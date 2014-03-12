@@ -203,7 +203,7 @@ namespace larlight {
     if(_verbosity[MSG::DEBUG])
       Message::send(MSG::DEBUG,__PRETTY_FUNCTION__,"called ...");
     
-    if(!_status==OPENED) {
+    if(_status!=OPENED) {
       sprintf(_buf,"Unexpected function call @ _status=%d!",_status);
       Message::send(MSG::ERROR,__FUNCTION__,_buf);
       status=false;
