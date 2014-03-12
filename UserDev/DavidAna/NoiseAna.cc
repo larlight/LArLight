@@ -62,7 +62,7 @@ namespace larlight {
     delete ranexmpl;
     //Sine Example
     for (int y=0; y<3000; y++)
-      sine->SetBinContent(y+1,TMath::Sin(y)+TMath::Sin(2*y));
+      sine->SetBinContent(y+1,TMath::Sin(2*TMath::Pi()*y)+TMath::Sin(2*TMath::Pi()*2*y));
     TH1 *ffexmpl = sine->FFT(NULL,"MAG");
     for (int w=0; w<(3000/2+1); w++)
       SineExmpl->AddBinContent(w+1,ffexmpl->GetBinContent(w));
