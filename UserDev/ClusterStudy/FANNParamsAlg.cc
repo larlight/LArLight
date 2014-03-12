@@ -1,5 +1,5 @@
-
-
+#ifndef FANNPARAMSALG_CC
+#define FANNPARAMSALG_CC
 
 #include "FANNParamsAlg.hh"
 #include "math.h"
@@ -24,6 +24,7 @@ cluster::FANNParamsAlg::~FANNParamsAlg(){
  * takes a cluster and its associated hit list and 
  * calculates everything needed for the feature vector
  */
+
 void cluster::FANNParamsAlg::FillParams(larlight::cluster & cluster,
                                         std::vector<larlight::hit> & hitlist){
 
@@ -91,14 +92,14 @@ void cluster::FANNParamsAlg::FillParams(larlight::cluster & cluster,
   principal->MakePrincipals();
   mean_x = (*principal -> GetMeanValues())[0];
   mean_y = (*principal -> GetMeanValues())[1];
-  std::vector<double> principal_Axis = 
-                          {(*principal -> GetEigenVectors())[0][0],
-                           (*principal -> GetEigenVectors())[0][1]};
-  std::vector<double> secondary_Axis = 
-                          {(*principal -> GetEigenVectors())[1][0],
-                           (*principal -> GetEigenVectors())[1][1]};
-
-
+  //std::vector<double> principal_Axis = 
+  double principal_Axis[2] = 
+    {(*principal -> GetEigenVectors())[0][0],
+     (*principal -> GetEigenVectors())[0][1]};
+  //std::vector<double> secondary_Axis = 
+  double secondary_Axis[2] = 
+    {(*principal -> GetEigenVectors())[1][0],
+     (*principal -> GetEigenVectors())[1][1]};
 
 
   // Next need to determine the start and end points
@@ -303,7 +304,6 @@ void cluster::FANNParamsAlg::FillParams(larlight::cluster & cluster,
   return;
 }
 
- 
 /**
  * returns a string of the feature vector, enumerated below
  * purely a "getter"
@@ -471,7 +471,10 @@ void cluster::FANNParamsAlg::ResetParams(){
   eigenvalue_secondary = 0.0;
 }
 
+/*
 namespace cluster{
+  
+
   std::ostream& operator<<(std::ostream & os, const FANNParamsAlg & FPA) {
 
     
@@ -499,8 +502,8 @@ namespace cluster{
   }
 
 }
-
-
+*/
+#endif
 
 
 

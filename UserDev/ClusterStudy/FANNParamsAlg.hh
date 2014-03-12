@@ -51,7 +51,7 @@ namespace cluster{
     void FillParams(larlight::cluster &, std::vector<larlight::hit> &);
     void ResetParams();
 
-    friend std::ostream & operator << (std::ostream &, const FANNParamsAlg &);
+    //friend std::ostream & operator << (std::ostream &, const FANNParamsAlg &);
 
     /**
      * returns a string of the feature vector, enumerated below
