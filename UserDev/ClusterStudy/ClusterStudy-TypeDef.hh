@@ -22,6 +22,11 @@ namespace larlight {
   //ADD_NEW_CLASS ... do not change this line
 }
 
+namespace cluster{
+
+  class FANNParamsAlg;
+}
+
 #endif
 
 

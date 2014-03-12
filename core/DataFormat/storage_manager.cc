@@ -458,6 +458,7 @@ namespace larlight {
 	    Message::send(MSG::INFO,__FUNCTION__,Form("Writing TTree: %s",_out_ch[i]->GetName()));
 	  
 	  _fout = _out_ch[i]->GetCurrentFile();
+	  _fout->cd();
 	  _out_ch[i]->Write();
 	  
 	  Message::send(MSG::NORMAL,__FUNCTION__,
