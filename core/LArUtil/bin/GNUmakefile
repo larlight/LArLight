@@ -1,5 +1,6 @@
 # Include your header file location
 CXXFLAGS += -I$(LARLIGHT_CORE_DIR)/Base
+CXXFLAGS += -I$(LARLIGHT_CORE_DIR)/DataFormat
 CXXFLAGS += -I$(LARLIGHT_CORE_DIR)/LArUtil
 CXXFLAGS += -I. $(shell root-config --cflags) -g
 

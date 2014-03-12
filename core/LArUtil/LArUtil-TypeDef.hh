@@ -11,6 +11,7 @@
 #include "Geometry.hh"
 #include "LArProperties.hh"
 #include "DetectorProperties.hh"
+#include "GeometryUtilities.hh"
 
 // Class forward declaration here
 namespace larutil {
@@ -19,6 +20,7 @@ namespace larutil {
   class Geometry;
   class LArProperties;
   class DetectorProperties;
+  class GeometryUtilities;
 //ADD_EMPTY_CLASS ... do not change this comment line
 }
 
