@@ -8,7 +8,7 @@
  * @author davidkaleko
  */
 
-/** \addtogroup Analysis
+/** \addtogroup ClusterMergeAlg
 
     @{*/
 
@@ -22,13 +22,13 @@
 #include <TH1F.h> //used for histos in RefineStartPoint stuff
 #include <TH2F.h> //used for temporary histogram comparing angle definitions
 
-namespace larlight {
+namespace larreco {
 
   /**
      \class ClusterMergeAlg
      User custom analysis class made by davidkaleko
    */
-  class ClusterMergeAlg : public ana_base{
+  class ClusterMergeAlg : public larlight::ana_base{
 
   public:
 
@@ -46,7 +46,7 @@ namespace larlight {
     /**
         Analyze a data event-by-event  
     */
-    virtual bool analyze(storage_manager* storage);
+    virtual bool analyze(larlight::storage_manager* storage);
 
     /**
         Finalize method to be called after all events processed.
@@ -72,8 +72,8 @@ namespace larlight {
     void ClearEventInfo();
 
     /// Method to add a cluster information for processing
-    void AppendClusterInfo(const cluster &cl,
-			   const event_hit* ev_hits);
+    void AppendClusterInfo(const larlight::cluster &cl,
+			   const larlight::event_hit* ev_hits);
 
     /**
        Method to execute the algorithm. All parameter configuration + adding input cluster information
@@ -218,9 +218,9 @@ namespace larlight {
     */
     std::vector<std::vector<unsigned int> > _cluster_sets_v;
 
-    std::vector<larlight::cluster_merge_info> _u_clusters; ///< Input U-plane clusters' information 
-    std::vector<larlight::cluster_merge_info> _v_clusters; ///< Input V-plane clusters' information
-    std::vector<larlight::cluster_merge_info> _w_clusters; ///< Input W-plane clusters' information
+    std::vector<larreco::cluster_merge_info> _u_clusters; ///< Input U-plane clusters' information 
+    std::vector<larreco::cluster_merge_info> _v_clusters; ///< Input V-plane clusters' information
+    std::vector<larreco::cluster_merge_info> _w_clusters; ///< Input W-plane clusters' information
 
     double _wire_2_cm; ///< Conversion factor from wire number to cm scale
     double _time_2_cm; ///< Conversion factor from time to cm scale

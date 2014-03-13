@@ -3,7 +3,7 @@
 
 #include "Base-TypeDef.hh"
 
-namespace larlight {
+namespace larreco{
 
   /**
      \struct cluster_ana_info
@@ -12,7 +12,7 @@ namespace larlight {
   struct cluster_ana_info {
 
     //View of this specific cluster
-    GEO::View_t view;
+    larlight::GEO::View_t view;
     //Unique (to the event) ID number for this cluster
     size_t cluster_index;
 
@@ -55,7 +55,7 @@ namespace larlight {
       peak_time_max = peak_time_min = -1;
       end_time_max = end_time_min = -1;
       sum_charge = 0;
-      view = GEO::kUnknown;
+      view = larlight::GEO::kUnknown;
       cluster_index = 0xffff;
 
     };
@@ -70,7 +70,7 @@ namespace larlight {
   struct cluster_merge_info {
 
     unsigned int cluster_index; ///< Input cluster ID
-    GEO::View_t  view;          ///< Wire plane ID
+    larlight::GEO::View_t  view;          ///< Wire plane ID
 
     double start_wire;          ///< Vertex wire
     double start_time;          ///< Vertex time
@@ -92,7 +92,7 @@ namespace larlight {
     cluster_merge_info() {
       
       cluster_index = 0xffffffff;
-      view = GEO::kUnknown;
+      view = larlight::GEO::kUnknown;
       start_wire = start_time = end_wire = end_time = -1;
       start_wire_err = start_time_err = end_wire_err =end_time_err = -1;
       n_hits = -1;

@@ -8,12 +8,12 @@
 
 #include <map>
 
-cluster::FANNParamsAlg::FANNParamsAlg(){
+larreco::FANNParamsAlg::FANNParamsAlg(){
   // Initialize the Principal Component Analysis object
   principal = new TPrincipal(2);
 }
 
-cluster::FANNParamsAlg::~FANNParamsAlg(){
+larreco::FANNParamsAlg::~FANNParamsAlg(){
   //empty destructor
   // Not sure if I need to delete the root object.  Cause root 
   // sucks like that.  I'll assume yes:
@@ -25,7 +25,7 @@ cluster::FANNParamsAlg::~FANNParamsAlg(){
  * calculates everything needed for the feature vector
  */
 
-void cluster::FANNParamsAlg::FillParams(larlight::cluster & cluster,
+void larreco::FANNParamsAlg::FillParams(larlight::cluster & cluster,
                                         std::vector<larlight::hit> & hitlist){
 
   // Here is the method:
@@ -309,7 +309,7 @@ void cluster::FANNParamsAlg::FillParams(larlight::cluster & cluster,
  * purely a "getter"
  * @return [string of features, deliminated by spaces ]
  */
-const std::string cluster::FANNParamsAlg::FeatureVector() const{
+const std::string larreco::FANNParamsAlg::FeatureVector() const{
 
   TString featureVector;
   featureVector += N_Hits;
@@ -357,16 +357,16 @@ const std::string cluster::FANNParamsAlg::FeatureVector() const{
   return s;
 
 }
-const std::string cluster::FANNParamsAlg::TruthInformation() const{
+const std::string larreco::FANNParamsAlg::TruthInformation() const{
   std::string s = "Wrong!";
   return s;
 }
 
-void cluster::FANNParamsAlg::SetConversion(float wireToCM, float timeToCM){
+void larreco::FANNParamsAlg::SetConversion(float wireToCM, float timeToCM){
   fWireToCM = wireToCM;
   fTimeToCM = timeToCM;
 }
-void cluster::FANNParamsAlg::GetData(float * data) const{
+void larreco::FANNParamsAlg::GetData(float * data) const{
 
   int i = 0;
   data[i] = N_Hits;  i++;
@@ -392,7 +392,7 @@ void cluster::FANNParamsAlg::GetData(float * data) const{
   return;
 }
 
-void cluster::FANNParamsAlg::GetData(
+void larreco::FANNParamsAlg::GetData(
                 float& _N_Hits, float& _axis_dist, float& _width, 
                 float& _opening_angle, float& _closing_angle, 
                 float& _opening_angle_HH, float& _closing_angle_HH, 
@@ -424,7 +424,7 @@ void cluster::FANNParamsAlg::GetData(
   return;
 }
 
-void cluster::FANNParamsAlg::Report() const{
+void larreco::FANNParamsAlg::Report() const{
   std::cout << "N_Hits: " << N_Hits << "\n"
             << "axis_dist: " << axis_dist << "\n"
             << "width: " << width << "\n"
@@ -446,7 +446,7 @@ void cluster::FANNParamsAlg::Report() const{
             << "eigenvalue_secondary: " << eigenvalue_secondary << "\n";
 }
 
-void cluster::FANNParamsAlg::ResetParams(){
+void larreco::FANNParamsAlg::ResetParams(){
 
   principal -> Clear();
 
