@@ -16,6 +16,10 @@
 
 using namespace std;
 
+larlight::DATA::DATA_TYPE associationNameToType(const std::string& name);
+larlight::DATA::DATA_TYPE nameToType(const std::string& name);
+
+
 Looter::Looter(std::string filename)
   : _good(true)
   , _filename(filename)
@@ -263,6 +267,73 @@ std::vector<std::string> Looter::findLeafOfType(std::string pattern)
     }
   }
   return retval;
+}
+
+
+larlight::DATA::DATA_TYPE associationNameToType(const std::string& name)
+{
+  using namespace larlight::DATA;
+  return larlight::DATA::DATA_TYPE_MAX;
+  
+}
+
+larlight::DATA::DATA_TYPE nameToType(const std::string& name)
+{
+  using namespace larlight;
+  using std::string;
+  if(string::npos != name.find_first_of("recob::Hits")) {
+    if(string::npos != name.find_first_of("recob::Hits_ffthit")) return larlight::DATA::FFTHit;
+    // FIXME: need to check these others.
+    if(string::npos != name.find_first_of("recob::Hits_apahit")) return DATA::APAHit;
+    if(string::npos != name.find_first_of("recob::Hits_gaushit")) return DATA::GausHit;
+    if(string::npos != name.find_first_of("recob::Hits_crawlerhit")) return DATA::CrawlerHit;
+    else return DATA::Hit;
+  }
+
+  if(std::string::npos != name.find_first_of("recob::Clusters")) {
+    if(std::string::npos != name.find_first_of("recob::Clusters_dbcluster")) return DATA::DBCluster;
+    // FIXME: need to check these others.
+    else return DATA::Cluster;
+  }
+  return DATA::DATA_TYPE_MAX;
+    
+  // if(std::npos != name.find_first_of("recob::Clusters") {
+  //   if(std::npos != name.find_first_of("recob::Clusters_dbcluster")) return DBCluster;
+  //   // FIXME: need to check these others.
+  //   else return Cluster;
+  // }
+  //   MCTruth,            ///< MCTruth
+  //         MCParticle,         ///< MCParticle
+  //         MCTrajectory,       ///< MCTrajectory
+  //         MCNeutrino,         ///< MCNeutrino
+  //         Wire,               ///< Wire
+  //         Hit,                ///< Hit
+  //         CrawlerHit,         ///< ClusterCrawler Hit algo
+  //         GausHit,            ///< Gaus Hit algo
+  //         APAHit,             ///< APA Hit algo
+  //         FFTHit,             ///< FFT Hit algo
+  //         Cluster,            ///< Cluster
+  //         FuzzyCluster,       ///< Fuzzy Cluster
+  //         DBCluster,          ///< DBCluster
+  //         CrawlerCluster,     ///< Crawler
+  //         HoughCluster,       ///< Hough
+  //         ShowerAngleCluster, ///< ShowerAngleCluster
+  //         Seed,               ///< Seed
+  //         SpacePoint,         ///< Spacepoints
+  //         Track,              ///< Track
+  //         Bezier,             ///< Track (Bezier)
+  //         Kalman3DSPS,        ///< Track (Kalman3DSPS)
+  //         Kalman3DHit,        ///< Track (Kalman3DHit)
+  //         Shower,             ///< Shower
+  //         Vertex,             ///< Vertex
+  //         FeatureVertex,      ///< FeatureVertex
+  //         HarrisVertex,       ///< HarrisVertex
+  //         EndPoint2D,         ///< EndPoint2D
+  //         FeatureEndPoint2D,  ///< EndPoint2D from Feature Vertex Finder
+  //         HarrisEndPoint2D,   ///< EndPoint2D from Harris Vertex Finder
+  //         Calorimetry,        ///< Calorimetry
+  //         UserInfo,           ///< dynamic data container ... this must be the last valid enum element
+    
 }
 
 #endif
