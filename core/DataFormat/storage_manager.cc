@@ -312,7 +312,7 @@ namespace larlight {
     
     if(_verbosity[MSG::DEBUG])
       Message::send(MSG::DEBUG,__PRETTY_FUNCTION__,"ends ...");
-    
+
     return status;
   }
   
@@ -504,7 +504,7 @@ namespace larlight {
       Message::send(MSG::ERROR,__FUNCTION__,
 		    "Cannot move the data pointer back/forth in WRITE mode.");
       status=false;
-    }else if(_nevents) {
+    }else if(!_nevents) {
       Message::send(MSG::WARNING,__FUNCTION__,"Input file empty!");
       status=false;
     }else if(!(index<_nevents)){
