@@ -2,6 +2,7 @@
 #include "Analysis-TypeDef.hh"
 #include "DataFormat-TypeDef.hh"
 #include "Base-TypeDef.hh"
+#include "ClusterRecoAlg-TypeDef.hh"
 #include "ClusterStudy-TypeDef.hh"
 
 int main(int argc, char** argv) {
@@ -20,7 +21,7 @@ int main(int argc, char** argv) {
   
   auto merger = new larlight::ClusterMerge;
 
-  merger->set_mergealg(new larlight::ClusterMergeAlg);
+  merger->set_mergealg(new larreco::ClusterMergeAlg);
 
   ana_proc.add_process(merger);
 
