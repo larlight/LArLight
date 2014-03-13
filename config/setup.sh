@@ -106,6 +106,7 @@ else
     if [ $LARLIGHT_OS = 'Darwin' ]; then
 	export DYLD_LIBRARY_PATH=$LARLIGHT_LIBDIR:$DECODER_LIBDIR:$DYLD_LIBRARY_PATH
     fi
+    export PATH=$MAKE_TOP_DIR/bin:$PATH
     echo
     echo "Finish configuration. To build, type:"
     echo "> cd \$MAKE_TOP_DIR"
