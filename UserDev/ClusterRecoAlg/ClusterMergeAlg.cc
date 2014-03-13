@@ -3,9 +3,9 @@
 
 #include "ClusterMergeAlg.hh"
 
-namespace larlight {
+namespace larreco {
 
-  ClusterMergeAlg::ClusterMergeAlg() : ana_base() {
+  ClusterMergeAlg::ClusterMergeAlg() : larlight::ana_base() {
     
     _name="ClusterMergeAlg"; 
     _fout=0;     
@@ -48,7 +48,7 @@ namespace larlight {
       << std::endl
       << "---------------------------------------------" << std::endl;
 
-    print(MSG::NORMAL,__FUNCTION__,msg.str());
+    print(larlight::MSG::NORMAL,__FUNCTION__,msg.str());
 
   }
 
@@ -90,19 +90,19 @@ namespace larlight {
      (1) Read-in cluster information into cluster_merge_info struct
      (2) Process read-in cluster information for merging
   */
-  bool ClusterMergeAlg::analyze(storage_manager* storage) {
+  bool ClusterMergeAlg::analyze(larlight::storage_manager* storage) {
     // Step (0) ... Clear input cluster information
     
     ClearEventInfo();
 
     // Step (1) ... loop over input cluster sets and store relevant information into the cluster_merge_info
 
-    const event_cluster* ev_cluster = (const event_cluster*)(storage->get_data(DATA::ShowerAngleCluster));
+    const larlight::event_cluster* ev_cluster = (const larlight::event_cluster*)(storage->get_data(larlight::DATA::ShowerAngleCluster));
 
-    const event_hit* ev_hits = (const event_hit*)(storage->get_data(ev_cluster->get_hit_type()));
+    const larlight::event_hit* ev_hits = (const larlight::event_hit*)(storage->get_data(ev_cluster->get_hit_type()));
     
     if(!ev_hits) {
-      print(MSG::ERROR,__FUNCTION__,"Data storage did not find associated hit collection!");
+      print(larlight::MSG::ERROR,__FUNCTION__,"Data storage did not find associated hit collection!");
       return false;
     }
 
@@ -119,8 +119,8 @@ namespace larlight {
 
   }
 
-  void ClusterMergeAlg::AppendClusterInfo(const cluster &cl, 
-					  const event_hit* ev_hits)
+  void ClusterMergeAlg::AppendClusterInfo(const larlight::cluster &cl, 
+					  const larlight::event_hit* ev_hits)
   {
 
     PrepareDetParams();
@@ -151,29 +151,29 @@ namespace larlight {
     //don't consider the cluster if its charge is too low
     if(ci.q_total < _min_q_total_to_consider) return;
 
-    if(ci.view == GEO::kU){
+    if(ci.view == larlight::GEO::kU){
       _u_clusters.push_back(ci);
       u_q_tot  += ci.q_total;
       //have to use .size() here b/c n_hits might be -1 if swapped
       u_n_hits += (int)hit_index.size();
     }
-    else if(ci.view == GEO::kV){
+    else if(ci.view == larlight::GEO::kV){
       _v_clusters.push_back(ci);
       v_q_tot  += ci.q_total;
       v_n_hits += (int)hit_index.size();
     }
-    else if(ci.view == GEO::kW){
+    else if(ci.view == larlight::GEO::kW){
       _w_clusters.push_back(ci);
       w_q_tot  += ci.q_total;
       w_n_hits += (int)hit_index.size();
     }
-    else print(MSG::ERROR,__FUNCTION__,Form("Invalid plane ID: %d",ci.view));
+    else print(larlight::MSG::ERROR,__FUNCTION__,Form("Invalid plane ID: %d",ci.view));
 
     if(_cluster_merged_index.size() <= (size_t)(ci.cluster_index)) {
 
       _cluster_merged_index.resize((size_t)(ci.cluster_index+1),-1);
 
-      print(MSG::INFO,__FUNCTION__,Form("Extending the input cluster index ... length = %zu",_cluster_merged_index.size()));
+      print(larlight::MSG::INFO,__FUNCTION__,Form("Extending the input cluster index ... length = %zu",_cluster_merged_index.size()));
     }
 
   }
@@ -450,7 +450,7 @@ namespace larlight {
 					const cluster_merge_info &clusB){
     
     if(_verbose) {
-      print(MSG::NORMAL,__FUNCTION__,"Printing out two input cluster information...");
+      print(larlight::MSG::NORMAL,__FUNCTION__,"Printing out two input cluster information...");
       PrintClusterVars(clusA);
       PrintClusterVars(clusB);
     }
@@ -495,8 +495,8 @@ namespace larlight {
     
     if(_verbose) {
       
-      if(compatible) print(MSG::NORMAL,__FUNCTION__," Compatible in angle.");
-      else print(MSG::NORMAL,__FUNCTION__," NOT compatible in angle.");
+      if(compatible) print(larlight::MSG::NORMAL,__FUNCTION__," Compatible in angle.");
+      else print(larlight::MSG::NORMAL,__FUNCTION__," NOT compatible in angle.");
       
     }
     
@@ -552,8 +552,8 @@ namespace larlight {
 
     if(_verbose) {
 
-      if(compatible) print(MSG::NORMAL,__FUNCTION__,Form(" Compatible in distance (%g)",shortest_distance2));
-      else print(MSG::NORMAL,__FUNCTION__,Form(" NOT compatible in distance (%g).",shortest_distance2));
+      if(compatible) print(larlight::MSG::NORMAL,__FUNCTION__,Form(" Compatible in distance (%g)",shortest_distance2));
+      else print(larlight::MSG::NORMAL,__FUNCTION__,Form(" NOT compatible in distance (%g).",shortest_distance2));
 
     }
 
@@ -590,7 +590,7 @@ namespace larlight {
         << " to represent this cluster's location." << std::endl
         << std::endl;
 
-      print(MSG::WARNING,__FUNCTION__,msg.str());
+      print(larlight::MSG::WARNING,__FUNCTION__,msg.str());
 
       return (pow((point_x - start_x),2) + pow((point_y - start_y),2));
 
@@ -623,7 +623,7 @@ namespace larlight {
       << " angle      : " << clus_info.angle << std::endl
       << std::endl;
   
-    print(MSG::NORMAL,__FUNCTION__,msg.str());
+    print(larlight::MSG::NORMAL,__FUNCTION__,msg.str());
 
   }//end PrintClusterVars function
 
@@ -636,7 +636,7 @@ namespace larlight {
     // First, check if this cluster_index is already in the set or not.
     if(!(isInClusterSets(cluster_index)<0)) {
 
-      print(MSG::ERROR,__FUNCTION__,Form(" Cluster ID = %d already in the set!",cluster_index));
+      print(larlight::MSG::ERROR,__FUNCTION__,Form(" Cluster ID = %d already in the set!",cluster_index));
 
       return isInClusterSets(cluster_index);
       
@@ -659,8 +659,8 @@ namespace larlight {
 
     }
     else
-
-      print(MSG::ERROR,__FUNCTION__,
+      
+      print(larlight::MSG::ERROR,__FUNCTION__,
 	    Form(" Requested to merge the cluster ID = %ud into the set = %d which does not exist!",cluster_index,merged_index));
 
     return isInClusterSets(cluster_index);
@@ -682,7 +682,7 @@ namespace larlight {
 
       if(_verbose)
 	
-	print(MSG::NORMAL,__FUNCTION__,Form(" Merging clusters %d + %d...",
+	print(larlight::MSG::NORMAL,__FUNCTION__,Form(" Merging clusters %d + %d...",
 					    clusA.cluster_index,
 					    clusB.cluster_index));
 	  
@@ -721,7 +721,7 @@ namespace larlight {
 	// else if both indexes are already in the _cluster_sets_v vector but the indexes are not same
 	else if(a_index != b_index)
 
-	  print(MSG::ERROR,__FUNCTION__,
+	  print(larlight::MSG::ERROR,__FUNCTION__,
 		Form("LOGIC ERROR: Found two compatible clusters (%d and %d) in different sets (%d and %d)!",
 		     clusA.cluster_index,clusB.cluster_index,a_index,b_index));
 
@@ -776,7 +776,7 @@ namespace larlight {
 
     else {
 
-      print(MSG::ERROR,__FUNCTION__,Form(" Cluster index %d not found among the input clusters!",index));
+      print(larlight::MSG::ERROR,__FUNCTION__,Form(" Cluster index %d not found among the input clusters!",index));
 
       return -2;
 

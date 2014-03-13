@@ -35,7 +35,7 @@
 #include <ostream>
 #include <iostream>
 
-namespace cluster{
+namespace larreco{
 
   class FANNParamsAlg
   {
