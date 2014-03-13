@@ -50,6 +50,9 @@ namespace larlight{
 	Finalize method to be called after all events processed.
     */
     virtual bool finalize();
+
+    /// Setter for a cluster type to be viewed
+    void SetClusterType(DATA::DATA_TYPE type);
     
     /// A utility function to (re)create Th3D histogram of a specified boundary & name
     TH2D* Prepare2DHisto(std::string name, 
@@ -123,6 +126,9 @@ namespace larlight{
     };
     
   protected:
+    /// Type of cluster to view
+    DATA::DATA_TYPE cluster_type;
+
     /// Main canvas
     TCanvas* _c1;
     /// Main pad

@@ -16,7 +16,24 @@ namespace larlight {
     _hHits_1 = 0;
     _hHits_2 = 0;
     //  _hMCStep  = 0;
+    cluster_type=DATA::ShowerAngleCluster;
+  }
+
+  //#######################################
+  void ClusterViewer::SetClusterType(DATA::DATA_TYPE type)
+  //#######################################
+  {
+    if( type != DATA::Cluster &&
+	type != DATA::FuzzyCluster &&
+	type != DATA::CrawlerCluster &&
+	type != DATA::ShowerAngleCluster &&
+	type != DATA::HoughCluster )
+
+      print(MSG::ERROR,__FUNCTION__,Form("Not a valid cluster type: %s",DATA::DATA_TREE_NAME[type].c_str()));
     
+    else
+      cluster_type=type;
+
   }
   
   //################################################################
@@ -60,7 +77,7 @@ namespace larlight {
     // Obtain event-wise data object pointers
     //
     //  event_mc*      ev_mc   = (event_mc*)      ( storage->get_data(DATA::MCTruth)            );
-    event_cluster* ev_clus = (event_cluster*) ( storage->get_data(DATA::ShowerAngleCluster) );
+    event_cluster* ev_clus = (event_cluster*) ( storage->get_data(cluster_type));
     event_hit*     ev_hit  = (event_hit*) ( storage->get_data(ev_clus->get_hit_type()));
 
     // Define utility variables to hold max/min of each axis range, for each of 3 views

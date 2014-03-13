@@ -34,7 +34,7 @@ namespace larlight {
     virtual ~ClusterMerge(){};
 
     /// Method to set ClusterMergeAlg pointer which should be processed prior to ClusterMerge::analyze() call.
-    void set_mergealg(ClusterMergeAlg* alg){ fCMergeAlg = alg;}
+    void set_mergealg(larreco::ClusterMergeAlg* alg){ fCMergeAlg = alg;}
 
     /** 
         Initialization method to be called before the analysis event loop.
@@ -55,7 +55,7 @@ namespace larlight {
 
     bool check_algo_ptr() const;
     
-    ClusterMergeAlg *fCMergeAlg;
+    larreco::ClusterMergeAlg *fCMergeAlg;
 
   };
 }
