@@ -10,7 +10,8 @@
 #include "KalekoUtilFunc.hh"
 
 // Class forward declaration here
-class kaleko::KalekoTrackAna;
-class kaleko::UtilFunctions;
-
+namespace kaleko {
+  class KalekoTrackAna;
+  class UtilFunctions;
+}
 #endif
