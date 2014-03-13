@@ -163,7 +163,7 @@ namespace larlight {
     if(nevents > (_storage->get_entries() - start_index))
       nevents=_storage->get_entries() - start_index;
     
-    sprintf(_buf,"Processing %d events...",nevents);
+    sprintf(_buf,"Processing %d events from entry %d...",nevents, start_index);
     Message::send(MSG::NORMAL,__FUNCTION__,_buf);
     
     int ten_percent_ctr=0;

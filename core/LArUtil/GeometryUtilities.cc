@@ -605,7 +605,7 @@ namespace larutil{
 						Double_t timein) const
   {
   
-    Double_t min_length_from_start=99999;
+    Double_t min_length_from_start=larlight::DATA::INVALID_DOUBLE;
     UInt_t index=larlight::DATA::INVALID_UINT;
    
     UInt_t plane,wire;
