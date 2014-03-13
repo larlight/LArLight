@@ -34,6 +34,9 @@ all:
 	@echo "Start building Decoder"
 	@make --directory=$(DECODER_DIR)
 	@echo 
+	@echo "Start building main"
+	@make --directory=$(MAKE_TOP_DIR)/main
+	@echo 
 	@echo "Exiting"
 
 clean:
@@ -45,6 +48,9 @@ clean:
 	@echo
 	@echo "Cleaning Decoder"
 	@make clean --directory=$(DECODER_DIR)
+	@echo
+	@echo "Cleaning main"
+	@make clean --directory=$(MAKE_TOP_DIR)/main
 	@echo
 	@echo "Exiting"
 
