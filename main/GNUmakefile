@@ -17,7 +17,8 @@ all:		$(PROGRAMS)
 
 $(PROGRAMS):
 	@echo '<<compiling' $@'>>'
-	@$(CXX) $@.cc -o ../bin/$@ $(CXXFLAGS) $(LDFLAGS)
+	@mkdir -p ../bin
+	$(CXX) $@.cc -o ../bin/$@ $(CXXFLAGS) $(LDFLAGS)
 	@rm -rf ../bin/*.dSYM
 
 clean:	

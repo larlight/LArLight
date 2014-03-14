@@ -24,8 +24,18 @@ class TTree;
 
 /**
    \class Looter
-   User defined class Looter ... these comments are used to generate
-   doxygen documentation!
+   This class is an attempt to read larsoft data directly from a LArSoft .root file, without the need
+    to run a LArSoft executable. It uses the ARgo method of directly interrogating the ROOT RTTI information to 
+    yank data from the file.
+
+   Although it currently works as proof-of-principle, it does nothing more than pull hits.  The problem is that
+    I can't figure out how to correctly disambiguate all the event types by string, since I don't yet understand
+    how larsoft generates these types.  This goes double for associations.  The functions at the bottom of the .cc
+    file show how far I got, which isn't very far.
+
+  Moreover, it's slow: it takes upwards of 2-3 seconds per event due to the extra load ROOT incurs for having
+   to do the RTTI on event load.   This is much slower than Kazu's solution.
+
  */
 class Looter{
 

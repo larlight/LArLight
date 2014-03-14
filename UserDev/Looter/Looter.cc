@@ -14,6 +14,9 @@
 #include "TTreeFormula.h"
 
 
+
+
+
 using namespace std;
 
 larlight::DATA::DATA_TYPE associationNameToType(const std::string& name);
@@ -282,17 +285,19 @@ larlight::DATA::DATA_TYPE nameToType(const std::string& name)
   using namespace larlight;
   using std::string;
   if(string::npos != name.find_first_of("recob::Hits")) {
-    if(string::npos != name.find_first_of("recob::Hits_ffthit")) return larlight::DATA::FFTHit;
-    // FIXME: need to check these others.
-    if(string::npos != name.find_first_of("recob::Hits_apahit")) return DATA::APAHit;
-    if(string::npos != name.find_first_of("recob::Hits_gaushit")) return DATA::GausHit;
+    if(string::npos != name.find_first_of("recob::Hits_ffthit"))     return larlight::DATA::FFTHit;
+    if(string::npos != name.find_first_of("recob::Hits_apahit"))     return DATA::APAHit;     // FIXME?
+    if(string::npos != name.find_first_of("recob::Hits_gaushit"))    return DATA::GausHit;
     if(string::npos != name.find_first_of("recob::Hits_crawlerhit")) return DATA::CrawlerHit;
     else return DATA::Hit;
   }
 
   if(std::string::npos != name.find_first_of("recob::Clusters")) {
     if(std::string::npos != name.find_first_of("recob::Clusters_dbcluster")) return DATA::DBCluster;
-    // FIXME: need to check these others.
+    if(std::string::npos != name.find_first_of("recob::Clusters_crawler")) return DATA::CrawlerCluster; // FIXME?
+    if(std::string::npos != name.find_first_of("recob::Clusters_hough")) return DATA::HoughCluster;
+    if(std::string::npos != name.find_first_of("recob::Clusters_showeranglecluster")) return DATA::ShowerAngleCluster;
+
     else return DATA::Cluster;
   }
   return DATA::DATA_TYPE_MAX;
@@ -307,10 +312,6 @@ larlight::DATA::DATA_TYPE nameToType(const std::string& name)
   //         MCTrajectory,       ///< MCTrajectory
   //         MCNeutrino,         ///< MCNeutrino
   //         Wire,               ///< Wire
-  //         Hit,                ///< Hit
-  //         CrawlerHit,         ///< ClusterCrawler Hit algo
-  //         GausHit,            ///< Gaus Hit algo
-  //         APAHit,             ///< APA Hit algo
   //         FFTHit,             ///< FFT Hit algo
   //         Cluster,            ///< Cluster
   //         FuzzyCluster,       ///< Fuzzy Cluster
