@@ -55,6 +55,14 @@ namespace larlight {
     
   }
   
+  std::vector<larlight::DATA::DATA_TYPE> storage_manager::list_data_types(){
+    std::vector<larlight::DATA::DATA_TYPE> list;
+    for(int i=0;i<larlight::DATA::DATA_TYPE_MAX;i++) {
+      if( _ptr_data_array[i]) { list.push_back((larlight::DATA::DATA_TYPE)(i)); }
+    }
+    return list;
+  }
+  
   void storage_manager::reset()
   {
     if(_verbosity[MSG::DEBUG])

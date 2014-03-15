@@ -28,6 +28,7 @@ public:
     JsonElement(const float value, int prec=-999) { fixed(prec); if(isnan(value)) fContent << "\"nan\""; else fContent << value; }
     JsonElement(const double value,int prec=-999) { fixed(prec); if(isnan(value)) fContent << "\"nan\""; else fContent << value; }
     JsonElement(const bool value) { fixed(); fContent << ((value)?("true"):("false"));  }
+    virtual ~JsonElement() {};
 
     virtual const std::string str() const {  return (fContent.str().length()<1)?"null":fContent.str(); }
     
@@ -131,6 +132,7 @@ public:
   virtual JsonObject& add(const std::string& key,const JsonElement& value);
   virtual JsonObject& add(const std::string& key,const JsonArray& value);
   virtual JsonObject& addBare(const std::string& key,const std::string& value);
+  virtual ~JsonObject() {};
   
     
   // template<typename T>
@@ -149,6 +151,7 @@ public:
   JsonArray(const JsonArray& c) { fixed(); fContent << c.fContent.str(); fElements = c.fElements; };
   template<typename T>
     JsonArray(const std::vector<T>& in);
+  virtual ~JsonArray() {};
   
   virtual JsonArray& add(const JsonObject& value);
   virtual JsonArray& add(const JsonElement& value);
