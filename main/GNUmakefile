@@ -11,14 +11,13 @@ include $(MAKE_TOP_DIR)/Makefile/Makefile.${OSNAME}
 
 # Add your program below with a space after the previous one.
 # This makefile compiles all binaries specified below.
-PROGRAMS = larlight
 
-all:		$(PROGRAMS)
+all: ../bin/larlight
 
-$(PROGRAMS):
+../bin/larlight:
 	@echo '<<compiling' $@'>>'
 	@mkdir -p ../bin
-	$(CXX) $@.cc -o ../bin/$@ $(CXXFLAGS) $(LDFLAGS)
+	$(CXX) larlight.cc -o ../bin/$@ $(CXXFLAGS) $(LDFLAGS)
 	@rm -rf ../bin/*.dSYM
 
 clean:	

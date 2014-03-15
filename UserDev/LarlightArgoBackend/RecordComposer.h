@@ -68,6 +68,7 @@ public:
   
   // Mapping from any adc value onto an 8-bit integer for crude color purposes.
   
+#ifndef __CINT__
   int inline static tanscale(float adc) 
   {
     return int(atan(adc/50.)/M_PI*256.) + 127;  
@@ -77,6 +78,7 @@ public:
   {
     return tan((y-127)*M_PI/256)*50.;
   }
+#endif
   
   
   JsonObject& fOutput; // Top-level output object

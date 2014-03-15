@@ -1,5 +1,6 @@
 #ifndef TREEREADER_H
 #define TREEREADER_H
+#ifndef __CINT__
 // 
 // TreeReader
 // This is the code that knows how to read Trees.
@@ -121,7 +122,7 @@ JsonArray TreeReader::makeFArray(std::vector<std::pair< std::string,std::string>
 }
 
 
-
+#endif
 #endif /* TreeReader_H */
 
 

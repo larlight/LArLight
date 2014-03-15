@@ -6,7 +6,7 @@
 DICT  = LarlightArgoBackendCint
 SHLIB = libLarlightArgoBackend.so
 SOURCES = $(wildcard *.cc)
-HEADERS = $(filter-out LinkDef.h,$(wildcard *.h)) $(wildcard *.hh)
+HEADERS = $(wildcard *.hh) JsonElement.h
 OBJECTS = $(SOURCES:.cc=.o)
 
 # include options for this package

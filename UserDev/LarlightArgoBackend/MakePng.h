@@ -1,5 +1,6 @@
 #ifndef MAKEPNG_H_NHQFGWDJ
 #define MAKEPNG_H_NHQFGWDJ
+#ifndef __CINT__
 
 #include <vector>
 #include <string>
@@ -50,4 +51,5 @@ private:
 
 void BuildThumbnail(const std::string& pathname, const std::string& thumbname);
 
+#endif
 #endif /* end of include guard: MAKEPNG_H_NHQFGWDJ */
