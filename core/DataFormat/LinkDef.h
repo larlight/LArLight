@@ -51,7 +51,7 @@
 
 #pragma link C++ class larlight::mcstep+;
 #pragma link C++ class std::vector<larlight::mcstep>+;
-#pragma link C++ class larlight::mctrack+;
+#pragma link C++ class larlight::mctrajectory+;
 
 #pragma link C++ class larlight::mcpart+;
 #pragma link C++ class std::vector<larlight::mcpart>+;
@@ -63,6 +63,16 @@
 #pragma link C++ class larlight::mctruth+;
 #pragma link C++ class std::vector<larlight::mctruth>+;
 #pragma link C++ class larlight::event_mctruth+;
+
+#pragma link C++ class larlight::mcshower+;
+#pragma link C++ class std::vector<larlight::mcshower>+;
+#pragma link C++ class larlight::event_mcshower+;
+
+#pragma link C++ class larlight::ide+;
+#pragma link C++ class larlight::simch+;
+#pragma link C++ class std::map<UShort_t,larlight::simch>+;
+#pragma link C++ class std::vector<larlight::simch>+;
+#pragma link C++ class larlight::event_simch+;
 
 #pragma link C++ class larlight::wire+;
 #pragma link C++ class std::vector<larlight::wire>+;

@@ -1,9 +1,9 @@
 /**
- * \file mctrack.hh
+ * \file mctrajectory.hh
  *
  * \ingroup DataFormat
  * 
- * \brief Class def header for mctrack data container
+ * \brief Class def header for mctrajectory data container
  *
  * @author Kazu - Nevis 2013
  */
@@ -12,8 +12,8 @@
     
 @{*/
 
-#ifndef MCTRACK_HH
-#define MCTRACK_HH
+#ifndef MCTRAJECTORY_HH
+#define MCTRAJECTORY_HH
 
 #include "data_base.hh"
 #include <set>
@@ -67,18 +67,18 @@ namespace larlight {
   };
 
   /**
-     \class mctrack
+     \class mctrajectory
      Equivalent of MCTrajectory in LArSoft
   */
     
-  class mctrack : public std::vector<larlight::mcstep>,
+  class mctrajectory : public std::vector<larlight::mcstep>,
 		  public data_base {
     
   public:
 
-    mctrack(DATA::DATA_TYPE type=DATA::MCTrajectory);
+    mctrajectory(DATA::DATA_TYPE type=DATA::MCTrajectory);
 
-    virtual ~mctrack(){}
+    virtual ~mctrajectory(){}
 
     ///--- Utility ---///
     virtual void clear_data() {data_base::clear_data(); clear();}
@@ -93,7 +93,7 @@ namespace larlight {
   private:
 
     ////////////////////////
-    ClassDef(mctrack,1)
+    ClassDef(mctrajectory,1)
     ////////////////////////    
       
   };

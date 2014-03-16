@@ -1,13 +1,13 @@
-#ifndef MCTRACK_CC
-#define MCTRACK_CC
+#ifndef MCTRAJECTORY_CC
+#define MCTRAJECTORY_CC
 
-#include "mctrack.hh"
+#include "mctrajectory.hh"
 
 namespace larlight{
 
   //***********************************************************************
-  mctrack::mctrack(DATA::DATA_TYPE type) : std::vector<larlight::mcstep>(), 
-					   data_base(type)
+  mctrajectory::mctrajectory(DATA::DATA_TYPE type) : std::vector<larlight::mcstep>(), 
+						     data_base(type)
   //***********************************************************************
   {
     if(_type!=DATA::MCTrajectory) {

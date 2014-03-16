@@ -321,6 +321,12 @@ namespace larlight {
     if(_ptr_data_array[type]) return;
     
     switch(type){
+    case DATA::SimChannel:
+      _ptr_data_array[type]=(event_base*)(new event_simch(type));
+      break;
+    case DATA::MCShower:
+      _ptr_data_array[type]=(event_base*)(new event_mcshower(type));
+      break;
     case DATA::Track:
     case DATA::Bezier:
     case DATA::Kalman3DHit:

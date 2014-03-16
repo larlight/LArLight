@@ -34,6 +34,7 @@ namespace larlight{
     const Int_t    INVALID_INT    = std::numeric_limits<Int_t>::max();
 
     const Double_t INVALID_DOUBLE = std::numeric_limits<Double_t>::max();
+    const Double_t INVALID_FLOAT  = std::numeric_limits<Float_t>::max();
     
     /// Define identifier for a data container class to be loaded through storage_manager::get_data()
     enum DATA_TYPE{
@@ -42,6 +43,8 @@ namespace larlight{
       MCParticle,         ///< MCParticle
       MCTrajectory,       ///< MCTrajectory
       MCNeutrino,         ///< MCNeutrino
+      MCShower,           ///< LArSoft utility class MCShower
+      SimChannel,         ///< SimChannel
       Wire,               ///< Wire
       Hit,                ///< Hit
       CrawlerHit,         ///< ClusterCrawler Hit algo
@@ -92,8 +95,10 @@ namespace larlight{
       "event",
       "mctruth",
       "mcpart",
-      "mctrack",
+      "mctrajectory",
       "mcnu",
+      "mcshower",
+      "simch",
       "wire",
       "hit",
       "crawlerhit",

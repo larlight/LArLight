@@ -15,7 +15,7 @@
 #ifndef MCPART_HH
 #define MCPART_HH
 
-#include "mctrack.hh"
+#include "mctrajectory.hh"
 
 namespace larlight {
   /**
@@ -66,7 +66,7 @@ namespace larlight {
     inline void SetPolarization (TVector3 const& p)   { fpolarization = p;           }
     inline void SetRescatter    (Int_t code)          { frescatter    = code;        }
     inline void SetWeight       (Double_t wt)         { fWeight       = wt;          }
-    inline void SetTrajectory   (const mctrack steps) { ftrajectory   = steps;       }
+    inline void SetTrajectory   (const mctrajectory steps) { ftrajectory   = steps;       }
     inline void AddTrajectory   (const mcstep step)   { ftrajectory.push_back(step); }
     inline void AddTrajectory   (const TLorentzVector& position,
 				 const TLorentzVector& momentum)
@@ -85,7 +85,7 @@ namespace larlight {
     Int_t                  PdgCode()      const { return fpdgCode;      }
     Int_t                  Mother()       const { return fmother;       }
     const std::string      Process()      const { return fprocess;      }
-    const mctrack&         Trajectory()   const { return ftrajectory;   }
+    const mctrajectory&    Trajectory()   const { return ftrajectory;   }
     Double_t               Mass()         const { return fmass;         }
     const TVector3&        Polarization() const { return fpolarization; }
     const std::set<Int_t>& Daughters()    const { return fdaughters;    } 
@@ -103,7 +103,7 @@ namespace larlight {
     Int_t           fpdgCode;      ///< PDG code
     Int_t           fmother;       ///< Mother
     std::string     fprocess;      ///< Detector-simulation physics process that created the particle
-    mctrack         ftrajectory;   ///< particle trajectory (position,momentum)
+    mctrajectory    ftrajectory;   ///< particle trajectory (position,momentum)
     Double_t        fmass;         ///< Mass; from PDG unless overridden Should be in GeV
     TVector3        fpolarization; ///< Polarization
     std::set<Int_t> fdaughters;    ///< Sorted list of daughters of this particle.
@@ -111,7 +111,7 @@ namespace larlight {
     TLorentzVector  fGvtx;         ///< Vertex needed by generater (genie) to rebuild. genie::EventRecord for event reweighting
     Int_t           frescatter;    ///< rescatter code
 
-    std::vector<std::pair<size_t,size_t> > ftrackFiducial; ///< mctrack indexes for a trajectory inside fiducial volume
+    std::vector<std::pair<size_t,size_t> > ftrackFiducial; ///< mctrajectory indexes for a trajectory inside fiducial volume
    
     ////////////////////////
     ClassDef(mcpart,1)
