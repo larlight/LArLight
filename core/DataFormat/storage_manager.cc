@@ -380,6 +380,7 @@ namespace larlight {
     case DATA::GausHit:
     case DATA::APAHit:
     case DATA::FFTHit:
+    case DATA::RFFHit:
       _ptr_data_array[type]=(event_base*)(new event_hit(type));
       break;
     case DATA::Cluster:

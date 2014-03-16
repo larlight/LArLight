@@ -14,7 +14,8 @@ namespace larlight {
 	_type != DATA::CrawlerHit &&
 	_type != DATA::GausHit &&
 	_type != DATA::APAHit &&
-	_type != DATA::FFTHit ) {
+	_type != DATA::FFTHit &&
+	_type != DATA::RFFHit ) {
 
       Message::send(MSG::ERROR,__FUNCTION__,
 		    Form("Provided data type (%s) not supported! Reset to default.",DATA::DATA_TREE_NAME[_type].c_str()));
@@ -73,7 +74,8 @@ namespace larlight {
 	_type != DATA::CrawlerHit &&
 	_type != DATA::GausHit &&
 	_type != DATA::APAHit &&
-	_type != DATA::FFTHit ) {
+	_type != DATA::FFTHit &&
+	_type != DATA::RFFHit ) {
 
       Message::send(MSG::ERROR,__FUNCTION__,
 		    Form("Provided data type (%s) not supported! Reset to default.",DATA::DATA_TREE_NAME[_type].c_str()));

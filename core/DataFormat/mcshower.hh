@@ -113,6 +113,9 @@ namespace larlight {
     void SetDaughterTrackList(const std::vector<UInt_t> &list)
     { fDaughterTrackID = list; }
 
+    void SetDaughterAngles(Double_t phi, Double_t theta, Double_t u, Double_t v, Double_t w)
+    { fDaughterPhi = phi; fDaughterTheta = theta; fDaughterAngleU = u; fDaughterAngleV = v; fDaughterAngleW = w; }
+
     void SetDaughterMomentum(const std::vector<Float_t> &mom);
 
     void SetPlaneCharge(Float_t qU, Float_t qV, Float_t qW)

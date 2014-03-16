@@ -43,14 +43,15 @@ namespace larlight{
       MCParticle,         ///< MCParticle
       MCTrajectory,       ///< MCTrajectory
       MCNeutrino,         ///< MCNeutrino
-      MCShower,           ///< LArSoft utility class MCShower
       SimChannel,         ///< SimChannel
+      MCShower,           ///< LArSoft utility class MCShower
       Wire,               ///< Wire
       Hit,                ///< Hit
       CrawlerHit,         ///< ClusterCrawler Hit algo
       GausHit,            ///< Gaus Hit algo
       APAHit,             ///< APA Hit algo
       FFTHit,             ///< FFT Hit algo
+      RFFHit,             ///< RFF Hit algo
       Cluster,            ///< Cluster
       FuzzyCluster,       ///< Fuzzy Cluster
       DBCluster,          ///< DBCluster
@@ -97,14 +98,15 @@ namespace larlight{
       "mcpart",
       "mctrajectory",
       "mcnu",
-      "mcshower",
       "simch",
+      "mcshower",
       "wire",
       "hit",
       "crawlerhit",
       "gaushit",
       "apahit",
       "ffthit",
+      "rffhit",
       "cluster",
       "fuzzycluster",
       "dbcluster",
