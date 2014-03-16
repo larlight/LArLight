@@ -126,6 +126,9 @@ namespace larlight {
     */
     event_base* get_data(DATA::DATA_TYPE type);
     
+    /// What data is available?
+    std::vector<larlight::DATA::DATA_TYPE> list_data_types();
+    
     /// Getter for a shared object instance pointer. Not limited to be a singleton.
     static storage_manager* get() 
     { if(!me) me= new storage_manager(); return me; }

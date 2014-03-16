@@ -6,10 +6,12 @@
 #define LARLIGHTARGOBACKEND_TYPEDEF_HH
 
 // Header files included here
-#include "LarlightArgoBackend.hh"
+#include "storage_manager.hh"
+#include "JsonComposer.hh"
+#include "JsonElement.h"
 
 // Class forward declaration here
-class LarlightArgoBackend;
+class JsonComposer;
 //ADD_EMPTY_CLASS ... do not change this comment line
 
 #endif

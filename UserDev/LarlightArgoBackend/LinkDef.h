@@ -6,6 +6,7 @@
 #pragma link off all classes;
 #pragma link off all functions;
 
+#pragma link C++ class JsonComposer+;
 #pragma link C++ class JsonElement+;
 #pragma link C++ class JsonFixed+;
 #pragma link C++ class JsonSigFig+;
