@@ -40,7 +40,7 @@ namespace larlight {
   //--------------------------------------------------
   {
     data_base::clear_data();
-    fChannel = DATA::INVALID_INT;
+    fChannel = DATA::INVALID_USHORT;
     fTDCIDEs.clear();
   }
 
