@@ -29,6 +29,8 @@
 #include "hit.hh"
 #include "cluster.hh"
 #include "shower.hh"
+#include "mcshower.hh"
+#include "simch.hh"
 #include "calorimetry.hh"
 #include "pulse.hh"
 #include "vertex.hh"

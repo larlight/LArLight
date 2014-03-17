@@ -180,13 +180,13 @@ namespace kaleko{
 	    double de_dx = -1.;
 	    
 	    tmplength = 0;
-	    const larlight::mctrack my_mctrack = my_event_mcpart->at(0).Trajectory();
+	    const larlight::mctrajectory my_mctraj = my_event_mcpart->at(0).Trajectory();
 
-	    for(size_t j=0; j < my_mctrack.size()-1; j++) {
-	      TVector3 vtx_j   = my_mctrack.at(j).Position().Vect();
-	      TVector3 vtx_jp1 = my_mctrack.at(j+1).Position().Vect();
-	      TVector3 mom_j   = my_mctrack.at(j).Momentum().Vect();
-	      TVector3 mom_jp1 = my_mctrack.at(j+1).Momentum().Vect();
+	    for(size_t j=0; j < my_mctraj.size()-1; j++) {
+	      TVector3 vtx_j   = my_mctraj.at(j).Position().Vect();
+	      TVector3 vtx_jp1 = my_mctraj.at(j+1).Position().Vect();
+	      TVector3 mom_j   = my_mctraj.at(j).Momentum().Vect();
+	      TVector3 mom_jp1 = my_mctraj.at(j+1).Momentum().Vect();
 	      
 	      //only add to MC tracklength, calculate dedx, etc
 	      //only if both points j and j+1 of muon are within the detector volume

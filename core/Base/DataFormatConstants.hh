@@ -34,6 +34,7 @@ namespace larlight{
     const Int_t    INVALID_INT    = std::numeric_limits<Int_t>::max();
 
     const Double_t INVALID_DOUBLE = std::numeric_limits<Double_t>::max();
+    const Double_t INVALID_FLOAT  = std::numeric_limits<Float_t>::max();
     
     /// Define identifier for a data container class to be loaded through storage_manager::get_data()
     enum DATA_TYPE{
@@ -42,12 +43,15 @@ namespace larlight{
       MCParticle,         ///< MCParticle
       MCTrajectory,       ///< MCTrajectory
       MCNeutrino,         ///< MCNeutrino
+      SimChannel,         ///< SimChannel
+      MCShower,           ///< LArSoft utility class MCShower
       Wire,               ///< Wire
       Hit,                ///< Hit
       CrawlerHit,         ///< ClusterCrawler Hit algo
       GausHit,            ///< Gaus Hit algo
       APAHit,             ///< APA Hit algo
       FFTHit,             ///< FFT Hit algo
+      RFFHit,             ///< RFF Hit algo
       Cluster,            ///< Cluster
       FuzzyCluster,       ///< Fuzzy Cluster
       DBCluster,          ///< DBCluster
@@ -92,14 +96,17 @@ namespace larlight{
       "event",
       "mctruth",
       "mcpart",
-      "mctrack",
+      "mctrajectory",
       "mcnu",
+      "simch",
+      "mcshower",
       "wire",
       "hit",
       "crawlerhit",
       "gaushit",
       "apahit",
       "ffthit",
+      "rffhit",
       "cluster",
       "fuzzycluster",
       "dbcluster",

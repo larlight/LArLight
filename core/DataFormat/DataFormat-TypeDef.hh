@@ -7,10 +7,12 @@
 
 // Header files included here
 #include "data_base.hh"
-#include "mctrack.hh"
+#include "mctrajectory.hh"
 #include "mcpart.hh"
 #include "mcnu.hh"
 #include "mctruth.hh"
+#include "mcshower.hh"
+#include "simch.hh"
 #include "wire.hh"
 #include "fifo.hh"
 #include "pmtfifo.hh"
@@ -34,7 +36,7 @@ namespace larlight{
   class event_base;
 
   class mcstep;
-  class mctrack;
+  class mctrajectory;
 
   class mcpart;
   class event_mcpart;
@@ -43,6 +45,13 @@ namespace larlight{
 
   class mctruth;
   class event_mctruth;
+
+  class mcshower;
+  class event_mcshower;
+
+  class ide;
+  class simch;
+  class event_simch;
   
   class wire;
   class event_wire;

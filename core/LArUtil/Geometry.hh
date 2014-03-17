@@ -173,12 +173,14 @@ namespace larutil {
     Double_t   WireAngleToVertical(larlight::GEO::View_t view) const;
 
     /// volume box
+    /*
     void  WorldBox(Double_t* xlo,
 		   Double_t* xhi,
 		   Double_t* ylo,
 		   Double_t* yhi,
 		   Double_t* zlo,
 		   Double_t* zhi)  const; 
+    */
 
     /**
        The following functions are utilized to determine if two wires
@@ -208,7 +210,7 @@ namespace larutil {
 
     
     /// Return gdml string which gives sensitive opdet name
-    std::string OpDetGeoName(UInt_t c=0) const;
+    //std::string OpDetGeoName(UInt_t c=0) const;
 
     /// Find the nearest OpChannel to some point, in the appropriate cryostat 
     UInt_t  GetClosestOpChannel(const Double_t * xyz) const;
