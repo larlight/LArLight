@@ -81,7 +81,7 @@ namespace larlight{
 
     // Get an output cluster data container. Clear it in case it's already filled.
     //auto out_clusters = (event_cluster*)(storage->get_data(DATA::ShowerAngleCluster));
-    auto out_clusters = (event_cluster*)(storage->get_data(DATA::Cluster));
+    auto out_clusters = (event_cluster*)(storage->get_data(DATA::ShowerAngleCluster));
     out_clusters->clear();
 
     // Prepare attribute vectors (clear & resize std::vector)
