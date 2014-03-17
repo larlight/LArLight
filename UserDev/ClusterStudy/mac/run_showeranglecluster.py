@@ -8,7 +8,6 @@ ana_proc.set_io_mode(fmwk.storage_manager.BOTH)
 ana_proc.add_input_file(sys.argv[1])
 ana_proc.set_input_rootdir("scanner")
 ana_proc.set_output_file("out.root")
-my_ana.SetClusterType(fmwk.DATA.Cluster)
 ana_proc.add_process(fmwk.ShowerAngleCluster())
 
 ana_proc.run()
