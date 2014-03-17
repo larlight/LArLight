@@ -110,11 +110,11 @@ namespace larutil{
 			      Double_t &wireout,
 			      Double_t &timeout) const;
     
-    const larlight::hit& FindClosestHit(const std::vector<larlight::hit> &hitlist,
+    const larlight::hit* FindClosestHit(const std::vector<larlight::hit*> &hitlist,
 					UInt_t wire,
 					Double_t time) const;
     
-    UInt_t FindClosestHitIndex(const std::vector<larlight::hit> &hitlist,
+    UInt_t FindClosestHitIndex(const std::vector<larlight::hit*> &hitlist,
 			       UInt_t wirein,
 			       Double_t timein) const;			       
 			       
@@ -124,7 +124,7 @@ namespace larutil{
     Double_t GetTimeTicks(Double_t x, Int_t plane) const;
     
     
-    Int_t GetPlaneAndTPC(const larlight::hit &h,
+    Int_t GetPlaneAndTPC(const larlight::hit* h,
 			 UInt_t &p,
 			 UInt_t &w) const;
 
@@ -144,15 +144,15 @@ namespace larutil{
 			     Double_t theta,
 			     Double_t *dirs) const;
 			     
-    void SelectLocalHitlist(const std::vector<larlight::hit>& hitlist, 
-			    std::vector <larlight::hit> &hitlistlocal_index,
+    void SelectLocalHitlist(const std::vector<larlight::hit*>& hitlist, 
+			    std::vector <larlight::hit*> &hitlistlocal_index,
 			    Double_t wire_start,
 			    Double_t time_start, 
 			    Double_t linearlimit,   
 			    Double_t ortlimit, 
 			    Double_t lineslopetest);
 
-    void SelectLocalHitlist(const std::vector<larlight::hit>& hitlist, 
+    void SelectLocalHitlist(const std::vector<larlight::hit*>& hitlist, 
 			    std::vector <UInt_t> &hitlistlocal_index,
 			    Double_t wire_start,
 			    Double_t time_start, 

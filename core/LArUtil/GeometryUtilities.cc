@@ -589,7 +589,7 @@ namespace larutil{
   //Find hit closest to wire,time coordinates
   // 
   ////////////////////////////////////////////////
-  const larlight::hit& GeometryUtilities::FindClosestHit(const std::vector<larlight::hit> &hitlist,
+  const larlight::hit* GeometryUtilities::FindClosestHit(const std::vector<larlight::hit*> &hitlist,
 							 UInt_t wirein,
 							 Double_t timein) const
   {
@@ -600,7 +600,7 @@ namespace larutil{
   //Find hit closest to wire,time coordinates
   // 
   ////////////////////////////////////////////////
-  UInt_t GeometryUtilities::FindClosestHitIndex(const std::vector<larlight::hit> &hitlist,
+  UInt_t GeometryUtilities::FindClosestHitIndex(const std::vector<larlight::hit*> &hitlist,
 						UInt_t wirein,
 						Double_t timein) const
   {
@@ -613,7 +613,7 @@ namespace larutil{
    
     for(UInt_t ii=0; ii<hitlist.size();ii++){
 
-      Double_t time = hitlist.at(ii).PeakTime();  
+      Double_t time = hitlist.at(ii)->PeakTime();  
       GetPlaneAndTPC(hitlist.at(ii),plane,wire);
       
       Double_t dist_mod=Get2DDistance(wirein,timein,wire,time);
@@ -812,17 +812,17 @@ namespace larutil{
 
 
   //////////////////////////////////////////
-  Int_t GeometryUtilities::GetPlaneAndTPC(const larlight::hit &h,
-					UInt_t &p,
-					UInt_t &w) const
+  Int_t GeometryUtilities::GetPlaneAndTPC(const larlight::hit* h,
+					  UInt_t &p,
+					  UInt_t &w) const
   {
-    p  = geom->ChannelToPlane(h.Channel());
-    w  = geom->ChannelToWire(h.Channel());
+    p  = geom->ChannelToPlane(h->Channel());
+    w  = geom->ChannelToWire(h->Channel());
     return 0;
   }
 
   
-  void GeometryUtilities::SelectLocalHitlist(const std::vector< larlight::hit> &hitlist, 
+  void GeometryUtilities::SelectLocalHitlist(const std::vector< larlight::hit*> &hitlist, 
 					     std::vector<UInt_t> &hitlistlocal_index,
 					     Double_t  wire_start,Double_t time_start, 
 					     Double_t linearlimit,   Double_t ortlimit, 
@@ -833,7 +833,7 @@ namespace larutil{
     
     for(size_t i=0; i<hitlist.size(); ++i) {
 
-      Double_t time = hitlist.at(i).PeakTime();
+      Double_t time = hitlist.at(i)->PeakTime();
       UInt_t plane,wire;
       GetPlaneAndTPC(hitlist.at(i),plane,wire);
       
@@ -857,8 +857,8 @@ namespace larutil{
     }
   }
 
-  void GeometryUtilities::SelectLocalHitlist(const std::vector< larlight::hit> &hitlist, 
-					     std::vector<larlight::hit> &hitlistlocal,
+  void GeometryUtilities::SelectLocalHitlist(const std::vector< larlight::hit*> &hitlist, 
+					     std::vector<larlight::hit*> &hitlistlocal,
 					     Double_t  wire_start,Double_t time_start, 
 					     Double_t linearlimit,   Double_t ortlimit, 
 					     Double_t lineslopetest)
@@ -868,7 +868,7 @@ namespace larutil{
     
     for(size_t i=0; i<hitlist.size(); ++i) {
 
-      Double_t time = hitlist.at(i).PeakTime();
+      Double_t time = hitlist.at(i)->PeakTime();
       UInt_t plane,wire;
       GetPlaneAndTPC(hitlist.at(i),plane,wire);
       

@@ -56,6 +56,8 @@ namespace larlight{
     // Assume there's only 1 unique association
     
     if(size_association(DATA::Hit))        return DATA::Hit;
+    if(size_association(DATA::GausHit))    return DATA::GausHit;
+    if(size_association(DATA::RFFHit))     return DATA::RFFHit;
     if(size_association(DATA::FFTHit))     return DATA::FFTHit;
     if(size_association(DATA::CrawlerHit)) return DATA::CrawlerHit;
     if(size_association(DATA::APAHit))     return DATA::APAHit;

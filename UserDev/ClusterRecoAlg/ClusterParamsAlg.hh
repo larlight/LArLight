@@ -32,57 +32,57 @@ namespace larreco {
     void reconfigure(); 
     
     int Find2DAxisRough(double &lineslope,double &lineintercept,double &goodness,
-			const std::vector <larlight::hit> &hitlist); /**Calculate 2D angle histograms, provided vertex is know */ 
+			const std::vector <larlight::hit*> &hitlist); /**Calculate 2D angle histograms, provided vertex is know */ 
     
     int Find2DAxisRoughHighCharge(double &lineslope,double &lineintercept,double &goodness,
-				  const std::vector <larlight::hit> &hitlist);  
+				  const std::vector <larlight::hit*> &hitlist);  
     //  void CalculateAxisParameters(unsigned nClust, std::vector < larlight::hit >  hitlist,double wstart,double tstart,double wend,double tend);
     
-    int  Find2DStartPointsBasic(const std::vector<larlight::hit> &hitlist,
+    int  Find2DStartPointsBasic(const std::vector<larlight::hit*> &hitlist,
 				double &wire_start,double &time_start,double &wire_end,double &time_end);
     
     int Find2DStartPointsBasic(double lineslope,double lineintercept,
-			       const std::vector<larlight::hit> &hitlist,
+			       const std::vector<larlight::hit*> &hitlist,
 			       double &wire_start,double &time_start,double &wire_end,double &time_end);
     
-    int Find2DStartPointsHighCharge(const std::vector<larlight::hit> &hitlist,
+    int Find2DStartPointsHighCharge(const std::vector<larlight::hit*> &hitlist,
 				    double &wire_start,double &time_start,double &wire_end,double &time_end);
     
-    int FindTrunk(const std::vector <larlight::hit> &hitlist,
+    int FindTrunk(const std::vector <larlight::hit*> &hitlist,
 		  double &wstn,double &tstn,double &wendn,double &tendn,double lineslope,double lineintercept);
     
-    int FindTrunk(const std::vector <larlight::hit> &hitlist,
+    int FindTrunk(const std::vector <larlight::hit*> &hitlist,
 		  double &wstn,double &tstn,double &wendn,double &tendn); //overloaded interface, will calculate the lineslope and basic points using Find2DStartPointsBasic.
     
     void FindDirectionWeights(double lineslope,double wstn,double tstn,double wendn,double tendn, 
-			      const std::vector <larlight::hit> &hitlist,
+			      const std::vector <larlight::hit*> &hitlist,
 			      double &HiBin,double &LowBin,double &invHiBin,double &invLowBin, double *altWeight=0); 
     
     void FindSideWeights(double lineslope,double lineintercept,double wstn,double tstn,int direction, 
-			 const std::vector <larlight::hit> &hitlist,
+			 const std::vector <larlight::hit*> &hitlist,
 			 double &sideWeightCharge); 
 
     /*
-    void RefineStartPointsHough(const std::vector<larlight::hit> &hitlist,
+    void RefineStartPointsHough(const std::vector<larlight::hit*> &hitlist,
 				double & wire_start,
 				double & time_start, 
 				double & wire_end,
 				double & time_end, 
 				int &direction);
     */    
-    int DecideClusterDirection(const std::vector <larlight::hit> &hitlist,
+    int DecideClusterDirection(const std::vector <larlight::hit*> &hitlist,
 			       double lineslope,double wstn,double tstn,double wendn,double tendn);
     
-    int FindHitCountDirection(const std::vector<larlight::hit> &hitlist, 
+    int FindHitCountDirection(const std::vector<larlight::hit*> &hitlist, 
 			      double  wire_start,double  time_start, double  wire_end,double  time_end, double lineslope);
     
-    int FindMultiHitDirection(const std::vector<larlight::hit> &hitlist, 
+    int FindMultiHitDirection(const std::vector<larlight::hit*> &hitlist, 
 			      double  wire_start,double  time_start, double  wire_end,double  time_end, double lineslope);
     
     bool isShower(double lineslope,double wstn,double tstn,double wendn,double tendn, 
-		  const std::vector <larlight::hit> &hitlist);
+		  const std::vector <larlight::hit*> &hitlist);
     
-    int MultiHitWires(const std::vector <larlight::hit> &hitlist);
+    int MultiHitWires(const std::vector <larlight::hit*> &hitlist);
     
     //     
     //     void RefineStartPoints(unsigned int nClust, std::vector< larlight::hit >  hitlist, double  wire_start,double time_start);
@@ -90,19 +90,19 @@ namespace larreco {
     //     double Get2DAngleForHit( larlight::hit starthit,std::vector < larlight::hit > hitlist);
     //     
 //     double Get2DAngleForHit( unsigned int wire, double time,std::vector < larlight::hit > hitlist);
-    int FindPrincipalDirection(const std::vector<larlight::hit> &hitlist, 
+    int FindPrincipalDirection(const std::vector<larlight::hit*> &hitlist, 
 			       double  wire_start,double  time_start, double  wire_end,double  time_end,double lineslope);
 
-    void GetPrincipal(const std::vector<larlight::hit> &hitlist, TPrincipal * pc);
+    void GetPrincipal(const std::vector<larlight::hit*> &hitlist, TPrincipal * pc);
 
     int Find2DAxisPrincipal(double &lineslope,double &lineintercept,double &goodness,
-			    const std::vector <larlight::hit> &hitlist);
+			    const std::vector <larlight::hit*> &hitlist);
 
     int Find2DAxisPrincipalHighCharge(double &lineslope,double &lineintercept,double &goodness,
-				      const std::vector <larlight::hit> &hitlist);
+				      const std::vector <larlight::hit*> &hitlist);
 
     double Get2DAngleForHit( unsigned int swire,double stime,
-			     const std::vector <larlight::hit> &hitlist);
+			     const std::vector <larlight::hit*> &hitlist);
     
   private:
     
@@ -126,21 +126,21 @@ namespace larreco {
     bool fForceRightGoing;
     //helper functions
 
-    void FindExtremeIntercepts(const std::vector <larlight::hit> &hitlist,
+    void FindExtremeIntercepts(const std::vector <larlight::hit*> &hitlist,
 			       double perpslope,
 			       double &inter_high,
 			       double &inter_low);  
     
-    void SelectLocalHitlist(const std::vector<larlight::hit> &hitlist, 
-			    std::vector< larlight::hit > &hitlistlocal, 
+    void SelectLocalHitlist(const std::vector<larlight::hit*> &hitlist, 
+			    std::vector< larlight::hit* > &hitlistlocal, 
 			    double  wire_start,double time_start, double radlimit);
     
     void CreateHighHitlist(double threshold,
-			   const std::vector<larlight::hit> &hitlist,
-			   std::vector<larlight::hit> &hitlist_high);
+			   const std::vector<larlight::hit*> &hitlist,
+			   std::vector<larlight::hit*> &hitlist_high);
     
     void FindMinMaxWiresTimes(double &MinWire, double &MaxWire,double &MinTime,double &Maxtime,double &MeanCharge,
-			      const std::vector<larlight::hit> &hitlist);
+			      const std::vector<larlight::hit*> &hitlist);
     
     double fHitDensityCutoff;
     double fMultiHitWireCutoff;
