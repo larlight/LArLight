@@ -11,6 +11,7 @@ namespace larlight{
     fh_omega_single=nullptr;
     ftree_cluster=nullptr;
     _name="ShowerAngleCluster"; 
+    _in_cluster_type=DATA::FuzzyCluster;
     geo  = (larutil::Geometry*)(larutil::Geometry::GetME());
     larp = (larutil::LArProperties*)(larutil::LArProperties::GetME());
     detp = (larutil::DetectorProperties*)(larutil::DetectorProperties::GetME());
@@ -27,6 +28,20 @@ namespace larlight{
 
   }
 
+  void ShowerAngleCluster::SetInputClusterType(DATA::DATA_TYPE type)
+  {
+    if( type != DATA::FuzzyCluster &&
+	type != DATA::ShowerAngleCluster &&
+	type != DATA::CrawlerCluster &&
+	type != DATA::DBCluster )
+      {
+	print(MSG::ERROR,__FUNCTION__,
+	      Form("Not supporting \"%s\" cluster type...",DATA::DATA_TREE_NAME[type].c_str()));
+	return;	
+      }
+    _in_cluster_type = type;
+  }
+
   bool ShowerAngleCluster::initialize() {
 
     // this will not change on a run per run basis.
@@ -40,21 +55,46 @@ namespace larlight{
   
   bool ShowerAngleCluster::analyze(larlight::storage_manager* storage) {
 
-    auto clusters = (const larlight::event_cluster*)(storage->get_data(larlight::DATA::FuzzyCluster));
-    const larlight::DATA::DATA_TYPE hit_type = clusters->get_hit_type();
-    
-    auto hits = (const larlight::event_hit*)(storage->get_data(hit_type));
-    auto out_clusters = (larlight::event_cluster*)(storage->get_data(larlight::DATA::Cluster));
-    
+    // Get an input cluster 
+    auto clusters = (const event_cluster*)(storage->get_data(_in_cluster_type));
+
+    // Check if it is valid. If not, return false
+    if(!clusters) {
+      
+      print(MSG::ERROR,__FUNCTION__,
+	    Form("Did not find input cluster type: \"%s\"",
+		 DATA::DATA_TREE_NAME[_in_cluster_type].c_str()));
+      return false;
+    }
+
+    // Get associated hit type and hit data container
+    const DATA::DATA_TYPE hit_type = clusters->get_hit_type();    
+    auto hits = (event_hit*)(storage->get_data(hit_type));
+
+    // Check if it is valid. 
+    if(!hits) {      
+      print(MSG::ERROR,__FUNCTION__,
+	    Form("Did not find associated hits of type: \"%s\"",
+		 DATA::DATA_TREE_NAME[hit_type].c_str()));
+      return false;
+    }
+
+    // Get an output cluster data container. Clear it in case it's already filled.
+    //auto out_clusters = (event_cluster*)(storage->get_data(DATA::ShowerAngleCluster));
+    auto out_clusters = (event_cluster*)(storage->get_data(DATA::ShowerAngleCluster));
     out_clusters->clear();
+
+    // Prepare attribute vectors (clear & resize std::vector)
     ClearandResizeVectors(clusters->size());
+
+    // Loop over input clusters
     for(size_t iClust=0; iClust<clusters->size(); ++iClust) {
       const std::vector<UShort_t> cl_hits_index(clusters->at(iClust).association(hit_type));
-      std::vector<larlight::hit> cl_hits;
+      std::vector<larlight::hit*> cl_hits;
       cl_hits.reserve(cl_hits_index.size());
-      for(auto const index : cl_hits_index)
+      for(auto index : cl_hits_index)
 	
-	cl_hits.push_back(hits->at(index));
+	cl_hits.push_back(&(hits->at(index)));
 
       larlight::cluster out_cl(MainClusterLoop(clusters->at(iClust), 
 					       cl_hits, 
@@ -115,7 +155,7 @@ namespace larlight{
   }
 
   larlight::cluster ShowerAngleCluster::MainClusterLoop(const larlight::cluster &inCluster,
-							const std::vector<larlight::hit> &hitlist,
+							const std::vector<larlight::hit*> &hitlist,
 							unsigned int iClustInput,
 							unsigned int iClustOutput) {
     
@@ -207,7 +247,7 @@ namespace larlight{
     //unsigned int xplane;
     //xplane=hitlist[0]->WireID().Plane;
 
-    larlight::GEO::View_t viewfix = hitlist.at(0).View();
+    larlight::GEO::View_t viewfix = hitlist.at(0)->View();
     
     //std::cout << " wire " << fWireVertex[iClustInput] << std::endl;
     //std::cout << " fErrors " << fErrors[iClustInput] << std::endl;
@@ -259,7 +299,7 @@ namespace larlight{
     return outCluster;
   }
 
-  larlight::cluster ShowerAngleCluster::MergeClusterLoop( const std::vector<larlight::hit> &hitlist,
+  larlight::cluster ShowerAngleCluster::MergeClusterLoop( const std::vector<larlight::hit*> &hitlist,
 							  unsigned int iClustOutput) {
 
     double lineslope, lineintercept,goodness,wire_start,time_start,wire_end,time_end;
@@ -301,7 +341,7 @@ namespace larlight{
     
     double vtx_error = ( (goodness < 1) ? 0.1 : 10);
 
-    larlight::GEO::View_t viewfix = hitlist.at(0).View();
+    larlight::GEO::View_t viewfix = hitlist.at(0)->View();
 
     /*
     larlight::cluster outCluster(wire_start, vtx_error,
@@ -340,7 +380,7 @@ namespace larlight{
   // Method to get the 2D angle ogf a Cluster based on its starting wire and time.
   ////////////////////////////////////////////////////////////////////////////////
   double ShowerAngleCluster::Get2DAngleForHit( unsigned int swire,double stime,
-					       const std::vector <larlight::hit> &hitlist) {
+					       const std::vector <larlight::hit*> &hitlist) {
     
     fh_omega_single->Reset();
     
@@ -348,10 +388,10 @@ namespace larlight{
     // this should changed on the loop on the cluster of the shower
     for(auto const h : hitlist) {
       // art::Ptr<recob::Hit> theHit = (*hitIter);
-      double time = h.PeakTime();  
-      wire=h.Wire();
+      double time = h->PeakTime();  
+      wire=h->Wire();
       double omx=gser->Get2Dangle((double)wire,(double)swire,time,stime);
-      fh_omega_single->Fill(180*omx/TMath::Pi(),h.Charge());
+      fh_omega_single->Fill(180*omx/TMath::Pi(),h->Charge());
     }
     
     double omega = fh_omega_single->GetBinCenter(fh_omega_single->GetMaximumBin());// Mean value of the fit

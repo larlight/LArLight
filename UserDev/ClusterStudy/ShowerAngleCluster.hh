@@ -50,13 +50,16 @@ namespace larlight {
     /// Finalize
     virtual bool finalize();
 
+    /// Set what kind of cluster to read-in
+    void SetInputClusterType(DATA::DATA_TYPE type);
+
   private:
 
-    double Get2DAngleForHit( const larlight::hit &starthit,
-			     const std::vector <larlight::hit> &hitlist);
+    double Get2DAngleForHit( const larlight::hit *starthit,
+			     const std::vector <larlight::hit*> &hitlist);
 
     double Get2DAngleForHit( unsigned int wire, double time,
-			     const std::vector <larlight::hit> &hitlist);
+			     const std::vector <larlight::hit*> &hitlist);
 
     void ClearandResizeVectors(unsigned int nClusters);
 
@@ -71,11 +74,11 @@ namespace larlight {
     double fNTimes;
     
     larlight::cluster MainClusterLoop(const larlight::cluster &inCluster,
-				      const std::vector<larlight::hit> &hitlist, 
+				      const std::vector<larlight::hit*> &hitlist, 
 				      unsigned int iClustInput, 
 				      unsigned int iClustOutput); 
 
-    larlight::cluster MergeClusterLoop(const std::vector<larlight::hit> &hitlist,
+    larlight::cluster MergeClusterLoop(const std::vector<larlight::hit*> &hitlist,
 				       unsigned int iClustOutput);
     
     larutil::DetectorProperties *detp;
@@ -107,7 +110,8 @@ namespace larlight {
     TTree* ftree_cluster;
     bool matchflag;
     unsigned int  fMinHitListSize;
-
+    
+    DATA::DATA_TYPE _in_cluster_type;
   };
 }
 #endif

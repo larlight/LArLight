@@ -63,7 +63,7 @@ namespace larreco {
   //Calculate Minimum and Maximum wires and times of the cluster. And Mean charge
   //--------------------------------------------------------------------------------------------
   void ClusterParamsAlg::FindMinMaxWiresTimes(double &MinWire, double &MaxWire,double &MinTime,double &MaxTime,double &MeanCharge,
-					      const std::vector<larlight::hit> &hitlist){
+					      const std::vector<larlight::hit*> &hitlist){
 
     unsigned int wire;    
     unsigned int plane;
@@ -75,7 +75,7 @@ namespace larreco {
     
     for(auto const h : hitlist) {
 
-      double time = h.PeakTime();  
+      double time = h->PeakTime();  
       //time_C -= (presamplings+10.1);
       gser->GetPlaneAndTPC(h,plane,wire);
       
@@ -91,7 +91,7 @@ namespace larreco {
       if(wire<MinWire)
 	MinWire=wire;
       
-      mcharge+=h.Charge();
+      mcharge+=h->Charge();
       
     }
     
@@ -109,11 +109,11 @@ namespace larreco {
   //Calculate rough axis of the cluster, using hits above the average charge. Calculate measure of verticalness of the cluster and return in goodness.
   //--------------------------------------------------------------------------------------------
   int ClusterParamsAlg::Find2DAxisRoughHighCharge(double &lineslope,double &lineintercept,double &goodness,
-						  const std::vector <larlight::hit> &hitlist){
+						  const std::vector <larlight::hit*> &hitlist){
     
     double kMinWire=99999,kMinTime=999999,kMaxWire=0,kMaxTime=0,kMeanCharge=0;
     FindMinMaxWiresTimes(kMinWire,kMaxWire,kMinTime,kMaxTime,kMeanCharge,hitlist);
-    std::vector<larlight::hit> highhitlist;
+    std::vector<larlight::hit*> highhitlist;
     CreateHighHitlist(kMeanCharge,hitlist,highhitlist);
     // //////std::cout << "$$$$$$$ highhitlist size: " << highhitlist.size() << " " << kMeanCharge <<  std::endl;
     
@@ -127,12 +127,12 @@ namespace larreco {
   //Calculate rough axis of the cluster, using hits above the average charge. Using Principal components
   //--------------------------------------------------------------------------------------------
   int ClusterParamsAlg::Find2DAxisPrincipalHighCharge(double &lineslope,double &lineintercept,double &goodness,
-						      const std::vector <larlight::hit> &hitlist){
+						      const std::vector <larlight::hit*> &hitlist){
     
     double kMinWire=99999,kMinTime=999999,kMaxWire=0,kMaxTime=0,kMeanCharge=0;
     FindMinMaxWiresTimes(kMinWire,kMaxWire,kMinTime,kMaxTime,kMeanCharge,hitlist);
 
-    std::vector<larlight::hit> highhitlist;
+    std::vector<larlight::hit*> highhitlist;
     CreateHighHitlist(kMeanCharge,hitlist,highhitlist);
     //   //////std::cout << "$$$$$$$ highhitlist size: " << highhitlist.size() << " " << kMeanCharge <<  std::endl;
     if(Find2DAxisRough(lineslope,lineintercept,goodness,highhitlist)==-1)
@@ -147,7 +147,7 @@ namespace larreco {
   //Calculate rough axis of the cluster. Calculate measure of verticalness of the cluster and return in goodness.
   //--------------------------------------------------------------------------------------------
   int ClusterParamsAlg::Find2DAxisPrincipal(double &lineslope,double &lineintercept,double &goodness,
-					    const std::vector <larlight::hit> &hitlist){
+					    const std::vector <larlight::hit*> &hitlist){
     
     //double time;
     //unsigned int wire,tpc, cstat;
@@ -177,7 +177,7 @@ namespace larreco {
     //calculate intercept:
     for(auto const h : hitlist) 
 
-	c+=  h.PeakTime()*fTimetoCm -  h.Wire()*fWiretoCm*a; 
+	c+=  h->PeakTime()*fTimetoCm -  h->Wire()*fWiretoCm*a; 
     
     c/=hitlist.size();
     
@@ -192,7 +192,7 @@ namespace larreco {
   //Calculate rough axis of the cluster. Calculate measure of verticalness of the cluster and return in goodness.
   //--------------------------------------------------------------------------------------------
   int ClusterParamsAlg::Find2DAxisRough(double &lineslope,double &lineintercept,double &goodness,
-					const std::vector<larlight::hit> &hitlist) 
+					const std::vector<larlight::hit*> &hitlist) 
   {
     
     double time;
@@ -236,11 +236,11 @@ namespace larreco {
     
     for(auto const h : hitlist) {
       
-    time =  h.PeakTime();  
+    time =  h->PeakTime();  
     gser->GetPlaneAndTPC(h,plane,wire);
     
     tgxtest->Fill((double)wire*fWiretoCm,
-		  time*fTimetoCm,h.Charge());
+		  time*fTimetoCm,h->Charge());
     }
   
     
@@ -280,7 +280,7 @@ namespace larreco {
   //---------------------------------------------------------------------------------------------
   //Calculate rough axis of the cluster. Interface for version without the slope yet
   //--------------------------------------------------------------------------------------------
-  int ClusterParamsAlg::Find2DStartPointsBasic(const std::vector<larlight::hit> &hitlist,
+  int ClusterParamsAlg::Find2DStartPointsBasic(const std::vector<larlight::hit*> &hitlist,
 					       double &wire_start,double &time_start,double &wire_end,double &time_end)
   {
     
@@ -297,7 +297,7 @@ namespace larreco {
   //---------------------------------------------------------------------------------------------
   //Calculate rough axis of the cluster. Interface for version without the slope yet
   //--------------------------------------------------------------------------------------------
-  int   ClusterParamsAlg::Find2DStartPointsHighCharge(const std::vector<larlight::hit> &hitlist,
+  int   ClusterParamsAlg::Find2DStartPointsHighCharge(const std::vector<larlight::hit*> &hitlist,
 						      double &wire_start,double &time_start,double &wire_end,double &time_end)
   {
     
@@ -316,7 +316,7 @@ namespace larreco {
   //Calculate rough axis of the cluster. Calculate measure of verticalness of the cluster and return in goodness.
   //--------------------------------------------------------------------------------------------
   int   ClusterParamsAlg::Find2DStartPointsBasic(double lineslope,double lineintercept,
-						 const std::vector<larlight::hit> &hitlist,
+						 const std::vector<larlight::hit*> &hitlist,
 						 double &wire_start,double &time_start,double &wire_end,double &time_end)
   {
     
@@ -334,7 +334,7 @@ namespace larreco {
     //   
     
     
-    gser->GetPlaneAndTPC((*hitlist.begin()),plane,wire);
+    gser->GetPlaneAndTPC(*hitlist.begin(),plane,wire);
     
     //get paramters of the straight line fit. (and rescale them to cm/cm)
     
@@ -390,11 +390,11 @@ namespace larreco {
 
     gser->GetPlaneAndTPC(hitlist.at(startHit_index),plane,wire);
     wire_start=wire;
-    time_start=hitlist.at(startHit_index).PeakTime();
+    time_start=hitlist.at(startHit_index)->PeakTime();
     
     gser->GetPlaneAndTPC(hitlist.at(endHit_index),plane,wire);
     wire_end=wire;
-    time_end=hitlist.at(endHit_index).PeakTime();
+    time_end=hitlist.at(endHit_index)->PeakTime();
     
     return 0;
     //  CalculateAxisParameters(nClust,hitlist,wire_start,time_start,wire_end,time_end);
@@ -405,7 +405,8 @@ namespace larreco {
   // uses, rough strarting points found earlier and the slope of the line found earlier
   // returns preliminary shower direction //interface that executes all the stuff before it
   //--------------------------------------------------------------------------------------------
-  int ClusterParamsAlg::FindTrunk(const std::vector <larlight::hit> &hitlist,double &wstn,double &tstn,double &wendn,double &tendn)
+  int ClusterParamsAlg::FindTrunk(const std::vector <larlight::hit*> &hitlist,
+				  double &wstn,double &tstn,double &wendn,double &tendn)
   {
     double lineslope, lineintercept,goodness;
     
@@ -422,7 +423,7 @@ namespace larreco {
   // returns preliminary shower direction //interface that needs earlier input
   //--------------------------------------------------------------------------------------------
   
-  int ClusterParamsAlg::FindTrunk(const std::vector <larlight::hit> &hitlist,
+  int ClusterParamsAlg::FindTrunk(const std::vector <larlight::hit*> &hitlist,
 				  double &wstn,
 				  double &tstn,
 				  double &wendn,
@@ -486,7 +487,7 @@ namespace larreco {
     
     for(auto const theHit : hitlist) {
 
-      double time = theHit.PeakTime() ;  
+      double time = theHit->PeakTime() ;  
       unsigned int wire,plane;
       gser->GetPlaneAndTPC(theHit,plane, wire);
       
@@ -503,10 +504,10 @@ namespace larreco {
       ////////////////////////////////////////////////////////////////////// 
       //calculate the weight along the axis, to guess the Shower direction  
       /////////////////////////////////////////////////////////////////////// 
-      double weight= (ortdist<1.) ? 10*theHit.Charge() : 5*theHit.Charge()/ortdist;
+      double weight= (ortdist<1.) ? 10*theHit->Charge() : 5*theHit->Charge()/ortdist;
       hithistinv->Fill(linedist,weight);
       
-      fTotalCharge+=theHit.Charge();  //calculate total charge while we're at it.
+      fTotalCharge+=theHit->Charge();  //calculate total charge while we're at it.
       
     }
     
@@ -598,7 +599,7 @@ namespace larreco {
     
     for(auto const theHit : hitlist) {
 
-      double time = theHit.PeakTime() ;  
+      double time = theHit->PeakTime() ;  
       unsigned int wire,plane;
       gser->GetPlaneAndTPC(theHit,plane, wire);
       
@@ -689,7 +690,7 @@ namespace larreco {
 
   void ClusterParamsAlg::FindDirectionWeights(double lineslope,
 					      double w_on_begin,double t_on_begin,double w_on_end,double t_on_end, 
-					      const std::vector <larlight::hit> &hitlist,
+					      const std::vector <larlight::hit*> &hitlist,
 					      double &HiBin,double &LowBin,double &invHiBin,double &invLowBin, double *altWeight)
   {
     
@@ -738,7 +739,7 @@ namespace larreco {
     ///////// Calculate weights
     for(auto const theHit : hitlist) {
 
-      double time = theHit.PeakTime() ;  
+      double time = theHit->PeakTime() ;  
       unsigned int wire,plane;
       gser->GetPlaneAndTPC(theHit,plane, wire);
       
@@ -756,7 +757,7 @@ namespace larreco {
       
       double linedist=gser->Get2DDistance(wire_on_line,time_on_line,w_on_begin,t_on_begin);
       double ortdist=gser->Get2DDistance(wire_on_line,time_on_line,wire,time);
-      double weight= (ortdist<1.) ? 10*(theHit.Charge()) : 5*(theHit.Charge())/ortdist;
+      double weight= (ortdist<1.) ? 10*(theHit->Charge()) : 5*(theHit->Charge())/ortdist;
       double revweight= (ortdist<1.) ? 0.1 : ortdist;
       
       if(altWeight!=0 && ortdist>0.5) *altWeight+=ortdist; 
@@ -794,7 +795,7 @@ namespace larreco {
   bool ClusterParamsAlg::isShower(double lineslope,
 				  double wstn,double tstn,
 				  double wendn,double tendn, 
-				  const std::vector <larlight::hit> &hitlist)
+				  const std::vector <larlight::hit*> &hitlist)
   {
     
     //   fHitDensityCutoff	 // Showers is high, tracks low, 0 don't use cut
@@ -903,14 +904,14 @@ namespace larreco {
   }
   
   
-  int ClusterParamsAlg::MultiHitWires(const std::vector <larlight::hit> &hitlist)
+  int ClusterParamsAlg::MultiHitWires(const std::vector <larlight::hit*> &hitlist)
   {
     int multihit=0;
-    for(std::vector<larlight::hit>::const_iterator hitIter = hitlist.begin(); hitIter!=hitlist.end(); ++hitIter) {
+    for(std::vector<larlight::hit*>::const_iterator hitIter = hitlist.begin(); hitIter!=hitlist.end(); ++hitIter) {
 
-      unsigned int wire=(*hitIter).Wire();   //current hit wire/time
-      for(std::vector<larlight::hit>::const_iterator hitItersecond = hitIter; hitItersecond != hitlist.end();  hitItersecond++){
-	unsigned int wiresecond=(*hitItersecond).Wire();   //current hit wire/time
+      unsigned int wire=(*hitIter)->Wire();   //current hit wire/time
+      for(std::vector<larlight::hit*>::const_iterator hitItersecond = hitIter; hitItersecond != hitlist.end();  hitItersecond++){
+	unsigned int wiresecond=(*hitItersecond)->Wire();   //current hit wire/time
 	if (wiresecond==wire)
 	  multihit++;             // not breaking - want multicounting to blow up the showers for now.
       }
@@ -922,7 +923,7 @@ namespace larreco {
   }
 
   double ClusterParamsAlg::Get2DAngleForHit( unsigned int swire,double stime,
-					     const std::vector <larlight::hit> &hitlist) 
+					     const std::vector <larlight::hit*> &hitlist) 
   {
     fh_omega_single->Reset();
 
@@ -930,10 +931,10 @@ namespace larreco {
     // this should changed on the loop on the cluster of the shower
     for(auto const theHit : hitlist) {
 
-      double time = theHit.PeakTime();  
-      wire=theHit.Wire();
+      double time = theHit->PeakTime();  
+      wire=theHit->Wire();
       double omx=gser->Get2Dangle((double)wire,(double)swire,time,stime);
-      fh_omega_single->Fill(180*omx/TMath::Pi(), theHit.Charge());
+      fh_omega_single->Fill(180*omx/TMath::Pi(), theHit->Charge());
     }
     
     double omega = fh_omega_single->GetBinCenter(fh_omega_single->GetMaximumBin());// Mean value of the fit
@@ -944,7 +945,7 @@ namespace larreco {
 
   void ClusterParamsAlg::FindSideWeights(double lineslope,double lineintercept,
 					 double w_on_begin,double t_on_begin, int direction,
-					 const std::vector <larlight::hit> &hitlist,
+					 const std::vector <larlight::hit*> &hitlist,
 					 double &side_weight_start_charge)
   {
     
@@ -970,7 +971,7 @@ namespace larreco {
     ///////// Calculate weights
     for(auto const theHit : hitlist) {
 
-      double time = theHit.PeakTime() ;  
+      double time = theHit->PeakTime() ;  
       unsigned int wire,plane;
       gser->GetPlaneAndTPC(theHit,plane, wire);
     
@@ -992,7 +993,7 @@ namespace larreco {
 	  // this is the intercept the line would have if it went through the point
 	  double intercept=time*fTimetoCm-at*(double)wire*fWiretoCm;
 	  
-	  side_weight_start_charge+=(intercept-ct)*theHit.Charge();
+	  side_weight_start_charge+=(intercept-ct)*theHit->Charge();
 	  startctr++;
      	}
       
@@ -1012,15 +1013,15 @@ namespace larreco {
   // and the list not smaller then 40: hits:
   //--------------------------------------------------------------------------------------------
   void ClusterParamsAlg::CreateHighHitlist(double threshold,
-					   const std::vector<larlight::hit> &hitlist,
-					   std::vector<larlight::hit> &hitlist_high)
+					   const std::vector<larlight::hit*> &hitlist,
+					   std::vector<larlight::hit*> &hitlist_high)
   {
     
     //first select a subset of points that is close to the selected start point:
-    std::vector <larlight::hit> hitlistlocal;
+    std::vector <larlight::hit*> hitlistlocal;
     
     for(auto const h : hitlist) {
-      if(h.Charge()>threshold)
+      if(h->Charge()>threshold)
 	hitlist_high.push_back(h);
     }
     
@@ -1031,7 +1032,7 @@ namespace larreco {
       if(hitlist_high.size()<(unsigned int)fMinHitListSize)
 	break;
 
-      double time = hitlist_high.at(ix).PeakTime() ;  
+      double time = hitlist_high.at(ix)->PeakTime() ;  
       unsigned int plane,wire;
       gser->GetPlaneAndTPC(hitlist_high.at(ix),plane,wire);
       
@@ -1049,7 +1050,7 @@ namespace larreco {
     
   }
 
-  int ClusterParamsAlg::FindPrincipalDirection(const std::vector<larlight::hit> &hitlist, 
+  int ClusterParamsAlg::FindPrincipalDirection(const std::vector<larlight::hit*> &hitlist, 
 					       double  wire_start,double  time_start, 
 					       double  wire_end,double  time_end, double lineslope)
   {
@@ -1058,8 +1059,8 @@ namespace larreco {
     double ortlimit=fSelectBoxSizePerp;
     int direction_local=1;
     
-    std::vector <larlight::hit> hitlistlocal_start;
-    std::vector <larlight::hit> hitlistlocal_end;
+    std::vector <larlight::hit*> hitlistlocal_start;
+    std::vector <larlight::hit*> hitlistlocal_end;
     
     ///////////////////////////// find trunk of shower:
     //double wstn=0.,tstn=0.,wendn=0.,tendn=0.;
@@ -1098,7 +1099,7 @@ namespace larreco {
   }
 
 
-  int ClusterParamsAlg::FindMultiHitDirection(const std::vector<larlight::hit> &hitlist, 
+  int ClusterParamsAlg::FindMultiHitDirection(const std::vector<larlight::hit*> &hitlist, 
 					      double  wire_start,double  time_start, double  wire_end,
 					      double  time_end, double lineslope)
   {
@@ -1107,8 +1108,8 @@ namespace larreco {
     double ortlimit=fSelectBoxSizePerp;
     int direction_local=1;
     
-    std::vector <larlight::hit> hitlistlocal_start;
-    std::vector <larlight::hit> hitlistlocal_end;
+    std::vector <larlight::hit*> hitlistlocal_start;
+    std::vector <larlight::hit*> hitlistlocal_end;
 
     gser->SelectLocalHitlist(hitlist, hitlistlocal_start, wire_start,time_start,linearlimit,ortlimit,lineslope);
     gser->SelectLocalHitlist(hitlist, hitlistlocal_end, wire_end,time_end,linearlimit,ortlimit,lineslope);
@@ -1135,7 +1136,7 @@ namespace larreco {
   }
 
 
-  int ClusterParamsAlg::FindHitCountDirection(const std::vector<larlight::hit> &hitlist, 
+  int ClusterParamsAlg::FindHitCountDirection(const std::vector<larlight::hit*> &hitlist, 
 					      double  wire_start,double  time_start, 
 					      double  wire_end,double  time_end, double lineslope)
   {
@@ -1177,7 +1178,7 @@ namespace larreco {
   // cluster.
   //////////////////////////////////////////////////////////////////////////
   
-  void ClusterParamsAlg::GetPrincipal(const std::vector<larlight::hit> &hitlist, TPrincipal * pc)
+  void ClusterParamsAlg::GetPrincipal(const std::vector<larlight::hit*> &hitlist, TPrincipal * pc)
   {
     
     for(unsigned int i=0; i!=hitlist.size(); i++)
@@ -1185,8 +1186,8 @@ namespace larreco {
 	double ThisStep[2];
 	//      ThisStep[0] = hitlist[i]->WireID().Wire*fWiretoCm - HitMean.X();
 	//      ThisStep[1] = hitlist[i]->PeakTime()*fTimetoCm - HitMean.Y();
-	ThisStep[0] = hitlist[i].Wire()*fWiretoCm ;
-	ThisStep[1] = hitlist[i].PeakTime()*fTimetoCm ;
+	ThisStep[0] = hitlist[i]->Wire()*fWiretoCm ;
+	ThisStep[1] = hitlist[i]->PeakTime()*fTimetoCm ;
 	pc->AddRow(ThisStep);
       }
     
@@ -1200,7 +1201,7 @@ namespace larreco {
   // refine the provided start points by looking for Hough Lines at the start and end of 
   // cluster.
   //////////////////////////////////////////////////////////////////////////
-  void ClusterParamsAlg::RefineStartPointsHough(const std::vector<larlight::hit> &hitlist, 
+  void ClusterParamsAlg::RefineStartPointsHough(const std::vector<larlight::hit*> &hitlist, 
 						double & wire_start,double & time_start, 
 						double & wire_end,double & time_end, int &direction)
   {
@@ -1209,9 +1210,9 @@ namespace larreco {
     double ortlimit=fSelectBoxSizePerp;
     int direction_local=1;
   
-    std::vector <larlight::hit> hitlistlocal_start;
-    std::vector <larlight::hit> hitlistlocal_end;
-    std::vector <larlight::hit> hitlistlocal_refined;  //these in principle should only be hits on the line.
+    std::vector <larlight::hit*> hitlistlocal_start;
+    std::vector <larlight::hit*> hitlistlocal_end;
+    std::vector <larlight::hit*> hitlistlocal_refined;  //these in principle should only be hits on the line.
     
     ///////////////////////////// find trunk of shower:
     //double wstn=0.,tstn=0.,wendn=0.,tendn=0.;
@@ -1371,7 +1372,7 @@ namespace larreco {
   */  
   ////////////////////// add override if forcing rightwise:
   
-  int ClusterParamsAlg::DecideClusterDirection(const std::vector <larlight::hit> &hitlist,
+  int ClusterParamsAlg::DecideClusterDirection(const std::vector <larlight::hit*> &hitlist,
 					       double lineslope,double wstn,double tstn,double wendn,double tendn)  
   {
     int fDirection=1;
@@ -1453,7 +1454,7 @@ namespace larreco {
     return fDirection;
   }
 
-  void ClusterParamsAlg::FindExtremeIntercepts(const std::vector <larlight::hit> &hitlist,
+  void ClusterParamsAlg::FindExtremeIntercepts(const std::vector <larlight::hit*> &hitlist,
 					       double perpslope,
 					       double &inter_high,
 					       double &inter_low)  
@@ -1466,7 +1467,7 @@ namespace larreco {
     
     for(auto const h : hitlist) {
 
-      double time = h.PeakTime() ;  
+      double time = h->PeakTime() ;  
       gser->GetPlaneAndTPC(h,plane,wire);
       
       //wire_bar+=wire;
@@ -1487,14 +1488,14 @@ namespace larreco {
   }
 
 
-  void ClusterParamsAlg::SelectLocalHitlist(const std::vector<larlight::hit> &hitlist,
-					    std::vector<larlight::hit> &hitlistlocal, 
+  void ClusterParamsAlg::SelectLocalHitlist(const std::vector<larlight::hit*> &hitlist,
+					    std::vector<larlight::hit*> &hitlistlocal, 
 					    double  wire_start,double time_start, double radlimit)
   {
 
     for(auto const h : hitlist) {
 
-    	double time = h.PeakTime() ;  
+    	double time = h->PeakTime() ;  
     	unsigned int plane,wire;
 	gser->GetPlaneAndTPC(h,plane,wire);
 	
