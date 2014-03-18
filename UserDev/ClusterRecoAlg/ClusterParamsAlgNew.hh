@@ -1,7 +1,7 @@
 ////////////////////////////////////////////////////////////////////////
-// ClusterParamsAlg.h
+// ClusterParamsAlgNew.h
 //
-// ClusterParamsAlg class
+// ClusterParamsAlgNew class
 //
 // Andrzej Szelc (andrzej.szelc@yale.edu)
 //
@@ -25,134 +25,86 @@
 
 namespace larreco {
    
-  class ClusterParamsAlg {
+  class ClusterParamsAlgNew {
 
   public:
     
-    ClusterParamsAlg(std::string mother="");
+    ClusterParamsAlgNew(std::vector<util::PxHit>);
     
-    void reconfigure(); 
-    
-    int Find2DAxisRough(double &lineslope,double &lineintercept,double &goodness,
-			const std::vector <larlight::hit*> &hitlist); /**Calculate 2D angle histograms, provided vertex is know */ 
-    
-    int Find2DAxisRoughHighCharge(double &lineslope,double &lineintercept,double &goodness,
-				  const std::vector <larlight::hit*> &hitlist);  
-    //  void CalculateAxisParameters(unsigned nClust, std::vector < larlight::hit >  hitlist,double wstart,double tstart,double wend,double tend);
-    
-    int  Find2DStartPointsBasic(const std::vector<larlight::hit*> &hitlist,
-				double &wire_start,double &time_start,double &wire_end,double &time_end);
-    
-    int Find2DStartPointsBasic(double lineslope,double lineintercept,
-			       const std::vector<larlight::hit*> &hitlist,
-			       double &wire_start,double &time_start,double &wire_end,double &time_end);
-    
-    int Find2DStartPointsHighCharge(const std::vector<larlight::hit*> &hitlist,
-				    double &wire_start,double &time_start,double &wire_end,double &time_end);
-    
-    int FindTrunk(const std::vector <larlight::hit*> &hitlist,
-		  double &wstn,double &tstn,double &wendn,double &tendn,double lineslope,double lineintercept);
-    
-    int FindTrunk(const std::vector <larlight::hit*> &hitlist,
-		  double &wstn,double &tstn,double &wendn,double &tendn); //overloaded interface, will calculate the lineslope and basic points using Find2DStartPointsBasic.
-    
-    void FindDirectionWeights(double lineslope,double wstn,double tstn,double wendn,double tendn, 
-			      const std::vector <larlight::hit*> &hitlist,
-			      double &HiBin,double &LowBin,double &invHiBin,double &invLowBin, double *altWeight=0); 
-    
-    void FindSideWeights(double lineslope,double lineintercept,double wstn,double tstn,int direction, 
-			 const std::vector <larlight::hit*> &hitlist,
-			 double &sideWeightCharge); 
+    void FillParams();
+    cluster_params * GetParams();
 
-    /*
-    void RefineStartPointsHough(const std::vector<larlight::hit*> &hitlist,
-				double & wire_start,
-				double & time_start, 
-				double & wire_end,
-				double & time_end, 
-				int &direction);
-    */    
-    int DecideClusterDirection(const std::vector <larlight::hit*> &hitlist,
-			       double lineslope,double wstn,double tstn,double wendn,double tendn);
-    
-    int FindHitCountDirection(const std::vector<larlight::hit*> &hitlist, 
-			      double  wire_start,double  time_start, double  wire_end,double  time_end, double lineslope);
-    
-    int FindMultiHitDirection(const std::vector<larlight::hit*> &hitlist, 
-			      double  wire_start,double  time_start, double  wire_end,double  time_end, double lineslope);
-    
-    bool isShower(double lineslope,double wstn,double tstn,double wendn,double tendn, 
-		  const std::vector <larlight::hit*> &hitlist);
-    
-    int MultiHitWires(const std::vector <larlight::hit*> &hitlist);
-    
-    //     
-    //     void RefineStartPoints(unsigned int nClust, std::vector< larlight::hit >  hitlist, double  wire_start,double time_start);
-    //     
-    //     double Get2DAngleForHit( larlight::hit starthit,std::vector < larlight::hit > hitlist);
-    //     
-//     double Get2DAngleForHit( unsigned int wire, double time,std::vector < larlight::hit > hitlist);
-    int FindPrincipalDirection(const std::vector<larlight::hit*> &hitlist, 
-			       double  wire_start,double  time_start, double  wire_end,double  time_end,double lineslope);
+    /**
+     * Calculates the following variables:
+     * mean_charge
+     * mean_x
+     * mean_y
+     * charge_wgt_x
+     * charge_wgt_y
+     * eigenvalue_principal
+     * eigenvalue_secondary
+     * multi_hit_wires
+     * N_Wires
+     * @param override force recalculation of variables
+     */
+    void GetAverages(bool override=false);
 
-    void GetPrincipal(const std::vector<larlight::hit*> &hitlist, TPrincipal * pc);
 
-    int Find2DAxisPrincipal(double &lineslope,double &lineintercept,double &goodness,
-			    const std::vector <larlight::hit*> &hitlist);
+    /**
+     * Calculates the following variables:
+     * verticalness
+     * rough_2d_slope
+     * rough_2d_intercept
+     * @param override [description]
+     */
+    void GetRoughAxis(bool override=false);
 
-    int Find2DAxisPrincipalHighCharge(double &lineslope,double &lineintercept,double &goodness,
-				      const std::vector <larlight::hit*> &hitlist);
 
-    double Get2DAngleForHit( unsigned int swire,double stime,
-			     const std::vector <larlight::hit*> &hitlist);
+    /**
+     * Calculates the following variables:
+     * opening_angle
+     * opening_angle_highcharge
+     * closing_angle
+     * closing_angle_highcharge
+     * offaxis_hits
+     * @param override [description]
+     */
+    void GetProfileInfo(bool override=false);
+
+    /**
+     * Calculates the following variables:
+     * length
+     * width
+     * @param override [description]
+     */
+    void RefineStartPoints(bool override=false);
+
+    /**
+     * Calculates the following variables:
+     * hit_density_1D
+     * hit_density_2D
+     * angle_2d
+     * direction
+     * @param override [description]
+     */
+    void GetFinalSlope(bool override=false);    
+
+
     
   private:
-    
-    const std::string extname; 
-    std::string funcname; 
-    //HoughBaseAlg fHBAlg;  
-    double fWiretoCm,fTimetoCm,fWireTimetoCmCm;
-    double fWirePitch ;   // wire pitch in cm
-    double fTimeTick;
-    TF1 * linefittest_cm;
-    TH2F *  tgxtest;
-    TH1F *  hithistinv, * hitinv2, * hitreinv2;
-    TH1F *  fh_omega_single;
-    int fMinHitListSize;
-    double fOutlierRadius;
-    larutil::GeometryUtilities *gser;
-    std::vector<double> fChargeCutoffThreshold;
-    double fSelectBoxSizePar;
-    double fSelectBoxSizePerp;
-    // double fSelectBoxDiff;
-    bool fForceRightGoing;
-    //helper functions
+    std::vector<PxHit>;         // This vector holds the wrapped up hit list
 
-    void FindExtremeIntercepts(const std::vector <larlight::hit*> &hitlist,
-			       double perpslope,
-			       double &inter_high,
-			       double &inter_low);  
+    bool finished_GetAverages;
+    bool finished_GetRoughAxis;
+    bool finished_GetProfileInfo;
+    bool finished_RefineStartPoints;
+    bool finished_GetFinalSlope;
+
+
+    double rough_2d_slope;    // slope 
+    double rough_2d_intercept;    // slope 
     
-    void SelectLocalHitlist(const std::vector<larlight::hit*> &hitlist, 
-			    std::vector< larlight::hit* > &hitlistlocal, 
-			    double  wire_start,double time_start, double radlimit);
-    
-    void CreateHighHitlist(double threshold,
-			   const std::vector<larlight::hit*> &hitlist,
-			   std::vector<larlight::hit*> &hitlist_high);
-    
-    void FindMinMaxWiresTimes(double &MinWire, double &MaxWire,double &MinTime,double &Maxtime,double &MeanCharge,
-			      const std::vector<larlight::hit*> &hitlist);
-    
-    double fHitDensityCutoff;
-    double fMultiHitWireCutoff;
-    double fOffAxisHitsCutoff;
-    double fPrincipalComponentCutoff;
-    bool fShowerSelisORorAND;
-    
-    
-    
-  }; //class ClusterParamsAlg
+  }; //class ClusterParamsAlgNew
   
 } //namespace cluster
 
