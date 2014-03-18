@@ -1,6 +1,7 @@
 #include "ClusterParamsAlgNew.hh"
 
 
+
 namespace cluster{
 
   ClusterParamsAlgNew::ClusterParamsAlgNew(std::vector<util::PxHit>){
