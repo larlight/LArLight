@@ -92,7 +92,7 @@ namespace larreco {
 
     
   private:
-    std::vector<PxHit>;         // This vector holds the wrapped up hit list
+    std::vector<util::PxHit> hitVector;         // This vector holds the wrapped up hit list
 
     bool finished_GetAverages;
     bool finished_GetRoughAxis;
@@ -104,6 +104,8 @@ namespace larreco {
     double rough_2d_slope;    // slope 
     double rough_2d_intercept;    // slope 
     
+    cluster_params _this_params;
+
   }; //class ClusterParamsAlgNew
   
 } //namespace cluster
