@@ -3,6 +3,23 @@
 
 namespace cluster{
 
+  ClusterParamsAlgNew(std::vector<util::PxHit>){
+
+    // Make default values
+    // Is done by the struct    
+
+
+    // 
+    finished_GetAverages       = false;
+    finished_GetRoughAxis      = false;
+    finished_GetProfileInfo    = false;
+    finished_RefineStartPoints = false;
+    finished_GetFinalSlope     = false;
+
+  }
+
+
+
   void ClusterParamsAlgNew::FillParams(){
 
   }
@@ -22,7 +39,7 @@ namespace cluster{
 
 
   void ClusterParamsAlgNew::GetAverages(){
-
+    if (finished_GetAverages)
   }
 
   // Also does the high hitlist
