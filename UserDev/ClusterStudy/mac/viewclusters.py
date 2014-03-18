@@ -42,7 +42,7 @@ c.Divide(2,3)
 c_graph=TCanvas("csub","Individual cluster start/end points",500,300)
 
 #start on first event always
-user_input_evt_no = 0;
+user_input_evt_no = -1;
 
 while true:
 
