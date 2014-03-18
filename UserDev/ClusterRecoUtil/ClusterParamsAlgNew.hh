@@ -23,44 +23,16 @@
 #include "LArUtil-TypeDef.hh"
 #include "HoughBaseAlg.hh"
 
-namespace larreco {
+namespace cluster {
    
   class ClusterParamsAlgNew {
+
   public:
-    
-    ClusterParamsAlgNew(std::vector<util::PxHit>){ 
-      mean_charge			= -999.999 ;
-      mean_x				= -999.999 ;
-      mean_y				= -999.999 ;
-      rms_x      			= -999.999 ;
-      rms_y				= -999.999 ;
-      charge_wgt_x			= -999.999 ;
-      charge_wgt_y			= -999.999 ;
-      eigenvalue_principal		= -999.999 ;
-      eigenvalue_secondary		= -999.999 ;
-      multi_hit_wires			= -999.999 ;
-      N_Wires				= -999.999 ;
-      verticalness			= -999.999 ;
-      rough_2d_slope			= -999.999 ;
-      rough_2d_intercept		= -999.999 ;
-      opening_angle			= -999.999 ;
-      opening_angle_highcharge		= -999.999 ;
-      closing_angle			= -999.999 ;
-      closing_angle_highcharge		= -999.999 ;
-      offaxis_hits			= -999.999 ;
-      modified_hit_density		= -999.999 ;	
-      length				= -999.999 ;
-      width				= -999.999 ;
-      hit_density_1D			= -999.999 ;
-      hit_density_2D			= -999.999 ;
-      angle_2d				= -999.999 ;
-      direction				= -999.999 ;
-      showerness			= -999.999 ;
-      trackness				= -999.999 ;
-   } 
+
+    ClusterParamsAlgNew(std::vector<util::PxHit>);
 
     void FillParams();
-    cluster_params * GetParams();
+    cluster::cluster_params * GetParams();
 
     /**
      * Calculates the following variables:
@@ -97,7 +69,7 @@ namespace larreco {
      * offaxis_hits
      * @param override [description]
      */
-    void GetProfileInfo(bool override=false);
+    void GetProfileInfo(bool override=false){};
 
     /**
      * Calculates the following variables:
@@ -105,7 +77,7 @@ namespace larreco {
      * width
      * @param override [description]
      */
-    void RefineStartPoints(bool override=false);
+    void RefineStartPoints(bool override=false){};
 
     /**
      * Calculates the following variables:
@@ -115,7 +87,7 @@ namespace larreco {
      * direction
      * @param override [description]
      */
-    void GetFinalSlope(bool override=false);    
+    void GetFinalSlope(bool override=false){};    
 
 
     
@@ -132,7 +104,7 @@ namespace larreco {
     double rough_2d_slope;    // slope 
     double rough_2d_intercept;    // slope 
     
-    cluster_params _this_params;
+    cluster::cluster_params _this_params;
 
   }; //class ClusterParamsAlgNew
   
