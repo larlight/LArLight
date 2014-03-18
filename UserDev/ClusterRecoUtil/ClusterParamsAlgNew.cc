@@ -1,9 +1,9 @@
-#include "ClusterParamsAlgNewNew.hh"
+#include "ClusterParamsAlgNew.hh"
 
 
 namespace cluster{
 
-  ClusterParamsAlgNew(std::vector<util::PxHit>){
+  ClusterParamsAlgNew::ClusterParamsAlgNew(std::vector<util::PxHit>){
 
     // Make default values
     // Is done by the struct    
@@ -34,16 +34,21 @@ namespace cluster{
     //  mean_y
     //  charge_wgt_x
     //  charge_wgt_y
+    //  
+     
 
+     // SOMEONE SHOULD FIX THIS!!!!!!!!!!!!!!
+    return 0;
   }
 
 
-  void ClusterParamsAlgNew::GetAverages(){
-    if (finished_GetAverages)
+  void ClusterParamsAlgNew::GetAverages(bool override){
+    if (finished_GetAverages) return;
+    else return;
   }
 
   // Also does the high hitlist
-  void ClusterParamsAlgNew::GetRoughAxis(){
+  void ClusterParamsAlgNew::GetRoughAxis(bool override){
 
   }
 
