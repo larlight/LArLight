@@ -1,3 +1,5 @@
+#include <iostream>
+
 namespace util{
     struct PxPoint {
       public:
@@ -28,7 +30,7 @@ namespace util{
     };
 }
 
-nampespace cluster{
+namespace cluster{
     struct cluster_params
     {
       double mean_charge;                // Mean (average) charge of hits in ADC

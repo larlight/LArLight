@@ -9,21 +9,21 @@
 #ifndef CLUSTERPARAMSALGNEW_H
 #define CLUSTERPARAMSALGNEW_H
 
-#include <TMath.h>
-#include <TH2F.h>
-#include <TF1.h>
-#include <TH1F.h>
-#include <TPrincipal.h>
+// #include <TMath.h>
+// #include <TH2F.h>
+// #include <TF1.h>
+// #include <TH1F.h>
+// #include <TPrincipal.h>
 
 #include "PxUtils.h"
 
 #include <vector>
 
-#include "DataFormat-TypeDef.hh"
-#include "LArUtil-TypeDef.hh"
-#include "HoughBaseAlg.hh"
+// #include "DataFormat-TypeDef.hh"
+// #include "LArUtil-TypeDef.hh"
+// #include "HoughBaseAlg.hh"
 
-namespace larreco {
+namespace cluster {
    
   class ClusterParamsAlgNew {
 
