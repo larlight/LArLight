@@ -49,7 +49,8 @@ namespace cluster{
 
   // Also does the high hitlist
   void ClusterParamsAlgNew::GetRoughAxis(bool override){
-
+    if (finished_GetRoughAxis && !override) return;
+    
   }
 
 
