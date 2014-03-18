@@ -5,10 +5,10 @@ from ROOT import *
 # Now import ana_processor & your class. For this example, ana_base.
 gSystem.Load("libAnalysis")
 
-#if len(sys.argv) != 2:
-#    print
-#    print "*** Improper usage. Usage: python viewclusters.py /path/to/input/file.root ***"
-#    print
+if len(sys.argv) != 2:
+    print
+    print "*** Improper usage. Usage: python viewclusters.py /path/to/input/file.root ***"
+    print
 
 
 filename = sys.argv[1]
