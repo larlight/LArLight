@@ -65,20 +65,24 @@ namespace cluster{
 
   }
 
-  cluster::cluster_params* ClusterParamsAlgNew::GetParams(){
-
-
-
     // Loop 1 calculates:
     //  mean_charge
     //  mean_x
     //  mean_y
     //  charge_wgt_x
     //  charge_wgt_y
-    //  
-     
+  cluster::cluster_params* ClusterParamsAlgNew::GetParams(){
+
+	//Loop over all particles
+	for (auto & hit : hitVector){
+
+
+
+				    }//Loop over hits
+
 
      // SOMEONE SHOULD FIX THIS!!!!!!!!!!!!!!
+	//....OK...
     return 0;
   }
 
