@@ -11,7 +11,5 @@
 
 #pragma link C++ class cluster::ClusterParamsAlgNew+;
 #pragma link C++ class cluster::cluster_params+;
-#pragma link C++ class util::PxPoint+;
-#pragma link C++ class util::PxHit+;
 //ADD_NEW_CLASS ... do not change this line
 #endif
