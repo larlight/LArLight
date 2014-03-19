@@ -670,9 +670,9 @@ namespace larutil{
   
   
   //////////////////////////////////////////////////////////
-  Int_t GeometryUtilities::GetProjectedPoint(pxpoint p0, 
-					     pxpoint p1, 
-					     pxpoint &pN) const
+  Int_t GeometryUtilities::GetProjectedPoint(PxPoint p0, 
+					     PxPoint p1, 
+					     PxPoint &pN) const
   {
 
     //determine third plane number
@@ -708,8 +708,8 @@ namespace larutil{
 
 
   //////////////////////////////////////////////////////////
-  Int_t GeometryUtilities::GetYZ(pxpoint p0,
-				 pxpoint p1,
+  Int_t GeometryUtilities::GetYZ(PxPoint p0,
+				 PxPoint p1,
 				 Double_t* yz) const
   {
     Double_t y,z;
@@ -728,9 +728,9 @@ namespace larutil{
 
   //////////////////////////////////////////////////////////////
   
-  pxpoint GeometryUtilities::Get2DPointProjection(Double_t *xyz, Int_t plane) const{
+  PxPoint GeometryUtilities::Get2DPointProjection(Double_t *xyz, Int_t plane) const{
   
-    pxpoint pN(0,0,0);
+    PxPoint pN(0,0,0);
     
     Double_t pos[3];
     geom->PlaneOriginVtx(plane,pos);

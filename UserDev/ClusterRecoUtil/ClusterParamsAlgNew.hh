@@ -93,7 +93,14 @@ namespace cluster {
     
   private:
     std::vector<util::PxHit> hitVector;         // This vector holds the wrapped up hit list
-
+ 
+    larutil::GeometryUtilities *gser;
+ 
+    std::vector< double > charge_profile;
+    std::vector< double > coarse_charge_profile;
+    const int coarse_nbins=2;
+    const int profile_nbins=100;
+    
     bool finished_GetAverages;
     bool finished_GetRoughAxis;
     bool finished_GetProfileInfo;
