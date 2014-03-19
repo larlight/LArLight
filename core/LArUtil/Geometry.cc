@@ -33,8 +33,10 @@ namespace larutil {
     fSignalType.clear();
     fViewType.clear();
     fPlanePitch.clear();
-    fFirstWireStartVtx.clear();
-    fFirstWireEndVtx.clear();
+    //fFirstWireStartVtx.clear();
+    //fFirstWireEndVtx.clear();
+    fWireStartVtx.clear();
+    fWireEndVtx.clear();
     fWirePitch.clear();
     fWireAngle.clear();
     fOpChannelVtx.clear();
@@ -65,8 +67,11 @@ namespace larutil {
     if(!(ch->GetBranch("fViewType")))   error_msg += "      fViewType\n";
     if(!(ch->GetBranch("fPlanePitch"))) error_msg += "      fPlanePitch\n";
 
-    if(!(ch->GetBranch("fFirstWireStartVtx"))) error_msg += "      fFirstWireStartVtx\n";
-    if(!(ch->GetBranch("fFirstWireEndVtx")))   error_msg += "      fFirstWireEndVtx\n";
+    //if(!(ch->GetBranch("fFirstWireStartVtx"))) error_msg += "      fFirstWireStartVtx\n";
+    //if(!(ch->GetBranch("fFirstWireEndVtx")))   error_msg += "      fFirstWireEndVtx\n";
+
+    if(!(ch->GetBranch("fWireStartVtx"))) error_msg += "      fWireStartVtx\n";
+    if(!(ch->GetBranch("fWireEndVtx")))   error_msg += "      fWireEndVtx\n";
 
     if(!(ch->GetBranch("fWirePitch")))    error_msg += "      fWirePitch\n";
     if(!(ch->GetBranch("fWireAngle")))    error_msg += "      fWireAngle\n";
@@ -90,9 +95,11 @@ namespace larutil {
     std::vector<larlight::GEO::SigType_t> *pSignalType = nullptr;
     std::vector<larlight::GEO::View_t>    *pViewType = nullptr;
     std::vector<Double_t>                 *pPlanePitch = nullptr;
-    std::vector<std::vector<Double_t> >   *pFirstWireStartVtx = nullptr;
-    std::vector<std::vector<Double_t> >   *pFirstWireEndVtx = nullptr;
-    std::vector<std::vector<Double_t> >   *pPlaneOriginVtx = nullptr;
+    //std::vector<std::vector<Double_t> >   *pFirstWireStartVtx = nullptr;
+    //std::vector<std::vector<Double_t> >   *pFirstWireEndVtx = nullptr;
+    std::vector<std::vector<std::vector<Double_t> > >  *pWireStartVtx = nullptr;
+    std::vector<std::vector<std::vector<Double_t> > >  *pWireEndVtx = nullptr;
+    std::vector<std::vector<Double_t> >  *pPlaneOriginVtx = nullptr;
 
     // Vectors with length = view
     std::vector<Double_t> *pWirePitch = nullptr;
@@ -116,8 +123,10 @@ namespace larutil {
     ch->SetBranchAddress("fViewType",&pViewType);
     ch->SetBranchAddress("fPlanePitch",&pPlanePitch);
 
-    ch->SetBranchAddress("fFirstWireStartVtx",&pFirstWireStartVtx);
-    ch->SetBranchAddress("fFirstWireEndVtx",&pFirstWireEndVtx);
+    //ch->SetBranchAddress("fFirstWireStartVtx",&pFirstWireStartVtx);
+    //ch->SetBranchAddress("fFirstWireEndVtx",&pFirstWireEndVtx);
+    ch->SetBranchAddress("fWireStartVtx",&pWireStartVtx);
+    ch->SetBranchAddress("fWireEndVtx",&pWireEndVtx);
     ch->SetBranchAddress("fPlaneOriginVtx",&pPlaneOriginVtx);
 
     ch->SetBranchAddress("fWirePitch",&pWirePitch);
@@ -142,16 +151,20 @@ namespace larutil {
     fSignalType.reserve(n_planes);
     fViewType.reserve(n_planes);
     fPlanePitch.reserve(n_planes);
-    fFirstWireStartVtx.reserve(n_planes);
-    fFirstWireEndVtx.reserve(n_planes);
+    //fFirstWireStartVtx.reserve(n_planes);
+    //fFirstWireEndVtx.reserve(n_planes);
+    fWireStartVtx.reserve(n_planes);
+    fWireEndVtx.reserve(n_planes);
     fPlaneOriginVtx.reserve(n_planes);
     for(size_t i=0; i<n_planes; ++i) {
       fPlaneWireToChannelMap.push_back(pPlaneWireToChannelMap->at(i));
       fSignalType.push_back(pSignalType->at(i));
       fViewType.push_back(pViewType->at(i));
       fPlanePitch.push_back(pPlanePitch->at(i));
-      fFirstWireStartVtx.push_back(pFirstWireStartVtx->at(i));
-      fFirstWireEndVtx.push_back(pFirstWireEndVtx->at(i));
+      //fFirstWireStartVtx.push_back(pFirstWireStartVtx->at(i));
+      //fFirstWireEndVtx.push_back(pFirstWireEndVtx->at(i));
+      fWireStartVtx.push_back(pWireStartVtx->at(i));
+      fWireEndVtx.push_back(pWireEndVtx->at(i));
       fPlaneOriginVtx.push_back(pPlaneOriginVtx->at(i));
     }
 
@@ -295,6 +308,7 @@ namespace larutil {
   UInt_t Geometry::NearestWire(const TVector3 &worldLoc,
 			       const UInt_t PlaneNo) const
   {
+    /*
     if(PlaneNo > fFirstWireStartVtx.size()) {
 
       throw LArUtilException(Form("Invalid plane number: %d",PlaneNo));
@@ -330,7 +344,8 @@ namespace larutil {
     dx /= fWirePitch.at(fViewType.at(PlaneNo)) + 0.5;
 
     return (UInt_t)(dx);
-
+    */
+    return 0;
   }
 
   // distance between planes p1 < p2
@@ -388,19 +403,23 @@ namespace larutil {
 			       const UInt_t wire, 
 			       Double_t *xyzStart, Double_t *xyzEnd) const
   {
-    xyzStart[0] = fFirstWireStartVtx.at(plane).at(0);
-    xyzStart[1] = fFirstWireStartVtx.at(plane).at(1);
-    xyzStart[2] = fFirstWireStartVtx.at(plane).at(2);
-    xyzEnd[0]   = fFirstWireEndVtx.at(plane).at(0);
-    xyzEnd[1]   = fFirstWireEndVtx.at(plane).at(1);
-    xyzEnd[2]   = fFirstWireEndVtx.at(plane).at(2);
 
-    Double_t angle_z = fWireAngle.at(fViewType.at(plane));
-    if(angle_z > TMath::Pi()/2) angle_z -= TMath::Pi()/2;
+    if(plane >= fWireStartVtx.size())  {
+      throw LArUtilException(Form("Plane %d invalid!",plane));
+      return;
+    }
+    if(wire >= fWireStartVtx.at(plane).size()) {
+      throw LArUtilException(Form("Wire %d invalid!",wire));
+      return;
+    }
 
-    Double_t dz = wire * fWirePitch.at(fViewType.at(plane)) * TMath::Cos(angle_z);
-    xyzStart[2] += dz;
-    xyzEnd[2]   += dz;
+    xyzStart[0] = fWireStartVtx.at(plane).at(wire).at(0);
+    xyzStart[1] = fWireStartVtx.at(plane).at(wire).at(1);
+    xyzStart[2] = fWireStartVtx.at(plane).at(wire).at(2);
+    xyzEnd[0]   = fWireEndVtx.at(plane).at(wire).at(0);
+    xyzEnd[1]   = fWireEndVtx.at(plane).at(wire).at(1);
+    xyzEnd[2]   = fWireEndVtx.at(plane).at(wire).at(2);
+
   }
   
   bool Geometry::ChannelsIntersect(const UInt_t c1, 
