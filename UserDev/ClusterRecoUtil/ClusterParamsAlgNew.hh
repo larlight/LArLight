@@ -16,12 +16,14 @@
 #include <TPrincipal.h>
 
 #include "PxUtils.h"
+#include "ClusterParams.hh"
 
 #include <vector>
 
 #include "DataFormat-TypeDef.hh"
 #include "LArUtil-TypeDef.hh"
 #include "HoughBaseAlg.hh"
+#include "TPrincipal.h"
 
 namespace cluster {
    
@@ -29,7 +31,7 @@ namespace cluster {
 
   public:
 
-    ClusterParamsAlgNew(std::vector<util::PxHit>);
+    ClusterParamsAlgNew(std::vector<larutil::PxHit>);
 
     void FillParams();
     cluster::cluster_params * GetParams();
@@ -73,7 +75,7 @@ namespace cluster {
      * offaxis_hits
      * @param override [description]
      */
-    void GetProfileInfo(bool override=false){};
+    void GetProfileInfo(bool override=false);
 
     /**
      * Calculates the following variables:
@@ -96,14 +98,15 @@ namespace cluster {
 
     
   private:
-    std::vector<util::PxHit> hitVector;         // This vector holds the wrapped up hit list
+    std::vector<larutil::PxHit> hitVector;         // This vector holds the wrapped up hit list
  
     larutil::GeometryUtilities *gser;
- 
+    TPrincipal *principal;
+    
     std::vector< double > charge_profile;
     std::vector< double > coarse_charge_profile;
-    const int coarse_nbins=2;
-    const int profile_nbins=100;
+    int coarse_nbins;
+    int profile_nbins;
     
     bool finished_GetAverages;
     bool finished_GetRoughAxis;

@@ -10,7 +10,7 @@
 
 namespace cluster{
 
-  ClusterParamsAlgNew::ClusterParamsAlgNew(std::vector<util::PxHit>){
+  ClusterParamsAlgNew::ClusterParamsAlgNew(std::vector<larutil::PxHit>){
 
     // Make default values
     // Is done by the struct    
@@ -180,11 +180,14 @@ namespace cluster{
   }
 
 
- void ClusterParamsAlgNew::GetProfileInfo(bool override=false)
+ void ClusterParamsAlgNew::GetProfileInfo(bool override)
   {
     if(rough_2d_slope==-999.999 || rough_2d_intercept==-999.999 ) //these variables need to be initialized to othervalues? 
 	GetRoughAxis(true);      
 
+    coarse_nbins=2;
+    profile_nbins=100;
+    
     charge_profile.clear();
     coarse_charge_profile.clear();
     charge_profile.resize(profile_nbins);
@@ -192,8 +195,8 @@ namespace cluster{
     
     //get slope of lines orthogonal to those found crossing the shower.
     double inv_2d_slope=0;
-    if(at){
-      inv_2d_slope=-1./rough_2d_slope*fWireTimetoCmCm*fWireTimetoCmCm;
+    if(rough_2d_slope){
+      inv_2d_slope=-1./rough_2d_slope; //*fWireTimetoCmCm*fWireTimetoCmCm;
     }
     else
       inv_2d_slope=-999999.;
