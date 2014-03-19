@@ -54,6 +54,7 @@ namespace cluster{
       trackness				= -999.999 ;
       */
 
+      gser = (larutil::GeometryUtilities*)(larutil::GeometryUtilities::GetME());
   }
   
 
@@ -140,6 +141,76 @@ namespace cluster{
   }
 
 
+ void ClusterParamsAlgNew::GetProfileInfo(bool override=false)
+  {
+    if(rough_2d_slope==-999.999 || rough_2d_intercept==-999.999 ) //these variables need to be initialized to othervalues? 
+	GetRoughAxis(true);      
+
+    charge_profile.clear();
+    coarse_charge_profile.clear();
+    charge_profile.resize(profile_nbins);
+    coarse_charge_profile.resize(coarse_nbins);
+    
+    //get slope of lines orthogonal to those found crossing the shower.
+    double inv_2d_slope=0;
+    if(at){
+      inv_2d_slope=-1./rough_2d_slope*fWireTimetoCmCm*fWireTimetoCmCm;
+    }
+    else
+      inv_2d_slope=-999999.;
+
+    double inter_high=-999999;
+    double inter_low=999999;
+    double inter_high_side=-999999;
+    double inter_low_side=999999;
+    //loop over all hits. Create coarse and fine profiles of the charge weight to help refine the start/end points and have a first guess of direction
+    for(auto & hit : hitVector)
+      {
+      
+      //calculate intercepts along   
+      double intercept=hit.t-inv_2d_slope*(double)hit.w;
+    
+      double side_intercept=hit.t-rough_2d_slope*(double)hit.w;
+    
+      if(intercept > inter_high ){
+	inter_high=intercept;
+    	}
+    
+      if(intercept < inter_low ){
+	inter_low=intercept;
+        }  
+
+      if(side_intercept > inter_high_side ){
+	inter_high_side=side_intercept;
+    	}
+    
+      if(side_intercept < inter_low_side ){
+	inter_low_side=side_intercept;
+        }
+    
+
+      }   // end of first HitIter loop, at this point we should have the extreme intercepts 
+	
+ /////////////////////////////////////////////
+ // Second loop. Fill profiles. 
+ /////////////////////////////////////////////
+      
+    for(auto & hit : hitVector)
+      {
+      
+      
+    
+      }  // end second loop on hits. Now should have filled profile vectors.
+      
+    
+  }
+  
+  
+  
+  
+  
+  
+  
 }
 
 #endif
