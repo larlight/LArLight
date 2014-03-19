@@ -1,4 +1,7 @@
 #include <iostream>
+#ifndef UTIL_PXUTILS_H
+#define UTIL_PXUTILS_H
+
 
 namespace larutil{
     class PxPoint {
@@ -121,3 +124,4 @@ namespace cluster{
     
 }
 
+#endif
