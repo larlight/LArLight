@@ -7,13 +7,15 @@
 
 // Header files included here
 #include "ClusterParamsAlgNew.hh"
+#include "ClusterRecoUtil.hh"
 
 // Class forward declaration here
 namespace cluster{
   class ClusterParamsAlgNew;
+  class ClusterRecoUtils;
   class cluster_params;
 }
-namespace util{
+namespace larutil{
 
   class PxPoint;
   class PxHit;

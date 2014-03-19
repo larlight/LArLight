@@ -33,8 +33,24 @@ namespace cluster {
 
     ClusterParamsAlgNew(std::vector<larutil::PxHit>);
 
-    void FillParams();
-    void GetParams(cluster_params &);
+    /**                                                                             
+     * Runs all the functions which calculate cluster params                        
+     * and stashes the results in the private ClusterParams                         
+     * struct.                                                                      
+     *                                                                              
+     * @param override_DoGetAverages       force re-execution of GetAverages()      
+     * @param override_DoGetRoughAxis      force re-execution of GetRoughAxis()     
+     * @param override_DoGetProfileInfo    force re-execution of GetProfileInfo()   
+     * @param override_DoRefineStartPoints force re-execution of RefineStartPoints()
+     * @param override_DoGetFinalSlope     force re-execution of GetFinalSlope()    
+     */
+    void FillParams(bool override_DoGetAverages      =false,
+                    bool override_DoGetRoughAxis     =false,
+                    bool override_DoGetProfileInfo   =false,
+                    bool override_DoRefineStartPoints=false,
+                    bool override_DoGetFinalSlope    =false );
+
+    void GetParams(cluster::cluster_params &);
 
     /**
      * Calculates the following variables:
@@ -57,9 +73,9 @@ namespace cluster {
      * verticalness
      * rough_2d_slope
      * rough_2d_intercept
-//would be good to have also the rough 2d for the high charge
-  //> rough_hc_2d_slope
-  //> rough_hc_2d_intercept
+     //would be good to have also the rough 2d for the high charge
+     //> rough_hc_2d_slope
+     //> rough_hc_2d_intercept
      * @param override [description]
      */
     //void GetRoughAxis(bool override=false);

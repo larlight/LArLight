@@ -53,6 +53,7 @@ namespace larutil{
     Double_t CalculatePitch(UInt_t iplane0,
 			  Double_t phi,
 			  Double_t theta) const;
+			  
     Double_t CalculatePitchPolar(UInt_t iplane0,
 			       Double_t phi,
 			       Double_t theta) const;
@@ -65,6 +66,10 @@ namespace larutil{
     
     Double_t Get2Dangle(Double_t wire,
 		      Double_t time) const;
+
+    Double_t Get2Dangle(larutil::PxPoint pp) const
+      {return Get2Dangle(pp.w,pp.t);};		      
+		      
     Double_t Get2Dangle(Double_t wireend,
 		      Double_t wirestart,
 		      Double_t timeend,
@@ -82,6 +87,10 @@ namespace larutil{
 			 Double_t wire2,
 			 Double_t time2) const;
   
+    double Get2DDistance(larutil::PxPoint point1,
+			  larutil::PxPoint point2) const;			 
+			 
+			 
     Double_t Get2DPitchDistance(Double_t angle,
 			      Double_t inwire,
 			      Double_t wire) const;
@@ -105,12 +114,28 @@ namespace larutil{
 		       Double_t &wireout,
 		       Double_t &timeout) const;
     
+    int GetPointOnLine(Double_t slope,
+		       larutil::PxPoint startpoint,
+		       larutil::PxPoint point1,
+		       larutil::PxPoint pointout) const;		       
+		       
+    int GetPointOnLine(double slope,
+	               double intercept,
+			larutil::PxPoint point1,
+			larutil::PxPoint pointout) const;
+		       
     Int_t GetPointOnLineWSlopes(Double_t slope,
 			      Double_t intercept,
 			      Double_t ort_intercept,
 			      Double_t &wireout,
 			      Double_t &timeout) const;
     
+    Int_t GetPointOnLineWSlopes(double slope,
+			      double intercept,
+			      double ort_intercept,
+			      larutil::PxPoint &pointonline) const;		      
+			      
+			      
     const larlight::hit* FindClosestHit(const std::vector<larlight::hit*> &hitlist,
 					UInt_t wire,
 					Double_t time) const;
