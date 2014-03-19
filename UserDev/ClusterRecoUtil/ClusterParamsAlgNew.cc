@@ -14,6 +14,9 @@ namespace cluster{
 
     // Make default values
     // Is done by the struct    
+  
+    // Make sure TPrincipal is initialized:
+    principal = new TPrincipal(2);
 
 
     // 
@@ -79,13 +82,58 @@ namespace cluster{
     return 0;
   }
 
-
+  /**
+   * Calculates the following variables:
+   * mean_charge
+   * mean_x
+   * mean_y
+   * charge_wgt_x
+   * charge_wgt_y
+   * eigenvalue_principal
+   * eigenvalue_secondary
+   * multi_hit_wires
+   * N_Wires
+   * **/
   void ClusterParamsAlgNew::GetAverages(bool override){
+    if (finished_GetAverages && !override) return;
 
-	//get the slope from 
+    principal -> Clear();
 
-    if (finished_GetAverages) return;
-    else return;
+    _this_params.N_Hits = hitVector.size();
+
+    std::map<double, int> wireMap;
+
+    double mean_charge = 0.0;
+
+
+
+    for (auto & hit : hitVector){
+      double data[2];
+      data[0] = hit.w;
+      data[1] = hit.t;
+      principal -> AddRow(data);
+      _this_params.charge_wgt_x += hit.w*hit.charge;
+      _this_params.charge_wgt_y += hit.t*hit.charge;
+      mean_charge += hit.charge;
+
+      wireMap[hit.w] ++;
+
+    }
+    _this_params.N_Wires = wireMap.size();
+    _this_params.multi_hit_wires = _this_params.N_Hits - _this_params.N_Wires;
+
+    _this_params.charge_wgt_x /= mean_charge;
+    _this_params.charge_wgt_y /= mean_charge;
+
+    _this_params.mean_x = (* principal -> GetMeanValues())[0];
+    _this_params.mean_y = (* principal -> GetMeanValues())[1];
+    _this_params.mean_charge /= _this_params.N_Hits;
+
+    principal -> MakePrincipals();
+
+    _this_params.eigenvalue_principal = (* principal -> GetEigenValues() )[0];
+    _this_params.eigenvalue_secondary = (* principal -> GetEigenValues() )[1];
+
   }
 
   // Also does the high hitlist
