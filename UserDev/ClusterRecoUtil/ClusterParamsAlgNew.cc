@@ -227,12 +227,50 @@ namespace cluster{
     /////////////////////////////////////////////
     // Second loop. Fill profiles. 
     /////////////////////////////////////////////
+    
+    // get projected points at the beginning and end of the axis.
+     
+     larutil::PxPoint HighOnlinePoint, LowOnlinePoint,BeginOnlinePoint;
+     
+     gser->GetPointOnLineWSlopes(rough_2d_slope,rough_2d_intercept,inter_high,HighOnlinePoint);
+     gser->GetPointOnLineWSlopes(rough_2d_slope,rough_2d_intercept,inter_low,LowOnlinePoint);
+  
+
+     //define BeginOnlinePoint as the one with lower wire number (for now)
+     
+     BeginOnlinePoint = (HighOnlinePoint.w > LowOnlinePoint.w) ? LowOnlinePoint : HighOnlinePoint;
+     
+     
+     double projectedlength=gser->Get2DDistance(HighOnlinePoint,LowOnlinePoint);
+     
+      
       
     for(auto & hit : hitVector)
       {
       
-      
+       larutil::PxPoint OnlinePoint;
+       // get coordinates of point on axis.
+       gser->GetPointOnLine(rough_2d_slope,LowOnlinePoint,hit,OnlinePoint);
     
+       double linedist=gser->Get2DDistance(OnlinePoint,BeginOnlinePoint);
+       double ortdist=gser->Get2DDistance(OnlinePoint,hit);
+    
+      ////////////////////////////////////////////////////////////////////// 
+      //calculate the weight along the axis, this formula is based on rough guessology. 
+      // there is no physics motivation behind the particular numbers, A.S.
+      /////////////////////////////////////////////////////////////////////// 
+      double weight= (ortdist<1.) ? 10*hit.charge : 5*hit.charge/ortdist;
+    
+      int fine_bin=(int)linedist/projectedlength*profile_nbins;
+      int coarse_bin=(int)linedist/projectedlength*coarse_nbins; 
+      
+      if(fine_bin<profile_nbins)  //only fill if bin number is in range
+	charge_profile[fine_bin]+=weight;
+      
+      if(coarse_bin<coarse_nbins) //only fill if bin number is in range
+	coarse_charge_profile[coarse_bin]+=weight;
+      
+           
       }  // end second loop on hits. Now should have filled profile vectors.
       
     
