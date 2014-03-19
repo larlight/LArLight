@@ -17,7 +17,7 @@ namespace larutil{
             std::cout<< "This is the default point ctor." << std::endl;
         }
         
-        PxPoint(uint pp,double ww,double tt){
+        PxPoint(unsigned int pp,double ww,double tt){
           plane=pp;
           w=ww;
           t=tt;
@@ -52,9 +52,9 @@ namespace larutil{
       double t0; ///<defined to be the vertex t-position
       double w1; ///<defined to be the ending w-position (of line or seed depending)
       double t1; ///<defined to be the ending t-position (of line or seed depending)
-      uint plane;
+      unsigned int plane;
    
-      PxLine(uint pp,double ww0,double tt0, double ww1, double tt1){
+      PxLine(unsigned int pp,double ww0,double tt0, double ww1, double tt1){
         plane=pp;
         w0=ww0;
         t0=tt0;
