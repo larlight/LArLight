@@ -72,20 +72,11 @@ namespace cluster{
     //  mean_y
     //  charge_wgt_x
     //  charge_wgt_y
-  cluster::cluster_params* ClusterParamsAlgNew::GetParams(){
-
-	//Loop over all particles
-	for (auto & hit : hitVector){
-
-
-
-				    }//Loop over hits
-
-
-     // SOMEONE SHOULD FIX THIS!!!!!!!!!!!!!!
-	//....OK...
-    return 0;
-  }
+	
+	 void ClusterParamsAlgNew::GetParams(cluster::cluster_params&  inputstruct){
+        inputstruct = _this_params;
+    	return;
+		  }
 
   /**
    * Calculates the following variables:
@@ -150,35 +141,31 @@ namespace cluster{
 
       return;}
 
-			double mean_charge;
-			double charge_wgt_x;              
-		        double charge_wgt_y;
 		//using the charge weighted coordinates find the axis from slope
 			double ncw=0;
-			double time;//from sum averages
-			double wire;//from sum averages
-			double wiretime=0;//sum over (wire*time)
-			double wirewire=0;//sum over (wire*wire)
+			double sumtime=0;//from sum averages
+			double sumwire=0;//from sum averages
+			double sumwiretime=0;//sum over (wire*time)
+			double sumwirewire=0;//sum over (wire*wire)
 		//next loop over all hits again
 	    for (auto & hit : hitVector){
 		//if charge is above avg_charge
-			if(hit.charge > mean_charge){
+			if(hit.charge > _this_params.mean_charge){
 				ncw+=1;
-				wire+=hit.w;
-				time+=hit.t;
-				wiretime+=hit.w*hit.t;
-				wirewire+=pow(hit.w,2);	
+				sumwire+=hit.w;
+				sumtime+=hit.t;
+				sumwiretime+=hit.w*hit.t;
+				sumwirewire+=pow(hit.w,2);	
 					          }//for high charge
 					}//For hh loop
 
 		//Looking for the slope and intercept of the line above avg_charge hits
 			double slopecw=0;
-			double ceptcw=0;
-				slopecw= (ncw*wiretime- wire*time)/(ncw*wirewire-wire*wire);//slope for cw
-				ceptcw= charge_wgt_y  -slopecw*(charge_wgt_x);//intercept for cw
-
+			//double ceptcw=0;
+				slopecw= (ncw*sumwiretime- sumwire*sumtime)/(ncw*sumwirewire-sumwire*sumwire);//slope for cw
+				//ceptcw= _this_params.charge_wgt_y  -slopecw*(_this_params.charge_wgt_x);//intercept for cw
 		//Getthe 2D_angle
-		double angle_2d = atan(slopecw)*180/PI;
+		_this_params.angle_2d = atan(slopecw)*180/PI;
 	return;
     
   }
