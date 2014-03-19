@@ -17,6 +17,10 @@
 
 #include "ana_base.hh"
 
+//this include works because I modified the GNUMakeFile to add LArUtil
+// to INCFLAGS, so compiler can find this hh file
+#include "GeometryUtilities.hh"
+
 namespace larlight {
   /**
      \class MCClusterStudy
@@ -47,7 +51,21 @@ namespace larlight {
     */
     virtual bool finalize();
 
+    TTree* GetMCClusTree() const {return _mcclus_tree;}
+
     protected:
+
+    void PrepareTTree();
+
+    TTree* _mcclus_tree;
+
+
+    //this i should get from geometry service but didn't find immediately
+    double _wire_2_cm;
+    double _time_2_cm;
+
+    // variables that go into the analysis ttree
+    double _refinestartend_FOM;
 
   };
 }

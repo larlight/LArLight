@@ -17,7 +17,7 @@ rootlibmap() {
 ######################################################
 # MCClusterStudy
 rootlibmap libMCClusterStudy.rootmap libMCClusterStudy.so $USER_DEV_DIR/MCClusterStudy/LinkDef.h \
-    libAnalysis.so
+    libAnalysis.so libLArUtil.so
 
 
 
