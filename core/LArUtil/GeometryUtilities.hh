@@ -15,12 +15,13 @@
 #include "Geometry.hh"
 #include "LArProperties.hh"
 #include "DetectorProperties.hh"
+#include "PxUtils.h"
 
 ///General LArSoft Utilities
 namespace larutil{
   
-  class pxpoint;
-  class pxline;
+  class PxPoint;
+  class PxLine;
   
   class GeometryUtilities : public larlight::larlight_base {
     
@@ -117,9 +118,11 @@ namespace larutil{
     UInt_t FindClosestHitIndex(const std::vector<larlight::hit*> &hitlist,
 			       UInt_t wirein,
 			       Double_t timein) const;			       
+			 
 			       
 			       
-    pxpoint Get2DPointProjection(Double_t *xyz,Int_t plane) const;			       
+			       
+    PxPoint Get2DPointProjection(Double_t *xyz,Int_t plane) const;			       
 	
     Double_t GetTimeTicks(Double_t x, Int_t plane) const;
     
@@ -128,12 +131,12 @@ namespace larutil{
 			 UInt_t &p,
 			 UInt_t &w) const;
 
-    Int_t GetProjectedPoint(pxpoint p0,
-			    pxpoint p1,
-			    pxpoint &pN) const;
+    Int_t GetProjectedPoint(PxPoint p0,
+			    PxPoint p1,
+			    PxPoint &pN) const;
 
-    Int_t GetYZ(pxpoint p0,
-		pxpoint p1, 
+    Int_t GetYZ(PxPoint p0,
+		PxPoint p1, 
 		Double_t* yz) const;
     
     Double_t PitchInView(UInt_t plane,
@@ -180,58 +183,58 @@ namespace larutil{
     
     }; // class GeometryUtilities
 
-    //helper class needed for the endpoint finding
-    class pxpoint {
-    public:
-      Double_t w;
-      Double_t t;
-      UInt_t plane;
-   
-      pxpoint(){
-	plane=0;
-	w=0;
-	t=0;
-      }
-      
-      pxpoint(Int_t pp,Double_t ww,Double_t tt){
-	plane=pp;
-	w=ww;
-	t=tt;
-      }
+//     //helper class needed for the endpoint finding
+//     class PxPoint {
+//     public:
+//       Double_t w;
+//       Double_t t;
+//       UInt_t plane;
+//    
+//       PxPoint(){
+// 	plane=0;
+// 	w=0;
+// 	t=0;
+//       }
+//       
+//       PxPoint(Int_t pp,Double_t ww,Double_t tt){
+// 	plane=pp;
+// 	w=ww;
+// 	t=tt;
+//       }
+//     
+//     };
     
-    };
     
-    
-    //helper class needed for the seeding
-    class pxline {
-    public:
-      
-      pxpoint pt0() { return pxpoint(plane,w0,t0); }
-      pxpoint pt1() { return pxpoint(plane,w1,t1); }
-      
-      Double_t w0; ///<defined to be the vertex w-position
-      Double_t t0; ///<defined to be the vertex t-position
-      Double_t w1; ///<defined to be the ending w-position (of line or seed depending)
-      Double_t t1; ///<defined to be the ending t-position (of line or seed depending)
-      UInt_t plane;
-   
-      pxline(Int_t pp,Double_t ww0,Double_t tt0, Double_t ww1, Double_t tt1){
-	plane=pp;
-	w0=ww0;
-	t0=tt0;
-	w1=ww1;
-	t1=tt1;
-      }
-    
-      pxline(){
-	plane=0;
-	w0=0;
-	t0=0;
-	w1=0;
-	t1=0;
-      }
-    
-    };
+//     //helper class needed for the seeding
+//     class PxLine {
+//     public:
+//       
+//       PxPoint pt0() { return PxPoint(plane,w0,t0); }
+//       PxPoint pt1() { return PxPoint(plane,w1,t1); }
+//       
+//       Double_t w0; ///<defined to be the vertex w-position
+//       Double_t t0; ///<defined to be the vertex t-position
+//       Double_t w1; ///<defined to be the ending w-position (of line or seed depending)
+//       Double_t t1; ///<defined to be the ending t-position (of line or seed depending)
+//       UInt_t plane;
+//    
+//       PxLine(Int_t pp,Double_t ww0,Double_t tt0, Double_t ww1, Double_t tt1){
+// 	plane=pp;
+// 	w0=ww0;
+// 	t0=tt0;
+// 	w1=ww1;
+// 	t1=tt1;
+//       }
+//     
+//       PxLine(){
+// 	plane=0;
+// 	w0=0;
+// 	t0=0;
+// 	w1=0;
+// 	t1=0;
+//       }
+//     
+//     };
   
 } //namespace larutils
 #endif // UTIL_DETECTOR_PROPERTIES_H

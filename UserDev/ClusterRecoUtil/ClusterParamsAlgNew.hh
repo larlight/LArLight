@@ -16,23 +16,25 @@
 #include <TPrincipal.h>
 
 #include "PxUtils.h"
+#include "ClusterParams.hh"
 
 #include <vector>
 
 #include "DataFormat-TypeDef.hh"
 #include "LArUtil-TypeDef.hh"
 #include "HoughBaseAlg.hh"
+#include "TPrincipal.h"
 
-namespace larreco {
+namespace cluster {
    
   class ClusterParamsAlgNew {
 
   public:
-    
-    ClusterParamsAlgNew(std::vector<util::PxHit>);
-    
+
+    ClusterParamsAlgNew(std::vector<larutil::PxHit>);
+
     void FillParams();
-    cluster_params * GetParams();
+    cluster::cluster_params * GetParams();
 
     /**
      * Calculates the following variables:
@@ -55,8 +57,12 @@ namespace larreco {
      * verticalness
      * rough_2d_slope
      * rough_2d_intercept
+//would be good to have also the rough 2d for the high charge
+  //> rough_hc_2d_slope
+  //> rough_hc_2d_intercept
      * @param override [description]
      */
+    //void GetRoughAxis(bool override=false);
     void GetRoughAxis(bool override=false);
 
 
@@ -77,7 +83,7 @@ namespace larreco {
      * width
      * @param override [description]
      */
-    void RefineStartPoints(bool override=false);
+    void RefineStartPoints(bool override=false){};
 
     /**
      * Calculates the following variables:
@@ -87,13 +93,21 @@ namespace larreco {
      * direction
      * @param override [description]
      */
-    void GetFinalSlope(bool override=false);    
+    void GetFinalSlope(bool override=false){};    
 
 
     
   private:
-    std::vector<util::PxHit> hitVector;         // This vector holds the wrapped up hit list
-
+    std::vector<larutil::PxHit> hitVector;         // This vector holds the wrapped up hit list
+ 
+    larutil::GeometryUtilities *gser;
+    TPrincipal *principal;
+    
+    std::vector< double > charge_profile;
+    std::vector< double > coarse_charge_profile;
+    int coarse_nbins;
+    int profile_nbins;
+    
     bool finished_GetAverages;
     bool finished_GetRoughAxis;
     bool finished_GetProfileInfo;
@@ -104,7 +118,7 @@ namespace larreco {
     double rough_2d_slope;    // slope 
     double rough_2d_intercept;    // slope 
     
-    cluster_params _this_params;
+    cluster::cluster_params _this_params;
 
   }; //class ClusterParamsAlgNew
   
