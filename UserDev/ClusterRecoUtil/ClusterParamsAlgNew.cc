@@ -26,7 +26,7 @@ namespace cluster{
     finished_RefineStartPoints = false;
     finished_GetFinalSlope     = false;
 
-      /*
+    /*
       mean_charge			= -999.999 ;
       mean_x				= -999.999 ;
       mean_y				= -999.999 ;
@@ -55,9 +55,9 @@ namespace cluster{
       direction				= -999.999 ;
       showerness			= -999.999 ;
       trackness				= -999.999 ;
-      */
+    */
 
-      gser = (larutil::GeometryUtilities*)(larutil::GeometryUtilities::GetME());
+    gser = (larutil::GeometryUtilities*)(larutil::GeometryUtilities::GetME());
   }
   
 
@@ -66,17 +66,17 @@ namespace cluster{
 
   }
 
-    // Loop 1 calculates:
-    //  mean_charge
-    //  mean_x
-    //  mean_y
-    //  charge_wgt_x
-    //  charge_wgt_y
+  // Loop 1 calculates:
+  //  mean_charge
+  //  mean_x
+  //  mean_y
+  //  charge_wgt_x
+  //  charge_wgt_y
 	
-	 void ClusterParamsAlgNew::GetParams(cluster::cluster_params&  inputstruct){
-        inputstruct = _this_params;
-    	return;
-		  }
+  void ClusterParamsAlgNew::GetParams(cluster::cluster_params&  inputstruct){
+    inputstruct = _this_params;
+    return;
+  }
 
   /**
    * Calculates the following variables:
@@ -135,46 +135,46 @@ namespace cluster{
   // Also does the high hitlist
   void ClusterParamsAlgNew::GetRoughAxis(bool override){
 
- if (finished_GetAverages && !override) {
+    if (finished_GetAverages && !override) {
 
       finished_GetRoughAxis = false;
 
       return;}
 
-		//using the charge weighted coordinates find the axis from slope
-			double ncw=0;
-			double sumtime=0;//from sum averages
-			double sumwire=0;//from sum averages
-			double sumwiretime=0;//sum over (wire*time)
-			double sumwirewire=0;//sum over (wire*wire)
-		//next loop over all hits again
-	    for (auto & hit : hitVector){
-		//if charge is above avg_charge
-			if(hit.charge > _this_params.mean_charge){
-				ncw+=1;
-				sumwire+=hit.w;
-				sumtime+=hit.t;
-				sumwiretime+=hit.w*hit.t;
-				sumwirewire+=pow(hit.w,2);	
-					          }//for high charge
-					}//For hh loop
+    //using the charge weighted coordinates find the axis from slope
+    double ncw=0;
+    double sumtime=0;//from sum averages
+    double sumwire=0;//from sum averages
+    double sumwiretime=0;//sum over (wire*time)
+    double sumwirewire=0;//sum over (wire*wire)
+    //next loop over all hits again
+    for (auto & hit : hitVector){
+      //if charge is above avg_charge
+      if(hit.charge > _this_params.mean_charge){
+	ncw+=1;
+	sumwire+=hit.w;
+	sumtime+=hit.t;
+	sumwiretime+=hit.w*hit.t;
+	sumwirewire+=pow(hit.w,2);	
+      }//for high charge
+    }//For hh loop
 
-		//Looking for the slope and intercept of the line above avg_charge hits
-			double slopecw=0;
-			//double ceptcw=0;
-				slopecw= (ncw*sumwiretime- sumwire*sumtime)/(ncw*sumwirewire-sumwire*sumwire);//slope for cw
-				//ceptcw= _this_params.charge_wgt_y  -slopecw*(_this_params.charge_wgt_x);//intercept for cw
-		//Getthe 2D_angle
-		_this_params.angle_2d = atan(slopecw)*180/PI;
-	return;
+    //Looking for the slope and intercept of the line above avg_charge hits
+    double slopecw=0;
+    //double ceptcw=0;
+    slopecw= (ncw*sumwiretime- sumwire*sumtime)/(ncw*sumwirewire-sumwire*sumwire);//slope for cw
+    //ceptcw= _this_params.charge_wgt_y  -slopecw*(_this_params.charge_wgt_x);//intercept for cw
+    //Getthe 2D_angle
+    _this_params.angle_2d = atan(slopecw)*180/PI;
+    return;
     
   }
 
 
- void ClusterParamsAlgNew::GetProfileInfo(bool override)
+  void ClusterParamsAlgNew::GetProfileInfo(bool override)
   {
     if(rough_2d_slope==-999.999 || rough_2d_intercept==-999.999 ) //these variables need to be initialized to othervalues? 
-	GetRoughAxis(true);      
+      GetRoughAxis(true);      
 
     coarse_nbins=2;
     profile_nbins=100;
@@ -200,33 +200,33 @@ namespace cluster{
     for(auto & hit : hitVector)
       {
       
-      //calculate intercepts along   
-      double intercept=hit.t-inv_2d_slope*(double)hit.w;
+	//calculate intercepts along   
+	double intercept=hit.t-inv_2d_slope*(double)hit.w;
     
-      double side_intercept=hit.t-rough_2d_slope*(double)hit.w;
+	double side_intercept=hit.t-rough_2d_slope*(double)hit.w;
     
-      if(intercept > inter_high ){
-	inter_high=intercept;
+	if(intercept > inter_high ){
+	  inter_high=intercept;
     	}
     
-      if(intercept < inter_low ){
-	inter_low=intercept;
+	if(intercept < inter_low ){
+	  inter_low=intercept;
         }  
 
-      if(side_intercept > inter_high_side ){
-	inter_high_side=side_intercept;
+	if(side_intercept > inter_high_side ){
+	  inter_high_side=side_intercept;
     	}
     
-      if(side_intercept < inter_low_side ){
-	inter_low_side=side_intercept;
+	if(side_intercept < inter_low_side ){
+	  inter_low_side=side_intercept;
         }
     
 
       }   // end of first HitIter loop, at this point we should have the extreme intercepts 
 	
- /////////////////////////////////////////////
- // Second loop. Fill profiles. 
- /////////////////////////////////////////////
+    /////////////////////////////////////////////
+    // Second loop. Fill profiles. 
+    /////////////////////////////////////////////
       
     for(auto & hit : hitVector)
       {
@@ -247,6 +247,3 @@ namespace cluster{
 }
 
 #endif
-
-
-
