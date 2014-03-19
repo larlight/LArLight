@@ -1,3 +1,4 @@
+
 /**
  * \file LArProperties.hh
  *

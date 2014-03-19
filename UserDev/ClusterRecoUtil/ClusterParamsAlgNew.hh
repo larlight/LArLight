@@ -34,7 +34,7 @@ namespace cluster {
     ClusterParamsAlgNew(std::vector<larutil::PxHit>);
 
     void FillParams();
-    cluster::cluster_params * GetParams();
+    void GetParams(cluster_params &);
 
     /**
      * Calculates the following variables:
