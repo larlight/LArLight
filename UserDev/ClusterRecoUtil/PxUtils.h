@@ -5,36 +5,34 @@
 
 namespace util{
 
-    class PxPoint {
-      public:
-        double w; // wire distance in cm
-        double t; // time distance in cm (drift distance)
-        unsigned int plane; // plane 0, 1, 2
-       
-        PxPoint(){
-            plane=0;
-            w=0;
-            t=0;
-            std::cout<< "This is the default point ctor." << std::endl;
-        }
-        ~PxPoint(){}
-    };
-
-    class PxHit : public PxPoint {
-
-    public:
-
-      double charge; //charge
-
-        PxHit(){
-            plane = 0;
-            w = 0;
-            t = 0;
-            charge = 0;
-            std::cout << "This is the $^_*&ing default ctor." << std::endl;
-        }
-        ~PxHit(){}
-    };
+  class PxPoint {
+  public:
+    double w; // wire distance in cm
+    double t; // time distance in cm (drift distance)
+    unsigned int plane; // plane 0, 1, 2
+    
+    PxPoint(){
+      plane=0;
+      w=0;
+      t=0;
+      std::cout<< "This is the default point ctor." << std::endl;
+    }
+    ~PxPoint(){}
+  };
+  
+  class PxHit : public PxPoint {
+    
+  public:
+    
+    double charge; //charge
+    
+  PxHit() : PxPoint() {
+      //plane, w, and t initialized to 0 thanks to inheritance from PxPoint
+      charge = 0;
+      std::cout << "This is the $^_*&ing default ctor." << std::endl;
+    }
+    ~PxHit(){}
+  };
 }
 
 namespace cluster{
@@ -71,8 +69,6 @@ namespace cluster{
       double N_Wires;
       int    N_Hits;
       double modified_hit_density;
-
-
 
       int    direction;                  // +1 means shower is "forward - start wire < end wire"
                                          // -1 is backwards, 0 is undecided
