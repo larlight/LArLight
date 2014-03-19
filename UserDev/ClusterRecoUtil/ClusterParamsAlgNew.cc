@@ -3,6 +3,9 @@
 
 #include "ClusterParamsAlgNew.hh"
 
+//-----Math-------
+#include <math.h>       
+#define PI 3.14159265
 
 
 namespace cluster{
@@ -78,13 +81,61 @@ namespace cluster{
 
 
   void ClusterParamsAlgNew::GetAverages(bool override){
+
+	//get the slope from 
+
     if (finished_GetAverages) return;
     else return;
   }
 
   // Also does the high hitlist
   void ClusterParamsAlgNew::GetRoughAxis(bool override){
-    if (finished_GetRoughAxis && !override) return;
+
+ if (finished_GetAverages && !override) {
+
+      finished_GetRoughAxis = false;
+
+      return;}
+
+		// grab things from averages
+		//&&comes from averages!
+		    double mean_charge;//from averages
+		    double charge_wgt_y;//from averages
+		    double charge_wgt_x;//from averages
+
+	//using the charge weighted coordinates find the axis from slope
+		double ncw=0;
+		double time;//from sum averages
+		double wire;//from sum averages
+		double wiretime=0;//sum over (wire*time)
+		double wirewire=0;//sum over (wire*wire)
+	//next loop over all hits
+	    for(unsigned int a=0; a<hitVector.size();a++) {
+		//Calculate the slope for all hits
+			//if charge is above avg
+		if(hitVector[a].charge >mean_charge){
+		ncw+=1;
+		wire+=hitVector[a].w;
+		time+=hitVector[a].t;
+		wiretime+=hitVector[a].w*hitVector[a].t;
+		wirewire+=pow(hitVector[a].w,2);	
+					  }//for high charge
+					}//For hh loop
+	//currently have weighted each hit evenly will need charge weight them to fit nicely
+
+	double slopecw=0;
+		slopecw= (ncw*wiretime- wire*time)/(ncw*wirewire-wire*wire);//slope for cw
+	double ceptcw=0;
+		ceptcw= charge_wgt_y  -slopecw*(charge_wgt_x);//intercept for cw
+
+		//the 2D_angle
+		double angle_2d = atan(slopecw)*180/PI;
+
+		
+
+	//stuff will go here
+	return;
+    //if (finished_GetRoughAxis && !override) return;
     
   }
 
