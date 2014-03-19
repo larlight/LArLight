@@ -13,7 +13,7 @@ namespace cluster{
     // Is done by the struct    
   
     // Make sure TPrincipal is initialized:
-    TPrincipal = new TPrincipal(2);
+    principal = new TPrincipal(2);
 
 
     // 
@@ -96,40 +96,40 @@ namespace cluster{
 
     principal -> Clear();
 
-    N_Hits = hitVector.size();
+    _this_params.N_Hits = hitVector.size();
 
     std::map<double, int> wireMap;
 
-    mean_x = 0.0;
-    mean_y = 0.0;
-    mean_charge = 0.0;
+    double mean_charge = 0.0;
+
+
 
     for (auto & hit : hitVector){
       double data[2];
       data[0] = hit.w;
       data[1] = hit.t;
       principal -> AddRow(data);
-      charge_wgt_x += hit.w*hit.charge;
-      charge_wgt_y += hit.t*hit.charge;
+      _this_params.charge_wgt_x += hit.w*hit.charge;
+      _this_params.charge_wgt_y += hit.t*hit.charge;
       mean_charge += hit.charge;
 
       wireMap[hit.w] ++;
 
     }
-    N_Wires = wireMap.size();
-    multi_hit_wires = N_Hits - N_Wires;
+    _this_params.N_Wires = wireMap.size();
+    _this_params.multi_hit_wires = _this_params.N_Hits - _this_params.N_Wires;
 
-    charge_wgt_x / mean_charge;
-    charge_wgt_y / mean_charge;
+    _this_params.charge_wgt_x /= mean_charge;
+    _this_params.charge_wgt_y /= mean_charge;
 
-    mean_x = principal -> GetMeanValues()[0];
-    mean_y = principal -> GetMeanValues()[1];
-    mean_charge /= N_Hits;
+    _this_params.mean_x = (* principal -> GetMeanValues())[0];
+    _this_params.mean_y = (* principal -> GetMeanValues())[1];
+    _this_params.mean_charge /= _this_params.N_Hits;
 
     principal -> MakePrincipals();
 
-    eigenvalue_principal = principal -> GetEigenValues()[0];
-    eigenvalue_secondary = principal -> GetEigenValues()[1];
+    _this_params.eigenvalue_principal = (* principal -> GetEigenValues() )[0];
+    _this_params.eigenvalue_secondary = (* principal -> GetEigenValues() )[1];
 
   }
 

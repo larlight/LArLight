@@ -1,6 +1,10 @@
+#ifndef PXUTIL_H
+#define PXUTIL_H
+
 #include <iostream>
 
 namespace util{
+
     class PxPoint {
       public:
         double w; // wire distance in cm
@@ -65,7 +69,7 @@ namespace cluster{
       double hit_density_2D;
       double multi_hit_wires;
       double N_Wires;
-      int    N_hits;
+      int    N_Hits;
       double modified_hit_density;
 
 
@@ -79,4 +83,6 @@ namespace cluster{
 
     };
 }
+
+#endif
 
