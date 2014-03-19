@@ -55,8 +55,12 @@ namespace cluster {
      * verticalness
      * rough_2d_slope
      * rough_2d_intercept
+//would be good to have also the rough 2d for the high charge
+  //> rough_hc_2d_slope
+  //> rough_hc_2d_intercept
      * @param override [description]
      */
+    //void GetRoughAxis(bool override=false);
     void GetRoughAxis(bool override=false);
 
 
@@ -112,8 +116,6 @@ namespace cluster {
     double rough_2d_intercept;    // slope 
     
     cluster::cluster_params _this_params;
-
-    TPrincipal * principal;
 
   }; //class ClusterParamsAlgNew
   

@@ -3,6 +3,9 @@
 
 #include "ClusterParamsAlgNew.hh"
 
+//-----Math-------
+#include <math.h>       
+#define PI 3.14159265
 
 
 namespace cluster{
@@ -13,7 +16,7 @@ namespace cluster{
     // Is done by the struct    
   
     // Make sure TPrincipal is initialized:
-    TPrincipal = new TPrincipal(2);
+    principal = new TPrincipal(2);
 
 
     // 
@@ -97,46 +100,82 @@ namespace cluster{
 
     principal -> Clear();
 
-    N_Hits = hitVector.size();
+    _this_params.N_Hits = hitVector.size();
 
     std::map<double, int> wireMap;
 
-    mean_x = 0.0;
-    mean_y = 0.0;
-    mean_charge = 0.0;
+    double mean_charge = 0.0;
+
+
 
     for (auto & hit : hitVector){
       double data[2];
       data[0] = hit.w;
       data[1] = hit.t;
       principal -> AddRow(data);
-      charge_wgt_x += hit.w*hit.charge;
-      charge_wgt_y += hit.t*hit.charge;
+      _this_params.charge_wgt_x += hit.w*hit.charge;
+      _this_params.charge_wgt_y += hit.t*hit.charge;
       mean_charge += hit.charge;
 
       wireMap[hit.w] ++;
 
     }
-    N_Wires = wireMap.size();
-    multi_hit_wires = N_Hits - N_Wires;
+    _this_params.N_Wires = wireMap.size();
+    _this_params.multi_hit_wires = _this_params.N_Hits - _this_params.N_Wires;
 
-    charge_wgt_x / mean_charge;
-    charge_wgt_y / mean_charge;
+    _this_params.charge_wgt_x /= mean_charge;
+    _this_params.charge_wgt_y /= mean_charge;
 
-    mean_x = principal -> GetMeanValues()[0];
-    mean_y = principal -> GetMeanValues()[1];
-    mean_charge /= N_Hits;
+    _this_params.mean_x = (* principal -> GetMeanValues())[0];
+    _this_params.mean_y = (* principal -> GetMeanValues())[1];
+    _this_params.mean_charge /= _this_params.N_Hits;
 
     principal -> MakePrincipals();
 
-    eigenvalue_principal = principal -> GetEigenValues()[0];
-    eigenvalue_secondary = principal -> GetEigenValues()[1];
+    _this_params.eigenvalue_principal = (* principal -> GetEigenValues() )[0];
+    _this_params.eigenvalue_secondary = (* principal -> GetEigenValues() )[1];
 
   }
 
   // Also does the high hitlist
   void ClusterParamsAlgNew::GetRoughAxis(bool override){
-    if (finished_GetRoughAxis && !override) return;
+
+ if (finished_GetAverages && !override) {
+
+      finished_GetRoughAxis = false;
+
+      return;}
+
+			double mean_charge;
+			double charge_wgt_x;              
+		        double charge_wgt_y;
+		//using the charge weighted coordinates find the axis from slope
+			double ncw=0;
+			double time;//from sum averages
+			double wire;//from sum averages
+			double wiretime=0;//sum over (wire*time)
+			double wirewire=0;//sum over (wire*wire)
+		//next loop over all hits again
+	    for (auto & hit : hitVector){
+		//if charge is above avg_charge
+			if(hit.charge > mean_charge){
+				ncw+=1;
+				wire+=hit.w;
+				time+=hit.t;
+				wiretime+=hit.w*hit.t;
+				wirewire+=pow(hit.w,2);	
+					          }//for high charge
+					}//For hh loop
+
+		//Looking for the slope and intercept of the line above avg_charge hits
+			double slopecw=0;
+			double ceptcw=0;
+				slopecw= (ncw*wiretime- wire*time)/(ncw*wirewire-wire*wire);//slope for cw
+				ceptcw= charge_wgt_y  -slopecw*(charge_wgt_x);//intercept for cw
+
+		//Getthe 2D_angle
+		double angle_2d = atan(slopecw)*180/PI;
+	return;
     
   }
 
