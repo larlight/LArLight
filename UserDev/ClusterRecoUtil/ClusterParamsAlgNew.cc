@@ -29,8 +29,16 @@ namespace cluster{
   
 
 
-  void ClusterParamsAlgNew::FillParams(){
-
+  void ClusterParamsAlgNew::FillParams(bool override_DoGetAverages      ,  
+				       bool override_DoGetRoughAxis     ,  
+				       bool override_DoGetProfileInfo   ,  
+				       bool override_DoRefineStartPoints,  
+				       bool override_DoGetFinalSlope     ){
+    GetAverages      (override_DoGetAverages      );
+    GetRoughAxis     (override_DoGetRoughAxis     );
+    GetProfileInfo   (override_DoGetProfileInfo   );
+    RefineStartPoints(override_DoRefineStartPoints);
+    GetFinalSlope    (override_DoGetFinalSlope    );
   }
 
   void ClusterParamsAlgNew::GetParams(cluster::cluster_params&  inputstruct){
@@ -125,9 +133,8 @@ namespace cluster{
     slopecw= (ncw*sumwiretime- sumwire*sumtime)/(ncw*sumwirewire-sumwire*sumwire);//slope for cw
     //ceptcw= _this_params.charge_wgt_y  -slopecw*(_this_params.charge_wgt_x);//intercept for cw
     //Getthe 2D_angle
-    _this_params.angle_2d = atan(slopecw)*180/PI;
+    _this_params.cluster_angle_2d = atan(slopecw)*180/PI;
     return;
-    
   }
 
 
