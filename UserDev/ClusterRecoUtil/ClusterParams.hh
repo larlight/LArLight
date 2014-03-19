@@ -19,6 +19,7 @@ namespace cluster{
       double rms_y;                      // rms of hits along y, (time)
       double charge_wgt_x;               // Mean of hits along x, charge weighted
       double charge_wgt_y;               // Mean of hits along y, charge weighted
+      double cluster_angle_2d;           // Linear best fit to high-charge hits in the cluster
       double angle_2d;                   // Angle of axis in wire/hit view
       double opening_angle;              // Width of angular distubtion wrt vertx
       double opening_angle_highcharge;   // Same for high charge 
