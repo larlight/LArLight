@@ -6,7 +6,7 @@
 #define CLUSTERRECOUTIL_TYPEDEF_HH
 
 // Header files included here
-#include "ClusterRecoUtil.hh"
+#include "ClusterParamsAlgNew.hh"
 
 // Class forward declaration here
 class cluster::ClusterParamsAlgNew;

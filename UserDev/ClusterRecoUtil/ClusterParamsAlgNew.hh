@@ -13,7 +13,7 @@
 // #include <TH2F.h>
 // #include <TF1.h>
 // #include <TH1F.h>
-// #include <TPrincipal.h>
+#include <TPrincipal.h>
 
 #include "PxUtils.h"
 
@@ -105,6 +105,8 @@ namespace cluster {
     double rough_2d_intercept;    // slope 
     
     cluster_params _this_params;
+
+    TPrincipal * principal;
 
   }; //class ClusterParamsAlgNew
   

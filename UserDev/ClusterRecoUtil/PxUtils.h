@@ -56,6 +56,7 @@ namespace cluster{
       double hit_density_2D;
       double multi_hit_wires;
       double N_Wires;
+      int    N_hits;
       double modified_hit_density;
 
 
