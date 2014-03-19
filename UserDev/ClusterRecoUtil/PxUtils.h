@@ -1,7 +1,7 @@
 #include <iostream>
 
 namespace util{
-    struct PxPoint {
+    class PxPoint {
       public:
         double w; // wire distance in cm
         double t; // time distance in cm (drift distance)
@@ -13,11 +13,14 @@ namespace util{
             t=0;
             std::cout<< "This is the default point ctor." << std::endl;
         }
+        ~PxPoint(){}
     };
 
-    struct PxHit : PxPoint {
+    class PxHit : public PxPoint {
 
-        double charge; //charge
+    public:
+
+      double charge; //charge
 
         PxHit(){
             plane = 0;
@@ -26,13 +29,19 @@ namespace util{
             charge = 0;
             std::cout << "This is the $^_*&ing default ctor." << std::endl;
         }
-
+        ~PxHit(){}
     };
 }
 
 namespace cluster{
-    struct cluster_params
+
+    class cluster_params
     {
+    public:
+      cluster_params(){}
+      ~cluster_params(){}
+
+    public:
       double mean_charge;                // Mean (average) charge of hits in ADC
       double mean_x;                     // Mean of hits along x, peaks only
       double mean_y;                     // Mean of hits along y, peaks only

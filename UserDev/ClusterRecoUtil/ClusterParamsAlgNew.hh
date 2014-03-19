@@ -9,30 +9,30 @@
 #ifndef CLUSTERPARAMSALGNEW_H
 #define CLUSTERPARAMSALGNEW_H
 
-// #include <TMath.h>
-// #include <TH2F.h>
-// #include <TF1.h>
-// #include <TH1F.h>
+#include <TMath.h>
+#include <TH2F.h>
+#include <TF1.h>
+#include <TH1F.h>
 #include <TPrincipal.h>
 
 #include "PxUtils.h"
 
 #include <vector>
 
-// #include "DataFormat-TypeDef.hh"
-// #include "LArUtil-TypeDef.hh"
-// #include "HoughBaseAlg.hh"
+#include "DataFormat-TypeDef.hh"
+#include "LArUtil-TypeDef.hh"
+#include "HoughBaseAlg.hh"
 
 namespace cluster {
    
   class ClusterParamsAlgNew {
 
   public:
-    
+
     ClusterParamsAlgNew(std::vector<util::PxHit>);
-    
+
     void FillParams();
-    cluster_params * GetParams();
+    cluster::cluster_params * GetParams();
 
     /**
      * Calculates the following variables:
@@ -69,7 +69,7 @@ namespace cluster {
      * offaxis_hits
      * @param override [description]
      */
-    void GetProfileInfo(bool override=false);
+    void GetProfileInfo(bool override=false){};
 
     /**
      * Calculates the following variables:
@@ -77,7 +77,7 @@ namespace cluster {
      * width
      * @param override [description]
      */
-    void RefineStartPoints(bool override=false);
+    void RefineStartPoints(bool override=false){};
 
     /**
      * Calculates the following variables:
@@ -87,7 +87,7 @@ namespace cluster {
      * direction
      * @param override [description]
      */
-    void GetFinalSlope(bool override=false);    
+    void GetFinalSlope(bool override=false){};    
 
 
     
@@ -104,7 +104,7 @@ namespace cluster {
     double rough_2d_slope;    // slope 
     double rough_2d_intercept;    // slope 
     
-    cluster_params _this_params;
+    cluster::cluster_params _this_params;
 
     TPrincipal * principal;
 

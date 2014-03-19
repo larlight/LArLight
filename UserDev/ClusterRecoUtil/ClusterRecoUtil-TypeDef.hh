@@ -9,7 +9,17 @@
 #include "ClusterParamsAlgNew.hh"
 
 // Class forward declaration here
-class cluster::ClusterParamsAlgNew;
+namespace cluster{
+  class ClusterParamsAlgNew;
+  class cluster_params;
+}
+namespace util{
+
+  class PxPoint;
+  class PxHit;
+}
+
+
 //ADD_EMPTY_CLASS ... do not change this comment line
 
 #endif
