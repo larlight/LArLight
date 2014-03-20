@@ -13,6 +13,7 @@ from ROOT import larlight as fmwk
 
 # Create ana_processor instance
 my_proc = fmwk.ana_processor()
+my_proc.set_verbosity(fmwk.MSG.NORMAL)
 
 # Set input root file
 my_proc.add_input_file(sys.argv[1])
@@ -32,14 +33,16 @@ if len(sys.argv) > 2:
 my_proc.set_ana_output_file("from_test_ana_you_can_remove_me.root");
 
 # Attach a template process
-my_proc.add_process(fmwk.MCShowerStudy());
+my_mcshowerstudy = fmwk.MCShowerStudy()
+my_mcshowerstudy.SetUseRefineDirection(True)
+my_proc.add_process(my_mcshowerstudy)
 
 print
 print  "Finished configuring ana_processor. Start event loop!"
 print
 
 # Let's run it.
-my_proc.run(0,10);
+my_proc.run();
 
 # done!
 print

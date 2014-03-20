@@ -237,11 +237,6 @@ namespace larlight {
 
       }//end if you want to use refine direction function
 
-
-
-
-
-  
       double dw1, dt1, da1, db1, dw2, dt2, da2, db2;
       //calculate start/end refining figure of merit for this cluster
       dw1 = mother_sw_view[iview].w - start_wire;
@@ -258,7 +253,7 @@ namespace larlight {
       
       //this is the variable that i want to go into the ttree... for single cluster events,
       //this will be a vector of length 3 (one per cluster, one cluster per view)
-      double myFOM = std::sqrt( da1*da1 + db1*db1 ) - std::sqrt( da2*da2 + db2*db2 );
+      double myFOM =  std::sqrt( da2*da2 + db2*db2 ) - std::sqrt( da1*da1 + db1*db1 );
       _refinestartend_FOM.push_back(myFOM);
 
       //debugging stuff
@@ -326,10 +321,10 @@ namespace larlight {
     
     //decide if you want to switch the start and end point
     //for now, use biggest mean && smallest RMS to decide
-    if(_hit_angles_forwards->GetMean() < _hit_angles_backwards->GetMean() &&
+    //works slightly better than just using mean to decide
+    //there's probably a better way to do this
+    if(_hit_angles_forwards->GetMean() < _hit_angles_backwards->GetMean() && 
        _hit_angles_forwards->GetRMS()  > _hit_angles_backwards->GetRMS() ){
-      //if(_hit_angles_forwards->GetRMS()  > _hit_angles_backwards->GetRMS() ){
-      //if(_hit_angles_forwards->GetMean() < _hit_angles_backwards->GetMean()){
       double new_end_wire   = start_wire;
       double new_end_time   = start_time;
       double new_start_wire = end_wire;
