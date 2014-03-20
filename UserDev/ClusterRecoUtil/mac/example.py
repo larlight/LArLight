@@ -31,6 +31,11 @@ while mgr.next_event():
 
         algo.LoadCluster(clusters.at(x),
                          mgr.get_data(clusters.get_hit_type()))
+        algo.FillParams(True,True,True,True,True)
+        print "(%g,%g) => (%g,%g)" % (algo.StartPoint().w,
+                                      algo.StartPoint().t,
+                                      algo.EndPoint().w,
+                                      algo.EndPoint().t)
         chit.cd()
         algo.GetHitView().Draw("COLZ")
         chit.Update()

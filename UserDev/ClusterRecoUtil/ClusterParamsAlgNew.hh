@@ -122,6 +122,9 @@ namespace cluster {
     void RefineDirection(larutil::PxPoint &start,
 			 larutil::PxPoint &end);
 
+    const larutil::PxPoint& StartPoint() {return rough_begin_point;}
+    const larutil::PxPoint& EndPoint() {return rough_end_point;}
+
   protected:
     std::vector<larutil::PxHit> hitVector;         // This vector holds the wrapped up hit list
  
@@ -134,6 +137,7 @@ namespace cluster {
     //settable parameters:
      double fChargeCutoffThreshold[3]; 
      int fplane;
+
     //this is required in RefineDirection
     double q_min_refdir;
     
