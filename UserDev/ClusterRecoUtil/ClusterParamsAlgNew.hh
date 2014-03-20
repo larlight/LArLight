@@ -17,6 +17,7 @@
 
 #include "PxUtils.h"
 #include "ClusterParams.hh"
+#include "RecoUtilException.hh"
 
 #include <vector>
 
@@ -31,7 +32,13 @@ namespace cluster {
 
   public:
 
-    ClusterParamsAlgNew(std::vector<larutil::PxHit>);
+    ClusterParamsAlgNew();
+
+    ClusterParamsAlgNew(const std::vector<larutil::PxHit>&);
+
+    void Initialize();
+
+    void SetHits(const std::vector<larutil::PxHit>&);
 
     /**                                                                             
      * Runs all the functions which calculate cluster params                        
@@ -73,9 +80,6 @@ namespace cluster {
      * verticalness
      * rough_2d_slope
      * rough_2d_intercept
-     //would be good to have also the rough 2d for the high charge
-     //> rough_hc_2d_slope
-     //> rough_hc_2d_intercept
      * @param override [description]
      */
     //void GetRoughAxis(bool override=false);
@@ -111,18 +115,36 @@ namespace cluster {
      */
     void GetFinalSlope(bool override=false);    
 
+    void RefineDirection(larutil::PxPoint &start,
+			 larutil::PxPoint &end);
 
-    
   private:
     std::vector<larutil::PxHit> hitVector;         // This vector holds the wrapped up hit list
  
-    larutil::GeometryUtilities *gser;
+    larutil::GeometryUtilities  *gser;
+    larutil::Geometry           *geo;
+    larutil::DetectorProperties *detp;
+    larutil::LArProperties      *larp;
     TPrincipal *principal;
+    
+    //settable parameters:
+     double fChargeCutoffThreshold[3]; 
+     int fplane;
     
     std::vector< double > charge_profile;
     std::vector< double > coarse_charge_profile;
     int coarse_nbins;
     int profile_nbins;
+    int profile_maximum_bin;
+    double profile_integral_forward;
+    double profile_integral_backward;
+    double projectedlength;
+    
+    //extreme intercepts using the rough_2d_slope
+    double inter_high;
+    double inter_low;
+    double inter_high_side;
+    double inter_low_side;
     
     bool finished_GetAverages;
     bool finished_GetRoughAxis;
@@ -133,7 +155,12 @@ namespace cluster {
 
     double rough_2d_slope;    // slope 
     double rough_2d_intercept;    // slope 
-    
+    larutil::PxPoint rough_begin_point; 
+    larutil::PxPoint rough_end_point;
+
+    std::vector<double> fWire2Cm; // Conversion factor from wire to cm scale
+    double fTime2Cm;              // Conversion factor from time to cm scale
+
     cluster::cluster_params _this_params;
 
   }; //class ClusterParamsAlgNew

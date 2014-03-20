@@ -3,7 +3,8 @@
  *
  * \ingroup MCShowerStudy
  * 
- * \brief Class def header for a class MCShowerStudy
+ * \brief This is a generic module to compare parameters from reconstructed showers to MC showers.
+ *        It calculates whatever figures of merit you want to calculate, and saves it to an output TTree.
  *
  * @author davidkaleko
  */
@@ -16,6 +17,7 @@
 #define MCSHOWERSTUDY_HH
 
 #include "ana_base.hh"
+#include <sstream>
 
 //this include works because I modified the GNUMakeFile to add LArUtil
 // to INCFLAGS, so compiler can find this hh file
@@ -51,21 +53,41 @@ namespace larlight {
     */
     virtual bool finalize();
 
-    TTree* GetMCClusTree() const {return _mcclus_tree;}
+    //getter for the tree holding figures of merit
+    TTree* GetMCShowerTree() const {return _mcshower_tree;}
 
+    void SetUseRefineDirection(bool flag) {_refine_direction = flag;}
+   
     protected:
 
     void PrepareTTree();
 
-    TTree* _mcclus_tree;
+    void ClearTTreeVars();
+
+    bool RefineDirectionTest(storage_manager* storage, event_cluster* ev_cluster, event_mcshower* ev_mcshower);
+    
+    TTree* _mcshower_tree;
 
 
     //this i should get from geometry service but didn't find immediately
     double _wire_2_cm;
     double _time_2_cm;
 
+    //whether you want to refine_direction before calculating figure of merit,
+    //or whether you want to disable refine_direction (to compare to... like a control group)
+    //default is false
+    bool _refine_direction = false;
+
     // variables that go into the analysis ttree
-    double _refinestartend_FOM;
+    std::vector<double> _refinestartend_FOM;
+
+    
+    
+    //stuff temporarily necessary for refine_direction test
+    void RefineStartPointsShowerShape(Double_t &start_wire, Double_t &start_time, Double_t &end_wire, Double_t &end_time, const std::vector<larlight::hit> &in_hit_v);
+
+    TH1F *_hit_angles_forwards;
+    TH1F *_hit_angles_backwards;
 
   };
 }

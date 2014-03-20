@@ -997,7 +997,44 @@ namespace larutil{
       
     }
     
-  } 
+  }
+
+  void GeometryUtilities::SelectLocalHitlist(const std::vector<larutil::PxHit*>& hitlist, 
+					     std::vector <larutil::PxHit*> &hitlistlocal,
+					     larutil::PxHit startHit,
+					     Double_t linearlimit,   
+					     Double_t ortlimit, 
+					     Double_t lineslopetest,
+					     larutil::PxHit& averageHit) {
+
+    Double_t time_start= startHit.t;
+    Double_t wire_start= startHit.w;
+    Double_t locintercept=time_start-wire_start*lineslopetest;
+
+    Double_t timesum = 0;
+    UInt_t wiresum = 0;
+    for(size_t i=0; i<hitlist.size(); ++i) {
+
+      Double_t time = hitlist.at(i)->t;
+      UInt_t wire = hitlist.at(i)->w;
+      timesum += time;
+      wiresum += wire;
+
+      Double_t wonline=wire,tonline=time;
+      GetPointOnLine(lineslopetest,locintercept,wire,time,wonline,tonline);
+      
+      //calculate linear distance from start point and orthogonal distance from axis
+      Double_t lindist=Get2DDistance(wonline,tonline,wire_start,time_start);
+      Double_t ortdist=Get2DDistance(wire,time,wonline,tonline);
+      
+      if(lindist<linearlimit && ortdist<ortlimit)  hitlistlocal.push_back(hitlist.at(i));
+    }
+
+    averageHit.plane = startHit.plane;
+    averageHit.w = wiresum/hitlist.size();
+    averageHit.t = timesum/((Double_t) hitlist.size());
+  }
+  
 
 
 } // namespace

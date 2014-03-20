@@ -8,6 +8,8 @@
 // Header files included here
 #include "ClusterParamsAlgNew.hh"
 #include "ClusterRecoUtil.hh"
+#include "RecoUtilException.hh"
+#include "ClusterParamsExecutor.hh"
 
 // Class forward declaration here
 namespace cluster{
@@ -15,6 +17,7 @@ namespace cluster{
   class ClusterParamsAlgNew;
   class ClusterRecoUtils;
   class cluster_params;
+  class RecoUtilException;
 }
 namespace larutil{
 

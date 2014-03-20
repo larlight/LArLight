@@ -10,13 +10,49 @@
 
 namespace cluster{
 
-  ClusterParamsAlgNew::ClusterParamsAlgNew(std::vector<larutil::PxHit>){
+  ClusterParamsAlgNew::ClusterParamsAlgNew()
+  {
+    Initialize();
+  }
+
+  ClusterParamsAlgNew::ClusterParamsAlgNew(const std::vector<larutil::PxHit> &inhitlist){
+    Initialize();
+    SetHits(inhitlist);
+  }
+
+  void ClusterParamsAlgNew::SetHits(const std::vector<larutil::PxHit> &inhitlist){
 
     // Make default values
-    // Is done by the struct    
-  
-    // Make sure TPrincipal is initialized:
-    principal = new TPrincipal(2);
+    // Is done by the struct
+    hitVector=inhitlist;
+    if(!(hitVector.size())) {
+      throw RecoUtilException("Provided empty hit list!");
+      return;
+    }
+    fplane=hitVector.at(0).plane;
+
+  }
+
+  void ClusterParamsAlgNew::Initialize()
+  {
+    // Clear hit vector
+    hitVector.clear();
+
+    // Set pointer attributes
+    if(!principal) principal = new TPrincipal(2);    
+    if(!gser) gser = (larutil::GeometryUtilities*)(larutil::GeometryUtilities::GetME());
+    if(!detp) detp = (larutil::DetectorProperties*)(larutil::DetectorProperties::GetME());
+    if(!geo)  geo  = (larutil::Geometry*)(larutil::Geometry::GetME());
+    if(!larp) larp = (larutil::LArProperties*)(larutil::LArProperties::GetME());
+
+
+    //--- Initilize attributes values ---//
+    fWire2Cm.resize(geo->Nplanes(),0);
+    for(size_t i=0; i<fWire2Cm.size(); ++i)
+      fWire2Cm.at(i) = geo->WirePitch(0,1,(UChar_t)i);
+
+    fTime2Cm = (detp->SamplingRate()/1.e3);
+    fTime2Cm *= (larp->DriftVelocity(larp->Efield(),larp->Temperature()));
 
     finished_GetAverages       = false;
     finished_GetRoughAxis      = false;
@@ -24,10 +60,23 @@ namespace cluster{
     finished_RefineStartPoints = false;
     finished_GetFinalSlope     = false;
 
-    gser = (larutil::GeometryUtilities*)(larutil::GeometryUtilities::GetME());
-  }
-  
+    rough_2d_slope=-999.999;    // slope 
+    rough_2d_intercept=-999.999;    // slope 
+       
+    rough_begin_point.w=-999.999;
+    rough_end_point.w=-999.999;
+     
+    rough_begin_point.t=-999.999;
+    rough_end_point.t=-999.999;
 
+    profile_integral_forward=-999.999;
+    profile_integral_backward=-999.999;
+    profile_maximum_bin=-999;
+    
+    fChargeCutoffThreshold[0]=500;
+    fChargeCutoffThreshold[1]=500;
+    fChargeCutoffThreshold[2]=1000;
+  }
 
   void ClusterParamsAlgNew::FillParams(bool override_DoGetAverages      ,  
 				       bool override_DoGetRoughAxis     ,  
@@ -164,10 +213,10 @@ namespace cluster{
     else
       inv_2d_slope=-999999.;
 
-    double inter_high=-999999;
-    double inter_low=999999;
-    double inter_high_side=-999999;
-    double inter_low_side=999999;
+    inter_high=-999999;
+    inter_low=999999;
+    inter_high_side=-999999;
+    inter_low_side=999999;
     //loop over all hits. Create coarse and fine profiles of the charge weight to help refine the start/end points and have a first guess of direction
     for(auto & hit : hitVector)
       {
@@ -213,10 +262,10 @@ namespace cluster{
      BeginOnlinePoint = (HighOnlinePoint.w > LowOnlinePoint.w) ? LowOnlinePoint : HighOnlinePoint;
      
      
-     double projectedlength=gser->Get2DDistance(HighOnlinePoint,LowOnlinePoint);
+     projectedlength=gser->Get2DDistance(HighOnlinePoint,LowOnlinePoint);
      
       
-      
+     double current_maximum=0; 
     for(auto & hit : hitVector)
       {
       
@@ -237,7 +286,12 @@ namespace cluster{
       int coarse_bin=(int)linedist/projectedlength*coarse_nbins; 
       
       if(fine_bin<profile_nbins)  //only fill if bin number is in range
-	charge_profile[fine_bin]+=weight;
+	{charge_profile[fine_bin]+=weight;
+         if(charge_profile[fine_bin]>current_maximum && fine_bin!=0 && fine_bin!=profile_nbins-1) //find maximum bin on the fly.
+	 {current_maximum=charge_profile[fine_bin];
+	  profile_maximum_bin=fine_bin; 
+	 }
+	}
       
       if(coarse_bin<coarse_nbins) //only fill if bin number is in range
 	coarse_charge_profile[coarse_bin]+=weight;
@@ -249,6 +303,15 @@ namespace cluster{
     return;    
   }
   
+  
+    /**
+     * Calculates the following variables:
+     * length
+     * width
+     * @param override [description]
+     */
+  
+  
   void ClusterParamsAlgNew::RefineStartPoints(bool override) {
     if(!override) { //Override being set, we skip all this logic.
       //OK, no override. Stop if we're already finshed.
@@ -258,6 +321,7 @@ namespace cluster{
     } else {
       if (!finished_GetProfileInfo) GetProfileInfo(true);
     }
+<<<<<<< HEAD
 	//Ryan's Shower Strip finder work here. 
 
 		//First we need to define the strip width that we want
@@ -344,6 +408,72 @@ namespace cluster{
 		
 
 	
+=======
+    
+    profile_integral_forward=0;
+    profile_integral_backward=0;
+    
+    //calculate the forward and backward integrals counting int the maximum bin.
+    
+    for(int ibin=0;ibin<profile_nbins;ibin++)
+    {
+    if(ibin<=profile_maximum_bin)  
+      profile_integral_forward+=charge_profile[ibin];
+    
+    if(ibin>=profile_maximum_bin)  
+      profile_integral_backward+=charge_profile[ibin];
+      
+    }
+    
+    // now, we have the forward and backward integral so start stepping forward and backward to find the trunk of the 
+    // shower. This is done making sure that the running integral until less than 1% is left and the bin is above 
+    // a set theshold many empty bins.
+    
+    //forward loop
+    double running_integral=profile_integral_forward;
+    int startbin,endbin;
+    for(startbin=profile_maximum_bin;startbin>1;startbin--)
+      {running_integral-=charge_profile[startbin];
+	if( charge_profile[startbin]<fChargeCutoffThreshold[fplane] && running_integral/profile_integral_forward<0.01 )
+	  break;
+      }
+    
+    //backward loop
+    running_integral=profile_integral_backward;
+    for(endbin=profile_maximum_bin;endbin<profile_nbins-1;endbin++)
+      {running_integral-=charge_profile[endbin];
+	if( charge_profile[endbin]<fChargeCutoffThreshold[fplane] && running_integral/profile_integral_backward<0.01 )
+	  break;
+      }
+    
+    // now have profile start and endpoints. Now translate to wire/time. Will use wire/time that are on the rough axis.
+    //projectedlength is the length from inter_low to interhigh along the rough_2d_axis
+    // on bin distance is: 
+     larutil::PxPoint OnlinePoint;
+     
+     
+     double ort_intercept_begin=(inter_high-inter_low)/profile_nbins*startbin;
+     
+     gser->GetPointOnLineWSlopes(rough_2d_slope,
+			      rough_2d_intercept,
+			      ort_intercept_begin,
+			      rough_begin_point);
+     
+     double ort_intercept_end=(inter_high-inter_low)/profile_nbins*endbin;
+     
+     gser->GetPointOnLineWSlopes(rough_2d_slope,
+			      rough_2d_intercept,
+			      ort_intercept_end,
+			      rough_end_point);
+     
+     // ok. now have rough_begin_point and rough_end_point. No decision about direction has been made yet.
+     // need to define physical direction with openind angles and pass that to Ryan's line finder.
+     
+     
+    
+       
+    
+>>>>>>> 7120a510b900f9ca124c09dd5c5d4bd13c636e88
 
     finished_RefineStartPoints = true;
     return;
@@ -374,6 +504,60 @@ namespace cluster{
   }
   
   
+  void ClusterParamsAlgNew::RefineDirection(larutil::PxPoint &start,
+					    larutil::PxPoint &end) {
+    
+    UChar_t plane = (*hitVector.begin()).plane;
+
+    Double_t wire_2_cm = fWire2Cm.at(plane);
+    Double_t time_2_cm = fTime2Cm;
+    
+    Double_t SEP_X = (end.w - start.w) / wire_2_cm;
+    Double_t SEP_Y = (end.t - start.t) / time_2_cm;
+
+    Double_t rms_forward   = 0;
+    Double_t rms_backward  = 0;
+    Double_t mean_forward  = 0;
+    Double_t mean_backward = 0;
+    Double_t weight_total  = 0;
+    for(auto const hit : hitVector) {
+
+      weight_total = hit.charge; 
+
+      // Compute forward mean
+      Double_t SHIT_X = (hit.w - start.w) / wire_2_cm;
+      Double_t SHIT_Y = (hit.t - start.t) / time_2_cm;
+
+      Double_t cosangle = (SEP_X*SHIT_X + SEP_Y*SHIT_Y);
+      cosangle /= ( pow(pow(SEP_X,2)+pow(SEP_Y,2),0.5) * pow(pow(SHIT_X,2)+pow(SHIT_Y,2),0.5));
+
+      mean_forward += cosangle * hit.charge;
+      rms_forward  += pow(cosangle * hit.charge,2);
+      
+      // Compute backward mean
+      SHIT_X = (hit.w - end.w) / wire_2_cm;
+      SHIT_Y = (hit.t - end.t) / time_2_cm;
+      
+      cosangle  = (SEP_X*SHIT_X + SEP_Y*SHIT_Y);
+      cosangle /= ( pow(pow(SEP_X,2)+pow(SEP_Y,2),0.5) * pow(pow(SHIT_X,2)+pow(SHIT_Y,2),0.5));
+      
+      mean_backward += cosangle * hit.charge;
+      rms_backward  += pow(cosangle * hit.charge,2);
+      
+    }
+
+    rms_forward   = pow(rms_forward/pow(weight_total,2),0.5);
+    mean_forward /= weight_total;
+
+    rms_backward   = pow(rms_backward/pow(weight_total,2),0.5);
+    mean_backward /= weight_total;
+    
+    if(rms_forward / mean_forward < rms_backward / mean_backward)
+      std::cout<<"Right Direction"<<std::endl;
+    else
+      std::cout<<"Wrong Direction"<<std::endl;
+    
+  }
   
   
   

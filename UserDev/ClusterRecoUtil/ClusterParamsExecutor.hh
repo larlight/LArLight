@@ -28,7 +28,7 @@ namespace cluster {
   public:
     
     /// Default constructor
-    ClusterParamsExecutor(){};
+    ClusterParamsExecutor();
     
     /// Default destructor
     virtual ~ClusterParamsExecutor(){};
@@ -38,6 +38,10 @@ namespace cluster {
     virtual bool finalize();
     
     virtual bool analyze(larlight::storage_manager* storage);
+
+  protected:
+
+    larlight::DATA::DATA_TYPE _in_cluster_type;
     
   };
 
