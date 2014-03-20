@@ -10,5 +10,9 @@
 #pragma link off all functions;
 
 #pragma link C++ class cluster::ClusterParamsAlgNew+;
+#pragma link C++ class cluster::cluster_params+;
+#pragma link C++ class cluster::ClusterParamsExecutor+;
+#pragma link C++ class cluster::RecoUtilException+;
 //ADD_NEW_CLASS ... do not change this line
 #endif
+

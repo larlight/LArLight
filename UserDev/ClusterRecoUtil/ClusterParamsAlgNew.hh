@@ -9,30 +9,59 @@
 #ifndef CLUSTERPARAMSALGNEW_H
 #define CLUSTERPARAMSALGNEW_H
 
-// #include <TMath.h>
-// #include <TH2F.h>
-// #include <TF1.h>
-// #include <TH1F.h>
-// #include <TPrincipal.h>
+#include <TMath.h>
+#include <TH2F.h>
+#include <TF1.h>
+#include <TH1F.h>
+#include <TPrincipal.h>
 
 #include "PxUtils.h"
+#include "ClusterParams.hh"
+#include "RecoUtilException.hh"
 
 #include <vector>
 
-// #include "DataFormat-TypeDef.hh"
-// #include "LArUtil-TypeDef.hh"
-// #include "HoughBaseAlg.hh"
+#include "DataFormat-TypeDef.hh"
+#include "LArUtil-TypeDef.hh"
+#include "HoughBaseAlg.hh"
+#include "TPrincipal.h"
 
 namespace cluster {
    
   class ClusterParamsAlgNew {
 
   public:
-    
-    ClusterParamsAlgNew(std::vector<util::PxHit>);
-    
-    void FillParams();
-    cluster_params * GetParams();
+
+    ClusterParamsAlgNew();
+    ~ClusterParamsAlgNew();
+
+    ClusterParamsAlgNew(const std::vector<larutil::PxHit>&);
+
+    void Initialize();
+
+    void SetHits(const std::vector<larutil::PxHit>&);
+
+    void SetRefineDirectionQMin(double qmin){ q_min_refdir = qmin; };
+
+
+    /**                                                                             
+     * Runs all the functions which calculate cluster params                        
+     * and stashes the results in the private ClusterParams                         
+     * struct.                                                                      
+     *                                                                              
+     * @param override_DoGetAverages       force re-execution of GetAverages()      
+     * @param override_DoGetRoughAxis      force re-execution of GetRoughAxis()     
+     * @param override_DoGetProfileInfo    force re-execution of GetProfileInfo()   
+     * @param override_DoRefineStartPoints force re-execution of RefineStartPoints()
+     * @param override_DoGetFinalSlope     force re-execution of GetFinalSlope()    
+     */
+    void FillParams(bool override_DoGetAverages      =false,
+                    bool override_DoGetRoughAxis     =false,
+                    bool override_DoGetProfileInfo   =false,
+                    bool override_DoRefineStartPoints=false,
+                    bool override_DoGetFinalSlope    =false );
+
+    void GetParams(cluster::cluster_params &);
 
     /**
      * Calculates the following variables:
@@ -57,6 +86,7 @@ namespace cluster {
      * rough_2d_intercept
      * @param override [description]
      */
+    //void GetRoughAxis(bool override=false);
     void GetRoughAxis(bool override=false);
 
 
@@ -70,6 +100,7 @@ namespace cluster {
      * @param override [description]
      */
     void GetProfileInfo(bool override=false);
+
 
     /**
      * Calculates the following variables:
@@ -89,11 +120,47 @@ namespace cluster {
      */
     void GetFinalSlope(bool override=false);    
 
+    void RefineDirection(larutil::PxPoint &start,
+                         larutil::PxPoint &end);
 
+    double GetOpeningAngle(larutil::PxPoint rough_start_point,
+                           larutil::PxPoint rough_end_point,
+                           std::vector<larutil::PxHit> & hits);
+
+    const larutil::PxPoint& StartPoint() {return rough_begin_point;}
+    const larutil::PxPoint& EndPoint() {return rough_end_point;}
+
+  protected:
+    std::vector<larutil::PxHit> hitVector;         // This vector holds the wrapped up hit list
+ 
+    larutil::GeometryUtilities  *gser;
+    larutil::Geometry           *geo;
+    larutil::DetectorProperties *detp;
+    larutil::LArProperties      *larp;
+    TPrincipal *principal;
     
-  private:
-    std::vector<util::PxHit> hitVector;         // This vector holds the wrapped up hit list
+    //settable parameters:
+     double fChargeCutoffThreshold[3]; 
+     int fplane;
 
+    //this is required in RefineDirection
+    double q_min_refdir;
+    
+    std::vector< double > charge_profile;
+    std::vector< double > coarse_charge_profile;
+    int coarse_nbins;
+    int profile_nbins;
+    int profile_maximum_bin;
+    double profile_integral_forward;
+    double profile_integral_backward;
+    double projectedlength;
+    
+    //extreme intercepts using the rough_2d_slope
+    double inter_high;
+    double inter_low;
+    double inter_high_side;
+    double inter_low_side;
+    
     bool finished_GetAverages;
     bool finished_GetRoughAxis;
     bool finished_GetProfileInfo;
@@ -103,8 +170,13 @@ namespace cluster {
 
     double rough_2d_slope;    // slope 
     double rough_2d_intercept;    // slope 
-    
-    cluster_params _this_params;
+    larutil::PxPoint rough_begin_point; 
+    larutil::PxPoint rough_end_point;
+
+    std::vector<double> fWire2Cm; // Conversion factor from wire to cm scale
+    double fTime2Cm;              // Conversion factor from time to cm scale
+
+    cluster::cluster_params _this_params;
 
   }; //class ClusterParamsAlgNew
   

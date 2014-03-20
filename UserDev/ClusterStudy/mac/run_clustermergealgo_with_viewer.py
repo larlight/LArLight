@@ -1,9 +1,16 @@
 import sys, os, ROOT
 from ROOT import *
-gSystem.Load("libKalekoAna")
+gSystem.Load("libAnalysis")
 
 
-filename = "/Users/davidkaleko/Data/ShowerStudy/PDGID_11/shower_larlight_11.root"
+if len(sys.argv) != 2:
+    print
+    print "*** Improper usage. Usage: python viewclusters.py /path/to/input/file.root ***"
+    print
+
+
+filename = sys.argv[1]
+#filename = "/Users/davidkaleko/Data/ShowerStudy/PDGID_11/shower_larlight_11.root"
 
 
 my_proc = larlight.ana_processor()
@@ -18,7 +25,8 @@ larlight.storage_manager.get().set_data_to_read(larlight.DATA.UserInfo,False)
 
 my_proc.set_ana_output_file("")
 
-my_ana0 = larlight.ClusterMergeAlg()
+#my_ana0 = larlight.ClusterMergeAlg()
+my_ana0 = larreco.ClusterMergeAlg()
 my_ana= larlight.ClusterViewer()
 
 my_proc.add_process(my_ana0)

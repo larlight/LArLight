@@ -404,13 +404,27 @@ namespace larutil{
 					 Double_t timestart) const
   {
 	
-    return Get2Dslope(wireend-wirestart,timeend-timestart);
+    return GeometryUtilities::Get2Dslope((wireend-wirestart)*fWiretoCm,(timeend-timestart)*fTimetoCm);
   
   }
 
+   /////////////////////////////////////////////////////////
+  //Calculate 2D slope 
+  // in "cm" "cm" coordinates
+  /////////////////////////////////////////////////////////
+  double GeometryUtilities::Get2Dslope(larutil::PxPoint endpoint,
+					larutil::PxPoint startpoint) const
+  {
+    return Get2Dslope(endpoint.w-startpoint.w,endpoint.t-startpoint.t);
+  
+  }
+  
+  
+  
   /////////////////////////////////////////////////////////
   //Calculate 2D slope 
   // in wire time coordinates coordinates
+  // 
   /////////////////////////////////////////////////////////
   Double_t GeometryUtilities::Get2Dslope(Double_t dwire,
 					 Double_t dtime) const
@@ -433,9 +447,21 @@ namespace larutil{
 					 Double_t timestart) const
   {
 
-    return Get2Dangle(wireend-wirestart,timeend-timestart);
+    return Get2Dangle((wireend-wirestart)*fWiretoCm,(timeend-timestart)*fTimetoCm);
   
   }
+  
+  /////////////////////////////////////////////////////////
+  //Calculate 2D angle 
+  // in "cm" "cm" coordinates, endpoint and startpoint are assumed to be in cm/cm space
+  /////////////////////////////////////////////////////////
+  Double_t GeometryUtilities::Get2Dangle(larutil::PxPoint endpoint,
+		        larutil::PxPoint startpoint) const
+  {
+    return Get2Dangle(endpoint.w-startpoint.w,endpoint.t-startpoint.t);
+  
+  }
+			
   ////////////////////////////
   //Calculate 2D angle 
   // in "cm" "cm" coordinates
@@ -447,8 +473,8 @@ namespace larutil{
     Double_t BC,AC;
     Double_t omega;
  
-    BC = ((Double_t)dwire)*fWiretoCm; // in cm
-    AC = ((Double_t)dtime)*fTimetoCm; //in cm 
+    BC = ((Double_t)dwire); // in cm
+    AC = ((Double_t)dtime); //in cm 
     omega = std::asin(  AC/std::sqrt(pow(AC,2)+pow(BC,2)) );
     if(BC<0)  // for the time being. Will check if it works for AC<0
       { 
@@ -481,6 +507,14 @@ namespace larutil{
   
   }
 
+  
+   double GeometryUtilities::Get2DDistance(larutil::PxPoint point1,
+			  larutil::PxPoint point2) const	
+  {
+    return TMath::Sqrt( pow((point1.w-point2.w),2)+pow((point1.t-point2.t),2) );	
+  }
+
+  
   ////////////////////////////
   //Calculate 2D distance, using 2D angle 
   // in "cm" "cm" coordinates
@@ -538,6 +572,51 @@ namespace larutil{
     return 0;
   }
     
+    //////////////////////////////////
+  //Calculate wire,time coordinates of the Hit projection onto a line
+  //  all points are assumed to be in cm/cm space.
+  ///////////////////////////////////
+     int GeometryUtilities::GetPointOnLine(Double_t slope,
+		       larutil::PxPoint startpoint,
+		       larutil::PxPoint point1,
+		       larutil::PxPoint pointout) const
+	{
+	
+      double intercept=startpoint.t-slope*startpoint.w;  
+	  
+      
+     return GetPointOnLine(slope,intercept,point1,pointout);		 
+		  
+	}
+    
+    
+    ///////////////////////////////////
+  //Calculate wire,time coordinates of the Hit projection onto a line
+  //  all points assumed to be in cm/cm space.
+  ///////////////////////////////////
+  int GeometryUtilities::GetPointOnLine(double slope,
+					  double intercept,
+					  larutil::PxPoint point1,
+					  larutil::PxPoint pointout) const
+  {
+    double invslope=0;
+      
+    if(slope)	
+      {
+	invslope=-1./slope*fWireTimetoCmCm*fWireTimetoCmCm;
+      }
+  
+    double ort_intercept=point1.t-invslope*point1.w;
+    
+    if((slope-invslope)!=0)
+      pointout.w=(ort_intercept - intercept)/(slope-invslope); 
+    else
+      pointout.w=point1.w;
+    
+    pointout.t=slope*pointout.w+intercept;   
+    
+    return 0;
+  }
     
   ///////////////////////////////////
   //Calculate wire,time coordinates of the Hit projection onto a line
@@ -585,6 +664,33 @@ namespace larutil{
     return 0;  
   }    
 
+  
+  ///////////////////////////////////
+  //Calculate wire,time coordinates of the Hit projection onto a line
+  // slope should be in cm/cm space. PxPoint should be in cm/cm space.
+  ///////////////////////////////////
+  Int_t GeometryUtilities::GetPointOnLineWSlopes(double slope,
+						 double intercept,
+						 double ort_intercept,
+						 larutil::PxPoint &pointonline) const
+  {
+    Double_t invslope=0;
+  
+    if(slope)	
+	{
+		invslope=-1./slope;
+	}
+    
+    invslope*=fWireTimetoCmCm*fWireTimetoCmCm;
+  	
+    pointonline.w=(ort_intercept - intercept)/(slope-invslope); 
+    pointonline.t=slope*pointonline.w+intercept; 
+  
+    return 0;  
+  }    
+  
+  
+  
   ///////////////////////////////////
   //Find hit closest to wire,time coordinates
   // 
@@ -670,9 +776,9 @@ namespace larutil{
   
   
   //////////////////////////////////////////////////////////
-  Int_t GeometryUtilities::GetProjectedPoint(pxpoint p0, 
-					     pxpoint p1, 
-					     pxpoint &pN) const
+  Int_t GeometryUtilities::GetProjectedPoint(PxPoint p0, 
+					     PxPoint p1, 
+					     PxPoint &pN) const
   {
 
     //determine third plane number
@@ -708,8 +814,8 @@ namespace larutil{
 
 
   //////////////////////////////////////////////////////////
-  Int_t GeometryUtilities::GetYZ(pxpoint p0,
-				 pxpoint p1,
+  Int_t GeometryUtilities::GetYZ(PxPoint p0,
+				 PxPoint p1,
 				 Double_t* yz) const
   {
     Double_t y,z;
@@ -728,9 +834,9 @@ namespace larutil{
 
   //////////////////////////////////////////////////////////////
   
-  pxpoint GeometryUtilities::Get2DPointProjection(Double_t *xyz, Int_t plane) const{
+  PxPoint GeometryUtilities::Get2DPointProjection(Double_t *xyz, Int_t plane) const{
   
-    pxpoint pN(0,0,0);
+    PxPoint pN(0,0,0);
     
     Double_t pos[3];
     geom->PlaneOriginVtx(plane,pos);
@@ -891,7 +997,44 @@ namespace larutil{
       
     }
     
-  } 
+  }
+
+  void GeometryUtilities::SelectLocalHitlist(const std::vector<larutil::PxHit*>& hitlist, 
+					     std::vector <larutil::PxHit*> &hitlistlocal,
+					     larutil::PxHit& startHit,
+					     Double_t& linearlimit,   
+					     Double_t& ortlimit, 
+					     Double_t& lineslopetest,
+					     larutil::PxHit& averageHit) {
+
+    Double_t time_start= startHit.t;
+    Double_t wire_start= startHit.w;
+    Double_t locintercept=time_start-wire_start*lineslopetest;
+
+    Double_t timesum = 0;
+    UInt_t wiresum = 0;
+    for(size_t i=0; i<hitlist.size(); ++i) {
+
+      Double_t time = hitlist.at(i)->t;
+      UInt_t wire = hitlist.at(i)->w;
+      timesum += time;
+      wiresum += wire;
+
+      Double_t wonline=wire,tonline=time;
+      GetPointOnLine(lineslopetest,locintercept,wire,time,wonline,tonline);
+      
+      //calculate linear distance from start point and orthogonal distance from axis
+      Double_t lindist=Get2DDistance(wonline,tonline,wire_start,time_start);
+      Double_t ortdist=Get2DDistance(wire,time,wonline,tonline);
+      
+      if(lindist<linearlimit && ortdist<ortlimit)  hitlistlocal.push_back(hitlist.at(i));
+    }
+
+    averageHit.plane = startHit.plane;
+    averageHit.w = wiresum/hitlist.size();
+    averageHit.t = timesum/((Double_t) hitlist.size());
+  }
+  
 
 
 } // namespace

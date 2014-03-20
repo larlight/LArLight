@@ -5,10 +5,10 @@ from ROOT import *
 # Now import ana_processor & your class. For this example, ana_base.
 gSystem.Load("libAnalysis")
 
-#if len(sys.argv) != 2:
-#    print
-#    print "*** Improper usage. Usage: python viewclusters.py /path/to/input/file.root ***"
-#    print
+if len(sys.argv) != 2:
+    print
+    print "*** Improper usage. Usage: python viewclusters.py /path/to/input/file.root ***"
+    print
 
 
 filename = sys.argv[1]
@@ -41,7 +41,18 @@ c.Divide(2,3)
 
 c_graph=TCanvas("csub","Individual cluster start/end points",500,300)
 
-while my_proc.process_event() and my_proc.get_process_status() == my_proc.PROCESSING:
+#start on first event always
+user_input_evt_no = -1;
+
+while true:
+
+    try:
+        user_input_evt_no = input('Hit Enter to continue to next evt, or type in an event number to jump to that event:')
+    except SyntaxError:
+        user_input_evt_no = user_input_evt_no + 1
+
+    my_proc.process_event(user_input_evt_no)
+
     currentview = 0;
     #First fill the 6 pads on the main canvas with stuff
     for pad in xrange(1,7,2):
@@ -90,7 +101,5 @@ while my_proc.process_event() and my_proc.get_process_status() == my_proc.PROCES
             print "Drawing cluster %d out of %d for view %d. To look at the next cluster hit enter." % (iclus,my_ana.GetClusterGraph_Reco(int(iview),bool(true)).size()-1,iview+1)
             sys.stdin.readline()
 
-    print "Hit Enter to continue to next evt..."
-    sys.stdin.readline()
 
 # done!

@@ -37,6 +37,9 @@ namespace larlight {
     fMotherAngleU = fMotherAngleV = fMotherAngleW = DATA::INVALID_FLOAT;
     fDaughterTrackID.clear();
     fDaughterMomentum.clear();
+    fDaughterMomentum.resize(4,0);
+    fDaughterVtx.clear();
+    fDaughterVtx.resize(4,0);
     fDaughterTheta = fDaughterPhi = DATA::INVALID_DOUBLE;
     fDaughterAngleU = fDaughterAngleV = fDaughterAngleW = DATA::INVALID_FLOAT;
     fChargeU = fChargeV = fChargeW = 0;
@@ -61,6 +64,15 @@ namespace larlight {
     fMotherMomentum = mom;
   }
   
+  void mcshower::SetDaughterPosition(const std::vector<Float_t> &vtx)
+  {
+    if(vtx.size()!=4) {
+      Message::get()->send(MSG::ERROR,__FUNCTION__,"Input must have 4 dimension (x,y,z,t)!");
+      return;
+    }
+    fDaughterVtx = vtx;
+  }
+
   void mcshower::SetDaughterMomentum(const std::vector<Float_t> &mom)
   {
     if(mom.size()!=4) {

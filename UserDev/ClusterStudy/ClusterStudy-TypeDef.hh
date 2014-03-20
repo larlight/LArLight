@@ -8,14 +8,12 @@
 // Header files included here
 #include "cluster_info_struct.hh"
 #include "ClusterViewer.hh"
-#include "ClusterMerge.hh"
 #include "ShowerAngleCluster.hh"
 //ADD_NEW_HEADER ... do not change this line
 
 // Class forward declaration here
 namespace larlight {
   class ClusterViewer;
-  class ClusterMerge;
   class ShowerAngleCluster;
   //ADD_NEW_CLASS ... do not change this line
 }

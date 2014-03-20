@@ -28,7 +28,7 @@ namespace larlight {
   public:
 
     /// Default constructor
-    mcshower(DATA::DATA_TYPE type=DATA::MCShower);
+     mcshower(DATA::DATA_TYPE type=DATA::MCShower);
 
     /// Default destructor
     virtual ~mcshower(){}
@@ -37,6 +37,7 @@ namespace larlight {
     mcshower(const mcshower& origin) : data_base(origin),
 				       fMotherPDGID(origin.fMotherPDGID),
 				       fMotherTrackID(origin.fMotherTrackID),
+				       fMotherVtx(origin.fMotherVtx),
 				       fMotherMomentum(origin.fMotherMomentum),
 				       fMotherPhi(origin.fMotherPhi),
 				       fMotherTheta(origin.fMotherTheta),
@@ -44,6 +45,7 @@ namespace larlight {
 				       fMotherAngleV(origin.fMotherAngleV),
 				       fMotherAngleW(origin.fMotherAngleW),
 				       fDaughterTrackID(origin.fDaughterTrackID),
+				       fDaughterVtx(origin.fDaughterVtx),
 				       fDaughterMomentum(origin.fDaughterMomentum),
                                        fDaughterPhi(origin.fDaughterPhi),
                                        fDaughterTheta(origin.fDaughterTheta),
@@ -68,10 +70,10 @@ namespace larlight {
     UInt_t MotherTrackID() const { return fMotherTrackID; }
 
     /// Shower mother's start point position
-    const std::vector<Double_t>& MotherPosition() { return fMotherVtx;      }
+    const std::vector<Double_t>& MotherPosition() const { return fMotherVtx;      }
 
     /// Shower mother's start point momentum
-    const std::vector<Double_t>& MotherMomentum() { return fMotherMomentum; }
+    const std::vector<Double_t>& MotherMomentum() const { return fMotherMomentum; }
 
     /// Shower mother's 3D angle in conventional definition (not ordinary 3D coord. system)
     void MotherAngle3D (Double_t &phi, Double_t &theta) const
@@ -83,6 +85,10 @@ namespace larlight {
     /// Array of daughters' track ID
     const std::vector<UInt_t>&  DaughterTrackID() const
     { return fDaughterTrackID; }
+
+    /// (x,y,z,dE) vector as a weighted average of daughters' energy deposition points
+    const std::vector<Float_t>& DaughterPosition() const
+    { return fDaughterVtx; }
 
     /// (x,y,z,dE) vector as a weighted average of daughters' energy deposition points
     const std::vector<Float_t>& DaughterMomentum() const
@@ -98,6 +104,11 @@ namespace larlight {
     /// Charge deposited by daughters per plane
     Float_t Charge(const GEO::View_t view) const;
 
+    /// Dauighter Charge Deposition Points
+    const std::vector<std::vector<Float_t> >& DaughterPoints() const
+    { return fEdepVtx; }
+    
+
     //--- Setters ---//
 
     void SetMotherID(Int_t pdgid, UInt_t trackid)
@@ -109,14 +120,16 @@ namespace larlight {
     void SetMotherPoint(const std::vector<Double_t> &vtx);
 
     void SetMotherMomentum(const std::vector<Double_t> &mom);
+
+    void SetDaughterPosition(const std::vector<Float_t> &vtx);
+
+    void SetDaughterMomentum(const std::vector<Float_t> &mom);
     
     void SetDaughterTrackList(const std::vector<UInt_t> &list)
     { fDaughterTrackID = list; }
 
     void SetDaughterAngles(Double_t phi, Double_t theta, Double_t u, Double_t v, Double_t w)
     { fDaughterPhi = phi; fDaughterTheta = theta; fDaughterAngleU = u; fDaughterAngleV = v; fDaughterAngleW = w; }
-
-    void SetDaughterMomentum(const std::vector<Float_t> &mom);
 
     void SetPlaneCharge(Float_t qU, Float_t qV, Float_t qW)
     { fChargeU = qU; fChargeV = qV; fChargeW = qW; }
@@ -145,6 +158,7 @@ namespace larlight {
 
     //---- Daughter info ----//
     std::vector<UInt_t>  fDaughterTrackID;  ///< Daughters' track ID
+    std::vector<Float_t> fDaughterVtx;      ///< Daughters' deposit point closest to the mother vtx
     std::vector<Float_t> fDaughterMomentum; ///< Daughters' deposit sum momentum 4-vector
     /// daughter 3D angle phi (along shower angle definition, not ordinary coord. system)
     Float_t fDaughterPhi;
@@ -166,7 +180,7 @@ namespace larlight {
     std::vector<std::vector<Float_t> > fEdepVtx;
 
     ////////////////////////
-    ClassDef(mcshower,1)
+    ClassDef(mcshower,2)
     ////////////////////////
       
   };

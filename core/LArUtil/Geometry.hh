@@ -229,6 +229,8 @@ namespace larutil {
     
     virtual bool ReadTree();
 
+    void ComputeData();
+
     virtual void ClearData();
 
   private:
@@ -242,8 +244,12 @@ namespace larutil {
     std::vector<larlight::GEO::SigType_t> fSignalType;
     std::vector<larlight::GEO::View_t>    fViewType;
     std::vector<Double_t> fPlanePitch;
-    std::vector<std::vector<Double_t> > fFirstWireStartVtx;
-    std::vector<std::vector<Double_t> > fFirstWireEndVtx;
+    //std::vector<std::vector<Double_t> > fFirstWireStartVtx;
+    //std::vector<std::vector<Double_t> > fFirstWireEndVtx;
+
+    std::vector<std::vector<std::vector<Double_t > > > fWireStartVtx;
+    std::vector<std::vector<std::vector<Double_t > > > fWireEndVtx;
+
     std::vector<std::vector<Double_t> > fPlaneOriginVtx;
 
     // Vectors with length = view
@@ -252,6 +258,10 @@ namespace larutil {
 
     std::vector<std::vector<Float_t> > fOpChannelVtx;
 
+    //--- Variables to be computd based on TTree data ---//
+    std::vector<Double_t> fOrthVectorsY;
+    std::vector<Double_t> fOrthVectorsZ;
+    std::vector<Double_t> fFirstWireProj;
   };
 }
 
