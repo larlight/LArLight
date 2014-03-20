@@ -48,7 +48,8 @@ namespace cluster {
       pxhits.push_back(larutil::PxHit());
       (*pxhits.rbegin()).w = hits->at(index).Wire();
       (*pxhits.rbegin()).t = hits->at(index).PeakTime();
-      (*pxhits.rbegin()).plane = plane;
+      (*pxhits.rbegin()).charge = hits->at(index).Charge();
+      (*pxhits.rbegin()).plane  = plane;
 
       hHit.at(plane)->Fill(hits->at(index).Wire(), hits->at(index).PeakTime(), hits->at(index).Charge());
 
