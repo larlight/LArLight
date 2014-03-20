@@ -38,8 +38,8 @@ namespace cluster{
   }
 
 
-//Calculate opening angle
-double cluster::ClusterRecoUtil::getOpeningAngle(std::vector<larutil::PxHit> rough_start_point,std::vector<larutil::PxHit> rough_end_point, std::vector<larutil::PxHit> hits){
+  //Calculate opening angle
+  double ClusterParamsAlgNew::GetOpeningAngle(larutil::PxPoint rough_start_point,larutil::PxPoint rough_end_point, std::vector<larutil::PxHit> & hits){
 
   double start_hit  ;
   double start_end_w = rough_start_point.w - rough_end_point.w;
@@ -49,7 +49,7 @@ double cluster::ClusterRecoUtil::getOpeningAngle(std::vector<larutil::PxHit> rou
   double angle_hit_axis ;
   double opening_angle ;
   int    Integral = 0;
-  std::vector<larutil::PxHit> binning_vector (100,0) ;
+  std::vector<int> binning_vector(100,0 ) ;
   start_end_start_hit = sqrt(pow(start_end_w,2)+ pow(start_end_t,2));
 
   for(auto & hit:hits){
@@ -62,13 +62,14 @@ double cluster::ClusterRecoUtil::getOpeningAngle(std::vector<larutil::PxHit> rou
     binning_vector[N_bins]++;
   }
 
-  int iBin = 1;
-  for(;percentage<= 0.95; iBin++)
-    {
-      percentage += binning_vector[iBin]/cluster_params::N_Hits ;
-    }
+  int iBin(0);
+  double percentage(0.0);
+  for(iBin = 1;percentage<= 0.95; iBin++)
+  {
+    percentage += binning_vector[iBin]/(_this_params.N_Hits) ;
+  }
 
-opening_angle = iBin * PI /100 ;
+  opening_angle = iBin * PI /100 ;
 
   return opening_angle;
 }
@@ -590,7 +591,8 @@ for( unsigned int k=0; k < closehits.size(); k++){
     // need to define physical direction with openind angles and pass that to Ryan's line finder.
  
     
-  _this_params.opening_angle = getOpeningAngle(rough_start_point, rough_end_point, hits);
+    _this_params.opening_angle = GetOpeningAngle(rough_begin_point,
+                                                 rough_end_point, hitVector);
                                                                                                     
     // rough_end_point
     // rough_end_point

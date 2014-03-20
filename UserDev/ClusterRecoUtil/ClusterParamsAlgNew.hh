@@ -101,6 +101,7 @@ namespace cluster {
      */
     void GetProfileInfo(bool override=false);
 
+
     /**
      * Calculates the following variables:
      * length
@@ -120,7 +121,11 @@ namespace cluster {
     void GetFinalSlope(bool override=false);    
 
     void RefineDirection(larutil::PxPoint &start,
-			 larutil::PxPoint &end);
+                         larutil::PxPoint &end);
+
+    double GetOpeningAngle(larutil::PxPoint rough_start_point,
+                           larutil::PxPoint rough_end_point,
+                           std::vector<larutil::PxHit> & hits);
 
   protected:
     std::vector<larutil::PxHit> hitVector;         // This vector holds the wrapped up hit list
