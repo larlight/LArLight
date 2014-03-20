@@ -587,7 +587,7 @@ for( unsigned int k=0; k < closehits.size(); k++){
   
   
   void ClusterParamsAlgNew::RefineDirection(larutil::PxPoint &start,
-              larutil::PxPoint &end) {
+					    larutil::PxPoint &end) {
     
     UChar_t plane = (*hitVector.begin()).plane;
 
@@ -659,11 +659,8 @@ for( unsigned int k=0; k < closehits.size(); k++){
 
     
     //if(rms_forward / mean_forward < rms_backward / mean_backward)
-    if(mean_forward > mean_backward && rms_forward < rms_backward)
-      std::cout<<"Right Direction"<<std::endl;
-    else
-      std::cout<<"Wrong Direction"<<std::endl;
-    
+    if(mean_forward > mean_backward && rms_forward < rms_backward) return;
+    std::swap(start,end);
   }
   
   

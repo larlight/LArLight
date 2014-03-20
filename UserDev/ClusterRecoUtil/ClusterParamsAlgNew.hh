@@ -122,7 +122,7 @@ namespace cluster {
     void RefineDirection(larutil::PxPoint &start,
 			 larutil::PxPoint &end);
 
-  private:
+  protected:
     std::vector<larutil::PxHit> hitVector;         // This vector holds the wrapped up hit list
  
     larutil::GeometryUtilities  *gser;
