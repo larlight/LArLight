@@ -17,6 +17,7 @@
 
 #include "PxUtils.h"
 #include "ClusterParams.hh"
+#include "RecoUtilException.hh"
 
 #include <vector>
 
@@ -31,7 +32,13 @@ namespace cluster {
 
   public:
 
-    ClusterParamsAlgNew(std::vector<larutil::PxHit>);
+    ClusterParamsAlgNew();
+
+    ClusterParamsAlgNew(const std::vector<larutil::PxHit>&);
+
+    void Initialize();
+
+    void SetHits(const std::vector<larutil::PxHit>&);
 
     /**                                                                             
      * Runs all the functions which calculate cluster params                        

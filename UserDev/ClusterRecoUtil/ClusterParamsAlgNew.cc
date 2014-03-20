@@ -10,14 +10,49 @@
 
 namespace cluster{
 
-  ClusterParamsAlgNew::ClusterParamsAlgNew(std::vector<larutil::PxHit> inhitlist){
+  ClusterParamsAlgNew::ClusterParamsAlgNew()
+  {
+    Initialize();
+  }
+
+  ClusterParamsAlgNew::ClusterParamsAlgNew(const std::vector<larutil::PxHit> &inhitlist){
+    Initialize();
+    SetHits(inhitlist);
+  }
+
+  void ClusterParamsAlgNew::SetHits(const std::vector<larutil::PxHit> &inhitlist){
 
     // Make default values
-    // Is done by the struct    
+    // Is done by the struct
     hitVector=inhitlist;
-    fplane=hitVector[0].plane;
-    // Make sure TPrincipal is initialized:
-    principal = new TPrincipal(2);
+    if(!(hitVector.size())) {
+      throw RecoUtilException("Provided empty hit list!");
+      return;
+    }
+    fplane=hitVector.at(0).plane;
+
+  }
+
+  void ClusterParamsAlgNew::Initialize()
+  {
+    // Clear hit vector
+    hitVector.clear();
+
+    // Set pointer attributes
+    if(!principal) principal = new TPrincipal(2);    
+    if(!gser) gser = (larutil::GeometryUtilities*)(larutil::GeometryUtilities::GetME());
+    if(!detp) detp = (larutil::DetectorProperties*)(larutil::DetectorProperties::GetME());
+    if(!geo)  geo  = (larutil::Geometry*)(larutil::Geometry::GetME());
+    if(!larp) larp = (larutil::LArProperties*)(larutil::LArProperties::GetME());
+
+
+    //--- Initilize attributes values ---//
+    fWire2Cm.resize(geo->Nplanes(),0);
+    for(size_t i=0; i<fWire2Cm.size(); ++i)
+      fWire2Cm.at(i) = geo->WirePitch(0,1,(UChar_t)i);
+
+    fTime2Cm = (detp->SamplingRate()/1.e3);
+    fTime2Cm *= (larp->DriftVelocity(larp->Efield(),larp->Temperature()));
 
     finished_GetAverages       = false;
     finished_GetRoughAxis      = false;
@@ -41,22 +76,7 @@ namespace cluster{
     fChargeCutoffThreshold[0]=500;
     fChargeCutoffThreshold[1]=500;
     fChargeCutoffThreshold[2]=1000;
-    
-    gser = (larutil::GeometryUtilities*)(larutil::GeometryUtilities::GetME());
-    detp = (larutil::DetectorProperties*)(larutil::DetectorProperties::GetME());
-    geo  = (larutil::Geometry*)(larutil::Geometry::GetME());
-    larp = (larutil::LArProperties*)(larutil::LArProperties::GetME());
-
-    fWire2Cm.resize(geo->Nplanes(),0);
-    for(size_t i=0; i<fWire2Cm.size(); ++i)
-      fWire2Cm.at(i) = geo->WirePitch(0,1,(UChar_t)i);
-
-    fTime2Cm = (detp->SamplingRate()/1.e3);
-    fTime2Cm *= (larp->DriftVelocity(larp->Efield(),larp->Temperature()));
-
   }
-  
-
 
   void ClusterParamsAlgNew::FillParams(bool override_DoGetAverages      ,  
 				       bool override_DoGetRoughAxis     ,  
