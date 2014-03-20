@@ -11,5 +11,7 @@
 
 #pragma link C++ class cluster::ClusterParamsAlgNew+;
 #pragma link C++ class cluster::cluster_params+;
+#pragma link C++ class ClusterParamsExecutor+;
 //ADD_NEW_CLASS ... do not change this line
 #endif
+
