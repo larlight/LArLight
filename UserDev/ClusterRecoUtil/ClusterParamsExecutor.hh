@@ -15,7 +15,8 @@
 #define CLUSTERPARAMSEXECUTOR_HH
 
 #include "ana_base.hh"
-
+#include "ClusterParamsAlgNew.hh"
+#include "Geometry.hh"
 namespace cluster {
   
   /**
@@ -42,6 +43,8 @@ namespace cluster {
   protected:
 
     larlight::DATA::DATA_TYPE _in_cluster_type;
+
+    ClusterParamsAlgNew fCParAlg;
     
   };
 
