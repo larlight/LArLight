@@ -196,6 +196,14 @@ namespace larutil{
 			    Double_t ortlimit, 
 			    Double_t lineslopetest);
 	
+    void SelectLocalHitlist(const std::vector<larutil::PxHit*>& hitlist, 
+			    std::vector <larutil::PxHit*> &hitlistlocal_index,
+			    larutil::PxHit startHit,
+			    Double_t linearlimit,   
+			    Double_t ortlimit, 
+			    Double_t lineslopetest,
+			    larutil::PxHit& averageHit);
+
    Double_t TimeToCm() {return fTimetoCm;};
    Double_t WireToCm() {return fWiretoCm;};			     
     
