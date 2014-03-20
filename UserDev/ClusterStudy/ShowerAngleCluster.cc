@@ -16,7 +16,9 @@ namespace larlight{
     larp = (larutil::LArProperties*)(larutil::LArProperties::GetME());
     detp = (larutil::DetectorProperties*)(larutil::DetectorProperties::GetME());
     gser = (larutil::GeometryUtilities*)(larutil::GeometryUtilities::GetME());
+    fCMergeAlg = 0;
     this->reconfigure();
+    
   }
 
   void ShowerAngleCluster::reconfigure()
@@ -25,7 +27,7 @@ namespace larlight{
     fCParAlg.reconfigure();
     fExternalStartPoints = false;
     fMinHitListSize = 15;
-
+    if(!fCMergeAlg) fCMergeAlg = new larreco::ClusterMergeAlg();
   }
 
   void ShowerAngleCluster::SetInputClusterType(DATA::DATA_TYPE type)
@@ -50,6 +52,12 @@ namespace larlight{
     fTimeTick=detp->SamplingRate()/1000.; 
     
     fh_omega_single= new TH1F("fh_omega_single","Theta distribution Hit",720,-180., 180.);
+
+    fCMergeAlg->set_verbosity(this->get_verbosity());
+    fCMergeAlg->initialize();
+    //    fCMergeAlg->SetAngleCut(99999.);
+    //    fCMergeAlg->SetSquaredDistanceCut(999999.);
+    fCMergeAlg->SetQTotalCut(0.);
     return true;
   }
   
@@ -58,6 +66,7 @@ namespace larlight{
     // Get an input cluster 
     auto clusters = (const event_cluster*)(storage->get_data(_in_cluster_type));
 
+    std::cout<<"in showeranglecluster, just got event_cluster collection... there are "<<clusters->size()<<" clusters."<<std::endl;
     // Check if it is valid. If not, return false
     if(!clusters) {
       
@@ -84,6 +93,13 @@ namespace larlight{
     auto out_clusters = (event_cluster*)(storage->get_data(DATA::ShowerAngleCluster));
     out_clusters->clear();
 
+
+    std::vector<larlight::cluster> localvec(0,larlight::cluster());
+    localvec.clear();
+    std::vector<larlight::cluster> secondlocalvec(0,larlight::cluster());
+    localvec.clear();
+
+
     // Prepare attribute vectors (clear & resize std::vector)
     ClearandResizeVectors(clusters->size());
 
@@ -99,7 +115,7 @@ namespace larlight{
       larlight::cluster out_cl(MainClusterLoop(clusters->at(iClust), 
 					       cl_hits, 
 					       iClust, 
-					       out_clusters->size())
+					       localvec.size())
 			       );
 
       if( fCParAlg.isShower(lineslopetest[iClust],
@@ -110,12 +126,105 @@ namespace larlight{
 			    cl_hits) 
 	  ) {
 	
-	out_cl.add_association(hit_type,cl_hits_index);
-	out_clusters->push_back(out_cl);
-      }      
-    }
-    out_clusters->set_event_id(clusters->event_id());
+	
+	//now that the cluster is shower-like, run the merging alg, which
+	//returns a vector saying which clusters should be merged
 
+	//here, push back to a local vector, later run that vector through mergealg to reduce it
+	out_cl.add_association(hit_type,cl_hits_index);
+
+	localvec.push_back(out_cl);	
+      }
+    }
+     
+    fCMergeAlg->ClearEventInfo();
+    
+    std::cout<<"putting in "<<localvec.size()<<" localvec clusters!"<<std::endl;
+
+    for(size_t i_lv = 0; i_lv < localvec.size(); ++i_lv)
+	fCMergeAlg->AppendClusterInfo(localvec[i_lv],hits);
+
+    fCMergeAlg->ProcessMergeAlg();
+    
+    const std::vector<std::vector<unsigned int> > cluster_sets = fCMergeAlg->GetClusterSets();
+    std::cout<<"got back "<<cluster_sets.size()<<" groups of clusters to be merged together"<<std::endl;
+
+
+    //hit associations for future merged clusters
+    std::vector<unsigned short> merged_hit_ass;
+
+    //loop over cluster sets vector to determine cluster IDs to merge
+    for(auto const& cluster_id_set : cluster_sets) {
+    
+      //don't i need to clear merged_hit_ass here? this isn't done in ClusterMerge
+      merged_hit_ass.clear();
+
+      //declare output cluster
+      cluster merged_cluster(clusters->data_type());
+
+      GEO::View_t view = GEO::kUnknown;
+      
+      for(auto const& cluster_id : cluster_id_set) {
+	
+	const cluster i_cluster = clusters->at(cluster_id);
+	
+	std::vector<unsigned short> hit_index;
+
+	hit_index = i_cluster.association(hit_type);
+
+	for(auto const& index : hit_index)
+	  
+	  merged_hit_ass.push_back(index);      
+      
+        if(view == GEO::kUnknown) view = clusters->at(cluster_id).View();
+	
+      } //end looping over original clusters to be merged
+  
+    
+      merged_cluster.add_association(hit_type,merged_hit_ass);
+      
+      merged_cluster.set_charge(-1);
+      merged_cluster.set_dtdw(-1);
+      merged_cluster.set_dtdw_err(-1);
+      merged_cluster.set_dqdw(-1);
+      merged_cluster.set_dqdw_err(-1);
+      merged_cluster.set_id(out_clusters->size());
+      merged_cluster.set_view(view);
+    
+      std::vector<double> whatever(2,-1);
+      
+      merged_cluster.set_start_vtx(whatever);
+      merged_cluster.set_start_vtx_err(whatever);
+      merged_cluster.set_end_vtx(whatever);
+      merged_cluster.set_end_vtx_err(whatever);
+      //    merged_cluster.set_event_id(clusters->event_id());
+      
+      secondlocalvec.push_back(merged_cluster);
+
+    }
+  
+    
+    
+      //now loop over secondlocalvec and run merged clusters through MainClusterLoop again
+    for(size_t iClust=0; iClust<secondlocalvec.size(); ++iClust) {
+      const std::vector<UShort_t> merged_cl_hits_index(secondlocalvec[iClust].association(hit_type));
+      std::vector<larlight::hit*> merged_cl_hits;
+      merged_cl_hits.reserve(merged_cl_hits_index.size());
+      for(auto index: merged_cl_hits_index)
+	merged_cl_hits.push_back(&(hits->at(index)));
+      larlight::cluster merged_out_cl(MainClusterLoop(secondlocalvec[iClust],
+						      merged_cl_hits,
+						      iClust,
+						      out_clusters->size()) //not sure what this out_clusters->size() is for
+				      );
+
+      //do i need to ask if isShower again?
+
+      out_clusters->push_back(merged_out_cl);
+    }  
+    //now out_clusters is saved by storage manager automatically 
+    
+    std::cout<<"in the end, i am left with "<< out_clusters->size() <<" merged clusters."<<std::endl;
     return true;
   }
 
