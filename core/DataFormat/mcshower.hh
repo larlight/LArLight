@@ -28,7 +28,7 @@ namespace larlight {
   public:
 
     /// Default constructor
-    mcshower(DATA::DATA_TYPE type=DATA::MCShower);
+     mcshower(DATA::DATA_TYPE type=DATA::MCShower);
 
     /// Default destructor
     virtual ~mcshower(){}
@@ -55,7 +55,7 @@ namespace larlight {
                                        fChargeU(origin.fChargeU),
                                        fChargeV(origin.fChargeV),
                                        fChargeW(origin.fChargeW),
-                                       fEdepVtx(origin.fEdepVtx)
+                                       fEdepVtxp(origin.fEdepVtxp)
     {}
 
     /// Clear method
@@ -103,6 +103,11 @@ namespace larlight {
 
     /// Charge deposited by daughters per plane
     Float_t Charge(const GEO::View_t view) const;
+
+    /// Dauighter Charge Deposition Points
+    const std::vector<std::vector<Float_t> >& DaughterPoints() const
+    { return fEdepVtxp; }
+    
 
     //--- Setters ---//
 
@@ -172,7 +177,7 @@ namespace larlight {
     Float_t fChargeW; ///< Charge deposit on W plane
 
     /// Charge deposition points
-    std::vector<std::vector<Float_t> > fEdepVtx;
+    std::vector<std::vector<Float_t> > fEdepVtxp;
 
     ////////////////////////
     ClassDef(mcshower,2)
