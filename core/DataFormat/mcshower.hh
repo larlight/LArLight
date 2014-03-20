@@ -55,7 +55,7 @@ namespace larlight {
                                        fChargeU(origin.fChargeU),
                                        fChargeV(origin.fChargeV),
                                        fChargeW(origin.fChargeW),
-                                       fEdepVtxp(origin.fEdepVtxp)
+                                       fEdepVtx(origin.fEdepVtx)
     {}
 
     /// Clear method
@@ -106,7 +106,7 @@ namespace larlight {
 
     /// Dauighter Charge Deposition Points
     const std::vector<std::vector<Float_t> >& DaughterPoints() const
-    { return fEdepVtxp; }
+    { return fEdepVtx; }
     
 
     //--- Setters ---//
@@ -177,7 +177,7 @@ namespace larlight {
     Float_t fChargeW; ///< Charge deposit on W plane
 
     /// Charge deposition points
-    std::vector<std::vector<Float_t> > fEdepVtxp;
+    std::vector<std::vector<Float_t> > fEdepVtx;
 
     ////////////////////////
     ClassDef(mcshower,2)
