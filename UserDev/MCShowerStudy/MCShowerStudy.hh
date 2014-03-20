@@ -54,27 +54,40 @@ namespace larlight {
     virtual bool finalize();
 
     //getter for the tree holding figures of merit
-    TTree* GetMCClusTree() const {return _mcclus_tree;}
+    TTree* GetMCShowerTree() const {return _mcshower_tree;}
 
+    void SetUseRefineDirection(bool flag) {_refine_direction = flag;}
+   
     protected:
 
     void PrepareTTree();
 
     void ClearTTreeVars();
 
-    bool RefineDirectionTest(event_cluster* ev_cluster, event_mcshower* ev_mcshower);
+    bool RefineDirectionTest(storage_manager* storage, event_cluster* ev_cluster, event_mcshower* ev_mcshower);
     
-
-
-    TTree* _mcclus_tree;
+    TTree* _mcshower_tree;
 
 
     //this i should get from geometry service but didn't find immediately
     double _wire_2_cm;
     double _time_2_cm;
 
+    //whether you want to refine_direction before calculating figure of merit,
+    //or whether you want to disable refine_direction (to compare to... like a control group)
+    //default is false
+    bool _refine_direction = false;
+
     // variables that go into the analysis ttree
     std::vector<double> _refinestartend_FOM;
+
+    
+    
+    //stuff temporarily necessary for refine_direction test
+    void RefineStartPointsShowerShape(Double_t &start_wire, Double_t &start_time, Double_t &end_wire, Double_t &end_time, const std::vector<larlight::hit> &in_hit_v);
+
+    TH1F *_hit_angles_forwards;
+    TH1F *_hit_angles_backwards;
 
   };
 }

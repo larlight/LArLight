@@ -14,7 +14,17 @@ namespace larlight {
     // here is a good place to create one on the heap (i.e. "new TH1D"). 
     //
 
-    _mcclus_tree = 0;
+    //temporary
+    _hit_angles_forwards = 0;
+    _hit_angles_backwards = 0;
+    if(!_hit_angles_forwards)
+      _hit_angles_forwards = new TH1F("_hit_angles_forwards","_hit_angles_forwards",100,-1.,1.);
+    if(!_hit_angles_backwards)
+      _hit_angles_backwards = new TH1F("_hit_angles_backwards","_hit_angles_backwards",100,-1.,1.);      
+    //end temporary
+
+
+    _mcshower_tree = 0;
     PrepareTTree();
 
     //setting variables that i should be getting from geometry service...
@@ -60,13 +70,13 @@ namespace larlight {
     //***********************************************************//
 
     //kaleko testing how well his refine-direction works
-    RefineDirectionTest(ev_cluster, ev_mcshower);
+    RefineDirectionTest(storage, ev_cluster, ev_mcshower);
     
 
 
 
     //fill TTree (make sure all variables going into it are defined in this scope)
-    if(_mcclus_tree) _mcclus_tree->Fill();
+    if(_mcshower_tree) _mcshower_tree->Fill();
   
   
     return true;
@@ -90,8 +100,8 @@ namespace larlight {
     if(_fout) {
 
       _fout->cd();
-      if(_mcclus_tree)
-	_mcclus_tree->Write();
+      if(_mcshower_tree)
+	_mcshower_tree->Write();
 
     }
     else 
@@ -104,9 +114,9 @@ namespace larlight {
   void MCShowerStudy::PrepareTTree() {
     //define branches on your ttree here for your calculated parameters
 
-    if(!_mcclus_tree) {
-      _mcclus_tree = new TTree("mcclus_tree","");
-      _mcclus_tree->Branch("refinestartend_FOM", "std::vector<double>", &_refinestartend_FOM);
+    if(!_mcshower_tree) {
+      _mcshower_tree = new TTree("mcshower_tree","");
+      _mcshower_tree->Branch("refinestartend_FOM", "std::vector<double>", &_refinestartend_FOM);
     }
 
 
@@ -117,9 +127,8 @@ namespace larlight {
 
   }
 
-
   
-  bool MCShowerStudy::RefineDirectionTest(larlight::event_cluster* ev_cluster, larlight::event_mcshower* ev_mcshower){
+  bool MCShowerStudy::RefineDirectionTest(storage_manager* storage, larlight::event_cluster* ev_cluster, larlight::event_mcshower* ev_mcshower){
     
     //for multi shower events, can use bryce's code that matches reco clusters with showers.. 
     //demand that 90% of the hits in my reco shower came from one MC shower, then use that MC shower for the comparison
@@ -146,8 +155,7 @@ namespace larlight {
     
     //loop over MCShowers in the event (there should only be one, for now)
     for(auto i_mcshower: *ev_mcshower){
-      
-      //check to make sure i'm choosing the right 3 out of the 4 vector
+
       Double_t pos[3]={0.};
       pos[0]=i_mcshower.MotherPosition()[0];
       pos[1]=i_mcshower.MotherPosition()[1];
@@ -164,10 +172,11 @@ namespace larlight {
 
       //debugging stuff
       std::ostringstream msg;
-      msg << Form("Motherposition of MCShower is (%f,%f,%f).\n",
+      msg << Form("Motherposition of MCShower is (%f,%f,%f,%f).\n",
 		  i_mcshower.MotherPosition()[0],
 		  i_mcshower.MotherPosition()[1],
-		  i_mcshower.MotherPosition()[2]);
+		  i_mcshower.MotherPosition()[2],
+		  i_mcshower.MotherPosition()[3]);
       
       msg << Form("This MCShower's start (wire,time) on view0 is (%f,%f)\n",
 		  mother_sw_view[0].w,mother_sw_view[0].t);
@@ -180,25 +189,69 @@ namespace larlight {
                
     }
 
+
     
-    //loop over reconstructed clusters in the event (there should only be three, for now)
+
+
+
     //debugging stuff
     std::ostringstream msg;
     
+    //loop over reconstructed clusters in the event (there should only be three, for now)    
     for(auto const i_cluster: *ev_cluster){
-
-      int iview = (int)i_cluster.View();
       
+      int iview = (int)i_cluster.View();
+            
+      Double_t start_wire = i_cluster.StartPos()[0];
+      Double_t start_time = i_cluster.StartPos()[1];
+      Double_t end_wire = i_cluster.EndPos()[0];
+      Double_t end_time = i_cluster.EndPos()[1];
+	      
+      
+      //if you want to run the refine direction function
+      if(_refine_direction){
+	print(larlight::MSG::DEBUG,__FUNCTION__,Form("Heads up! You're using refine_direction function!"));
+	DATA::DATA_TYPE hit_type = ev_cluster->get_hit_type();
+
+	//you need the hits for this function
+	larlight::event_hit* ev_hits = (event_hit*)storage->get_data(hit_type);
+
+	if(!ev_hits) {
+	  print(larlight::MSG::ERROR,__FUNCTION__,Form("Did not find specified data product, Hits!"));
+	  return false;
+	}
+
+	//list of the hits's indicies associated with this cluster
+	std::vector<unsigned short> hit_index(i_cluster.association(hit_type));
+	
+	//vector to hold these actual hits
+	std::vector<larlight::hit> hits(hit_index.size());
+	
+	//pushing back the actual hits into the containter
+	for(auto const &index : hit_index)
+	  hits.push_back(ev_hits->at(index));
+
+	//this function should edit start_wire, start_time etc, flipping stuff when necessary
+	RefineStartPointsShowerShape(start_wire,start_time,end_wire,end_time,hits);
+
+
+      }//end if you want to use refine direction function
+
+
+
+
+
+  
       double dw1, dt1, da1, db1, dw2, dt2, da2, db2;
       //calculate start/end refining figure of merit for this cluster
-      dw1 = mother_sw_view[iview].w - i_cluster.StartPos()[0];
-      dt1 = mother_sw_view[iview].t - i_cluster.StartPos()[1];
+      dw1 = mother_sw_view[iview].w - start_wire;
+      dt1 = mother_sw_view[iview].t - start_time;
 
       da1 = dw1 * _wire_2_cm;
       db1 = dt1 * _time_2_cm;
 
-      dw2 = mother_sw_view[iview].w - i_cluster.EndPos()[0];
-      dt2 = mother_sw_view[iview].t - i_cluster.EndPos()[1];
+      dw2 = mother_sw_view[iview].w - end_wire;
+      dt2 = mother_sw_view[iview].t - end_time;
 
       da2 = dw2 * _wire_2_cm;
       db2 = dt2 * _time_2_cm;
@@ -210,7 +263,7 @@ namespace larlight {
 
       //debugging stuff
       msg << Form("This cluster's start (wire,time) on view %d is (%f,%f)\n",
-		  iview, i_cluster.StartPos()[0], i_cluster.StartPos()[1]);
+		  iview, start_wire, start_time);
       msg << Form("So, the _refinestartend_FOM value is %f", myFOM);
 
     }
@@ -221,6 +274,76 @@ namespace larlight {
     
  
   }
+  
+  
+  //for now, hand-copying this function from the merge alg until kazu implements it in showercluster
+  void MCShowerStudy::RefineStartPointsShowerShape(Double_t &start_wire, Double_t &start_time, 
+						   Double_t &end_wire, Double_t &end_time,
+						   const std::vector<larlight::hit> &in_hit_v){
+    //assuming start/endpoint are correct, make histogram of angles between
+    //individual hits and the vector pointing from start to end point
+    _hit_angles_forwards -> Reset();
+    _hit_angles_backwards-> Reset();
+    
+    double clus_q = 0;
+    
+    double cosangle = 99999999.;
+    
+    //vector from start point to end point is SEPvec
+    //vector from start point to hit is SHITvec ;)
+    
+    //loop over hits
+    for(auto const i_hit: in_hit_v){
+      clus_q += i_hit.Charge();
+      
+      double SEP_x  = (end_wire      - start_wire) * _wire_2_cm;
+      double SEP_y  = (end_time      - start_time) * _time_2_cm;
+      double SHIT_x = (i_hit.Wire()     - start_wire) * _wire_2_cm;
+      double SHIT_y = (i_hit.PeakTime() - start_time) * _time_2_cm;    
+      
+      cosangle = ( SEP_x*SHIT_x + SEP_y*SHIT_y );
+      cosangle = cosangle / (
+			     pow( pow(SEP_x,2)+ pow(SEP_y,2) ,0.5) *
+			     pow( pow(SHIT_x,2)+pow(SHIT_y,2),0.5)
+			     );
+      
+      _hit_angles_forwards->Fill(cosangle,i_hit.Charge());
+      
+      //now switch the vector to be from end point to start point and re-do
+      SEP_x  = (start_wire    - end_wire) * _wire_2_cm;
+      SEP_y  = (start_time    - end_time) * _time_2_cm;
+      SHIT_x = (i_hit.Wire()     - end_wire) * _wire_2_cm;
+      SHIT_y = (i_hit.PeakTime() - end_time) * _time_2_cm;        
+      
+      cosangle = ( SEP_x*SHIT_x + SEP_y*SHIT_y );
+      cosangle = cosangle / (
+			     pow( pow(SEP_x,2)+ pow(SEP_y,2) ,0.5) *
+			     pow( pow(SHIT_x,2)+pow(SHIT_y,2),0.5)
+			     );
+      
+      _hit_angles_backwards->Fill(cosangle,i_hit.Charge());
+    }
+    
+    //decide if you want to switch the start and end point
+    //for now, use biggest mean && smallest RMS to decide
+    if(_hit_angles_forwards->GetMean() < _hit_angles_backwards->GetMean() &&
+       _hit_angles_forwards->GetRMS()  > _hit_angles_backwards->GetRMS() ){
+      //if(_hit_angles_forwards->GetRMS()  > _hit_angles_backwards->GetRMS() ){
+      //if(_hit_angles_forwards->GetMean() < _hit_angles_backwards->GetMean()){
+      double new_end_wire   = start_wire;
+      double new_end_time   = start_time;
+      double new_start_wire = end_wire;
+      double new_start_time = end_time;
+      //double new_angle = something?!! not trivial to switch it
+      start_wire = new_start_wire;
+      end_wire   = new_end_wire;
+      start_time = new_start_time;
+      end_time   = new_end_time;
+      
+    }
+   
+ 
+  }//end RefineStart shit
   
 
 
