@@ -108,12 +108,16 @@ namespace cluster {
      */
     void GetFinalSlope(bool override=false);    
 
+    void RefineDirection(larutil::PxPoint &start,
+			 larutil::PxPoint &end);
 
-    
   private:
     std::vector<larutil::PxHit> hitVector;         // This vector holds the wrapped up hit list
  
-    larutil::GeometryUtilities *gser;
+    larutil::GeometryUtilities  *gser;
+    larutil::Geometry           *geo;
+    larutil::DetectorProperties *detp;
+    larutil::LArProperties      *larp;
     TPrincipal *principal;
     
     //settable parameters:
@@ -146,6 +150,9 @@ namespace cluster {
     double rough_2d_intercept;    // slope 
     larutil::PxPoint rough_begin_point; 
     larutil::PxPoint rough_end_point;
+
+    std::vector<double> fWire2Cm; // Conversion factor from wire to cm scale
+    double fTime2Cm;              // Conversion factor from time to cm scale
 
     cluster::cluster_params _this_params;
 

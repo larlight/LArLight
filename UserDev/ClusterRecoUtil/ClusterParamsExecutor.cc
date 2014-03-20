@@ -12,6 +12,9 @@ namespace cluster {
 
   bool ClusterParamsExecutor::analyze(larlight::storage_manager* storage)
   {
+
+    //auto clusters = (larlight::event_cluster*)(storage->get_data(
+
     return true;
   }
 

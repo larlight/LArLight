@@ -43,6 +43,17 @@ namespace cluster{
     fChargeCutoffThreshold[2]=1000;
     
     gser = (larutil::GeometryUtilities*)(larutil::GeometryUtilities::GetME());
+    detp = (larutil::DetectorProperties*)(larutil::DetectorProperties::GetME());
+    geo  = (larutil::Geometry*)(larutil::Geometry::GetME());
+    larp = (larutil::LArProperties*)(larutil::LArProperties::GetME());
+
+    fWire2Cm.resize(geo->Nplanes(),0);
+    for(size_t i=0; i<fWire2Cm.size(); ++i)
+      fWire2Cm.at(i) = geo->WirePitch(0,1,(UChar_t)i);
+
+    fTime2Cm = (detp->SamplingRate()/1.e3);
+    fTime2Cm *= (larp->DriftVelocity(larp->Efield(),larp->Temperature()));
+
   }
   
 
@@ -384,6 +395,60 @@ namespace cluster{
   }
   
   
+  void ClusterParamsAlgNew::RefineDirection(larutil::PxPoint &start,
+					    larutil::PxPoint &end) {
+    
+    UChar_t plane = (*hitVector.begin()).plane;
+
+    Double_t wire_2_cm = fWire2Cm.at(plane);
+    Double_t time_2_cm = fTime2Cm;
+    
+    Double_t SEP_X = (end.w - start.w) / wire_2_cm;
+    Double_t SEP_Y = (end.t - start.t) / time_2_cm;
+
+    Double_t rms_forward   = 0;
+    Double_t rms_backward  = 0;
+    Double_t mean_forward  = 0;
+    Double_t mean_backward = 0;
+    Double_t weight_total  = 0;
+    for(auto const hit : hitVector) {
+
+      weight_total = hit.charge; 
+
+      // Compute forward mean
+      Double_t SHIT_X = (hit.w - start.w) / wire_2_cm;
+      Double_t SHIT_Y = (hit.t - start.t) / time_2_cm;
+
+      Double_t cosangle = (SEP_X*SHIT_X + SEP_Y*SHIT_Y);
+      cosangle /= ( pow(pow(SEP_X,2)+pow(SEP_Y,2),0.5) * pow(pow(SHIT_X,2)+pow(SHIT_Y,2),0.5));
+
+      mean_forward += cosangle * hit.charge;
+      rms_forward  += pow(cosangle * hit.charge,2);
+      
+      // Compute backward mean
+      SHIT_X = (hit.w - end.w) / wire_2_cm;
+      SHIT_Y = (hit.t - end.t) / time_2_cm;
+      
+      cosangle  = (SEP_X*SHIT_X + SEP_Y*SHIT_Y);
+      cosangle /= ( pow(pow(SEP_X,2)+pow(SEP_Y,2),0.5) * pow(pow(SHIT_X,2)+pow(SHIT_Y,2),0.5));
+      
+      mean_backward += cosangle * hit.charge;
+      rms_backward  += pow(cosangle * hit.charge,2);
+      
+    }
+
+    rms_forward   = pow(rms_forward/pow(weight_total,2),0.5);
+    mean_forward /= weight_total;
+
+    rms_backward   = pow(rms_backward/pow(weight_total,2),0.5);
+    mean_backward /= weight_total;
+    
+    if(rms_forward / mean_forward < rms_backward / mean_backward)
+      std::cout<<"Right Direction"<<std::endl;
+    else
+      std::cout<<"Wrong Direction"<<std::endl;
+    
+  }
   
   
   
