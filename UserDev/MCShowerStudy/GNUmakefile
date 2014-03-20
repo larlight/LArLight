@@ -3,8 +3,8 @@
 #
 
 # specific names for this package
-DICT  = MCClusterStudyCint
-SHLIB = libMCClusterStudy.so
+DICT  = MCShowerStudyCint
+SHLIB = libMCShowerStudy.so
 SOURCES = $(wildcard *.cc)
 HEADERS = $(wildcard *.hh)
 OBJECTS = $(SOURCES:.cc=.o)

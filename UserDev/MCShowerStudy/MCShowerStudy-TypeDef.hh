@@ -2,17 +2,17 @@
 // type-def file for ROOT
 //
 
-#ifndef MCCLUSTERSTUDY_TYPEDEF_HH
-#define MCCLUSTERSTUDY_TYPEDEF_HH
+#ifndef MCSHOWERSTUDY_TYPEDEF_HH
+#define MCSHOWERSTUDY_TYPEDEF_HH
 
 // Header files included here
-#include "MCClusterStudy.hh"
+#include "MCShowerStudy.hh"
 //ADD_NEW_HEADER ... do not change this comment line
 
 // Class forward declaration here
 namespace larlight {
 
-  class MCClusterStudy;
+  class MCShowerStudy;
 
 //ADD_ANA_CLASS ... do not change this comment line
 
