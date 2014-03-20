@@ -46,68 +46,58 @@ namespace cluster{
     return;
   }
 
-  /**
-   * Calculates the following variables:
-   * mean_charge
-   * mean_x
-   * mean_y
-   * charge_wgt_x
-   * charge_wgt_y
-   * eigenvalue_principal
-   * eigenvalue_secondary
-   * multi_hit_wires
-   * N_Wires
-   * **/
-  void ClusterParamsAlgNew::GetAverages(bool override){
-    if (finished_GetAverages && !override) return;
-
-    principal -> Clear();
-
-    _this_params.N_Hits = hitVector.size();
-
-    std::map<double, int> wireMap;
-
-    double mean_charge = 0.0;
-
-
-
-    for (auto & hit : hitVector){
-      double data[2];
-      data[0] = hit.w;
-      data[1] = hit.t;
-      principal -> AddRow(data);
-      _this_params.charge_wgt_x += hit.w*hit.charge;
-      _this_params.charge_wgt_y += hit.t*hit.charge;
-      mean_charge += hit.charge;
-
-      wireMap[hit.w] ++;
-
-    }
-    _this_params.N_Wires = wireMap.size();
-    _this_params.multi_hit_wires = _this_params.N_Hits - _this_params.N_Wires;
-
-    _this_params.charge_wgt_x /= mean_charge;
-    _this_params.charge_wgt_y /= mean_charge;
-
-    _this_params.mean_x = (* principal -> GetMeanValues())[0];
-    _this_params.mean_y = (* principal -> GetMeanValues())[1];
-    _this_params.mean_charge /= _this_params.N_Hits;
-
-    principal -> MakePrincipals();
-
-    _this_params.eigenvalue_principal = (* principal -> GetEigenValues() )[0];
-    _this_params.eigenvalue_secondary = (* principal -> GetEigenValues() )[1];
-
-  }
+//What is this cruft?//      if(!override) { //Override being set, we skip all this logic.
+//What is this cruft?//      //OK, no override. Stop if we're already finshed.
+//What is this cruft?//      if (finished_GetAverages) return;
+//What is this cruft?//    }
+//What is this cruft?//
+//What is this cruft?//    principal -> Clear();
+//What is this cruft?//
+//What is this cruft?//    _this_params.N_Hits = hitVector.size();
+//What is this cruft?//
+//What is this cruft?//    std::map<double, int> wireMap;
+//What is this cruft?//
+//What is this cruft?//    double mean_charge = 0.0;
+//What is this cruft?//
+//What is this cruft?//
+//What is this cruft?//
+//What is this cruft?//    for (auto & hit : hitVector){
+//What is this cruft?//      double data[2];
+//What is this cruft?//      data[0] = hit.w;
+//What is this cruft?//      data[1] = hit.t;
+//What is this cruft?//      principal -> AddRow(data);
+//What is this cruft?//      _this_params.charge_wgt_x += hit.w*hit.charge;
+//What is this cruft?//      _this_params.charge_wgt_y += hit.t*hit.charge;
+//What is this cruft?//      mean_charge += hit.charge;
+//What is this cruft?//
+//What is this cruft?//      wireMap[hit.w] ++;
+//What is this cruft?//
+//What is this cruft?//    }
+//What is this cruft?//    _this_params.N_Wires = wireMap.size();
+//What is this cruft?//    _this_params.multi_hit_wires = _this_params.N_Hits - _this_params.N_Wires;
+//What is this cruft?//
+//What is this cruft?//    _this_params.charge_wgt_x /= mean_charge;
+//What is this cruft?//    _this_params.charge_wgt_y /= mean_charge;
+//What is this cruft?//
+//What is this cruft?//    _this_params.mean_x = (* principal -> GetMeanValues())[0];
+//What is this cruft?//    _this_params.mean_y = (* principal -> GetMeanValues())[1];
+//What is this cruft?//    _this_params.mean_charge /= _this_params.N_Hits;
+//What is this cruft?//
+//What is this cruft?//    principal -> MakePrincipals();
+//What is this cruft?//
+//What is this cruft?//    _this_params.eigenvalue_principal = (* principal -> GetEigenValues() )[0];
+//What is this cruft?//    _this_params.eigenvalue_secondary = (* principal -> GetEigenValues() )[1];
+//What is this cruft?//
+//What is this cruft?//}
 
   // Also does the high hitlist
   void ClusterParamsAlgNew::GetRoughAxis(bool override){
-
-    if (finished_GetAverages && !override) {
-
-      finished_GetRoughAxis = false;
-
-      return;}
+    if(!override) { //Override being set, we skip all this logic.
+      //OK, no override. Stop if we're already finshed.
+      if (finished_GetRoughAxis) return;
+      //Try to run the previous function if not yet done.
+      if (!finished_GetAverages) GetAverages(true);
+    }
 
     //using the charge weighted coordinates find the axis from slope
     double ncw=0;
@@ -134,13 +124,23 @@ namespace cluster{
     //ceptcw= _this_params.charge_wgt_y  -slopecw*(_this_params.charge_wgt_x);//intercept for cw
     //Getthe 2D_angle
     _this_params.cluster_angle_2d = atan(slopecw)*180/PI;
+
+
+    finished_GetRoughAxis = true;
     return;
   }
 
 
-  void ClusterParamsAlgNew::GetProfileInfo(bool override)
-  {
-    if(rough_2d_slope==-999.999 || rough_2d_intercept==-999.999 ) //these variables need to be initialized to othervalues? 
+  void ClusterParamsAlgNew::GetProfileInfo(bool override)  {
+    if(!override) { //Override being set, we skip all this logic.
+      //OK, no override. Stop if we're already finshed.
+      if (finished_GetProfileInfo) return;
+      //Try to run the previous function if not yet done.
+      if (!finished_GetRoughAxis) GetRoughAxis(true);
+    }
+
+    //these variables need to be initialized to other values? 
+    if(rough_2d_slope==-999.999 || rough_2d_intercept==-999.999 ) 
       GetRoughAxis(true);      
 
     coarse_nbins=2;
@@ -240,9 +240,33 @@ namespace cluster{
            
       }  // end second loop on hits. Now should have filled profile vectors.
       
-    
+    finished_GetProfileInfo = true;
+    return;    
   }
   
+  void ClusterParamsAlgNew::RefineStartPoints(bool override) {
+    if(!override) { //Override being set, we skip all this logic.
+      //OK, no override. Stop if we're already finshed.
+      if (finished_RefineStartPoints) return;
+      //Try to run the previous function if not yet done.
+      if (!finished_GetProfileInfo) GetProfileInfo(true);
+    }
+    
+    finished_RefineStartPoints = true;
+    return;
+  }
+  
+  void ClusterParamsAlgNew::GetFinalSlope(bool override) {
+    if(!override) { //Override being set, we skip all this logic.
+      //OK, no override. Stop if we're already finshed.
+      if (finished_GetFinalSlope) return;
+      //Try to run the previous function if not yet done.
+      if (!finished_RefineStartPoints) RefineStartPoints(true);
+    }
+    
+    finished_RefineStartPoints = true;
+    return;
+  }
   
   
   
