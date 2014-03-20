@@ -359,9 +359,9 @@ namespace larutil {
   UInt_t Geometry::NearestWire(const TVector3 &worldLoc,
 			       const UInt_t PlaneNo) const
   {
-    int NearestWireNumber = int(std::nearbyint(worldLoc[1]*fOrthVectorsY.at(PlaneNo)
-                                               + worldLoc[2]*fOrthVectorsZ.at(PlaneNo)
-                                               - fFirstWireProj.at(PlaneNo)));
+    int NearestWireNumber = int(nearbyint(worldLoc[1]*fOrthVectorsY.at(PlaneNo)
+					  + worldLoc[2]*fOrthVectorsZ.at(PlaneNo)
+					  - fFirstWireProj.at(PlaneNo)));
 
     unsigned int wireNumber = (unsigned int) NearestWireNumber;
 
