@@ -39,7 +39,6 @@ namespace larutil{
     
     PxHit(){
       Clear();
-      std::cout << "This is the $^_*&ing default ctor." << std::endl;
     }
     ~PxHit(){}
 

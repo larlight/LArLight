@@ -41,6 +41,9 @@ namespace cluster {
 
     void SetHits(const std::vector<larutil::PxHit>&);
 
+    void SetRefineDirectionQMin(double qmin){ q_min_refdir = qmin; };
+
+
     /**                                                                             
      * Runs all the functions which calculate cluster params                        
      * and stashes the results in the private ClusterParams                         
@@ -119,7 +122,7 @@ namespace cluster {
     void RefineDirection(larutil::PxPoint &start,
 			 larutil::PxPoint &end);
 
-  private:
+  protected:
     std::vector<larutil::PxHit> hitVector;         // This vector holds the wrapped up hit list
  
     larutil::GeometryUtilities  *gser;
@@ -131,6 +134,8 @@ namespace cluster {
     //settable parameters:
      double fChargeCutoffThreshold[3]; 
      int fplane;
+    //this is required in RefineDirection
+    double q_min_refdir;
     
     std::vector< double > charge_profile;
     std::vector< double > coarse_charge_profile;

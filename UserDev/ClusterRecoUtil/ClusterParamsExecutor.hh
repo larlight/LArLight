@@ -17,6 +17,8 @@
 #include "ana_base.hh"
 #include "ClusterParamsAlgNew.hh"
 #include "Geometry.hh"
+#include <TH2D.h>
+
 namespace cluster {
   
   /**
@@ -24,7 +26,7 @@ namespace cluster {
      User defined class ClusterParamsExecutor ... these comments are used to generate
      doxygen documentation!
   */
-  class ClusterParamsExecutor : public larlight::ana_base {
+  class ClusterParamsExecutor : public ClusterParamsAlgNew {
     
   public:
     
@@ -34,18 +36,16 @@ namespace cluster {
     /// Default destructor
     virtual ~ClusterParamsExecutor(){};
     
-    virtual bool initialize();
-    
-    virtual bool finalize();
-    
-    virtual bool analyze(larlight::storage_manager* storage);
+    void LoadCluster(const larlight::cluster &i_cluster,
+		     const larlight::event_hit *hits);
 
+    TH2D* GetHitView()
+    { return hCurrentHit;}
+    
   protected:
 
-    larlight::DATA::DATA_TYPE _in_cluster_type;
-
-    ClusterParamsAlgNew fCParAlg;
-    
+    TH2D* hCurrentHit;
+    std::vector<TH2D*> hHit;
   };
 
 }

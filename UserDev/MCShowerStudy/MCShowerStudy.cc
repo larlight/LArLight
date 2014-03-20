@@ -23,7 +23,6 @@ namespace larlight {
       _hit_angles_backwards = new TH1F("_hit_angles_backwards","_hit_angles_backwards",100,-1.,1.);      
     //end temporary
 
-
     _mcshower_tree = 0;
     PrepareTTree();
 
@@ -117,14 +116,25 @@ namespace larlight {
     if(!_mcshower_tree) {
       _mcshower_tree = new TTree("mcshower_tree","");
       _mcshower_tree->Branch("refinestartend_FOM", "std::vector<double>", &_refinestartend_FOM);
-    }
+      _mcshower_tree->Branch("nhits","std::vector<int>",&_nhits);
+      _mcshower_tree->Branch("cluscharge","std::vector<double>",&_cluscharge);
+      _mcshower_tree->Branch("cluslength","std::vector<double>",&_cluster_length);
+      _mcshower_tree->Branch("dirqual","std::vector<double>",&_dir_quality);
+      _mcshower_tree->Branch("alpha_s","std::vector<double>",&_alpha1);
+      _mcshower_tree->Branch("alpha_e","std::vector<double>",&_alpha2);
 
+    }
 
   }
   void MCShowerStudy::ClearTTreeVars() {
     
     _refinestartend_FOM.clear();
-
+    _nhits.clear();
+    _cluscharge.clear();
+    _cluster_length.clear();
+    _dir_quality.clear();
+    _alpha1.clear();
+    _alpha2.clear();
   }
 
   
@@ -136,12 +146,12 @@ namespace larlight {
 
     //for kaleko's current study, this only works for single-shower events, and single-cluster (fully merged)
     if(ev_mcshower->size() != 1){
-      print(larlight::MSG::ERROR,__FUNCTION__,Form("This event has more than one MCShower in it! In fact, it has %d! Wtf?",(int)ev_mcshower->size()));
+      print(larlight::MSG::INFO,__FUNCTION__,Form("This event has more than one MCShower in it! In fact, it has %d! Wtf?",(int)ev_mcshower->size()));
       return false;
     }
 
     if(ev_cluster->size() != 3){
-      print(larlight::MSG::ERROR,__FUNCTION__,Form("This event has != 3 reco clusters in it! In fact, it has %d! Wtf?",(int)ev_cluster->size()));
+      print(larlight::MSG::INFO,__FUNCTION__,Form("This event has != 3 reco clusters in it! In fact, it has %d! Wtf?",(int)ev_cluster->size()));
       return false;
     }
     
@@ -208,54 +218,55 @@ namespace larlight {
       Double_t end_time = i_cluster.EndPos()[1];
 	      
       
-      //if you want to run the refine direction function
-      if(_refine_direction){
-	print(larlight::MSG::DEBUG,__FUNCTION__,Form("Heads up! You're using refine_direction function!"));
-	DATA::DATA_TYPE hit_type = ev_cluster->get_hit_type();
-
-	//you need the hits for this function
-	larlight::event_hit* ev_hits = (event_hit*)storage->get_data(hit_type);
-
-	if(!ev_hits) {
-	  print(larlight::MSG::ERROR,__FUNCTION__,Form("Did not find specified data product, Hits!"));
-	  return false;
-	}
-
-	//list of the hits's indicies associated with this cluster
-	std::vector<unsigned short> hit_index(i_cluster.association(hit_type));
-	
-	//vector to hold these actual hits
-	std::vector<larlight::hit> hits(hit_index.size());
-	
-	//pushing back the actual hits into the containter
-	for(auto const &index : hit_index)
-	  hits.push_back(ev_hits->at(index));
-
-	//this function should edit start_wire, start_time etc, flipping stuff when necessary
-	RefineStartPointsShowerShape(start_wire,start_time,end_wire,end_time,hits);
-
-
-      }//end if you want to use refine direction function
+      
+      print(larlight::MSG::DEBUG,__FUNCTION__,Form("Heads up! You're using refine_direction function!"));
+      DATA::DATA_TYPE hit_type = ev_cluster->get_hit_type();
+      
+      //you need the hits for the refine function
+      larlight::event_hit* ev_hits = (event_hit*)storage->get_data(hit_type);
+      
+      if(!ev_hits) {
+	print(larlight::MSG::ERROR,__FUNCTION__,Form("Did not find specified data product, Hits!"));
+	return false;
+      }
+      
+      //list of the hits's indicies associated with this cluster
+      std::vector<unsigned short> hit_index(i_cluster.association(hit_type));
+      
+      //vector to hold these actual hits
+      std::vector<larlight::hit> hits(hit_index.size());
+      
+      //pushing back the actual hits into the containter
+      for(auto const &index : hit_index)
+	hits.push_back(ev_hits->at(index));
+      
+      //this function should edit start_wire, start_time etc, flipping stuff when necessary
+      RefineStartPointsShowerShape(start_wire,start_time,end_wire,end_time,hits);
+      
 
       double dw1, dt1, da1, db1, dw2, dt2, da2, db2;
       //calculate start/end refining figure of merit for this cluster
       dw1 = mother_sw_view[iview].w - start_wire;
       dt1 = mother_sw_view[iview].t - start_time;
-
+      
       da1 = dw1 * _wire_2_cm;
       db1 = dt1 * _time_2_cm;
-
+      
       dw2 = mother_sw_view[iview].w - end_wire;
       dt2 = mother_sw_view[iview].t - end_time;
-
+      
       da2 = dw2 * _wire_2_cm;
       db2 = dt2 * _time_2_cm;
+      
+      double clusterlength;
+      clusterlength = std::sqrt(pow((end_wire-start_wire)*_wire_2_cm,2)+pow((end_time-start_time)*_time_2_cm,2));
+      _cluster_length.push_back(clusterlength);
       
       //this is the variable that i want to go into the ttree... for single cluster events,
       //this will be a vector of length 3 (one per cluster, one cluster per view)
       double myFOM =  std::sqrt( da2*da2 + db2*db2 ) - std::sqrt( da1*da1 + db1*db1 );
       _refinestartend_FOM.push_back(myFOM);
-
+      
       //debugging stuff
       msg << Form("This cluster's start (wire,time) on view %d is (%f,%f)\n",
 		  iview, start_wire, start_time);
@@ -288,6 +299,9 @@ namespace larlight {
     //vector from start point to hit is SHITvec ;)
     
     //loop over hits
+
+    _nhits.push_back((int)in_hit_v.size());
+
     for(auto const i_hit: in_hit_v){
       clus_q += i_hit.Charge();
       
@@ -318,25 +332,44 @@ namespace larlight {
       
       _hit_angles_backwards->Fill(cosangle,i_hit.Charge());
     }
+
+    //more ttree variables
+    _cluscharge.push_back(clus_q);
+
     
-    //decide if you want to switch the start and end point
     //for now, use biggest mean && smallest RMS to decide
     //works slightly better than just using mean to decide
     //there's probably a better way to do this
-    if(_hit_angles_forwards->GetMean() < _hit_angles_backwards->GetMean() && 
-       _hit_angles_forwards->GetRMS()  > _hit_angles_backwards->GetRMS() ){
-      double new_end_wire   = start_wire;
-      double new_end_time   = start_time;
-      double new_start_wire = end_wire;
-      double new_start_time = end_time;
-      //double new_angle = something?!! not trivial to switch it
-      start_wire = new_start_wire;
-      end_wire   = new_end_wire;
-      start_time = new_start_time;
-      end_time   = new_end_time;
-      
+    double alpha_start = (_hit_angles_forwards->GetMean())/(_hit_angles_forwards->GetRMS());
+    double alpha_end = (_hit_angles_backwards->GetMean())/(_hit_angles_backwards->GetRMS());
+    double DirectionQualityScore = (alpha_start-alpha_end)/(alpha_start+alpha_end);
+    _dir_quality.push_back(DirectionQualityScore);
+    _alpha1.push_back(alpha_start);
+    _alpha2.push_back(alpha_end);
+    /*
+      if(DirectionQualityScore<-1 || DirectionQualityScore>1){
+	std::cout<<"DQS = "<<DirectionQualityScore<<std::endl;
+	std::cout<<"alpha_Start, alpha_end = "<<alpha_start<<", "<<alpha_end<<std::endl;
+	}
+    */
+    
+    //if you want to actually switch clusters that this function determined should be switched
+    if(_refine_direction){
+      //decide if you want to switch the start and end point
+    
+      if(_hit_angles_forwards->GetMean() < _hit_angles_backwards->GetMean() && 
+    	 _hit_angles_forwards->GetRMS()  > _hit_angles_backwards->GetRMS() ){
+	double new_end_wire   = start_wire;
+	double new_end_time   = start_time;
+	double new_start_wire = end_wire;
+	double new_start_time = end_time;
+	//double new_angle = something?!! not trivial to switch it
+	start_wire = new_start_wire;
+	end_wire   = new_end_wire;
+	start_time = new_start_time;
+	end_time   = new_end_time;	
+      }
     }
-   
  
   }//end RefineStart shit
   

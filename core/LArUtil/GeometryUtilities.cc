@@ -1001,10 +1001,10 @@ namespace larutil{
 
   void GeometryUtilities::SelectLocalHitlist(const std::vector<larutil::PxHit*>& hitlist, 
 					     std::vector <larutil::PxHit*> &hitlistlocal,
-					     larutil::PxHit startHit,
-					     Double_t linearlimit,   
-					     Double_t ortlimit, 
-					     Double_t lineslopetest,
+					     larutil::PxHit& startHit,
+					     Double_t& linearlimit,   
+					     Double_t& ortlimit, 
+					     Double_t& lineslopetest,
 					     larutil::PxHit& averageHit) {
 
     Double_t time_start= startHit.t;
