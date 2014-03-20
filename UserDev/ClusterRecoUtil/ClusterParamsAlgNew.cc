@@ -37,6 +37,43 @@ namespace cluster{
 
   }
 
+
+//Calculate opening angle
+double cluster::ClusterRecoUtil::getOpeningAngle(std::vector<larutil::PxHit> rough_start_point,std::vector<larutil::PxHit> rough_end_point, std::vector<larutil::PxHit> hits){
+
+  double start_hit  ;
+  double start_end_w = rough_start_point.w - rough_end_point.w;
+  double start_end_t = rough_start_point.t - rough_end_point.t;
+  double start_end_start_hit ;
+  double dot_product ;
+  double angle_hit_axis ;
+  double opening_angle ;
+  int    Integral = 0;
+  std::vector<larutil::PxHit> binning_vector (100,0) ;
+  start_end_start_hit = sqrt(pow(start_end_w,2)+ pow(start_end_t,2));
+
+  for(auto & hit:hits){
+
+    dot_product = (hit.w - rough_start_point.w)*(start_end_w)+ (hit.t - rough_start_point.t) * (start_end_t) ; 
+    start_hit = (hit.w - rough_start_point.w)*(hit.w - rough_start_point.w) + (hit.t - rough_start_point.t)*(hit.t - rough_start_point.t);
+    start_hit = sqrt(start_hit);
+    angle_hit_axis = dot_product/start_end_start_hit/start_hit ;
+    int N_bins = 100 * acos(angle_hit_axis)/PI;
+    binning_vector[N_bins]++;
+  }
+
+  int iBin = 1;
+  for(;percentage<= 0.95; iBin++)
+    {
+      percentage += binning_vector[iBin]/cluster_params::N_Hits ;
+    }
+
+opening_angle = iBin * PI /100 ;
+
+  return opening_angle;
+}
+
+
   void ClusterParamsAlgNew::Initialize()
   {
     // Clear hit vector
@@ -391,8 +428,10 @@ namespace cluster{
      
     // ok. now have rough_begin_point and rough_end_point. No decision about direction has been made yet.
     // need to define physical direction with openind angles and pass that to Ryan's line finder.
-     
-    // Ariana Elena Mina put it here!  You have
+ 
+    
+  _this_params.opening_angle = getOpeningAngle(rough_start_point, rough_end_point, hits);
+                                                                                                    
     // rough_end_point
     // rough_end_point
     // and use them to get the axis
