@@ -259,6 +259,13 @@ namespace cluster{
       if (!finished_GetProfileInfo) GetProfileInfo(true);
     }
     
+    /**
+     * Calculates the following variables:
+     * length
+     * width
+     * @param override [description]
+     */
+
     finished_RefineStartPoints = true;
     return;
   }
@@ -273,6 +280,15 @@ namespace cluster{
       //Try to run the previous function if not yet done.
       if (!finished_RefineStartPoints) RefineStartPoints(true);
     }
+
+    /**
+     * Calculates the following variables:
+     * hit_density_1D
+     * hit_density_2D
+     * angle_2d
+     * direction
+     */
+
 
     finished_RefineStartPoints = true;
     return;
