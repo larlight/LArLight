@@ -442,7 +442,17 @@ namespace cluster{
     Double_t mean_forward  = 0;
     Double_t mean_backward = 0;
     Double_t weight_total  = 0;
+    Double_t hit_counter   = 0;
+    
+    //hard coding this for now, should use SetRefineDirectionQMin function
+    q_min_refdir  = 25;
+
     for(auto const hit : hitVector) {
+
+      //skip this hit if below minimum cutoff param
+      if(hit.charge < q_min_refdir) continue;
+
+      hit_counter++;
 
       weight_total = hit.charge; 
 
@@ -453,8 +463,11 @@ namespace cluster{
       Double_t cosangle = (SEP_X*SHIT_X + SEP_Y*SHIT_Y);
       cosangle /= ( pow(pow(SEP_X,2)+pow(SEP_Y,2),0.5) * pow(pow(SHIT_X,2)+pow(SHIT_Y,2),0.5));
 
-      mean_forward += cosangle * hit.charge;
-      rms_forward  += pow(cosangle * hit.charge,2);
+      //no weighted average, works better as flat average w/ min charge cut
+      mean_forward += cosangle;
+      rms_forward  += pow(cosangle,2);
+      //mean_forward += cosangle * hit.charge;
+      //rms_forward  += pow(cosangle * hit.charge,2);
       
       // Compute backward mean
       SHIT_X = (hit.w - end.w) / wire_2_cm;
@@ -463,18 +476,30 @@ namespace cluster{
       cosangle  = (SEP_X*SHIT_X + SEP_Y*SHIT_Y);
       cosangle /= ( pow(pow(SEP_X,2)+pow(SEP_Y,2),0.5) * pow(pow(SHIT_X,2)+pow(SHIT_Y,2),0.5));
       
-      mean_backward += cosangle * hit.charge;
-      rms_backward  += pow(cosangle * hit.charge,2);
+      //no weighted average, works better as flat average w/ min charge cut
+      mean_backward += cosangle;
+      rms_backward  += pow(cosangle,2);
+      //mean_backward += cosangle * hit.charge;
+      //rms_backward  += pow(cosangle * hit.charge,2);
       
     }
 
-    rms_forward   = pow(rms_forward/pow(weight_total,2),0.5);
-    mean_forward /= weight_total;
+    //no weighted average, works better as flat average w/ min charge cut
+    //rms_forward   = pow(rms_forward/pow(weight_total,2),0.5);
+    //mean_forward /= weight_total;
 
-    rms_backward   = pow(rms_backward/pow(weight_total,2),0.5);
-    mean_backward /= weight_total;
+    //rms_backward   = pow(rms_backward/pow(weight_total,2),0.5);
+    //mean_backward /= weight_total;
+
+    rms_forward   = pow(rms_forward/hit_counter,0.5);
+    mean_forward /= hit_counter;
+
+    rms_backward   = pow(rms_backward/hit_counter,0.5);
+    mean_backward /= hit_counter;
+
     
-    if(rms_forward / mean_forward < rms_backward / mean_backward)
+    //if(rms_forward / mean_forward < rms_backward / mean_backward)
+    if(mean_forward > mean_backward && rms_forward < rms_backward)
       std::cout<<"Right Direction"<<std::endl;
     else
       std::cout<<"Wrong Direction"<<std::endl;
