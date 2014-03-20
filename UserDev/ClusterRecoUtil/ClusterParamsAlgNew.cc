@@ -321,94 +321,7 @@ namespace cluster{
     } else {
       if (!finished_GetProfileInfo) GetProfileInfo(true);
     }
-<<<<<<< HEAD
-	//Ryan's Shower Strip finder work here. 
-
-		//First we need to define the strip width that we want
-			double d=0.6;//this is the width of the strip.... this needs to be tuned to something.
-	//===============================================================================================================	
-			// Will need to feed in the set of hits that we want. 
-			std::vector<std::pair<double,double>> vertil;//vertex in tilda-space pair(x-til,y-til)
-			vertil.clear();// This isn't needed?
-			std::vector<double> vs;//vector of the sum of the distance of a vector to every vertex in tilda-space
-			vs.clear();// this isn't needed?
-			std::vector< hits>  ghits;// $$This needs to be corrected//this is the good hits that are between strip
-			double vd=0;//the distance for vertex... just needs to be something 0
-			int n=0;
-			double fardistcurrent=0;
-			HITHERE startpoint;
-	//===============================================================================================================	
-			
-		//Now we need to do the transformation into "tilda-space"
-			 for(unsigned int a=0; a<subhit.size();a++){
-				for(unsigned int b=a+1;b<subhit.size();b++){
-						if(subhit[a]->w != subhit[b]->w){
-			double xtil = ((subhit[a]->t-avgtime)-(subhit[b]->t-avgtime))/((subhit[a]->w-avgwire)-(subhit[b]->w-avgwire));
-			double ytil = (subhit[a]->w - avgwire)*xtil -(subhit[a]->t-avgtime);
-        		//push back the tilda vertex point on the pair
-                                std::pair<double,double> tv(xtil,ytil);
-                                vertil.push_back(tv);
-										}//if Wires are not the same
-									    }//for over b
-			      				       }//for over a
-		// look at the distance from a tilda-vertex to all other tilda-verticies
-			for(unsigned int z=0;z<vertil.size();z++){
-				for(unsigned int c=0; c<vertil.size();c++){
-                          vd+= sqrt(pow((vertil[z].first-vertil[c].first),2)+pow((vertil[z].second-vertil[c].second),2));}//for c loop
-							 vs.push_back(vd);
-							 vd=0.0;}//for z loop
-		//need to find the min of the distance of vertex in tilda-space
-		//this will get me the area where things are most linear
-                int minvs= std::min_element(vs.begin(),vs.end())-vs.begin();
-		// now use the min position to find the vertex in tilda-space
-		//now need to look a which hits are between the tilda lines from the points
-		//in the tilda space everything in wire time is based on the new origin which is at the average wire/time
-			       double tilwire=vertil[minvs].first;//slope
-			       double tiltimet=-vertil[minvs].second+d*sqrt(1+pow(tilwire,2));//negative cept is accounted for top strip
-			       double tiltimeb=-vertil[minvs].second-d*sqrt(1+pow(tilwire,2));//negative cept is accounted for bottom strip
-			// look over the subhit list and ask for which are inside of the strip
-			for(unsigned int a=0; a<subhit.size(); a++){
-        double dtstrip= (-tilwire * (subhit[a]->w-avgwire) +(subhit[a]->t-avgtime)-tiltimet)/sqrt(tilwire*tilwire+1);
-        double dbstrip= (-tilwire * (subhit[a]->w-avgwire) +(subhit[a]->t-avgtime)-tiltimeb)/sqrt(tilwire*tilwire+1);
-
-        if((dtstrip<0.0 && dbstrip>0.0)||(dbstrip<0.0 && dtstrip>0.0)){
-                ghits.push_back(subhit[a]);
-                                }//if between strip
-								}//for a loop
-
-
-	//=======================Do stuff with the good hits============================
-
-	//of these small set of hits just fit a simple line. 
-	//then we will need to see which of these hits is farthest away 
 	
-	for(unsigned int g; g<ghits.size();g++){
-		// should call the helper funtion to do the fit
-		//but for now since there is no helper function I will just write it here......again
-		n+=1;	
-		gwiretime+= ghits[g]->w *ghits[g]->t;
-		gwire+= ghits[g]->w;
-		gtime+= ghits[g]->t;
-		gwirewire+= ghits[g]->w* ghits[g]->w;
-		// now work on calculating the distance in wire time space from the far point
-			//farhit needs to be a hit that is given to me
-		fardist= sqrt(pow(ghits[g]->w-farhit.w,2)+pow(ghits[g]->t-farhit.t,2));
-		//come back to this... there is a better way to do this probably in the loop
-		//there should also be a check that the hit that is farthest away has subsequent hits after it on a few wires
-			if(fardist>fardistcurrent){
-			fardistcurrent=fardist;
-			//start point hit 
-			startpoint =ghits[g];}//if fardist... this is the point to use for the start point
-						}//for ghits loop
-
-	double gslope=(n* gwiretime- gwire*gtime)/(n*gwirewire -gwire*gwire);
-	double gcept= gtime/n -gslope*(gwire/n);
-
-
-		
-
-	
-=======
     
     profile_integral_forward=0;
     profile_integral_backward=0;
@@ -451,7 +364,6 @@ namespace cluster{
     // on bin distance is: 
      larutil::PxPoint OnlinePoint;
      
-     
      double ort_intercept_begin=(inter_high-inter_low)/profile_nbins*startbin;
      
      gser->GetPointOnLineWSlopes(rough_2d_slope,
@@ -469,11 +381,164 @@ namespace cluster{
      // ok. now have rough_begin_point and rough_end_point. No decision about direction has been made yet.
      // need to define physical direction with openind angles and pass that to Ryan's line finder.
      
-     
+        //Ryan's Shower Strip finder work here. 
+                //First we need to define the strip width that we want
+                        double d=0.6;//this is the width of the strip.... this needs to be tuned to something.
+        //===============================================================================================================       
+                        // Will need to feed in the set of hits that we want. 
+		//	const std::vector<larutil::PxHit*> whole;
+			std::vector <larutil::PxHit> subhit;
+		//	larutil::PxHit startHit;
+		//	Double_t linearlimit;
+		//	Double_t ortlimit;
+		//	Double_t lineslopetest;
+		//	larutil::PxHit averageHit;
+//			avgwire= averageHit.w;
+//			avgtime= averageHit.t;
+		//	gser->SelectLocalHitlist(whole,subhit,startHit,linearlimit,ortlimit,lineslopetest,averageHit);
+                        std::vector<std::pair<double,double>> vertil;//vertex in tilda-space pair(x-til,y-til)
+                        vertil.clear();// This isn't needed?
+                        std::vector<double> vs;//vector of the sum of the distance of a vector to every vertex in tilda-space
+                        vs.clear();// this isn't needed?
+                        std::vector< larutil::PxHit>  ghits;// $$This needs to be corrected//this is the good hits that are between strip
+                        double vd=0;//the distance for vertex... just needs to be something 0
+                        int n=0;
+                        double fardistcurrent=0;
+                        larutil::PxPoint startpoint;
+			double gwiretime; 
+			double gwire; 
+			double gtime;
+			double gwirewire;
+			larutil::PxHit farhit;// will come from somewhere	
+
+	//=============building the local vector===================
+	//this is clumsy... but just want to get something to work for now. 
+	//THIS is REAL Horrible and CLUMSY... We can make things into helper functions soon. 
+		std::vector<larutil::PxHit> returnhits;
+		std::vector<double> radiusofhit;
+		std::vector<int> closehits;
+		unsigned int minhits=50;	
+	        double maxreset=0;
+		double avgwire=0;
+		double avgtime=0;
+	if(minhits>hitVector.size()){
+    for(auto & hit : hitVector){
+	std::pair<double,double> rv(rough_end_point.w,rough_end_point.t);
+		closehits.clear();
+		radiusofhit.clear();
+	        returnhits.clear();
+       // for( unsigned int a=0; a<hit.size(); a++){
+                double d= sqrt( pow((rv.first-hit.w),2) + pow((rv.second-hit.t),2)  );
+        maxreset+=d;
+        radiusofhit.push_back(d);}
+        for(unsigned int b=0; b<minhits; b++){
+                int minss= std::min_element(radiusofhit.begin(),radiusofhit.end())-radiusofhit.begin();
+                closehits.push_back(minss);
+                radiusofhit[minss] = maxreset;}
+                //now make the vector o just the close hits using the closehit index
+for( unsigned int k=0; k < closehits.size(); k++){
+//first find the average wire and time for each set of hits... and make that the new origin before the transpose.
+	avgwire+=hitVector[closehits[k]].w;
+	avgtime+=hitVector[closehits[k]].t;
+     returnhits.push_back(hitVector[closehits[k]]);}
+	}//if hitVector is big enough	
+	
+	avgwire=avgwire/closehits.size();
+	avgtime=avgtime/closehits.size();
+	subhit=returnhits;
+
+
+
+
+
+
+
+
+
+
+
+
+	
+		
+
+
+
+
+
+
+
+
+        //===============================================================================================================       
+
+                //Now we need to do the transformation into "tilda-space"
+                         for(unsigned int a=0; a<subhit.size();a++){
+                                for(unsigned int b=a+1;b<subhit.size();b++){
+                                                if(subhit[a].w != subhit[b].w){
+                        double xtil = ((subhit[a].t-avgtime)-(subhit[b].t-avgtime))/((subhit[a].w-avgwire)-(subhit[b].w-avgwire));
+                        double ytil = (subhit[a].w - avgwire)*xtil -(subhit[a].t-avgtime);
+                        //push back the tilda vertex point on the pair
+                                std::pair<double,double> tv(xtil,ytil);
+                                vertil.push_back(tv);
+                                                                                }//if Wires are not the same
+                                                                            }//for over b
+                                                               }//for over a
+                // look at the distance from a tilda-vertex to all other tilda-verticies
+                        for(unsigned int z=0;z<vertil.size();z++){
+                                for(unsigned int c=0; c<vertil.size();c++){
+                          vd+= sqrt(pow((vertil[z].first-vertil[c].first),2)+pow((vertil[z].second-vertil[c].second),2));}//for c loop
+                                                         vs.push_back(vd);
+                                                         vd=0.0;}//for z loop
+                //need to find the min of the distance of vertex in tilda-space
+                //this will get me the area where things are most linear
+                int minvs= std::min_element(vs.begin(),vs.end())-vs.begin();
+                // now use the min position to find the vertex in tilda-space
+                //now need to look a which hits are between the tilda lines from the points
+                //in the tilda space everything in wire time is based on the new origin which is at the average wire/time
+                               double tilwire=vertil[minvs].first;//slope
+                               double tiltimet=-vertil[minvs].second+d*sqrt(1+pow(tilwire,2));//negative cept is accounted for top strip
+                               double tiltimeb=-vertil[minvs].second-d*sqrt(1+pow(tilwire,2));//negative cept is accounted for bottom strip
+                        // look over the subhit list and ask for which are inside of the strip
+                        for(unsigned int a=0; a<subhit.size(); a++){
+        double dtstrip= (-tilwire * (subhit[a].w-avgwire) +(subhit[a].t-avgtime)-tiltimet)/sqrt(tilwire*tilwire+1);
+        double dbstrip= (-tilwire * (subhit[a].w-avgwire) +(subhit[a].t-avgtime)-tiltimeb)/sqrt(tilwire*tilwire+1);
+
+        if((dtstrip<0.0 && dbstrip>0.0)||(dbstrip<0.0 && dtstrip>0.0)){
+                ghits.push_back(subhit[a]);
+                                }//if between strip
+                                                                }//for a loop
+
+        //=======================Do stuff with the good hits============================
+
+        //of these small set of hits just fit a simple line. 
+        //then we will need to see which of these hits is farthest away 
+
+        for(unsigned int g; g<ghits.size();g++){
+                // should call the helper funtion to do the fit
+                //but for now since there is no helper function I will just write it here......again
+                n+=1;
+                gwiretime+= ghits[g].w *ghits[g].t;
+                gwire+= ghits[g].w;
+                gtime+= ghits[g].t;
+                gwirewire+= ghits[g].w* ghits[g].w;
+                // now work on calculating the distance in wire time space from the far point
+                        //farhit needs to be a hit that is given to me
+                double fardist= sqrt(pow(ghits[g].w-farhit.w,2)+pow(ghits[g].t-farhit.t,2));
+                //come back to this... there is a better way to do this probably in the loop
+                //there should also be a check that the hit that is farthest away has subsequent hits after it on a few wires
+                        if(fardist>fardistcurrent){
+                        fardistcurrent=fardist;
+                        //start point hit 
+                        startpoint =ghits[g];}//if fardist... this is the point to use for the start point
+                                                }//for ghits loop
+
+       // double gslope=(n* gwiretime- gwire*gtime)/(n*gwirewire -gwire*gwire);
+       // double gcept= gtime/n -gslope*(gwire/n);
+
+
+
     
        
     
->>>>>>> 7120a510b900f9ca124c09dd5c5d4bd13c636e88
 
     finished_RefineStartPoints = true;
     return;
