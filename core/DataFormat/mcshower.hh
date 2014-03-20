@@ -175,7 +175,7 @@ namespace larlight {
     std::vector<std::vector<Float_t> > fEdepVtx;
 
     ////////////////////////
-    ClassDef(mcshower,1)
+    ClassDef(mcshower,2)
     ////////////////////////
       
   };
