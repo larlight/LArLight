@@ -80,7 +80,14 @@ namespace larlight {
 
     // variables that go into the analysis ttree
     std::vector<double> _refinestartend_FOM;
+    std::vector<int> _nhits;
+    std::vector<double> _cluscharge;
+    std::vector<double> _cluster_length;
+    std::vector<double> _dir_quality;
+    std::vector<double> _alpha1;
+    std::vector<double> _alpha2;
 
+    
     
     
     //stuff temporarily necessary for refine_direction test
