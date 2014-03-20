@@ -8,7 +8,7 @@ if len(sys.argv) < 2:
     sys.exit(1)
 
 from ROOT import gSystem
-gSystem.Load("libMCClusterStudy")
+gSystem.Load("libMCShowerStudy")
 from ROOT import larlight as fmwk
 
 # Create ana_processor instance
@@ -32,14 +32,14 @@ if len(sys.argv) > 2:
 my_proc.set_ana_output_file("from_test_ana_you_can_remove_me.root");
 
 # Attach a template process
-my_proc.add_process(fmwk.MCClusterStudy());
+my_proc.add_process(fmwk.MCShowerStudy());
 
 print
 print  "Finished configuring ana_processor. Start event loop!"
 print
 
 # Let's run it.
-my_proc.run();
+my_proc.run(0,10);
 
 # done!
 print

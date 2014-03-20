@@ -56,12 +56,6 @@ namespace larutil {
       fFirstWireProj[plane] /= ThisWirePitch;
       fFirstWireProj[plane] -= 0.5;
 
-      std::cout << Form("Plane %d ... (%g,%g,%g)",
-			plane,
-			fOrthVectorsY[plane],
-			fOrthVectorsZ[plane],
-			fFirstWireProj[plane])
-		<<std::endl;
     }
     
   }
@@ -359,6 +353,7 @@ namespace larutil {
   UInt_t Geometry::NearestWire(const TVector3 &worldLoc,
 			       const UInt_t PlaneNo) const
   {
+
     int NearestWireNumber = int(nearbyint(worldLoc[1]*fOrthVectorsY.at(PlaneNo)
 					  + worldLoc[2]*fOrthVectorsZ.at(PlaneNo)
 					  - fFirstWireProj.at(PlaneNo)));
@@ -375,6 +370,7 @@ namespace larutil {
 					   worldLoc[0],worldLoc[1], worldLoc[2]));
 
     }
+    /*
     std::cout<<"NearestWireID"<<std::endl;
     std::cout<<Form("(%g,%g,%g) position ... using (%g,%g,%g) ... Wire %d Plane %d",
                     worldLoc[0],worldLoc[1],worldLoc[2],
@@ -383,7 +379,7 @@ namespace larutil {
                     fFirstWireProj[PlaneNo],
 		    wireNumber,PlaneNo)
              << std::endl;
-
+    */
     return wireNumber;
   }
 
