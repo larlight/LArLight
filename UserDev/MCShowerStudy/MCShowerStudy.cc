@@ -1,11 +1,11 @@
-#ifndef MCCLUSTERSTUDY_CC
-#define MCCLUSTERSTUDY_CC
+#ifndef MCSHOWERSTUDY_CC
+#define MCSHOWERSTUDY_CC
 
-#include "MCClusterStudy.hh"
+#include "MCShowerStudy.hh"
 
 namespace larlight {
 
-  bool MCClusterStudy::initialize() {
+  bool MCShowerStudy::initialize() {
 
     //
     // This function is called in the beggining of event loop
@@ -24,7 +24,7 @@ namespace larlight {
     return true;
   }
   
-  bool MCClusterStudy::analyze(storage_manager* storage) {
+  bool MCShowerStudy::analyze(storage_manager* storage) {
     
 
 
@@ -133,7 +133,7 @@ namespace larlight {
     return true;
   }
 
-  bool MCClusterStudy::finalize() {
+  bool MCShowerStudy::finalize() {
 
     // This function is called at the end of event loop.
     // Do all variable finalization you wish to do here.
@@ -162,7 +162,7 @@ namespace larlight {
   }
 
 
-  void MCClusterStudy::PrepareTTree() {
+  void MCShowerStudy::PrepareTTree() {
     if(!_mcclus_tree) {
       _mcclus_tree = new TTree("mcclus_tree","");
       _mcclus_tree->Branch("refinestartend_FOM", &_refinestartend_FOM, "refinestartend_FOM/D");

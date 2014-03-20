@@ -1,19 +1,19 @@
 /**
- * \file MCClusterStudy.hh
+ * \file MCShowerStudy.hh
  *
- * \ingroup MCClusterStudy
+ * \ingroup MCShowerStudy
  * 
- * \brief Class def header for a class MCClusterStudy
+ * \brief Class def header for a class MCShowerStudy
  *
  * @author davidkaleko
  */
 
-/** \addtogroup MCClusterStudy
+/** \addtogroup MCShowerStudy
 
     @{*/
 
-#ifndef MCCLUSTERSTUDY_HH
-#define MCCLUSTERSTUDY_HH
+#ifndef MCSHOWERSTUDY_HH
+#define MCSHOWERSTUDY_HH
 
 #include "ana_base.hh"
 
@@ -23,30 +23,30 @@
 
 namespace larlight {
   /**
-     \class MCClusterStudy
+     \class MCShowerStudy
      User custom analysis class made by davidkaleko
    */
-  class MCClusterStudy : public ana_base{
+  class MCShowerStudy : public ana_base{
   
   public:
 
     /// Default constructor
-    MCClusterStudy() : ana_base() { _name="MCClusterStudy"; }
+    MCShowerStudy() : ana_base() { _name="MCShowerStudy"; }
 
     /// Default destructor
-    virtual ~MCClusterStudy(){};
+    virtual ~MCShowerStudy(){};
 
-    /** IMPLEMENT in MCClusterStudy.cc!
+    /** IMPLEMENT in MCShowerStudy.cc!
         Initialization method to be called before the analysis event loop.
     */ 
     virtual bool initialize();
 
-    /** IMPLEMENT in MCClusterStudy.cc! 
+    /** IMPLEMENT in MCShowerStudy.cc! 
         Analyze a data event-by-event  
     */
     virtual bool analyze(storage_manager* storage);
 
-    /** IMPLEMENT in MCClusterStudy.cc! 
+    /** IMPLEMENT in MCShowerStudy.cc! 
         Finalize method to be called after all events processed.
     */
     virtual bool finalize();
