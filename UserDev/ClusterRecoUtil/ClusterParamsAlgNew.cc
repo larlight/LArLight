@@ -97,6 +97,9 @@ namespace cluster{
       if (finished_GetRoughAxis) return;
       //Try to run the previous function if not yet done.
       if (!finished_GetAverages) GetAverages(true);
+    } else {
+      //Try to run the previous function if not yet done.
+      if (!finished_GetAverages) GetAverages(true);
     }
 
     //using the charge weighted coordinates find the axis from slope
@@ -136,6 +139,8 @@ namespace cluster{
       //OK, no override. Stop if we're already finshed.
       if (finished_GetProfileInfo) return;
       //Try to run the previous function if not yet done.
+      if (!finished_GetRoughAxis) GetRoughAxis(true);
+    } else {
       if (!finished_GetRoughAxis) GetRoughAxis(true);
     }
 
@@ -250,6 +255,8 @@ namespace cluster{
       if (finished_RefineStartPoints) return;
       //Try to run the previous function if not yet done.
       if (!finished_GetProfileInfo) GetProfileInfo(true);
+    } else {
+      if (!finished_GetProfileInfo) GetProfileInfo(true);
     }
     
     finished_RefineStartPoints = true;
@@ -262,8 +269,11 @@ namespace cluster{
       if (finished_GetFinalSlope) return;
       //Try to run the previous function if not yet done.
       if (!finished_RefineStartPoints) RefineStartPoints(true);
+    } else {
+      //Try to run the previous function if not yet done.
+      if (!finished_RefineStartPoints) RefineStartPoints(true);
     }
-    
+
     finished_RefineStartPoints = true;
     return;
   }
