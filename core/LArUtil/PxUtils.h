@@ -12,7 +12,7 @@ namespace larutil{
       
       PxPoint(){
 	Clear();
-	std::cout<< "This is the default point ctor." << std::endl;
+	//	std::cout<< "This is the default point ctor." << std::endl;
       }
       
       PxPoint(unsigned int pp,double ww,double tt){

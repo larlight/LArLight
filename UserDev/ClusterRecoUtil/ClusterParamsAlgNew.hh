@@ -120,6 +120,9 @@ namespace cluster {
     std::vector< double > coarse_charge_profile;
     int coarse_nbins;
     int profile_nbins;
+    int profile_maximum_bin;
+    double profile_integral_forward;
+    double profile_integral_backward;
     
     bool finished_GetAverages;
     bool finished_GetRoughAxis;
@@ -130,7 +133,9 @@ namespace cluster {
 
     double rough_2d_slope;    // slope 
     double rough_2d_intercept;    // slope 
-    
+    larutil::PxPoint rough_begin_point; 
+    larutil::PxPoint rough_end_point;
+
     cluster::cluster_params _this_params;
 
   }; //class ClusterParamsAlgNew

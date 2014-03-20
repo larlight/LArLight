@@ -10,11 +10,11 @@
 
 namespace cluster{
 
-  ClusterParamsAlgNew::ClusterParamsAlgNew(std::vector<larutil::PxHit>){
+  ClusterParamsAlgNew::ClusterParamsAlgNew(std::vector<larutil::PxHit> inhitlist){
 
     // Make default values
     // Is done by the struct    
-  
+    hitVector=inhitlist;
     // Make sure TPrincipal is initialized:
     principal = new TPrincipal(2);
 
@@ -24,6 +24,20 @@ namespace cluster{
     finished_RefineStartPoints = false;
     finished_GetFinalSlope     = false;
 
+    rough_2d_slope=-999.999;    // slope 
+    rough_2d_intercept=-999.999;    // slope 
+       
+    rough_begin_point.w=-999.999;
+    rough_end_point.w=-999.999;
+     
+    rough_begin_point.t=-999.999;
+    rough_end_point.t=-999.999;
+
+    profile_integral_forward=-999.999;
+    profile_integral_backward=-999.999;
+    profile_maximum_bin=-999;
+    
+    
     gser = (larutil::GeometryUtilities*)(larutil::GeometryUtilities::GetME());
   }
   
@@ -213,10 +227,10 @@ namespace cluster{
      BeginOnlinePoint = (HighOnlinePoint.w > LowOnlinePoint.w) ? LowOnlinePoint : HighOnlinePoint;
      
      
-     double projectedlength=gser->Get2DDistance(HighOnlinePoint,LowOnlinePoint);
+    double projectedlength=gser->Get2DDistance(HighOnlinePoint,LowOnlinePoint);
      
       
-      
+     double current_maximum=0; 
     for(auto & hit : hitVector)
       {
       
@@ -237,7 +251,12 @@ namespace cluster{
       int coarse_bin=(int)linedist/projectedlength*coarse_nbins; 
       
       if(fine_bin<profile_nbins)  //only fill if bin number is in range
-	charge_profile[fine_bin]+=weight;
+	{charge_profile[fine_bin]+=weight;
+         if(charge_profile[fine_bin]>current_maximum && fine_bin!=0 && fine_bin!=profile_nbins-1) //find maximum bin on the fly.
+	 {current_maximum=charge_profile[fine_bin];
+	  profile_maximum_bin=fine_bin; 
+	 }
+	}
       
       if(coarse_bin<coarse_nbins) //only fill if bin number is in range
 	coarse_charge_profile[coarse_bin]+=weight;
@@ -249,6 +268,15 @@ namespace cluster{
     return;    
   }
   
+  
+    /**
+     * Calculates the following variables:
+     * length
+     * width
+     * @param override [description]
+     */
+  
+  
   void ClusterParamsAlgNew::RefineStartPoints(bool override) {
     if(!override) { //Override being set, we skip all this logic.
       //OK, no override. Stop if we're already finshed.
@@ -259,12 +287,7 @@ namespace cluster{
       if (!finished_GetProfileInfo) GetProfileInfo(true);
     }
     
-    /**
-     * Calculates the following variables:
-     * length
-     * width
-     * @param override [description]
-     */
+    
 
     finished_RefineStartPoints = true;
     return;
