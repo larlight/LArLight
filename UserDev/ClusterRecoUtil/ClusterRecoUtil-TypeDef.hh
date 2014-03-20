@@ -11,6 +11,7 @@
 
 // Class forward declaration here
 namespace cluster{
+  class ClusterParamsExecutor;
   class ClusterParamsAlgNew;
   class ClusterRecoUtils;
   class cluster_params;

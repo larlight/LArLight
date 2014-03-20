@@ -16,22 +16,32 @@
 
 #include "ana_base.hh"
 
-/**
-   \class ClusterParamsExecutor
-   User defined class ClusterParamsExecutor ... these comments are used to generate
-   doxygen documentation!
- */
-class ClusterParamsExecutor{
+namespace cluster {
+  
+  /**
+     \class ClusterParamsExecutor
+     User defined class ClusterParamsExecutor ... these comments are used to generate
+     doxygen documentation!
+  */
+  class ClusterParamsExecutor : public larlight::ana_base {
+    
+  public:
+    
+    /// Default constructor
+    ClusterParamsExecutor(){};
+    
+    /// Default destructor
+    virtual ~ClusterParamsExecutor(){};
+    
+    virtual bool initialize();
+    
+    virtual bool finalize();
+    
+    virtual bool analyze(larlight::storage_manager* storage);
+    
+  };
 
-public:
-
-  /// Default constructor
-  ClusterParamsExecutor(){};
-
-  /// Default destructor
-  virtual ~ClusterParamsExecutor(){};
-
-};
+}
 
 #endif
 /** @} */ // end of doxygen group 
