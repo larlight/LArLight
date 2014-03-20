@@ -404,13 +404,27 @@ namespace larutil{
 					 Double_t timestart) const
   {
 	
-    return Get2Dslope(wireend-wirestart,timeend-timestart);
+    return GeometryUtilities::Get2Dslope((wireend-wirestart)*fWiretoCm,(timeend-timestart)*fTimetoCm);
   
   }
 
+   /////////////////////////////////////////////////////////
+  //Calculate 2D slope 
+  // in "cm" "cm" coordinates
+  /////////////////////////////////////////////////////////
+  double GeometryUtilities::Get2Dslope(larutil::PxPoint endpoint,
+					larutil::PxPoint startpoint) const
+  {
+    return Get2Dslope(endpoint.w-startpoint.w,endpoint.t-startpoint.t);
+  
+  }
+  
+  
+  
   /////////////////////////////////////////////////////////
   //Calculate 2D slope 
   // in wire time coordinates coordinates
+  // 
   /////////////////////////////////////////////////////////
   Double_t GeometryUtilities::Get2Dslope(Double_t dwire,
 					 Double_t dtime) const
@@ -433,9 +447,21 @@ namespace larutil{
 					 Double_t timestart) const
   {
 
-    return Get2Dangle(wireend-wirestart,timeend-timestart);
+    return Get2Dangle((wireend-wirestart)*fWiretoCm,(timeend-timestart)*fTimetoCm);
   
   }
+  
+  /////////////////////////////////////////////////////////
+  //Calculate 2D angle 
+  // in "cm" "cm" coordinates, endpoint and startpoint are assumed to be in cm/cm space
+  /////////////////////////////////////////////////////////
+  Double_t GeometryUtilities::Get2Dangle(larutil::PxPoint endpoint,
+		        larutil::PxPoint startpoint) const
+  {
+    return Get2Dangle(endpoint.w-startpoint.w,endpoint.t-startpoint.t);
+  
+  }
+			
   ////////////////////////////
   //Calculate 2D angle 
   // in "cm" "cm" coordinates
@@ -447,8 +473,8 @@ namespace larutil{
     Double_t BC,AC;
     Double_t omega;
  
-    BC = ((Double_t)dwire)*fWiretoCm; // in cm
-    AC = ((Double_t)dtime)*fTimetoCm; //in cm 
+    BC = ((Double_t)dwire); // in cm
+    AC = ((Double_t)dtime); //in cm 
     omega = std::asin(  AC/std::sqrt(pow(AC,2)+pow(BC,2)) );
     if(BC<0)  // for the time being. Will check if it works for AC<0
       { 

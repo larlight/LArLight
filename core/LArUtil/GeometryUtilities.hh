@@ -64,24 +64,32 @@ namespace larutil{
 				 Double_t dw1) const;
         
     
-    Double_t Get2Dangle(Double_t wire,
-		      Double_t time) const;
+    Double_t Get2Dangle(Double_t deltawire,
+		      Double_t deltatime) const;
 
-    Double_t Get2Dangle(larutil::PxPoint pp) const
-      {return Get2Dangle(pp.w,pp.t);};		      
+		      
 		      
     Double_t Get2Dangle(Double_t wireend,
 		      Double_t wirestart,
 		      Double_t timeend,
 		      Double_t timestart) const;
-    
-    Double_t Get2Dslope(Double_t wire,
-		      Double_t time) const;
+   
+    double Get2Dangle(larutil::PxPoint endpoint,
+		        larutil::PxPoint startpoint) const;
+   		      
+		      
+		      
+    Double_t Get2Dslope(Double_t deltawire,
+		      Double_t deltatime) const;
+		      
     Double_t Get2Dslope(Double_t wireend,
 		      Double_t wirestart,
 		      Double_t timeend,
 		      Double_t timestart) const;
     
+    double Get2Dslope(larutil::PxPoint endpoint,
+		        larutil::PxPoint startpoint) const;		      
+		      
     Double_t Get2DDistance(Double_t wire1,
 			 Double_t time1,
 			 Double_t wire2,
