@@ -3,7 +3,8 @@
  *
  * \ingroup MCShowerStudy
  * 
- * \brief Class def header for a class MCShowerStudy
+ * \brief This is a generic module to compare parameters from reconstructed showers to MC showers.
+ *        It calculates whatever figures of merit you want to calculate, and saves it to an output TTree.
  *
  * @author davidkaleko
  */
@@ -16,6 +17,7 @@
 #define MCSHOWERSTUDY_HH
 
 #include "ana_base.hh"
+#include <sstream>
 
 //this include works because I modified the GNUMakeFile to add LArUtil
 // to INCFLAGS, so compiler can find this hh file
@@ -51,11 +53,18 @@ namespace larlight {
     */
     virtual bool finalize();
 
+    //getter for the tree holding figures of merit
     TTree* GetMCClusTree() const {return _mcclus_tree;}
 
     protected:
 
     void PrepareTTree();
+
+    void ClearTTreeVars();
+
+    bool RefineDirectionTest(event_cluster* ev_cluster, event_mcshower* ev_mcshower);
+    
+
 
     TTree* _mcclus_tree;
 
@@ -65,7 +74,7 @@ namespace larlight {
     double _time_2_cm;
 
     // variables that go into the analysis ttree
-    double _refinestartend_FOM;
+    std::vector<double> _refinestartend_FOM;
 
   };
 }
