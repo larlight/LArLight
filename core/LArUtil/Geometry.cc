@@ -15,6 +15,55 @@ namespace larutil {
       _tree_name = kTREENAME_GEOMETRY;
     _name = "Geometry";
     LoadData();
+    ComputeData();
+  }
+
+  void Geometry::ComputeData()
+  {
+    fOrthVectorsY.resize(this->Nplanes());
+    fOrthVectorsZ.resize(this->Nplanes());
+    fFirstWireProj.resize(this->Nplanes());
+    for(size_t plane=0; plane<this->Nplanes(); ++plane) {
+      
+      larlight::GEO::View_t view = this->PlaneToView(plane);
+
+      Double_t ThisWirePitch = this->WirePitch(view);
+
+      Double_t WireCentre1[3] = {0.};
+      Double_t WireCentre2[3] = {0.};
+
+      Double_t  th = this->WireAngleToVertical(view);
+      Double_t sth = TMath::Sin(th);
+      Double_t cth = TMath::Cos(th);
+      
+      for(size_t coord=0; coord<3; ++coord) {
+	WireCentre1[coord] = (fWireEndVtx.at(plane).at(0).at(coord) + fWireStartVtx.at(plane).at(0).at(coord)) / 2.;
+	WireCentre2[coord] = (fWireEndVtx.at(plane).at(1).at(coord) + fWireStartVtx.at(plane).at(1).at(coord)) / 2.;
+      }
+
+      Double_t OrthY =  cth;
+      Double_t OrthZ = -sth;
+      if(((WireCentre2[1] - WireCentre1[1])*OrthY 
+	  + (WireCentre2[2] - WireCentre1[2])*OrthZ) < 0){
+	OrthZ *= -1;
+	OrthY *= -1;
+      }
+
+      fOrthVectorsY[plane] = OrthY / ThisWirePitch;
+      fOrthVectorsZ[plane] = OrthZ / ThisWirePitch;
+
+      fFirstWireProj[plane]  = WireCentre1[1]*OrthY + WireCentre1[2]*OrthZ;
+      fFirstWireProj[plane] /= ThisWirePitch;
+      fFirstWireProj[plane] -= 0.5;
+
+      std::cout << Form("Plane %d ... (%g,%g,%g)",
+			plane,
+			fOrthVectorsY[plane],
+			fOrthVectorsZ[plane],
+			fFirstWireProj[plane])
+		<<std::endl;
+    }
+    
   }
 
   void Geometry::ClearData()
@@ -165,8 +214,10 @@ namespace larutil {
       //fFirstWireEndVtx.push_back(pFirstWireEndVtx->at(i));
       fWireStartVtx.push_back(pWireStartVtx->at(i));
       fWireEndVtx.push_back(pWireEndVtx->at(i));
+
       fPlaneOriginVtx.push_back(pPlaneOriginVtx->at(i));
     }
+
 
     // Copy view-wise variables
     size_t n_views = pWirePitch->size();
@@ -308,44 +359,32 @@ namespace larutil {
   UInt_t Geometry::NearestWire(const TVector3 &worldLoc,
 			       const UInt_t PlaneNo) const
   {
-    /*
-    if(PlaneNo > fFirstWireStartVtx.size()) {
+    int NearestWireNumber = int(std::nearbyint(worldLoc[1]*fOrthVectorsY.at(PlaneNo)
+                                               + worldLoc[2]*fOrthVectorsZ.at(PlaneNo)
+                                               - fFirstWireProj.at(PlaneNo)));
 
-      throw LArUtilException(Form("Invalid plane number: %d",PlaneNo));
-      return larlight::DATA::INVALID_UINT;
+    unsigned int wireNumber = (unsigned int) NearestWireNumber;
+
+    if(NearestWireNumber < 0 ||
+       NearestWireNumber >= this->Nwires(PlaneNo)) {
+
+      if(NearestWireNumber < 0) wireNumber = 0;
+      else wireNumber = this->Nwires(PlaneNo) - 1;
+
+      throw larutil::LArUtilException(Form("Can't find nearest wire for (%g,%g,%g)",
+					   worldLoc[0],worldLoc[1], worldLoc[2]));
 
     }
+    std::cout<<"NearestWireID"<<std::endl;
+    std::cout<<Form("(%g,%g,%g) position ... using (%g,%g,%g) ... Wire %d Plane %d",
+                    worldLoc[0],worldLoc[1],worldLoc[2],
+                    fOrthVectorsY[PlaneNo],
+                    fOrthVectorsZ[PlaneNo],
+                    fFirstWireProj[PlaneNo],
+		    wireNumber,PlaneNo)
+             << std::endl;
 
-    Double_t point_y = worldLoc[1];
-    Double_t point_z = worldLoc[2];
-
-    Double_t wire_upper_y = fFirstWireStartVtx.at(PlaneNo).at(1);
-    Double_t wire_lower_y = fFirstWireEndVtx.at(PlaneNo).at(1);
-
-    Double_t wire_upper_z = fFirstWireStartVtx.at(PlaneNo).at(2);
-    Double_t wire_lower_z = fFirstWireEndVtx.at(PlaneNo).at(2);
-
-    if(wire_upper_y < wire_lower_y) {
-      std::swap(wire_upper_y,wire_lower_y);
-      std::swap(wire_upper_z,wire_lower_z);
-    }
-
-    if(point_y > wire_upper_y) point_y = wire_upper_y;
-    if(point_y < wire_lower_y) point_y = wire_lower_y;
-
-    Double_t dx = (point_z - wire_lower_z) - 
-      TMath::Abs(point_y - wire_lower_y)/TMath::Tan(fWireAngle.at(fViewType.at(PlaneNo)));
-
-    if(dx < 0) return 0;
-
-    if(dx > (wire_lower_z + fWirePitch.at(fViewType.at(PlaneNo)) * (this->Nwires(PlaneNo))) ) 
-      return ( this->Nwires(PlaneNo) - 1 );
-
-    dx /= fWirePitch.at(fViewType.at(PlaneNo)) + 0.5;
-
-    return (UInt_t)(dx);
-    */
-    return 0;
+    return wireNumber;
   }
 
   // distance between planes p1 < p2

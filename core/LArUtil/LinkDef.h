@@ -12,7 +12,7 @@
 #pragma link C++ namespace larutil;
 
 #pragma link C++ class std::vector<std::vector<Float_t> >+;
-
+#pragma link C++ class std::vector<std::vector<std::vector<Double_t > > >+;
 #pragma link C++ class larutil::LArUtilException+;
 //#pragma link C++ class larutil::LArUtilBase+;
 #pragma link C++ class larutil::Geometry+;
