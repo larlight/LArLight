@@ -16,4 +16,5 @@ rootlibmap() {
 
 ######################################################
 # ClusterRecoUtil
-rootlibmap libClusterRecoUtil.rootmap libClusterRecoUtil.so $USER_DEV_DIR/ClusterRecoUtil/LinkDef.h 
+rootlibmap libClusterRecoUtil.rootmap libClusterRecoUtil.so $USER_DEV_DIR/ClusterRecoUtil/LinkDef.h \
+    libBase.so libDataFormat.so libLArUtil.so
