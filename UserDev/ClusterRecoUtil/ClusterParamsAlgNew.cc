@@ -15,6 +15,7 @@ namespace cluster{
     // Make default values
     // Is done by the struct    
     hitVector=inhitlist;
+    fplane=hitVector[0].plane;
     // Make sure TPrincipal is initialized:
     principal = new TPrincipal(2);
 
@@ -37,6 +38,9 @@ namespace cluster{
     profile_integral_backward=-999.999;
     profile_maximum_bin=-999;
     
+    fChargeCutoffThreshold[0]=500;
+    fChargeCutoffThreshold[1]=500;
+    fChargeCutoffThreshold[2]=1000;
     
     gser = (larutil::GeometryUtilities*)(larutil::GeometryUtilities::GetME());
   }
@@ -178,10 +182,10 @@ namespace cluster{
     else
       inv_2d_slope=-999999.;
 
-    double inter_high=-999999;
-    double inter_low=999999;
-    double inter_high_side=-999999;
-    double inter_low_side=999999;
+    inter_high=-999999;
+    inter_low=999999;
+    inter_high_side=-999999;
+    inter_low_side=999999;
     //loop over all hits. Create coarse and fine profiles of the charge weight to help refine the start/end points and have a first guess of direction
     for(auto & hit : hitVector)
       {
@@ -227,7 +231,7 @@ namespace cluster{
      BeginOnlinePoint = (HighOnlinePoint.w > LowOnlinePoint.w) ? LowOnlinePoint : HighOnlinePoint;
      
      
-    double projectedlength=gser->Get2DDistance(HighOnlinePoint,LowOnlinePoint);
+     projectedlength=gser->Get2DDistance(HighOnlinePoint,LowOnlinePoint);
      
       
      double current_maximum=0; 
@@ -287,6 +291,68 @@ namespace cluster{
       if (!finished_GetProfileInfo) GetProfileInfo(true);
     }
     
+    profile_integral_forward=0;
+    profile_integral_backward=0;
+    
+    //calculate the forward and backward integrals counting int the maximum bin.
+    
+    for(int ibin=0;ibin<profile_nbins;ibin++)
+    {
+    if(ibin<=profile_maximum_bin)  
+      profile_integral_forward+=charge_profile[ibin];
+    
+    if(ibin>=profile_maximum_bin)  
+      profile_integral_backward+=charge_profile[ibin];
+      
+    }
+    
+    // now, we have the forward and backward integral so start stepping forward and backward to find the trunk of the 
+    // shower. This is done making sure that the running integral until less than 1% is left and the bin is above 
+    // a set theshold many empty bins.
+    
+    //forward loop
+    double running_integral=profile_integral_forward;
+    int startbin,endbin;
+    for(startbin=profile_maximum_bin;startbin>1;startbin--)
+      {running_integral-=charge_profile[startbin];
+	if( charge_profile[startbin]<fChargeCutoffThreshold[fplane] && running_integral/profile_integral_forward<0.01 )
+	  break;
+      }
+    
+    //backward loop
+    running_integral=profile_integral_backward;
+    for(endbin=profile_maximum_bin;endbin<profile_nbins-1;endbin++)
+      {running_integral-=charge_profile[endbin];
+	if( charge_profile[endbin]<fChargeCutoffThreshold[fplane] && running_integral/profile_integral_backward<0.01 )
+	  break;
+      }
+    
+    // now have profile start and endpoints. Now translate to wire/time. Will use wire/time that are on the rough axis.
+    //projectedlength is the length from inter_low to interhigh along the rough_2d_axis
+    // on bin distance is: 
+     larutil::PxPoint OnlinePoint;
+     
+     
+     double ort_intercept_begin=(inter_high-inter_low)/profile_nbins*startbin;
+     
+     gser->GetPointOnLineWSlopes(rough_2d_slope,
+			      rough_2d_intercept,
+			      ort_intercept_begin,
+			      rough_begin_point);
+     
+     double ort_intercept_end=(inter_high-inter_low)/profile_nbins*endbin;
+     
+     gser->GetPointOnLineWSlopes(rough_2d_slope,
+			      rough_2d_intercept,
+			      ort_intercept_end,
+			      rough_end_point);
+     
+     // ok. now have rough_begin_point and rough_end_point. No decision about direction has been made yet.
+     // need to define physical direction with openind angles and pass that to Ryan's line finder.
+     
+     
+    
+       
     
 
     finished_RefineStartPoints = true;

@@ -119,6 +119,10 @@ namespace cluster {
     larutil::GeometryUtilities *gser;
     TPrincipal *principal;
     
+    //settable parameters:
+     double fChargeCutoffThreshold[3]; 
+     int fplane;
+    
     std::vector< double > charge_profile;
     std::vector< double > coarse_charge_profile;
     int coarse_nbins;
@@ -126,6 +130,13 @@ namespace cluster {
     int profile_maximum_bin;
     double profile_integral_forward;
     double profile_integral_backward;
+    double projectedlength;
+    
+    //extreme intercepts using the rough_2d_slope
+    double inter_high;
+    double inter_low;
+    double inter_high_side;
+    double inter_low_side;
     
     bool finished_GetAverages;
     bool finished_GetRoughAxis;
