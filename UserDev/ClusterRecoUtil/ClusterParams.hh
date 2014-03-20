@@ -49,7 +49,7 @@ namespace cluster{
     double offaxis_hits;
 
     void clear(){
-            mean_charge                       = -999.999 ;
+      mean_charge                       = -999.999 ;
       mean_x                            = -999.999 ;
       mean_y                            = -999.999 ;
       rms_x                             = -999.999 ;
@@ -72,7 +72,7 @@ namespace cluster{
       hit_density_1D                    = -999.999 ;
       hit_density_2D                    = -999.999 ;
       angle_2d                          = -999.999 ;
-      cluster_angle_2d		        = -999.999 ;
+      cluster_angle_2d		              = -999.999 ;
       showerness                        = -999.999 ;
       trackness                         = -999.999 ;
     }

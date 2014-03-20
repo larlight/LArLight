@@ -15,6 +15,10 @@ namespace cluster{
     Initialize();
   }
 
+  ClusterParamsAlgNew::~ClusterParamsAlgNew(){
+    if (principal != 0) delete principal;
+  }
+
   ClusterParamsAlgNew::ClusterParamsAlgNew(const std::vector<larutil::PxHit> &inhitlist){
     Initialize();
     SetHits(inhitlist);
@@ -76,13 +80,15 @@ namespace cluster{
     fChargeCutoffThreshold[0]=500;
     fChargeCutoffThreshold[1]=500;
     fChargeCutoffThreshold[2]=1000;
+
+
   }
 
   void ClusterParamsAlgNew::FillParams(bool override_DoGetAverages      ,  
-				       bool override_DoGetRoughAxis     ,  
-				       bool override_DoGetProfileInfo   ,  
-				       bool override_DoRefineStartPoints,  
-				       bool override_DoGetFinalSlope     ){
+                                       bool override_DoGetRoughAxis     ,  
+                                       bool override_DoGetProfileInfo   ,  
+                                       bool override_DoRefineStartPoints,  
+                                       bool override_DoGetFinalSlope     ){
     GetAverages      (override_DoGetAverages      );
     GetRoughAxis     (override_DoGetRoughAxis     );
     GetProfileInfo   (override_DoGetProfileInfo   );
@@ -95,49 +101,52 @@ namespace cluster{
     return;
   }
 
-//What is this cruft?//      if(!override) { //Override being set, we skip all this logic.
-//What is this cruft?//      //OK, no override. Stop if we're already finshed.
-//What is this cruft?//      if (finished_GetAverages) return;
-//What is this cruft?//    }
-//What is this cruft?//
-//What is this cruft?//    principal -> Clear();
-//What is this cruft?//
-//What is this cruft?//    _this_params.N_Hits = hitVector.size();
-//What is this cruft?//
-//What is this cruft?//    std::map<double, int> wireMap;
-//What is this cruft?//
-//What is this cruft?//    double mean_charge = 0.0;
-//What is this cruft?//
-//What is this cruft?//
-//What is this cruft?//
-//What is this cruft?//    for (auto & hit : hitVector){
-//What is this cruft?//      double data[2];
-//What is this cruft?//      data[0] = hit.w;
-//What is this cruft?//      data[1] = hit.t;
-//What is this cruft?//      principal -> AddRow(data);
-//What is this cruft?//      _this_params.charge_wgt_x += hit.w*hit.charge;
-//What is this cruft?//      _this_params.charge_wgt_y += hit.t*hit.charge;
-//What is this cruft?//      mean_charge += hit.charge;
-//What is this cruft?//
-//What is this cruft?//      wireMap[hit.w] ++;
-//What is this cruft?//
-//What is this cruft?//    }
-//What is this cruft?//    _this_params.N_Wires = wireMap.size();
-//What is this cruft?//    _this_params.multi_hit_wires = _this_params.N_Hits - _this_params.N_Wires;
-//What is this cruft?//
-//What is this cruft?//    _this_params.charge_wgt_x /= mean_charge;
-//What is this cruft?//    _this_params.charge_wgt_y /= mean_charge;
-//What is this cruft?//
-//What is this cruft?//    _this_params.mean_x = (* principal -> GetMeanValues())[0];
-//What is this cruft?//    _this_params.mean_y = (* principal -> GetMeanValues())[1];
-//What is this cruft?//    _this_params.mean_charge /= _this_params.N_Hits;
-//What is this cruft?//
-//What is this cruft?//    principal -> MakePrincipals();
-//What is this cruft?//
-//What is this cruft?//    _this_params.eigenvalue_principal = (* principal -> GetEigenValues() )[0];
-//What is this cruft?//    _this_params.eigenvalue_secondary = (* principal -> GetEigenValues() )[1];
-//What is this cruft?//
-//What is this cruft?//}
+
+  void ClusterParamsAlgNew::GetAverages(bool override){
+    if(!override) { //Override being set, we skip all this logic.
+      //OK, no override. Stop if we're already finshed.
+      if (finished_GetAverages) return;
+    }
+
+    principal -> Clear();
+
+    _this_params.N_Hits = hitVector.size();
+
+    std::map<double, int> wireMap;
+
+    double mean_charge = 0.0;
+
+
+
+    for (auto & hit : hitVector){
+      double data[2];
+      data[0] = hit.w;
+      data[1] = hit.t;
+      principal -> AddRow(data);
+      _this_params.charge_wgt_x += hit.w*hit.charge;
+      _this_params.charge_wgt_y += hit.t*hit.charge;
+      mean_charge += hit.charge;
+
+      wireMap[hit.w] ++;
+
+    }
+    _this_params.N_Wires = wireMap.size();
+    _this_params.multi_hit_wires = _this_params.N_Hits - _this_params.N_Wires;
+
+    _this_params.charge_wgt_x /= mean_charge;
+    _this_params.charge_wgt_y /= mean_charge;
+
+    _this_params.mean_x = (* principal -> GetMeanValues())[0];
+    _this_params.mean_y = (* principal -> GetMeanValues())[1];
+    _this_params.mean_charge /= _this_params.N_Hits;
+
+    principal -> MakePrincipals();
+
+    _this_params.eigenvalue_principal = (* principal -> GetEigenValues() )[0];
+    _this_params.eigenvalue_secondary = (* principal -> GetEigenValues() )[1];
+
+    finished_GetAverages = true;
+  }
 
   // Also does the high hitlist
   void ClusterParamsAlgNew::GetRoughAxis(bool override){
@@ -161,11 +170,11 @@ namespace cluster{
     for (auto & hit : hitVector){
       //if charge is above avg_charge
       if(hit.charge > _this_params.mean_charge){
-	ncw+=1;
-	sumwire+=hit.w;
-	sumtime+=hit.t;
-	sumwiretime+=hit.w*hit.t;
-	sumwirewire+=pow(hit.w,2);	
+        ncw+=1;
+        sumwire+=hit.w;
+        sumtime+=hit.t;
+        sumwiretime+=hit.w*hit.t;
+        sumwirewire+=pow(hit.w,2);  
       }//for high charge
     }//For hh loop
 
@@ -219,62 +228,60 @@ namespace cluster{
     inter_low_side=999999;
     //loop over all hits. Create coarse and fine profiles of the charge weight to help refine the start/end points and have a first guess of direction
     for(auto & hit : hitVector)
-      {
+    {
       
-	//calculate intercepts along   
-	double intercept=hit.t-inv_2d_slope*(double)hit.w;
+      //calculate intercepts along   
+      double intercept=hit.t-inv_2d_slope*(double)hit.w;
+        
+      double side_intercept=hit.t-rough_2d_slope*(double)hit.w;
+        
+      if(intercept > inter_high ){
+        inter_high=intercept;
+      }
+        
+      if(intercept < inter_low ){
+        inter_low=intercept;
+      }  
     
-	double side_intercept=hit.t-rough_2d_slope*(double)hit.w;
+      if(side_intercept > inter_high_side ){
+        inter_high_side=side_intercept;
+      }
+        
+      if(side_intercept < inter_low_side ){
+        inter_low_side=side_intercept;
+      }
     
-	if(intercept > inter_high ){
-	  inter_high=intercept;
-    	}
-    
-	if(intercept < inter_low ){
-	  inter_low=intercept;
-        }  
 
-	if(side_intercept > inter_high_side ){
-	  inter_high_side=side_intercept;
-    	}
-    
-	if(side_intercept < inter_low_side ){
-	  inter_low_side=side_intercept;
-        }
-    
-
-      }   // end of first HitIter loop, at this point we should have the extreme intercepts 
-	
+    }   // end of first HitIter loop, at this point we should have the extreme intercepts 
+  
     /////////////////////////////////////////////
     // Second loop. Fill profiles. 
     /////////////////////////////////////////////
     
     // get projected points at the beginning and end of the axis.
-     
-     larutil::PxPoint HighOnlinePoint, LowOnlinePoint,BeginOnlinePoint;
-     
-     gser->GetPointOnLineWSlopes(rough_2d_slope,rough_2d_intercept,inter_high,HighOnlinePoint);
-     gser->GetPointOnLineWSlopes(rough_2d_slope,rough_2d_intercept,inter_low,LowOnlinePoint);
+    
+    larutil::PxPoint HighOnlinePoint, LowOnlinePoint,BeginOnlinePoint;
+    
+    gser->GetPointOnLineWSlopes(rough_2d_slope,rough_2d_intercept,inter_high,HighOnlinePoint);
+    gser->GetPointOnLineWSlopes(rough_2d_slope,rough_2d_intercept,inter_low,LowOnlinePoint);
   
 
-     //define BeginOnlinePoint as the one with lower wire number (for now)
-     
-     BeginOnlinePoint = (HighOnlinePoint.w > LowOnlinePoint.w) ? LowOnlinePoint : HighOnlinePoint;
-     
-     
-     projectedlength=gser->Get2DDistance(HighOnlinePoint,LowOnlinePoint);
-     
-      
-     double current_maximum=0; 
-    for(auto & hit : hitVector)
-      {
-      
-       larutil::PxPoint OnlinePoint;
-       // get coordinates of point on axis.
-       gser->GetPointOnLine(rough_2d_slope,LowOnlinePoint,hit,OnlinePoint);
+    //define BeginOnlinePoint as the one with lower wire number (for now)
     
-       double linedist=gser->Get2DDistance(OnlinePoint,BeginOnlinePoint);
-       double ortdist=gser->Get2DDistance(OnlinePoint,hit);
+    BeginOnlinePoint = (HighOnlinePoint.w > LowOnlinePoint.w) ? LowOnlinePoint : HighOnlinePoint;
+    
+    projectedlength=gser->Get2DDistance(HighOnlinePoint,LowOnlinePoint);
+     
+    double current_maximum=0; 
+    for(auto & hit : hitVector)
+    {
+     
+      larutil::PxPoint OnlinePoint;
+      // get coordinates of point on axis.
+      gser->GetPointOnLine(rough_2d_slope,LowOnlinePoint,hit,OnlinePoint);
+    
+      double linedist=gser->Get2DDistance(OnlinePoint,BeginOnlinePoint);
+      double ortdist=gser->Get2DDistance(OnlinePoint,hit);
     
       ////////////////////////////////////////////////////////////////////// 
       //calculate the weight along the axis, this formula is based on rough guessology. 
@@ -286,18 +293,20 @@ namespace cluster{
       int coarse_bin=(int)linedist/projectedlength*coarse_nbins; 
       
       if(fine_bin<profile_nbins)  //only fill if bin number is in range
-	{charge_profile[fine_bin]+=weight;
-         if(charge_profile[fine_bin]>current_maximum && fine_bin!=0 && fine_bin!=profile_nbins-1) //find maximum bin on the fly.
-	 {current_maximum=charge_profile[fine_bin];
-	  profile_maximum_bin=fine_bin; 
-	 }
-	}
+      {
+        charge_profile[fine_bin]+=weight;
+        if(charge_profile[fine_bin]>current_maximum && fine_bin!=0 && fine_bin!=profile_nbins-1) //find maximum bin on the fly.
+        {
+          current_maximum=charge_profile[fine_bin];
+          profile_maximum_bin=fine_bin; 
+        }
+      }
       
       if(coarse_bin<coarse_nbins) //only fill if bin number is in range
-	coarse_charge_profile[coarse_bin]+=weight;
+      coarse_charge_profile[coarse_bin]+=weight;
       
            
-      }  // end second loop on hits. Now should have filled profile vectors.
+    }  // end second loop on hits. Now should have filled profile vectors.
       
     finished_GetProfileInfo = true;
     return;    
@@ -345,46 +354,48 @@ namespace cluster{
     double running_integral=profile_integral_forward;
     int startbin,endbin;
     for(startbin=profile_maximum_bin;startbin>1;startbin--)
-      {running_integral-=charge_profile[startbin];
-	if( charge_profile[startbin]<fChargeCutoffThreshold[fplane] && running_integral/profile_integral_forward<0.01 )
-	  break;
-      }
+    {
+      running_integral-=charge_profile[startbin];
+      if( charge_profile[startbin]<fChargeCutoffThreshold[fplane] && running_integral/profile_integral_forward<0.01 )
+        break;
+    }
     
     //backward loop
     running_integral=profile_integral_backward;
     for(endbin=profile_maximum_bin;endbin<profile_nbins-1;endbin++)
-      {running_integral-=charge_profile[endbin];
-	if( charge_profile[endbin]<fChargeCutoffThreshold[fplane] && running_integral/profile_integral_backward<0.01 )
-	  break;
-      }
+    {
+      running_integral-=charge_profile[endbin];
+      if( charge_profile[endbin]<fChargeCutoffThreshold[fplane] && running_integral/profile_integral_backward<0.01 )
+      break;
+    }
     
     // now have profile start and endpoints. Now translate to wire/time. Will use wire/time that are on the rough axis.
     //projectedlength is the length from inter_low to interhigh along the rough_2d_axis
     // on bin distance is: 
-     larutil::PxPoint OnlinePoint;
+    larutil::PxPoint OnlinePoint;
      
      
-     double ort_intercept_begin=(inter_high-inter_low)/profile_nbins*startbin;
+    double ort_intercept_begin=(inter_high-inter_low)/profile_nbins*startbin;
      
-     gser->GetPointOnLineWSlopes(rough_2d_slope,
-			      rough_2d_intercept,
-			      ort_intercept_begin,
-			      rough_begin_point);
+    gser->GetPointOnLineWSlopes(rough_2d_slope,
+            rough_2d_intercept,
+            ort_intercept_begin,
+            rough_begin_point);
      
-     double ort_intercept_end=(inter_high-inter_low)/profile_nbins*endbin;
+    double ort_intercept_end=(inter_high-inter_low)/profile_nbins*endbin;
      
-     gser->GetPointOnLineWSlopes(rough_2d_slope,
-			      rough_2d_intercept,
-			      ort_intercept_end,
-			      rough_end_point);
+    gser->GetPointOnLineWSlopes(rough_2d_slope,
+            rough_2d_intercept,
+            ort_intercept_end,
+            rough_end_point);
      
-     // ok. now have rough_begin_point and rough_end_point. No decision about direction has been made yet.
-     // need to define physical direction with openind angles and pass that to Ryan's line finder.
+    // ok. now have rough_begin_point and rough_end_point. No decision about direction has been made yet.
+    // need to define physical direction with openind angles and pass that to Ryan's line finder.
      
-     
-    
-       
-    
+    // Ariana Elena Mina put it here!  You have
+    // rough_end_point
+    // rough_end_point
+    // and use them to get the axis
 
     finished_RefineStartPoints = true;
     return;
@@ -416,7 +427,7 @@ namespace cluster{
   
   
   void ClusterParamsAlgNew::RefineDirection(larutil::PxPoint &start,
-					    larutil::PxPoint &end) {
+              larutil::PxPoint &end) {
     
     UChar_t plane = (*hitVector.begin()).plane;
 

@@ -33,6 +33,7 @@ namespace cluster {
   public:
 
     ClusterParamsAlgNew();
+    ~ClusterParamsAlgNew();
 
     ClusterParamsAlgNew(const std::vector<larutil::PxHit>&);
 
