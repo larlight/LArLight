@@ -99,7 +99,7 @@ namespace cluster {
      * width
      * @param override [description]
      */
-    void RefineStartPoints(bool override=false){};
+    void RefineStartPoints(bool override=false);
 
     /**
      * Calculates the following variables:
@@ -109,7 +109,7 @@ namespace cluster {
      * direction
      * @param override [description]
      */
-    void GetFinalSlope(bool override=false){};    
+    void GetFinalSlope(bool override=false);    
 
 
     
