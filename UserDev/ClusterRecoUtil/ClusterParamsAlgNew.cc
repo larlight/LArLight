@@ -373,16 +373,11 @@ namespace cluster{
     // now have profile start and endpoints. Now translate to wire/time. Will use wire/time that are on the rough axis.
     //projectedlength is the length from inter_low to interhigh along the rough_2d_axis
     // on bin distance is: 
-<<<<<<< HEAD
      larutil::PxPoint OnlinePoint;
      
      double ort_intercept_begin=(inter_high-inter_low)/profile_nbins*startbin;
-=======
-    larutil::PxPoint OnlinePoint;
      
->>>>>>> 863e83f70b0e98e6aac1beac0521ead1a834913a
      
-    double ort_intercept_begin=(inter_high-inter_low)/profile_nbins*startbin;
      
     gser->GetPointOnLineWSlopes(rough_2d_slope,
             rough_2d_intercept,
@@ -396,7 +391,6 @@ namespace cluster{
             ort_intercept_end,
             rough_end_point);
      
-<<<<<<< HEAD
         //Ryan's Shower Strip finder work here. 
                 //First we need to define the strip width that we want
                         double d=0.6;//this is the width of the strip.... this needs to be tuned to something.
@@ -555,7 +549,6 @@ for( unsigned int k=0; k < closehits.size(); k++){
     
        
     
-=======
     // ok. now have rough_begin_point and rough_end_point. No decision about direction has been made yet.
     // need to define physical direction with openind angles and pass that to Ryan's line finder.
      
@@ -563,7 +556,6 @@ for( unsigned int k=0; k < closehits.size(); k++){
     // rough_end_point
     // rough_end_point
     // and use them to get the axis
->>>>>>> 863e83f70b0e98e6aac1beac0521ead1a834913a
 
     finished_RefineStartPoints = true;
     return;
