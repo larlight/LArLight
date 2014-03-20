@@ -54,7 +54,8 @@ namespace larlight{
     fh_omega_single= new TH1F("fh_omega_single","Theta distribution Hit",720,-180., 180.);
 
     fCMergeAlg->set_verbosity(this->get_verbosity());
-    fCMergeAlg->initialize();
+    //fCMergeAlg->initialize();
+    fCMergeAlg->reconfigure();
     //    fCMergeAlg->SetAngleCut(99999.);
     //    fCMergeAlg->SetSquaredDistanceCut(999999.);
     fCMergeAlg->SetQTotalCut(0.);
