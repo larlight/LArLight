@@ -452,7 +452,7 @@ namespace cluster{
     
     std::cout << rough_begin_point.w << ", " << rough_begin_point.t << " end: " <<  rough_end_point.w << " " << rough_end_point.t << std::endl;
     
-    return;
+    //return;
     //Ryan's Shower Strip finder work here. 
     //First we need to define the strip width that we want
     double d=0.6;//this is the width of the strip.... this needs to be tuned to something.
@@ -460,14 +460,15 @@ namespace cluster{
     // Will need to feed in the set of hits that we want. 
     //	const std::vector<larutil::PxHit*> whole;
     std::vector <larutil::PxHit> subhit;
-    //	larutil::PxHit startHit;
-    //	Double_t linearlimit;
-    //	Double_t ortlimit;
-    //	Double_t lineslopetest;
-    //	larutil::PxHit averageHit;
-    //			avgwire= averageHit.w;
-    //			avgtime= averageHit.t;
-    //	gser->SelectLocalHitlist(whole,subhit,startHit,linearlimit,ortlimit,lineslopetest,averageHit);
+    larutil::PxHit startHit;
+    Double_t linearlimit=10;
+    Double_t ortlimit=10;
+    Double_t lineslopetest;
+    larutil::PxHit averageHit;
+    gser->SelectLocalHitlist(hitVector,subhit,startHit,linearlimit,ortlimit,lineslopetest,averageHit);
+
+    avgwire= averageHit.w;
+    avgtime= averageHit.t;
     std::vector<std::pair<double,double>> vertil;//vertex in tilda-space pair(x-til,y-til)
     vertil.clear();// This isn't needed?
     std::vector<double> vs;//vector of the sum of the distance of a vector to every vertex in tilda-space

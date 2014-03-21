@@ -196,8 +196,8 @@ namespace larutil{
 			    Double_t ortlimit, 
 			    Double_t lineslopetest);
 	
-    void SelectLocalHitlist(const std::vector<larutil::PxHit*>& hitlist, 
-			    std::vector <larutil::PxHit*>& hitlistlocal_index,
+    void SelectLocalHitlist(const std::vector<larutil::PxHit>& hitlist, 
+			    std::vector <larutil::PxHit>& hitlistlocal_index,
 			    larutil::PxHit& startHit,
 			    Double_t& linearlimit,   
 			    Double_t& ortlimit, 

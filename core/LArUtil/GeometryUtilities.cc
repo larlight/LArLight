@@ -999,8 +999,8 @@ namespace larutil{
     
   }
 
-  void GeometryUtilities::SelectLocalHitlist(const std::vector<larutil::PxHit*>& hitlist, 
-					     std::vector <larutil::PxHit*> &hitlistlocal,
+  void GeometryUtilities::SelectLocalHitlist(const std::vector<larutil::PxHit>& hitlist, 
+					     std::vector <larutil::PxHit> &hitlistlocal,
 					     larutil::PxHit& startHit,
 					     Double_t& linearlimit,   
 					     Double_t& ortlimit, 
@@ -1015,8 +1015,8 @@ namespace larutil{
     UInt_t wiresum = 0;
     for(size_t i=0; i<hitlist.size(); ++i) {
 
-      Double_t time = hitlist.at(i)->t;
-      UInt_t wire = hitlist.at(i)->w;
+      Double_t time = hitlist.at(i).t;
+      UInt_t wire = hitlist.at(i).w;
       timesum += time;
       wiresum += wire;
 
