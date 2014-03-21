@@ -486,7 +486,7 @@ namespace cluster{
     double gwirewire;
 	//KAZU!!! I NEED this too//this will need to come from somewhere... 
 	//This is some hit that is from the way far side of the entire shower cluster...
-    larutil::PxHit farhit= rough_end_point;// will come from somewhere... is this supposed to be some point that is far away? from the side that we are expecting to be the start?	
+    larutil::PxPoint farhit= rough_end_point;// will come from somewhere... is this supposed to be some point that is far away? from the side that we are expecting to be the start?	
     
     //=============building the local vector===================
     //this is clumsy... but just want to get something to work for now. 
