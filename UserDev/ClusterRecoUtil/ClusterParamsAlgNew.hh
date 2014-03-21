@@ -61,7 +61,8 @@ namespace cluster {
                     bool override_DoRefineStartPoints=false,
                     bool override_DoGetFinalSlope    =false );
 
-    void GetParams(cluster::cluster_params &);
+    const cluster_params& GetParams()
+    { return fParams;}
 
     /**
        Calculates the following variables:
@@ -175,7 +176,7 @@ namespace cluster {
     std::vector<double> fWire2Cm; // Conversion factor from wire to cm scale
     double fTime2Cm;              // Conversion factor from time to cm scale
 
-    cluster::cluster_params _this_params;
+    cluster::cluster_params fParams;
 
   }; //class ClusterParamsAlgNew
   

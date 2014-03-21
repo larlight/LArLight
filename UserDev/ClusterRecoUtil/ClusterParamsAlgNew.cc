@@ -54,7 +54,7 @@ namespace cluster{
   double dot_product ;
   double angle_hit_axis ;
   double opening_angle ;
-  int    Integral = 0;
+  //int    Integral = 0;
   std::vector<int> binning_vector(100,0 ) ;
   start_end_start_hit = sqrt(pow(start_end_w,2)+ pow(start_end_t,2));
 
@@ -72,7 +72,7 @@ namespace cluster{
   double percentage(0.0);
   for(iBin = 1;percentage<= 0.95; iBin++)
   {
-    percentage += binning_vector[iBin]/(_this_params.N_Hits) ;
+    percentage += binning_vector[iBin]/(fParams.N_Hits) ;
   }
 
   opening_angle = iBin * PI /100 ;
@@ -137,12 +137,6 @@ namespace cluster{
     GetFinalSlope    (override_DoGetFinalSlope    );
   }
 
-  void ClusterParamsAlgNew::GetParams(cluster::cluster_params&  inputstruct){
-    inputstruct = _this_params;
-    return;
-  }
-
-
   void ClusterParamsAlgNew::GetAverages(bool override){
     if(!override) { //Override being set, we skip all this logic.
       //OK, no override. Stop if we're already finshed.
@@ -151,7 +145,7 @@ namespace cluster{
 
     fPrincipal -> Clear();
 
-    _this_params.N_Hits = fHitVector.size();
+    fParams.N_Hits = fHitVector.size();
 
     std::map<double, int> wireMap;
 
@@ -164,28 +158,28 @@ namespace cluster{
       data[0] = hit.w;
       data[1] = hit.t;
       fPrincipal -> AddRow(data);
-      _this_params.charge_wgt_x += hit.w*hit.charge;
-      _this_params.charge_wgt_y += hit.t*hit.charge;
+      fParams.charge_wgt_x += hit.w*hit.charge;
+      fParams.charge_wgt_y += hit.t*hit.charge;
       mean_charge += hit.charge;
 
       wireMap[hit.w] ++;
 
     }
-    _this_params.N_Wires = wireMap.size();
-    _this_params.multi_hit_wires = _this_params.N_Hits - _this_params.N_Wires;
+    fParams.N_Wires = wireMap.size();
+    fParams.multi_hit_wires = fParams.N_Hits - fParams.N_Wires;
 
-    _this_params.charge_wgt_x /= mean_charge;
-    _this_params.charge_wgt_y /= mean_charge;
+    fParams.charge_wgt_x /= mean_charge;
+    fParams.charge_wgt_y /= mean_charge;
 
-    std::cout << " charge weights:  x: " << _this_params.charge_wgt_x << " y: " <<  _this_params.charge_wgt_y << " mean charge: " << mean_charge << std::endl;
-    _this_params.mean_x = (* fPrincipal -> GetMeanValues())[0];
-    _this_params.mean_y = (* fPrincipal -> GetMeanValues())[1];
-    _this_params.mean_charge /= _this_params.N_Hits;
+    std::cout << " charge weights:  x: " << fParams.charge_wgt_x << " y: " <<  fParams.charge_wgt_y << " mean charge: " << mean_charge << std::endl;
+    fParams.mean_x = (* fPrincipal -> GetMeanValues())[0];
+    fParams.mean_y = (* fPrincipal -> GetMeanValues())[1];
+    fParams.mean_charge /= fParams.N_Hits;
 
     fPrincipal -> MakePrincipals();
 
-    _this_params.eigenvalue_principal = (* fPrincipal -> GetEigenValues() )[0];
-    _this_params.eigenvalue_secondary = (* fPrincipal -> GetEigenValues() )[1];
+    fParams.eigenvalue_principal = (* fPrincipal -> GetEigenValues() )[0];
+    fParams.eigenvalue_secondary = (* fPrincipal -> GetEigenValues() )[1];
 
     fFinishedGetAverages = true;
   }
@@ -211,7 +205,7 @@ namespace cluster{
     //next loop over all hits again
     for (auto & hit : fHitVector){
       //if charge is above avg_charge
-      if(hit.charge > _this_params.mean_charge){
+      if(hit.charge > fParams.mean_charge){
         ncw+=1;
         sumwire+=hit.w;
         sumtime+=hit.t;
@@ -222,9 +216,9 @@ namespace cluster{
 
     //Looking for the slope and intercept of the line above avg_charge hits
     fRough2DSlope= (ncw*sumwiretime- sumwire*sumtime)/(ncw*sumwirewire-sumwire*sumwire);//slope for cw
-    fRough2DIntercept= _this_params.charge_wgt_y  -fRough2DSlope*(_this_params.charge_wgt_x);//intercept for cw
+    fRough2DIntercept= fParams.charge_wgt_y  -fRough2DSlope*(fParams.charge_wgt_x);//intercept for cw
     //Getthe 2D_angle
-    _this_params.cluster_angle_2d = atan(fRough2DSlope)*180/PI;
+    fParams.cluster_angle_2d = atan(fRough2DSlope)*180/PI;
 
 
     fFinishedGetRoughAxis = true;
@@ -459,9 +453,9 @@ namespace cluster{
     Double_t ortlimit=10;
     Double_t lineslopetest;
     larutil::PxHit averageHit;
-    //also are we sure this is actually doing what it is supposed to???/
-    fGSer->SelectLocalHitlist(fHitVector,subhit,startHit,linearlimit,ortlimit,lineslopetest,averageHit);
+    //also are we sure this is actually doing what it is supposed to???
     //are we sure this works? 
+    fGSer->SelectLocalHitlist(fHitVector,subhit,startHit,linearlimit,ortlimit,lineslopetest,averageHit);
 
     double avgwire= averageHit.w;
     double avgtime= averageHit.t;
@@ -474,10 +468,10 @@ namespace cluster{
     int n=0;
     double fardistcurrent=0;
     larutil::PxHit startpoint;
-    double gwiretime; 
-    double gwire; 
-    double gtime;
-    double gwirewire;
+    double gwiretime=0; 
+    double gwire=0; 
+    double gtime=0;
+    double gwirewire=0;
     //KAZU!!! I NEED this too//this will need to come from somewhere... 
     //This is some hit that is from the way far side of the entire shower cluster...
     larutil::PxPoint farhit= fRoughEndPoint;
@@ -488,8 +482,8 @@ namespace cluster{
     std::vector<larutil::PxHit> returnhits;
     std::vector<double> radiusofhit;
     std::vector<int> closehits;
-    unsigned int minhits=0;	
-    double maxreset=0;
+    //unsigned int minhits=0;	
+    //double maxreset=0;
     //    double avgwire=0;
     //    double avgtime=0;
     //    if(minhits<fHitVector.size()){
@@ -562,7 +556,7 @@ namespace cluster{
     //of these small set of hits just fit a simple line. 
     //then we will need to see which of these hits is farthest away 
     
-    for(unsigned int g; g<ghits.size();g++){
+    for(unsigned int g=0; g<ghits.size();g++){
       // should call the helper funtion to do the fit
       //but for now since there is no helper function I will just write it here......again
       n+=1;
@@ -582,7 +576,6 @@ namespace cluster{
     }//for ghits loop
     
     //This can be the new start point
-    startpoint;
     std::cout<<"Here Kazu"<<std::endl;
     std::cout<<"Ryan This is the new SP ("<<startpoint.w<<" , "<<startpoint.t<<")"<<std::endl;
     // double gslope=(n* gwiretime- gwire*gtime)/(n*gwirewire -gwire*gwire);
@@ -592,7 +585,7 @@ namespace cluster{
     // need to define physical direction with openind angles and pass that to Ryan's line finder.
  
     
-    _this_params.opening_angle = GetOpeningAngle(fRoughBeginPoint,
+    fParams.opening_angle = GetOpeningAngle(fRoughBeginPoint,
                                                  fRoughEndPoint, fHitVector);
                                                                                                     
     // fRoughEndPoint
