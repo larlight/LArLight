@@ -465,7 +465,9 @@ namespace cluster{
     Double_t ortlimit=10;
     Double_t lineslopetest;
     larutil::PxHit averageHit;
+	//also are we sure this is actually doing what it is supposed to???/
     gser->SelectLocalHitlist(hitVector,subhit,startHit,linearlimit,ortlimit,lineslopetest,averageHit);
+	//are we sure this works? 
 
     double avgwire= averageHit.w;
     double avgtime= averageHit.t;
@@ -482,7 +484,9 @@ namespace cluster{
     double gwire; 
     double gtime;
     double gwirewire;
-    larutil::PxHit farhit;// will come from somewhere	
+	//KAZU!!! I NEED this too//this will need to come from somewhere... 
+	//This is some hit that is from the way far side of the entire shower cluster...
+    larutil::PxHit farhit= rough_end_point;// will come from somewhere... is this supposed to be some point that is far away? from the side that we are expecting to be the start?	
     
     //=============building the local vector===================
     //this is clumsy... but just want to get something to work for now. 
