@@ -23,7 +23,7 @@
 
 #include "DataFormat-TypeDef.hh"
 #include "LArUtil-TypeDef.hh"
-#include "HoughBaseAlg.hh"
+//#include "HoughBaseAlg.hh"
 #include "TPrincipal.h"
 
 namespace cluster {

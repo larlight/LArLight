@@ -12,6 +12,11 @@ namespace cluster{
 
   ClusterParamsAlgNew::ClusterParamsAlgNew()
   {
+    principal=0;
+    geo =0;
+    larp=0;
+    detp=0;
+    gser=0;
     Initialize();
   }
 
@@ -20,6 +25,11 @@ namespace cluster{
   }
 
   ClusterParamsAlgNew::ClusterParamsAlgNew(const std::vector<larutil::PxHit> &inhitlist){
+    principal=0;
+    geo =0;
+    larp=0;
+    detp=0;
+    gser=0;
     Initialize();
     SetHits(inhitlist);
   }
@@ -174,6 +184,7 @@ namespace cluster{
     _this_params.charge_wgt_x /= mean_charge;
     _this_params.charge_wgt_y /= mean_charge;
 
+    std::cout << " charge weights:  x: " << _this_params.charge_wgt_x << " y: " <<  _this_params.charge_wgt_y << " mean charge: " << mean_charge << std::endl;
     _this_params.mean_x = (* principal -> GetMeanValues())[0];
     _this_params.mean_y = (* principal -> GetMeanValues())[1];
     _this_params.mean_charge /= _this_params.N_Hits;
@@ -217,12 +228,10 @@ namespace cluster{
     }//For hh loop
 
     //Looking for the slope and intercept of the line above avg_charge hits
-    double slopecw=0;
-    //double ceptcw=0;
-    slopecw= (ncw*sumwiretime- sumwire*sumtime)/(ncw*sumwirewire-sumwire*sumwire);//slope for cw
-    //ceptcw= _this_params.charge_wgt_y  -slopecw*(_this_params.charge_wgt_x);//intercept for cw
+    rough_2d_slope= (ncw*sumwiretime- sumwire*sumtime)/(ncw*sumwirewire-sumwire*sumwire);//slope for cw
+    rough_2d_intercept= _this_params.charge_wgt_y  -rough_2d_slope*(_this_params.charge_wgt_x);//intercept for cw
     //Getthe 2D_angle
-    _this_params.cluster_angle_2d = atan(slopecw)*180/PI;
+    _this_params.cluster_angle_2d = atan(rough_2d_slope)*180/PI;
 
 
     finished_GetRoughAxis = true;
@@ -302,7 +311,10 @@ namespace cluster{
     
     gser->GetPointOnLineWSlopes(rough_2d_slope,rough_2d_intercept,inter_high,HighOnlinePoint);
     gser->GetPointOnLineWSlopes(rough_2d_slope,rough_2d_intercept,inter_low,LowOnlinePoint);
-  
+
+    std::cout << "axis + intercept "  << rough_2d_slope << " " << rough_2d_intercept << std::endl;
+    
+    std::cout << " begin online point: " << LowOnlinePoint.w << ", " << LowOnlinePoint.t << " High: " << HighOnlinePoint.w << ", " << HighOnlinePoint.t << std::endl; 
 
     //define BeginOnlinePoint as the one with lower wire number (for now)
     
@@ -409,7 +421,7 @@ namespace cluster{
     // now have profile start and endpoints. Now translate to wire/time. Will use wire/time that are on the rough axis.
     //projectedlength is the length from inter_low to interhigh along the rough_2d_axis
     // on bin distance is: 
-    larutil::PxPoint OnlinePoint;
+   // larutil::PxPoint OnlinePoint;
     
     double ort_intercept_begin=(inter_high-inter_low)/profile_nbins*startbin;
     
@@ -427,6 +439,10 @@ namespace cluster{
 				ort_intercept_end,
 				rough_end_point);
     
+    
+    std::cout << rough_begin_point.w << ", " << rough_begin_point.t << " end: " <<  rough_end_point.w << " " << rough_end_point.t << std::endl;
+    
+    return;
     //Ryan's Shower Strip finder work here. 
     //First we need to define the strip width that we want
     double d=0.6;//this is the width of the strip.... this needs to be tuned to something.
