@@ -467,8 +467,8 @@ namespace cluster{
     larutil::PxHit averageHit;
     gser->SelectLocalHitlist(hitVector,subhit,startHit,linearlimit,ortlimit,lineslopetest,averageHit);
 
-    avgwire= averageHit.w;
-    avgtime= averageHit.t;
+    double avgwire= averageHit.w;
+    double avgtime= averageHit.t;
     std::vector<std::pair<double,double>> vertil;//vertex in tilda-space pair(x-til,y-til)
     vertil.clear();// This isn't needed?
     std::vector<double> vs;//vector of the sum of the distance of a vector to every vertex in tilda-space
@@ -477,7 +477,7 @@ namespace cluster{
     double vd=0;//the distance for vertex... just needs to be something 0
     int n=0;
     double fardistcurrent=0;
-    larutil::PxPoint startpoint;
+    larutil::PxHit startpoint;
     double gwiretime; 
     double gwire; 
     double gtime;
@@ -490,35 +490,35 @@ namespace cluster{
     std::vector<larutil::PxHit> returnhits;
     std::vector<double> radiusofhit;
     std::vector<int> closehits;
-    unsigned int minhits=50;	
+    unsigned int minhits=0;	
     double maxreset=0;
-    double avgwire=0;
-    double avgtime=0;
-    if(minhits>hitVector.size()){
-      for(auto & hit : hitVector){
-	std::pair<double,double> rv(rough_end_point.w,rough_end_point.t);
-	closehits.clear();
-	radiusofhit.clear();
-	returnhits.clear();
+//    double avgwire=0;
+//    double avgtime=0;
+//    if(minhits<hitVector.size()){
+//      for(auto & hit : hitVector){
+//	std::pair<double,double> rv(rough_end_point.w,rough_end_point.t);
+//	closehits.clear();
+//	radiusofhit.clear();
+//	returnhits.clear();
 	// for( unsigned int a=0; a<hit.size(); a++){
-	double d= sqrt( pow((rv.first-hit.w),2) + pow((rv.second-hit.t),2)  );
-        maxreset+=d;
-        radiusofhit.push_back(d);}
-      for(unsigned int b=0; b<minhits; b++){
-	int minss= std::min_element(radiusofhit.begin(),radiusofhit.end())-radiusofhit.begin();
-	closehits.push_back(minss);
-	radiusofhit[minss] = maxreset;}
+//	double d= sqrt( pow((rv.first-hit.w),2) + pow((rv.second-hit.t),2)  );
+//      maxreset+=d;
+//        radiusofhit.push_back(d);}
+//      for(unsigned int b=0; b<minhits; b++){
+//	int minss= std::min_element(radiusofhit.begin(),radiusofhit.end())-radiusofhit.begin();
+//	closehits.push_back(minss);
+//	radiusofhit[minss] = maxreset;}
       //now make the vector o just the close hits using the closehit index
-      for( unsigned int k=0; k < closehits.size(); k++){
-	//first find the average wire and time for each set of hits... and make that the new origin before the transpose.
-	avgwire+=hitVector[closehits[k]].w;
-	avgtime+=hitVector[closehits[k]].t;
-	returnhits.push_back(hitVector[closehits[k]]);}
-    }//if hitVector is big enough	
+//      for( unsigned int k=0; k < closehits.size(); k++){
+//	//first find the average wire and time for each set of hits... and make that the new origin before the transpose.
+//	avgwire+=hitVector[closehits[k]].w;
+//	avgtime+=hitVector[closehits[k]].t;
+//	returnhits.push_back(hitVector[closehits[k]]);}
+ //   }//if hitVector is big enough	
     
-    avgwire=avgwire/closehits.size();
-    avgtime=avgtime/closehits.size();
-    subhit=returnhits;
+//    avgwire=avgwire/closehits.size();
+ //   avgtime=avgtime/closehits.size();
+//    subhit=returnhits;
     
     //==============================================================================
     
@@ -583,6 +583,10 @@ namespace cluster{
 	startpoint =ghits[g];}//if fardist... this is the point to use for the start point
     }//for ghits loop
     
+	//This can be the new start point
+	startpoint;
+	std::cout<<"Here Kazu"<<std::endl;
+	std::cout<<"Ryan This is the new SP ("<<startpoint.w<<" , "<<startpoint.t<<")"<<std::endl;
     // double gslope=(n* gwiretime- gwire*gtime)/(n*gwirewire -gwire*gwire);
     // double gcept= gtime/n -gslope*(gwire/n);
     
