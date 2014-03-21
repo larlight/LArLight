@@ -90,14 +90,17 @@ namespace larlight {
 	int ymin = (int)(miny);
 	int zmin = (int)(minz);
 
-	hShowerMap = new TH3D("ShowerMap", "Shower Map",  50, xmin, xmax, 50, ymin, ymax, 50, zmin, zmax);
+	hShowerMap = new TH3D("ShowerMap", "Shower Map; Z [mm]; X [mm]; Y [mm]",  
+			      50, zmin, zmax, 
+			      50, xmin, xmax, 
+			      50, ymin, ymax);
 	hXYEnergy  = new TH2D("XYEnergy",  "Daughter X-Y Energy", 50, xmin, xmax, 50, ymin, ymax);
 	hXZEnergy  = new TH2D("XZEnergy",  "Daughter X-Z Energy", 50, xmin, xmax, 50, zmin, zmax);
 	hYZEnergy  = new TH2D("YZEnergy",  "Daughter Y-Z Energy", 50, ymin, ymax, 50, zmin, zmax);
 
 	for (size_t j=0; j<daughterpoints.size(); j++){
 	  std::vector<Float_t> thispoint = daughterpoints.at(j);
-	  hShowerMap->Fill(thispoint.at(0), thispoint.at(1), thispoint.at(2),thispoint.at(3));
+	  hShowerMap->Fill(thispoint.at(2), thispoint.at(0), thispoint.at(1),thispoint.at(3));
 	  hXYEnergy->Fill(thispoint.at(0), thispoint.at(1), thispoint.at(3));
 	  hXZEnergy->Fill(thispoint.at(0), thispoint.at(2), thispoint.at(3));
 	  hYZEnergy->Fill(thispoint.at(1), thispoint.at(2), thispoint.at(3));
