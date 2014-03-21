@@ -1026,7 +1026,7 @@ namespace larutil{
       //calculate linear distance from start point and orthogonal distance from axis
       Double_t lindist=Get2DDistance(wonline,tonline,wire_start,time_start);
       Double_t ortdist=Get2DDistance(wire,time,wonline,tonline);
-      
+
       if(lindist<linearlimit && ortdist<ortlimit)  hitlistlocal.push_back(hitlist.at(i));
     }
 
