@@ -452,7 +452,6 @@ namespace cluster{
     
     std::cout << rough_begin_point.w << ", " << rough_begin_point.t << " end: " <<  rough_end_point.w << " " << rough_end_point.t << std::endl;
     
-    //return;
     //Ryan's Shower Strip finder work here. 
     //First we need to define the strip width that we want
     double d=0.6;//this is the width of the strip.... this needs to be tuned to something.
@@ -461,12 +460,15 @@ namespace cluster{
     //	const std::vector<larutil::PxHit*> whole;
     std::vector <larutil::PxHit> subhit;
     larutil::PxHit startHit;
+    startHit.w = rough_begin_point.w;
+    startHit.t = rough_begin_point.t;
+    startHit.plane = rough_begin_point.plane;
     Double_t linearlimit=10;
     Double_t ortlimit=10;
     Double_t lineslopetest;
     larutil::PxHit averageHit;
     gser->SelectLocalHitlist(hitVector,subhit,startHit,linearlimit,ortlimit,lineslopetest,averageHit);
-
+    std::cout<<"Sub hit list: "<<subhit.size()<<" ... average hit: "<<averageHit.w<<" : "<<averageHit.t<<" : "<<averageHit.charge<<std::endl;
     double avgwire= averageHit.w;
     double avgtime= averageHit.t;
     std::vector<std::pair<double,double>> vertil;//vertex in tilda-space pair(x-til,y-til)
@@ -583,10 +585,10 @@ namespace cluster{
 	startpoint =ghits[g];}//if fardist... this is the point to use for the start point
     }//for ghits loop
     
-	//This can be the new start point
-	startpoint;
-	std::cout<<"Here Kazu"<<std::endl;
-	std::cout<<"Ryan This is the new SP ("<<startpoint.w<<" , "<<startpoint.t<<")"<<std::endl;
+    //This can be the new start point
+    startpoint;
+    std::cout<<"Here Kazu"<<std::endl;
+    std::cout<<"Ryan This is the new SP ("<<startpoint.w<<" , "<<startpoint.t<<")"<<std::endl;
     // double gslope=(n* gwiretime- gwire*gtime)/(n*gwirewire -gwire*gwire);
     // double gcept= gtime/n -gslope*(gwire/n);
     
