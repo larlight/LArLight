@@ -15,8 +15,8 @@ namespace cluster {
       
       hHit.push_back(new TH2D(Form("hClusterHit_%zu",i),
 			      Form("Cluster Hits (Plane=%zu);Wire;Time",i),
-			      200,-0.5,geo->Nwires(i)-0.5,
-			      150,0,detp->ReadOutWindowSize()));
+			      200,-0.5,(geo->Nwires(i)-0.5)*fWire2Cm.at(i),
+			      150,0,detp->ReadOutWindowSize()*fTime2Cm));
 
     }
 
@@ -46,13 +46,14 @@ namespace cluster {
     for(auto const index : hit_index_v) {
 
       pxhits.push_back(larutil::PxHit());
-      (*pxhits.rbegin()).w = hits->at(index).Wire();
-      (*pxhits.rbegin()).t = hits->at(index).PeakTime();
+      (*pxhits.rbegin()).w = hits->at(index).Wire()*fWire2Cm.at(plane);
+      (*pxhits.rbegin()).t = hits->at(index).PeakTime()*fTime2Cm;
       (*pxhits.rbegin()).charge = hits->at(index).Charge();
       (*pxhits.rbegin()).plane  = plane;
 
-      hHit.at(plane)->Fill(hits->at(index).Wire(), hits->at(index).PeakTime(), hits->at(index).Charge());
+      hHit.at(plane)->Fill(hits->at(index).Wire()*fWire2Cm.at(plane), hits->at(index).PeakTime()*fTime2Cm, hits->at(index).Charge());
 
+      
     }
     
     this->Initialize();

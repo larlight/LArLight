@@ -264,11 +264,13 @@ namespace cluster{
     //get slope of lines orthogonal to those found crossing the shower.
     double inv_2d_slope=0;
     if(rough_2d_slope){
-      inv_2d_slope=-1./rough_2d_slope; //*fWireTimetoCmCm*fWireTimetoCmCm;
+      inv_2d_slope=-1./rough_2d_slope*fTime2Cm*fTime2Cm/(fWire2Cm.at(fplane)*fWire2Cm.at(fplane));
     }
     else
       inv_2d_slope=-999999.;
 
+    std::cout << " conversions " << fWire2Cm.at(fplane) << " " << fTime2Cm << std::endl;
+    
     inter_high=-999999;
     inter_low=999999;
     inter_high_side=-999999;
@@ -312,9 +314,11 @@ namespace cluster{
     gser->GetPointOnLineWSlopes(rough_2d_slope,rough_2d_intercept,inter_high,HighOnlinePoint);
     gser->GetPointOnLineWSlopes(rough_2d_slope,rough_2d_intercept,inter_low,LowOnlinePoint);
 
+    std::cout << " extreme intercepts: low: " << inter_low << " " << inter_high << std::endl;
+    std::cout << " extreme intercepts: side: " << inter_low_side << " " << inter_high_side << std::endl;
     std::cout << "axis + intercept "  << rough_2d_slope << " " << rough_2d_intercept << std::endl;
     
-    std::cout << " begin online point: " << LowOnlinePoint.w << ", " << LowOnlinePoint.t << " High: " << HighOnlinePoint.w << ", " << HighOnlinePoint.t << std::endl; 
+    std::cout << " Low online point: " << LowOnlinePoint.w << ", " << LowOnlinePoint.t << " High: " << HighOnlinePoint.w << ", " << HighOnlinePoint.t << std::endl; 
 
     //define BeginOnlinePoint as the one with lower wire number (for now)
     
@@ -322,14 +326,16 @@ namespace cluster{
     
     projectedlength=gser->Get2DDistance(HighOnlinePoint,LowOnlinePoint);
      
+    std::cout << " projected length " << projectedlength << " Begin Point " << BeginOnlinePoint.w << " " << BeginOnlinePoint.t << std::endl;
+    
     double current_maximum=0; 
     for(auto & hit : hitVector)
     {
      
       larutil::PxPoint OnlinePoint;
       // get coordinates of point on axis.
-      gser->GetPointOnLine(rough_2d_slope,LowOnlinePoint,hit,OnlinePoint);
-    
+      gser->GetPointOnLine(rough_2d_slope,BeginOnlinePoint,hit,OnlinePoint);
+     //std::cout << " Online Point " << OnlinePoint.w << " " << OnlinePoint.t << std::endl; 
       double linedist=gser->Get2DDistance(OnlinePoint,BeginOnlinePoint);
       double ortdist=gser->Get2DDistance(OnlinePoint,hit);
     
@@ -339,8 +345,10 @@ namespace cluster{
       /////////////////////////////////////////////////////////////////////// 
       double weight= (ortdist<1.) ? 10*hit.charge : 5*hit.charge/ortdist;
     
-      int fine_bin=(int)linedist/projectedlength*profile_nbins;
-      int coarse_bin=(int)linedist/projectedlength*coarse_nbins; 
+      int fine_bin=(int)(linedist/projectedlength*profile_nbins);
+      int coarse_bin=(int)(linedist/projectedlength*coarse_nbins); 
+      
+      //std::cout << "length" << linedist <<   " fine_bin, coarse " << fine_bin << " " << coarse_bin << std::endl;
       
       if(fine_bin<profile_nbins)  //only fill if bin number is in range
       {
@@ -423,16 +431,18 @@ namespace cluster{
     // on bin distance is: 
    // larutil::PxPoint OnlinePoint;
     
-    double ort_intercept_begin=(inter_high-inter_low)/profile_nbins*startbin;
+    double ort_intercept_begin=inter_low+(inter_high-inter_low)/profile_nbins*startbin;
     
-    
+    std::cout << " ort_intercept_begin: " << ort_intercept_begin << std::endl;
     
     gser->GetPointOnLineWSlopes(rough_2d_slope,
 				rough_2d_intercept,
 				ort_intercept_begin,
 				rough_begin_point);
     
-    double ort_intercept_end=(inter_high-inter_low)/profile_nbins*endbin;
+    double ort_intercept_end=inter_low+(inter_high-inter_low)/profile_nbins*endbin;
+    
+    std::cout << " ort_intercept_end: " << ort_intercept_end << std::endl;
     
     gser->GetPointOnLineWSlopes(rough_2d_slope,
 				rough_2d_intercept,

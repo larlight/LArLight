@@ -125,12 +125,12 @@ namespace larutil{
     int GetPointOnLine(Double_t slope,
 		       larutil::PxPoint startpoint,
 		       larutil::PxPoint point1,
-		       larutil::PxPoint pointout) const;		       
+		       larutil::PxPoint &pointout) const;		       
 		       
     int GetPointOnLine(double slope,
 	               double intercept,
 			larutil::PxPoint point1,
-			larutil::PxPoint pointout) const;
+			larutil::PxPoint &pointout) const;
 		       
     Int_t GetPointOnLineWSlopes(Double_t slope,
 			      Double_t intercept,

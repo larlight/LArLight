@@ -579,7 +579,7 @@ namespace larutil{
      int GeometryUtilities::GetPointOnLine(Double_t slope,
 		       larutil::PxPoint startpoint,
 		       larutil::PxPoint point1,
-		       larutil::PxPoint pointout) const
+		       larutil::PxPoint &pointout) const
 	{
 	
       double intercept=startpoint.t-slope*startpoint.w;  
@@ -597,7 +597,7 @@ namespace larutil{
   int GeometryUtilities::GetPointOnLine(double slope,
 					  double intercept,
 					  larutil::PxPoint point1,
-					  larutil::PxPoint pointout) const
+					  larutil::PxPoint &pointout) const
   {
     double invslope=0;
       
@@ -683,8 +683,8 @@ namespace larutil{
     
     invslope*=fWireTimetoCmCm*fWireTimetoCmCm;
   	
-    pointonline.w=(ort_intercept - intercept)/(slope-invslope)/fWiretoCm; 
-    pointonline.t=slope*pointonline.w+intercept/fTimetoCm; 
+    pointonline.w=(ort_intercept - intercept)/(slope-invslope); 
+    pointonline.t=slope*pointonline.w+intercept; 
   
     return 0;  
   }    
