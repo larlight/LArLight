@@ -683,8 +683,8 @@ namespace larutil{
     
     invslope*=fWireTimetoCmCm*fWireTimetoCmCm;
   	
-    pointonline.w=(ort_intercept - intercept)/(slope-invslope); 
-    pointonline.t=slope*pointonline.w+intercept; 
+    pointonline.w=(ort_intercept - intercept)/(slope-invslope)/fWiretoCm; 
+    pointonline.t=slope*pointonline.w+intercept/fTimetoCm; 
   
     return 0;  
   }    

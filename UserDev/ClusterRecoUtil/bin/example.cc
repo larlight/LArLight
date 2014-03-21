@@ -3,7 +3,6 @@
 //
 
 #include "ClusterRecoUtil-TypeDef.hh"
-#include "ClusterRecoAlg-TypeDef.hh"
 #include "Base-TypeDef.hh"
 #include "DataFormat-TypeDef.hh"
 #include <iostream>
@@ -35,9 +34,10 @@ int main(int argc, char** argv){
     for(auto const &c : *clusters) {
 
       algo.LoadCluster(c,hits);
-
+      algo.FillParams(true,true,true,true,true);
+      
     }
-
+    
   }
   return 0;
 }
