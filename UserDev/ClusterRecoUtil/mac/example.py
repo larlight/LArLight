@@ -15,6 +15,8 @@ if len(sys.argv) > 2:
 mgr.open()
 
 chit=TCanvas("chit","chit",600,500)
+chit.SetGridx(1)
+chit.SetGridy(1)
 algo = cluster.ClusterParamsExecutor()
 
 while mgr.next_event():

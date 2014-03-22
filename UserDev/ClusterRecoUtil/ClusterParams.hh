@@ -9,10 +9,16 @@ namespace cluster{
   public:
     cluster_params(){
       //Initialize all values.
-      clear();
+      Clear();
     } 
 
     ~cluster_params(){};
+
+    /**
+       This vector holds the pointer to hits. 
+       This should be used for computation for speed.
+    */
+    std::vector<const larutil::PxHit*> fHitPtrVector;
 
     double mean_charge;                // Mean (average) charge of hits in ADC
     double mean_x;                     // Mean of hits along x, peaks only
@@ -48,7 +54,7 @@ namespace cluster{
     double trackness;                  // got soul                                       
     double offaxis_hits;
 
-    void clear(){
+    void Clear(){
       mean_charge                       = -999.999 ;
       mean_x                            = -999.999 ;
       mean_y                            = -999.999 ;
@@ -72,9 +78,10 @@ namespace cluster{
       hit_density_1D                    = -999.999 ;
       hit_density_2D                    = -999.999 ;
       angle_2d                          = -999.999 ;
-      cluster_angle_2d		              = -999.999 ;
+      cluster_angle_2d		        = -999.999 ;
       showerness                        = -999.999 ;
       trackness                         = -999.999 ;
+      fHitPtrVector.clear();
     }
 
   };

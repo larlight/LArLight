@@ -15,8 +15,8 @@ namespace cluster {
       
       hHit.push_back(new TH2D(Form("hClusterHit_%zu",i),
 			      Form("Cluster Hits (Plane=%zu);Wire;Time",i),
-			      200,-0.5,(larutil::Geometry::GetME()->Nwires(i)-0.5)*fWire2Cm.at(i),
-			      150,0,larutil::DetectorProperties::GetME()->ReadOutWindowSize()*fTime2Cm));
+			      400,-0.5,(larutil::Geometry::GetME()->Nwires(i)-0.5)*fWire2Cm.at(i),
+			      300,0,larutil::DetectorProperties::GetME()->ReadOutWindowSize()*fTime2Cm));
 
     }
 

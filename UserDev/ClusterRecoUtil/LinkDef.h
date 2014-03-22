@@ -13,6 +13,8 @@
 #pragma link C++ class cluster::cluster_params+;
 #pragma link C++ class cluster::ClusterParamsExecutor+;
 #pragma link C++ class cluster::RecoUtilException+;
+#pragma link C++ class cluster::ClusterMergeAlgNew+;
 //ADD_NEW_CLASS ... do not change this line
 #endif
+
 

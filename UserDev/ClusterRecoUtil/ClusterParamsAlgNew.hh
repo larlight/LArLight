@@ -35,9 +35,11 @@ namespace cluster {
     ClusterParamsAlgNew();
     ~ClusterParamsAlgNew();
 
-    ClusterParamsAlgNew(const std::vector<larutil::PxHit>&);
+    ClusterParamsAlgNew(const std::vector<larutil::PxHit*>&);
 
     void Initialize();
+
+    void SetHits(const std::vector<larutil::PxHit*>&);
 
     void SetHits(const std::vector<larutil::PxHit>&);
 
@@ -124,17 +126,15 @@ namespace cluster {
     void RefineDirection(larutil::PxPoint &start,
                          larutil::PxPoint &end);
 
-    double GetOpeningAngle(larutil::PxPoint rough_start_point,
-                           larutil::PxPoint rough_end_point,
-                           std::vector<larutil::PxHit> & hits);
+    double GetOpeningAngle(const larutil::PxPoint *rough_start_point,
+                           const larutil::PxPoint *rough_end_point,
+                           const std::vector<const larutil::PxHit*> & hits);
 
     const larutil::PxPoint& StartPoint() {return fRoughBeginPoint;}
     const larutil::PxPoint& EndPoint() {return fRoughEndPoint;}
 
   protected:
-
-    std::vector<larutil::PxHit> fHitVector;         // This vector holds the wrapped up hit list
- 
+    
     larutil::GeometryUtilities  *fGSer;
     TPrincipal *fPrincipal;
     
