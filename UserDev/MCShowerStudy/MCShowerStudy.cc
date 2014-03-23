@@ -23,7 +23,7 @@ namespace larlight {
       _hit_angles_backwards = new TH1F("_hit_angles_backwards","_hit_angles_backwards",100,-1.,1.);      
     //end temporary
 
-    _mcshower_tree = 0;
+    _mcss_ana_tree = 0;
     PrepareTTree();
 
     //setting variables that i should be getting from geometry service...
@@ -75,7 +75,7 @@ namespace larlight {
 
 
     //fill TTree (make sure all variables going into it are defined in this scope)
-    if(_mcshower_tree) _mcshower_tree->Fill();
+    if(_mcss_ana_tree) _mcss_ana_tree->Fill();
   
   
     return true;
@@ -99,13 +99,14 @@ namespace larlight {
     if(_fout) {
 
       _fout->cd();
-      if(_mcshower_tree)
-	_mcshower_tree->Write();
+      if(_mcss_ana_tree)
+	_mcss_ana_tree->Write();
 
     }
     else 
       print(MSG::ERROR,__FUNCTION__,"Did not find an output file pointer!!! File not opened?");
 
+    delete _mcss_ana_tree;
     return true;
   }
 
@@ -113,15 +114,17 @@ namespace larlight {
   void MCShowerStudy::PrepareTTree() {
     //define branches on your ttree here for your calculated parameters
 
-    if(!_mcshower_tree) {
-      _mcshower_tree = new TTree("mcshower_tree","");
-      _mcshower_tree->Branch("refinestartend_FOM", "std::vector<double>", &_refinestartend_FOM);
-      _mcshower_tree->Branch("nhits","std::vector<int>",&_nhits);
-      _mcshower_tree->Branch("cluscharge","std::vector<double>",&_cluscharge);
-      _mcshower_tree->Branch("cluslength","std::vector<double>",&_cluster_length);
-      _mcshower_tree->Branch("dirqual","std::vector<double>",&_dir_quality);
-      _mcshower_tree->Branch("alpha_s","std::vector<double>",&_alpha1);
-      _mcshower_tree->Branch("alpha_e","std::vector<double>",&_alpha2);
+    if(!_mcss_ana_tree) {
+      _mcss_ana_tree = new TTree("mcss_ana_tree","");
+      _mcss_ana_tree->Branch("refinestartend_FOM", "std::vector<double>", &_refinestartend_FOM);
+      _mcss_ana_tree->Branch("nhits","std::vector<int>",&_nhits);
+      _mcss_ana_tree->Branch("qhit","std::vector<double>",&_qhit);
+      _mcss_ana_tree->Branch("mom_energy","std::vector<double>",&_mom_energy);
+      _mcss_ana_tree->Branch("cluscharge","std::vector<double>",&_cluscharge);
+      _mcss_ana_tree->Branch("cluslength","std::vector<double>",&_cluster_length);
+      _mcss_ana_tree->Branch("dirqual","std::vector<double>",&_dir_quality);
+      _mcss_ana_tree->Branch("alpha_s","std::vector<double>",&_alpha1);
+      _mcss_ana_tree->Branch("alpha_e","std::vector<double>",&_alpha2);
 
     }
 
@@ -130,6 +133,8 @@ namespace larlight {
     
     _refinestartend_FOM.clear();
     _nhits.clear();
+    _qhit.clear();
+    _mom_energy.clear();
     _cluscharge.clear();
     _cluster_length.clear();
     _dir_quality.clear();
@@ -170,10 +175,9 @@ namespace larlight {
       pos[0]=i_mcshower.MotherPosition()[0];
       pos[1]=i_mcshower.MotherPosition()[1];
       pos[2]=i_mcshower.MotherPosition()[2];
-      //pos[0] = 50.;  // x= 50cm
-      //pos[1] = 0.;    // y= 0cm
-      //pos[2] = 100.; // z= 100cm
 
+      Double_t mom_energy = i_mcshower.MotherMomentum()[3];
+      _mom_energy.push_back(mom_energy);
 
       for(size_t i = 0; i < mother_sw_view.size(); ++i)
 	mother_sw_view.at(i)=myGeoUtil->Get2DPointProjection(pos,i);
@@ -304,6 +308,10 @@ namespace larlight {
 
     for(auto const i_hit: in_hit_v){
       clus_q += i_hit.Charge();
+
+      _qhit.push_back(i_hit.Charge());
+      //cutoff testing here
+      if(i_hit.Charge() < 25) continue;
       
       double SEP_x  = (end_wire      - start_wire) * _wire_2_cm;
       double SEP_y  = (end_time      - start_time) * _time_2_cm;
@@ -316,7 +324,8 @@ namespace larlight {
 			     pow( pow(SHIT_x,2)+pow(SHIT_y,2),0.5)
 			     );
       
-      _hit_angles_forwards->Fill(cosangle,i_hit.Charge());
+      //      _hit_angles_forwards->Fill(cosangle,std::sqrt(i_hit.Charge()));
+      _hit_angles_forwards->Fill(cosangle);
       
       //now switch the vector to be from end point to start point and re-do
       SEP_x  = (start_wire    - end_wire) * _wire_2_cm;
@@ -330,7 +339,8 @@ namespace larlight {
 			     pow( pow(SHIT_x,2)+pow(SHIT_y,2),0.5)
 			     );
       
-      _hit_angles_backwards->Fill(cosangle,i_hit.Charge());
+      //_hit_angles_backwards->Fill(cosangle,std::sqrt(i_hit.Charge()));
+      _hit_angles_backwards->Fill(cosangle);
     }
 
     //more ttree variables
@@ -343,6 +353,9 @@ namespace larlight {
     double alpha_start = (_hit_angles_forwards->GetMean())/(_hit_angles_forwards->GetRMS());
     double alpha_end = (_hit_angles_backwards->GetMean())/(_hit_angles_backwards->GetRMS());
     double DirectionQualityScore = (alpha_start-alpha_end)/(alpha_start+alpha_end);
+    if(DirectionQualityScore < -1 || DirectionQualityScore > 1)
+      DirectionQualityScore = 0;
+
     _dir_quality.push_back(DirectionQualityScore);
     _alpha1.push_back(alpha_start);
     _alpha2.push_back(alpha_end);

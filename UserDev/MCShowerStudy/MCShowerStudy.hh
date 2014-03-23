@@ -54,7 +54,7 @@ namespace larlight {
     virtual bool finalize();
 
     //getter for the tree holding figures of merit
-    TTree* GetMCShowerTree() const {return _mcshower_tree;}
+    TTree* GetMCShowerTree() const {return _mcss_ana_tree;}
 
     void SetUseRefineDirection(bool flag) {_refine_direction = flag;}
    
@@ -66,7 +66,7 @@ namespace larlight {
 
     bool RefineDirectionTest(storage_manager* storage, event_cluster* ev_cluster, event_mcshower* ev_mcshower);
     
-    TTree* _mcshower_tree;
+    TTree* _mcss_ana_tree;
 
 
     //this i should get from geometry service but didn't find immediately
@@ -81,6 +81,8 @@ namespace larlight {
     // variables that go into the analysis ttree
     std::vector<double> _refinestartend_FOM;
     std::vector<int> _nhits;
+    std::vector<double> _qhit;
+    std::vector<double> _mom_energy;
     std::vector<double> _cluscharge;
     std::vector<double> _cluster_length;
     std::vector<double> _dir_quality;
