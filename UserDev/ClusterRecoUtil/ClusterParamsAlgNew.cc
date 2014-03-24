@@ -60,7 +60,7 @@ namespace cluster{
     for(auto &h : inhitlist) {
 
       fParams.fHitPtrVector.push_back(&h);
-     
+
     } 
     fPlane=fParams.fHitPtrVector.at(0)->plane;
     
@@ -84,7 +84,7 @@ namespace cluster{
     std::vector<int> binning_vector(100,0 ) ;
     start_end_start_hit = sqrt(pow(start_end_w,2)+ pow(start_end_t,2));
     
-    for(auto hit : hits){
+    for(auto & hit : hits){
       
       dot_product = (hit->w - rough_start_point->w)*(start_end_w)+ (hit->t - rough_start_point->t) * (start_end_t) ; 
       start_hit = (hit->w - rough_start_point->w)*(hit->w - rough_start_point->w) + (hit->t - rough_start_point->t)*(hit->t - rough_start_point->t);
@@ -186,7 +186,7 @@ namespace cluster{
     std::map<double, int> wireMap;
 
     fParams.sum_charge = 0.;
-    for(auto const hit : fParams.fHitPtrVector){
+    for(auto const & hit : fParams.fHitPtrVector){
       std::cout << "This hit has charge " <<  hit -> charge << "\n";
       double data[2];
       data[0] = hit->w;
@@ -245,10 +245,10 @@ namespace cluster{
     double sumwiretime=0;//sum over (wire*time)
     double sumwirewire=0;//sum over (wire*wire)
     //next loop over all hits again
-    for (auto const hit : fParams.fHitPtrVector){
+    for (auto const & hit : fParams.fHitPtrVector){
       // First, abuse this loop to calculate rms in x and y
       rmsx += pow(fParams.mean_x - hit->w, 2);
-      rmsx += pow(fParams.mean_x - hit->w, 2);
+      rmsy += pow(fParams.mean_x - hit->w, 2);
       //if charge is above avg_charge
       std::cout << "This hit has charge " <<  hit -> charge << "\n";
       if(hit->charge > fParams.mean_charge){
@@ -314,7 +314,7 @@ namespace cluster{
     fInterHigh_side=-999999;
     fInterLow_side=999999;
     //loop over all hits. Create coarse and fine profiles of the charge weight to help refine the start/end points and have a first guess of direction
-    for(auto const hit : fParams.fHitPtrVector)
+    for(auto const & hit : fParams.fHitPtrVector)
     {
       
       //calculate intercepts along   
@@ -373,7 +373,7 @@ namespace cluster{
               << BeginOnlinePoint.t << std::endl;
     
     double current_maximum=0; 
-    for(auto const hit : fParams.fHitPtrVector)
+    for(auto const & hit : fParams.fHitPtrVector)
     {
      
       larutil::PxPoint OnlinePoint;
@@ -514,9 +514,9 @@ namespace cluster{
     startHit.w = fRoughBeginPoint.w;
     startHit.t = fRoughBeginPoint.t;
     startHit.plane = fRoughBeginPoint.plane;
-    Double_t linearlimit=10;
-    Double_t ortlimit=10;
-    Double_t lineslopetest;
+    double linearlimit=10;
+    double ortlimit=10;
+    double lineslopetest;
     larutil::PxHit averageHit;
     //also are we sure this is actually doing what it is supposed to???
     //are we sure this works? 
@@ -709,18 +709,18 @@ namespace cluster{
     
     UChar_t plane = (*fParams.fHitPtrVector.begin())->plane;
 
-    Double_t wire_2_cm = fWire2Cm.at(plane);
-    Double_t time_2_cm = fTime2Cm;
+    double wire_2_cm = fWire2Cm.at(plane);
+    double time_2_cm = fTime2Cm;
     
-    Double_t SEP_X = (end.w - start.w) / wire_2_cm;
-    Double_t SEP_Y = (end.t - start.t) / time_2_cm;
+    double SEP_X = (end.w - start.w) / wire_2_cm;
+    double SEP_Y = (end.t - start.t) / time_2_cm;
 
-    Double_t rms_forward   = 0;
-    Double_t rms_backward  = 0;
-    Double_t mean_forward  = 0;
-    Double_t mean_backward = 0;
-    Double_t weight_total  = 0;
-    Double_t hit_counter   = 0;
+    double rms_forward   = 0;
+    double rms_backward  = 0;
+    double mean_forward  = 0;
+    double mean_backward = 0;
+    double weight_total  = 0;
+    double hit_counter   = 0;
     
     //hard coding this for now, should use SetRefineDirectionQMin function
     fQMinRefDir  = 25;
@@ -735,10 +735,10 @@ namespace cluster{
       weight_total = hit->charge; 
 
       // Compute forward mean
-      Double_t SHIT_X = (hit->w - start.w) / wire_2_cm;
-      Double_t SHIT_Y = (hit->t - start.t) / time_2_cm;
+      double SHIT_X = (hit->w - start.w) / wire_2_cm;
+      double SHIT_Y = (hit->t - start.t) / time_2_cm;
 
-      Double_t cosangle = (SEP_X*SHIT_X + SEP_Y*SHIT_Y);
+      double cosangle = (SEP_X*SHIT_X + SEP_Y*SHIT_Y);
       cosangle /= ( pow(pow(SEP_X,2)+pow(SEP_Y,2),0.5) * pow(pow(SHIT_X,2)+pow(SHIT_Y,2),0.5));
 
       //no weighted average, works better as flat average w/ min charge cut
