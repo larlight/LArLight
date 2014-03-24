@@ -86,7 +86,7 @@ namespace cluster{
     }
 
     void Report(std::ostream & os = std::cout){
-      os << "ClusterParams report: "
+      os << "ClusterParams report: " << "\n"
          << "\tmean_charge: " << mean_charge << "\n"
          << "\tmean_x: " << mean_x << "\n"
          << "\tmean_y: " << mean_y << "\n"

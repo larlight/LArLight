@@ -151,7 +151,7 @@ namespace cluster{
   }
 
   void ClusterParamsAlgNew::Report(){
-    std::cout << "ClusterParamsAlgNew Report: "
+    std::cout << "ClusterParamsAlgNew Report: "  << "\n"
               << "\tFinishedGetAverages "        << fFinishedGetAverages << "\n"
               << "\tFinishedGetRoughAxis "       << fFinishedGetRoughAxis << "\n"
               << "\tFinishedGetProfileInfo "     << fFinishedGetProfileInfo << "\n"
@@ -188,6 +188,7 @@ namespace cluster{
     double mean_charge = 0.0;
 
     for(auto const hit : fParams.fHitPtrVector){
+      std::cout << "This hit has charge " <<  hit -> charge << "\n";
       double data[2];
       data[0] = hit->w;
       data[1] = hit->t;
@@ -205,17 +206,22 @@ namespace cluster{
     fParams.charge_wgt_x /= mean_charge;
     fParams.charge_wgt_y /= mean_charge;
 
-    std::cout << " charge weights:  x: " << fParams.charge_wgt_x << " y: " <<  fParams.charge_wgt_y << " mean charge: " << mean_charge << std::endl;
+
     fParams.mean_x = (* fPrincipal->GetMeanValues())[0];
     fParams.mean_y = (* fPrincipal->GetMeanValues())[1];
-    fParams.mean_charge /= fParams.N_Hits;
-
+    fParams.mean_charge = mean_charge/fParams.N_Hits;
+    
+    std::cout << " charge weights:  x: " << fParams.charge_wgt_x 
+              << " y: " <<  fParams.charge_wgt_y 
+              << " mean charge: " << mean_charge << std::endl;
+    
     fPrincipal -> MakePrincipals();
 
     fParams.eigenvalue_principal = (* fPrincipal -> GetEigenValues() )[0];
     fParams.eigenvalue_secondary = (* fPrincipal -> GetEigenValues() )[1];
 
     fFinishedGetAverages = true;
+    // Report();
   }
 
   // Also does the high hitlist
@@ -230,6 +236,9 @@ namespace cluster{
       if (!fFinishedGetAverages) GetAverages(true);
     }
 
+    double rmsx = 0.0;
+    double rmsy = 0.0;
+
     //using the charge weighted coordinates find the axis from slope
     double ncw=0;
     double sumtime=0;//from sum averages
@@ -238,7 +247,11 @@ namespace cluster{
     double sumwirewire=0;//sum over (wire*wire)
     //next loop over all hits again
     for (auto const hit : fParams.fHitPtrVector){
+      // First, abuse this loop to calculate rms in x and y
+      rmsx += pow(fParams.mean_x - hit->w, 2);
+      rmsx += pow(fParams.mean_x - hit->w, 2);
       //if charge is above avg_charge
+      std::cout << "This hit has charge " <<  hit -> charge << "\n";
       if(hit->charge > fParams.mean_charge){
         ncw+=1;
         sumwire+=hit->w;
@@ -254,7 +267,11 @@ namespace cluster{
     //Getthe 2D_angle
     fParams.cluster_angle_2d = atan(fRough2DSlope)*180/PI;
 
-    fFinishedGetRoughAxis = true;
+    std::cout << "fRough2DSlope is " << fRough2DSlope << std::endl;
+
+
+    fFinishedGetRoughAxis = true;    
+    Report();
     return;
   }
 
@@ -283,12 +300,14 @@ namespace cluster{
     
     //get slope of lines orthogonal to those found crossing the shower.
     double inv_2d_slope=0;
-    if(fRough2DSlope){
+    if(fabs(fRough2DSlope)>0.001){
       inv_2d_slope=-1./fRough2DSlope*fTime2Cm*fTime2Cm/(fWire2Cm.at(fPlane)*fWire2Cm.at(fPlane));
     }
     else
       inv_2d_slope=-999999.;
-
+    std::cout << " N_Hits is " << fParams.N_Hits << std::endl;
+    std::cout << " inv_2d_slope is " << inv_2d_slope << std::endl;
+    std::cout << " fRough2DSlope is " << fRough2DSlope << std::endl;
     std::cout << " conversions " << fWire2Cm.at(fPlane) << " " << fTime2Cm << std::endl;
     
     fInterHigh=-999999;
@@ -334,11 +353,15 @@ namespace cluster{
     fGSer->GetPointOnLineWSlopes(fRough2DSlope,fRough2DIntercept,fInterHigh,&HighOnlinePoint);
     fGSer->GetPointOnLineWSlopes(fRough2DSlope,fRough2DIntercept,fInterLow,&LowOnlinePoint);
 
-    std::cout << " extreme intercepts: low: " << fInterLow << " " << fInterHigh << std::endl;
-    std::cout << " extreme intercepts: side: " << fInterLow_side << " " << fInterHigh_side << std::endl;
-    std::cout << "axis + intercept "  << fRough2DSlope << " " << fRough2DIntercept << std::endl;
+    std::cout << " extreme intercepts: low: " << fInterLow 
+              << " " << fInterHigh << std::endl;
+    std::cout << " extreme intercepts: side: " << fInterLow_side 
+              << " " << fInterHigh_side << std::endl;
+    std::cout << "axis + intercept "  << fRough2DSlope << " " 
+              << fRough2DIntercept << std::endl;
     
-    std::cout << " Low online point: " << LowOnlinePoint.w << ", " << LowOnlinePoint.t << " High: " << HighOnlinePoint.w << ", " << HighOnlinePoint.t << std::endl; 
+    std::cout << " Low online point: " << LowOnlinePoint.w << ", " << LowOnlinePoint.t 
+              << " High: " << HighOnlinePoint.w << ", " << HighOnlinePoint.t << std::endl; 
 
     //define BeginOnlinePoint as the one with lower wire number (for now)
     
@@ -346,7 +369,9 @@ namespace cluster{
     
     fProjectedLength=fGSer->Get2DDistance(&HighOnlinePoint,&LowOnlinePoint);
      
-    std::cout << " projected length " << fProjectedLength << " Begin Point " << BeginOnlinePoint.w << " " << BeginOnlinePoint.t << std::endl;
+    std::cout << " projected length " << fProjectedLength 
+              << " Begin Point " << BeginOnlinePoint.w << " " 
+              << BeginOnlinePoint.t << std::endl;
     
     double current_maximum=0; 
     for(auto const hit : fParams.fHitPtrVector)
@@ -354,6 +379,8 @@ namespace cluster{
      
       larutil::PxPoint OnlinePoint;
       // get coordinates of point on axis.
+      std::cout << &BeginOnlinePoint << std::endl;
+      std::cout << &OnlinePoint << std::endl;
       fGSer->GetPointOnLine(fRough2DSlope,&BeginOnlinePoint,hit,&OnlinePoint);
      //std::cout << " Online Point " << OnlinePoint.w << " " << OnlinePoint.t << std::endl; 
       double linedist=fGSer->Get2DDistance(&OnlinePoint,&BeginOnlinePoint);
@@ -366,12 +393,18 @@ namespace cluster{
       double weight= (ortdist<1.) ? 10 * (hit->charge) : 5 * (hit->charge) / ortdist;
     
       int fine_bin=(int)(linedist/fProjectedLength*fProfileNbins);
-      int coarse_bin=(int)(linedist/fProjectedLength*fCoarseNbins); 
-      
+      int coarse_bin=(int)(linedist/fProjectedLength*fCoarseNbins);
+      std::cout << "linedist: " << linedist << std::endl;
+      std::cout << "fProjectedLength: " << fProjectedLength << std::endl;
+      std::cout << "fProfileNbins: " << fProfileNbins << std::endl;
+      std::cout << "fine_bin: " << fine_bin << std::endl;
+      std::cout << "coarse_bin: " << coarse_bin << std::endl;
       //std::cout << "length" << linedist <<   " fine_bin, coarse " << fine_bin << " " << coarse_bin << std::endl;
       
       if(fine_bin<fProfileNbins)  //only fill if bin number is in range
       {
+
+
         fChargeProfile.at(fine_bin)+=weight;
         if(fChargeProfile.at(fine_bin)>current_maximum && fine_bin!=0 && fine_bin!=fProfileNbins-1) //find maximum bin on the fly.
         {
