@@ -21,14 +21,14 @@ namespace cluster{
     if (fPrincipal != 0) delete fPrincipal;
   }
 
-  ClusterParamsAlgNew::ClusterParamsAlgNew(const std::vector<larutil::PxHit*> &inhitlist){
+  ClusterParamsAlgNew::ClusterParamsAlgNew(const std::vector<larutil::PxHit> &inhitlist){
     fPrincipal=nullptr;
     fGSer=nullptr;
     Initialize();
     SetHits(inhitlist);
   }
 
-  void ClusterParamsAlgNew::SetHits(const std::vector<larutil::PxHit*> &inhitlist){
+  void ClusterParamsAlgNew::SetHits(const std::vector<larutil::PxHit> &inhitlist){
 
     // Make default values
     // Is done by the struct
@@ -36,6 +36,8 @@ namespace cluster{
       throw RecoUtilException("Provided empty hit list!");
       return;
     }
+    fHitVector = inhitlist;
+    /*
     fParams.fHitPtrVector.clear();
     fParams.fHitPtrVector.reserve(inhitlist.size());
     for(auto h : inhitlist) {
@@ -44,9 +46,10 @@ namespace cluster{
      
     } 
     fPlane=fParams.fHitPtrVector.at(0)->plane;
-    
+    */    
   }
 
+  /*
   void ClusterParamsAlgNew::SetHits(const std::vector<larutil::PxHit> &inhitlist){
 
     // Make default values
@@ -65,17 +68,17 @@ namespace cluster{
     fPlane=fParams.fHitPtrVector.at(0)->plane;
     
   }
-  
+  */  
 
   //Calculate opening angle
-  double ClusterParamsAlgNew::GetOpeningAngle(const larutil::PxPoint *rough_start_point,
-					      const larutil::PxPoint *rough_end_point,
-					      const std::vector<const larutil::PxHit*> & hits)
+  double ClusterParamsAlgNew::GetOpeningAngle(const larutil::PxPoint &rough_start_point,
+					      const larutil::PxPoint &rough_end_point,
+					      const std::vector<larutil::PxHit> & hits)
   {
     
     double start_hit;
-    double start_end_w = rough_start_point->w - rough_end_point->w;
-    double start_end_t = rough_start_point->t - rough_end_point->t;
+    double start_end_w = rough_start_point.w - rough_end_point.w;
+    double start_end_t = rough_start_point.t - rough_end_point.t;
     double start_end_start_hit ;
     double dot_product ;
     double angle_hit_axis ;
@@ -84,10 +87,10 @@ namespace cluster{
     std::vector<int> binning_vector(100,0 ) ;
     start_end_start_hit = sqrt(pow(start_end_w,2)+ pow(start_end_t,2));
     
-    for(auto hit : hits){
+    for(auto &hit : hits){
       
-      dot_product = (hit->w - rough_start_point->w)*(start_end_w)+ (hit->t - rough_start_point->t) * (start_end_t) ; 
-      start_hit = (hit->w - rough_start_point->w)*(hit->w - rough_start_point->w) + (hit->t - rough_start_point->t)*(hit->t - rough_start_point->t);
+      dot_product = (hit.w - rough_start_point.w)*(start_end_w)+ (hit.t - rough_start_point.t) * (start_end_t) ; 
+      start_hit = (hit.w - rough_start_point.w)*(hit.w - rough_start_point.w) + (hit.t - rough_start_point.t)*(hit.t - rough_start_point.t);
       start_hit = sqrt(start_hit);
       angle_hit_axis = dot_product/start_end_start_hit/start_hit ;
       int N_bins = 100 * acos(angle_hit_axis)/PI;
@@ -181,22 +184,22 @@ namespace cluster{
 
     fPrincipal -> Clear();
 
-    fParams.N_Hits = fParams.fHitPtrVector.size();
+    fParams.N_Hits = fHitVector.size();
 
     std::map<double, int> wireMap;
 
     fParams.sum_charge = 0.;
-    for(auto const hit : fParams.fHitPtrVector){
-      std::cout << "This hit has charge " <<  hit -> charge << "\n";
+    for(auto& hit : fHitVector){
+      std::cout << "This hit has charge " <<  hit . charge << "\n";
       double data[2];
-      data[0] = hit->w;
-      data[1] = hit->t;
+      data[0] = hit.w;
+      data[1] = hit.t;
       fPrincipal -> AddRow(data);
-      fParams.charge_wgt_x += hit->w * hit->charge;
-      fParams.charge_wgt_y += hit->t * hit->charge;
-      fParams.sum_charge += hit->charge;
+      fParams.charge_wgt_x += hit.w * hit.charge;
+      fParams.charge_wgt_y += hit.t * hit.charge;
+      fParams.sum_charge += hit.charge;
 
-      wireMap[hit->w] ++;
+      wireMap[hit.w] ++;
 
     }
     fParams.N_Wires = wireMap.size();
@@ -245,18 +248,18 @@ namespace cluster{
     double sumwiretime=0;//sum over (wire*time)
     double sumwirewire=0;//sum over (wire*wire)
     //next loop over all hits again
-    for (auto const hit : fParams.fHitPtrVector){
+    for (auto& hit : fHitVector){
       // First, abuse this loop to calculate rms in x and y
-      rmsx += pow(fParams.mean_x - hit->w, 2);
-      rmsx += pow(fParams.mean_x - hit->w, 2);
+      rmsx += pow(fParams.mean_x - hit.w, 2);
+      rmsx += pow(fParams.mean_x - hit.w, 2);
       //if charge is above avg_charge
-      std::cout << "This hit has charge " <<  hit -> charge << "\n";
-      if(hit->charge > fParams.mean_charge){
+      std::cout << "This hit has charge " <<  hit . charge << "\n";
+      if(hit.charge > fParams.mean_charge){
         ncw+=1;
-        sumwire+=hit->w;
-        sumtime+=hit->t;
-        sumwiretime+=hit->w * hit->t;
-        sumwirewire+=pow(hit->w,2);  
+        sumwire+=hit.w;
+        sumtime+=hit.t;
+        sumwiretime+=hit.w * hit.t;
+        sumwirewire+=pow(hit.w,2);  
       }//for high charge
     }//For hh loop
 
@@ -314,13 +317,13 @@ namespace cluster{
     fInterHigh_side=-999999;
     fInterLow_side=999999;
     //loop over all hits. Create coarse and fine profiles of the charge weight to help refine the start/end points and have a first guess of direction
-    for(auto const hit : fParams.fHitPtrVector)
+    for(auto& hit : fHitVector)
     {
       
       //calculate intercepts along   
-      double intercept=hit->t - inv_2d_slope * (double)(hit->w);
+      double intercept=hit.t - inv_2d_slope * (double)(hit.w);
         
-      double side_intercept=hit->t - fRough2DSlope * (double)(hit->w);
+      double side_intercept=hit.t - fRough2DSlope * (double)(hit.w);
         
       if(intercept > fInterHigh ){
         fInterHigh=intercept;
@@ -349,8 +352,8 @@ namespace cluster{
     
     larutil::PxPoint HighOnlinePoint, LowOnlinePoint,BeginOnlinePoint;
     
-    fGSer->GetPointOnLineWSlopes(fRough2DSlope,fRough2DIntercept,fInterHigh,&HighOnlinePoint);
-    fGSer->GetPointOnLineWSlopes(fRough2DSlope,fRough2DIntercept,fInterLow,&LowOnlinePoint);
+    fGSer->GetPointOnLineWSlopes(fRough2DSlope,fRough2DIntercept,fInterHigh,HighOnlinePoint);
+    fGSer->GetPointOnLineWSlopes(fRough2DSlope,fRough2DIntercept,fInterLow,LowOnlinePoint);
 
     std::cout << " extreme intercepts: low: " << fInterLow 
               << " " << fInterHigh << std::endl;
@@ -366,30 +369,30 @@ namespace cluster{
     
     BeginOnlinePoint = (HighOnlinePoint.w > LowOnlinePoint.w) ? LowOnlinePoint : HighOnlinePoint;
     
-    fProjectedLength=fGSer->Get2DDistance(&HighOnlinePoint,&LowOnlinePoint);
+    fProjectedLength=fGSer->Get2DDistance(HighOnlinePoint,LowOnlinePoint);
      
     std::cout << " projected length " << fProjectedLength 
               << " Begin Point " << BeginOnlinePoint.w << " " 
               << BeginOnlinePoint.t << std::endl;
     
     double current_maximum=0; 
-    for(auto const hit : fParams.fHitPtrVector)
+    for(auto& hit : fHitVector)
     {
      
       larutil::PxPoint OnlinePoint;
       // get coordinates of point on axis.
       std::cout << &BeginOnlinePoint << std::endl;
       std::cout << &OnlinePoint << std::endl;
-      fGSer->GetPointOnLine(fRough2DSlope,&BeginOnlinePoint,hit,&OnlinePoint);
+      fGSer->GetPointOnLine(fRough2DSlope,BeginOnlinePoint,hit,OnlinePoint);
      //std::cout << " Online Point " << OnlinePoint.w << " " << OnlinePoint.t << std::endl; 
-      double linedist=fGSer->Get2DDistance(&OnlinePoint,&BeginOnlinePoint);
-      double ortdist=fGSer->Get2DDistance(&OnlinePoint,hit);
+      double linedist=fGSer->Get2DDistance(OnlinePoint,BeginOnlinePoint);
+      double ortdist=fGSer->Get2DDistance(OnlinePoint,hit);
     
       ////////////////////////////////////////////////////////////////////// 
       //calculate the weight along the axis, this formula is based on rough guessology. 
       // there is no physics motivation behind the particular numbers, A.S.
       /////////////////////////////////////////////////////////////////////// 
-      double weight= (ortdist<1.) ? 10 * (hit->charge) : 5 * (hit->charge) / ortdist;
+      double weight= (ortdist<1.) ? 10 * (hit.charge) : 5 * (hit.charge) / ortdist;
     
       int fine_bin=(int)(linedist/fProjectedLength*fProfileNbins);
       int coarse_bin=(int)(linedist/fProjectedLength*fCoarseNbins);
@@ -489,7 +492,7 @@ namespace cluster{
     fGSer->GetPointOnLineWSlopes(fRough2DSlope,
 				 fRough2DIntercept,
 				 ort_intercept_begin,
-				 &fRoughBeginPoint);
+				 fRoughBeginPoint);
     
     double ort_intercept_end=fInterLow+(fInterHigh-fInterLow)/fProfileNbins*endbin;
     
@@ -498,7 +501,7 @@ namespace cluster{
     fGSer->GetPointOnLineWSlopes(fRough2DSlope,
 				 fRough2DIntercept,
 				 ort_intercept_end,
-				 &fRoughEndPoint);
+				 fRoughEndPoint);
     
     
     std::cout << fRoughBeginPoint.w << ", " << fRoughBeginPoint.t << " end: " <<  fRoughEndPoint.w << " " << fRoughEndPoint.t << std::endl;
@@ -509,7 +512,7 @@ namespace cluster{
     //===============================================================================================================       
     // Will need to feed in the set of hits that we want. 
     //	const std::vector<larutil::PxHit*> whole;
-    std::vector <const larutil::PxHit*> subhit;
+    std::vector <larutil::PxHit> subhit;
     larutil::PxHit startHit;
     startHit.w = fRoughBeginPoint.w;
     startHit.t = fRoughBeginPoint.t;
@@ -520,10 +523,10 @@ namespace cluster{
     larutil::PxHit averageHit;
     //also are we sure this is actually doing what it is supposed to???
     //are we sure this works? 
-    fGSer->SelectLocalHitlist(fParams.fHitPtrVector,subhit,
-			      &startHit,
+    fGSer->SelectLocalHitlist(fHitVector,subhit,
+			      startHit,
 			      linearlimit,ortlimit,lineslopetest,
-			      &averageHit);
+			      averageHit);
 
     double avgwire= averageHit.w;
     double avgtime= averageHit.t;
@@ -532,7 +535,7 @@ namespace cluster{
     vertil.reserve(subhit.size() * subhit.size());
     std::vector<double> vs;//vector of the sum of the distance of a vector to every vertex in tilda-space
     vs.clear();// this isn't needed?
-    std::vector<const larutil::PxHit*>  ghits;// $$This needs to be corrected//this is the good hits that are between strip
+    std::vector<larutil::PxHit>  ghits;// $$This needs to be corrected//this is the good hits that are between strip
     ghits.reserve(subhit.size());
     int n=0;
     double fardistcurrent=0;
@@ -555,8 +558,8 @@ namespace cluster{
     //double maxreset=0;
     //    double avgwire=0;
     //    double avgtime=0;
-    //    if(minhits<fParams.fHitPtrVector.size()){
-    //      for(auto & hit : fParams.fHitPtrVector){
+    //    if(minhits<fHitVector.size()){
+    //      for(auto & hit : fHitVector){
     //	std::pair<double,double> rv(fRoughEndPoint.w,fRoughEndPoint.t);
     //	closehits.clear();
     //	radiusofhit.clear();
@@ -572,10 +575,10 @@ namespace cluster{
     //now make the vector o just the close hits using the closehit index
     //      for( unsigned int k=0; k < closehits.size(); k++){
     //	//first find the average wire and time for each set of hits... and make that the new origin before the transpose.
-    //	avgwire+=fParams.fHitPtrVector[closehits[k]].w;
-    //	avgtime+=fParams.fHitPtrVector[closehits[k]].t;
-    //	returnhits.push_back(fParams.fHitPtrVector[closehits[k]]);}
-    //   }//if fParams.fHitPtrVector is big enough	
+    //	avgwire+=fHitVector[closehits[k]].w;
+    //	avgtime+=fHitVector[closehits[k]].t;
+    //	returnhits.push_back(fHitVector[closehits[k]]);}
+    //   }//if fHitVector is big enough	
     
     //    avgwire=avgwire/closehits.size();
     //   avgtime=avgtime/closehits.size();
@@ -586,10 +589,10 @@ namespace cluster{
     //Now we need to do the transformation into "tilda-space"
     for(unsigned int a=0; a<subhit.size();a++){
       for(unsigned int b=a+1;b<subhit.size();b++){
-	if(subhit.at(a)->w != subhit.at(b)->w){
-	  double xtil = ((subhit.at(a)->t - avgtime) - (subhit.at(b)->t - avgtime));
-	  xtil /= ((subhit.at(a)->w - avgwire)-(subhit.at(b)->w - avgwire));
-	  double ytil = (subhit.at(a)->w - avgwire)*xtil -(subhit.at(a)->t - avgtime);
+	if(subhit.at(a).w != subhit.at(b).w){
+	  double xtil = ((subhit.at(a).t - avgtime) - (subhit.at(b).t - avgtime));
+	  xtil /= ((subhit.at(a).w - avgwire)-(subhit.at(b).w - avgwire));
+	  double ytil = (subhit.at(a).w - avgwire)*xtil -(subhit.at(a).t - avgtime);
 	  //push back the tilda vertex point on the pair
 	  std::pair<double,double> tv(xtil,ytil);
 	  vertil.push_back(tv);
@@ -619,8 +622,8 @@ namespace cluster{
     double tiltimeb=-vertil.at(minvs).second-d*sqrt(1+pow(tilwire,2));//negative cept is accounted for bottom strip
     // look over the subhit list and ask for which are inside of the strip
     for(unsigned int a=0; a<subhit.size(); a++){
-      double dtstrip= (-tilwire * (subhit.at(a)->w - avgwire) +(subhit.at(a)->t - avgtime)-tiltimet)/sqrt(tilwire*tilwire+1);
-      double dbstrip= (-tilwire * (subhit.at(a)->w - avgwire) +(subhit.at(a)->t - avgtime)-tiltimeb)/sqrt(tilwire*tilwire+1);
+      double dtstrip= (-tilwire * (subhit.at(a).w - avgwire) +(subhit.at(a).t - avgtime)-tiltimet)/sqrt(tilwire*tilwire+1);
+      double dbstrip= (-tilwire * (subhit.at(a).w - avgwire) +(subhit.at(a).t - avgtime)-tiltimeb)/sqrt(tilwire*tilwire+1);
       
       if((dtstrip<0.0 && dbstrip>0.0)||(dbstrip<0.0 && dtstrip>0.0)){
 	ghits.push_back(subhit.at(a));
@@ -636,22 +639,22 @@ namespace cluster{
       // should call the helper funtion to do the fit
       //but for now since there is no helper function I will just write it here......again
       n+=1;
-      gwiretime+= ghits.at(g)->w * ghits.at(g)->t;
-      gwire+= ghits.at(g)->w;
-      gtime+= ghits.at(g)->t;
-      gwirewire+= ghits.at(g)->w * ghits.at(g)->w;
+      gwiretime+= ghits.at(g).w * ghits.at(g).t;
+      gwire+= ghits.at(g).w;
+      gtime+= ghits.at(g).t;
+      gwirewire+= ghits.at(g).w * ghits.at(g).w;
       // now work on calculating the distance in wire time space from the far point
       //farhit needs to be a hit that is given to me
-      double fardist= sqrt(pow(ghits.at(g)->w - farhit.w,2)+pow(ghits.at(g)->t - farhit.t,2));
+      double fardist= sqrt(pow(ghits.at(g).w - farhit.w,2)+pow(ghits.at(g).t - farhit.t,2));
       //come back to this... there is a better way to do this probably in the loop
       //there should also be a check that the hit that is farthest away has subsequent hits after it on a few wires
       if(fardist>fardistcurrent){
 	fardistcurrent=fardist;
 	//if fardist... this is the point to use for the start point
-	startpoint.t = ghits.at(g)->t;
-	startpoint.w = ghits.at(g)->w;
-	startpoint.plane = ghits.at(g)->plane;
-	startpoint.charge = ghits.at(g)->charge;
+	startpoint.t = ghits.at(g).t;
+	startpoint.w = ghits.at(g).w;
+	startpoint.plane = ghits.at(g).plane;
+	startpoint.charge = ghits.at(g).charge;
       }
     }//for ghits loop
     
@@ -665,9 +668,9 @@ namespace cluster{
     // need to define physical direction with openind angles and pass that to Ryan's line finder.
  
     
-    fParams.opening_angle = GetOpeningAngle(&fRoughBeginPoint,
-					    &fRoughEndPoint, 
-					    fParams.fHitPtrVector);
+    fParams.opening_angle = GetOpeningAngle(fRoughBeginPoint,
+					    fRoughEndPoint, 
+					    fHitVector);
 
     fParams.start_point = fRoughBeginPoint;
     fParams.end_point   = fRoughEndPoint;
@@ -707,7 +710,7 @@ namespace cluster{
   void ClusterParamsAlgNew::RefineDirection(larutil::PxPoint &start,
 					    larutil::PxPoint &end) {
     
-    UChar_t plane = (*fParams.fHitPtrVector.begin())->plane;
+    UChar_t plane = (*fHitVector.begin()).plane;
 
     Double_t wire_2_cm = fWire2Cm.at(plane);
     Double_t time_2_cm = fTime2Cm;
@@ -725,18 +728,18 @@ namespace cluster{
     //hard coding this for now, should use SetRefineDirectionQMin function
     fQMinRefDir  = 25;
 
-    for(auto const hit : fParams.fHitPtrVector) {
+    for(auto& hit : fHitVector) {
 
       //skip this hit if below minimum cutoff param
-      if(hit->charge < fQMinRefDir) continue;
+      if(hit.charge < fQMinRefDir) continue;
 
       hit_counter++;
 
-      weight_total = hit->charge; 
+      weight_total = hit.charge; 
 
       // Compute forward mean
-      Double_t SHIT_X = (hit->w - start.w) / wire_2_cm;
-      Double_t SHIT_Y = (hit->t - start.t) / time_2_cm;
+      Double_t SHIT_X = (hit.w - start.w) / wire_2_cm;
+      Double_t SHIT_Y = (hit.t - start.t) / time_2_cm;
 
       Double_t cosangle = (SEP_X*SHIT_X + SEP_Y*SHIT_Y);
       cosangle /= ( pow(pow(SEP_X,2)+pow(SEP_Y,2),0.5) * pow(pow(SHIT_X,2)+pow(SHIT_Y,2),0.5));
@@ -746,8 +749,8 @@ namespace cluster{
       rms_forward  += pow(cosangle,2);
       
       // Compute backward mean
-      SHIT_X = (hit->w - end.w) / wire_2_cm;
-      SHIT_Y = (hit->t - end.t) / time_2_cm;
+      SHIT_X = (hit.w - end.w) / wire_2_cm;
+      SHIT_Y = (hit.t - end.t) / time_2_cm;
       
       cosangle  = (SEP_X*SHIT_X + SEP_Y*SHIT_Y);
       cosangle /= ( pow(pow(SEP_X,2)+pow(SEP_Y,2),0.5) * pow(pow(SHIT_X,2)+pow(SHIT_Y,2),0.5));

@@ -15,11 +15,6 @@ namespace cluster{
 
     ~cluster_params(){};
 
-    /**
-       This vector holds the pointer to hits. 
-       This should be used for computation for speed.
-    */
-    std::vector<const larutil::PxHit*> fHitPtrVector;
 
     larutil::PxPoint start_point;      ///< start point 
     larutil::PxPoint end_point;        ///< end point 
@@ -92,7 +87,6 @@ namespace cluster{
       cluster_angle_2d	                = -999.999 ;
       showerness                        = -999.999 ;
       trackness                         = -999.999 ;
-      fHitPtrVector.clear();
     }
 
     void Report(std::ostream & os = std::cout){

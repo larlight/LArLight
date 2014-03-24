@@ -35,12 +35,12 @@ namespace cluster {
     ClusterParamsAlgNew();
     ~ClusterParamsAlgNew();
 
-    ClusterParamsAlgNew(const std::vector<larutil::PxHit*>&);
+    ClusterParamsAlgNew(const std::vector<larutil::PxHit>&);
 
     void Initialize();
 
-    void SetHits(const std::vector<larutil::PxHit*>&);
-
+    //void SetHits(const std::vector<larutil::PxHit*>&);
+    
     void SetHits(const std::vector<larutil::PxHit>&);
 
     void SetRefineDirectionQMin(double qmin){ fQMinRefDir = qmin; }
@@ -127,9 +127,9 @@ namespace cluster {
     void RefineDirection(larutil::PxPoint &start,
                          larutil::PxPoint &end);
 
-    double GetOpeningAngle(const larutil::PxPoint *rough_start_point,
-                           const larutil::PxPoint *rough_end_point,
-                           const std::vector<const larutil::PxHit*> & hits);
+    double GetOpeningAngle(const larutil::PxPoint &rough_start_point,
+                           const larutil::PxPoint &rough_end_point,
+                           const std::vector<larutil::PxHit> & hits);
 
     const larutil::PxPoint& StartPoint() {return fRoughBeginPoint;}
     const larutil::PxPoint& EndPoint() {return fRoughEndPoint;}
@@ -138,6 +138,13 @@ namespace cluster {
     
     larutil::GeometryUtilities  *fGSer;
     TPrincipal *fPrincipal;
+
+    /**
+       This vector holds the pointer to hits. 
+       This should be used for computation for speed.
+    */
+    std::vector<larutil::PxHit> fHitVector;
+
     
     //settable parameters:
      double fChargeCutoffThreshold[3]; 
