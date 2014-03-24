@@ -185,8 +185,7 @@ namespace cluster{
 
     std::map<double, int> wireMap;
 
-    fParams.mean_charge = 0.;
-
+    fParams.sum_charge = 0.;
     for(auto const hit : fParams.fHitPtrVector){
       double data[2];
       data[0] = hit->w;
@@ -194,7 +193,7 @@ namespace cluster{
       fPrincipal -> AddRow(data);
       fParams.charge_wgt_x += hit->w * hit->charge;
       fParams.charge_wgt_y += hit->t * hit->charge;
-      fParams.mean_charge += hit->charge;
+      fParams.sum_charge += hit->charge;
 
       wireMap[hit->w] ++;
 
@@ -202,17 +201,17 @@ namespace cluster{
     fParams.N_Wires = wireMap.size();
     fParams.multi_hit_wires = fParams.N_Hits - fParams.N_Wires;
 
-    fParams.charge_wgt_x /= fParams.mean_charge;
-    fParams.charge_wgt_y /= fParams.mean_charge;
+    fParams.charge_wgt_x /= fParams.sum_charge;
+    fParams.charge_wgt_y /= fParams.sum_charge;
 
     std::cout 
       << " charge weights:  x: " << fParams.charge_wgt_x 
       << " y: "                  << fParams.charge_wgt_y 
-      << " mean charge: "        << fParams.mean_charge 
+      << " mean charge: "        << fParams.sum_charge 
       << std::endl;
     fParams.mean_x = (* fPrincipal->GetMeanValues())[0];
     fParams.mean_y = (* fPrincipal->GetMeanValues())[1];
-    fParams.mean_charge /= fParams.N_Hits;
+    fParams.mean_charge = fParams.sum_charge / fParams.N_Hits;
 
     fPrincipal -> MakePrincipals();
 
@@ -640,7 +639,9 @@ namespace cluster{
     fParams.opening_angle = GetOpeningAngle(&fRoughBeginPoint,
 					    &fRoughEndPoint, 
 					    fParams.fHitPtrVector);
-                                                                                                    
+
+    fParams.start_point = fRoughBeginPoint;
+    fParams.end_point   = fRoughEndPoint;
     // fRoughEndPoint
     // fRoughEndPoint
     // and use them to get the axis

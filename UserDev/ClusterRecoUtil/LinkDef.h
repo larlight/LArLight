@@ -9,6 +9,8 @@
 #pragma link off all classes;
 #pragma link off all functions;
 
+#pragma link C++ namespace cluster+;
+
 #pragma link C++ class cluster::ClusterParamsAlgNew+;
 #pragma link C++ class cluster::cluster_params+;
 #pragma link C++ class cluster::ClusterParamsExecutor+;
