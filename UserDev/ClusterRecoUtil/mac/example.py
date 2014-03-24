@@ -87,7 +87,12 @@ while mgr.next_event():
 
         algo.LoadCluster(clusters.at(x),
                          mgr.get_data(clusters.get_hit_type()))
-        algo.FillParams(True,True,True,True,True)
+        # algo.FillParams(True,True,True,True,True)
+        algo.GetAverages(True)
+        algo.GetRoughAxis(True)
+        algo.GetProfileInfo(True)
+        # algo.RefineStartPoints(True)
+        # algo.GetFinalSlope(True)
         print "(%g,%g) => (%g,%g)" % (algo.StartPoint().w,
                                       algo.StartPoint().t,
                                       algo.EndPoint().w,
