@@ -247,8 +247,8 @@ namespace cluster{
     //next loop over all hits again
     for (auto const & hit : fParams.fHitPtrVector){
       // First, abuse this loop to calculate rms in x and y
-      rmsx += pow(fParams.mean_x - hit->w, 2);
-      rmsy += pow(fParams.mean_x - hit->w, 2);
+      rmsx += sqrt(pow(fParams.mean_x - hit->w, 2)/N_Hits);
+      rmsy += sqrt(pow(fParams.mean_x - hit->w, 2)/N_Hits);
       //if charge is above avg_charge
       std::cout << "This hit has charge " <<  hit -> charge << "\n";
       if(hit->charge > fParams.mean_charge){
