@@ -73,7 +73,7 @@ namespace cluster{
 					      const std::vector<const larutil::PxHit*> & hits)
   {
     
-    double start_hit  ;
+    double start_hit;
     double start_end_w = rough_start_point->w - rough_end_point->w;
     double start_end_t = rough_start_point->t - rough_end_point->t;
     double start_end_start_hit ;
@@ -97,9 +97,9 @@ namespace cluster{
     int iBin(0);
     double percentage(0.0);
     for(iBin = 1;percentage<= 0.95; iBin++)
-      {
-	percentage += binning_vector[iBin]/(fParams.N_Hits) ;
-      }
+    {
+      percentage += binning_vector[iBin]/(fParams.N_Hits) ;
+    }
     
     opening_angle = iBin * PI /100 ;
     
@@ -148,6 +148,17 @@ namespace cluster{
 
     fParams.Clear();
     
+  }
+
+  void ClusterParamsAlgNew::Report(){
+    std::cout << "ClusterParamsAlgNew Report: "
+              << "\tFinishedGetAverages "        << fFinishedGetAverages << "\n"
+              << "\tFinishedGetRoughAxis "       << fFinishedGetRoughAxis << "\n"
+              << "\tFinishedGetProfileInfo "     << fFinishedGetProfileInfo << "\n"
+              << "\tFinishedRefineStartPoints "  << fFinishedRefineStartPoints << "\n"
+              << "\tFinishedGetFinalSlope "      << fFinishedGetFinalSlope << "\n"
+              << "--------------------------------------" << "\n";
+    fParams.Report();
   }
 
   void ClusterParamsAlgNew::FillParams(bool override_DoGetAverages      ,  

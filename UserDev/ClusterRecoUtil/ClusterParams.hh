@@ -1,6 +1,7 @@
 #ifndef UTIL_CLUSTERPARAMS_H
 #define UTIL_CLUSTERPARAMS_H
 
+#include <ostream>
 
 namespace cluster{
 
@@ -78,10 +79,40 @@ namespace cluster{
       hit_density_1D                    = -999.999 ;
       hit_density_2D                    = -999.999 ;
       angle_2d                          = -999.999 ;
-      cluster_angle_2d		        = -999.999 ;
+      cluster_angle_2d		              = -999.999 ;
       showerness                        = -999.999 ;
       trackness                         = -999.999 ;
       fHitPtrVector.clear();
+    }
+
+    void Report(std::ostream & os = std::cout){
+      os << "ClusterParams report: "
+         << "\tmean_charge: " << mean_charge << "\n"
+         << "\tmean_x: " << mean_x << "\n"
+         << "\tmean_y: " << mean_y << "\n"
+         << "\trms_x: " << rms_x << "\n"
+         << "\trms_y: " << rms_y << "\n"
+         << "\tcharge_wgt_x: " << charge_wgt_x << "\n"
+         << "\tcharge_wgt_y: " << charge_wgt_y << "\n"
+         << "\teigenvalue_principal: " << eigenvalue_principal << "\n"
+         << "\teigenvalue_secondary: " << eigenvalue_secondary << "\n"
+         << "\tmulti_hit_wires: " << multi_hit_wires << "\n"
+         << "\tN_Wires: " << N_Wires << "\n"
+         << "\tverticalness: " << verticalness << "\n"
+         << "\topening_angle: " << opening_angle << "\n"
+         << "\topening_angle_highcharge: " << opening_angle_highcharge << "\n"
+         << "\tclosing_angle: " << closing_angle << "\n"
+         << "\tclosing_angle_highcharge: " << closing_angle_highcharge << "\n"
+         << "\toffaxis_hits: " << offaxis_hits << "\n"
+         << "\tmodified_hit_density: " << modified_hit_density << "\n"
+         << "\tlength: " << length << "\n"
+         << "\twidth: " << width << "\n"
+         << "\thit_density_1D: " << hit_density_1D << "\n"
+         << "\thit_density_2D: " << hit_density_2D << "\n"
+         << "\tangle_2d: " << angle_2d << "\n"
+         << "\tcluster_angle_2d: " << cluster_angle_2d << "\n"
+         << "\tshowerness: " << showerness << "\n"
+         << "\ttrackness: " << trackness << "\n";
     }
 
   };

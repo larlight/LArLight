@@ -45,6 +45,7 @@ namespace cluster {
 
     void SetRefineDirectionQMin(double qmin){ fQMinRefDir = qmin; }
 
+    void Report();
 
     /**
       Runs all the functions which calculate cluster params                        
