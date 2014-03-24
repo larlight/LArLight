@@ -23,6 +23,8 @@
 #include <TH1F.h>
 #include <TTree.h>
 
+#include "ClusterMergeAlg.hh"
+
 namespace larlight {
   /**
      \class ShowerAngleCluster
@@ -66,6 +68,10 @@ namespace larlight {
  
     //HoughBaseAlg fHBAlg; 
     larreco::ClusterParamsAlg fCParAlg;
+
+    larreco::ClusterMergeAlg *fCMergeAlg;
+
+
     //ClusterMergeAlg fCMergeAlg;
     //ClusterMatchAlg fCMatchAlg;
     bool fExternalStartPoints;
@@ -112,6 +118,8 @@ namespace larlight {
     unsigned int  fMinHitListSize;
     
     DATA::DATA_TYPE _in_cluster_type;
+
+
   };
 }
 #endif

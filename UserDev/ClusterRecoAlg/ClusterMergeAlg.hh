@@ -28,7 +28,7 @@ namespace larreco {
      \class ClusterMergeAlg
      User custom analysis class made by davidkaleko
    */
-  class ClusterMergeAlg : public larlight::ana_base{
+  class ClusterMergeAlg : public larlight::larlight_base {
 
   public:
 
@@ -36,22 +36,10 @@ namespace larreco {
     ClusterMergeAlg();
 
     /// Default destructor
-    virtual ~ClusterMergeAlg(){};
+    virtual ~ClusterMergeAlg();
 
-    /**
-        Initialization method to be called before the analysis event loop.
-    */ 
-    virtual bool initialize();
-
-    /**
-        Analyze a data event-by-event  
-    */
-    virtual bool analyze(larlight::storage_manager* storage);
-
-    /**
-        Finalize method to be called after all events processed.
-    */
-    virtual bool finalize();
+    /// Method to re-configure the instance
+    void reconfigure();
 
     /// Method to set verbose mode
     void VerboseMode(bool on) { _verbose = on; }

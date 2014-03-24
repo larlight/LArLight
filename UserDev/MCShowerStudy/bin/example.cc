@@ -1,9 +1,9 @@
 //
-// Example C++ routine to run your analysis module, MCClusterStudy.
+// Example C++ routine to run your analysis module, MCShowerStudy.
 //
 
 #include "Analysis-TypeDef.hh"
-#include "MCClusterStudy-TypeDef.hh"
+#include "MCShowerStudy-TypeDef.hh"
 
 int main(int argc, char** argv){
 
@@ -40,7 +40,7 @@ int main(int argc, char** argv){
   my_proc.set_ana_output_file("from_test_ana_you_can_remove_me.root");
 
   // Attach a template process
-  my_proc.add_process(new larlight::MCClusterStudy);
+  my_proc.add_process(new larlight::MCShowerStudy);
 
   std::cout
     << std::endl
