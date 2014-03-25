@@ -10,5 +10,6 @@
 #pragma link off all functions;
 
 #pragma link C++ class FANN+;
+#pragma link C++ class TrainingModule+;
 //ADD_NEW_CLASS ... do not change this line
 #endif

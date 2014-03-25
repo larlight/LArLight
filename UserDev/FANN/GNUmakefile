@@ -10,7 +10,7 @@ HEADERS = $(wildcard *.hh)
 OBJECTS = $(SOURCES:.cc=.o)
 
 # include options for this package
-INCFLAGS = -I.                       #Include itself
+INCFLAGS = -I. -I./include/                       #Include itself
 
 # platform-specific options
 OSNAME          = $(shell uname -s)
@@ -22,8 +22,8 @@ FANN_DIR = FANN-2.2.0-Source
 .PHONY: fanncode
 
 fanncode:
-	@$(MAKE) -C $(FANN_DIR)
-	@$(MAKE) install -C $(FANN_DIR)
+	@$(MAKE) -C $(FANN_DIR) > /dev/null
+	@$(MAKE) install -C $(FANN_DIR) > /dev/null
 
 
 
