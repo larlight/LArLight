@@ -14,13 +14,16 @@
 #ifndef TRAININGMODULE_HH
 #define TRAININGMODULE_HH
 
+
+// Uncomment the following line to use "double" type for FANN
+//#define USE_DOUBLE_FANN
+
 #include <iostream>
 #include <stdarg.h>
 
 #include <vector>
 #include <string>
-// #include "fann.h"
-#include "doublefann.h"
+#include "fann.h"
 
 /**
    \class TrainingModule

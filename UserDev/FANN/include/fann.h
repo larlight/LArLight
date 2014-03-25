@@ -41,7 +41,11 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 #ifdef FIXEDFANN
 #include "fixedfann.h"
 #else
+#ifdef USE_DOUBLE_FANN
+#include "doublefann.h"
+#else
 #include "floatfann.h"
+#endif /* USE_DOUBLE_FANN */
 #endif	/* FIXEDFANN  */
 	
 #else

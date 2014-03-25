@@ -22,12 +22,14 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 typedef double fann_type;
 
+
 #undef DOUBLEFANN
 #define DOUBLEFANN
 #define FANNPRINTF "%.20e"
 #define FANNSCANF "%le"
 
 #define FANN_INCLUDE
+
 #include "fann.h"
 
 #endif
