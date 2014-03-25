@@ -45,6 +45,8 @@ namespace cluster {
 
     void SetRefineDirectionQMin(double qmin){ fQMinRefDir = qmin; }
 
+    void SetVerbose(){ verbose = true;}
+
     void Report();
 
     /**
@@ -145,10 +147,13 @@ namespace cluster {
     */
     std::vector<larutil::PxHit> fHitVector;
 
-    
+    // bool to control debug/verbose mode
+    // defaults to off.
+    bool verbose;
+
     //settable parameters:
-     double fChargeCutoffThreshold[3]; 
-     int fPlane;
+    double fChargeCutoffThreshold[3]; 
+    int fPlane;
 
     //this is required in RefineDirection
     double fQMinRefDir;

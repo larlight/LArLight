@@ -386,8 +386,6 @@ namespace cluster{
      
       larutil::PxPoint OnlinePoint;
       // get coordinates of point on axis.
-      std::cout << &BeginOnlinePoint << std::endl;
-      std::cout << &OnlinePoint << std::endl;
       fGSer->GetPointOnLine(fRough2DSlope,BeginOnlinePoint,hit,OnlinePoint);
      //std::cout << " Online Point " << OnlinePoint.w << " " << OnlinePoint.t << std::endl; 
       double linedist=fGSer->Get2DDistance(OnlinePoint,BeginOnlinePoint);
@@ -401,11 +399,11 @@ namespace cluster{
     
       int fine_bin=(int)(linedist/fProjectedLength*fProfileNbins);
       int coarse_bin=(int)(linedist/fProjectedLength*fCoarseNbins);
-      std::cout << "linedist: " << linedist << std::endl;
-      std::cout << "fProjectedLength: " << fProjectedLength << std::endl;
-      std::cout << "fProfileNbins: " << fProfileNbins << std::endl;
-      std::cout << "fine_bin: " << fine_bin << std::endl;
-      std::cout << "coarse_bin: " << coarse_bin << std::endl;
+      // std::cout << "\tlinedist: " << linedist << std::endl;
+      // std::cout << "\tfProjectedLength: " << fProjectedLength << std::endl;
+      // std::cout << "\tfProfileNbins: " << fProfileNbins << std::endl;
+      // std::cout << "\tfine_bin: " << fine_bin << std::endl;
+      // std::cout << "\tcoarse_bin: " << coarse_bin << std::endl;
       //std::cout << "length" << linedist <<   " fine_bin, coarse " << fine_bin << " " << coarse_bin << std::endl;
       
       if(fine_bin<fProfileNbins)  //only fill if bin number is in range
