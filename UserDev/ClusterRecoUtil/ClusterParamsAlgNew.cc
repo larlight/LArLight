@@ -70,45 +70,84 @@ namespace cluster{
   }
   */  
 
-  //Calculate opening angle
-  double ClusterParamsAlgNew::GetOpeningAngle(const larutil::PxPoint &rough_start_point,
-					      const larutil::PxPoint &rough_end_point,
-					      const std::vector<larutil::PxHit> & hits)
+void ClusterParamsAlgNew::GetOpeningAngle()
   {
-    
-    double start_hit;
-    double start_end_w = rough_start_point.w - rough_end_point.w;
-    double start_end_t = rough_start_point.t - rough_end_point.t;
-    double start_end_start_hit ;
-    double dot_product ;
-    double angle_hit_axis ;
-    double opening_angle ;
-    //int    Integral = 0;
-    std::vector<int> binning_vector(100,0 ) ;
-    start_end_start_hit = sqrt(pow(start_end_w,2)+ pow(start_end_t,2));
-    
-    for(auto & hit : hits){
-      
-      dot_product = (hit.w - rough_start_point.w)*(start_end_w)+ (hit.t - rough_start_point.t) * (start_end_t) ; 
-      start_hit = (hit.w - rough_start_point.w)*(hit.w - rough_start_point.w) + (hit.t - rough_start_point.t)*(hit.t - rough_start_point.t);
-      start_hit = sqrt(start_hit);
-      angle_hit_axis = dot_product/start_end_start_hit/start_hit ;
-      int N_bins = 100 * acos(angle_hit_axis)/PI;
-      binning_vector[N_bins]++;
-    }
-    
-    int iBin(0);
-    double percentage(0.0);
-    for(iBin = 1;percentage<= 0.95; iBin++)
-    {
-      percentage += binning_vector[iBin]/(fParams.N_Hits) ;
-    }
-    
-    opening_angle = iBin * PI /100 ;
-    
-    return opening_angle;
-  }
-  
+    double distance_end_points ;                                        //distance between start and end points                                 
+    double distance_hits_OPEN ;                                         //distance between start and hit points
+    double distance_hits_CLOSE ;                                        //distance between start and hit points
+    double dot_product_OPEN ;                                           //dot product for opening angle
+    double dot_product_CLOSE ;                                          //dot product for closing angle
+    double cos_opening_angle ;                                          //cos(opening_angle) between hit and axis
+    double cos_closing_angle ;                                          //cos(closing_angle) between hit and axis
+    double percentage = 0.95 ;
+
+    //define variables for angle calculation 
+    double start_end_w = fRoughEndPoint.w - fRoughBeginPoint.w ;
+    double start_end_t = fRoughEndPoint.t - fRoughBeginPoint.t ;
+    distance_end_points = sqrt(pow(start_end_w,2)+ pow(start_end_t,2));
+
+    std::vector<int> opening_angle_bin(100,0 ) ;
+    std::vector<int> closing_angle_bin(100,0 ) ;
+    std::vector<int> opening_angle_highcharge_bin(100,0 ) ;
+    std::vector<int> closing_angle_highcharge_bin(100,0 ) ;
+
+    for(auto& hit : fHitVector){
+
+      dot_product_OPEN = (hit.w - fRoughBeginPoint.w)*(start_end_w)+ (hit.t - fRoughBeginPoint.t) * (start_end_t) ;
+      dot_product_CLOSE = (hit.w - fRoughEndPoint.w)*( -start_end_w)+ (hit.t - fRoughEndPoint.t) * ( -start_end_t) ;
+
+      distance_hits_OPEN = sqrt(pow(hit.w - fRoughBeginPoint.w,2) + pow(hit.t - fRoughBeginPoint.t,2));
+      distance_hits_CLOSE = sqrt(pow(hit.w - fRoughEndPoint.w,2) + pow(hit.t - fRoughEndPoint.t,2));
+
+      cos_opening_angle = dot_product_OPEN/distance_end_points/distance_hits_OPEN ;
+      cos_closing_angle = dot_product_CLOSE/distance_end_points/distance_hits_CLOSE ;
+
+      int N_bins_OPEN = 100 * acos(cos_opening_angle)/PI;
+      int N_bins_CLOSE = 100 * acos(cos_closing_angle)/PI;
+      opening_angle_bin[N_bins_OPEN]++;
+      closing_angle_bin[N_bins_CLOSE]++;
+
+      //Also fill bins for high charge hits
+      if(hit.charge > fParams.mean_charge){
+        opening_angle_highcharge_bin[N_bins_OPEN]++;
+        closing_angle_highcharge_bin[N_bins_CLOSE]++;
+        }
+     }
+
+    int iBin(0), jBin(0), kBin(0), lBin(0);  //initialize iterators for the 4 angles
+    double percentage_OPEN(0.0), percentage_CLOSE(0.0), percentage_OPEN_HC(0.0), percentage_CLOSE_HC(0.0); //The last 2 are for High Charge (HC)
+
+    for(iBin = 1; percentage_OPEN<= percentage; iBin++)
+      {
+        percentage_OPEN += opening_angle_bin[iBin]/(fParams.N_Hits) ;
+      }
+
+    for(jBin = 1; percentage_CLOSE<= percentage; jBin++)
+      {
+	 percentage_CLOSE += closing_angle_bin[iBin]/(fParams.N_Hits) ;
+       }
+
+    for(kBin = 1; percentage_OPEN_HC<= percentage; kBin++)
+      {
+        percentage_OPEN_HC += opening_angle_highcharge_bin[kBin]/(fParams.N_Hits) ;
+      }
+
+    for(lBin = 1; percentage_CLOSE_HC<= percentage; lBin++)
+      {
+        percentage_CLOSE_HC += closing_angle_highcharge_bin[lBin]/(fParams.N_Hits) ;
+      }
+    fParams.opening_angle = iBin * PI /100 ;
+    fParams.closing_angle = jBin * PI /100 ;
+    fParams.opening_angle_highcharge = kBin * PI /100 ;
+    fParams.closing_angle_highcharge = lBin * PI /100 ;
+
+    std::cout<<"opening angle: "<<fParams.opening_angle<<std::endl;
+    std::cout<<"closing angle: "<<fParams.closing_angle<<std::endl;
+    std::cout<<"opening high charge angle: "<<fParams.opening_angle_highcharge<<std::endl;
+    std::cout<<"closing high charge angle: "<<fParams.closing_angle_highcharge<<std::endl;
+
+   }
+
 
   void ClusterParamsAlgNew::Initialize()
   {
@@ -671,9 +710,7 @@ namespace cluster{
     // need to define physical direction with openind angles and pass that to Ryan's line finder.
  
     
-    fParams.opening_angle = GetOpeningAngle(fRoughBeginPoint,
-					    fRoughEndPoint, 
-					    fHitVector);
+    GetOpeningAngle();  //Sets opening angle, closing angle, and open/close angles for high charge
 
     fParams.start_point = fRoughBeginPoint;
     fParams.end_point   = fRoughEndPoint;

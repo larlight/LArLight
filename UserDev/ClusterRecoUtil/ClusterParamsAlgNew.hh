@@ -129,9 +129,7 @@ namespace cluster {
     void RefineDirection(larutil::PxPoint &start,
                          larutil::PxPoint &end);
 
-    double GetOpeningAngle(const larutil::PxPoint &rough_start_point,
-                           const larutil::PxPoint &rough_end_point,
-                           const std::vector<larutil::PxHit> & hits);
+    void GetOpeningAngle();
 
     const larutil::PxPoint& StartPoint() {return fRoughBeginPoint;}
     const larutil::PxPoint& EndPoint() {return fRoughEndPoint;}
