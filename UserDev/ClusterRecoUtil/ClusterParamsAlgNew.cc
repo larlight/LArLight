@@ -191,7 +191,7 @@ namespace cluster{
     fParams.sum_charge = 0.;
 
     for(auto& hit : fHitVector){
-      std::cout << "This hit has charge " <<  hit.charge << "\n";
+      // std::cout << "This hit has charge " <<  hit.charge << "\n";
 
       double data[2];
       data[0] = hit.w;
@@ -210,11 +210,11 @@ namespace cluster{
     fParams.charge_wgt_x /= fParams.sum_charge;
     fParams.charge_wgt_y /= fParams.sum_charge;
 
-    std::cout 
-      << " charge weights:  x: " << fParams.charge_wgt_x 
-      << " y: "                  << fParams.charge_wgt_y 
-      << " mean charge: "        << fParams.sum_charge 
-      << std::endl;
+    // std::cout 
+    //   << " charge weights:  x: " << fParams.charge_wgt_x 
+    //   << " y: "                  << fParams.charge_wgt_y 
+    //   << " mean charge: "        << fParams.sum_charge 
+    //   << std::endl;
     fParams.mean_x = (* fPrincipal->GetMeanValues())[0];
     fParams.mean_y = (* fPrincipal->GetMeanValues())[1];
     fParams.mean_charge = fParams.sum_charge / fParams.N_Hits;
@@ -225,7 +225,7 @@ namespace cluster{
     fParams.eigenvalue_secondary = (* fPrincipal -> GetEigenValues() )[1];
 
     fFinishedGetAverages = true;
-    // Report();
+    Report();
   }
 
   // Also does the high hitlist
@@ -254,10 +254,10 @@ namespace cluster{
     for (auto& hit : fHitVector){
       // First, abuse this loop to calculate rms in x and y
       rmsx += sqrt(pow(fParams.mean_x - hit.w, 2)/fParams.N_Hits);
-      rmsx += sqrt(pow(fParams.mean_x - hit.w, 2)/fParams.N_Hits);
+      rmsy += sqrt(pow(fParams.mean_y - hit.t, 2)/fParams.N_Hits);
 
       //if charge is above avg_charge
-      std::cout << "This hit has charge " <<  hit . charge << "\n";
+      // std::cout << "This hit has charge " <<  hit . charge << "\n";
       if(hit.charge > fParams.mean_charge){
         ncw+=1;
         sumwire+=hit.w;
@@ -273,7 +273,7 @@ namespace cluster{
     //Getthe 2D_angle
     fParams.cluster_angle_2d = atan(fRough2DSlope)*180/PI;
 
-    std::cout << "fRough2DSlope is " << fRough2DSlope << std::endl;
+    // std::cout << "fRough2DSlope is " << fRough2DSlope << std::endl;
 
 
     fFinishedGetRoughAxis = true;    
@@ -311,10 +311,10 @@ namespace cluster{
     }
     else
       inv_2d_slope=-999999.;
-    std::cout << " N_Hits is " << fParams.N_Hits << std::endl;
-    std::cout << " inv_2d_slope is " << inv_2d_slope << std::endl;
-    std::cout << " fRough2DSlope is " << fRough2DSlope << std::endl;
-    std::cout << " conversions " << fWire2Cm.at(fPlane) << " " << fTime2Cm << std::endl;
+    // std::cout << " N_Hits is " << fParams.N_Hits << std::endl;
+    // std::cout << " inv_2d_slope is " << inv_2d_slope << std::endl;
+    // std::cout << " fRough2DSlope is " << fRough2DSlope << std::endl;
+    // std::cout << " conversions " << fWire2Cm.at(fPlane) << " " << fTime2Cm << std::endl;
     
     fInterHigh=-999999;
     fInterLow=999999;

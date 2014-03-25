@@ -91,8 +91,8 @@ while mgr.next_event():
         algo.GetAverages(True)
         algo.GetRoughAxis(True)
         algo.GetProfileInfo(True)
-        # algo.RefineStartPoints(True)
-        # algo.GetFinalSlope(True)
+        algo.RefineStartPoints(True)
+        algo.GetFinalSlope(True)
         print "(%g,%g) => (%g,%g)" % (algo.StartPoint().w,
                                       algo.StartPoint().t,
                                       algo.EndPoint().w,
