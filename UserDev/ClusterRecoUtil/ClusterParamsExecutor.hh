@@ -43,7 +43,7 @@ namespace cluster {
     { return hCurrentHit;}
     
   protected:
-
+    std::vector<const larlight::hit*> cluster_hits;
     TH2D* hCurrentHit;
     std::vector<TH2D*> hHit;
   };

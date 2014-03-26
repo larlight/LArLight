@@ -74,8 +74,8 @@ namespace larutil{
 			Double_t timeend,
 			Double_t timestart) const;
     
-    double Get2Dangle(const larutil::PxPoint &endpoint,
-		      const larutil::PxPoint &startpoint) const;
+    double Get2Dangle(const larutil::PxPoint *endpoint,
+		      const larutil::PxPoint *startpoint) const;
     
 		      
 		      
@@ -87,16 +87,16 @@ namespace larutil{
 			Double_t timeend,
 			Double_t timestart) const;
     
-    double Get2Dslope(const larutil::PxPoint &endpoint,
-		      const larutil::PxPoint &startpoint) const;
+    double Get2Dslope(const larutil::PxPoint *endpoint,
+		      const larutil::PxPoint *startpoint) const;
 		      
     Double_t Get2DDistance(Double_t wire1,
 			   Double_t time1,
 			   Double_t wire2,
 			   Double_t time2) const;
     
-    double Get2DDistance(const larutil::PxPoint &point1,
-			 const larutil::PxPoint &point2) const;			 
+    double Get2DDistance(const larutil::PxPoint *point1,
+			 const larutil::PxPoint *point2) const;			 
 			 
 			 
     Double_t Get2DPitchDistance(Double_t angle,
@@ -123,13 +123,13 @@ namespace larutil{
 			 Double_t &timeout) const;
     
     int GetPointOnLine(Double_t slope,
-		       const larutil::PxPoint &startpoint,
-		       const larutil::PxPoint &point1,
+		       const larutil::PxPoint *startpoint,
+		       const larutil::PxPoint *point1,
 		       larutil::PxPoint &pointout) const;
     
     int GetPointOnLine(double slope,
 	               double intercept,
-		       const larutil::PxPoint &point1,
+		       const larutil::PxPoint *point1,
 		       larutil::PxPoint &pointout) const;
 		       
     Int_t GetPointOnLineWSlopes(Double_t slope,
@@ -164,12 +164,12 @@ namespace larutil{
 			 UInt_t &p,
 			 UInt_t &w) const;
 
-    Int_t GetProjectedPoint(const PxPoint &p0,
-			    const PxPoint &p1,
+    Int_t GetProjectedPoint(const PxPoint *p0,
+			    const PxPoint *p1,
 			    PxPoint &pN) const;
     
-    Int_t GetYZ(const PxPoint &p0,
-		const PxPoint &p1, 
+    Int_t GetYZ(const PxPoint *p0,
+		const PxPoint *p1, 
 		Double_t* yz) const;
     
     Double_t PitchInView(UInt_t plane,
@@ -196,8 +196,8 @@ namespace larutil{
 			    Double_t ortlimit, 
 			    Double_t lineslopetest);
 	
-    void SelectLocalHitlist(const std::vector<larutil::PxHit>& hitlist, 
-			    std::vector <larutil::PxHit> &hitlistlocal,
+    void SelectLocalHitlist(const std::vector<larutil::PxHit> &hitlist, 
+			    std::vector <const larutil::PxHit*> &hitlistlocal,
 			    larutil::PxHit &startHit,
 			    Double_t& linearlimit,   
 			    Double_t& ortlimit, 

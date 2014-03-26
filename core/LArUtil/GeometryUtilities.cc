@@ -412,10 +412,10 @@ namespace larutil{
   //Calculate 2D slope 
   // in "cm" "cm" coordinates
   /////////////////////////////////////////////////////////
-  double GeometryUtilities::Get2Dslope(const larutil::PxPoint &endpoint,
-				       const larutil::PxPoint &startpoint) const
+  double GeometryUtilities::Get2Dslope(const larutil::PxPoint *endpoint,
+				       const larutil::PxPoint *startpoint) const
   {
-    return Get2Dslope(endpoint.w - startpoint.w,endpoint.t - startpoint.t);
+    return Get2Dslope(endpoint->w - startpoint->w,endpoint->t - startpoint->t);
   
   }
 
@@ -453,10 +453,10 @@ namespace larutil{
   //Calculate 2D angle 
   // in "cm" "cm" coordinates, endpoint and startpoint are assumed to be in cm/cm space
   /////////////////////////////////////////////////////////
-  Double_t GeometryUtilities::Get2Dangle(const larutil::PxPoint &endpoint,
-					 const larutil::PxPoint &startpoint) const
+  Double_t GeometryUtilities::Get2Dangle(const larutil::PxPoint *endpoint,
+					 const larutil::PxPoint *startpoint) const
   {
-    return Get2Dangle(endpoint.w - startpoint.w, endpoint.t - startpoint.t);
+    return Get2Dangle(endpoint->w - startpoint->w, endpoint->t - startpoint->t);
   
   }
 			
@@ -506,10 +506,10 @@ namespace larutil{
   }
 
   
-   double GeometryUtilities::Get2DDistance(const larutil::PxPoint &point1,
-					   const larutil::PxPoint &point2) const	
+   double GeometryUtilities::Get2DDistance(const larutil::PxPoint *point1,
+					   const larutil::PxPoint *point2) const	
   {
-    return TMath::Sqrt( pow((point1.w - point2.w),2)+pow((point1.t - point2.t),2) );	
+    return TMath::Sqrt( pow((point1->w - point2->w),2)+pow((point1->t - point2->t),2) );	
   }
 
   
@@ -575,12 +575,12 @@ namespace larutil{
   //  all points are assumed to be in cm/cm space.
   ///////////////////////////////////
   int GeometryUtilities::GetPointOnLine(Double_t slope,
-					const larutil::PxPoint &startpoint,
-					const larutil::PxPoint &point1,
+					const larutil::PxPoint *startpoint,
+					const larutil::PxPoint *point1,
 					larutil::PxPoint &pointout) const
   {
     
-    double intercept=startpoint.t - slope * startpoint.w;  
+    double intercept=startpoint->t - slope * startpoint->w;  
     
     
     return GetPointOnLine(slope,intercept,point1,pointout);
@@ -594,7 +594,7 @@ namespace larutil{
   ///////////////////////////////////
   int GeometryUtilities::GetPointOnLine(double slope,
 					double intercept,
-					const larutil::PxPoint &point1,
+					const larutil::PxPoint *point1,
 					larutil::PxPoint &pointout) const
   {
     double invslope=0;
@@ -604,12 +604,12 @@ namespace larutil{
 	invslope=-1./slope*fWireTimetoCmCm*fWireTimetoCmCm;
       }
   
-    double ort_intercept=point1.t - invslope * point1.w;
+    double ort_intercept=point1->t - invslope * point1->w;
     
     if((slope-invslope)!=0)
       pointout.w = (ort_intercept - intercept)/(slope-invslope); 
     else
-      pointout.w = point1.w;
+      pointout.w = point1->w;
     
     pointout.t = slope * pointout.w + intercept;   
     
@@ -773,27 +773,27 @@ namespace larutil{
   
   
   //////////////////////////////////////////////////////////
-  Int_t GeometryUtilities::GetProjectedPoint(const PxPoint &p0, 
-					     const PxPoint &p1, 
+  Int_t GeometryUtilities::GetProjectedPoint(const PxPoint *p0, 
+					     const PxPoint *p1, 
 					     PxPoint &pN) const
   {
 
     //determine third plane number
     for(UInt_t i = 0; i < fNPlanes; ++i){
-      if(i == p0.plane || i == p1.plane)
+      if(i == p0->plane || i == p1->plane)
 	continue;   
       pN.plane = i;
     }
   
     // Assuming there is no problem ( and we found the best pair that comes close in time )
     // we try to get the Y and Z coordinates for the start of the shower. 
-    UInt_t chan1 = geom->PlaneWireToChannel(p0.plane,p0.w);
-    UInt_t chan2 = geom->PlaneWireToChannel(p1.plane,p1.w);
+    UInt_t chan1 = geom->PlaneWireToChannel(p0->plane,p0->w);
+    UInt_t chan2 = geom->PlaneWireToChannel(p1->plane,p1->w);
  
     Double_t pos[3]={0.};
-    geom->PlaneOriginVtx(p0.plane, pos);
+    geom->PlaneOriginVtx(p0->plane, pos);
  
-    Double_t x=(p0.t - detp->TriggerOffset())*fTimetoCm+pos[0];
+    Double_t x=(p0->t - detp->TriggerOffset())*fTimetoCm+pos[0];
  
     Double_t y,z;
     if(! geom->ChannelsIntersect(chan1,chan2,y,z) )
@@ -811,14 +811,14 @@ namespace larutil{
 
 
   //////////////////////////////////////////////////////////
-  Int_t GeometryUtilities::GetYZ(const PxPoint &p0,
-				 const PxPoint &p1,
+  Int_t GeometryUtilities::GetYZ(const PxPoint *p0,
+				 const PxPoint *p1,
 				 Double_t* yz) const
   {
     Double_t y,z;
   
-    UInt_t chan1 = geom->PlaneWireToChannel(p0.plane, p0.w);
-    UInt_t chan2 = geom->PlaneWireToChannel(p1.plane, p1.w);
+    UInt_t chan1 = geom->PlaneWireToChannel(p0->plane, p0->w);
+    UInt_t chan2 = geom->PlaneWireToChannel(p1->plane, p1->w);
 
     if(! geom->ChannelsIntersect(chan1,chan2,y,z) )
       return -1;
@@ -997,7 +997,7 @@ namespace larutil{
   }
 
   void GeometryUtilities::SelectLocalHitlist(const std::vector<larutil::PxHit>& hitlist, 
-					     std::vector <larutil::PxHit> &hitlistlocal,
+					     std::vector <const larutil::PxHit*> &hitlistlocal,
 					     larutil::PxHit &startHit,
 					     Double_t& linearlimit,   
 					     Double_t& ortlimit, 
@@ -1024,7 +1024,7 @@ namespace larutil{
       Double_t lindist=Get2DDistance(wonline,tonline,wire_start,time_start);
       Double_t ortdist=Get2DDistance(wire,time,wonline,tonline);
 
-      if(lindist<linearlimit && ortdist<ortlimit)  hitlistlocal.push_back(hitlist.at(i));
+      if(lindist<linearlimit && ortdist<ortlimit)  hitlistlocal.push_back((const larutil::PxHit*)(&(hitlist.at(i))));
     }
 
     averageHit.plane = startHit.plane;

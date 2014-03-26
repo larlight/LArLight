@@ -35,29 +35,24 @@ namespace cluster {
       return;
     }
 
-    std::vector<larutil::PxHit> pxhits;
+    cluster_hits.clear();
     const std::vector<UShort_t> &hit_index_v = i_cluster.association(hit_type);
 
     UChar_t plane = larutil::Geometry::GetME()->ChannelToPlane(hits->at(*hit_index_v.begin()).Channel());
     hHit.at(plane)->Reset();
     hCurrentHit = hHit.at(plane);
 
-    pxhits.reserve(hit_index_v.size());
+    cluster_hits.reserve(hit_index_v.size());
     for(auto const index : hit_index_v) {
 
-      pxhits.push_back(larutil::PxHit());
-      (*pxhits.rbegin()).w = hits->at(index).Wire()*fWire2Cm.at(plane);
-      (*pxhits.rbegin()).t = hits->at(index).PeakTime()*fTime2Cm;
-      (*pxhits.rbegin()).charge = hits->at(index).Charge();
-      (*pxhits.rbegin()).plane  = plane;
-
+      cluster_hits.push_back((const larlight::hit*)(&(hits->at(index))));
+      
       hHit.at(plane)->Fill(hits->at(index).Wire()*fWire2Cm.at(plane), hits->at(index).PeakTime()*fTime2Cm, hits->at(index).Charge());
-
       
     }
     
     this->Initialize();
-    this->SetHits(pxhits);
+    this->SetHits(cluster_hits);
 
   }
 

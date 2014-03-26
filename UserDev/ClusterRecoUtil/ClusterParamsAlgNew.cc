@@ -21,14 +21,14 @@ namespace cluster{
     if (fPrincipal != 0) delete fPrincipal;
   }
 
-  ClusterParamsAlgNew::ClusterParamsAlgNew(const std::vector<larutil::PxHit> &inhitlist){
+  ClusterParamsAlgNew::ClusterParamsAlgNew(const std::vector<const larlight::hit*> &inhitlist){
     fPrincipal=nullptr;
     fGSer=nullptr;
     Initialize();
     SetHits(inhitlist);
   }
 
-  void ClusterParamsAlgNew::SetHits(const std::vector<larutil::PxHit> &inhitlist){
+  void ClusterParamsAlgNew::SetHits(const std::vector<const larlight::hit*> &inhitlist){
 
     // Make default values
     // Is done by the struct
@@ -36,41 +36,25 @@ namespace cluster{
       throw RecoUtilException("Provided empty hit list!");
       return;
     }
-    fHitVector = inhitlist;
-    /*
-    fParams.fHitPtrVector.clear();
-    fParams.fHitPtrVector.reserve(inhitlist.size());
+    
+    Initialize();
+
+    UChar_t plane = larutil::Geometry::GetME()->ChannelToPlane((*inhitlist.begin())->Channel());
+
+    fHitVector.reserve(inhitlist.size());
     for(auto h : inhitlist) {
+      fHitVector.push_back(larutil::PxHit());
 
-      fParams.fHitPtrVector.push_back((const larutil::PxHit*)h);
-     
-    } 
-    fPlane=fParams.fHitPtrVector.at(0)->plane;
-    */    
-  }
-
-  /*
-  void ClusterParamsAlgNew::SetHits(const std::vector<larutil::PxHit> &inhitlist){
-
-    // Make default values
-    // Is done by the struct
-    if(!(inhitlist.size())) {
-      throw RecoUtilException("Provided empty hit list!");
-      return;
+      (*fHitVector.rbegin()).t = h->PeakTime() * fTime2Cm;
+      (*fHitVector.rbegin()).w = h->Wire() * fWire2Cm.at(plane);
+      (*fHitVector.rbegin()).charge = h->Charge();
+      (*fHitVector.rbegin()).plane = plane;
     }
-    fParams.fHitPtrVector.clear();
-    fParams.fHitPtrVector.reserve(inhitlist.size());
-    for(auto &h : inhitlist) {
-
-      fParams.fHitPtrVector.push_back(&h);
-
-    } 
-    fPlane=fParams.fHitPtrVector.at(0)->plane;
+    
     
   }
-  */  
 
-void ClusterParamsAlgNew::GetOpeningAngle()
+  void ClusterParamsAlgNew::GetOpeningAngle()
   {
     double distance_end_points ;                                        //distance between start and end points                                 
     double distance_hits_OPEN ;                                         //distance between start and hit points
@@ -187,6 +171,8 @@ void ClusterParamsAlgNew::GetOpeningAngle()
     fChargeCutoffThreshold[0]=500;
     fChargeCutoffThreshold[1]=500;
     fChargeCutoffThreshold[2]=1000;
+
+    fHitVector.clear();
 
     fParams.Clear();
     
@@ -413,7 +399,7 @@ void ClusterParamsAlgNew::GetOpeningAngle()
     
     BeginOnlinePoint = (HighOnlinePoint.w > LowOnlinePoint.w) ? LowOnlinePoint : HighOnlinePoint;
     
-    fProjectedLength=fGSer->Get2DDistance(HighOnlinePoint,LowOnlinePoint);
+    fProjectedLength=fGSer->Get2DDistance(&HighOnlinePoint,&LowOnlinePoint);
      
     std::cout << " projected length " << fProjectedLength 
               << " Begin Point " << BeginOnlinePoint.w << " " 
@@ -425,10 +411,13 @@ void ClusterParamsAlgNew::GetOpeningAngle()
      
       larutil::PxPoint OnlinePoint;
       // get coordinates of point on axis.
-      fGSer->GetPointOnLine(fRough2DSlope,BeginOnlinePoint,hit,OnlinePoint);
+      //std::cout << &BeginOnlinePoint << std::endl;
+      //std::cout << &OnlinePoint << std::endl;
+      fGSer->GetPointOnLine(fRough2DSlope,&BeginOnlinePoint,&hit,OnlinePoint);
+
      //std::cout << " Online Point " << OnlinePoint.w << " " << OnlinePoint.t << std::endl; 
-      double linedist=fGSer->Get2DDistance(OnlinePoint,BeginOnlinePoint);
-      double ortdist=fGSer->Get2DDistance(OnlinePoint,hit);
+      double linedist=fGSer->Get2DDistance(&OnlinePoint,&BeginOnlinePoint);
+      double ortdist=fGSer->Get2DDistance(&OnlinePoint,&hit);
     
       ////////////////////////////////////////////////////////////////////// 
       //calculate the weight along the axis, this formula is based on rough guessology. 
@@ -438,11 +427,14 @@ void ClusterParamsAlgNew::GetOpeningAngle()
     
       int fine_bin=(int)(linedist/fProjectedLength*fProfileNbins);
       int coarse_bin=(int)(linedist/fProjectedLength*fCoarseNbins);
-      // std::cout << "\tlinedist: " << linedist << std::endl;
-      // std::cout << "\tfProjectedLength: " << fProjectedLength << std::endl;
-      // std::cout << "\tfProfileNbins: " << fProfileNbins << std::endl;
-      // std::cout << "\tfine_bin: " << fine_bin << std::endl;
-      // std::cout << "\tcoarse_bin: " << coarse_bin << std::endl;
+      /*
+      std::cout << "linedist: " << linedist << std::endl;
+      std::cout << "fProjectedLength: " << fProjectedLength << std::endl;
+      std::cout << "fProfileNbins: " << fProfileNbins << std::endl;
+      std::cout << "fine_bin: " << fine_bin << std::endl;
+      std::cout << "coarse_bin: " << coarse_bin << std::endl;
+      */
+
       //std::cout << "length" << linedist <<   " fine_bin, coarse " << fine_bin << " " << coarse_bin << std::endl;
       
       if(fine_bin<fProfileNbins)  //only fill if bin number is in range
@@ -554,7 +546,7 @@ void ClusterParamsAlgNew::GetOpeningAngle()
     //===============================================================================================================       
     // Will need to feed in the set of hits that we want. 
     //	const std::vector<larutil::PxHit*> whole;
-    std::vector <larutil::PxHit> subhit;
+    std::vector <const larutil::PxHit*> subhit;
     larutil::PxHit startHit;
     startHit.w = fRoughBeginPoint.w;
     startHit.t = fRoughBeginPoint.t;
@@ -570,6 +562,18 @@ void ClusterParamsAlgNew::GetOpeningAngle()
 			      linearlimit,ortlimit,lineslopetest,
 			      averageHit);
 
+    if(!(subhit.size())) {
+      std::cout<<"Subhit list is empty. Using rough start/end points..."<<std::endl;
+      GetOpeningAngle();
+      fParams.start_point = fRoughBeginPoint;
+      fParams.end_point   = fRoughEndPoint;
+      // fRoughEndPoint
+      // fRoughEndPoint
+      // and use them to get the axis
+      
+      fFinishedRefineStartPoints = true;
+      return;
+    }
     double avgwire= averageHit.w;
     double avgtime= averageHit.t;
     std::vector<std::pair<double,double>> vertil;//vertex in tilda-space pair(x-til,y-til)
@@ -577,7 +581,7 @@ void ClusterParamsAlgNew::GetOpeningAngle()
     vertil.reserve(subhit.size() * subhit.size());
     std::vector<double> vs;//vector of the sum of the distance of a vector to every vertex in tilda-space
     vs.clear();// this isn't needed?
-    std::vector<larutil::PxHit>  ghits;// $$This needs to be corrected//this is the good hits that are between strip
+    std::vector<const larutil::PxHit*>  ghits;// $$This needs to be corrected//this is the good hits that are between strip
     ghits.reserve(subhit.size());
     int n=0;
     double fardistcurrent=0;
@@ -631,10 +635,10 @@ void ClusterParamsAlgNew::GetOpeningAngle()
     //Now we need to do the transformation into "tilda-space"
     for(unsigned int a=0; a<subhit.size();a++){
       for(unsigned int b=a+1;b<subhit.size();b++){
-	if(subhit.at(a).w != subhit.at(b).w){
-	  double xtil = ((subhit.at(a).t - avgtime) - (subhit.at(b).t - avgtime));
-	  xtil /= ((subhit.at(a).w - avgwire)-(subhit.at(b).w - avgwire));
-	  double ytil = (subhit.at(a).w - avgwire)*xtil -(subhit.at(a).t - avgtime);
+	if(subhit.at(a)->w != subhit.at(b)->w){
+	  double xtil = ((subhit.at(a)->t - avgtime) - (subhit.at(b)->t - avgtime));
+	  xtil /= ((subhit.at(a)->w - avgwire)-(subhit.at(b)->w - avgwire));
+	  double ytil = (subhit.at(a)->w - avgwire)*xtil -(subhit.at(a)->t - avgtime);
 	  //push back the tilda vertex point on the pair
 	  std::pair<double,double> tv(xtil,ytil);
 	  vertil.push_back(tv);
@@ -664,8 +668,8 @@ void ClusterParamsAlgNew::GetOpeningAngle()
     double tiltimeb=-vertil.at(minvs).second-d*sqrt(1+pow(tilwire,2));//negative cept is accounted for bottom strip
     // look over the subhit list and ask for which are inside of the strip
     for(unsigned int a=0; a<subhit.size(); a++){
-      double dtstrip= (-tilwire * (subhit.at(a).w - avgwire) +(subhit.at(a).t - avgtime)-tiltimet)/sqrt(tilwire*tilwire+1);
-      double dbstrip= (-tilwire * (subhit.at(a).w - avgwire) +(subhit.at(a).t - avgtime)-tiltimeb)/sqrt(tilwire*tilwire+1);
+      double dtstrip= (-tilwire * (subhit.at(a)->w - avgwire) +(subhit.at(a)->t - avgtime)-tiltimet)/sqrt(tilwire*tilwire+1);
+      double dbstrip= (-tilwire * (subhit.at(a)->w - avgwire) +(subhit.at(a)->t - avgtime)-tiltimeb)/sqrt(tilwire*tilwire+1);
       
       if((dtstrip<0.0 && dbstrip>0.0)||(dbstrip<0.0 && dtstrip>0.0)){
 	ghits.push_back(subhit.at(a));
@@ -681,22 +685,22 @@ void ClusterParamsAlgNew::GetOpeningAngle()
       // should call the helper funtion to do the fit
       //but for now since there is no helper function I will just write it here......again
       n+=1;
-      gwiretime+= ghits.at(g).w * ghits.at(g).t;
-      gwire+= ghits.at(g).w;
-      gtime+= ghits.at(g).t;
-      gwirewire+= ghits.at(g).w * ghits.at(g).w;
+      gwiretime+= ghits.at(g)->w * ghits.at(g)->t;
+      gwire+= ghits.at(g)->w;
+      gtime+= ghits.at(g)->t;
+      gwirewire+= ghits.at(g)->w * ghits.at(g)->w;
       // now work on calculating the distance in wire time space from the far point
       //farhit needs to be a hit that is given to me
-      double fardist= sqrt(pow(ghits.at(g).w - farhit.w,2)+pow(ghits.at(g).t - farhit.t,2));
+      double fardist= sqrt(pow(ghits.at(g)->w - farhit.w,2)+pow(ghits.at(g)->t - farhit.t,2));
       //come back to this... there is a better way to do this probably in the loop
       //there should also be a check that the hit that is farthest away has subsequent hits after it on a few wires
       if(fardist>fardistcurrent){
 	fardistcurrent=fardist;
 	//if fardist... this is the point to use for the start point
-	startpoint.t = ghits.at(g).t;
-	startpoint.w = ghits.at(g).w;
-	startpoint.plane = ghits.at(g).plane;
-	startpoint.charge = ghits.at(g).charge;
+	startpoint.t = ghits.at(g)->t;
+	startpoint.w = ghits.at(g)->w;
+	startpoint.plane = ghits.at(g)->plane;
+	startpoint.charge = ghits.at(g)->charge;
       }
     }//for ghits loop
     
