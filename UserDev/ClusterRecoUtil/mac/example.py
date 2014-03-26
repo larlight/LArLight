@@ -93,6 +93,7 @@ while mgr.next_event():
         algo.GetProfileInfo(True)
         algo.RefineStartPoints(True)
         algo.GetFinalSlope(True)
+        algo.Report()
         print "(%g,%g) => (%g,%g)" % (algo.StartPoint().w,
                                       algo.StartPoint().t,
                                       algo.EndPoint().w,
