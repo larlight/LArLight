@@ -468,6 +468,7 @@ namespace larutil{
 					 Double_t dtime) const
   {
  
+      
     Double_t BC,AC;
     Double_t omega;
  
@@ -491,6 +492,60 @@ namespace larutil{
 
   }
 
+  //accepting phi and theta in degrees
+  // returning in radians.
+  
+   double  GeometryUtilities::Get2DangleFrom3D(unsigned int plane,double phi, double theta) const
+   {
+   TVector3 dummyvector(cos(theta*TMath::Pi()/180.)*sin(phi*TMath::Pi()/180.)  ,sin(theta*TMath::Pi()/180.)  ,  cos(theta*TMath::Pi()/180.)*cos(phi*TMath::Pi()/180.));
+    
+    return Get2DangleFrom3D(plane,dummyvector);
+     
+   }
+   
+   
+   // accepting TVector3
+   // returning in radians as is customary,
+   
+   double  GeometryUtilities::Get2DangleFrom3D(unsigned int plane,TVector3 dir_vector) const
+  {
+   double alpha= 0.5*TMath::Pi()-geom->WireAngleToVertical(geom->PlaneToView(plane)); 
+   // create dummy  xyz point in middle of detector and another one in unit length.
+   // calculate correspoding points in wire-time space and use the differnces between those to return 2D a
+   // angle
+ //  std::cout << " alpha angle " <<alpha*180/TMath::Pi() <<std::endl;
+   
+   TVector3 start(geom->DetHalfWidth(),0.,geom->DetLength()/2.);
+   TVector3 end=start+dir_vector;
+   
+   
+   
+    Double_t pos[3];
+    geom->PlaneOriginVtx(plane,pos);
+    
+    
+    double correction= -(pos[0]/fDriftVelocity)*(1./fTimeTick)+detp->TriggerOffset();  // this accounts for plane position
+    
+   // drifttick=(start[0]/fDriftVelocity)*(1./fTimeTick);
+      
+    //the wire coordinate is already in cm. The time needs to be converted.
+   larutil::PxPoint startp(plane,(geom->DetHalfHeight()*sin(fabs(alpha))+start[2]*cos(alpha)+start[1]*sin(alpha)),((start[0]/fDriftVelocity)*(1./fTimeTick)+correction)*fTimetoCm);
+   
+   larutil::PxPoint endp(plane,(geom->DetHalfHeight()*sin(fabs(alpha))+end[2]*cos(alpha)+end[1]*sin(alpha)),((end[0]/fDriftVelocity)*(1./fTimeTick)+correction)*fTimetoCm);
+   
+   //std::cout <<" points " << startp.w << "," << startp.t << "   "<< endp.w << "," << endp.t << std::endl;
+   double angle=Get2Dangle(&endp,&startp);
+   
+   //std::cout << "calculated angle " << angle*180/TMath::Pi() << std::endl;
+   
+   return angle;
+    
+  }
+  
+  
+  
+  
+  
   //////////////////////////////////////
   //Calculate 2D distance 
   // in "cm" "cm" coordinates
