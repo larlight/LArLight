@@ -28,6 +28,31 @@ namespace cluster{
     SetHits(inhitlist);
   }
 
+  ClusterParamsAlgNew::ClusterParamsAlgNew(const std::vector<larutil::PxHit> &inhitlist){
+    fPrincipal=nullptr;
+    fGSer=nullptr;
+    Initialize();
+    SetHits(inhitlist);
+  }
+
+  void ClusterParamsAlgNew::SetHits(const std::vector<larutil::PxHit> &inhitlist){
+
+    // Make default values
+    // Is done by the struct
+    if(!(inhitlist.size())) {
+      throw RecoUtilException("Provided empty hit list!");
+      return;
+    }
+    
+    Initialize();
+
+    fHitVector.reserve(inhitlist.size());
+    for(auto h : inhitlist)
+
+      fHitVector.push_back(h);
+    
+  }
+
   void ClusterParamsAlgNew::SetHits(const std::vector<const larlight::hit*> &inhitlist){
 
     // Make default values
