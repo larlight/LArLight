@@ -74,9 +74,13 @@ namespace larutil{
 			Double_t timeend,
 			Double_t timestart) const;
     
+						
     double Get2Dangle(const larutil::PxPoint *endpoint,
 		      const larutil::PxPoint *startpoint) const;
     
+    double Get2DangleFrom3D(unsigned int plane,double phi, double theta) const;
+		      
+    double Get2DangleFrom3D(unsigned int plane,TVector3 dir_vector) const;
 		      
 		      
     Double_t Get2Dslope(Double_t deltawire,
