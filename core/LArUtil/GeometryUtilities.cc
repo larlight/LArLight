@@ -520,18 +520,12 @@ namespace larutil{
    
    
    
-    Double_t pos[3];
-    geom->PlaneOriginVtx(plane,pos);
-    
-    
-    double correction= -(pos[0]/fDriftVelocity)*(1./fTimeTick)+detp->TriggerOffset();  // this accounts for plane position
-    
-   // drifttick=(start[0]/fDriftVelocity)*(1./fTimeTick);
+   
       
     //the wire coordinate is already in cm. The time needs to be converted.
-   larutil::PxPoint startp(plane,(geom->DetHalfHeight()*sin(fabs(alpha))+start[2]*cos(alpha)+start[1]*sin(alpha)),((start[0]/fDriftVelocity)*(1./fTimeTick)+correction)*fTimetoCm);
+   larutil::PxPoint startp(plane,(geom->DetHalfHeight()*sin(fabs(alpha))+start[2]*cos(alpha)+start[1]*sin(alpha)),start[0]);
    
-   larutil::PxPoint endp(plane,(geom->DetHalfHeight()*sin(fabs(alpha))+end[2]*cos(alpha)+end[1]*sin(alpha)),((end[0]/fDriftVelocity)*(1./fTimeTick)+correction)*fTimetoCm);
+   larutil::PxPoint endp(plane,(geom->DetHalfHeight()*sin(fabs(alpha))+end[2]*cos(alpha)+end[1]*sin(alpha)),end[0]);
    
    //std::cout <<" points " << startp.w << "," << startp.t << "   "<< endp.w << "," << endp.t << std::endl;
    double angle=Get2Dangle(&endp,&startp);
