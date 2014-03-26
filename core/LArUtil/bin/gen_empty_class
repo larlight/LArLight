@@ -4,14 +4,14 @@ import sys, os
 if len(sys.argv)<2:
    sys.stderr.write('Usage: %s CLASS_NAME\n\n' % sys.argv[0])
    sys.exit(1)
-if not 'ANA_PROC_DIR' in os.environ.keys():
-   sys.stderr.write('$ANA_PROC_DIR not defined!\n\n')
+if not 'LARLIGHT_CORE_DIR' in os.environ.keys():
+   sys.stderr.write('$LARLIGHT_CORE_DIR not defined!\n\n')
    sys.exit(1)
 
 name=sys.argv[1]
 working_package='LArUtil'
-target_dir='%s/LArUtil' % os.environ['ANA_PROC_DIR']
-source_dir='%s/LArUtil/bin/tmp' % os.environ['ANA_PROC_DIR']
+target_dir='%s/LArUtil' % os.environ['LARLIGHT_CORE_DIR']
+source_dir='%s/LArUtil/bin/tmp' % os.environ['LARLIGHT_CORE_DIR']
 
 in_source='%s/empty.cc' % source_dir
 in_header='%s/empty.hh' % source_dir
@@ -66,7 +66,7 @@ print ' OR'
 print '    > cd %s; make;' % target_dir
 print
 print 'If needed, make sure you define linked libraries in rootmap generation script.'
-print 'The script is: %s/lib/make_rootmap.sh' % os.environ['ANA_PROC_DIR']
+print 'The script is: %s/lib/make_rootmap.sh' % os.environ['LARLIGHT_CORE_DIR']
 print 'If you have no idea what this means, just ignore it!'
 print
 print 'To remove your analysis code, you should remove:'
