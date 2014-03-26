@@ -1,5 +1,7 @@
 import sys
 from ROOT import *
+gSystem.Load("libBase")
+gSystem.Load("libLArUtil")
 gSystem.Load("libClusterRecoUtil")
 from ROOT import larlight as fmwk
 from ROOT import cluster
@@ -21,6 +23,7 @@ parser.add_argument("-d","--display",help="Turn on the display to see each view 
 args = parser.parse_args()
 
 if len(sys.argv) == 1:
+    print "\n-------You forgot to include a source file!-------\n"
     parser.print_help()
 
 if args.verbose:
