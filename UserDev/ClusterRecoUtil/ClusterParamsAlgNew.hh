@@ -35,13 +35,13 @@ namespace cluster {
     ClusterParamsAlgNew();
     ~ClusterParamsAlgNew();
 
-    ClusterParamsAlgNew(const std::vector<larutil::PxHit>&);
+    ClusterParamsAlgNew(const std::vector<const larlight::hit*>&);
 
     void Initialize();
 
     //void SetHits(const std::vector<larutil::PxHit*>&);
     
-    void SetHits(const std::vector<larutil::PxHit>&);
+    void SetHits(const std::vector<const larlight::hit*> &);
 
     void SetRefineDirectionQMin(double qmin){ fQMinRefDir = qmin; }
 
