@@ -102,15 +102,30 @@ while mgr.next_event():
         algo.GetAverages(True)
         algo.GetRoughAxis(True)
         algo.GetProfileInfo(True)
-        algo.RefineStartPoints(True)
+#       algo.RefineStartPoints(True)
         # algo.GetFinalSlope(True)
         algo.Report()
         print "(%g,%g) => (%g,%g)" % (algo.StartPoint().w,
                                       algo.StartPoint().t,
                                       algo.EndPoint().w,
                                       algo.EndPoint().t)
+	
+	#Add black star to mark begin point and black square to mark end point
+#	begin = TGraph(1)
+#	end = TGraph(1)
+#	begin.SetPoint(0,algo.StartPoint().w, algo.StartPoint().t)
+#	end.SetPoint(0,algo.EndPoint().w, algo.EndPoint().t)
+
         chit.cd()
         algo.GetHitView().Draw("COLZ")
+#	begin.SetLineColor(1)
+#	begin.SetMarkerStyle(29)
+#	begin.SetMarkerColor(1)
+#	begin.Draw("P same")
+#	end.SetLineColor(1)
+#	end.SetMarkerStyle(21)
+#	end.SetMarkerColor(1)
+#	end.Draw("P same")
         chit.Update()
         sys.stdin.readline()
 
