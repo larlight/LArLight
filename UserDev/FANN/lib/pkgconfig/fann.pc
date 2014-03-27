@@ -1,0 +1,10 @@
+prefix=$MAKE_TOP_DIR/UserDev/FANN
+exec_prefix=$MAKE_TOP_DIR/UserDev/FANN/bin
+libdir=$MAKE_TOP_DIR/UserDev/FANN/lib
+includedir=$MAKE_TOP_DIR/UserDev/FANN/include
+ 
+Name: fann
+Description: Fast Artificial Neural Network Library
+Version: 2.2.0
+Libs: -L${libdir} -lm -lfann
+Cflags: -I${includedir}
