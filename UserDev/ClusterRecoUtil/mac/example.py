@@ -18,7 +18,7 @@ group.add_argument("-q", "--quiet", help="Turn off most output",
 parser.add_argument("-s","--source",help="Name of input file")
 parser.add_argument("-o","--data-output",help="Output data file, if event is changed")
 parser.add_argument("-a","--ana-output",help="Analysis output file")
-parser.add_argument("-n", "--num-events",help="Number of events to process")
+parser.add_argument("-n","--num-events",help="Number of events to process")
 parser.add_argument("-d","--display",help="Turn on the display to see each view before and after." )
 args = parser.parse_args()
 
@@ -38,6 +38,9 @@ if args.verbose:
 if args.source == None:
     print "Error: please specificy an input file with -s or --source."
     quit()
+
+if args.num_events == None:
+    args.num_events = -1
 
 if args.data_output == None:
     args.data_output = "default_event_output.root"
@@ -76,10 +79,15 @@ chit.SetGridx(1)
 chit.SetGridy(1)
 algo = cluster.ClusterParamsExecutor()
 
+processed_events=0
+
 while mgr.next_event():
 
     clusters = mgr.get_data(fmwk.DATA.ShowerAngleCluster)
-
+    
+    if args.num_events == processed_events:
+        exit()
+        
     if not clusters:
         continue
 
@@ -95,7 +103,7 @@ while mgr.next_event():
         algo.GetRoughAxis(True)
         algo.GetProfileInfo(True)
         algo.RefineStartPoints(True)
-        algo.GetFinalSlope(True)
+        # algo.GetFinalSlope(True)
         algo.Report()
         print "(%g,%g) => (%g,%g)" % (algo.StartPoint().w,
                                       algo.StartPoint().t,

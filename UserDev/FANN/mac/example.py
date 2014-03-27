@@ -1,9 +1,5 @@
 import sys
 from ROOT import *
-gSystem.Load("libBase")
-gSystem.Load("libAnalysis")
-gSystem.Load("libDataFormat")
-gSystem.Load("libLArUtil")
 gSystem.Load("libClusterRecoUtil")
 gSystem.Load("libFANN")
 from ROOT import larlight as fmwk
@@ -95,9 +91,9 @@ while mgr.next_event():
         # algo.FillParams(True,True,True,True,True)
         algo.GetAverages(True)
         algo.GetRoughAxis(True)
-        algo.GetProfileInfo(True)
-        algo.RefineStartPoints(True)
-        algo.GetFinalSlope(True)
+        # algo.GetProfileInfo(True)
+        # algo.RefineStartPoints(True)
+        # algo.GetFinalSlope(True)
         print "(%g,%g) => (%g,%g)" % (algo.StartPoint().w,
                                       algo.StartPoint().t,
                                       algo.EndPoint().w,

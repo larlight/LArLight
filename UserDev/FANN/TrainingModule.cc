@@ -30,8 +30,24 @@ void TrainingModule::saveFANNToFile(std::string s){
   return;
 }
 
-template <class T>
-void TrainingModule::trainOnData(T * data, T * truth){
+void TrainingModule::init(){
+
+  if (ann){
+    std::cerr << "ERROR: ann is already initialized, aborting.\n";
+    return; 
+  }
+
+  unsigned int * layers;
+  layers = new unsigned int[fNumHiddenLayers + 2];
+  layers[0] = fFeatureVectorLength;
+  for (unsigned int i = 1; i <= fNumHiddenLayers; i++)
+    layers[i] = fHiddenLayerLength[i-1];
+  layers[fNumHiddenLayers+1] = fOutputVectorLength;
+  ann = fann_create_standard_array(fFeatureVectorLength, layers); 
+  return;
+}
+
+void TrainingModule::trainOnData(float * data, float * truth){
   fann_train(ann, data, truth);
 }
 

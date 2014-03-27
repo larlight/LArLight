@@ -54,6 +54,16 @@ namespace cluster {
     void Report();
 
     /**
+     * This function returns a feature vector suitable for a neural net
+     * This function uses the data from cluster_params but packages it
+     * up in a different way, and so is inappropriate to include in 
+     * clusterParams.hh.   That's why it's here.
+     * @param  data  takes a reference to a vector, templated to allow double or float
+     */
+    void  GetFANNVector(std::vector<float> & data);
+
+
+    /**
       Runs all the functions which calculate cluster params                        
       and stashes the results in the private ClusterParams                         
       struct.                                                                      

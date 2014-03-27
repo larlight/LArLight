@@ -15,15 +15,12 @@
 #define TRAININGMODULE_HH
 
 
-// Uncomment the following line to use "double" type for FANN
-//#define USE_DOUBLE_FANN
-
 #include <iostream>
 #include <stdarg.h>
 
 #include <vector>
 #include <string>
-#include "doublefann.h"
+#include "fann.h"
 
 /**
    \class TrainingModule
@@ -35,7 +32,13 @@ class TrainingModule{
 public:
 
   /// Default constructor
-  TrainingModule(){};
+  TrainingModule(){
+    fFeatureVectorLength = 2;
+    fOutputVectorLength = 1;
+    fOutputFileName = "default.net";
+    fNumHiddenLayers = 0;
+    fHiddenLayerLength.clear();
+  }
 
   /// Default destructor
   ~TrainingModule(){ if (ann) fann_destroy(ann);}
@@ -61,12 +64,17 @@ public:
   void setOutputFileName(std::string s){fOutputFileName = s;}
 
   /**
+   * call this function to actually initialize the network.
+   */
+  void init();
+
+  /**
    * Runs the fann training alg on 1 iteration of input data
    * @param data  array of double with input data, must be length set by setFeatureVectorLength
    * @param truth array of double with truth data, must be length set by setOutputVectorLength
    */
-  template <class T>
-  void trainOnData(T * data, T * truth);
+  void trainOnData(float * data, float * truth);
+
 
   /**
    * saves the current state of the fann to a file
