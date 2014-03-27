@@ -35,8 +35,8 @@ CXXFLAGS +=  `root-config --cflags`
 # call the common GNUmakefile
 include $(MAKE_TOP_DIR)/Makefile/GNUmakefile.CORE
 
-clean:
-	@rm lib/*.so
-	@rm lib/*.so.2
-	@rm lib/*.so.2.2.0
+# clean:
+	# @rm lib/*.so
+	# @rm lib/*.so.2
+	# @rm lib/*.so.2.2.0
 

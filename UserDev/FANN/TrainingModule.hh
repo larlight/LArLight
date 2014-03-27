@@ -23,7 +23,7 @@
 
 #include <vector>
 #include <string>
-#include "fann.h"
+#include "doublefann.h"
 
 /**
    \class TrainingModule
@@ -38,7 +38,7 @@ public:
   TrainingModule(){};
 
   /// Default destructor
-  virtual ~TrainingModule(){};
+  ~TrainingModule(){ if (ann) fann_destroy(ann);}
 
   // some functions for controlling the input and output to ANN:
   

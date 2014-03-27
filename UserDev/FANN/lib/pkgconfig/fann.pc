@@ -1,7 +1,7 @@
-prefix=/home1/microboone/guest27/LArLight/UserDev/FANN
-exec_prefix=/home1/microboone/guest27/LArLight/UserDev/FANN/bin
-libdir=/home1/microboone/guest27/LArLight/UserDev/FANN/lib
-includedir=/home1/microboone/guest27/LArLight/UserDev/FANN/include
+prefix=$MAKE_TOP_DIR/UserDev/FANN
+exec_prefix=$MAKE_TOP_DIR/UserDev/FANN/bin
+libdir=$MAKE_TOP_DIR/UserDev/FANN/lib
+includedir=$MAKE_TOP_DIR/UserDev/FANN/include
  
 Name: fann
 Description: Fast Artificial Neural Network Library
