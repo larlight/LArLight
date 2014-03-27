@@ -28,6 +28,9 @@ namespace larutil{
   private:
     /// Default constructor = private for singleton
     GeometryUtilities();
+
+    /// Default destructor
+    ~GeometryUtilities();
     
     static GeometryUtilities* _me;
     
@@ -39,9 +42,7 @@ namespace larutil{
       return _me;
     }
     
-    /// Default destructor
-    ~GeometryUtilities();
-    
+    void Reconfigure();
     
     Int_t Get3DaxisN(Int_t iplane0,
 		     Int_t iplane1,
