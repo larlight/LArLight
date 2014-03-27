@@ -519,9 +519,6 @@ namespace larutil{
    TVector3 end=start+dir_vector;
    
    
-   
-   
-      
     //the wire coordinate is already in cm. The time needs to be converted.
    larutil::PxPoint startp(plane,(geom->DetHalfHeight()*sin(fabs(alpha))+start[2]*cos(alpha)+start[1]*sin(alpha)),start[0]);
    
