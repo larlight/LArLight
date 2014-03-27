@@ -29,22 +29,21 @@ namespace larutil {
   private:
 
     /// Singleton constructor
-    DetectorProperties(std::string file_name, std::string tree_name);
+    DetectorProperties(bool default_load=true);
+
+    /// Default destructor
+    virtual ~DetectorProperties(){};
 
     static DetectorProperties* _me;
     
   public:
 
     /// Singleton getter
-    static const DetectorProperties* GetME(std::string file_name="", 
-					   std::string tree_name="") 
+    static const DetectorProperties* GetME(bool default_load=true)
     {
-      if(!_me) _me = new DetectorProperties(file_name,tree_name);
+      if(!_me) _me = new DetectorProperties(default_load);
       return _me;
     }
-
-    /// Default destructor
-    virtual ~DetectorProperties(){};
 
     //--- LArSoft Function Implementations ---//
     

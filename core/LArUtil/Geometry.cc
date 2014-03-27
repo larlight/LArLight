@@ -7,19 +7,24 @@ namespace larutil {
 
   Geometry* Geometry::_me = 0;
 
-  Geometry::Geometry(std::string file_name, std::string tree_name) : LArUtilBase(file_name,tree_name)
+  Geometry::Geometry(bool default_load) : LArUtilBase()
   {
-    if(_file_name.empty())
-      _file_name = Form("%s/LArUtil/dat/%s",getenv("LARLIGHT_CORE_DIR"),kFILENAME_GEOMETRY.c_str());
-    if(_tree_name.empty())
-      _tree_name = kTREENAME_GEOMETRY;
     _name = "Geometry";
-    LoadData();
-    ComputeData();
+    if(default_load) {
+      _file_name = Form("%s/LArUtil/dat/%s",
+			getenv("LARLIGHT_CORE_DIR"),
+			kUTIL_DATA_FILENAME[LArUtilConfig::Detector()].c_str());
+      _tree_name = kTREENAME_GEOMETRY;
+      LoadData();
+    }
   }
 
-  void Geometry::ComputeData()
+  bool Geometry::LoadData(bool force_reload)
   {
+    bool status = LArUtilBase::LoadData(force_reload);
+
+    if(!status) return status;
+
     fOrthVectorsY.resize(this->Nplanes());
     fOrthVectorsZ.resize(this->Nplanes());
     fFirstWireProj.resize(this->Nplanes());
@@ -57,7 +62,7 @@ namespace larutil {
       fFirstWireProj[plane] -= 0.5;
 
     }
-    
+    return status;
   }
 
   void Geometry::ClearData()

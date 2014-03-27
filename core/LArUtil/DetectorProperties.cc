@@ -7,17 +7,16 @@ namespace larutil {
 
   DetectorProperties* DetectorProperties::_me = 0;
 
-  DetectorProperties::DetectorProperties(std::string file_name, std::string tree_name) 
-    : LArUtilBase(file_name,tree_name)
+  DetectorProperties::DetectorProperties(bool default_load) : LArUtilBase()
   {
-    if(_file_name.empty())
+    _name = "DetectorProperties";
+    if(default_load) {
       _file_name = Form("%s/LArUtil/dat/%s",
 			getenv("LARLIGHT_CORE_DIR"),
-			kFILENAME_DETECTORPROPERTIES.c_str());
-    if(_tree_name.empty())
+			kUTIL_DATA_FILENAME[LArUtilConfig::Detector()].c_str());
       _tree_name = kTREENAME_DETECTORPROPERTIES;
-    _name = "DetectorProperties";
-    LoadData();
+      LoadData();
+    }
   }
 
   void DetectorProperties::ClearData()

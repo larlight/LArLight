@@ -2,16 +2,26 @@
 #ifndef LARUTILCONSTANTS_HH
 #define LARUTILCONSTANTS_HH
 
+#include "GeoConstants.hh"
+
 namespace larutil{
 
-  // Geometry default data file
-  const std::string kFILENAME_GEOMETRY = "larutil.root";
+  /// Geometry default data file
+  const std::string kUTIL_DATA_FILENAME[larlight::GEO::kDetIdMax] = 
+    { "",                        // Bo
+      "larutil_argoneut.root",   // ArgoNeuT
+      "larutil_microboone.root", // MicroBoone
+      "",                        // LBNE 10kt 
+      "",                        // JPARC 250 L
+      "",                        // 35t prototype
+      "",                        // LBNE 34kt
+      "",                        // CSU 40 L
+      "",                        // LArIAT
+      ""                         // ICARUS T600
+    };
+
   const std::string kTREENAME_GEOMETRY = "scanner/Geometry";
-
-  const std::string kFILENAME_DETECTORPROPERTIES = "larutil.root";
   const std::string kTREENAME_DETECTORPROPERTIES = "scanner/DetectorProperties";
-
-  const std::string kFILENAME_LARPROPERTIES = "larutil.root";
   const std::string kTREENAME_LARPROPERTIES = "scanner/LArProperties";
   
   //--- LArSoft parameters ---//
