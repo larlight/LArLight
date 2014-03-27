@@ -24,8 +24,12 @@
 #pragma link C++ class larutil::PxLine+;
 #pragma link C++ class larutil::PxHit+;
 
+#pragma link C++ class larutil::LArUtilConfig+;
+#pragma link C++ class larutil::LArUtilManager+;
 //ADD_NEW_CLASS ... do not change this line
 #endif
+
+
 
 
 

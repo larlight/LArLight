@@ -6,14 +6,13 @@
 namespace larutil {
 
   //-----------------------------------------------------
-  LArUtilBase::LArUtilBase(std::string file_name,
-			   std::string tree_name)
+  LArUtilBase::LArUtilBase()
     : larlight::larlight_base(),
-      _file_name(file_name),
-      _tree_name(tree_name)
+      _file_name(""),
+      _tree_name("")
   //-----------------------------------------------------
   { 
-    _name      = "LArUtilBase";
+    _name   = "LArUtilBase";
     _loaded = false;
   }
 

@@ -21,6 +21,7 @@
 
 #include "LArUtilException.hh"
 #include "LArUtilConstants.hh"
+#include "LArUtilConfig.hh"
 
 namespace larutil {
   /**
@@ -34,7 +35,7 @@ namespace larutil {
   public:
     
     /// Default constructor
-    LArUtilBase(std::string file_name="", std::string tree_name="");
+    LArUtilBase();
     
     /// Default destructor
     virtual ~LArUtilBase(){};
@@ -48,7 +49,7 @@ namespace larutil {
     { _tree_name = treename; }
 
     /// Method to load data TTree
-    bool LoadData(bool force_reload=false);
+    virtual bool LoadData(bool force_reload=false);
 
   protected:
 

@@ -16,8 +16,13 @@ namespace larutil{
   //--------------------------------------------------------------------
   GeometryUtilities::GeometryUtilities() 
   {
-
     _name = "GeometryUtilities";
+
+    Reconfigure();
+  }
+
+  void GeometryUtilities::Reconfigure()
+  {
     geom = (larutil::Geometry*)(larutil::Geometry::GetME());
     detp = (larutil::DetectorProperties*)(larutil::DetectorProperties::GetME());
     larp = (larutil::LArProperties*)(larutil::LArProperties::GetME());
@@ -34,8 +39,6 @@ namespace larutil{
     fWiretoCm=fWirePitch;
     fTimetoCm=fTimeTick*fDriftVelocity;
     fWireTimetoCmCm=(fTimeTick*fDriftVelocity)/fWirePitch;
-	  
-    ////std::cout << " --- getting geom info " << fWirePitch << std::endl;
   }
 
   //--------------------------------------------------------------------

@@ -28,23 +28,21 @@ namespace larutil {
   private:
 
     /// Singleton constructor
-    Geometry(std::string file_name="",
-	     std::string tree_name="");
+    Geometry(bool default_load=true);
+
+    /// Default destructor
+    virtual ~Geometry(){};
 
     static Geometry* _me;
     
   public:
 
     /// Singleton getter
-    static const Geometry* GetME(std::string file_name="", std::string tree_name="") 
+    static const Geometry* GetME(bool default_load=true)
     {
-      if(!_me) _me = new Geometry(file_name,tree_name);
-
+      if(!_me) _me = new Geometry(default_load);
       return _me;
     }
-    
-    /// Default destructor
-    virtual ~Geometry(){};
 
     //--- LArSoft Implementation ---//
 
@@ -225,11 +223,11 @@ namespace larutil {
 
     void PlaneOriginVtx(UChar_t plane, Double_t *vtx) const;
 
+    virtual bool LoadData(bool force_reload=false);
+
   protected:
     
     virtual bool ReadTree();
-
-    void ComputeData();
 
     virtual void ClearData();
 

@@ -79,6 +79,24 @@ namespace cluster{
     
   }
 
+  void  ClusterParamsAlgNew::GetFANNVector(std::vector<float> & data){
+    unsigned int length = 13;
+    if (data.size() != length) data.resize(length);
+      data[0] = fParams.opening_angle / 180;
+      data[1] = fParams.opening_angle_highcharge / 180;
+      data[2] = fParams.closing_angle / 180;
+      data[3] = fParams.closing_angle_highcharge / 180;
+      data[4] = fParams.eigenvalue_principal;
+      data[5] = fParams.eigenvalue_secondary;
+      data[6] = fParams.length;
+      data[7] = fParams.width;
+      data[8] = fParams.hit_density_1D;
+      data[9] = fParams.hit_density_2D;
+      data[10] = fParams.multi_hit_wires/fParams.N_Wires;
+      data[11] = fParams.modified_hit_density;
+      data[12] = fParams.offaxis_hits/fParams.N_Hits;
+  }
+
   void ClusterParamsAlgNew::GetOpeningAngle()
   {
     double distance_end_points ;                                        //distance between start and end points                                 
@@ -303,8 +321,8 @@ namespace cluster{
 
     for (auto& hit : fHitVector){
       // First, abuse this loop to calculate rms in x and y
-      rmsx += sqrt(pow(fParams.mean_x - hit.w, 2)/fParams.N_Hits);
-      rmsy += sqrt(pow(fParams.mean_y - hit.t, 2)/fParams.N_Hits);
+      rmsx += pow(fParams.mean_x - hit.w, 2)/fParams.N_Hits;
+      rmsy += pow(fParams.mean_y - hit.t, 2)/fParams.N_Hits;
 
       //if charge is above avg_charge
       // std::cout << "This hit has charge " <<  hit . charge << "\n";
@@ -316,6 +334,9 @@ namespace cluster{
         sumwirewire+=pow(hit.w,2);  
       }//for high charge
     }//For hh loop
+
+    fParams.rms_x = sqrt(rmsx);
+    fParams.rms_y = sqrt(rmsy);
 
     //Looking for the slope and intercept of the line above avg_charge hits
     fRough2DSlope= (ncw*sumwiretime- sumwire*sumtime)/(ncw*sumwirewire-sumwire*sumwire);//slope for cw
