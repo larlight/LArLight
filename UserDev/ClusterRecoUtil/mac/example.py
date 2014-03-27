@@ -83,21 +83,32 @@ processed_events=0
 
 while mgr.next_event():
 
-    clusters = mgr.get_data(fmwk.DATA.ShowerAngleCluster)
-    
+    # Get event_cluster ... std::vector<larlight::cluster>
+    cluster_v = mgr.get_data(fmwk.DATA.ShowerAngleCluster)
+
+    # Get event_mctruth ... std::vector<larlight::mctruth>
+    mctruth_v = mgr.get_data(fmwk.DATA.MCTruth)
+
+    # Get the primary particl generator vtx position
+    mct_vtx=None
+    if mctruth_v and mctruth_v.size():
+        if mctruth_v.size()>1:
+            print "Found more than 1 MCTruth. Only use the 1st one..."
+        mct_vtx = mctruth_v.at(0).GetParticles().at(0).Trajectory().at(0).Position()
+
     if args.num_events == processed_events:
         exit()
         
-    if not clusters:
+    if not cluster_v:
         continue
 
-    print "Event:",clusters.event_id()
-    for x in xrange(clusters.size()):
+    print "Event:",cluster_v.event_id()
+    for x in xrange(cluster_v.size()):
         
-        print "  Cluster ID:",clusters.at(x).ID()
+        print "  Cluster ID:",cluster_v.at(x).ID()
 
-        algo.LoadCluster(clusters.at(x),
-                         mgr.get_data(clusters.get_hit_type()))
+        algo.LoadCluster(cluster_v.at(x),
+                         mgr.get_data(cluster_v.get_hit_type()))
         # algo.FillParams(True,True,True,True,True)
         algo.GetAverages(True)
         algo.GetRoughAxis(True)
@@ -109,6 +120,8 @@ while mgr.next_event():
                                       algo.StartPoint().t,
                                       algo.EndPoint().w,
                                       algo.EndPoint().t)
+        if(mct_vtx):
+            print "MC Particle Start Point: (%g,%g,%g)" % (mct_vtx[0],mct_vtx[1],mct_vtx[2])
 	
 	#Add black star to mark begin point and black square to mark end point
 #	begin = TGraph(1)
