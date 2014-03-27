@@ -203,7 +203,7 @@ namespace larutil{
 	
     void SelectLocalHitlist(const std::vector<larutil::PxHit> &hitlist, 
 			    std::vector <const larutil::PxHit*> &hitlistlocal,
-			    larutil::PxHit &startHit,
+			    larutil::PxPoint &startHit,
 			    Double_t& linearlimit,   
 			    Double_t& ortlimit, 
 			    Double_t& lineslopetest,

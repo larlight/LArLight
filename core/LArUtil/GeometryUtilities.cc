@@ -1045,40 +1045,46 @@ namespace larutil{
     
   }
 
-  void GeometryUtilities::SelectLocalHitlist(const std::vector<larutil::PxHit>& hitlist, 
+  void GeometryUtilities::SelectLocalHitlist(const std::vector<larutil::PxHit> &hitlist, 
 					     std::vector <const larutil::PxHit*> &hitlistlocal,
-					     larutil::PxHit &startHit,
+					     larutil::PxPoint &startHit,
 					     Double_t& linearlimit,   
 					     Double_t& ortlimit, 
 					     Double_t& lineslopetest,
 					     larutil::PxHit &averageHit) {
 
-    Double_t time_start= startHit.t;
-    Double_t wire_start= startHit.w;
-    Double_t locintercept=time_start - wire_start * lineslopetest;
+    
+    double locintercept=startHit.t - startHit.w * lineslopetest;
 
-    Double_t timesum = 0;
-    UInt_t wiresum = 0;
+    double timesum = 0;
+    double wiresum = 0;
     for(size_t i=0; i<hitlist.size(); ++i) {
 
-      Double_t time = hitlist.at(i).t;
-      UInt_t wire = hitlist.at(i).w;
-      timesum += time;
-      wiresum += wire;
-
-      Double_t wonline=wire,tonline=time;
-      GetPointOnLine(lineslopetest,locintercept,wire,time,wonline,tonline);
       
+      larutil::PxPoint hitonline;
+      
+      GetPointOnLine( lineslopetest, locintercept, (const larutil::PxHit*)(&hitlist.at(i)), hitonline );
+       
       //calculate linear distance from start point and orthogonal distance from axis
-      Double_t lindist=Get2DDistance(wonline,tonline,wire_start,time_start);
-      Double_t ortdist=Get2DDistance(wire,time,wonline,tonline);
-
-      if(lindist<linearlimit && ortdist<ortlimit)  hitlistlocal.push_back((const larutil::PxHit*)(&(hitlist.at(i))));
+      Double_t lindist=Get2DDistance((const larutil::PxPoint*)(&hitonline),(const larutil::PxPoint*)(&startHit));
+      Double_t ortdist=Get2DDistance((const larutil::PxPoint*)(&hitlist.at(i)),(const larutil::PxPoint*)(&hitonline));
+      
+      
+      if(lindist<linearlimit && ortdist<ortlimit)  {
+	hitlistlocal.push_back((const larutil::PxHit*)(&(hitlist.at(i))));
+        timesum += hitlist.at(i).t;
+	wiresum += hitlist.at(i).w;
+      }
+      
+      
     }
 
     averageHit.plane = startHit.plane;
-    averageHit.w = wiresum/hitlist.size();
-    averageHit.t = timesum/((Double_t) hitlist.size());
+    if(hitlistlocal.size())
+    {
+      averageHit.w = wiresum/(double)hitlistlocal.size();
+      averageHit.t = timesum/((double) hitlistlocal.size());
+    }
   }
   
 
