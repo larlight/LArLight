@@ -1,4 +1,5 @@
 import sys
+from array import array
 from ROOT import *
 import ROOT
 gSystem.Load("libBase")
@@ -124,25 +125,50 @@ while mgr.next_event():
         algo.GetRoughAxis(True)
         algo.GetProfileInfo(True)
         algo.RefineStartPoints(True)
+        algo.RefineDirection(True)
         # algo.GetFinalSlope(True)
-        algo.Report()
-        print "(%g,%g) => (%g,%g), plane: %g" % (algo.StartPoint().w,
-                                      algo.StartPoint().t,
-                                      algo.EndPoint().w,
-                                      algo.EndPoint().t,algo.StartPoint().plane)
+        #algo.Report()
+        
+        result = algo.GetParams()
+
+        print "(%g,%g) => (%g,%g), plane: %g" % (result.start_point.w,
+                                                 result.start_point.t,
+                                                 result.end_point.w,
+                                                 result.end_point.t,result.start_point.plane)
+
+        mc_begin=None
         if(mct_vtx):
             print "MC Particle Start Point: (%g,%g,%g)" % (mct_vtx[0],mct_vtx[1],mct_vtx[2])
-            my_vec=ROOT.std.vector(ROOT.Double)(3,0)
-            my_vec[0]=mct_vtx[0]
-            my_vec[1]=mct_vtx[1]
-            my_vec[2]=mct_vtx[2]
-            mcpoint=fGSer.Get2DPointProjectionCM(my_vec,algo.StartPoint().plane)
+
+            # Usage example 1: std::vector<double> in python
+            # std.vector(ROOT.Double) is equivalent of std::vector<double> template specialization
+            #my_vec=ROOT.std.vector(ROOT.Double)(3,0) 
+            #my_vec[0]=mct_vtx[0]
+            #my_vec[1]=mct_vtx[1]
+            #my_vec[2]=mct_vtx[2]
+            #mcpoint=fGSer.Get2DPointProjectionCM(my_vec,result.start_point.plane)
+
+            # Usage example 2: double[3] C-array like object in python
+            # 'd' specifies "double precision", 2nd argument specifies the array (length & values)
+            my_vec = array('d',[0,0,0]) 
+            my_vec[0] = mct_vtx[0]
+            my_vec[1] = mct_vtx[1]
+            my_vec[2] = mct_vtx[2]
+            mcpoint=fGSer.Get2DPointProjectionCM(my_vec,result.start_point.plane)
+
+            # Example 1 & 2 should have the same return here (checked)
 	    print " Start point in w,t  (%g,%g)" % (mcpoint.w,mcpoint.t)   
+
+            mc_begin = TGraph(1)
+            mc_begin.SetPoint(0,mcpoint.w,mcpoint.t)
+            mc_begin.SetMarkerStyle(29)
+            mc_begin.SetMarkerColor(ROOT.kRed)
+            mc_begin.SetMarkerSize(3)
 	#Add black star to mark begin point and black square to mark end point
 	begin = TGraph(1)
 	end = TGraph(1)
-	begin.SetPoint(0,algo.StartPoint().w, algo.StartPoint().t)
-	end.SetPoint(0,algo.EndPoint().w, algo.EndPoint().t)
+	begin.SetPoint(0,result.start_point.w, result.start_point.t)
+	end.SetPoint(0,result.end_point.w, result.end_point.t)
 
         chit.cd()
         hHits = algo.GetHitView()
@@ -158,6 +184,8 @@ while mgr.next_event():
 	end.SetMarkerColor(ROOT.kBlack)
         end.SetMarkerSize(2)
 	end.Draw("P same")
+        if(mc_begin):
+            mc_begin.Draw("P same")
         chit.Update()
         sys.stdin.readline()
 
