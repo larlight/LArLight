@@ -46,6 +46,7 @@ namespace cluster{
     double N_Wires;
     double modified_hit_density;
     double N_Hits;
+    double N_Hits_HC;
 
     /**
        +1 means shower is "forward - start wire < end wire"
