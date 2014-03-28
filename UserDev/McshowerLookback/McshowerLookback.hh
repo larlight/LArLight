@@ -31,9 +31,9 @@ public:
   /// Default constructor
   McshowerLookback();
 
-  void FillShowerMap(larlight::event_mcshower* my_mcshow, std::map<unsigned short, unsigned long> &shower_idmap);
-  void FillSimchMap(larlight::event_simch* mysimch, std::map<unsigned long, larlight::simch> &simch_map);
-  double MatchHitsOne(larlight::hit* myhit, std::map<unsigned short, larlight::simch>* map_clusid, std::map<unsigned short, unsigned long>* map_showid);
+  void FillShowerMap(larlight::event_mcshower* my_mcshow, std::map<unsigned long, unsigned short> &shower_idmap);
+  void FillSimchMap(larlight::event_simch* my_simch, std::map<unsigned short, larlight::simch> &simch_map);
+  void MatchHitsAll(larlight::hit this_hit, std::map<unsigned short, larlight::simch> simch_map, std::map<unsigned long, unsigned short> shower_idmap, unsigned int num_mcshow);
   //std::vector<double> MatchHitsAll;
   //double MatchClusOne;
   //std::vector<double> MatchClusAll;

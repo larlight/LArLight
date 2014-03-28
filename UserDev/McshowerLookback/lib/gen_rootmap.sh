@@ -16,4 +16,5 @@ rootlibmap() {
 
 ######################################################
 # McshowerLookback
-rootlibmap libMcshowerLookback.rootmap libMcshowerLookback.so $USER_DEV_DIR/McshowerLookback/LinkDef.h 
+rootlibmap libMcshowerLookback.rootmap libMcshowerLookback.so $USER_DEV_DIR/McshowerLookback/LinkDef.h \
+    libDataFormat.so libAnalysis.so
