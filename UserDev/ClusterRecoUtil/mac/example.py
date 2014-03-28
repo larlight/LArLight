@@ -1,4 +1,5 @@
 import sys
+from array import array
 from ROOT import *
 import ROOT
 gSystem.Load("libBase")
@@ -138,11 +139,24 @@ while mgr.next_event():
         mc_begin=None
         if(mct_vtx):
             print "MC Particle Start Point: (%g,%g,%g)" % (mct_vtx[0],mct_vtx[1],mct_vtx[2])
-            my_vec=ROOT.std.vector(ROOT.Double)(3,0)
-            my_vec[0]=mct_vtx[0]
-            my_vec[1]=mct_vtx[1]
-            my_vec[2]=mct_vtx[2]
+
+            # Usage example 1: std::vector<double> in python
+            # std.vector(ROOT.Double) is equivalent of std::vector<double> template specialization
+            #my_vec=ROOT.std.vector(ROOT.Double)(3,0) 
+            #my_vec[0]=mct_vtx[0]
+            #my_vec[1]=mct_vtx[1]
+            #my_vec[2]=mct_vtx[2]
+            #mcpoint=fGSer.Get2DPointProjectionCM(my_vec,result.start_point.plane)
+
+            # Usage example 2: double[3] C-array like object in python
+            # 'd' specifies "double precision", 2nd argument specifies the array (length & values)
+            my_vec = array('d',[0,0,0]) 
+            my_vec[0] = mct_vtx[0]
+            my_vec[1] = mct_vtx[1]
+            my_vec[2] = mct_vtx[2]
             mcpoint=fGSer.Get2DPointProjectionCM(my_vec,result.start_point.plane)
+
+            # Example 1 & 2 should have the same return here (checked)
 	    print " Start point in w,t  (%g,%g)" % (mcpoint.w,mcpoint.t)   
 
             mc_begin = TGraph(1)

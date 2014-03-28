@@ -163,6 +163,8 @@ namespace larutil{
     PxPoint Get2DPointProjection(Double_t *xyz,Int_t plane) const;			       
 
     PxPoint Get2DPointProjectionCM(std::vector< double > xyz, int plane) const;
+
+    PxPoint Get2DPointProjectionCM(Double_t *xyz, int plane) const;
     
     Double_t GetTimeTicks(Double_t x, Int_t plane) const;
     

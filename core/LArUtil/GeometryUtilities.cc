@@ -926,6 +926,26 @@ namespace larutil{
     return pN;
      
    }
+
+  PxPoint GeometryUtilities::Get2DPointProjectionCM(Double_t *xyz, Int_t plane) const{
+  
+    PxPoint pN(0,0,0);
+    
+    Double_t pos[3];
+        
+      
+    pos[1]=xyz[1];
+    pos[2]=xyz[2];
+
+    ///\todo: this should use the cryostat and tpc as well in the NearestWire method
+    
+    pN.w = geom->NearestWire(pos, plane)*fWiretoCm;
+    pN.t=xyz[0];  
+    pN.plane=plane;
+    
+    return pN;
+     
+   }
   
   
   
