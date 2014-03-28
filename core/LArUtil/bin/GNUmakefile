@@ -14,11 +14,11 @@ include $(MAKE_TOP_DIR)/Makefile/Makefile.${OSNAME}
 
 # Add your program below with a space after the previous one.
 # This makefile compiles all binaries specified below.
-PROGRAMS = example gen_tree_Geometry gen_tree_DetectorProperties gen_tree_LArProperties
+PROGRAMS = print_constants gen_tree_Geometry gen_tree_DetectorProperties gen_tree_LArProperties
 
 all:		$(PROGRAMS)
 
-$(PROGRAMS):
+$(PROGRAMS): *.cc
 	@echo '<<compiling' $@'>>'
 	@$(CXX) $@.cc -o $@ $(CXXFLAGS) $(LDFLAGS)
 	@rm -rf *.dSYM
