@@ -134,6 +134,9 @@ namespace cluster{
       cos_opening_angle = dot_product_OPEN/distance_end_points/distance_hits_OPEN ;
       cos_closing_angle = dot_product_CLOSE/distance_end_points/distance_hits_CLOSE ;
 
+	std::cout<<"Cos(open_angle): "<<cos_opening_angle<<std::endl;
+	std::cout<<"Cos(close_angle): "<<cos_closing_angle<<std::endl;
+
       int N_bins_OPEN = NBINS * acos(cos_opening_angle)/PI;
       int N_bins_CLOSE = NBINS * acos(cos_closing_angle)/PI;
       opening_angle_bin[N_bins_OPEN]++;
