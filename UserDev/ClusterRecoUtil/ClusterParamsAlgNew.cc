@@ -108,16 +108,20 @@ namespace cluster{
     double cos_closing_angle ;                                          //cos(closing_angle) between hit and axis
     double percentage = 0.95 ;
 
+    const int NBINS=100;
+    
     //define variables for angle calculation 
     double start_end_w = fRoughEndPoint.w - fRoughBeginPoint.w ;
     double start_end_t = fRoughEndPoint.t - fRoughBeginPoint.t ;
     distance_end_points = sqrt(pow(start_end_w,2)+ pow(start_end_t,2));
 
-    std::vector<int> opening_angle_bin(100,0 ) ;
-    std::vector<int> closing_angle_bin(100,0 ) ;
-    std::vector<int> opening_angle_highcharge_bin(100,0 ) ;
-    std::vector<int> closing_angle_highcharge_bin(100,0 ) ;
+    std::vector<int> opening_angle_bin(NBINS,0 ) ;
+    std::vector<int> closing_angle_bin(NBINS,0 ) ;
+    std::vector<int> opening_angle_highcharge_bin(NBINS,0 ) ;
+    std::vector<int> closing_angle_highcharge_bin(NBINS,0 ) ;
 
+    std::cout << " in Opening Angle " << fHitVector.size() << std::endl;
+    
     for(auto& hit : fHitVector){
 
       dot_product_OPEN = (hit.w - fRoughBeginPoint.w)*(start_end_w)+ (hit.t - fRoughBeginPoint.t) * (start_end_t) ;
@@ -129,8 +133,8 @@ namespace cluster{
       cos_opening_angle = dot_product_OPEN/distance_end_points/distance_hits_OPEN ;
       cos_closing_angle = dot_product_CLOSE/distance_end_points/distance_hits_CLOSE ;
 
-      int N_bins_OPEN = 100 * acos(cos_opening_angle)/PI;
-      int N_bins_CLOSE = 100 * acos(cos_closing_angle)/PI;
+      int N_bins_OPEN = NBINS * acos(cos_opening_angle)/PI;
+      int N_bins_CLOSE = NBINS * acos(cos_closing_angle)/PI;
       opening_angle_bin[N_bins_OPEN]++;
       closing_angle_bin[N_bins_CLOSE]++;
 
@@ -141,27 +145,34 @@ namespace cluster{
         }
      }
 
+    std::cout << " in Opening Angle, after loop " << fHitVector.size() << std::endl;
+    std::cout << " N_Hits, NHits_HC " << fParams.N_Hits << " " << fParams.N_Hits_HC << std::endl;
+     
     int iBin(0), jBin(0), kBin(0), lBin(0);  //initialize iterators for the 4 angles
     double percentage_OPEN(0.0), percentage_CLOSE(0.0), percentage_OPEN_HC(0.0), percentage_CLOSE_HC(0.0); //The last 2 are for High Charge (HC)
 
-    for(iBin = 1; percentage_OPEN<= percentage; iBin++)
+    std::cout << " percentage: "<< percentage << " OPEN " <<  percentage_OPEN << std::endl;
+    for(iBin = 1; percentage_OPEN<= percentage && iBin < NBINS; iBin++)
       {
         percentage_OPEN += opening_angle_bin[iBin]/(fParams.N_Hits) ;
       }
 
-    for(jBin = 1; percentage_CLOSE<= percentage; jBin++)
+     std::cout << " percentage: "<< percentage << " CLOSE " <<  percentage_CLOSE << std::endl;  
+    for(jBin = 1; percentage_CLOSE<= percentage && jBin < NBINS; jBin++)
       {
 	 percentage_CLOSE += closing_angle_bin[iBin]/(fParams.N_Hits) ;
        }
 
-    for(kBin = 1; percentage_OPEN_HC<= percentage; kBin++)
+     std::cout << " percentage: "<< percentage << " OPEN_HC " <<  percentage_OPEN_HC << std::endl;   
+    for(kBin = 1; percentage_OPEN_HC<= percentage && kBin < NBINS; kBin++)
       {
-        percentage_OPEN_HC += opening_angle_highcharge_bin[kBin]/(fParams.N_Hits) ;
+        percentage_OPEN_HC += opening_angle_highcharge_bin[kBin]/(fParams.N_Hits_HC) ;
       }
 
-    for(lBin = 1; percentage_CLOSE_HC<= percentage; lBin++)
+      std::cout << " percentage: "<< percentage << " CLOSE_HC " <<  percentage_CLOSE_HC << std::endl;   
+    for(lBin = 1; percentage_CLOSE_HC<= percentage && lBin < NBINS; lBin++)
       {
-        percentage_CLOSE_HC += closing_angle_highcharge_bin[lBin]/(fParams.N_Hits) ;
+        percentage_CLOSE_HC += closing_angle_highcharge_bin[lBin]/(fParams.N_Hits_HC) ;
       }
     fParams.opening_angle = iBin * PI /100 ;
     fParams.closing_angle = jBin * PI /100 ;
@@ -337,7 +348,8 @@ namespace cluster{
 
     fParams.rms_x = sqrt(rmsx);
     fParams.rms_y = sqrt(rmsy);
-
+ 
+    fParams.N_Hits_HC = ncw;
     //Looking for the slope and intercept of the line above avg_charge hits
     fRough2DSlope= (ncw*sumwiretime- sumwire*sumtime)/(ncw*sumwirewire-sumwire*sumwire);//slope for cw
     fRough2DIntercept= fParams.charge_wgt_y  -fRough2DSlope*(fParams.charge_wgt_x);//intercept for cw
@@ -586,6 +598,27 @@ namespace cluster{
     
     std::cout << fRoughBeginPoint.w << ", " << fRoughBeginPoint.t << " end: " <<  fRoughEndPoint.w << " " << fRoughEndPoint.t << std::endl;
     
+     // ok. now have fRoughBeginPoint and fRoughEndPoint. No decision about direction has been made yet.
+    fParams.start_point = fRoughBeginPoint;
+    fParams.end_point   = fRoughEndPoint;
+    // fRoughEndPoint
+    // fRoughEndPoint
+    // and use them to get the axis
+    
+    
+     // need to define physical direction with openind angles and pass that to Ryan's line finder.
+    
+    GetOpeningAngle();  //Sets opening angle, closing angle, and open/close angles for high charge
+
+    std::cout << "after opening angle" << std::endl;
+    
+    //direction decision happens here:
+    // should the opening and closing angle be already defined?
+    // do we care whether they're associated to the start/end point?
+    
+    // // // 
+    
+    
     //Ryan's Shower Strip finder work here. 
     //First we need to define the strip width that we want
     double d=0.6;//this is the width of the strip.... this needs to be tuned to something.
@@ -597,18 +630,19 @@ namespace cluster{
     startHit.w = fRoughBeginPoint.w;
     startHit.t = fRoughBeginPoint.t;
     startHit.plane = fRoughBeginPoint.plane;
-    double linearlimit=10;
-    double ortlimit=10;
+    double linearlimit=8;
+    double ortlimit=12;
     double lineslopetest;
     larutil::PxHit averageHit;
     //also are we sure this is actually doing what it is supposed to???
     //are we sure this works? 
+      
     fGSer->SelectLocalHitlist(fHitVector,subhit,
 			      startHit,
 			      linearlimit,ortlimit,lineslopetest,
 			      averageHit);
 
-    if(!(subhit.size())) {
+   if(!(subhit.size())) {
       std::cout<<"Subhit list is empty. Using rough start/end points..."<<std::endl;
       GetOpeningAngle();
       fParams.start_point = fRoughBeginPoint;
@@ -756,17 +790,8 @@ namespace cluster{
     // double gslope=(n* gwiretime- gwire*gtime)/(n*gwirewire -gwire*gwire);
     // double gcept= gtime/n -gslope*(gwire/n);
     
-    // ok. now have fRoughBeginPoint and fRoughEndPoint. No decision about direction has been made yet.
-    // need to define physical direction with openind angles and pass that to Ryan's line finder.
- 
-    
-    GetOpeningAngle();  //Sets opening angle, closing angle, and open/close angles for high charge
-
-    fParams.start_point = fRoughBeginPoint;
-    fParams.end_point   = fRoughEndPoint;
-    // fRoughEndPoint
-    // fRoughEndPoint
-    // and use them to get the axis
+   
+   
 
     fFinishedRefineStartPoints = true;
     return;
@@ -807,7 +832,6 @@ namespace cluster{
     
     double SEP_X = (end.w - start.w) / wire_2_cm;
     double SEP_Y = (end.t - start.t) / time_2_cm;
-
     double rms_forward   = 0;
     double rms_backward  = 0;
     double mean_forward  = 0;
