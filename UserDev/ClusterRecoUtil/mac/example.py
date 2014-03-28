@@ -134,6 +134,8 @@ while mgr.next_event():
                                                  result.start_point.t,
                                                  result.end_point.w,
                                                  result.end_point.t,result.start_point.plane)
+
+        mc_begin=None
         if(mct_vtx):
             print "MC Particle Start Point: (%g,%g,%g)" % (mct_vtx[0],mct_vtx[1],mct_vtx[2])
             my_vec=ROOT.std.vector(ROOT.Double)(3,0)
@@ -142,6 +144,12 @@ while mgr.next_event():
             my_vec[2]=mct_vtx[2]
             mcpoint=fGSer.Get2DPointProjectionCM(my_vec,result.start_point.plane)
 	    print " Start point in w,t  (%g,%g)" % (mcpoint.w,mcpoint.t)   
+
+            mc_begin = TGraph(1)
+            mc_begin.SetPoint(0,mcpoint.w,mcpoint.t)
+            mc_begin.SetMarkerStyle(29)
+            mc_begin.SetMarkerColor(ROOT.kRed)
+            mc_begin.SetMarkerSize(3)
 	#Add black star to mark begin point and black square to mark end point
 	begin = TGraph(1)
 	end = TGraph(1)
@@ -162,6 +170,8 @@ while mgr.next_event():
 	end.SetMarkerColor(ROOT.kBlack)
         end.SetMarkerSize(2)
 	end.Draw("P same")
+        if(mc_begin):
+            mc_begin.Draw("P same")
         chit.Update()
         sys.stdin.readline()
 
