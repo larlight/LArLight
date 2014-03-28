@@ -17,7 +17,7 @@ rootlibmap() {
 ######################################################
 # BryceToy
 rootlibmap libBryceToy.rootmap libBryceToy.so $USER_DEV_DIR/BryceToy/LinkDef.h \
-    libAnalysis.so
+    libDataFormat.so libAnalysis.so libMcshowerLookback.so
 
 
 

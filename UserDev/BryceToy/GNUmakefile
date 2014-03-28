@@ -14,7 +14,8 @@ INCFLAGS = -I.                       #Include itself
 INCFLAGS += -I$(LARLIGHT_CORE_DIR)/Base
 INCFLAGS += -I$(LARLIGHT_CORE_DIR)/DataFormat
 INCFLAGS += -I$(LARLIGHT_CORE_DIR)/Analysis
-#INCFLAGS += -I$(MAKE_TOP_DIR)/UserDev/BacktrackAlg
+INCFLAGS += -I$(MAKE_TOP_DIR)/UserDev/McshowerLookback
+#INCFLAGS += -I$(USER_DEV_DIR)/McshowerLookback
 
 # platform-specific options
 OSNAME          = $(shell uname -s)
