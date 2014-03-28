@@ -124,25 +124,29 @@ while mgr.next_event():
         algo.GetRoughAxis(True)
         algo.GetProfileInfo(True)
         algo.RefineStartPoints(True)
+        algo.RefineDirection(True)
         # algo.GetFinalSlope(True)
-        algo.Report()
-        print "(%g,%g) => (%g,%g), plane: %g" % (algo.StartPoint().w,
-                                      algo.StartPoint().t,
-                                      algo.EndPoint().w,
-                                      algo.EndPoint().t,algo.StartPoint().plane)
+        #algo.Report()
+        
+        result = algo.GetParams()
+
+        print "(%g,%g) => (%g,%g), plane: %g" % (result.start_point.w,
+                                                 result.start_point.t,
+                                                 result.end_point.w,
+                                                 result.end_point.t,result.start_point.plane)
         if(mct_vtx):
             print "MC Particle Start Point: (%g,%g,%g)" % (mct_vtx[0],mct_vtx[1],mct_vtx[2])
             my_vec=ROOT.std.vector(ROOT.Double)(3,0)
             my_vec[0]=mct_vtx[0]
             my_vec[1]=mct_vtx[1]
             my_vec[2]=mct_vtx[2]
-            mcpoint=fGSer.Get2DPointProjectionCM(my_vec,algo.StartPoint().plane)
+            mcpoint=fGSer.Get2DPointProjectionCM(my_vec,result.start_point.plane)
 	    print " Start point in w,t  (%g,%g)" % (mcpoint.w,mcpoint.t)   
 	#Add black star to mark begin point and black square to mark end point
 	begin = TGraph(1)
 	end = TGraph(1)
-	begin.SetPoint(0,algo.StartPoint().w, algo.StartPoint().t)
-	end.SetPoint(0,algo.EndPoint().w, algo.EndPoint().t)
+	begin.SetPoint(0,result.start_point.w, result.start_point.t)
+	end.SetPoint(0,result.end_point.w, result.end_point.t)
 
         chit.cd()
         hHits = algo.GetHitView()

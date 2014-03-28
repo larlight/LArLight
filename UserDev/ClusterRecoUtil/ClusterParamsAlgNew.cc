@@ -208,6 +208,7 @@ namespace cluster{
     fFinishedGetRoughAxis      = false;
     fFinishedGetProfileInfo    = false;
     fFinishedRefineStartPoints = false;
+    fFinishedRefineDirection   = false;
     fFinishedGetFinalSlope     = false;
 
     fRough2DSlope=-999.999;    // slope 
@@ -239,6 +240,7 @@ namespace cluster{
               << "\tFinishedGetRoughAxis "       << fFinishedGetRoughAxis << "\n"
               << "\tFinishedGetProfileInfo "     << fFinishedGetProfileInfo << "\n"
               << "\tFinishedRefineStartPoints "  << fFinishedRefineStartPoints << "\n"
+	      << "\tFinishedRefineDirection "    << fFinishedRefineDirection << "\n"
               << "\tFinishedGetFinalSlope "      << fFinishedGetFinalSlope << "\n"
               << "--------------------------------------" << "\n";
     fParams.Report();
@@ -247,12 +249,14 @@ namespace cluster{
   void ClusterParamsAlgNew::FillParams(bool override_DoGetAverages      ,  
                                        bool override_DoGetRoughAxis     ,  
                                        bool override_DoGetProfileInfo   ,  
-                                       bool override_DoRefineStartPoints,  
+                                       bool override_DoRefineStartPoints,
+				       bool override_DoRefineDirection,
                                        bool override_DoGetFinalSlope     ){
     GetAverages      (override_DoGetAverages      );
     GetRoughAxis     (override_DoGetRoughAxis     );
     GetProfileInfo   (override_DoGetProfileInfo   );
     RefineStartPoints(override_DoRefineStartPoints);
+    RefineDirection  (override_DoRefineDirection  );
     GetFinalSlope    (override_DoGetFinalSlope    );
   }
 
@@ -824,22 +828,31 @@ namespace cluster{
   }
   
   
-  void ClusterParamsAlgNew::RefineDirection(larutil::PxPoint &start,
-					    larutil::PxPoint &end) {
+  void ClusterParamsAlgNew::RefineDirection(bool override) {
+    if(!override) { //Override being set, we skip all this logic.
+      //OK, no override. Stop if we're already finshed.
+      if (fFinishedRefineDirection) return;
+      //Try to run the previous function if not yet done.
+      if (!fFinishedRefineStartPoints) RefineStartPoints(true);
+    } else {
+      //Try to run the previous function if not yet done.
+      if (!fFinishedRefineStartPoints) RefineStartPoints(true);
+    }
     
     UChar_t plane = (*fHitVector.begin()).plane;
 
     double wire_2_cm = fWire2Cm.at(plane);
     double time_2_cm = fTime2Cm;
     
-    double SEP_X = (end.w - start.w) / wire_2_cm;
-    double SEP_Y = (end.t - start.t) / time_2_cm;
+    double SEP_X = (fParams.end_point.w - fParams.start_point.w) / wire_2_cm;
+    double SEP_Y = (fParams.end_point.t - fParams.start_point.t) / time_2_cm;
     double rms_forward   = 0;
     double rms_backward  = 0;
     double mean_forward  = 0;
     double mean_backward = 0;
     double weight_total  = 0;
-    double hit_counter   = 0;
+    double hit_counter_forward  = 0;
+    double hit_counter_backward = 0;
     
     //hard coding this for now, should use SetRefineDirectionQMin function
     fQMinRefDir  = 25;
@@ -849,44 +862,58 @@ namespace cluster{
       //skip this hit if below minimum cutoff param
       if(hit.charge < fQMinRefDir) continue;
 
-      hit_counter++;
-
       weight_total = hit.charge; 
 
       // Compute forward mean
-      double SHIT_X = (hit.w - start.w) / wire_2_cm;
-      double SHIT_Y = (hit.t - start.t) / time_2_cm;
-
+      double SHIT_X = (hit.w - fParams.start_point.w) / wire_2_cm;
+      double SHIT_Y = (hit.t - fParams.start_point.t) / time_2_cm;
+      
       double cosangle = (SEP_X*SHIT_X + SEP_Y*SHIT_Y);
       cosangle /= ( pow(pow(SEP_X,2)+pow(SEP_Y,2),0.5) * pow(pow(SHIT_X,2)+pow(SHIT_Y,2),0.5));
 
-      //no weighted average, works better as flat average w/ min charge cut
-      mean_forward += cosangle;
-      rms_forward  += pow(cosangle,2);
-      
+      if(cosangle>0) {
+	// Only take into account for hits that are in "front"
+	//no weighted average, works better as flat average w/ min charge cut
+	mean_forward += cosangle;
+	rms_forward  += pow(cosangle,2);
+	hit_counter_forward++;
+      }
+
       // Compute backward mean
-      SHIT_X = (hit.w - end.w) / wire_2_cm;
-      SHIT_Y = (hit.t - end.t) / time_2_cm;
+      SHIT_X = (hit.w - fParams.end_point.w) / wire_2_cm;
+      SHIT_Y = (hit.t - fParams.end_point.t) / time_2_cm;
       
-      cosangle  = (SEP_X*SHIT_X + SEP_Y*SHIT_Y);
+      cosangle  = (SEP_X*SHIT_X + SEP_Y*SHIT_Y) * (-1.);
       cosangle /= ( pow(pow(SEP_X,2)+pow(SEP_Y,2),0.5) * pow(pow(SHIT_X,2)+pow(SHIT_Y,2),0.5));
-      
-      //no weighted average, works better as flat average w/ min charge cut
-      mean_backward += cosangle;
-      rms_backward  += pow(cosangle,2);
-      
+
+      if(cosangle>0) {
+	//no weighted average, works better as flat average w/ min charge cut
+	mean_backward += cosangle;
+	rms_backward  += pow(cosangle,2);
+	hit_counter_backward++;
+      }
     }
 
     //no weighted average, works better as flat average w/ min charge cut
 
-    rms_forward   = pow(rms_forward/hit_counter,0.5);
-    mean_forward /= hit_counter;
+    rms_forward   = pow(rms_forward/hit_counter_forward,0.5);
+    mean_forward /= hit_counter_forward;
 
-    rms_backward   = pow(rms_backward/hit_counter,0.5);
-    mean_backward /= hit_counter;
+    rms_backward   = pow(rms_backward/hit_counter_backward,0.5);
+    mean_backward /= hit_counter_backward;
 
-    if(mean_forward > mean_backward && rms_forward < rms_backward) return;
-    std::swap(start,end);
+    std::cout
+      << "mean forward  : " << mean_forward  << std::endl
+      << "mean backward : " << mean_backward << std::endl
+      << "rms_forward   : " << rms_forward   << std::endl
+      << "rms_backward  : " << rms_backward  << std::endl;
+
+    if(mean_forward > mean_backward && rms_forward > rms_backward) {
+      std::cout<<"Not flipping..."<<std::endl;
+      return;
+    }
+    std::cout<<"Flipping!"<<std::endl;
+    std::swap(fParams.start_point,fParams.end_point);
   }
   
   

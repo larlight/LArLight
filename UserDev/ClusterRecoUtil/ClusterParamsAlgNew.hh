@@ -78,6 +78,7 @@ namespace cluster {
                     bool override_DoGetRoughAxis     =false,
                     bool override_DoGetProfileInfo   =false,
                     bool override_DoRefineStartPoints=false,
+		    bool override_DoRefineDirection  =false,
                     bool override_DoGetFinalSlope    =false );
 
     const cluster_params& GetParams()
@@ -140,13 +141,12 @@ namespace cluster {
     */
     void GetFinalSlope(bool override=false);
 
-    void RefineDirection(larutil::PxPoint &start,
-                         larutil::PxPoint &end);
+    void RefineDirection(bool override=false);
 
     void GetOpeningAngle();
 
-    const larutil::PxPoint& StartPoint() {return fRoughBeginPoint;}
-    const larutil::PxPoint& EndPoint() {return fRoughEndPoint;}
+    const larutil::PxPoint& RoughStartPoint() {return fRoughBeginPoint;}
+    const larutil::PxPoint& RoughEndPoint() {return fRoughEndPoint;}
 
   protected:
     
@@ -189,6 +189,7 @@ namespace cluster {
     bool fFinishedGetRoughAxis;
     bool fFinishedGetProfileInfo;
     bool fFinishedRefineStartPoints;
+    bool fFinishedRefineDirection;
     bool fFinishedGetFinalSlope;
 
 
