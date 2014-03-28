@@ -24,18 +24,18 @@ namespace cluster{
   ClusterParamsAlgNew::ClusterParamsAlgNew(const std::vector<const larlight::hit*> &inhitlist){
     fPrincipal=nullptr;
     fGSer=nullptr;
-    Initialize(); // do we need to call this here? it's called in SetHits already... A.S.
     SetHits(inhitlist);
   }
 
   ClusterParamsAlgNew::ClusterParamsAlgNew(const std::vector<larutil::PxHit> &inhitlist){
     fPrincipal=nullptr;
     fGSer=nullptr;
-    Initialize(); // do we need to call this here? it's called in SetHits already... A.S.
     SetHits(inhitlist);
   }
 
   void ClusterParamsAlgNew::SetHits(const std::vector<larutil::PxHit> &inhitlist){
+
+    Initialize();
 
     // Make default values
     // Is done by the struct
@@ -43,8 +43,6 @@ namespace cluster{
       throw RecoUtilException("Provided empty hit list!");
       return;
     }
-    
-    Initialize();
 
     fHitVector.reserve(inhitlist.size());
     for(auto h : inhitlist)
