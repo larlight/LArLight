@@ -5,10 +5,9 @@
 
 namespace larreco {
 
-  ClusterMergeAlg::ClusterMergeAlg() : larlight::ana_base() {
+  ClusterMergeAlg::ClusterMergeAlg() : larlight::larlight_base() {
     
     _name="ClusterMergeAlg"; 
-    _fout=0;     
     _verbose=false;
     
     SetAngleCut(180.);
@@ -28,9 +27,18 @@ namespace larreco {
 
     ClearEventInfo();
 
+    this->reconfigure();
+        
   };
   
-
+  ClusterMergeAlg::~ClusterMergeAlg()
+  {
+    if(_hit_angles_forwards)
+      {delete _hit_angles_forwards; _hit_angles_forwards=0;}
+    if(_hit_angles_backwards)
+      {delete _hit_angles_backwards; _hit_angles_backwards=0;}
+  }
+  
   void ClusterMergeAlg::ReportConfig() const {
 
     std::ostringstream msg;
@@ -52,10 +60,11 @@ namespace larreco {
 
   }
 
-  bool ClusterMergeAlg::initialize() {
-
+  void ClusterMergeAlg::reconfigure() {
+    
     _det_params_prepared = false;
 
+    if(_merge_tree) delete _merge_tree;
     _merge_tree = 0;
 
     PrepareTTree();
@@ -63,59 +72,6 @@ namespace larreco {
     PrepareHistos();
 
     ClearEventInfo();
-
-    return true;
-  }
-
-  bool ClusterMergeAlg::finalize() {
-
-    if(_fout) {
-
-      _fout->cd();
-      _merge_tree->Write();
-
-    }
-  
-    if(_hit_angles_forwards)
-      {delete _hit_angles_forwards; _hit_angles_forwards=0;}
-    if(_hit_angles_backwards)
-      {delete _hit_angles_backwards; _hit_angles_backwards=0;}
-
-    return true;
-  }
-  
-  /**
-     In case ClusterMergeAlg is run as analysis module in ana_processor, it does following tasks:
-     (0) Clear event-wise information (input & output)
-     (1) Read-in cluster information into cluster_merge_info struct
-     (2) Process read-in cluster information for merging
-  */
-  bool ClusterMergeAlg::analyze(larlight::storage_manager* storage) {
-    // Step (0) ... Clear input cluster information
-    
-    ClearEventInfo();
-
-    // Step (1) ... loop over input cluster sets and store relevant information into the cluster_merge_info
-
-    const larlight::event_cluster* ev_cluster = (const larlight::event_cluster*)(storage->get_data(larlight::DATA::ShowerAngleCluster));
-
-    const larlight::event_hit* ev_hits = (const larlight::event_hit*)(storage->get_data(ev_cluster->get_hit_type()));
-    
-    if(!ev_hits) {
-      print(larlight::MSG::ERROR,__FUNCTION__,"Data storage did not find associated hit collection!");
-      return false;
-    }
-
-    //    std::cout<<"this ev_cluster has event_id() = "<<ev_cluster->event_id()<<std::endl;
-
-    for(auto const i_cluster: *ev_cluster)
-
-      AppendClusterInfo(i_cluster,ev_hits);
-
-    // Step (2) ... Run algorithm
-    ProcessMergeAlg();
-
-    return true;
 
   }
 

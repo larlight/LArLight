@@ -28,7 +28,7 @@ namespace larlight {
   public:
 
     /// Default constructor
-    mcshower(DATA::DATA_TYPE type=DATA::MCShower);
+     mcshower(DATA::DATA_TYPE type=DATA::MCShower);
 
     /// Default destructor
     virtual ~mcshower(){}
@@ -104,6 +104,11 @@ namespace larlight {
     /// Charge deposited by daughters per plane
     Float_t Charge(const GEO::View_t view) const;
 
+    /// Dauighter Charge Deposition Points
+    const std::vector<std::vector<Float_t> >& DaughterPoints() const
+    { return fEdepVtx; }
+    
+
     //--- Setters ---//
 
     void SetMotherID(Int_t pdgid, UInt_t trackid)
@@ -175,7 +180,7 @@ namespace larlight {
     std::vector<std::vector<Float_t> > fEdepVtx;
 
     ////////////////////////
-    ClassDef(mcshower,1)
+    ClassDef(mcshower,2)
     ////////////////////////
       
   };

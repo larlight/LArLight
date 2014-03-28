@@ -15,6 +15,8 @@
 #include <TH1F.h>
 #include <TPrincipal.h>
 
+#include "PxUtils.h"
+
 #include <vector>
 
 #include "DataFormat-TypeDef.hh"

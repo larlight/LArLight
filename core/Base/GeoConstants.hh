@@ -21,6 +21,20 @@ namespace larlight{
   
   namespace GEO {
 
+    enum DetId_t {
+      kBo,         ///< Bo id
+      kArgoNeuT,   ///< ArgoNeuT id
+      kMicroBooNE, ///< MicroBoone id
+      kLBNE10kt,   ///< LBNE 10kt id
+      kJP250L,     ///< JPARC 250 L id
+      kLBNE35t,    ///< 35t prototype id
+      kLBNE34kt,   ///< LBNE 34kt id
+      kCSU40L,     ///< CSU 40 L id
+      kLArIAT,     ///< LArIAT id
+      kICARUS,     ///< ICARUS T600 id
+      kDetIdMax 
+    };
+    
     /// Enumerate the possible plane projections
     enum View_t {
       kU,       ///< planes which measure U

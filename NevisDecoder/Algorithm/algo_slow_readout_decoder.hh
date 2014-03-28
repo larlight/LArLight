@@ -56,12 +56,13 @@ namespace larlight {
 	return FEM::FEM_FIRST_WORD;
       else if( (word & 0xf000) == 0x9000 )
 	return FEM::CHANNEL_HEADER;
-      else if( (word & 0xf000) == 0xa000 )
+      else if( (word & 0xf000) == 0xa000 || (word & 0xf000) == 0x8000)
 	return FEM::CHANNEL_WORD;
       else if( (word & 0xf000) == 0xb000 )
 	return FEM::CHANNEL_LAST_WORD;
       else if( (word & 0xf000) == 0xc000 )
-	return FEM::FEM_LAST_WORD;
+	//return FEM::FEM_LAST_WORD;
+	return FEM::EVENT_LAST_WORD;
       else
 	return FEM::UNDEFINED_WORD;
     }
@@ -125,8 +126,8 @@ namespace larlight {
     // Constants
     //
     // Comment out the following if you deal with an older format with 1 less header
-  #define INCLUDE_EXTRA_HEADER
-  #ifdef INCLUDE_EXTRA_HEADER
+#define INCLUDE_EXTRA_HEADER
+#ifdef INCLUDE_EXTRA_HEADER
     static const size_t FEM_HEADER_COUNT=6; ///< Number of event header words
   #else
     static const size_t FEM_HEADER_COUNT=5; ///< Number of event header words

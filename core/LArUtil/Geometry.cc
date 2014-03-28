@@ -7,19 +7,24 @@ namespace larutil {
 
   Geometry* Geometry::_me = 0;
 
-  Geometry::Geometry(std::string file_name, std::string tree_name) : LArUtilBase(file_name,tree_name)
+  Geometry::Geometry(bool default_load) : LArUtilBase()
   {
-    if(_file_name.empty())
-      _file_name = Form("%s/LArUtil/dat/%s",getenv("LARLIGHT_CORE_DIR"),kFILENAME_GEOMETRY.c_str());
-    if(_tree_name.empty())
-      _tree_name = kTREENAME_GEOMETRY;
     _name = "Geometry";
-    LoadData();
-    ComputeData();
+    if(default_load) {
+      _file_name = Form("%s/LArUtil/dat/%s",
+			getenv("LARLIGHT_CORE_DIR"),
+			kUTIL_DATA_FILENAME[LArUtilConfig::Detector()].c_str());
+      _tree_name = kTREENAME_GEOMETRY;
+      LoadData();
+    }
   }
 
-  void Geometry::ComputeData()
+  bool Geometry::LoadData(bool force_reload)
   {
+    bool status = LArUtilBase::LoadData(force_reload);
+
+    if(!status) return status;
+
     fOrthVectorsY.resize(this->Nplanes());
     fOrthVectorsZ.resize(this->Nplanes());
     fFirstWireProj.resize(this->Nplanes());
@@ -56,14 +61,8 @@ namespace larutil {
       fFirstWireProj[plane] /= ThisWirePitch;
       fFirstWireProj[plane] -= 0.5;
 
-      std::cout << Form("Plane %d ... (%g,%g,%g)",
-			plane,
-			fOrthVectorsY[plane],
-			fOrthVectorsZ[plane],
-			fFirstWireProj[plane])
-		<<std::endl;
     }
-    
+    return status;
   }
 
   void Geometry::ClearData()
@@ -359,6 +358,7 @@ namespace larutil {
   UInt_t Geometry::NearestWire(const TVector3 &worldLoc,
 			       const UInt_t PlaneNo) const
   {
+
     int NearestWireNumber = int(nearbyint(worldLoc[1]*fOrthVectorsY.at(PlaneNo)
 					  + worldLoc[2]*fOrthVectorsZ.at(PlaneNo)
 					  - fFirstWireProj.at(PlaneNo)));
@@ -375,6 +375,7 @@ namespace larutil {
 					   worldLoc[0],worldLoc[1], worldLoc[2]));
 
     }
+    /*
     std::cout<<"NearestWireID"<<std::endl;
     std::cout<<Form("(%g,%g,%g) position ... using (%g,%g,%g) ... Wire %d Plane %d",
                     worldLoc[0],worldLoc[1],worldLoc[2],
@@ -383,7 +384,7 @@ namespace larutil {
                     fFirstWireProj[PlaneNo],
 		    wireNumber,PlaneNo)
              << std::endl;
-
+    */
     return wireNumber;
   }
 

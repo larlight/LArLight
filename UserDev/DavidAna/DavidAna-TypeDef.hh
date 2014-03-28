@@ -27,6 +27,7 @@ namespace larlight {
   class HitMaker;
   class BaselineAna;
   class NoiseAna;
+  class MCShowerParams;
 //ADD_NEW_CLASS ... do not change this comment line
 
 }

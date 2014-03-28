@@ -31,7 +31,10 @@ namespace larutil {
   private:
 
     /// Singleton constructor
-    LArProperties(std::string file_name="",std::string tree_name="");
+    LArProperties(bool default_load=true);
+
+    /// Default destructor
+    virtual ~LArProperties(){};
 
     static LArProperties* _me;
 
@@ -43,15 +46,11 @@ namespace larutil {
   public:
 
     /// Singleton getter
-    static const LArProperties* GetME(std::string file_name="", 
-				      std::string tree_name="") 
+    static const LArProperties* GetME(bool default_load=true)
     {
-      if(!_me) _me = new LArProperties(file_name,tree_name);
+      if(!_me) _me = new LArProperties(default_load);
       return _me;
     }
-    
-    /// Default destructor
-    virtual ~LArProperties(){};
     
     //--- LArSoft Implementation ---//
 
