@@ -24,14 +24,14 @@ namespace cluster{
   ClusterParamsAlgNew::ClusterParamsAlgNew(const std::vector<const larlight::hit*> &inhitlist){
     fPrincipal=nullptr;
     fGSer=nullptr;
-    Initialize();
+    Initialize(); // do we need to call this here? it's called in SetHits already... A.S.
     SetHits(inhitlist);
   }
 
   ClusterParamsAlgNew::ClusterParamsAlgNew(const std::vector<larutil::PxHit> &inhitlist){
     fPrincipal=nullptr;
     fGSer=nullptr;
-    Initialize();
+    Initialize(); // do we need to call this here? it's called in SetHits already... A.S.
     SetHits(inhitlist);
   }
 
@@ -51,6 +51,7 @@ namespace cluster{
 
       fHitVector.push_back(h);
     
+    fPlane=fHitVector[0].plane;
   }
 
   void ClusterParamsAlgNew::SetHits(const std::vector<const larlight::hit*> &inhitlist){
@@ -75,7 +76,7 @@ namespace cluster{
       (*fHitVector.rbegin()).charge = h->Charge();
       (*fHitVector.rbegin()).plane = plane;
     }
-    
+    fPlane=fHitVector[0].plane;
     
   }
 
@@ -587,6 +588,7 @@ namespace cluster{
 				 fRoughBeginPoint);
     
     double ort_intercept_end=fInterLow+(fInterHigh-fInterLow)/fProfileNbins*endbin;
+    fRoughBeginPoint.plane=fPlane;
     
     std::cout << " ort_intercept_end: " << ort_intercept_end << std::endl;
     
@@ -594,7 +596,7 @@ namespace cluster{
 				 fRough2DIntercept,
 				 ort_intercept_end,
 				 fRoughEndPoint);
-    
+    fRoughEndPoint.plane=fPlane;
     
     std::cout << fRoughBeginPoint.w << ", " << fRoughBeginPoint.t << " end: " <<  fRoughEndPoint.w << " " << fRoughEndPoint.t << std::endl;
     

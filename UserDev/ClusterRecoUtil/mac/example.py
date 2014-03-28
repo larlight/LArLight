@@ -1,5 +1,6 @@
 import sys
 from ROOT import *
+import ROOT
 gSystem.Load("libBase")
 gSystem.Load("libLArUtil")
 gSystem.Load("libClusterRecoUtil")
@@ -81,6 +82,8 @@ algo = cluster.ClusterParamsExecutor()
 
 processed_events=0
 
+fGSer = larutil.GeometryUtilities.GetME()
+
 while mgr.next_event():
 
     # Get event_cluster ... std::vector<larlight::cluster>
@@ -93,8 +96,15 @@ while mgr.next_event():
     mct_vtx=None
     if mctruth_v and mctruth_v.size():
         if mctruth_v.size()>1:
-            print "Found more than 1 MCTruth. Only use the 1st one..."
-        mct_vtx = mctruth_v.at(0).GetParticles().at(0).Trajectory().at(0).Position()
+            print "Found more than 1 MCTruth. Only use the 1st one... \n \n"
+        if mctruth_v.at(0).GetParticles().at(0).PdgCode() == 11:      ## electron    
+	    mct_vtx = mctruth_v.at(0).GetParticles().at(0).Trajectory().at(0).Position()
+	    print "\n electron \n"
+	elif mctruth_v.at(0).GetParticles().at(0).PdgCode() == 22:    
+	    trajsize= mctruth_v.at(0).GetParticles().at(0).Trajectory().size()
+	    mct_vtx = mctruth_v.at(0).GetParticles().at(0).Trajectory().at(trajsize-1).Position()
+	    print "\n gamma \n"
+   #PdgCode
 
     if args.num_events == processed_events:
         exit()
@@ -113,16 +123,21 @@ while mgr.next_event():
         algo.GetAverages(True)
         algo.GetRoughAxis(True)
         algo.GetProfileInfo(True)
-#       algo.RefineStartPoints(True)
+        algo.RefineStartPoints(True)
         # algo.GetFinalSlope(True)
         algo.Report()
-        print "(%g,%g) => (%g,%g)" % (algo.StartPoint().w,
+        print "(%g,%g) => (%g,%g), plane: %g" % (algo.StartPoint().w,
                                       algo.StartPoint().t,
                                       algo.EndPoint().w,
-                                      algo.EndPoint().t)
+                                      algo.EndPoint().t,algo.StartPoint().plane)
         if(mct_vtx):
             print "MC Particle Start Point: (%g,%g,%g)" % (mct_vtx[0],mct_vtx[1],mct_vtx[2])
-	
+           # my_vec=ROOT.std.vector(ROOT.Double)()
+           # my_vec[0]=mct_vtx[0]
+           # my_vec[1]=mct_vtx[1]
+           # my_vec[2]=mct_vtx[2]
+           # mcpoint=fGSer.Get2DPointProjectionCM(my_vec,algo.StartPoint().plane)
+	   # print " Start point in w,t  (%g,%g)" % (mcpoint.w,mcpoint.t)   
 	#Add black star to mark begin point and black square to mark end point
 #	begin = TGraph(1)
 #	end = TGraph(1)

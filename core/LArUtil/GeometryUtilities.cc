@@ -731,7 +731,6 @@ namespace larutil{
   	
     pointonline.w = (ort_intercept - intercept)/(slope-invslope); 
     pointonline.t = slope * pointonline.w + intercept; 
-  
     return 0;  
   }    
   
@@ -900,6 +899,35 @@ namespace larutil{
     return pN;
      
    }
+  
+  
+    //////////////////////////////////////////////////////////////
+    // for now this returns the vlause in CM/CM space.
+    // this will become the default, but don't want to break the code that depends on the 
+    // previous version. A.S. 03/26/14
+    //////////////////////////////////////
+  
+  PxPoint GeometryUtilities::Get2DPointProjectionCM(std::vector< double > xyz, int plane) const{
+  
+    PxPoint pN(0,0,0);
+    
+    Double_t pos[3];
+        
+      
+    pos[1]=xyz[1];
+    pos[2]=xyz[2];
+
+    ///\todo: this should use the cryostat and tpc as well in the NearestWire method
+    
+    pN.w = geom->NearestWire(pos, plane)*fWiretoCm;
+    pN.t=xyz[0];  
+    pN.plane=plane;
+    
+    return pN;
+     
+   }
+  
+  
   
 
   Double_t GeometryUtilities::GetTimeTicks(Double_t x, Int_t plane) const{
