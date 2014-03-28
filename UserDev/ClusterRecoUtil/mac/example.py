@@ -132,12 +132,12 @@ while mgr.next_event():
                                       algo.EndPoint().t,algo.StartPoint().plane)
         if(mct_vtx):
             print "MC Particle Start Point: (%g,%g,%g)" % (mct_vtx[0],mct_vtx[1],mct_vtx[2])
-           # my_vec=ROOT.std.vector(ROOT.Double)()
-           # my_vec[0]=mct_vtx[0]
-           # my_vec[1]=mct_vtx[1]
-           # my_vec[2]=mct_vtx[2]
-           # mcpoint=fGSer.Get2DPointProjectionCM(my_vec,algo.StartPoint().plane)
-	   # print " Start point in w,t  (%g,%g)" % (mcpoint.w,mcpoint.t)   
+            my_vec=ROOT.std.vector(ROOT.Double)(3,0)
+            my_vec[0]=mct_vtx[0]
+            my_vec[1]=mct_vtx[1]
+            my_vec[2]=mct_vtx[2]
+            mcpoint=fGSer.Get2DPointProjectionCM(my_vec,algo.StartPoint().plane)
+	    print " Start point in w,t  (%g,%g)" % (mcpoint.w,mcpoint.t)   
 	#Add black star to mark begin point and black square to mark end point
 #	begin = TGraph(1)
 #	end = TGraph(1)
