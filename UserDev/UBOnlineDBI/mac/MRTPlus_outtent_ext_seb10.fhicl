@@ -1,0 +1,116 @@
+### Configuration for a calibration run. 
+### Be sure to reduce the dma_buffer_size if you reduce the timesize.
+# These require you have done ... export SHORTHOSTNAME=`hostname -s | sed "s/uboonedaq-//" | sed "s/-//"`
+
+sebAppseb10:
+[     {
+        name: "seb10"  type: "PMT" port: 31423
+        recipe:onepmtcard
+        trigger_source: INT# INT==no pulse out
+        fragment_id:1 # 2 in real life! 7-Nov:14:07pm
+        nu_stream_source:dma_pmt
+        nu_stream_sink:assembler
+        sn_stream_source:NONE
+        sn_stream_sink:NONE
+        dma_buffer_size:120000   # Roughly size of data / event
+	circular_buffer_size:10e9
+        tpc:{channels: 64 slots:0x00000 }
+        xmit:{ slot:6 timesize:33
+               maxpoll:1e8 dmastrategy:disrespect # shorten maxpoll from 1e8 to catch Pause,
+	       # 1e6 too small for 10 Hz triggers. this is non-ideal solution. 
+	       # Imagine triggers coming widely
+	       # separated. We need a solution to allow Pause msg to take effect.
+               delay_after_trigger:0 # musecs
+               max_internal_triggers:0 } # should mean nothing in EXT trigger mode.
+
+	# Triger module configuration block
+	#
+        trigger: { slot:2 
+		   config: { 
+		   	     trigmask0: 0   # ??? (if you know, fill-in)
+			     trigmask1: 0   # Enable PMT-FEM trigger ... 0x0=NONE, 0x1=Beam, 0x4=Cosmic, 0x8=ALL
+			     trigmask8: 0x2 # Enable external-input trigger ... 0x0=NONE, 0x2=EXT, 0xfd=BNB
+		   	     
+			     prescale0:0 
+			     prescale1:0 
+			     prescale8:0
+		   	   }
+
+	         }
+
+	# Shapers' slot number is specified through bit 3 to 16
+	# ex) one shaper in slot 3 is 0x8
+	# ex) three shapers in slot 3, 4, 5 is 0x38
+	shaper:  { slots: 0x38 }
+        controller: { slot:0 }
+	
+	# PMT-FEM configuration block
+	#
+	# For detailed description, see PMTFrontEndModule_Config class definition in hwutil/PMTFrontEndModule.h.
+	# Default values are defined in PMTFrontEndModule_Config::acceptConfigurationReader method
+	# which is implemented in hwutil/PMTFrontEndModule.cpp.
+	#
+	# Brief comments are made below.
+	#
+        pmt:{channels:40                    # Number of channels in the module
+	     slot:7            		    # Slot number of THIS PMT-FEM module
+ 
+	     config:{ enable_top:    0xffff # 3 switches to enable 3 sockets in the front panel of PMT-FEM module.
+	     	      enable_middle: 0xffff # Each socket has 16 channels, and 16-bit word is used to enable
+		      enable_bottom: 0xffff # individual channels per socket. Easier way to enable channels by
+		      		     	    # channel number is introduced in the later part.
+
+		      # Overall channel configuration
+		      # Parameters specified here is applied to all channels.
+		      # If you wish to tune parameter value channel-wise, see the later part.
+		      #
+		      pmt_precount: 3      # pre-count for discriminators
+		      pmt_words:    20     # Number of PMT-words to read-in
+		      pmt_deadtime: 24     # Dead-time in 64MHz sample count
+		      threshold0:   4      # Discriminator 0 threshold
+		      threshold1:   400    # Discriminator 1 threshold (cosmic)
+		      threshold3:   1000   # Discriminator 3 threshold (beam)
+
+		      # Parameters for PMT-Trigger condition
+		      #					 
+		      pmt_width:    5      # Sample width to issue PMT-Trigger
+		      cos_mult:     1      # Disc. 1 multiplicity condition for cosmic trigger
+		      cos_thres:    200    # Disc. 1 max adc sum  condition for cosmic trigger
+		      beam_mult:    1      # Disc. 3 multiplicity condition for beam trigger
+		      beam_thres:   1      # Disc. 3 max adc sum  condition for beam trigger
+		      					 
+		      # Beamgate parameters
+		      # This is somewhat confusing, but you can see detailed diagram and explanation
+		      # in PMTFrontEndModule.h. Take a look at there.
+		      #
+		      pmt_gate_size:  1500 # Beamgate readout window size in 64MHz clock
+		      pmt_beam_size:  102  # Beamgate spill width in 64 MHz clock
+		      pmt_beam_delay: 256  # Beamgate spill start time from the readout window start in 64MHz clock
+		      
+		      # Channel-wise parameter configuration
+		      # The following allows you to configure some parameters channel-wise.
+		      # "chwise_enable" is an array of channel numbers you wish to enable & configure.
+		      # Other "chwise_*" parameters must have the same length and sets self-descriptive parameters.
+		      # Commented out by default.
+		      #
+		      #chwise_enable:     [0,   2,   7   ]  # Channel numbers to be enabled
+		      #chwise_deadtime:   [44,  44,  44  ]  # Deadtime for enabled channels (64MHz clock)
+		      #chwise_words:      [40,  40,  40  ]  # Number of samples to readout  (64MHz clock)
+		      #chwise_threshold1: [20,  20,  20  ]  # Disc. 1 (cosmic) threshold    (ADC count)
+		      #chwise_threshold3: [1000,1000,1000]  # Disc. 3 (beam)   threshold    (ADC count)
+	      	    }
+	}
+
+	configMem: {shmKey:31499}
+	
+	neviscards:{
+	  controller:{vendor_id:0x1172  device_id:0x4 bus:0x41}
+	  nu_card:   {vendor_id:0x1172  device_id:0x4 bus:0x3}
+	  }
+	
+       }
+	
+]
+
+
+
