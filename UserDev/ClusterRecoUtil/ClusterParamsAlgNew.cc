@@ -106,8 +106,8 @@ namespace cluster{
     double cos_opening_angle ;                                          //cos(opening_angle) between hit and axis
     double cos_closing_angle ;                                          //cos(closing_angle) between hit and axis
     double percentage = 0.95 ;
-    double percentage_HC = 0.3 ;	
-    const int NBINS=100;
+    double percentage_HC = 0.5 ;  //fParams.N_Hits_HC/fParams.N_Hits ;
+    const int NBINS=200;
     
     //define variables for angle calculation 
     double start_end_w = fRoughEndPoint.w - fRoughBeginPoint.w ;
@@ -132,64 +132,63 @@ namespace cluster{
       cos_opening_angle = dot_product_OPEN/distance_end_points/distance_hits_OPEN ;
       cos_closing_angle = dot_product_CLOSE/distance_end_points/distance_hits_CLOSE ;
 
-//	std::cout<<"Cos(open_angle): "<<cos_opening_angle<<std::endl;
-//	std::cout<<"Cos(close_angle): "<<cos_closing_angle<<std::endl;
-
       int N_bins_OPEN = NBINS * acos(cos_opening_angle)/PI;
       int N_bins_CLOSE = NBINS * acos(cos_closing_angle)/PI;
       opening_angle_bin[N_bins_OPEN]++;
       closing_angle_bin[N_bins_CLOSE]++;
 
+
       //Also fill bins for high charge hits
       if(hit.charge > fParams.mean_charge){
         opening_angle_highcharge_bin[N_bins_OPEN]++;
         closing_angle_highcharge_bin[N_bins_CLOSE]++;
+	std::cout<<"Bin filled (open): "<<N_bins_OPEN<<" and number of entries: "<<opening_angle_highcharge_bin[N_bins_OPEN]<<std::endl;
+	std::cout<<"Bin filled (closed): "<<N_bins_CLOSE<<" and number of entries: "<<closing_angle_highcharge_bin[N_bins_CLOSE]<<std::endl<<std::endl;
         }
-	std::cout<<hit.charge<<" : Hit Charge and mean charge: "<<fParams.mean_charge<<std::endl;
+//	std::cout<<hit.charge<<" : Hit Charge and mean charge: "<<fParams.mean_charge<<std::endl;
      }
 
     std::cout << " in Opening Angle, after loop " << fHitVector.size() << std::endl;
     std::cout << " N_Hits, NHits_HC " << fParams.N_Hits << " " << fParams.N_Hits_HC << std::endl;
-     
+    
+ 
     int iBin(0), jBin(0), kBin(0), lBin(0);  //initialize iterators for the 4 angles
     double percentage_OPEN(0.0), percentage_CLOSE(0.0), percentage_OPEN_HC(0.0), percentage_CLOSE_HC(0.0); //The last 2 are for High Charge (HC)
 
-    for(iBin = 1; percentage_OPEN<= percentage && iBin < NBINS; iBin++)
+    for(iBin = 0; percentage_OPEN<= percentage && iBin < NBINS; iBin++)
       {
         percentage_OPEN += opening_angle_bin[iBin]/(fParams.N_Hits) ;
       }
 
-    std::cout << " OPEN " <<  percentage_OPEN << " and iBin: "<<iBin<<std::endl;
-
-    for(jBin = 1; percentage_CLOSE<= percentage && jBin < NBINS; jBin++)
+    for(jBin = 0; percentage_CLOSE<= percentage && jBin < NBINS; jBin++)
       {
-	 percentage_CLOSE += closing_angle_bin[iBin]/(fParams.N_Hits) ;
+	 percentage_CLOSE += closing_angle_bin[jBin]/(fParams.N_Hits) ;
        }
 
-     std::cout << " CLOSE " <<  percentage_CLOSE <<" and jBin "<<jBin<< std::endl;  
-    for(kBin = 1; percentage_OPEN_HC<= percentage_HC && kBin < NBINS; kBin++)
+    for(kBin = 0; percentage_OPEN_HC<= percentage_HC && kBin < NBINS; kBin++)
       {
         percentage_OPEN_HC += opening_angle_highcharge_bin[kBin]/(fParams.N_Hits_HC) ;
       }
 
-     std::cout << " OPEN_HC " <<  percentage_OPEN_HC << " and kBin "<<kBin<< std::endl; 
-
-    for(lBin = 1; percentage_CLOSE_HC<= percentage_HC && lBin < NBINS; lBin++)
+    for(lBin = 0; percentage_CLOSE_HC<= percentage_HC && lBin < NBINS; lBin++)
       {
         percentage_CLOSE_HC += closing_angle_highcharge_bin[lBin]/(fParams.N_Hits_HC) ;
       }
-      std::cout << " CLOSE_HC " <<  percentage_CLOSE_HC <<" and lBin "<<lBin<<std::endl;   
+     std::cout << " OPEN " <<  percentage_OPEN << " and iBin: "<<iBin<<std::endl;
+     std::cout << " CLOSE " <<  percentage_CLOSE <<" and jBin "<<jBin<< std::endl;  
+     std::cout << " OPEN_HC " <<  percentage_OPEN_HC << " and kBin "<<kBin<< std::endl; 
+     std::cout << " CLOSE_HC " <<  percentage_CLOSE_HC <<" and lBin "<<lBin<<std::endl;   
 
-    fParams.opening_angle = iBin * PI /100 ;
-    fParams.closing_angle = jBin * PI /100 ;
-    fParams.opening_angle_highcharge = kBin * PI /100 ;
-    fParams.closing_angle_highcharge = lBin * PI /100 ;
+    fParams.opening_angle = iBin * PI /NBINS ;
+    fParams.closing_angle = jBin * PI /NBINS ;
+    fParams.opening_angle_highcharge = kBin * PI /NBINS ;
+    fParams.closing_angle_highcharge = lBin * PI /NBINS ;
 
     std::cout<<"opening angle: "<<fParams.opening_angle<<std::endl;
     std::cout<<"closing angle: "<<fParams.closing_angle<<std::endl;
     std::cout<<"opening high charge angle: "<<fParams.opening_angle_highcharge<<std::endl;
     std::cout<<"closing high charge angle: "<<fParams.closing_angle_highcharge<<std::endl;
-
+    std::cout<<"Percentage high charge: "<<percentage_HC<<std::endl;
    }
 
 
