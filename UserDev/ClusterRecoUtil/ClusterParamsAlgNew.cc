@@ -98,86 +98,96 @@ namespace cluster{
 
   void ClusterParamsAlgNew::GetOpeningAngle()
   {
-    double distance_end_points ;                                        //distance between start and end points                                 
-    double distance_hits_OPEN ;                                         //distance between start and hit points
-    double distance_hits_CLOSE ;                                        //distance between start and hit points
-    double dot_product_OPEN ;                                           //dot product for opening angle
-    double dot_product_CLOSE ;                                          //dot product for closing angle
-    double cos_opening_angle ;                                          //cos(opening_angle) between hit and axis
-    double cos_closing_angle ;                                          //cos(closing_angle) between hit and axis
-    double percentage = 0.95 ;
-    double percentage_HC = 0.5 ;  //fParams.N_Hits_HC/fParams.N_Hits ;
+    double distance_end_points ;  // distance between start and end points                                 
+    double distance_hits_OPEN ;   // distance between start and hit points
+    double distance_hits_CLOSE ;  // distance between start and hit points
+    double dot_product_OPEN ;     // dot product for opening angle
+    double dot_product_CLOSE ;    // dot product for closing angle
+    double cos_opening_angle ;    // cos(opening_angle) between hit and axis
+    double cos_closing_angle ;    // cos(closing_angle) between hit and axis
+    double percentage = 0.9;
+    double percentage_HC = 0.9*fParams.N_Hits_HC/fParams.N_Hits;  // fParams.N_Hits_HC/fParams.N_Hits ;
     const int NBINS=200;
+    const double wgt = 1.0/fParams.N_Hits;
     
     //define variables for angle calculation 
     double start_end_w = fRoughEndPoint.w - fRoughBeginPoint.w ;
     double start_end_t = fRoughEndPoint.t - fRoughBeginPoint.t ;
     distance_end_points = sqrt(pow(start_end_w,2)+ pow(start_end_t,2));
 
-    std::vector<int> opening_angle_bin(NBINS,0 ) ;
-    std::vector<int> closing_angle_bin(NBINS,0 ) ;
-    std::vector<int> opening_angle_highcharge_bin(NBINS,0 ) ;
-    std::vector<int> closing_angle_highcharge_bin(NBINS,0 ) ;
+    std::vector<float> opening_angle_bin(NBINS,0.0 ) ;
+    std::vector<float> closing_angle_bin(NBINS,0.0 ) ;
+    std::vector<float> opening_angle_highcharge_bin(NBINS,0.0 ) ;
+    std::vector<float> closing_angle_highcharge_bin(NBINS,0.0 ) ;
 
-    std::cout << " in Opening Angle " << fHitVector.size() << std::endl;
+    // std::cout << " in Opening Angle " << fHitVector.size() << std::endl;
     
     for(auto& hit : fHitVector){
 
-      dot_product_OPEN = (hit.w - fRoughBeginPoint.w)*(start_end_w)+ (hit.t - fRoughBeginPoint.t) * (start_end_t) ;
-      dot_product_CLOSE = (hit.w - fRoughEndPoint.w)*( -start_end_w)+ (hit.t - fRoughEndPoint.t) * ( -start_end_t) ;
+      dot_product_OPEN  = (hit.w - fRoughBeginPoint.w) * ( start_end_w)
+                        + (hit.t - fRoughBeginPoint.t) * ( start_end_t);
+      dot_product_CLOSE = (hit.w - fRoughEndPoint.w)   * (-start_end_w)
+                        + (hit.t - fRoughEndPoint.t)   * (-start_end_t);
 
-      distance_hits_OPEN = sqrt(pow(hit.w - fRoughBeginPoint.w,2) + pow(hit.t - fRoughBeginPoint.t,2));
-      distance_hits_CLOSE = sqrt(pow(hit.w - fRoughEndPoint.w,2) + pow(hit.t - fRoughEndPoint.t,2));
+      distance_hits_OPEN  = sqrt(pow(hit.w - fRoughBeginPoint.w,2) 
+                               + pow(hit.t - fRoughBeginPoint.t,2));
+      distance_hits_CLOSE = sqrt(pow(hit.w - fRoughEndPoint.w,2) 
+                               + pow(hit.t - fRoughEndPoint.t,2));
 
-      cos_opening_angle = dot_product_OPEN/distance_end_points/distance_hits_OPEN ;
-      cos_closing_angle = dot_product_CLOSE/distance_end_points/distance_hits_CLOSE ;
+      cos_opening_angle = dot_product_OPEN/(distance_end_points*distance_hits_OPEN);
+      cos_closing_angle = dot_product_CLOSE/(distance_end_points*distance_hits_CLOSE);
 
       int N_bins_OPEN = NBINS * acos(cos_opening_angle)/PI;
       int N_bins_CLOSE = NBINS * acos(cos_closing_angle)/PI;
-      opening_angle_bin[N_bins_OPEN]++;
-      closing_angle_bin[N_bins_CLOSE]++;
-
+      // std::cout << "Binning at N_bins_OPEN "  << N_bins_OPEN  << "\n";
+      // std::cout << "Binning at N_bins_CLOSE " << N_bins_CLOSE << "\n";
+      opening_angle_bin[N_bins_OPEN] += wgt;
+      closing_angle_bin[N_bins_CLOSE] += wgt;
 
       //Also fill bins for high charge hits
       if(hit.charge > fParams.mean_charge){
-        opening_angle_highcharge_bin[N_bins_OPEN]++;
-        closing_angle_highcharge_bin[N_bins_CLOSE]++;
-	std::cout<<"Bin filled (open): "<<N_bins_OPEN<<" and number of entries: "<<opening_angle_highcharge_bin[N_bins_OPEN]<<std::endl;
-	std::cout<<"Bin filled (closed): "<<N_bins_CLOSE<<" and number of entries: "<<closing_angle_highcharge_bin[N_bins_CLOSE]<<std::endl<<std::endl;
-        }
-//	std::cout<<hit.charge<<" : Hit Charge and mean charge: "<<fParams.mean_charge<<std::endl;
-     }
-
-    std::cout << " in Opening Angle, after loop " << fHitVector.size() << std::endl;
-    std::cout << " N_Hits, NHits_HC " << fParams.N_Hits << " " << fParams.N_Hits_HC << std::endl;
-    
+        opening_angle_highcharge_bin[N_bins_OPEN] += wgt;
+        closing_angle_highcharge_bin[N_bins_CLOSE] += wgt;
+        // std::cout <<"Bin filled (open): "  << N_bins_OPEN  
+                  // << " and number of entries: " 
+                  // << opening_angle_highcharge_bin[N_bins_OPEN]
+                  // << std::endl;
+        // std::cout <<"Bin filled (closed): "<< N_bins_CLOSE 
+                  // << " and number of entries: " 
+                  // << closing_angle_highcharge_bin[N_bins_CLOSE]
+                  // << std::endl << std::endl;
+      }
+    }   
  
     int iBin(0), jBin(0), kBin(0), lBin(0);  //initialize iterators for the 4 angles
-    double percentage_OPEN(0.0), percentage_CLOSE(0.0), percentage_OPEN_HC(0.0), percentage_CLOSE_HC(0.0); //The last 2 are for High Charge (HC)
+    double percentage_OPEN(0.0),
+           percentage_CLOSE(0.0),
+           percentage_OPEN_HC(0.0),
+           percentage_CLOSE_HC(0.0); //The last 2 are for High Charge (HC)
 
     for(iBin = 0; percentage_OPEN<= percentage && iBin < NBINS; iBin++)
-      {
-        percentage_OPEN += opening_angle_bin[iBin]/(fParams.N_Hits) ;
-      }
+    {
+      percentage_OPEN += opening_angle_bin[iBin];
+    }
 
     for(jBin = 0; percentage_CLOSE<= percentage && jBin < NBINS; jBin++)
-      {
-	 percentage_CLOSE += closing_angle_bin[jBin]/(fParams.N_Hits) ;
-       }
+    {
+      percentage_CLOSE += closing_angle_bin[jBin];
+    }
 
     for(kBin = 0; percentage_OPEN_HC<= percentage_HC && kBin < NBINS; kBin++)
-      {
-        percentage_OPEN_HC += opening_angle_highcharge_bin[kBin]/(fParams.N_Hits_HC) ;
-      }
+    {
+      percentage_OPEN_HC += opening_angle_highcharge_bin[kBin];
+    }
 
     for(lBin = 0; percentage_CLOSE_HC<= percentage_HC && lBin < NBINS; lBin++)
-      {
-        percentage_CLOSE_HC += closing_angle_highcharge_bin[lBin]/(fParams.N_Hits_HC) ;
-      }
-     std::cout << " OPEN " <<  percentage_OPEN << " and iBin: "<<iBin<<std::endl;
-     std::cout << " CLOSE " <<  percentage_CLOSE <<" and jBin "<<jBin<< std::endl;  
-     std::cout << " OPEN_HC " <<  percentage_OPEN_HC << " and kBin "<<kBin<< std::endl; 
-     std::cout << " CLOSE_HC " <<  percentage_CLOSE_HC <<" and lBin "<<lBin<<std::endl;   
+    {
+      percentage_CLOSE_HC += closing_angle_highcharge_bin[lBin];
+    }
+    // std::cout << " OPEN " <<  percentage_OPEN << " and iBin: "<<iBin<<std::endl;
+    // std::cout << " CLOSE " <<  percentage_CLOSE <<" and jBin "<<jBin<< std::endl;  
+    // std::cout << " OPEN_HC " <<  percentage_OPEN_HC << " and kBin "<<kBin<< std::endl; 
+    // std::cout << " CLOSE_HC " <<  percentage_CLOSE_HC <<" and lBin "<<lBin<<std::endl;   
 
     fParams.opening_angle = iBin * PI /NBINS ;
     fParams.closing_angle = jBin * PI /NBINS ;
@@ -189,7 +199,7 @@ namespace cluster{
     std::cout<<"opening high charge angle: "<<fParams.opening_angle_highcharge<<std::endl;
     std::cout<<"closing high charge angle: "<<fParams.closing_angle_highcharge<<std::endl;
     std::cout<<"Percentage high charge: "<<percentage_HC<<std::endl;
-   }
+  }
 
 
   void ClusterParamsAlgNew::Initialize()
@@ -205,8 +215,9 @@ namespace cluster{
       fWire2Cm.at(i) = larutil::Geometry::GetME()->WirePitch(0,1,(UChar_t)i);
 
     fTime2Cm  = larutil::DetectorProperties::GetME()->SamplingRate()/1.e3;
-    fTime2Cm *= larutil::LArProperties::GetME()->DriftVelocity(larutil::LArProperties::GetME()->Efield(),
-							       larutil::LArProperties::GetME()->Temperature());
+    fTime2Cm *= larutil::LArProperties::GetME()->DriftVelocity(
+                  larutil::LArProperties::GetME()->Efield(),
+                  larutil::LArProperties::GetME()->Temperature());
 
     fFinishedGetAverages       = false;
     fFinishedGetRoughAxis      = false;
@@ -244,7 +255,7 @@ namespace cluster{
               << "\tFinishedGetRoughAxis "       << fFinishedGetRoughAxis << "\n"
               << "\tFinishedGetProfileInfo "     << fFinishedGetProfileInfo << "\n"
               << "\tFinishedRefineStartPoints "  << fFinishedRefineStartPoints << "\n"
-	      << "\tFinishedRefineDirection "    << fFinishedRefineDirection << "\n"
+              << "\tFinishedRefineDirection "    << fFinishedRefineDirection << "\n"
               << "\tFinishedGetFinalSlope "      << fFinishedGetFinalSlope << "\n"
               << "--------------------------------------" << "\n";
     fParams.Report();
@@ -254,7 +265,7 @@ namespace cluster{
                                        bool override_DoGetRoughAxis     ,  
                                        bool override_DoGetProfileInfo   ,  
                                        bool override_DoRefineStartPoints,
-				       bool override_DoRefineDirection,
+                                       bool override_DoRefineDirection,
                                        bool override_DoGetFinalSlope     ){
     GetAverages      (override_DoGetAverages      );
     GetRoughAxis     (override_DoGetRoughAxis     );
@@ -298,11 +309,6 @@ namespace cluster{
     fParams.charge_wgt_x /= fParams.sum_charge;
     fParams.charge_wgt_y /= fParams.sum_charge;
 
-    // std::cout 
-    //   << " charge weights:  x: " << fParams.charge_wgt_x 
-    //   << " y: "                  << fParams.charge_wgt_y 
-    //   << " mean charge: "        << fParams.sum_charge 
-    //   << std::endl;
     fParams.mean_x = (* fPrincipal->GetMeanValues())[0];
     fParams.mean_y = (* fPrincipal->GetMeanValues())[1];
     fParams.mean_charge = fParams.sum_charge / fParams.N_Hits;
@@ -313,7 +319,7 @@ namespace cluster{
     fParams.eigenvalue_secondary = (* fPrincipal -> GetEigenValues() )[1];
 
     fFinishedGetAverages = true;
-    Report();
+    // Report();
   }
 
   // Also does the high hitlist
@@ -369,7 +375,7 @@ namespace cluster{
 
 
     fFinishedGetRoughAxis = true;    
-    Report();
+    // Report();
     return;
   }
 
@@ -406,13 +412,16 @@ namespace cluster{
     // std::cout << " N_Hits is " << fParams.N_Hits << std::endl;
     // std::cout << " inv_2d_slope is " << inv_2d_slope << std::endl;
     // std::cout << " fRough2DSlope is " << fRough2DSlope << std::endl;
-    // std::cout << " conversions " << fWire2Cm.at(fPlane) << " " << fTime2Cm << std::endl;
+    // std::cout << " conversions " << fWire2Cm.at(fPlane) 
+    //           << " " << fTime2Cm << std::endl;
     
     fInterHigh=-999999;
     fInterLow=999999;
     fInterHigh_side=-999999;
     fInterLow_side=999999;
-    //loop over all hits. Create coarse and fine profiles of the charge weight to help refine the start/end points and have a first guess of direction
+    //loop over all hits. Create coarse and fine profiles
+    // of the charge weight to help refine the start/end 
+    // points and have a first guess of direction
 
     for(auto& hit : fHitVector)
     {
@@ -439,7 +448,9 @@ namespace cluster{
       }
     
 
-    }   // end of first HitIter loop, at this point we should have the extreme intercepts 
+    }   
+    // end of first HitIter loop, at this point we should
+    // have the extreme intercepts 
   
     /////////////////////////////////////////////
     // Second loop. Fill profiles. 
@@ -449,8 +460,10 @@ namespace cluster{
     
     larutil::PxPoint HighOnlinePoint, LowOnlinePoint,BeginOnlinePoint;
     
-    fGSer->GetPointOnLineWSlopes(fRough2DSlope,fRough2DIntercept,fInterHigh,HighOnlinePoint);
-    fGSer->GetPointOnLineWSlopes(fRough2DSlope,fRough2DIntercept,fInterLow,LowOnlinePoint);
+    fGSer->GetPointOnLineWSlopes(fRough2DSlope,fRough2DIntercept,
+                                 fInterHigh,HighOnlinePoint);
+    fGSer->GetPointOnLineWSlopes(fRough2DSlope,fRough2DIntercept,
+                                 fInterLow,LowOnlinePoint);
 
     std::cout << " extreme intercepts: low: " << fInterLow 
               << " " << fInterHigh << std::endl;
@@ -489,6 +502,8 @@ namespace cluster{
       ////////////////////////////////////////////////////////////////////// 
       //calculate the weight along the axis, this formula is based on rough guessology. 
       // there is no physics motivation behind the particular numbers, A.S.
+      // \todo: switch to something that is motivated and easier to 
+      //        spell than guessology.  C.A.
       /////////////////////////////////////////////////////////////////////// 
       double weight= (ortdist<1.) ? 10 * (hit.charge) : 5 * (hit.charge) / ortdist;
     
@@ -506,10 +521,10 @@ namespace cluster{
       
       if(fine_bin<fProfileNbins)  //only fill if bin number is in range
       {
-
-
         fChargeProfile.at(fine_bin)+=weight;
-        if(fChargeProfile.at(fine_bin)>current_maximum && fine_bin!=0 && fine_bin!=fProfileNbins-1) //find maximum bin on the fly.
+        //find maximum bin on the fly:
+        if(fChargeProfile.at(fine_bin)>current_maximum 
+          && fine_bin!=0 && fine_bin!=fProfileNbins-1) 
         {
           current_maximum=fChargeProfile.at(fine_bin);
           fProfileMaximumBin=fine_bin; 
@@ -517,13 +532,13 @@ namespace cluster{
       }
       
       if(coarse_bin<fCoarseNbins) //only fill if bin number is in range
-	fCoarseChargeProfile.at(coarse_bin)+=weight;
+        fCoarseChargeProfile.at(coarse_bin)+=weight;
       
-           
     }  // end second loop on hits. Now should have filled profile vectors.
       
     fFinishedGetProfileInfo = true;
-    return;    
+    // Report();
+    return;
   }
   
   
@@ -549,14 +564,13 @@ namespace cluster{
     //calculate the forward and backward integrals counting int the maximum bin.
     
     for(int ibin=0;ibin<fProfileNbins;ibin++)
-      {
-	if(ibin<=fProfileMaximumBin)  
-	  fProfileIntegralForward+=fChargeProfile.at(ibin);
-	
-	if(ibin>=fProfileMaximumBin)  
-	  fProfileIntegralBackward+=fChargeProfile.at(ibin);
-	
-      }
+    {
+      if(ibin<=fProfileMaximumBin)  
+        fProfileIntegralForward+=fChargeProfile.at(ibin);
+      
+      if(ibin>=fProfileMaximumBin)  
+        fProfileIntegralBackward+=fChargeProfile.at(ibin);
+    }
     
     // now, we have the forward and backward integral so start stepping forward and backward to find the trunk of the 
     // shower. This is done making sure that the running integral until less than 1% is left and the bin is above 
@@ -566,34 +580,34 @@ namespace cluster{
     double running_integral=fProfileIntegralForward;
     int startbin,endbin;
     for(startbin=fProfileMaximumBin;startbin>1;startbin--)
-      {
-	running_integral-=fChargeProfile.at(startbin);
-	if( fChargeProfile.at(startbin)<fChargeCutoffThreshold[fPlane] && running_integral/fProfileIntegralForward<0.01 )
-	  break;
-      }
+    {
+      running_integral-=fChargeProfile.at(startbin);
+      if( fChargeProfile.at(startbin)<fChargeCutoffThreshold[fPlane] && running_integral/fProfileIntegralForward<0.01 )
+        break;
+    }
     
     //backward loop
     running_integral=fProfileIntegralBackward;
     for(endbin=fProfileMaximumBin;endbin<fProfileNbins-1;endbin++)
-      {
-	running_integral-=fChargeProfile.at(endbin);
-	if( fChargeProfile.at(endbin)<fChargeCutoffThreshold[fPlane] && running_integral/fProfileIntegralBackward<0.01 )
-	  break;
-      }
+    {
+      running_integral-=fChargeProfile.at(endbin);
+      if( fChargeProfile.at(endbin)<fChargeCutoffThreshold[fPlane] && running_integral/fProfileIntegralBackward<0.01 )
+        break;
+    }
     
     // now have profile start and endpoints. Now translate to wire/time. Will use wire/time that are on the rough axis.
     //fProjectedLength is the length from fInterLow to interhigh along the rough_2d_axis
     // on bin distance is: 
-   // larutil::PxPoint OnlinePoint;
+    // larutil::PxPoint OnlinePoint;
     
     double ort_intercept_begin=fInterLow+(fInterHigh-fInterLow)/fProfileNbins*startbin;
     
     std::cout << " ort_intercept_begin: " << ort_intercept_begin << std::endl;
     
     fGSer->GetPointOnLineWSlopes(fRough2DSlope,
-				 fRough2DIntercept,
-				 ort_intercept_begin,
-				 fRoughBeginPoint);
+                                 fRough2DIntercept,
+                                 ort_intercept_begin,
+                                 fRoughBeginPoint);
     
     double ort_intercept_end=fInterLow+(fInterHigh-fInterLow)/fProfileNbins*endbin;
     fRoughBeginPoint.plane=fPlane;
@@ -601,9 +615,9 @@ namespace cluster{
     std::cout << " ort_intercept_end: " << ort_intercept_end << std::endl;
     
     fGSer->GetPointOnLineWSlopes(fRough2DSlope,
-				 fRough2DIntercept,
-				 ort_intercept_end,
-				 fRoughEndPoint);
+                                 fRough2DIntercept,
+                                 ort_intercept_end,
+                                 fRoughEndPoint);
     fRoughEndPoint.plane=fPlane;
     
     std::cout << fRoughBeginPoint.w << ", " << fRoughBeginPoint.t << " end: " <<  fRoughEndPoint.w << " " << fRoughEndPoint.t << std::endl;
@@ -645,7 +659,8 @@ namespace cluster{
     double lineslopetest;
     larutil::PxHit averageHit;
     //also are we sure this is actually doing what it is supposed to???
-    //are we sure this works? 
+    //are we sure this works?
+    //is anybody even listening?  Were they eaten by a grue? 
       
     fGSer->SelectLocalHitlist(fHitVector,subhit,
 			      startHit,
@@ -666,12 +681,15 @@ namespace cluster{
     }
     double avgwire= averageHit.w;
     double avgtime= averageHit.t;
-    std::vector<std::pair<double,double>> vertil;//vertex in tilda-space pair(x-til,y-til)
+    //vertex in tilda-space pair(x-til,y-til)
+    std::vector<std::pair<double,double>> vertil;
     vertil.clear();// This isn't needed?
     vertil.reserve(subhit.size() * subhit.size());
-    std::vector<double> vs;//vector of the sum of the distance of a vector to every vertex in tilda-space
+    //vector of the sum of the distance of a vector to every vertex in tilda-space
+    std::vector<double> vs;
     vs.clear();// this isn't needed?
-    std::vector<const larutil::PxHit*>  ghits;// $$This needs to be corrected//this is the good hits that are between strip
+    // $$This needs to be corrected//this is the good hits that are between strip
+    std::vector<const larutil::PxHit*>  ghits;
     ghits.reserve(subhit.size());
     int n=0;
     double fardistcurrent=0;
@@ -725,25 +743,23 @@ namespace cluster{
     //Now we need to do the transformation into "tilda-space"
     for(unsigned int a=0; a<subhit.size();a++){
       for(unsigned int b=a+1;b<subhit.size();b++){
-	if(subhit.at(a)->w != subhit.at(b)->w){
-	  double xtil = ((subhit.at(a)->t - avgtime) - (subhit.at(b)->t - avgtime));
-	  xtil /= ((subhit.at(a)->w - avgwire)-(subhit.at(b)->w - avgwire));
-	  double ytil = (subhit.at(a)->w - avgwire)*xtil -(subhit.at(a)->t - avgtime);
-	  //push back the tilda vertex point on the pair
-	  std::pair<double,double> tv(xtil,ytil);
-	  vertil.push_back(tv);
-	}//if Wires are not the same
+        if(subhit.at(a)->w != subhit.at(b)->w){
+          double xtil = ((subhit.at(a)->t - avgtime) - (subhit.at(b)->t - avgtime));
+          xtil /= ((subhit.at(a)->w - avgwire)-(subhit.at(b)->w - avgwire));
+          double ytil = (subhit.at(a)->w - avgwire)*xtil -(subhit.at(a)->t - avgtime);
+          //push back the tilda vertex point on the pair
+          std::pair<double,double> tv(xtil,ytil);
+          vertil.push_back(tv);
+        }//if Wires are not the same
       }//for over b
     }//for over a
     // look at the distance from a tilda-vertex to all other tilda-verticies
     for(unsigned int z=0;z<vertil.size();z++){
-
       double vd=0;//the distance for vertex... just needs to be something 0
-
       for(unsigned int c=0; c<vertil.size();c++)
 
-	vd+= sqrt(pow((vertil.at(z).first - vertil.at(c).first),2) + pow((vertil.at(z).second-vertil.at(c).second),2));
-
+        vd+= sqrt(pow((vertil.at(z).first - vertil.at(c).first),2)
+                + pow((vertil.at(z).second-vertil.at(c).second),2));
       vs.push_back(vd);
       vd=0.0;
     }//for z loop
@@ -758,11 +774,13 @@ namespace cluster{
     double tiltimeb=-vertil.at(minvs).second-d*sqrt(1+pow(tilwire,2));//negative cept is accounted for bottom strip
     // look over the subhit list and ask for which are inside of the strip
     for(unsigned int a=0; a<subhit.size(); a++){
-      double dtstrip= (-tilwire * (subhit.at(a)->w - avgwire) +(subhit.at(a)->t - avgtime)-tiltimet)/sqrt(tilwire*tilwire+1);
-      double dbstrip= (-tilwire * (subhit.at(a)->w - avgwire) +(subhit.at(a)->t - avgtime)-tiltimeb)/sqrt(tilwire*tilwire+1);
+      double dtstrip= (-tilwire * (subhit.at(a)->w - avgwire) 
+                     +(subhit.at(a)->t - avgtime)-tiltimet)/sqrt(tilwire*tilwire+1);
+      double dbstrip= (-tilwire * (subhit.at(a)->w - avgwire) 
+                     +(subhit.at(a)->t - avgtime)-tiltimeb)/sqrt(tilwire*tilwire+1);
       
       if((dtstrip<0.0 && dbstrip>0.0)||(dbstrip<0.0 && dtstrip>0.0)){
-	ghits.push_back(subhit.at(a));
+        ghits.push_back(subhit.at(a));
       }//if between strip
     }//for a loop
     
@@ -785,12 +803,12 @@ namespace cluster{
       //come back to this... there is a better way to do this probably in the loop
       //there should also be a check that the hit that is farthest away has subsequent hits after it on a few wires
       if(fardist>fardistcurrent){
-	fardistcurrent=fardist;
-	//if fardist... this is the point to use for the start point
-	startpoint.t = ghits.at(g)->t;
-	startpoint.w = ghits.at(g)->w;
-	startpoint.plane = ghits.at(g)->plane;
-	startpoint.charge = ghits.at(g)->charge;
+        fardistcurrent=fardist;
+        //if fardist... this is the point to use for the start point
+        startpoint.t = ghits.at(g)->t;
+        startpoint.w = ghits.at(g)->w;
+        startpoint.plane = ghits.at(g)->plane;
+        startpoint.charge = ghits.at(g)->charge;
       }
     }//for ghits loop
     
@@ -800,10 +818,8 @@ namespace cluster{
     // double gslope=(n* gwiretime- gwire*gtime)/(n*gwirewire -gwire*gwire);
     // double gcept= gtime/n -gslope*(gwire/n);
     
-   
-   
-
     fFinishedRefineStartPoints = true;
+    Report();
     return;
   }
   
@@ -825,6 +841,9 @@ namespace cluster{
      * angle_2d
      * direction
      */
+
+    std::cout << "Ah yes, the elusive \"GetFinalSlope Function.\"\n"
+              << "We should consider implementing this." << std::endl;
 
 
     fFinishedRefineStartPoints = true;
@@ -876,11 +895,11 @@ namespace cluster{
       cosangle /= ( pow(pow(SEP_X,2)+pow(SEP_Y,2),0.5) * pow(pow(SHIT_X,2)+pow(SHIT_Y,2),0.5));
 
       if(cosangle>0) {
-	// Only take into account for hits that are in "front"
-	//no weighted average, works better as flat average w/ min charge cut
-	mean_forward += cosangle;
-	rms_forward  += pow(cosangle,2);
-	hit_counter_forward++;
+        // Only take into account for hits that are in "front"
+        //no weighted average, works better as flat average w/ min charge cut
+        mean_forward += cosangle;
+        rms_forward  += pow(cosangle,2);
+        hit_counter_forward++;
       }
 
       // Compute backward mean
@@ -891,10 +910,10 @@ namespace cluster{
       cosangle /= ( pow(pow(SEP_X,2)+pow(SEP_Y,2),0.5) * pow(pow(SHIT_X,2)+pow(SHIT_Y,2),0.5));
 
       if(cosangle>0) {
-	//no weighted average, works better as flat average w/ min charge cut
-	mean_backward += cosangle;
-	rms_backward  += pow(cosangle,2);
-	hit_counter_backward++;
+        //no weighted average, works better as flat average w/ min charge cut
+        mean_backward += cosangle;
+        rms_backward  += pow(cosangle,2);
+        hit_counter_backward++;
       }
     }
 
@@ -918,11 +937,11 @@ namespace cluster{
     }
     std::cout<<"Flipping!"<<std::endl;
     std::swap(fParams.start_point,fParams.end_point);
-  }
+
+    return;
+  } //end RefineDirection
   
   
-  
-  
-}
+} //end namespace
 
 #endif
