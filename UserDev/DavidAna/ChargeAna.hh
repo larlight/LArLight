@@ -16,6 +16,7 @@
 #define CHARGEANA_HH
 
 #include "ana_base.hh"
+#include "Geometry.hh"
 
 namespace larlight {
   /**
@@ -51,6 +52,7 @@ namespace larlight {
 
     int _event_num;
     int _coll_baseline;
+    int _hitthreshold;
     TH1D *TotCharge;
     TH1D *ChargePerWire;
     TH1D *ChargePerPulse;

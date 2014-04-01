@@ -11,8 +11,10 @@ namespace larlight {
 
     noise = new TH1D("noise", "Noise RMS; ADC-baseline; freq." , 10, -5, 5);
     rms   = new TH1D("rms",   "RMS; ADC-baseline" ,              10,  0,10);
-    _baseline      =   0;
-    event_num      =   0;
+    _baseline      =     0;
+    event_num      =     0;
+    _PedInduction  =  2048;
+    _PedCollection =   400;
 
     return true;
   }
@@ -21,22 +23,16 @@ namespace larlight {
   
     //Count events (since variable seems set to 0)
     event_num += 1;
-    bool interesting = false;
-
     if (event_num == 1){
 
     const event_tpcfifo *event_wf = (event_tpcfifo*)(storage->get_data(DATA::TPCFIFO));
-    
     //waveform counter
     int wfnum = 0;
-
     int multiplicity = 0;
 
     //Loop over all waveforms
     for (size_t i=0; i<event_wf->size(); i++){
-      
       wfnum += 1;
-
       //Check for empty waveforms!
       const tpcfifo* tpc_data = (&(event_wf->at(i)));
       if(tpc_data->size()<1){
@@ -45,55 +41,46 @@ namespace larlight {
 	continue;
       }
 
+      UInt_t chan = tpc_data->channel_number();
       //determine collection plane
       //(for now by looking at value of first adc)
-      std::cout << "first bin: " << tpc_data->at(0) << std::endl;
-      if ( (int)(tpc_data->at(0)) > 2000 )
-	_baseline = 2048;
-      else
-	_baseline = 400;
+      if ( larutil::Geometry::GetME()->SignalType(chan) == larlight::GEO::kInduction)
+	_baseline = _PedInduction;
+      else if ( larutil::Geometry::GetME()->SignalType(chan) == larlight::GEO::kCollection )
+	_baseline = _PedCollection;
+      else 
+	_baseline = 1000;
 
       //count how many waveforms from same channel
       if ( i > 0 ){
-	if ( (&event_wf->at(i))->channel_number() == (&event_wf->at(i-1))->channel_number() ) {multiplicity += 1; }
+	if ( chan == (&event_wf->at(i-1))->channel_number() ) {multiplicity += 1; }
 	else { multiplicity = 0; }
       }
 
       //Here allow for selection of 1 channel
-      if ( (tpc_data->channel_number())%1==0 ){
+      if ( chan%1==0 ){
 	
 	//create temporary histogram
 	
-	char c[25];
-	//char d[25];
-	sprintf(c,"fff_ev_%d_wf_%d_%d",event_num,tpc_data->channel_number(),multiplicity);
-	TH1D* temphist = new TH1D(c,"pulse",tpc_data->size(),0,tpc_data->size());
-	//sprintf(d,"ggg_ev_%d_wf_%d_%d",event_num,tpc_data->channel_number(),i);
-	//TH1D* newpulse = new TH1D(d,"newpulse",tpc_data->size()-_NSamples/2,0,tpc_data->size()-_NSamples/2);
+	char ADCName[25];
+	sprintf(ADCName,"WF_ev_%d_wf_%d_%d",event_num,tpc_data->channel_number(),multiplicity);
+	TH1D* ADChist = new TH1D(ADCName,"pulse",tpc_data->size(),0,tpc_data->size());
 	
 	//Get Waveform
-	for ( int adc_index=0; adc_index<tpc_data->size(); adc_index++){
-	  
+	for ( unsigned int  adc_index=0; adc_index<tpc_data->size(); adc_index++){
 	  int adcs = tpc_data->at(adc_index);
-	  
 	  //determine if something interesting happens
-	  if ( (adcs-_baseline > 20) || (_baseline-adcs > 20) )
-	    interesting = true;
-	  else {
+	  if ( (adcs-_baseline < 20) || (_baseline-adcs < 20) ){
 	    noise->Fill(adcs-_baseline);
 	    double rmsbin = sqrt((adcs-_baseline)*(adcs-_baseline));
 	    rms->Fill(rmsbin);
 	  }
-	  temphist->SetBinContent(adc_index+1,adcs);
+	  ADChist->SetBinContent(adc_index+1,adcs);
 
 	}
 	
-	if (_baseline == 400){
-	  temphist->Write();
-	  std::cout << "baseline: " << _baseline << std::endl;
-	  std::cout << "ADC 1:" << tpc_data->at(0) << std::endl;
-	}
-	interesting = false;
+
+	ADChist->Write();
 
       }//End IF correct channel #
       

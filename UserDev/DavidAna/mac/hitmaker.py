@@ -7,6 +7,7 @@
 import os, ROOT, sys
 from ROOT import gSystem
 gSystem.Load("libAnalysis")
+gSystem.Load("libLArUtil")
 gSystem.Load("libDavidAna")
 
 # Now import ana_processor & your class. For this example, ana_base.
@@ -36,7 +37,7 @@ my_proc.add_input_file(infilename)
 my_proc.set_output_file(outfilename)
 
 #Specify ROOT TDirectory in the file if such structure is present (which is the case for DataScanner output)
-#my_proc.set_input_rootdir("scanner")
+my_proc.set_input_rootdir("scanner")
 
 # Set output root file: this is a separate root file in which your
 # analysis module can store anything such as histograms, your own TTree, etc.

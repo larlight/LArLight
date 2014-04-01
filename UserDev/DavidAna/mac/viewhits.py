@@ -4,6 +4,7 @@ from ROOT import *
 
 # Now import ana_processor & your class. For this example, ana_base.
 gSystem.Load("libAnalysis")
+gSystem.Load("libLArUtil")
 gSystem.Load("libDavidAna")
 
 filename = sys.argv[1]
