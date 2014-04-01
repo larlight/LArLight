@@ -18,6 +18,7 @@
 #include "ClusterParamsAlgNew.hh"
 #include "Geometry.hh"
 #include <TH2D.h>
+#include <TF1.h>
 
 namespace cluster {
   
@@ -39,6 +40,8 @@ namespace cluster {
     void LoadCluster(const larlight::cluster &i_cluster,
 		     const larlight::event_hit *hits);
 
+    void SetUseHitBlurring(bool flag) { _useHitBlurring = flag; }
+
     TH2D* GetHitView()
     { return hCurrentHit;}
     
@@ -46,7 +49,11 @@ namespace cluster {
     std::vector<const larlight::hit*> cluster_hits;
     TH2D* hCurrentHit;
     std::vector<TH2D*> hHit;
+
+    bool _useHitBlurring;
+    TF1* _blurFunction;
   };
+
 
 }
 

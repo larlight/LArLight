@@ -9,6 +9,11 @@ namespace cluster {
   ClusterParamsExecutor::ClusterParamsExecutor() : ClusterParamsAlgNew()
   {
     hCurrentHit = 0;
+
+    _useHitBlurring = false;
+
+    _blurFunction = 0;
+
   }
 
   void ClusterParamsExecutor::LoadCluster(const larlight::cluster &i_cluster,
@@ -31,6 +36,7 @@ namespace cluster {
 
     cluster_hits.reserve(hit_index_v.size());
     if(hCurrentHit) delete hCurrentHit;
+    if(_blurFunction) delete _blurFunction;
 
     double wire_min=1e9;
     double wire_max=0;
@@ -71,11 +77,93 @@ namespace cluster {
     hCurrentHit->GetYaxis()->SetLabelFont(22);
     hCurrentHit->GetYaxis()->SetLabelSize(0.05);
 
+    //for blurring in the y (time) direction:
+    _blurFunction = new TF1("_blurFunction","[0]*exp(-0.5*((x-[1])/[2])**2)",0.,99999.);
+
     for(auto const index : hit_index_v) {
 
       cluster_hits.push_back((const larlight::hit*)(&(hits->at(index))));
 
-      hCurrentHit->Fill(hits->at(index).Wire()*fWire2Cm.at(plane), hits->at(index).PeakTime()*fTime2Cm, hits->at(index).Charge());
+      if(!_useHitBlurring)
+	hCurrentHit->Fill(hits->at(index).Wire()*fWire2Cm.at(plane), 
+			  hits->at(index).PeakTime()*fTime2Cm, 
+			  hits->at(index).Charge());
+
+
+      else{
+	//center of peak = hit.PeakTime
+	_blurFunction->SetParameter(1,hits->at(index).PeakTime()*fTime2Cm);
+
+	//width of peak (estimated) = avg time b/t peak&start, and peak&end
+	double blurfnsigma = 
+	  ( (hits->at(index).PeakTime() - hits->at(index).StartTime() )
+	   +(hits->at(index).EndTime()  - hits->at(index).PeakTime()) ) / 2;
+	blurfnsigma *= fTime2Cm;
+	_blurFunction->SetParameter(2,blurfnsigma);
+	
+	//height of peak = changes to normalize gaussian area to 1 (2.5066 is sqrt(2pi))
+	_blurFunction->SetParameter(0, (1/(blurfnsigma*2.5066)) );
+
+	//fill the histogram in y outward from the peak until 97% of charge is added
+	Int_t peak_bin = hCurrentHit->GetYaxis()->FindBin(hits->at(index).PeakTime()*fTime2Cm);
+	
+	double peak_bin_low  = hCurrentHit->GetYaxis()->GetBinLowEdge(peak_bin);
+	double peak_bin_high = hCurrentHit->GetYaxis()->GetBinUpEdge(peak_bin);
+	double bin_width = hCurrentHit->GetYaxis()->GetBinWidth(peak_bin);
+
+	double charge_filled = 0.; 
+	unsigned int counter = 0;
+	double charge_in_bin, bin_low, bin_high;
+	
+	while( (charge_filled)/(hits->at(index).Charge()) < 0.97
+	       && counter < hCurrentHit->GetNbinsY() ){
+
+	  //if you're dealing with the one peak bin
+	  if(!counter){
+	    charge_in_bin = (_blurFunction->Integral(peak_bin_low,peak_bin_high)) * hits->at(index).Charge();
+	    
+	    hCurrentHit->Fill(hits->at(index).Wire()*fWire2Cm.at(plane), 
+			      hits->at(index).PeakTime()*fTime2Cm, 
+			      charge_in_bin);
+	    
+	    charge_filled += charge_in_bin;
+	  }
+
+	  //if not dealing with the one peak bin, fill next bin above/below
+	  else{
+
+	    Int_t current_bin_above_peak = 
+	      hCurrentHit->GetYaxis()->FindBin(hits->at(index).PeakTime()*fTime2Cm + (counter*bin_width));
+
+	    bin_low = hCurrentHit->GetYaxis()->GetBinLowEdge(current_bin_above_peak);
+	    bin_high = hCurrentHit->GetYaxis()->GetBinUpEdge(current_bin_above_peak);
+	    
+	    charge_in_bin = (_blurFunction->Integral(bin_low,bin_high)) * hits->at(index).Charge();
+
+	    if(charge_in_bin > 1e-4)
+	      hCurrentHit->Fill(hits->at(index).Wire()*fWire2Cm.at(plane),
+				hCurrentHit->GetYaxis()->GetBinCenter(current_bin_above_peak),
+				charge_in_bin);
+	    charge_filled += charge_in_bin;
+
+	    Int_t current_bin_below_peak = 
+	      hCurrentHit->GetYaxis()->FindBin(hits->at(index).PeakTime()*fTime2Cm - (counter*bin_width));
+	    bin_low = hCurrentHit->GetYaxis()->GetBinLowEdge(current_bin_below_peak);
+	    bin_high = hCurrentHit->GetYaxis()->GetBinUpEdge(current_bin_below_peak);
+
+	    charge_in_bin = (_blurFunction->Integral(bin_low,bin_high)) * hits->at(index).Charge();
+
+	    if(charge_in_bin > 1e-4)
+	      hCurrentHit->Fill(hits->at(index).Wire()*fWire2Cm.at(plane),
+				hCurrentHit->GetYaxis()->GetBinCenter(current_bin_below_peak),
+				charge_in_bin);
+	    charge_filled += charge_in_bin;
+
+	  }
+	  counter++;
+
+	}
+      }
     }
     
     this->Initialize();

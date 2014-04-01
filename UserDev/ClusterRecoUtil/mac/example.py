@@ -81,6 +81,8 @@ chit.SetGridx(1)
 chit.SetGridy(1)
 algo = cluster.ClusterParamsExecutor()
 
+algo.SetUseHitBlurring(false);
+
 processed_events=0
 
 fGSer = larutil.GeometryUtilities.GetME()
