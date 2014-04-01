@@ -31,6 +31,7 @@ namespace cluster {
     enum MergeAlg_t {
       kStartPoint=0,
       kPolygonCollision,
+      kAngleCompat,
       kAlgoMax
     };
     
@@ -49,6 +50,9 @@ namespace cluster {
     /// Method to set cut value in cm^2 for distance compatibility (TestStartPoint) test
     void SetSquaredDistanceCut(double d) { _max_2D_dist2 = d; }
 
+    /// Method to set cut value in degrees for angle compatibility test
+    void SetAngleCut(double angle) { _max_allowed_2D_angle_diff = angle; }
+
     /// Set verbosity
     void VerboseMode(bool on) { _verbose = on; }
 
@@ -58,22 +62,32 @@ namespace cluster {
     bool TestStartPoint(const cluster::cluster_params &param_a, 
 			const cluster::cluster_params &param_b);
 
+    /// Function that determines if the two clusters' 2D axis angles agree w/in a set value
+    bool Angle2DCompatibility(const cluster::cluster_params &param_a, 
+			      const cluster::cluster_params &param_b);
+
+
     bool TestPolygonCollision(const cluster::cluster_params &param_a, 
 			      const cluster::cluster_params &param_b);
 
     std::vector<bool> fAlgoSwitch;
 
 
-    bool _verbose; ///< Verbose mode boolean
 
     /// TestStartPoint utility function
     double ShortestDistanceSquared(double point_x, double point_y, 
 				   double start_x, double start_y,
 				   double end_x,   double end_y  ) const;
 
+
+    bool _verbose; ///< Verbose mode boolean
+
+
     /// TestStartPoint (cluster merge) parameters
     double _max_2D_dist2;           //in cm^2
     double _min_distance_unit;      //in cm^2
+    double _max_allowed_2D_angle_diff; //in degrees
+
   };
 }
 

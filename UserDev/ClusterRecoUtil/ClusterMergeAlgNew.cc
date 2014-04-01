@@ -14,7 +14,8 @@ namespace cluster {
     //Set default parameter values, user can change them with setter functions.
     _min_distance_unit = 0.;
     _max_2D_dist2 = 0.;
-    
+    _max_allowed_2D_angle_diff = 999.;
+
     //default verbosity. user can change with setter functions
     _verbose=false;
 
@@ -30,6 +31,10 @@ namespace cluster {
     if(merge && fAlgoSwitch.at(kStartPoint))
 
       merge = TestStartPoint(param_a, param_b);
+
+    if(merge && fAlgoSwitch.at(kAngleCompat))
+      
+      merge = Angle2DCompatibility(param_a, param_b);
 
     if(merge && fAlgoSwitch.at(kPolygonCollision))
 
@@ -141,6 +146,41 @@ namespace cluster {
     
 
   }
+
+
+  bool ClusterMergeAlgNew::Angle2DCompatibility(const cluster::cluster_params &param_a,
+						const cluster::cluster_params &param_b)
+  {
+    
+    //pretty sure we don't need conversion factors here. already in cm/cm units
+    double angle1 = param_a.angle_2d;
+    double angle2 = param_b.angle_2d;
+
+    bool compatible = false;
+    
+    compatible = ( abs(angle1-angle2)     < _max_allowed_2D_angle_diff );
+    //if you want to allow a 180 degree ambiguity (to accept if one cluster was reco'd backwards)
+    /*
+		   abs(angle1-angle2-180) < _max_allowed_2D_angle_diff ||
+		   abs(angle1-angle2+180) < _max_allowed_2D_angle_diff   );
+    */
+    
+    if(_verbose) {
+      
+      if(compatible) print(larlight::MSG::NORMAL,__FUNCTION__," Compatible in angle.");
+      else print(larlight::MSG::NORMAL,__FUNCTION__," NOT compatible in angle.");
+      
+    }
+    
+    return compatible;
+
+  }
+
+
+
+
+
+
 
 
 
