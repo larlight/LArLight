@@ -126,6 +126,7 @@ while mgr.next_event():
         algo.GetProfileInfo(True)
         algo.RefineStartPoints(True)
         algo.RefineDirection(True)
+        algo.FillPolygon()
         # algo.GetFinalSlope(True)
         #algo.Report()
         
@@ -154,40 +155,64 @@ while mgr.next_event():
             my_vec[0] = mct_vtx[0]
             my_vec[1] = mct_vtx[1]
             my_vec[2] = mct_vtx[2]
-           # mcpoint=fGSer.Get2DPointProjectionCM(my_vec,result.start_point.plane)
+            mcpoint=fGSer.Get2DPointProjectionCM(my_vec,result.start_point.plane)
 
-            # Example 1 & 2 should have the same return here (checked)
+           # Example 1 & 2 should have the same return here (checked)
 	   # print " Start point in w,t  (%g,%g)" % (mcpoint.w,mcpoint.t)   
 
-           # mc_begin = TGraph(1)
-           # mc_begin.SetPoint(0,mcpoint.w,mcpoint.t)
-           # mc_begin.SetMarkerStyle(29)
-           # mc_begin.SetMarkerColor(ROOT.kRed)
-           # mc_begin.SetMarkerSize(3)
+            mc_begin = TGraph(1)
+            mc_begin.SetPoint(0,mcpoint.w,mcpoint.t)
+            mc_begin.SetMarkerStyle(29)
+            mc_begin.SetMarkerColor(ROOT.kRed)
+            mc_begin.SetMarkerSize(3)
 	#Add black star to mark begin point and black square to mark end point
 	begin = TGraph(1)
 	end = TGraph(1)
 	begin.SetPoint(0,result.start_point.w, result.start_point.t)
 	end.SetPoint(0,result.end_point.w, result.end_point.t)
 
-        chit.cd()
-        hHits = algo.GetHitView()
-        print hHits.GetNbinsX(),hHits.GetNbinsY()
-        hHits.Draw("COLZ")
+        # Set Start & End point TGraph
 	begin.SetLineColor(1)
 	begin.SetMarkerStyle(29)
 	begin.SetMarkerColor(ROOT.kBlack)
         begin.SetMarkerSize(3)
-	begin.Draw("P same")
 	end.SetLineColor(1)
 	end.SetMarkerStyle(21)
 	end.SetMarkerColor(ROOT.kBlack)
         end.SetMarkerSize(2)
+
+        # Set Polygon
+        gPolygon = None
+        if result.container_polygon.size() > 0:
+            gPolygon = TGraph(result.container_polygon.size() + 1)
+            for x in xrange(result.container_polygon.size()):
+                gPolygon.SetPoint(x,
+                                  result.container_polygon.at(x).w,
+                                  result.container_polygon.at(x).t)
+                print result.container_polygon.at(x).w, result.container_polygon.at(x).t
+
+            gPolygon.SetPoint(result.container_polygon.size(),
+                              result.container_polygon.at(0).w,
+                              result.container_polygon.at(0).t)
+
+            gPolygon.SetMarkerStyle(20)
+            gPolygon.SetMarkerSize(1)
+            gPolygon.SetMarkerColor(kBlue)
+
+        # Draw Hit 2D View & points
+        chit.cd()
+        hHits = algo.GetHitView()
+        hHits.Draw("COLZ")
+	begin.Draw("P same")
 	end.Draw("P same")
         if(mc_begin):
             mc_begin.Draw("P same")
+        if(gPolygon):
+            gPolygon.Draw("PL same")
+        # Update canvas
         chit.Update()
         sys.stdin.readline()
-
+        
+        
 
 

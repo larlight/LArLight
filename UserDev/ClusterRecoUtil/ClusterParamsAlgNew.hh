@@ -143,6 +143,8 @@ namespace cluster {
 
     void RefineDirection(bool override=false);
 
+    void FillPolygon();
+
     void GetOpeningAngle();
 
     const larutil::PxPoint& RoughStartPoint() {return fRoughBeginPoint;}

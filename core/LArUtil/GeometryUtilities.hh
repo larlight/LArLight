@@ -213,6 +213,9 @@ namespace larutil{
 			    Double_t& lineslopetest,
 			    larutil::PxHit &averageHit);
 
+    void SelectPolygonHitList(const std::vector<larutil::PxHit> &hitlist,
+			      std::vector <const larutil::PxHit*> &hitlistlocal);
+
    Double_t TimeToCm() {return fTimetoCm;};
    Double_t WireToCm() {return fWiretoCm;};			     
     

@@ -941,6 +941,15 @@ namespace cluster{
     return;
   } //end RefineDirection
   
+
+  void ClusterParamsAlgNew::FillPolygon()
+  {
+    if(fHitVector.size()) {
+      std::cout<<"Filling polygon!"<<std::endl;
+      fGSer->SelectPolygonHitList(fHitVector,fParams.container_polygon);
+      std::cout<<fParams.container_polygon.size()<<std::endl;
+    }
+  }
   
 } //end namespace
 

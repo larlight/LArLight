@@ -15,6 +15,7 @@ namespace cluster{
 
     ~cluster_params(){};
 
+    std::vector<const larutil::PxHit*> container_polygon; ///< Polygon that contains hits
 
     larutil::PxPoint start_point;      ///< start point 
     larutil::PxPoint end_point;        ///< end point 
@@ -59,6 +60,7 @@ namespace cluster{
     double offaxis_hits;               ///< got brain
 
     void Clear(){
+      container_polygon.clear();
       start_point.Clear();
       end_point.Clear();
       sum_charge                        = -999.999 ;
