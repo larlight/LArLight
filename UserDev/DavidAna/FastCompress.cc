@@ -184,10 +184,11 @@ namespace larlight {
     //std::cout << "Into WF of size:        " << new_wf_bins.size() << std::endl;
     
     //create new waveform
-    larlight::tpcfifo new_wf( wf->channel_number(), wf->readout_frame_number(),
-			  wf_time, wf->module_address(),
-			      wf->module_id(), larlight::GEO::kUnknown,
-			      larlight::GEO::kMysteryType, DATA::TPCFIFO, new_wf_bins);
+    UInt_t chan = wf->channel_number();
+    larlight::tpcfifo new_wf( chan, wf->readout_frame_number(),
+			      wf_time, wf->module_address(),
+			      wf->module_id(), larutil::Geometry::GetME()->View(chan),
+			      larutil::Geometry::GetME()->SignalType(chan), DATA::TPCFIFO, new_wf_bins);
 
     //std::cout << "NEW WF: " << (&new_wf)->channel_number() << std::endl;
     //write new waveform

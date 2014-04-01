@@ -64,28 +64,22 @@ namespace larlight {
 	Double_t peak_time  = 0;
 	//get tpc_data
 	larlight::tpcfifo* tpc_data = (&(event_wf->at(i)));      
-	
+
 	//Check for empty waveforms!
 	if(tpc_data->size()<1){
 	  Message::send(MSG::ERROR,__FUNCTION__,
 			Form("Found 0-length waveform: Event %d ... Ch. %d",event_wf->event_number(),tpc_data->channel_number()));
 	  continue;
 	}
-	
+	UInt_t chan = tpc_data->channel_number();		
 	//determine if collection plane
-	//(do this better...)
-	if ( tpc_data->at(0) < 1500 )
-	  
-	  {
-	    
+	if ( larutil::Geometry::GetME()->SignalType(chan) == larlight::GEO::kCollection ){
 	    //make new (empty hit)
 	    larlight::hit thishit0;
 	    larlight::hit thishit1;
 	    larlight::hit thishit2;
-	    
 	    //loop over samples
-	    for (UShort_t adc_index=0; adc_index<tpc_data->size(); adc_index++)
-	      {
+	    for (UShort_t adc_index=0; adc_index<tpc_data->size(); adc_index++){
 		int adcs = tpc_data->at(adc_index);
 		if ( ((adcs-_baseline) >= 10) ) {
 		  pulse_ADCs   += (adcs-_baseline);
@@ -101,8 +95,8 @@ namespace larlight {
 	    thishit0.set_view(plane0);
 	    thishit0.set_charge(pulse_ADCs, pulse_ADCs);
 	    thishit0.set_times(peak_time, peak_time, peak_time);
-	    thishit0.set_channel(tpc_data->channel_number());
-	    thishit0.set_wire(tpc_data->channel_number());
+	    thishit0.set_channel(chan);
+	    thishit0.set_wire(larutil::Geometry::GetME()->ChannelToWire(chan));
 	    thishit0.set_times_err(0.0,0.0,0.0);
 	    thishit0.set_charge_err(0.0,0.0);
 	    thishit0.set_multiplicity(0);

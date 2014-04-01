@@ -10,6 +10,7 @@ namespace larlight {
     //Define Variables
     _event_num = 0;
     _coll_baseline = 400;
+    _hitthreshold  = 5; //ADC counts
     //Define Histograms
     TotCharge      = new TH1D("TotCharge",      "Tot Charge in Evt.; Charge [ADCs]",        100, 10000,  30000);
     ChargePerWire  = new TH1D("ChargePerWire",  "Charge on Wire; Wire num; Charge [ADCs]", 8000,     0,   8000);
@@ -68,6 +69,8 @@ namespace larlight {
 	continue;
       }
 
+      UInt_t chan = tpc_data->channel_number();
+
       //reset charge counted if new channel number (new wire)
       if ( i > 0 ){
 	if ( (event_wf->at(i)).channel_number() != (event_wf->at(i-1)).channel_number() ){
@@ -78,19 +81,19 @@ namespace larlight {
       int wf_time = tpc_data->readout_sample_number_RAW();
       //determine if collection plane
       //(do this better...)
-      if ( tpc_data->at(0) < 1500 )
+      if ( larutil::Geometry::GetME()->SignalType(chan) == larlight::GEO::kCollection )
 	{
 
 	  bool found_pulse = false;
 
-	  for (int adc_index=0; adc_index<tpc_data->size(); adc_index++)
+	  for (unsigned int adc_index=0; adc_index<tpc_data->size(); adc_index++)
 	    {
 	      int adcs = tpc_data->at(adc_index);
 
 	      //find pulse and count ADCs
 	      //for now if 2 ADCs above baseline then we found a pulse
 	      //AND if not double counted (by looking at time)
-	      if ( ((adcs-_coll_baseline) >= 3) )
+	      if ( ((adcs-_coll_baseline) >= _hitthreshold ) )
 		{
 		  if ( adc_index+wf_time > time_counted )
 		    {

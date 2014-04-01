@@ -8,6 +8,7 @@ import os, ROOT, sys
 from ROOT import gSystem
 gSystem.Load("libAnalysis")
 gSystem.Load("libDavidAna")
+gSystem.Load("libDavidAna")
 
 # Now import ana_processor & your class. For this example, ana_base.
 from ROOT import larlight as fmwk

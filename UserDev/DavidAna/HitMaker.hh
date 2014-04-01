@@ -16,6 +16,7 @@
 #define HITMAKER_HH
 
 #include "ana_base.hh"
+#include "Geometry.hh"
 
 namespace larlight {
   /**

@@ -16,6 +16,7 @@
 #define FASTCOMPRESS_HH
 
 #include "ana_base.hh"
+#include "Geometry.hh"
 #include <map>
 #include <vector>
 #include <TH1D.h>
