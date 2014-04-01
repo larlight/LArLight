@@ -1,0 +1,11 @@
+assemblerMain: 
+[ 
+   #do list of connected sebs    
+   { name:"seb2" type:"TPC" port:31402 },
+   
+   #and then parameters for the assembler itself
+   #note, DON'T PUT A PARAMETER NAMED 'port' IN HERE
+   { timeout:5000 }
+  fragment_id:1
+]
+

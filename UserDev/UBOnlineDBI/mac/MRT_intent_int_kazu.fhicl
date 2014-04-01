@@ -1,0 +1,37 @@
+### Configuration for a calibration run. 
+### Be sure to reduce the dma_buffer_size if you reduce the timesize.
+# These require you have done ... export SHORTHOSTNAME=`hostname -s | sed "s/uboonedaq-//" | sed "s/-//"`
+
+sebAppsebdabhb:
+[     {
+        name: "sebmrt"  type: "TPC" port: 38300
+        recipe:Calibration
+        trigger_source:INT
+        fragment_id:1 
+        nu_stream_source:dma
+        nu_stream_sink:assembler
+        sn_stream_source:NONE
+        sn_stream_sink:NONE
+        dma_buffer_size: 12700 # 12700 # 152312
+	circular_buffer_size:2e9
+        tpc:{channels: 64 slots:0x00080 } #0x7ff80
+        xmit:{ slot:6 timesize:33
+               maxpoll:1e8 dmastrategy:eventboundary
+               delay_after_trigger:200000 #[usec]: in INT mode, this drives rate
+               max_internal_triggers:100000 }
+#        trigger: { slot:2 }
+	 trigger: { slot:2 config: { trigmask0:0 trigmask1:0 trigmask8:0x2
+                                      prescale0:0 prescale1:0 prescale8:0 } }
+
+        controller: { slot:0 }
+
+	configMem: {shmKey:38300}
+	
+	neviscards:{
+	  controller:{vendor_id:0x1172  device_id:0x4 bus:0x5}
+	  nu_card:   {vendor_id:0x1172  device_id:0x4 bus:0x4}
+	  }
+	
+       }
+	
+]

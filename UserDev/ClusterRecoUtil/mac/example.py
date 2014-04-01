@@ -154,16 +154,16 @@ while mgr.next_event():
             my_vec[0] = mct_vtx[0]
             my_vec[1] = mct_vtx[1]
             my_vec[2] = mct_vtx[2]
-            mcpoint=fGSer.Get2DPointProjectionCM(my_vec,result.start_point.plane)
+           # mcpoint=fGSer.Get2DPointProjectionCM(my_vec,result.start_point.plane)
 
             # Example 1 & 2 should have the same return here (checked)
-	    print " Start point in w,t  (%g,%g)" % (mcpoint.w,mcpoint.t)   
+	   # print " Start point in w,t  (%g,%g)" % (mcpoint.w,mcpoint.t)   
 
-            mc_begin = TGraph(1)
-            mc_begin.SetPoint(0,mcpoint.w,mcpoint.t)
-            mc_begin.SetMarkerStyle(29)
-            mc_begin.SetMarkerColor(ROOT.kRed)
-            mc_begin.SetMarkerSize(3)
+           # mc_begin = TGraph(1)
+           # mc_begin.SetPoint(0,mcpoint.w,mcpoint.t)
+           # mc_begin.SetMarkerStyle(29)
+           # mc_begin.SetMarkerColor(ROOT.kRed)
+           # mc_begin.SetMarkerSize(3)
 	#Add black star to mark begin point and black square to mark end point
 	begin = TGraph(1)
 	end = TGraph(1)
