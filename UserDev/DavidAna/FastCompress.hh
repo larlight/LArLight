@@ -1,19 +1,19 @@
 /**
- * \file WFCompress.hh
+ * \file FastCompress.hh
  *
  * \ingroup Analysis
  * 
- * \brief Class def header for a class WFCompress
+ * \brief Class def header for a class FastCompress
  *
- * @author David Caratelli
+ * @author SHELL_USER_NAME
  */
 
 /** \addtogroup Analysis
 
     @{*/
 
-#ifndef WFCOMPRESS_HH
-#define WFCOMPRESS_HH
+#ifndef FASTCOMPRESS_HH
+#define FASTCOMPRESS_HH
 
 #include "ana_base.hh"
 #include <map>
@@ -31,38 +31,35 @@
 
 namespace larlight {
   /**
-     \class WFCompress
+     \class FastCompress
      User custom analysis class made by SHELL_USER_NAME
    */
-  class WFCompress : public ana_base{
+  class FastCompress : public ana_base{
   
   public:
 
     /// Default constructor
-    WFCompress(){ _name="WFCompress"; _fout=0;};
+    FastCompress(){ _name="FastCompress"; _fout=0;};
 
     /// Default destructor
-    virtual ~WFCompress(){};
+    virtual ~FastCompress(){};
 
-    /** IMPLEMENT in WFCompress.cc!
+    /** IMPLEMENT in FastCompress.cc!
         Initialization method to be called before the analysis event loop.
     */ 
     virtual bool initialize();
 
-    /** IMPLEMENT in WFCompress.cc! 
+    /** IMPLEMENT in FastCompress.cc! 
         Analyze a data event-by-event  
     */
     virtual bool analyze(storage_manager* storage);
 
-    /** IMPLEMENT in WFCompress.cc! 
+    /** IMPLEMENT in FastCompress.cc! 
         Finalize method to be called after all events processed.
     */
     virtual bool finalize();
 
     void Compress(larlight::tpcfifo* tpc_data, larlight::event_tpcfifo* new_event_wf);
-
-    void make_new_wf(larlight::tpcfifo* wf, int start, int stop, larlight::event_tpcfifo* new_event_wf);
-
     void make_new_wf_simple(larlight::tpcfifo* wf, int start, larlight::event_tpcfifo* new_event_wf);
 
     protected:

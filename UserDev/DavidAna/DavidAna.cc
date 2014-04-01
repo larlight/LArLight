@@ -47,7 +47,8 @@ namespace larlight {
 
       //determine collection plane
       //(for now by looking at value of first adc)
-      if ( tpc_data->at(0) > 2000 )
+      std::cout << "first bin: " << tpc_data->at(0) << std::endl;
+      if ( (int)(tpc_data->at(0)) > 2000 )
 	_baseline = 2048;
       else
 	_baseline = 400;
@@ -87,8 +88,11 @@ namespace larlight {
 
 	}
 	
-	if (wfnum<100)
+	if (_baseline == 400){
 	  temphist->Write();
+	  std::cout << "baseline: " << _baseline << std::endl;
+	  std::cout << "ADC 1:" << tpc_data->at(0) << std::endl;
+	}
 	interesting = false;
 
       }//End IF correct channel #

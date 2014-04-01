@@ -18,9 +18,11 @@
 #pragma link C++ class larlight::BaselineAna+;
 #pragma link C++ class larlight::NoiseAna+;
 #pragma link C++ class larlight::MCShowerParams+;
+#pragma link C++ class larlight::FastCompress+;
 //ADD_NEW_CLASS ... do not change this line
 
 #endif
+
 
 
 

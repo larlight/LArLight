@@ -13,15 +13,15 @@ gSystem.Load("libDavidAna")
 from ROOT import larlight as fmwk
 
 infilename = sys.argv[1]
-outfilename = "/uboone/data/users/davidc1/WF_output.root"
+outfilename = sys.argv[2]
 
 # Create ana_processor instance
 my_proc=fmwk.ana_processor()
 
 # Specify IO mode
-my_proc.set_io_mode(fmwk.storage_manager.BOTH)
+#my_proc.set_io_mode(fmwk.storage_manager.READ)
 #my_proc.set_io_mode(storage_manager.WRITE)
-#my_proc.set_io_mode(fmwk.storage_manager.BOTH)
+my_proc.set_io_mode(fmwk.storage_manager.BOTH)
 
 # Specify what data to read
 my_proc.set_data_to_read(fmwk.DATA.TPCFIFO)
@@ -46,7 +46,7 @@ my_proc.set_ana_output_file("compressed_wfs.root")
 # To show how one can run multiple analysis modules at once,
 # we make multiple ana_base instance.
 
-my_ana_1=fmwk.WFCompress()
+my_ana_1=fmwk.FastCompress()
 #my_ana_2=ana_base()
 #my_ana_3=ana_base()
 

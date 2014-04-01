@@ -35,7 +35,7 @@ my_proc.add_input_file(infilename)
 #set output data file
 my_proc.set_output_file(outfilename)
 
-# Specify ROOT TDirectory in the file if such structure is present (which is the case for DataScanner output)
+#Specify ROOT TDirectory in the file if such structure is present (which is the case for DataScanner output)
 #my_proc.set_input_rootdir("scanner")
 
 # Set output root file: this is a separate root file in which your
