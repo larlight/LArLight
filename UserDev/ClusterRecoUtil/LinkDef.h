@@ -17,7 +17,9 @@
 #pragma link C++ class cluster::ClusterParamsExecutor+;
 #pragma link C++ class cluster::RecoUtilException+;
 #pragma link C++ class cluster::ClusterMergeAlgNew+;
+#pragma link C++ class cluster::SimChannelViewer+;
 //ADD_NEW_CLASS ... do not change this line
 #endif
+
 
 
