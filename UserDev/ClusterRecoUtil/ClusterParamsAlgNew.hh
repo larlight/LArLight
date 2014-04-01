@@ -201,8 +201,6 @@ namespace cluster {
     larutil::PxPoint fRoughEndPoint;
 
     public:
-    std::vector<double> fWire2Cm; // Conversion factor from wire to cm scale
-    double fTime2Cm;              // Conversion factor from time to cm scale
 
     cluster::cluster_params fParams;
 

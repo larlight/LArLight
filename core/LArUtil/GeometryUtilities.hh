@@ -216,9 +216,10 @@ namespace larutil{
     void SelectPolygonHitList(const std::vector<larutil::PxHit> &hitlist,
 			      std::vector <const larutil::PxHit*> &hitlistlocal);
 
-   Double_t TimeToCm() {return fTimetoCm;};
-   Double_t WireToCm() {return fWiretoCm;};			     
-    
+    Double_t TimeToCm() {return fTimetoCm;}
+    Double_t WireToCm() {return fWiretoCm;}
+    Double_t WireTimeToCmCm() {return fWireTimetoCmCm;}
+
   private:
 
     larutil::Geometry* geom;

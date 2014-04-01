@@ -69,8 +69,8 @@ namespace cluster{
     for(auto h : inhitlist) {
       fHitVector.push_back(larutil::PxHit());
 
-      (*fHitVector.rbegin()).t = h->PeakTime() * fTime2Cm;
-      (*fHitVector.rbegin()).w = h->Wire() * fWire2Cm.at(plane);
+      (*fHitVector.rbegin()).t = h->PeakTime() * fGSer->TimeToCm();
+      (*fHitVector.rbegin()).w = h->Wire() * fGSer->WireToCm();
       (*fHitVector.rbegin()).charge = h->Charge();
       (*fHitVector.rbegin()).plane = plane;
     }
@@ -210,15 +210,6 @@ namespace cluster{
     if(!fGSer) fGSer = (larutil::GeometryUtilities*)(larutil::GeometryUtilities::GetME());
 
     //--- Initilize attributes values ---//
-    fWire2Cm.resize(larutil::Geometry::GetME()->Nplanes(),0);
-    for(size_t i=0; i<fWire2Cm.size(); ++i)
-      fWire2Cm.at(i) = larutil::Geometry::GetME()->WirePitch(0,1,(UChar_t)i);
-
-    fTime2Cm  = larutil::DetectorProperties::GetME()->SamplingRate()/1.e3;
-    fTime2Cm *= larutil::LArProperties::GetME()->DriftVelocity(
-                  larutil::LArProperties::GetME()->Efield(),
-                  larutil::LArProperties::GetME()->Temperature());
-
     fFinishedGetAverages       = false;
     fFinishedGetRoughAxis      = false;
     fFinishedGetProfileInfo    = false;
@@ -404,9 +395,8 @@ namespace cluster{
     
     //get slope of lines orthogonal to those found crossing the shower.
     double inv_2d_slope=0;
-    if(fabs(fRough2DSlope)>0.001){
-      inv_2d_slope=-1./fRough2DSlope*fTime2Cm*fTime2Cm/(fWire2Cm.at(fPlane)*fWire2Cm.at(fPlane));
-    }
+    if(fabs(fRough2DSlope)>0.001)
+      inv_2d_slope=-1./fRough2DSlope*pow(fGSer->WireTimeToCmCm(),2);
     else
       inv_2d_slope=-999999.;
     // std::cout << " N_Hits is " << fParams.N_Hits << std::endl;
@@ -862,10 +852,8 @@ namespace cluster{
       if (!fFinishedRefineStartPoints) RefineStartPoints(true);
     }
     
-    UChar_t plane = (*fHitVector.begin()).plane;
-
-    double wire_2_cm = fWire2Cm.at(plane);
-    double time_2_cm = fTime2Cm;
+    double wire_2_cm = fGSer->WireToCm();
+    double time_2_cm = fGSer->TimeToCm();
     
     double SEP_X = (fParams.end_point.w - fParams.start_point.w) / wire_2_cm;
     double SEP_Y = (fParams.end_point.t - fParams.start_point.t) / time_2_cm;
