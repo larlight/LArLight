@@ -51,8 +51,8 @@ namespace larlight {
     protected:
 
     int _event_num;
-    int _coll_baseline;
-    int _hitthreshold;
+    short _coll_baseline;
+    short _hitthreshold;
     TH1D *TotCharge;
     TH1D *ChargePerWire;
     TH1D *ChargePerPulse;

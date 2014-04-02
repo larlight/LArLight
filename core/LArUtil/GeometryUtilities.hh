@@ -216,6 +216,9 @@ namespace larutil{
     void SelectPolygonHitList(const std::vector<larutil::PxHit> &hitlist,
 			      std::vector <const larutil::PxHit*> &hitlistlocal);
 
+    std::set<size_t> PolyOverlap( std::vector<const larutil::PxHit*> ordered_hits,
+				  std::vector<size_t> candidate_polygon);
+
    Double_t TimeToCm() {return fTimetoCm;};
    Double_t WireToCm() {return fWiretoCm;};			     
     

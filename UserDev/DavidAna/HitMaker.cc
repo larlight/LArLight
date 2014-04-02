@@ -41,12 +41,6 @@ namespace larlight {
       larlight::event_hit *hits = (event_hit*)(storage->get_data(DATA::FFTHit));
       hits->clear();
       hits->set_event_id(_event_num);
-      int adcs_over = 0;
-      //make sure not empty...if so report
-      //if(!hits) {
-      // print(MSG::ERROR,__FUNCTION__,"Data storage did not find associated hits!");
-      // return false;
-      //}
       
       //read waveforms from event
       larlight::event_tpcfifo *event_wf = (event_tpcfifo*)(storage->get_data(DATA::TPCFIFO));
@@ -83,7 +77,6 @@ namespace larlight {
 		int adcs = tpc_data->at(adc_index);
 		if ( ((adcs-_baseline) >= 10) ) {
 		  pulse_ADCs   += (adcs-_baseline);
-		  adcs_over += 1;
 		}
 		//find if pulse peak
 		if ( pulse_ADCs > peak_time )
@@ -92,6 +85,7 @@ namespace larlight {
 	    
 	    //set hit properties
 	    //	  std::cout << "charge: " << pulse_ADCs << std::endl;
+	    if ( pulse_ADCs > 0 ){
 	    thishit0.set_view(plane0);
 	    thishit0.set_charge(pulse_ADCs, pulse_ADCs);
 	    thishit0.set_times(peak_time, peak_time, peak_time);
@@ -103,39 +97,15 @@ namespace larlight {
 	    thishit0.set_fit_goodness(1);
 	    //add hit to hit vector
 	    hits->push_back(thishit0);
-	    //
-	    thishit1.set_view(plane1);
-	    thishit1.set_charge(pulse_ADCs, pulse_ADCs);
-	    thishit1.set_times(peak_time, peak_time, peak_time);
-	    thishit1.set_channel(tpc_data->channel_number());
-	    thishit1.set_wire(tpc_data->channel_number());
-	    thishit1.set_times_err(0.0,0.0,0.0);
-	    thishit1.set_charge_err(0.0,0.0);
-	    thishit1.set_multiplicity(0);
-	    thishit1.set_fit_goodness(1);
-	    //add hit to hit vector
-	    hits->push_back(thishit1);
-	    //
-	    thishit2.set_view(plane2);
-	    thishit2.set_charge(pulse_ADCs, pulse_ADCs);
-	    thishit2.set_times(peak_time, peak_time, peak_time);
-	    thishit2.set_channel(tpc_data->channel_number());
-	    thishit2.set_wire(tpc_data->channel_number());
-	    thishit2.set_times_err(0.0,0.0,0.0);
-	    thishit2.set_charge_err(0.0,0.0);
-	    thishit2.set_multiplicity(0);
-	    thishit2.set_fit_goodness(1);
-	    //add hit to hit vector
-	    hits->push_back(thishit2);
-	    
+	    }
+		    
 	  }//if collection plane
 	
       }//loop over waveforms in event
-      //std::cout << adcs_over << std::endl;
       std::cout << "Hits on Coll. Plane: " << (int)((hits->size())/3) << std::endl;
     
       //eliminate waveform
-      //event_wf->clear();
+      event_wf->clear();
     }
     return true;
   }

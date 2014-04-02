@@ -1282,9 +1282,70 @@ namespace larutil{
       }
       
     }
-    if(unique_index.size()>8) throw LArUtilException("Size of the polygon > 8!");
+
+    if(unique_index.size()>8) throw LArUtilException("Size of the polygon > 8!");    
+
+    //close loop of polygons...add point 0 as extra point
+    std::vector<size_t> candidate_polygon;
+    candidate_polygon.reserve(9);
+    for (std::set<size_t>::iterator it=unique_index.begin(); it != unique_index.end(); it++)
+      candidate_polygon.push_back(*it);
+    //add last element to end...to close circle
+    std::cout << "size: " << candidate_polygon.size() << "adding 1st to end..." << std::endl;
+    candidate_polygon.push_back(*(unique_index.begin()));
+    std::cout << "size: " << candidate_polygon.size() << std::endl;
+    //check for overlaps between polygon segments
+    unique_index = PolyOverlap( ordered_hits, candidate_polygon);
     
+    if(unique_index.size()>8) throw LArUtilException("Size of the polygon > 8!");    
   }
   
+
+  std::set<size_t>  GeometryUtilities::PolyOverlap( std::vector<const larutil::PxHit*> ordered_hits ,
+						    std::vector<size_t> candidate_polygon ) {
+
+    //loop over edges
+    for ( unsigned int i=0; i<(candidate_polygon.size()-1); i++){
+      std::cout << "loop1:" << i << "   Polygon size is: " << candidate_polygon.size() << std::endl;
+      double Ax = ordered_hits.at(candidate_polygon.at(i))->w;
+      double Ay = ordered_hits.at(candidate_polygon.at(i))->t;
+      double Bx = ordered_hits.at(candidate_polygon.at(i+1))->w;
+      double By = ordered_hits.at(candidate_polygon.at(i+1))->t;
+      //loop over edges that have not been checked yet...
+      //only ones furhter down in polygon
+      for ( unsigned int j=i+2; j<(candidate_polygon.size()-1); j++){
+	std::cout << "loop2:" << j << "   Polygon size is: " << candidate_polygon.size() << std::endl;
+	double Cx = ordered_hits.at(candidate_polygon.at(j))->w;
+	double Cy = ordered_hits.at(candidate_polygon.at(j))->t;
+	double Dx = ordered_hits.at(candidate_polygon.at(j+1))->w;
+	double Dy = ordered_hits.at(candidate_polygon.at(j+1))->t;
+	double cross1 = (Bx-Ax)*(Cy-By)-(By-Ay)*(Cx-Bx);
+	double cross2 = (Bx-Ax)*(Dy-By)-(By-Ay)*(Dx-Bx);
+	if ( cross1*cross2 < 0 ){
+	  std::cout << "swapping points!" << std::endl;
+	  //two lines intersect! swap points!
+	  //swap i and j+1 or i+1 and j...otherwise w make two separate closed polygons
+	  //swap i+1 and j...
+	  size_t tmp = candidate_polygon.at(i+1);
+	  candidate_polygon.at(i+1) = candidate_polygon.at(j);
+	  candidate_polygon.at(j) = tmp;
+	  //check that last element is still first (to close circle...)
+	  candidate_polygon.at(candidate_polygon.size()-1) = candidate_polygon.at(0);
+	  std::cout << "fixed last point!" << std::endl;
+	  //swapped polygon...now do recursion to make sure
+	  return PolyOverlap( ordered_hits, candidate_polygon);
+	}//if crossing
+      }//second loop
+    }//first loop
+    //create std::set object
+    std::set<size_t> poly;
+    //looping over size-1 because last element is repeat of first
+    for (unsigned int i=0; i<(candidate_polygon.size()-1); i++){
+      if (poly.find(candidate_polygon.at(i)) == poly.end())
+	poly.insert(candidate_polygon.at(i));
+    }
+    std::cout << "sides: " << candidate_polygon.size() << std::endl;
+    return poly;
+  }
 
 } // namespace

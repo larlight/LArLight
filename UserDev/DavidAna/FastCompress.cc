@@ -81,7 +81,7 @@ namespace larlight {
     //replace event_ef with new_event_wf data
     //this will be outputed to output script
     event_wf->clear();
-    for (int i=0; i<new_event_wf.size(); i++){
+    for (unsigned int i=0; i<new_event_wf.size(); i++){
       event_wf->push_back(new_event_wf.at(i));
     }
 

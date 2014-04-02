@@ -147,11 +147,11 @@ namespace larlight {
     std::cout << "SIZE PL 0: " << size_pl0 << std::endl;
 
     //Fill histograms
-    for (int j=0; j<times_pl0.size(); j++)
+    for (unsigned int j=0; j<times_pl0.size(); j++)
       evt_pl0->SetBinContent(  times_pl0.at(j),  wires_pl0.at(j),  charges_pl0.at(j)  );
-    for (int j=0; j<times_pl1.size(); j++)
+    for (unsigned int j=0; j<times_pl1.size(); j++)
       evt_pl1->SetBinContent(  times_pl1.at(j),  wires_pl1.at(j),  charges_pl1.at(j)  );
-    for (int j=0; j<times_pl2.size(); j++)
+    for (unsigned int j=0; j<times_pl2.size(); j++)
       evt_pl2->SetBinContent(  times_pl2.at(j),  wires_pl2.at(j),  charges_pl2.at(j)  );
       
     //Write histograms
