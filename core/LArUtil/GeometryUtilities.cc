@@ -1288,13 +1288,15 @@ namespace larutil{
     //close loop of polygons...add point 0 as extra point
     std::vector<size_t> candidate_polygon;
     candidate_polygon.reserve(9);
-    for (std::set<size_t>::iterator it=unique_index.begin(); it != unique_index.end(); it++)
+    std::cout << "Original polygon: " << std::endl;
+    for (std::set<size_t>::iterator it=unique_index.begin(); it != unique_index.end(); it++){
+      std::cout << *it << "  ";
       candidate_polygon.push_back(*it);
+    }
+    std::cout << std::endl;
     //add last element to end...to close circle
-    std::cout << "size: " << candidate_polygon.size() << "adding 1st to end..." << std::endl;
-    candidate_polygon.push_back(*(unique_index.begin()));
-    std::cout << "size: " << candidate_polygon.size() << std::endl;
-    //check for overlaps between polygon segments
+     candidate_polygon.push_back(*(unique_index.begin()));
+     //check for overlaps between polygon segments
     unique_index = PolyOverlap( ordered_hits, candidate_polygon);
     
     if(unique_index.size()>8) throw LArUtilException("Size of the polygon > 8!");    
@@ -1340,11 +1342,13 @@ namespace larutil{
     //create std::set object
     std::set<size_t> poly;
     //looping over size-1 because last element is repeat of first
+    std::cout << "New Polygon: " << std::endl;
     for (unsigned int i=0; i<(candidate_polygon.size()-1); i++){
+      std::cout << candidate_polygon.at(i) << "  ";
       if (poly.find(candidate_polygon.at(i)) == poly.end())
 	poly.insert(candidate_polygon.at(i));
     }
-    std::cout << "sides: " << candidate_polygon.size() << std::endl;
+    std::cout << std::endl;
     return poly;
   }
 
