@@ -38,7 +38,7 @@ namespace larutil{
     
     fWiretoCm=fWirePitch;
     fTimetoCm=fTimeTick*fDriftVelocity;
-    fWireTimetoCmCm=(fTimeTick*fDriftVelocity)/fWirePitch;
+    fWireTimetoCmCm=fTimetoCm/fWirePitch;
   }
 
   //--------------------------------------------------------------------

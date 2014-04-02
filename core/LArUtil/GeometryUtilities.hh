@@ -219,9 +219,10 @@ namespace larutil{
     std::set<size_t> PolyOverlap( std::vector<const larutil::PxHit*> ordered_hits,
 				  std::vector<size_t> candidate_polygon);
 
-   Double_t TimeToCm() {return fTimetoCm;};
-   Double_t WireToCm() {return fWiretoCm;};			     
-    
+    Double_t TimeToCm() const {return fTimetoCm;}
+    Double_t WireToCm() const {return fWiretoCm;}
+    Double_t WireTimeToCmCm() const {return fWireTimetoCmCm;}
+
   private:
 
     larutil::Geometry* geom;
