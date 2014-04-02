@@ -89,9 +89,6 @@ fGSer = larutil.GeometryUtilities.GetME()
 
 while mgr.next_event():
 
-    # Get event_cluster ... std::vector<larlight::cluster>
-    cluster_v = mgr.get_data(fmwk.DATA.ShowerAngleCluster)
-
     # Get event_mctruth ... std::vector<larlight::mctruth>
     mctruth_v = mgr.get_data(fmwk.DATA.MCTruth)
 
@@ -112,16 +109,9 @@ while mgr.next_event():
     if args.num_events == processed_events:
         exit()
         
-    if not cluster_v:
-        continue
+    for plane in xrange(larutil.Geometry.GetME().Nplanes()):
 
-    print "Event:",cluster_v.event_id()
-
-    for x in xrange(cluster_v.size()):
-
-        print "  Cluster ID:",cluster_v.at(x).ID()
-        algo.LoadCluster(cluster_v.at(x),
-                         mgr.get_data(cluster_v.get_hit_type()))
+        algo.LoadAllHits(mgr.get_data(larlight.DATA.GausHit), plane)
 
         # algo.FillParams(True,True,True,True,True)
         algo.GetAverages(True)

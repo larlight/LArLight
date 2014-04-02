@@ -40,12 +40,16 @@ namespace cluster {
     void LoadCluster(const larlight::cluster &i_cluster,
 		     const larlight::event_hit *hits);
 
+    void LoadAllHits(const larlight::event_hit *hits, const UChar_t plane_id);
+
     void SetUseHitBlurring(bool flag) { _useHitBlurring = flag; }
 
     TH2D* GetHitView()
     { return hCurrentHit;}
     
   protected:
+
+    void Execute(Int_t event_id, Int_t cluster_id, UChar_t plane_id);
     std::vector<const larlight::hit*> cluster_hits;
     TH2D* hCurrentHit;
     std::vector<TH2D*> hHit;
