@@ -292,17 +292,21 @@ namespace larlight {
     // Check for zero-padding that is allowed after channel last word
     if(word == 0x0){
 
+      /*
       if(get_word_class(last_word)!=FEM::CHANNEL_LAST_WORD){
 
 	Message::send(MSG::ERROR,__FUNCTION__,
 		      Form("Unexpected Zero-padding found after %x",last_word));
 	status = false;
       }else if(_verbosity[MSG::INFO])
+      */
+      if(get_word_class(last_word)==FEM::CHANNEL_LAST_WORD) {
 
 	Message::send(MSG::INFO,__FUNCTION__,
 		      Form("Zero-padding found after %x",last_word));
 
-      return status;
+	return status;
+      }
     }
 
     switch(word_class){
