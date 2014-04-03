@@ -23,12 +23,13 @@ namespace larlight {
   
     //Count events (since variable seems set to 0)
     event_num += 1;
-    if (event_num == 1){
+    if (event_num==1){
 
     const event_tpcfifo *event_wf = (event_tpcfifo*)(storage->get_data(DATA::TPCFIFO));
     //waveform counter
     int wfnum = 0;
     int multiplicity = 0;
+
 
     //Loop over all waveforms
     for (size_t i=0; i<event_wf->size(); i++){
@@ -41,6 +42,7 @@ namespace larlight {
 	continue;
       }
 
+      bool interesting = false;
       UInt_t chan = tpc_data->channel_number();
       //determine collection plane
       //(for now by looking at value of first adc)
@@ -50,7 +52,7 @@ namespace larlight {
 	_baseline = _PedCollection;
       else 
 	_baseline = 1000;
-
+      //      std::cout << "Baseline: " << _baseline << std::endl;
       //count how many waveforms from same channel
       if ( i > 0 ){
 	if ( chan == (&event_wf->at(i-1))->channel_number() ) {multiplicity += 1; }
@@ -70,17 +72,18 @@ namespace larlight {
 	for ( unsigned int  adc_index=0; adc_index<tpc_data->size(); adc_index++){
 	  int adcs = tpc_data->at(adc_index);
 	  //determine if something interesting happens
-	  if ( (adcs-_baseline < 20) || (_baseline-adcs < 20) ){
-	    noise->Fill(adcs-_baseline);
-	    double rmsbin = sqrt((adcs-_baseline)*(adcs-_baseline));
-	    rms->Fill(rmsbin);
+	  if ( (adcs-_baseline > 15) ){
+	    interesting = true;
+	    std::cout << "interesting!" << std::endl;
 	  }
+	  noise->Fill(adcs-_baseline);
+	  double rmsbin = sqrt((adcs-_baseline)*(adcs-_baseline));
+	  rms->Fill(rmsbin);
 	  ADChist->SetBinContent(adc_index+1,adcs);
-
 	}
 	
-
-	ADChist->Write();
+	if (interesting)
+	  ADChist->Write();
 
       }//End IF correct channel #
       
