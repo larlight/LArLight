@@ -7,4 +7,7 @@
 *.so
 *.dylib
 *.root
+*.bin
+*.dat
+*.info
 /GNUmakefile
