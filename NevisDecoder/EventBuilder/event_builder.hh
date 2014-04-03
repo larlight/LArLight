@@ -19,6 +19,7 @@
 #include <iterator>
 #include <vector>
 #include <time.h>
+#include <TStopwatch.h>
 
 #include "Base-TypeDef.hh"
 #include "evb_algo_pmt.hh"
