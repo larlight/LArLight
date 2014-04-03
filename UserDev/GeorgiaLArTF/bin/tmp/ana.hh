@@ -1,14 +1,14 @@
 /**
  * \file Ana_Class_Name.hh
  *
- * \ingroup Analysis
+ * \ingroup Working_Package
  * 
  * \brief Class def header for a class Ana_Class_Name
  *
- * @author SHELL_USER_NAME
+ * @author georgia
  */
 
-/** \addtogroup Analysis
+/** \addtogroup Working_Package
 
     @{*/
 
@@ -20,7 +20,7 @@
 namespace larlight {
   /**
      \class Ana_Class_Name
-     User custom analysis class made by SHELL_USER_NAME
+     User custom analysis class made by georgia
    */
   class Ana_Class_Name : public ana_base{
   
@@ -52,5 +52,13 @@ namespace larlight {
   };
 }
 #endif
+
+//**************************************************************************
+// 
+// For Analysis framework documentation, read Manual.pdf here:
+//
+// http://microboone-docdb.fnal.gov:8080/cgi-bin/ShowDocument?docid=3183
+//
+//**************************************************************************
 
 /** @} */ // end of doxygen group 

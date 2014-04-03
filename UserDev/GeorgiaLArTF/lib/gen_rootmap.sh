@@ -15,11 +15,9 @@ rootlibmap() {
 }
 
 ######################################################
-# Georgia
-rootlibmap libGeorgia.rootmap libGeorgia.so $USER_DEV_DIR/Georgia/LinkDef.h \
+# GeorgiaLArTF
+rootlibmap libGeorgiaLArTF.rootmap libGeorgiaLArTF.so $USER_DEV_DIR/GeorgiaLArTF/LinkDef.h \
     libAnalysis.so
-
-
 
 
 

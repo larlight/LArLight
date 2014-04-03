@@ -1,62 +1,47 @@
 /**
- * \file georgia_timing1.hh
+ * \file GeorgiaLArTF.hh
  *
- * \ingroup Analysis
+ * \ingroup GeorgiaLArTF
  * 
- * \brief Class def header for a class georgia_timing1
+ * \brief Class def header for a class GeorgiaLArTF
  *
- * @author ub
+ * @author georgia
  */
 
-/** \addtogroup Analysis
+/** \addtogroup GeorgiaLArTF
 
     @{*/
 
-#ifndef GEORGIA_TIMING1_HH
-#define GEORGIA_TIMING1_HH
+#ifndef GEORGIALARTF_HH
+#define GEORGIALARTF_HH
 
-#include <map>
-#include <vector>
 #include "ana_base.hh"
 #include <TH1D.h>
 #include <TH2D.h>
-#include <math.h>
 #include <TGraph.h>
-#include <TGraphErrors.h>
 
 namespace larlight {
 
-  /**
-     \class georgia_timing1
-     User custom analysis class made by ub
-  */
-  class georgia_timing1 : public ana_base{
-    
+  class GeorgiaLArTF : public ana_base{
+  
   public:
-    
+
     /// Default constructor
-    georgia_timing1(){ _name="georgia_timing1"; _fout=0;};
-    
+    GeorgiaLArTF() : ana_base() { _name="GeorgiaLArTF"; }
+
     /// Default destructor
-    virtual ~georgia_timing1(){};
-    
-    /** IMPLEMENT in georgia_timing1.cc!
-	Initialization method to be called before the analysis event loop.
-    */ 
+    virtual ~GeorgiaLArTF(){};
+
     virtual bool initialize();
-    
-    /** IMPLEMENT in georgia_timing1.cc! 
-	Analyze a data event-by-event  
-    */
+
     virtual bool analyze(storage_manager* storage);
-    
-    /** IMPLEMENT in georgia_timing1.cc! 
-	Finalize method to be called after all events processed.
-    */
+
     virtual bool finalize();
+
+    protected:
     
-  private:
-    
+    private:
+
     //nu stream
     TH1D *pmt_nu_evno;
     TH1D *pmt_nu_evfrm;
@@ -65,7 +50,6 @@ namespace larlight {
     TH1D *pmt_nu_trfrm;
     TH1D *pmt_nu_trslc;
     TH1D *pmt_nu_ch;
-    TH1D *pmt_nu_nch;
     TH1D *pmt_nu_nrd;
     TH2D *pmt_nu_rdtype;
     
@@ -90,17 +74,19 @@ namespace larlight {
     TGraph *trig_frdiff;
     TGraph *trig_slcdiff;
 
-    int _nch;
-    int _nrd;
-
-    int k;
-
-    int pmt_nu_evtno;
-    int trig_evtno;
+    //some variables which come from configurations
+    const int samples_per_frame = 102400;
 
   };
 }
-
 #endif
+
+//**************************************************************************
+// 
+// For Analysis framework documentation, read Manual.pdf here:
+//
+// http://microboone-docdb.fnal.gov:8080/cgi-bin/ShowDocument?docid=3183
+//
+//**************************************************************************
 
 /** @} */ // end of doxygen group 
