@@ -75,7 +75,7 @@ namespace larlight {
 	    //loop over samples
 	    for (UShort_t adc_index=0; adc_index<tpc_data->size(); adc_index++){
 		int adcs = tpc_data->at(adc_index);
-		if ( ((adcs-_baseline) >= 10) ) {
+		if ( ((adcs-_baseline) >= 8) ) {
 		  pulse_ADCs   += (adcs-_baseline);
 		}
 		//find if pulse peak

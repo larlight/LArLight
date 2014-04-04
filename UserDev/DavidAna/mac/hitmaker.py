@@ -60,6 +60,6 @@ my_proc.add_process(my_ana_1)
 
 # Let's run it.
 
-my_proc.run()
+my_proc.run(0,10)
 
 # done!

@@ -34,11 +34,11 @@ my_proc.set_data_to_read(fmwk.DATA.MCTruth)
 my_proc.add_input_file(sys.argv[1])
 
 # Specify ROOT TDirectory in the file if such structure is present (which is the case for DataScanner output)
-#my_proc.set_input_rootdir("scanner")
+my_proc.set_input_rootdir("scanner")
 
 # Set output root file: this is a separate root file in which your
 # analysis module can store anything such as histograms, your own TTree, etc.
-my_proc.set_ana_output_file("charge_counter.root")
+my_proc.set_ana_output_file("chargeana.root")
 
 # Create analysis class instance. For this example, ana_base.
 # To show how one can run multiple analysis modules at once,

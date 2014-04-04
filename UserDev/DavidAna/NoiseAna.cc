@@ -7,8 +7,8 @@ namespace larlight {
 
   bool NoiseAna::initialize() {
 
-    _ChMin = 1;
-    _ChMax = 20000;
+    _ChMin = 0;
+    _ChMax = 2000;
     //Bin Time - 2MHz for TPC data
     _BinTime = 5*(1.0e-7); //500 ns time-ticks
     //RMS histogram per channel
@@ -26,13 +26,13 @@ namespace larlight {
     //Channel Numbers
     AllChan    = new TH1D("AllChan",     "All Channel Numbers",     (_ChMax-_ChMin), _ChMin, _ChMax);
     //RMS values for all waveforms for all events
-    AllRMS     = new TH1D("AllRMS",      "All RMS values; RMS [ADCs]",             50,      0,    50);
+    AllRMS     = new TH1D("AllRMS",      "All RMS values; RMS [ADCs]",             1000,      0,    5);
     //Avg over all events of RMS noise per channel
-    ChannelRMS = new TH1D("Channel RMS", "RMS values; Channel; RMS", (_ChMax-_ChMin),  _ChMin, _ChMax);
+    ChannelRMS = new TH1D("ChannelRMS", "RMS values; Channel; RMS", (_ChMax-_ChMin),  _ChMin, _ChMax);
     //Mean of Baseline values -- channel by channel
     BaseMeanHisto     = new TH1D("BaselineMean", "Mean of Baseline values by Channel", 3000, 0, 3000);
     //RMS of Baseline values -- channel by channel
-    BaseRMSHisto     = new TH1D("BaselineRMS", "RMS of Baseline values by Channel", 200, 0, 5);
+    BaseRMSHisto     = new TH1D("BaselineRMS", "RMS of Baseline values by Channel", 1000, 0, 5);
     //BaseTrendHisto: tendency of baseline for channel to increase (+1) or decrease (-1)
     BaseTrendHisto  = new TH1D("BaseTrend", "Baseline Trend", 101, -1, 1);
     //RMSTrendHisto: tendency of RMS noise for channel to increase (+1) or decrease (-1)
@@ -69,9 +69,6 @@ namespace larlight {
     delete ffexmpl;
 
     event_num = 0;
-    //Select event number for which to plot max ADCs
-    std::cout << "Max ADCs for which event?" << std::endl;
-    std::cin >> maxevt;
 
     return true;
   }
@@ -94,80 +91,75 @@ namespace larlight {
 
       //get channel number
       int chan = tpc_data->channel_number();
-      AllChan->Fill(chan);
+      int chan_index = (tpc_data->module_address())*100+chan;
+      //      std::cout << "Channel Index: " << chan_index << std::endl;
+      //AllChan->Fill(chan);
 
-      //Make histogram with ADC values - use to find mean
-      //max ADC value is 4096 -> afterwards saturation...
-      TH1D *ADCs = new TH1D("ADCs", "ADC values", 4096, 0, 4096);
       //Baseline subtracted ADCs
       TH1D *ADC_subtracted = new TH1D("ADC_subtracted", "Baseline subtracted", tpc_data->size(), 0, tpc_data->size());
 
-      //Make histogram for RMS noise
-      //use mean to characterize channel noise
-      TH1D *RMS  = new TH1D("RMS", "RMS noise", 100, 0, 100);
+      //loop over ADCs and find baseline
+      int ADCsum = 0;
+      for (UInt_t u=0; u<tpc_data->size(); u++)
+	ADCsum += tpc_data->at(u);
+      double baseline = ADCsum/(tpc_data->size());
 
-      //loop over ADCs and insert in histo
-      int maxadcs = 0;
-      for (UInt_t u=0; u<tpc_data->size(); u++){
-	ADCs->Fill(tpc_data->at(u));
-	if (event_num==maxevt){
-	  if (tpc_data->at(u)>maxadcs) { maxadcs=tpc_data->at(u); }
-	}
-      }
-      if ( (event_num==maxevt) && (chan >= _ChMin) && (chan < _ChMax) ) { MaxADCsHisto->SetBinContent(chan,maxadcs); }
-      maxadcs = 0;
-
-      double baseline = ADCs->GetMean();
-      ChanBaseline[chan][event_num] = baseline;
+      ChanBaseline[chan_index][event_num] = baseline;
+      /*
       if (event_num > 0){
-	if (ChanBaseline[chan][event_num] > ChanBaseline[chan][event_num-1])
-	  BaselineTrend[chan] += 1;
+	if (ChanBaseline[chan_index][event_num] > ChanBaseline[chan_index][event_num-1])
+	  BaselineTrend[chan_index] += 1;
 	else
-	  BaselineTrend[chan] -= 1;
+	  BaselineTrend[chan_index] -= 1;
       }
       else   //preset value to 0
-	BaselineTrend[chan] = 0;
-
+	BaselineTrend[chan_index] = 0;
+      */
       //Now subtract baseline and find noise RMS
+      double RMS = 0;
       for (UInt_t u=0; u<tpc_data->size(); u++){
-	RMS->Fill( sqrt( ((tpc_data->at(u))-baseline) * ((tpc_data->at(u))-baseline) ) );
-	ADC_subtracted->SetBinContent( u+1 , (tpc_data->at(u)-baseline) );// TMath::Sin(u)+TMath::Sin(2*u)+TMath::Sin(3*u));//
+	RMS += ( sqrt( ((tpc_data->at(u))-baseline) * ((tpc_data->at(u))-baseline) ) );
+	ADC_subtracted->SetBinContent( u+1 , (tpc_data->at(u)-baseline) );
       }
-      double rmsnoise = RMS->GetMean();
+      double rmsnoise = RMS/tpc_data->size();
+      //      std::cout << "RMS noise: " << rmsnoise << std::endl;
+      AllRMS->Fill(rmsnoise);
+
       //Fill Histo of corresponding channel with RMS
-      if ( (chan >= _ChMin) && (chan < _ChMax) )
-	ChanRMS[chan][event_num] = rmsnoise;
+      if ( (chan_index >= _ChMin) && (chan_index < _ChMax) )
+	ChanRMS[chan_index][event_num] = rmsnoise;
       else
-	std::cout << "Channel out of bounds!   " << chan  << std::endl;
+	std::cout << "Channel out of bounds!   Chan Number: " << chan_index  << std::endl;
+      /*
       //study variation over "time"
       if (event_num > 0){
-	if (ChanRMS[chan][event_num] > ChanRMS[chan][event_num-1])
-	  RMSTrend[chan] += 1;
+	if (ChanRMS[chan_index][event_num] > ChanRMS[chan_index][event_num-1])
+	  RMSTrend[chan_index] += 1;
 	else
-	  RMSTrend[chan] -= 1;
+	  RMSTrend[chan_index] -= 1;
       }
       else   //preset value to 0
-	RMSTrend[chan] = 0;
-
+	RMSTrend[chan_index] = 0;
+      */
       //save waveform if RMS is high
-      if ( (event_num == 1) and (rmsnoise>30) ){
-	TH1D *waveform =new TH1D(Form("waveform_ev%d_ch%d",event_num,chan),Form("waveform_ev%d_ch%d",event_num,chan)
+      if ( (rmsnoise>30) ){
+	TH1D *waveform =new TH1D(Form("waveform_ev%d_ch%d",event_num,chan_index),Form("waveform_ev%d_ch%d",event_num,chan_index)
 				 ,tpc_data->size(), 0, tpc_data->size());
 	for (UInt_t k=0; k<tpc_data->size(); k++)
 	  waveform->SetBinContent(k+1,tpc_data->at(k));
 	waveform->Write();
 	}
-     
+      
       //Foiurier Transform of noise
+      /*
       TH1 *fft = ADC_subtracted->FFT(NULL,"MAG");
       for (UInt_t w=0; w<((tpc_data->size())/2+1); w++)
 	NoiseSpec->AddBinContent(w+1,fft->GetBinContent(w));
-      AllRMS->Fill(rmsnoise);
+      */
 
-      delete ADCs;
-      delete RMS;
+
       delete ADC_subtracted;
-      delete fft;
+      //delete fft;
 
     }//Loop over all waveforms - end
 
@@ -180,6 +172,7 @@ namespace larlight {
 
   bool NoiseAna::finalize() {
 
+    /*
     //Choose Channel to plot Baselines for
     int chplot = -1;
     std::cout << "Plot Baseline value for one channel for all events..." << std::endl;
@@ -193,13 +186,13 @@ namespace larlight {
       }
       else { std::cout << "Channel out of bounds..." << std::endl; chplot=-1; }
     }
-
+    
     TH1D *chbaseline =new TH1D(Form("BaselineChan_%d",chplot),Form("BaselineChan_%d",chplot)
 			     ,100, ChanBaseline[chplot][0]-10, ChanBaseline[chplot][0]+10);
     for (UInt_t k=0; k<100; k++)
       chbaseline->Fill(ChanBaseline[chplot][k]);
     chbaseline->Write();
-
+    */
 
     //Calculate Baseline Mean and RMS channel-by-channel
     for (int ch=0; ch<(_ChMax-_ChMin); ch++){
@@ -215,6 +208,8 @@ namespace larlight {
 	BaseMeanHisto->Fill(baseavg);
 	BaseRMSHisto->Fill(baserms);
       }
+      else
+	std::cout << "Baseline Histos Not Written..." << std::endl;
     }
 
     //Fill ChannelRMS with avg value of RMS for that channel
@@ -233,7 +228,7 @@ namespace larlight {
 	else {std::cout << "This Chan had < 100 events: " << u << std::endl;}
       }//if channel has at least 1 element
     }//loop over all channel numbers
-
+    
     AllRMS->Write();
     ChannelRMS->Write();
     AllChan->Write();

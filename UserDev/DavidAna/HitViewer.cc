@@ -103,8 +103,8 @@ namespace larlight {
     int timewidth = 50;//(int)(mytimemax-mytimemin)/12; 
 
     h = new TH2D(name.c_str(),"2D Viewer; Wire; Time;",
-		 wirewidth,  mywiremin, mywiremax,
-		 timewidth,  mytimemin, mytimemax);
+		 200,  mywiremin, mywiremax,
+		 200,  mytimemin, mytimemax);
     
     return h;
   }
