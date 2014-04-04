@@ -97,12 +97,12 @@ namespace larlight {
 
       //Baseline subtracted ADCs
       TH1D *ADC_subtracted = new TH1D("ADC_subtracted", "Baseline subtracted", tpc_data->size(), 0, tpc_data->size());
-
       //loop over ADCs and find baseline
       int ADCsum = 0;
       for (UInt_t u=0; u<tpc_data->size(); u++)
 	ADCsum += tpc_data->at(u);
-      double baseline = ADCsum/(tpc_data->size());
+
+      double baseline = ((float)(ADCsum))/(tpc_data->size());
 
       ChanBaseline[chan_index][event_num] = baseline;
       /*
