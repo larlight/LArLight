@@ -54,7 +54,7 @@ algo.set_backtrace_mode(200)
 decoder.set_decoder(algo);
 
 # Set input file format ... ASCII or BINARY
-#decoder.set_format(FORMAT.ASCII)
+#decoder.set_format(fmwk.FORMAT.ASCII)
 decoder.set_format(fmwk.FORMAT.BINARY)
 
 # Set input file path

@@ -9,8 +9,7 @@
 #pragma link off all classes;
 #pragma link off all functions;
 
-#pragma link C++ class larlight::georgia_timing1+;
-#pragma link C++ class larlight::david_timing1+;
+#pragma link C++ class larlight::GeorgiaLArTF+;
 //ADD_NEW_CLASS ... do not change this line
 
 #endif

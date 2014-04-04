@@ -107,6 +107,8 @@ namespace larlight {
     bool   eof      = false;
     UInt_t ctr      = 0;
     UInt_t event_id = 0;
+    TStopwatch clock;
+    clock.Start();
     while( status && !eof && _evb_algo_v[_algo_index[_ref_data]]->process(_out_storage) ) {
 
       event_id = _out_storage->get_data(_ref_data)->event_id();
@@ -134,6 +136,10 @@ namespace larlight {
 	}
 
 	ctr++;
+	
+	if(ctr%10==0) 
+	  print(MSG::NORMAL,__FUNCTION__,
+		Form("  Done %d events @ %g [s]",ctr,clock.RealTime()));
 
       }else{
 

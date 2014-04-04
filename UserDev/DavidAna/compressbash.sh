@@ -3,7 +3,7 @@
 x=1
 
 
-while [ $x -le 9 ]
+while [ $x -le 1 ]
 do
 
   while read line

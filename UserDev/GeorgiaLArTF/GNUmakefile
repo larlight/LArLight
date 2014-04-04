@@ -3,8 +3,8 @@
 #
 
 # specific names for this package
-DICT  = GeorgiaCint
-SHLIB = libGeorgia.so
+DICT  = GeorgiaLArTFCint
+SHLIB = libGeorgiaLArTF.so
 SOURCES = $(wildcard *.cc)
 HEADERS = $(wildcard *.hh)
 OBJECTS = $(SOURCES:.cc=.o)

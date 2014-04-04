@@ -1,21 +1,27 @@
-
-LD := $(subst build/,$(ROOTSYS)/build/,$(LD))
-LDFLAGS  += -L$(ROOTSYS)/lib  $(shell root-config --libs) -g
-
 # Include your header file location
 CXXFLAGS += -I$(LARLIGHT_CORE_DIR)/Base 
 CXXFLAGS += -I$(LARLIGHT_CORE_DIR)/DataFormat
 CXXFLAGS += -I$(LARLIGHT_CORE_DIR)/Analysis
+CXXFLAGS += -I$(USER_DEV_DIR)/GeorgiaLArTF
 CXXFLAGS += -I. $(shell root-config --cflags) -g
 
 # Include your shared object lib location
-LDFLAGS += -L$(LARLIGHT_LIBDIR) -lGeorgia -lBase -lDataFormat -lAnalysis
+LDFLAGS += -L$(LARLIGHT_LIBDIR) -lGeorgiaLArTF -lAnalysis -lDataFormat -lBase 
+LDFLAGS += $(shell root-config --libs) -lPhysics -lMatrix -g
+
+# platform-specific options
+OSNAME = $(shell uname -s)
+include $(MAKE_TOP_DIR)/Makefile/Makefile.${OSNAME}
 
 # Add your program below with a space after the previous one.
 # This makefile compiles all binaries specified below.
-PROGRAMS = simple_loop
+PROGRAMS = example
 
 all:		$(PROGRAMS)
+
+$(PROGRAMS):
+	@echo '<<compiling' $@'>>'
+	@$(CXX) $@.cc -o $@ $(CXXFLAGS) $(LDFLAGS)
 	@rm -rf *.dSYM
 clean:	
 	rm -f $(PROGRAMS)
