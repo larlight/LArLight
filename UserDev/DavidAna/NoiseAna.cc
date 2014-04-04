@@ -103,8 +103,8 @@ namespace larlight {
 	ADCsum += tpc_data->at(u);
 
       double baseline = ((float)(ADCsum))/(tpc_data->size());
-
-      ChanBaseline[chan_index][event_num] = baseline;
+      if ( (chan_index >=  _ChMin) and (chan_index <=  _ChMax) )
+	ChanBaseline[chan_index][event_num] = baseline;
       /*
       if (event_num > 0){
 	if (ChanBaseline[chan_index][event_num] > ChanBaseline[chan_index][event_num-1])
@@ -118,10 +118,10 @@ namespace larlight {
       //Now subtract baseline and find noise RMS
       double RMS = 0;
       for (UInt_t u=0; u<tpc_data->size(); u++){
-	RMS += ( sqrt( ((tpc_data->at(u))-baseline) * ((tpc_data->at(u))-baseline) ) );
+	RMS += ((tpc_data->at(u))-baseline) * ((tpc_data->at(u))-baseline) ;
 	ADC_subtracted->SetBinContent( u+1 , (tpc_data->at(u)-baseline) );
       }
-      double rmsnoise = RMS/tpc_data->size();
+      double rmsnoise = sqrt( RMS/ (tpc_data->size() - 1) );
       //      std::cout << "RMS noise: " << rmsnoise << std::endl;
       AllRMS->Fill(rmsnoise);
 
