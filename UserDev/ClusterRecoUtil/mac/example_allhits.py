@@ -98,13 +98,13 @@ while mgr.next_event():
         if mctruth_v.size()>1:
             print "Found more than 1 MCTruth. Only use the 1st one... \n \n"
         if mctruth_v.at(0).GetParticles().at(0).PdgCode() == 11:      ## electron    
-	    mct_vtx = mctruth_v.at(0).GetParticles().at(0).Trajectory().at(0).Position()
-	    print "\n electron \n"
-	elif mctruth_v.at(0).GetParticles().at(0).PdgCode() == 22:    
-	    trajsize= mctruth_v.at(0).GetParticles().at(0).Trajectory().size()
-	    mct_vtx = mctruth_v.at(0).GetParticles().at(0).Trajectory().at(trajsize-1).Position()
-	    print "\n gamma \n"
-   #PdgCode
+            mct_vtx = mctruth_v.at(0).GetParticles().at(0).Trajectory().at(0).Position()
+        print "\n electron \n"
+    elif mctruth_v.at(0).GetParticles().at(0).PdgCode() == 22:    
+        trajsize= mctruth_v.at(0).GetParticles().at(0).Trajectory().size()
+        mct_vtx = mctruth_v.at(0).GetParticles().at(0).Trajectory().at(trajsize-1).Position()
+        print "\n gamma \n"
+    #PdgCode
 
     if args.num_events == processed_events:
         exit()
@@ -117,8 +117,8 @@ while mgr.next_event():
         algo.GetAverages(True)
         algo.GetRoughAxis(True)
         algo.GetProfileInfo(True)
-        algo.RefineStartPoints(True)
         algo.RefineDirection(True)
+        algo.RefineStartPoints(True)
         algo.FillPolygon()
         algo.GetFinalSlope(True)
         #algo.Report()
@@ -150,28 +150,28 @@ while mgr.next_event():
             my_vec[2] = mct_vtx[2]
             mcpoint=fGSer.Get2DPointProjectionCM(my_vec,result.start_point.plane)
 
-           # Example 1 & 2 should have the same return here (checked)
-	   # print " Start point in w,t  (%g,%g)" % (mcpoint.w,mcpoint.t)   
+            # Example 1 & 2 should have the same return here (checked)
+            # print " Start point in w,t  (%g,%g)" % (mcpoint.w,mcpoint.t)   
 
             mc_begin = TGraph(1)
             mc_begin.SetPoint(0,mcpoint.w,mcpoint.t)
             mc_begin.SetMarkerStyle(29)
             mc_begin.SetMarkerColor(ROOT.kRed)
             mc_begin.SetMarkerSize(3)
-	#Add black star to mark begin point and black square to mark end point
-	begin = TGraph(1)
-	end = TGraph(1)
-	begin.SetPoint(0,result.start_point.w, result.start_point.t)
-	end.SetPoint(0,result.end_point.w, result.end_point.t)
+        #Add black star to mark begin point and black square to mark end point
+        begin = TGraph(1)
+        end = TGraph(1)
+        begin.SetPoint(0,result.start_point.w, result.start_point.t)
+        end.SetPoint(0,result.end_point.w, result.end_point.t)
 
         # Set Start & End point TGraph
-	begin.SetLineColor(1)
-	begin.SetMarkerStyle(29)
-	begin.SetMarkerColor(ROOT.kBlack)
+        begin.SetLineColor(1)
+        begin.SetMarkerStyle(29)
+        begin.SetMarkerColor(ROOT.kBlack)
         begin.SetMarkerSize(3)
-	end.SetLineColor(1)
-	end.SetMarkerStyle(21)
-	end.SetMarkerColor(ROOT.kBlack)
+        end.SetLineColor(1)
+        end.SetMarkerStyle(21)
+        end.SetMarkerColor(ROOT.kBlack)
         end.SetMarkerSize(2)
 
         func=TF1("nf","[1]*x+[0]",result.start_point.w-50,result.end_point.w+50);
@@ -225,6 +225,7 @@ while mgr.next_event():
 	end.Draw("P same")
 	func.Draw("same");
 	angleline.Draw("same");
+
         if(mc_begin):
             mc_begin.Draw("P same")
         if(gPolygon):
