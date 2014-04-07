@@ -14,6 +14,8 @@
 #include <TF1.h>
 #include <TH1F.h>
 #include <TPrincipal.h>
+#include <TCanvas.h>
+#include <TLegend.h>
 
 #include "PxUtils.h"
 #include "ClusterParams.hh"
@@ -189,12 +191,13 @@ namespace cluster {
     double fInterHigh_side;
     double fInterLow_side;
     
-    bool fFinishedGetAverages;
-    bool fFinishedGetRoughAxis;
-    bool fFinishedGetProfileInfo;
-    bool fFinishedRefineStartPoints;
-    bool fFinishedRefineDirection;
-    bool fFinishedGetFinalSlope;
+    // book keeping variables to validate completion of methods:
+    bool fFinishedGetAverages;       
+    bool fFinishedGetRoughAxis;      
+    bool fFinishedGetProfileInfo;    
+    bool fFinishedRefineStartPoints; 
+    bool fFinishedRefineDirection;   
+    bool fFinishedGetFinalSlope;     
 
 
     double fRough2DSlope;        // slope 

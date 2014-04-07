@@ -726,10 +726,11 @@ namespace larutil{
   
     if(slope)	
 
-	invslope=-1./slope;
+    invslope=-1./slope;
 
-    //invslope *= fWireTimetoCmCm * fWireTimetoCmCm;
-  	
+
+    // invslope *= fWireTimetoCmCm * fWireTimetoCmCm;
+  
     pointonline.w = (ort_intercept - intercept)/(slope-invslope); 
     pointonline.t = slope * pointonline.w + intercept; 
     return 0;  
@@ -1048,12 +1049,10 @@ namespace larutil{
       
       ////////std::cout << " w,t: " << wire << " " << time << " ws,ts " << wonline << " "<< tonline <<" "<< lindist << " " << ortdist << std::endl;
       
-      if(lindist<linearlimit && ortdist<ortlimit)
-
-	{ hitlistlocal_index.push_back((UInt_t)i);
-	  //std::cout << " w,t: " << wire << " " << time << " calc time: " << wire*lineslopetest + locintercept  << " ws,ts " << wonline << " "<< tonline <<" "<< lindist << " " << ortdist  << " plane: " << plane << std::endl;
-	}
-      
+      if(lindist<linearlimit && ortdist<ortlimit){ 
+        hitlistlocal_index.push_back((UInt_t)i);      
+        //std::cout << " w,t: " << wire << " " << time << " calc time: " << wire*lineslopetest + locintercept  << " ws,ts " << wonline << " "<< tonline <<" "<< lindist << " " << ortdist  << " plane: " << plane << std::endl;     
+      }
       
     }
   }
@@ -1083,15 +1082,11 @@ namespace larutil{
       
       ////////std::cout << " w,t: " << wire << " " << time << " ws,ts " << wonline << " "<< tonline <<" "<< lindist << " " << ortdist << std::endl;
       
-      if(lindist<linearlimit && ortdist<ortlimit)
-
-	{ hitlistlocal.push_back(hitlist.at(i));
-	  //std::cout << " w,t: " << wire << " " << time << " calc time: " << wire*lineslopetest + locintercept  << " ws,ts " << wonline << " "<< tonline <<" "<< lindist << " " << ortdist  << " plane: " << plane << std::endl;
-	}
-      
-      
+      if(lindist<linearlimit && ortdist<ortlimit){
+        hitlistlocal.push_back(hitlist.at(i));
+	      //std::cout << " w,t: " << wire << " " << time << " calc time: " << wire*lineslopetest + locintercept  << " ws,ts " << wonline << " "<< tonline <<" "<< lindist << " " << ortdist  << " plane: " << plane << std::endl;
+	    }
     }
-    
   }
 
   void GeometryUtilities::SelectLocalHitlist(const std::vector<larutil::PxHit> &hitlist, 
@@ -1100,7 +1095,8 @@ namespace larutil{
 					     Double_t& linearlimit,   
 					     Double_t& ortlimit, 
 					     Double_t& lineslopetest,
-					     larutil::PxHit &averageHit) {
+					     larutil::PxHit &averageHit) 
+  {
 
     hitlistlocal.clear();
     double locintercept=startHit.t - startHit.w * lineslopetest;
@@ -1118,10 +1114,10 @@ namespace larutil{
       Double_t ortdist=Get2DDistance((const larutil::PxPoint*)(&hitlist.at(i)),(const larutil::PxPoint*)(&hitonline));
       
       
-      if(lindist<linearlimit && ortdist<ortlimit)  {
-	hitlistlocal.push_back((const larutil::PxHit*)(&(hitlist.at(i))));
+      if(lindist<linearlimit && ortdist<ortlimit){
+        hitlistlocal.push_back((const larutil::PxHit*)(&(hitlist.at(i))));
         timesum += hitlist.at(i).t;
-	wiresum += hitlist.at(i).w;
+        wiresum += hitlist.at(i).w;
       }
       
       

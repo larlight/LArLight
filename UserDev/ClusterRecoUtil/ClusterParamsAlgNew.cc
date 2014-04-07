@@ -380,6 +380,7 @@ namespace cluster{
     } else {
       if (!fFinishedGetRoughAxis) GetRoughAxis(true);
     }
+    bool drawOrtHistos = true;
 
     //these variables need to be initialized to other values? 
     if(fRough2DSlope==-999.999 || fRough2DIntercept==-999.999 ) 
@@ -396,8 +397,7 @@ namespace cluster{
     //get slope of lines orthogonal to those found crossing the shower.
     double inv_2d_slope=0;
     if(fabs(fRough2DSlope)>0.001)
-//       inv_2d_slope=-1./fRough2DSlope*pow(fGSer->WireTimeToCmCm(),2);
-       inv_2d_slope=-1./fRough2DSlope;//*pow(fGSer->WireTimeToCmCm(),2);
+      inv_2d_slope=-1./fRough2DSlope;
     else
       inv_2d_slope=-999999.;
     // std::cout << " N_Hits is " << fParams.N_Hits << std::endl;
@@ -488,8 +488,14 @@ namespace cluster{
               << " Begin Point " << BeginOnlinePoint.w << " " 
               << BeginOnlinePoint.t  << " End Point " << EndOnlinePoint.w << ","<< EndOnlinePoint.t << std::endl;
     
-   double current_maximum=0; 
-   for(auto& hit : fHitVector)
+
+    // Some fitting variables to make a histogram:
+    double min_ortdist(999), max_ortdist(-999);
+    std::vector<double> ort_dist_vect;
+    ort_dist_vect.reserve(fParams.N_Hits);
+
+    double current_maximum=0; 
+    for(auto& hit : fHitVector)
     {
      
       larutil::PxPoint OnlinePoint;
@@ -501,7 +507,10 @@ namespace cluster{
      //std::cout << " Online Point " << OnlinePoint.w << " " << OnlinePoint.t << std::endl; 
       double linedist=fGSer->Get2DDistance(&OnlinePoint,&BeginOnlinePoint);
       double ortdist=fGSer->Get2DDistance(&OnlinePoint,&hit);
-    
+      ort_dist_vect.push_back(ortdist);
+      if (ortdist < min_ortdist) min_ortdist = ortdist;
+      if (ortdist > max_ortdist) max_ortdist = ortdist;
+
       ////////////////////////////////////////////////////////////////////// 
       //calculate the weight along the axis, this formula is based on rough guessology. 
       // there is no physics motivation behind the particular numbers, A.S.
@@ -510,7 +519,7 @@ namespace cluster{
       /////////////////////////////////////////////////////////////////////// 
       double weight= (ortdist<1.) ? 10 * (hit.charge) : 5 * (hit.charge) / ortdist;
     
-      int fine_bin=(int)(linedist/fProjectedLength*fProfileNbins);
+      int fine_bin  =(int)(linedist/fProjectedLength*fProfileNbins);
       int coarse_bin=(int)(linedist/fProjectedLength*fCoarseNbins);
       /*
       std::cout << "linedist: " << linedist << std::endl;
@@ -539,6 +548,51 @@ namespace cluster{
       
     }  // end second loop on hits. Now should have filled profile vectors.
       
+
+    if (drawOrtHistos){
+      TH1F * ortDistHist = 
+                new TH1F("ortDistHist", 
+                         "Orthogonal Distance to axis;Distance (cm)",
+                         30, min_ortdist, max_ortdist);
+      TH1F * ortDistHistCharge = 
+                new TH1F("ortDistHistCharge", 
+                         "Orthogonal Distance to axis (Charge Weighted);Distance (cm)", 
+                         30, min_ortdist, max_ortdist);
+      TH1F * ortDistHistAndrzej= 
+                new TH1F("ortDistHistAndrzej",
+                         "Orthogonal Distance Andrzej weighting",
+                         30, min_ortdist, max_ortdist);
+
+      for (int index = 0; index < fParams.N_Hits; index++){
+        ortDistHist -> Fill(ort_dist_vect[index]);
+        ortDistHistCharge -> Fill(ort_dist_vect[index], fHitVector[index].charge);
+        double weight= (ort_dist_vect[index]<1.) ? 
+                      10 * (fHitVector[index].charge) : 
+                      (5 * (fHitVector[index].charge)/ort_dist_vect[index]);
+        ortDistHistAndrzej -> Fill(ort_dist_vect[index], weight);
+      }
+      ortDistHist -> Scale(1.0/ortDistHist->Integral());
+      ortDistHistCharge -> Scale(1.0/ortDistHistCharge->Integral());
+      ortDistHistAndrzej -> Scale(1.0/ortDistHistAndrzej->Integral());
+
+      TCanvas * ortCanv = new TCanvas("ortCanv","ortCanv", 600, 600);
+      ortCanv -> cd();
+      ortDistHistAndrzej -> SetLineColor(3);
+      ortDistHistAndrzej -> Draw("");
+      ortDistHistCharge -> Draw("same");
+      ortDistHist -> SetLineColor(2);
+      ortDistHist -> Draw("same");
+
+      TLegend * leg = new TLegend(.4,.6,.8,.9);
+      leg -> SetHeader("Charge distribution");
+      leg -> AddEntry(ortDistHist, "Unweighted Hits");
+      leg -> AddEntry(ortDistHistCharge, "Charge Weighted Hits");
+      leg -> AddEntry(ortDistHistAndrzej, "Charge Weighted by Guessology");
+      leg -> Draw();
+
+      ortCanv -> Update();
+    }
+
     fFinishedGetProfileInfo = true;
     // Report();
     return;
@@ -564,6 +618,7 @@ namespace cluster{
       if (!fFinishedGetProfileInfo) GetProfileInfo(true);
     }
     
+
     fProfileIntegralForward=0;
     fProfileIntegralBackward=0;
     
@@ -578,8 +633,10 @@ namespace cluster{
         fProfileIntegralBackward+=fChargeProfile.at(ibin);
     }
     
-    // now, we have the forward and backward integral so start stepping forward and backward to find the trunk of the 
-    // shower. This is done making sure that the running integral until less than 1% is left and the bin is above 
+    // now, we have the forward and backward integral so start
+    // stepping forward and backward to find the trunk of the 
+    // shower. This is done making sure that the running 
+    // integral until less than 1% is left and the bin is above 
     // a set theshold many empty bins.
     
    
@@ -604,9 +661,10 @@ namespace cluster{
         break;
     }
     
-    // now have profile start and endpoints. Now translate to wire/time. Will use wire/time that are on the rough axis.
-    //fProjectedLength is the length from fInterLow to interhigh along the rough_2d_axis
-    // on bin distance is: 
+    // now have profile start and endpoints. Now translate to wire/time. 
+    // Will use wire/time that are on the rough axis.
+    // fProjectedLength is the length from fInterLow to interhigh a
+    // long the rough_2d_axis on bin distance is: 
     // larutil::PxPoint OnlinePoint;
     
     double ort_intercept_begin=fBeginIntercept+(fEndIntercept-fBeginIntercept)/fProfileNbins*startbin;
@@ -687,12 +745,11 @@ namespace cluster{
     //are we sure this works?
     //is anybody even listening?  Were they eaten by a grue? 
       
-    fGSer->SelectLocalHitlist(fHitVector,subhit,
-			      startHit,
-			      linearlimit,ortlimit,lineslopetest,
-			      averageHit);
+    fGSer->SelectLocalHitlist(fHitVector,subhit, startHit,
+                              linearlimit,ortlimit,lineslopetest,
+                              averageHit);
 
-   if(!(subhit.size())) {
+    if(!(subhit.size())) {
       std::cout<<"Subhit list is empty. Using rough start/end points..."<<std::endl;
       GetOpeningAngle();
       fParams.start_point = fRoughBeginPoint;
@@ -708,11 +765,11 @@ namespace cluster{
     double avgtime= averageHit.t;
     //vertex in tilda-space pair(x-til,y-til)
     std::vector<std::pair<double,double>> vertil;
-    vertil.clear();// This isn't needed?
+    // vertil.clear();// This isn't needed?
     vertil.reserve(subhit.size() * subhit.size());
     //vector of the sum of the distance of a vector to every vertex in tilda-space
     std::vector<double> vs;
-    vs.clear();// this isn't needed?
+    // vs.clear();// this isn't needed?
     // $$This needs to be corrected//this is the good hits that are between strip
     std::vector<const larutil::PxHit*>  ghits;
     ghits.reserve(subhit.size());
@@ -885,11 +942,10 @@ namespace cluster{
     
     // fParams.start_point
     
-   double current_maximum=0;
-   double curr_max_bin=-1;
-   
-   for( auto hit : fHitVector){
-      
+    double current_maximum=0;
+    double curr_max_bin=-1;
+    
+    for( auto hit : fHitVector){
       
       double omx=fGSer->Get2Dangle((larutil::PxPoint *)&hit,&fParams.start_point);  // in rad and assuming cm/cm space.
       int nbin=(omx+TMath::Pi())*NBINS/(2*TMath::Pi());
@@ -898,27 +954,32 @@ namespace cluster{
       fh_omega_single[nbin]+=hit.charge;
       
       if( fh_omega_single[nbin]>current_maximum )
-	{
-	 current_maximum= fh_omega_single[nbin];
-	 curr_max_bin=nbin;
-	}
+      {
+        current_maximum= fh_omega_single[nbin];
+        curr_max_bin=nbin;
+      }
 	
       
-     }
+    }
     
   
-   fParams.angle_2d=(curr_max_bin/720*2*TMath::Pi())-TMath::Pi();
-  
-   if(cos(fParams.angle_2d))
-    fParams.modified_hit_density=fParams.hit_density_1D/cos(fParams.angle_2d);
-   else 
-    fParams.modified_hit_density=fParams.hit_density_1D;
-     
-   fFinishedGetFinalSlope = true;
+    fParams.angle_2d=(curr_max_bin/720*2*TMath::Pi())-TMath::Pi();
+    
+    if(cos(fParams.angle_2d))
+      fParams.modified_hit_density=fParams.hit_density_1D/cos(fParams.angle_2d);
+    else 
+      fParams.modified_hit_density=fParams.hit_density_1D;
+       
+    fFinishedGetFinalSlope = true;
     return;
   }
   
-  
+  /**
+   * This function calculates the opening/closing angles
+   * It also makes a decision on whether or not to flip the direction
+   * the cluster.  Then the start point is refined later.
+   * @param override [description]
+   */
   void ClusterParamsAlgNew::RefineDirection(bool override) {
     if(!override) { //Override being set, we skip all this logic.
       //OK, no override. Stop if we're already finshed.
@@ -930,11 +991,13 @@ namespace cluster{
       if (!fFinishedRefineStartPoints) RefineStartPoints(true);
     }
     
-    double wire_2_cm = fGSer->WireToCm();
-    double time_2_cm = fGSer->TimeToCm();
+    // double wire_2_cm = fGSer->WireToCm();
+    // double time_2_cm = fGSer->TimeToCm();
     
-    double SEP_X = (fParams.end_point.w - fParams.start_point.w) / wire_2_cm;
-    double SEP_Y = (fParams.end_point.t - fParams.start_point.t) / time_2_cm;
+    // Removing the conversion since these points are set above in cm-cm space
+    //   -- Corey
+    double endStartDiff_x = (fParams.end_point.w - fParams.start_point.w);
+    double endStartDiff_y = (fParams.end_point.t - fParams.start_point.t);
     double rms_forward   = 0;
     double rms_backward  = 0;
     double mean_forward  = 0;
@@ -954,11 +1017,13 @@ namespace cluster{
       weight_total = hit.charge; 
 
       // Compute forward mean
-      double SHIT_X = (hit.w - fParams.start_point.w) / wire_2_cm;
-      double SHIT_Y = (hit.t - fParams.start_point.t) / time_2_cm;
+      double hitStartDiff_x = (hit.w - fParams.start_point.w) ;
+      double hitStartDiff_y = (hit.t - fParams.start_point.t) ;
       
-      double cosangle = (SEP_X*SHIT_X + SEP_Y*SHIT_Y);
-      cosangle /= ( pow(pow(SEP_X,2)+pow(SEP_Y,2),0.5) * pow(pow(SHIT_X,2)+pow(SHIT_Y,2),0.5));
+      double cosangle = (endStartDiff_x*hitStartDiff_x + 
+                         endStartDiff_y*hitStartDiff_y);
+      cosangle /= ( pow(pow(endStartDiff_x,2)+pow(endStartDiff_y,2),0.5)
+                  * pow(pow(hitStartDiff_x,2)+pow(hitStartDiff_y,2),0.5));
 
       if(cosangle>0) {
         // Only take into account for hits that are in "front"
@@ -969,11 +1034,13 @@ namespace cluster{
       }
 
       // Compute backward mean
-      SHIT_X = (hit.w - fParams.end_point.w) / wire_2_cm;
-      SHIT_Y = (hit.t - fParams.end_point.t) / time_2_cm;
+      double hitEndDiff_x = (hit.w - fParams.end_point.w);
+      double hitEndDiff_y = (hit.t - fParams.end_point.t);
       
-      cosangle  = (SEP_X*SHIT_X + SEP_Y*SHIT_Y) * (-1.);
-      cosangle /= ( pow(pow(SEP_X,2)+pow(SEP_Y,2),0.5) * pow(pow(SHIT_X,2)+pow(SHIT_Y,2),0.5));
+      cosangle  = (endStartDiff_x*hitEndDiff_x +
+                   endStartDiff_y*hitEndDiff_y) * (-1.);
+      cosangle /= ( pow(pow(endStartDiff_x,2)+pow(endStartDiff_y,2),0.5) 
+                  * pow(pow(hitEndDiff_x,2)+pow(hitEndDiff_y,2),0.5));
 
       if(cosangle>0) {
         //no weighted average, works better as flat average w/ min charge cut
