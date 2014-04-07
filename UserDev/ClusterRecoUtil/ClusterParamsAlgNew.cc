@@ -591,6 +591,9 @@ namespace cluster{
    * Calculates the following variables:
    * length
    * width
+   * hit_density_1D
+   * hit_density_2D
+   * direction
    * @param override [description]
    */
   void ClusterParamsAlgNew::RefineStartPoints(bool override) {
@@ -689,9 +692,28 @@ namespace cluster{
     // should the opening and closing angle be already defined?
     // do we care whether they're associated to the start/end point?
     
-    // // // 
+    /////////////////////////////////
+    // fParams.direction=  ...
+    
+    larutil::PxPoint startHit,endHit;
+    //startHit.w = fRoughBeginPoint.w;
+    //startHit.t = fRoughBeginPoint.t;
+    //startHit.plane = fRoughBeginPoint.plane;
     
     
+    if(fParams.direction==1)
+      {
+      startHit=fRoughBeginPoint;
+      endHit=fRoughEndPoint;
+      }
+    else
+      {
+      startHit=fRoughEndPoint;
+      endHit=fRoughBeginPoint;
+      }
+    
+    
+    ///////////////////////////////
     //Ryan's Shower Strip finder work here. 
     //First we need to define the strip width that we want
     double d=0.6;//this is the width of the strip.... this needs to be tuned to something.
@@ -699,10 +721,7 @@ namespace cluster{
     // Will need to feed in the set of hits that we want. 
     //	const std::vector<larutil::PxHit*> whole;
     std::vector <const larutil::PxHit*> subhit;
-    larutil::PxHit startHit;
-    startHit.w = fRoughBeginPoint.w;
-    startHit.t = fRoughBeginPoint.t;
-    startHit.plane = fRoughBeginPoint.plane;
+   
     double linearlimit=8;
     double ortlimit=12;
     double lineslopetest;
@@ -866,10 +885,23 @@ namespace cluster{
     // double gslope=(n* gwiretime- gwire*gtime)/(n*gwirewire -gwire*gwire);
     // double gcept= gtime/n -gslope*(gwire/n);
     
+    fParams.length=fGSer->Get2DDistance((larutil::PxPoint *)&startpoint,&endHit);
+    if(fParams.length)
+      fParams.hit_density_1D=fParams.N_Hits/fParams.length;
+    else
+      fParams.hit_density_1D=0;
+    
+    fParams.start_point=startpoint;
+    
     fFinishedRefineStartPoints = true;
     Report();
     return;
   }
+  
+  
+  ///////////////////////////////////////////////////////
+  ////
+  /////////////////////////////////////////////////////////////
   
   void ClusterParamsAlgNew::GetFinalSlope(bool override) {
     if(!override) { //Override being set, we skip all this logic.
@@ -884,17 +916,47 @@ namespace cluster{
 
     /**
      * Calculates the following variables:
-     * hit_density_1D
-     * hit_density_2D
      * angle_2d
-     * direction
+     * modified_hit_density
      */
 
-    std::cout << "Ah yes, the elusive \"GetFinalSlope Function.\"\n"
-              << "We should consider implementing this." << std::endl;
 
-
-    fFinishedRefineStartPoints = true;
+    //double xangle=Get2DAngleForHit( wstn,tstn, hitlist);
+    const int NBINS=720;
+    std::vector< int > fh_omega_single(NBINS,0);   //720,-180., 180.
+    
+    // fParams.start_point
+    
+   double current_maximum=0;
+   double curr_max_bin=-1;
+   
+   for( auto hit : fHitVector){
+      
+      
+      double omx=fGSer->Get2Dangle((larutil::PxPoint *)&hit,&fParams.start_point);  // in rad and assuming cm/cm space.
+      int nbin=(omx+TMath::Pi())*NBINS/(2*TMath::Pi());
+      if(nbin >= NBINS) nbin=NBINS-1;
+      if(nbin < 0) nbin=0;
+      fh_omega_single[nbin]+=hit.charge;
+      
+      if( fh_omega_single[nbin]>current_maximum )
+	{
+	 current_maximum= fh_omega_single[nbin];
+	 curr_max_bin=nbin;
+	}
+	
+      
+     }
+    
+  
+   fParams.angle_2d=(curr_max_bin/720*2*TMath::Pi())-TMath::Pi();
+  
+   if(cos(fParams.angle_2d))
+    fParams.modified_hit_density=fParams.hit_density_1D/cos(fParams.angle_2d);
+   else 
+    fParams.modified_hit_density=fParams.hit_density_1D;
+     
+   fFinishedGetFinalSlope = true;
     return;
   }
   

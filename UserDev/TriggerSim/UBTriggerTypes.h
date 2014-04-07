@@ -1,6 +1,6 @@
 
-#ifndef UBTRIGGERTYPES_HH
-#define UBTRIGGERTYPES_HH
+#ifndef UBTRIGGERTYPES_H
+#define UBTRIGGERTYPES_H
 
 namespace trigger{
 

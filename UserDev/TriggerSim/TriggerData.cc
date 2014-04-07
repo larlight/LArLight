@@ -9,12 +9,15 @@ namespace trigdata {
   Trigger::Trigger()
   //****************
   {
-    fTriggerNumber  = std::numeric_limits<unsigned int>::max();
-    fTriggerSample  = std::numeric_limits<unsigned int>::max();
-    fTriggerFrame   = std::numeric_limits<unsigned int>::max();
-    fBeamGateSample = std::numeric_limits<unsigned int>::max();
-    fBeamGateFrame  = std::numeric_limits<unsigned int>::max();
-    fTriggerBits    = std::numeric_limits<unsigned int>::min();
+    fTriggerNumber       = std::numeric_limits<unsigned int>::max();
+
+    fTriggerTime         = std::numeric_limits<double>::max();
+    fBeamGateTime        = std::numeric_limits<double>::max();
+
+    fReadOutStartOptical = std::numeric_limits<double>::max();
+    fReadOutStartTPC     = std::numeric_limits<double>::max();
+
+    fTriggerBits         = 0x0;
   }
   
   //****************************************************

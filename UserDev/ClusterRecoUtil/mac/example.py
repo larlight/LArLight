@@ -130,6 +130,7 @@ while mgr.next_event():
         algo.RefineStartPoints(True)
         algo.RefineDirection(True)
         algo.FillPolygon()
+
         # algo.GetFinalSlope(True)
         #algo.Report()
         

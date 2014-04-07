@@ -7,6 +7,11 @@
 #ifndef UBTRIGGERALGO_CXX
 #define UBTRIGGERALGO_CXX
 
+#include <iostream>
+#include <sstream>
+#include <TString.h>
+#include "TimeService.h"
+#include "UBTriggerTypes.h"
 #include "UBTriggerAlgo.h"
 
 namespace trigger{
@@ -73,13 +78,14 @@ namespace trigger{
   */
 
   //##############################################################
-  UBTriggerAlgo::UBTriggerAlgo() : _tpc_clock(3200,2.e6,0.),
-				   _pmt_clock(102400,64.e6,0.),
-				   _trigger_clock(25600,16.e6,0.),
-				   _mask(9,0),
+  UBTriggerAlgo::UBTriggerAlgo() : _mask(9,0),
 				   _prescale(9,false)
   //##############################################################
-					      {
+  {
+    _trig_clock = util::TimeService::GetME().TriggerClock();
+    _pmt_clock  = util::TimeService::GetME().OpticalClock();
+    _tpc_clock  = util::TimeService::GetME().TPCClock();
+						
     // LArLight version constructor
     SetDeadtime(4);
     SetBNBParams(102,256,0,0);
@@ -197,47 +203,97 @@ namespace trigger{
 
   }
 
-  //###########################################
-  void UBTriggerAlgo::AddTriggerCalib(double t)
-  //###########################################
+  //############################################################################
+  util::ElecClock UBTriggerAlgo::BNBStartTime(const util::ElecClock& time) const
+  //############################################################################
   {
-    
+    auto clock = util::TimeService::GetME().OpticalClock(_pmt_clock.Time(time.Time()));
+
+    clock += _bnb_delay;
+
+    return clock;
+  }
+
+  //#############################################################################
+  util::ElecClock UBTriggerAlgo::NuMIStartTime(const util::ElecClock& time) const
+  //#############################################################################
+  {
+    auto clock = util::TimeService::GetME().OpticalClock(_pmt_clock.Time(time.Time()));
+
+    clock += _numi_delay;
+
+    return clock;
+  }
+
+  //###################################################################################
+  util::ElecClock UBTriggerAlgo::ReadOutStartTimeTPC(const util::ElecClock& time) const
+  //###################################################################################
+  {
+    auto clock = util::TimeService::GetME().OpticalClock(_pmt_clock.Time(time.Time()));
+
+    clock += _tpc_readout_offset;
+
+    return clock;
+
+  }
+
+  //#######################################################################################
+  util::ElecClock UBTriggerAlgo::ReadOutStartTimeOptical(const util::ElecClock& time) const
+  //#######################################################################################
+  {
+    auto clock = util::TimeService::GetME().OpticalClock(_pmt_clock.Time(time.Time()));
+
+    clock += _readout_frame_offset * clock.FrameTicks();
+
+    return clock;
+  }
+
+  //##############################################################
+  void UBTriggerAlgo::AddTriggerCalib(const util::ElecClock &time)
+  //##############################################################
+  {
+    _pmt_clock.SetTime(_pmt_clock.Time(time.Time()));
     // Calibration triggers
     AddTrigger(trigdata::Trigger(0,
-				 _pmt_clock.MCSample(t),
-				 _pmt_clock.MCFrame(t),
-				 _pmt_clock.MCSample(t),
-				 _pmt_clock.MCFrame(t),
+				 _pmt_clock.Time(),
+				 _pmt_clock.Time(),
+				 ReadOutStartTimeTPC(_pmt_clock).Time(),
+				 ReadOutStartTimeOptical(_pmt_clock).Time(),
 				 ( (0x1) << trigger::kTriggerCalib )) 
 	       );
+    _pmt_clock.SetTime(0);
   }
 
-  //###########################################
-  void UBTriggerAlgo::AddTriggerExt(double t)
-  //###########################################
+  //############################################################
+  void UBTriggerAlgo::AddTriggerExt(const util::ElecClock& time)
+  //############################################################
   {
-    // External triggers
+    _pmt_clock.SetTime(_pmt_clock.Time(time.Time()));
+    // EXT triggers
     AddTrigger(trigdata::Trigger(0,
-				 _pmt_clock.MCSample(t),
-				 _pmt_clock.MCFrame(t),
-				 _pmt_clock.MCSample(t),
-				 _pmt_clock.MCFrame(t),
+				 _pmt_clock.Time(),
+				 _pmt_clock.Time(),
+				 ReadOutStartTimeTPC(_pmt_clock).Time(),
+				 ReadOutStartTimeOptical(_pmt_clock).Time(),
 				 ( (0x1) << trigger::kTriggerEXT ))
 	       );
+    _pmt_clock.SetTime(0);
   }
 
-  //#########################################
-  void UBTriggerAlgo::AddTriggerPC(double t)
-  //#########################################
+  //###########################################################
+  void UBTriggerAlgo::AddTriggerPC(const util::ElecClock& time)
+  //###########################################################
   {
+    _pmt_clock.SetTime(_pmt_clock.Time(time.Time()));
     // PC triggers
     AddTrigger(trigdata::Trigger(0,
-				 _pmt_clock.MCSample(t),
-				 _pmt_clock.MCFrame(t),
-				 _pmt_clock.MCSample(t),
-				 _pmt_clock.MCFrame(t),
+				 _pmt_clock.Time(),
+				 _pmt_clock.Time(),
+				 ReadOutStartTimeTPC(_pmt_clock).Time(),
+				 ReadOutStartTimeOptical(_pmt_clock).Time(),
 				 ( (0x1) << trigger::kTriggerPC ))
 	       );
+    _pmt_clock.SetTime(0);
   }
 
   //#######################################
@@ -267,15 +323,15 @@ namespace trigger{
     msg << std::endl;
 
     msg
-      << Form(" Trigger Deadtime   : %d",_deadtime) << std::endl
+      << Form(" Trigger Deadtime    : %d frames",_deadtime) << std::endl
       << std::endl
-      << Form("  NuMI Trigger Delay : %d",_numi_delay) << std::endl
-      << Form("  NuMI Cosmic Start  : %d",_numi_cosmic_allow_min) << std::endl
-      << Form("  NuMI Cosmic End    : %d",_numi_cosmic_allow_max) << std::endl
+      << Form("  NuMI Trigger Delay : %d samples",_numi_delay) << std::endl
+      << Form("  NuMI Cosmic Start  : %d samples",_numi_cosmic_allow_min) << std::endl
+      << Form("  NuMI Cosmic End    : %d samples",_numi_cosmic_allow_max) << std::endl
       << std::endl
-      << Form("  BNB Trigger Delay  : %d",_bnb_delay) << std::endl
-      << Form("  BNB Cosmic Start   : %d",_bnb_cosmic_allow_min) << std::endl
-      << Form("  BNB Cosmic End     : %d",_bnb_cosmic_allow_max) << std::endl
+      << Form("  BNB Trigger Delay  : %d samples",_bnb_delay) << std::endl
+      << Form("  BNB Cosmic Start   : %d samples",_bnb_cosmic_allow_min) << std::endl
+      << Form("  BNB Cosmic End     : %d samples",_bnb_cosmic_allow_max) << std::endl
       << "---------------------------------------------" << std::endl
       << std::endl;
 
@@ -289,34 +345,40 @@ namespace trigger{
   //#######################################################################################
   {
 
+    auto trig1_time = trigger1.TriggerTime();
+    auto trig2_time = trigger2.TriggerTime();
+
+    auto trig1_number = trigger1.TriggerNumber();
+    auto trig2_number = trigger2.TriggerNumber();
+
     if(_debug_mode)
       
       Report(Form("  Attempting to combine two triggers: (%d,%d) and (%d,%d)",
-		  trigger1.TriggerSample(),
-		  trigger1.TriggerFrame(),
-		  trigger2.TriggerSample(),
-		  trigger2.TriggerFrame()) );
+		  _trig_clock.Sample(trig1_time),
+		  _trig_clock.Frame(trig1_time),
+		  _trig_clock.Sample(trig2_time),
+		  _trig_clock.Frame(trig2_time))
+	     );
 
-    if( trigger1.TriggerNumber() != trigger2.TriggerNumber() ) {
+    if( trig1_number != trig2_number ) {
       RaiseTriggerException("Cannot combine triggers with different trigger counters!");
       return trigdata::Trigger();
     }
 
-    if( trigger1.TriggerFrame() != trigger2.TriggerFrame() ) {
+    if( _trig_clock.Frame(trig1_time) != _trig_clock.Frame(trig2_time) ) {
       RaiseTriggerException("Cannot combine triggers in different frames!");
       return trigdata::Trigger();
     }
 
-    auto const res_number = trigger1.TriggerNumber();
-    auto const res_frame  = trigger1.TriggerFrame();
-
-    auto const trig1_sample = trigger1.TriggerSample();
-    auto const trig2_sample = trigger2.TriggerSample();
-    if( _trigger_clock.Sample(_pmt_clock,trig1_sample) != _trigger_clock.Sample(_pmt_clock,trig2_sample) ){
+    if( _trig_clock.Sample(trig1_time) != _trig_clock.Sample(trig2_time) ) {
       RaiseTriggerException("Cannot combine triggers in different trigger clock sample number!");
       return trigdata::Trigger();
     }
 
+    auto const res_number = trig1_number;
+    auto const res_frame  = _pmt_clock.Frame(trig1_time);
+    auto const trig1_sample = _pmt_clock.Sample(trig1_time);
+    auto const trig2_sample = _pmt_clock.Sample(trig2_time);
     auto const res_sample = (trig1_sample < trig2_sample ? trig1_sample : trig2_sample);
 
     // Construct beam gate region. Note that this is relevant only if either of
@@ -333,15 +395,15 @@ namespace trigger{
     // Case2: only trigger 1 is beam
     else if( (trigger1.Triggered(trigger::kTriggerBNB) || trigger1.Triggered(trigger::kTriggerNuMI)) ) {
       
-      beam_frame  = trigger1.BeamGateFrame();
-      beam_sample = trigger1.BeamGateSample();
+      beam_frame  = _pmt_clock.Frame(trigger1.BeamGateTime());
+      beam_sample = _pmt_clock.Sample(trigger1.BeamGateTime());
 
     }
     // Case3: only trigger 2 is beam
     else if( (trigger2.Triggered(trigger::kTriggerBNB) || trigger2.Triggered(trigger::kTriggerNuMI)) ) {
 
-      beam_frame  = trigger2.BeamGateFrame();
-      beam_sample = trigger2.BeamGateSample();
+      beam_frame  = _pmt_clock.Frame(trigger2.BeamGateTime());
+      beam_sample = _pmt_clock.Sample(trigger2.BeamGateTime());
 
     }
     // Case4: neither is beam ... use trigger timing
@@ -365,29 +427,27 @@ namespace trigger{
 	}
     }
     
+    auto trig_time = util::TimeService::GetME().OpticalClock(res_sample,res_frame);
+    auto beam_time = util::TimeService::GetME().OpticalClock(beam_sample,beam_frame);
     return trigdata::Trigger(res_number,
-			     res_sample,
-			     res_frame,
-			     beam_sample,
-			     beam_frame,
+			     trig_time.Time(),
+			     beam_time.Time(),
+			     ReadOutStartTimeTPC(trig_time).Time(),
+			     ReadOutStartTimeOptical(trig_time).Time(),
 			     res_bits);
-
+    
   }
 
   //##################################################################
   void UBTriggerAlgo::AddTrigger(const trigdata::Trigger &new_trigger)
   //##################################################################
   {
-    unsigned int frame  = new_trigger.TriggerFrame();
-    unsigned int sample = _trigger_clock.Sample(_pmt_clock,new_trigger.TriggerSample());
+    auto frame  = _trig_clock.Frame(new_trigger.TriggerTime());
+    auto sample = _trig_clock.Sample(new_trigger.TriggerTime());
 
-    if(_debug_mode) {
+    if(_debug_mode)
 
-      Report(Form("Requested to add a new trigger @ (%d, %d)",
-		  new_trigger.TriggerSample(),
-		  new_trigger.TriggerFrame()));
-
-    }
+      Report(Form("Requested to add a new trigger @ (%d, %d)",sample,frame));
 
     auto frame_iter = _candidates.find(frame);
 
@@ -414,171 +474,90 @@ namespace trigger{
     }
   }
 
-  //
-  // LArSoft interface functions ... comment out to compile for LArLight
-  //
-  /*
-  //######################################################################
-  void UBTriggerAlgo::AddTriggerBNB(const art::Ptr<sim::BeamGateInfo> bgi)
-  //######################################################################
+  //##################################################################
+  void UBTriggerAlgo::AddTriggerPMTCosmic(const util::ElecClock& time)
+  //##################################################################
   {
-    AddTriggerBNB(bgi->Start());
-  }
-
-  //######################################################################
-  void UBTriggerAlgo::AddTriggerNuMI(const art::Ptr<sim::BeamGateInfo> bgi)
-  //######################################################################
-  {
-    AddTriggerNuMI(bgi->Start());
-  }
-
-  //################################################################################
-  void UBTriggerAlgo::AddTriggerPMT(const art::Ptr<optdata::PMTTrigger> pmt_trigger)
-  //################################################################################
-  {
-
-    // Trigger bits
-    uint32_t trig_bits=0x0;
-    switch(pmt_trigger->Category()) {
-    case optdata::kUndefined:
-    case optdata::kHighGain:
-    case optdata::kLowGain:
-    case optdata::kFEMCosmicHighGain:
-    case optdata::kFEMCosmicLowGain:
-    case optdata::kFEMBeamHighGain:
-    case optdata::kFEMBeamLowGain:
-      RaiseTriggerException("Unknown type PMT trigger received!");
-      return;
-    case optdata::kBeamPMTTrigger:
-      AddTriggerPMTBeam( pmt_trigger->TimeSlice(), pmt_trigger->Frame() );
-      break;
-    case optdata::kCosmicPMTTrigger:
-      AddTriggerPMTCosmic( pmt_trigger->TimeSlice(), pmt_trigger->Frame() );
-      break;
-    }
-  }
-  */
-  //
-  // End of LArSoft interface functions 
-  //
-
-  //###############################################
-  void UBTriggerAlgo::AddTriggerPMTCosmic(double t)
-  //###############################################
-  {
-    AddTriggerPMTCosmic( _pmt_clock.MCSample(t), _pmt_clock.MCFrame(t) );
-  }
-
-  //###############################################
-  void UBTriggerAlgo::AddTriggerPMTBeam(double t)
-  //###############################################
-  {
-    AddTriggerPMTBeam( _pmt_clock.MCSample(t), _pmt_clock.MCFrame(t) );
-  }
-
-  //#################################################################
-  void UBTriggerAlgo::AddTriggerPMTCosmic(unsigned int trig_sample, 
-					     unsigned int trig_frame)
-  //#################################################################
-  {
+    _pmt_clock.SetTime(_pmt_clock.Time(time.Time()));
     // Trigger bits
     unsigned int trig_bits=0x0;
     trig_bits += ( (0x1) << kPMTTriggerCosmic );
     trig_bits += ( (0x1) << kPMTTrigger );
     
-    // Beam frame & sample number ... for PMT trigger, this is same as trigger frame/sample
-    unsigned int beam_frame  = trig_frame;
-    unsigned int beam_sample = trig_sample;
-
     // Create this trigger candidate object
     trigdata::Trigger trig_candidate(0,
-				     trig_sample, trig_frame,
-				     beam_sample, beam_frame,
+				     _pmt_clock.Time(),
+				     _pmt_clock.Time(),
+				     ReadOutStartTimeTPC(_pmt_clock).Time(),
+				     ReadOutStartTimeOptical(_pmt_clock).Time(),
 				     trig_bits);
 
     // Add this trigger candidate
     AddTrigger(trig_candidate);
+    _pmt_clock.SetTime(0);
   }
 
   //################################################################
-  void UBTriggerAlgo::AddTriggerPMTBeam(unsigned int trig_sample, 
-					   unsigned int trig_frame)
+  void UBTriggerAlgo::AddTriggerPMTBeam(const util::ElecClock& time)
   //################################################################
   {
+    _pmt_clock.SetTime(_pmt_clock.Time(time.Time()));
    // Trigger bits
     unsigned int trig_bits=0x0;
     trig_bits += ( (0x1) << kPMTTriggerBeam );
     trig_bits += ( (0x1) << kPMTTrigger );
     
-    // Beam frame & sample number ... for PMT trigger, this is same as trigger frame/sample
-    unsigned int beam_frame  = trig_frame;
-    unsigned int beam_sample = trig_sample;
-
     // Create this trigger candidate object
     trigdata::Trigger trig_candidate(0,
-				     trig_sample, trig_frame,
-				     beam_sample, beam_frame,
+				     _pmt_clock.Time(),
+				     _pmt_clock.Time(),
+				     ReadOutStartTimeTPC(_pmt_clock).Time(),
+				     ReadOutStartTimeOptical(_pmt_clock).Time(),
 				     trig_bits);
 
     // Add this trigger candidate
     AddTrigger(trig_candidate);
+    _pmt_clock.SetTime(0);
   }
 
-  //################################################################
-  void UBTriggerAlgo::AddTriggerBNB(double start)
-  //################################################################
+  //############################################################
+  void UBTriggerAlgo::AddTriggerBNB(const util::ElecClock& time)
+  //############################################################
   {
-    // Trigger frame number
-    unsigned int trig_frame  = _pmt_clock.MCFrame(start);
-    // Trigger sample number
-    unsigned int trig_sample = _pmt_clock.MCSample(start);
-
-    // Beam frame and sample numbers
-    unsigned int beam_timing = trig_sample + _pmt_clock.Sample(_trigger_clock,_bnb_delay);
-    unsigned int beam_sample = 0;
-    unsigned int beam_frame  = 0;
-    _pmt_clock.Tick2SampleFrame( beam_timing, beam_sample, beam_frame );
-    beam_frame += trig_frame;
-
+    _pmt_clock.SetTime(_pmt_clock.Time(time.Time()));
     uint32_t trig_bits = ( (0x1) << trigger::kTriggerBNB );
  
     // Create this trigger candidate object
     trigdata::Trigger trig_candidate(0,
-				     trig_sample, trig_frame,
-				     beam_sample, beam_frame,
+				     _pmt_clock.Time(),
+				     BNBStartTime(_pmt_clock).Time(),
+				     ReadOutStartTimeTPC(_pmt_clock).Time(),
+				     ReadOutStartTimeOptical(_pmt_clock).Time(),
 				     trig_bits);
-
+    
     // Add this trigger candidate
     AddTrigger(trig_candidate);
+    _pmt_clock.SetTime(0);
   }
 
-  //###############################################
-  void UBTriggerAlgo::AddTriggerNuMI(double start)
-  //###############################################
+  //#############################################################
+  void UBTriggerAlgo::AddTriggerNuMI(const util::ElecClock& time)
+  //#############################################################
   {
-    // Trigger frame number
-    unsigned int trig_frame  = _pmt_clock.MCFrame(start);
-    // Trigger sample number
-    unsigned int trig_sample = _pmt_clock.MCSample(start);
-
-    // Beam frame and sample numbers
-    unsigned int beam_timing = trig_sample + _pmt_clock.Sample(_trigger_clock,_numi_delay);
-    unsigned int beam_sample = 0;
-    unsigned int beam_frame  = 0;
-    _pmt_clock.Tick2SampleFrame( beam_timing, beam_sample, beam_frame );
-    beam_frame += trig_frame;
-
+    _pmt_clock.SetTime(_pmt_clock.Time(time.Time()));
     uint32_t trig_bits = ( (0x1) << trigger::kTriggerNuMI );
 
     // Create this trigger candidate object
     trigdata::Trigger trig_candidate(0,
-				     trig_sample, trig_frame,
-				     beam_sample, beam_frame,
+				     _pmt_clock.Time(),
+				     NuMIStartTime(_pmt_clock).Time(),
+				     ReadOutStartTimeTPC(_pmt_clock).Time(),
+				     ReadOutStartTimeOptical(_pmt_clock).Time(),
 				     trig_bits);
 
     // Add this trigger candidate
     AddTrigger(trig_candidate);
-
+    _pmt_clock.SetTime(0);
   }
   
   //###############################################
@@ -586,7 +565,6 @@ namespace trigger{
   //###############################################
   {
     auto frame_iter = _candidates.begin();
-
     std::ostringstream msg;
 
     msg
@@ -612,10 +590,12 @@ namespace trigger{
 
 	unsigned int decision_sample = (*sample_iter).first;
 	unsigned int decision_frame  = (*frame_iter).first;
-	unsigned int trigger_sample  = (*sample_iter).second.TriggerSample();
-	unsigned int trigger_frame   = (*sample_iter).second.TriggerFrame();
-	unsigned int beam_sample     = (*sample_iter).second.BeamGateSample();
-	unsigned int beam_frame      = (*sample_iter).second.BeamGateFrame();
+
+	unsigned int trigger_sample  = _pmt_clock.Sample(((*sample_iter).second.TriggerTime()));
+	unsigned int trigger_frame   = _pmt_clock.Frame(((*sample_iter).second.TriggerTime()));
+
+	unsigned int beam_sample     = _pmt_clock.Sample(((*sample_iter).second.BeamGateTime()));
+	unsigned int beam_frame      = _pmt_clock.Sample(((*sample_iter).second.BeamGateTime()));
 	
 	msg
 	  << Form("  %-18d : %-18d : %-18d : %-18d : %-18d : %-18d : ",
@@ -656,16 +636,15 @@ namespace trigger{
       
       ShowCandidateTriggers();
 
-    // Create deadtime and PMT-Trigger allow time windows
-    trigger::time_window_t deadtime(0,0,0);
+    // Just make sure trigger clock is only used for sample/frame getter (i.e. no time used)
+    _trig_clock.SetTime(0);
+    util::ElecClock trig_time = _trig_clock;
 
-    trigger::time_window_t bnb_active(0,0,0);
-
-    trigger::time_window_t numi_active(0,0,0);
-
-    trigger::time_window_t bnb_gate(0,0,0);
-
-    trigger::time_window_t numi_gate(0,0,0);
+    time_window_t deadtime    (_trig_clock,_trig_clock);
+    time_window_t bnb_active  (_trig_clock,_trig_clock);
+    time_window_t numi_active (_trig_clock,_trig_clock);
+    time_window_t bnb_gate    (_trig_clock,_trig_clock);
+    time_window_t numi_gate   (_trig_clock,_trig_clock);
 
     auto const mask0 = _mask.at(0);
     auto const mask1 = _mask.at(1);
@@ -695,14 +674,27 @@ namespace trigger{
 				    (*sample_iter).first,
 				    (*frame_iter).first));
 
+	trig_time.SetTime(_trig_clock.Time((*sample_iter).first,(*frame_iter).first));
+
 	// If in deadtime, continue
-	if( InWindow(deadtime, (*sample_iter).first, (*frame_iter).first) ) {
-	  if(_debug_mode) Report(Form("    Skipping as deadtime is (%d,%d) => %d samples",
-				      deadtime.start_sample,
-				      deadtime.start_frame,
-				      deadtime.duration));
+	if( InWindow(trig_time, deadtime) ) {
+
+	  if(_debug_mode) Report(Form("    Skipping as deadtime is (%d,%d) => (%d,%d)",
+				      deadtime.first.Sample(),
+				      deadtime.first.Frame(),
+				      deadtime.second.Sample(),
+				      deadtime.second.Frame())
+				 );
 	  sample_iter++;
 	  continue;
+	}else if(_debug_mode){
+	  
+	  Report(Form("    Not in deadtime: (%d,%d) => (%d,%d)",
+		      deadtime.first.Sample(),
+		      deadtime.first.Frame(),
+		      deadtime.second.Sample(),
+		      deadtime.second.Frame())
+		 );
 	}
 
 	auto const pmt0   = (*sample_iter).second.Triggered(trigger::kPMTTriggerCosmic);
@@ -712,23 +704,20 @@ namespace trigger{
 	auto const calib  = (*sample_iter).second.Triggered(trigger::kTriggerCalib);
 	auto const ext    = (*sample_iter).second.Triggered(trigger::kTriggerEXT);
 	auto const pc     = (*sample_iter).second.Triggered(trigger::kTriggerPC);
-	auto const active = ( InWindow(bnb_active, (*sample_iter).first, (*frame_iter).first) ||
-			      InWindow(numi_active, (*sample_iter).first, (*frame_iter).first) );
+	auto const active = ( InWindow(trig_time, bnb_active) || InWindow(trig_time, numi_active) );
 
 	// If BNB or NuMI, open new beam trigger gate
 	if(bnb) {
-	  bnb_gate.start_sample = (*sample_iter).first;
-	  bnb_gate.start_frame  = (*frame_iter).first;
-	  bnb_gate.duration = _bnb_gate_width;
+	  bnb_gate.first.SetTime((*sample_iter).first, (*frame_iter).first);
+	  bnb_gate.second.SetTime(bnb_gate.first.Time() + _trig_clock.Time(_bnb_gate_width));
 	}
 	if(numi) {
-	  numi_gate.start_sample = (*sample_iter).first;
-	  numi_gate.start_frame  = (*frame_iter).first;
-	  numi_gate.duration = _numi_gate_width;
+	  numi_gate.first.SetTime((*sample_iter).first, (*frame_iter).first);
+	  numi_gate.second.SetTime(numi_gate.first.Time() + _trig_clock.Time(_bnb_gate_width));
 	}
 	
-	auto const bnb_gate_active  = InWindow(bnb_gate,  (*sample_iter).first, (*frame_iter).first);
-	auto const numi_gate_active = InWindow(numi_gate, (*sample_iter).first, (*frame_iter).first);
+	auto const bnb_gate_active  = InWindow(trig_time, bnb_gate);
+	auto const numi_gate_active = InWindow(trig_time, numi_gate);
 
 	if(_debug_mode)
 	  {
@@ -789,76 +778,49 @@ namespace trigger{
 	if( p0 || p1 || p8 ) {
 	  // New trigger found. 
 
-	  // Assign deadtime
-	  deadtime.start_sample = (*sample_iter).first;
-	  deadtime.start_frame  = (*frame_iter).first;
-	  deadtime.duration     = _deadtime * _trigger_clock.FrameTick();
+	  deadtime.first.SetTime(trig_time.Time());
+	  deadtime.second.SetTime(trig_time.Time());
+	  deadtime.second += (int)(_deadtime * _trig_clock.FrameTicks() - 1);
+	  if(_debug_mode) {
+	    std::cout<<Form("    Dead time set: (%d,%d) => (%d,%d) with trigger @ (%d,%d)",
+			    deadtime.first.Sample(),
+			    deadtime.first.Frame(),
+			    deadtime.second.Sample(),
+			    deadtime.second.Frame(),
+			    trig_time.Sample(),
+			    trig_time.Frame()
+			    )
+		     << std::endl;
+	  }
 
 	  // Assign active window for bnb/numi
 	  if(bnb) {
-	    unsigned int allow_duration     = _bnb_cosmic_allow_max - _bnb_cosmic_allow_min;
-	    unsigned int allow_start_sample = 0;
-	    unsigned int allow_start_frame  = 0;
-	    _trigger_clock.Tick2SampleFrame( ((*sample_iter).first + _bnb_cosmic_allow_min),
-					     allow_start_sample,
-					     allow_start_frame );
-	    allow_start_frame += (*frame_iter).first;
-	    
-	    bnb_active.start_sample = allow_start_sample;
-	    bnb_active.start_frame  = allow_start_frame;
-	    bnb_active.duration     = allow_duration;
+	    bnb_active.first.SetTime(trig_time.Time());
+	    bnb_active.first  += (int)(_bnb_cosmic_allow_min);
+	    bnb_active.second.SetTime(trig_time.Time());
+	    bnb_active.second += (int)(_bnb_cosmic_allow_max);
 	  }
 	  if(numi) {
-	    unsigned int allow_duration     = _numi_cosmic_allow_max - _numi_cosmic_allow_min;
-	    unsigned int allow_start_sample = 0;
-	    unsigned int allow_start_frame  = 0;
-	    _trigger_clock.Tick2SampleFrame( ((*sample_iter).first + _numi_cosmic_allow_min),
-					     allow_start_sample,
-					     allow_start_frame );
-	    allow_start_frame += (*frame_iter).first;
-	    
-	    numi_active.start_sample = allow_start_sample;
-	    numi_active.start_frame  = allow_start_frame;
-	    numi_active.duration     = allow_duration;
+	    numi_active.first.SetTime(trig_time.Time());
+	    numi_active.first  += (int)(_numi_cosmic_allow_min);
+	    numi_active.second.SetTime(trig_time.Time());
+	    numi_active.second += (int)(_numi_cosmic_allow_max);
 	  }
 	  
 	  // Store trigger object
-	  triggers.push_back( trigdata::Trigger( _trigger_counter,
-						 (*sample_iter).second.TriggerSample(),
-						 (*sample_iter).second.TriggerFrame(),
-						 (*sample_iter).second.BeamGateSample(),
-						 (*sample_iter).second.BeamGateFrame(),
-						 (*sample_iter).second.TriggerBits() ) );
+	  triggers.push_back( trigdata::Trigger(_trigger_counter,
+						(*sample_iter).second.TriggerTime(),
+						(*sample_iter).second.BeamGateTime(),
+						(*sample_iter).second.ReadOutStartTPC(),
+						(*sample_iter).second.ReadOutStartOptical(),
+						(*sample_iter).second.TriggerBits()) 
+			      );
 	  _trigger_counter++;
 	} // end if trigger found
 	sample_iter++;
       } // end looping over samples
       frame_iter++;
     } // end looping over frames
-    
-  }
-
-  //###############################################################################################
-  bool UBTriggerAlgo::InWindow(time_window_t window, unsigned int sample, unsigned int frame) const
-  //###############################################################################################
-  {
-    if( frame < window.start_frame ) return false;
-
-    if( frame == window.start_frame ) {
-
-      if( sample < window.start_sample ) return false;
-      else return (sample < (window.start_sample + window.duration));
-
-    } else {
-
-      if(_trigger_clock.FrameTick() < window.start_sample)
-
-	RaiseTriggerException("Logic error: found time window sample number larger than frame size!");
-
-      unsigned int diff_tick = (_trigger_clock.FrameTick()) * (frame - window.start_frame) - window.start_sample + sample;
-      return (diff_tick < window.duration);
-
-    }
     
   }
 
