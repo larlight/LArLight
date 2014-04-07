@@ -963,7 +963,9 @@ namespace cluster{
     }
     
   
-    fParams.angle_2d=(curr_max_bin/720*2*TMath::Pi())-TMath::Pi();
+    fParams.angle_2d=(curr_max_bin/720*(2*TMath::Pi()))-TMath::Pi();
+    
+    std::cout << " Final 2D angle: " << fParams.angle_2d*180/TMath::Pi() << " degrees " << std::endl;
     
     if(cos(fParams.angle_2d))
       fParams.modified_hit_density=fParams.hit_density_1D/cos(fParams.angle_2d);

@@ -152,6 +152,10 @@ namespace cluster {
     const larutil::PxPoint& RoughStartPoint() {return fRoughBeginPoint;}
     const larutil::PxPoint& RoughEndPoint() {return fRoughEndPoint;}
 
+    double RoughSlope() {return fRough2DSlope;}
+    double RoughIntercept() {return fRough2DIntercept;}
+    
+       
   protected:
     
     larutil::GeometryUtilities  *fGSer;
