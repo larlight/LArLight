@@ -38,7 +38,7 @@ namespace larutil{
     
     fWiretoCm=fWirePitch;
     fTimetoCm=fTimeTick*fDriftVelocity;
-    fWireTimetoCmCm=(fTimeTick*fDriftVelocity)/fWirePitch;
+    fWireTimetoCmCm=fTimetoCm/fWirePitch;
   }
 
   //--------------------------------------------------------------------
@@ -1028,7 +1028,7 @@ namespace larutil{
 					     Double_t linearlimit,   Double_t ortlimit, 
 					     Double_t lineslopetest)
   {
-    
+    hitlistlocal_index.clear();
     Double_t locintercept=time_start-wire_start*lineslopetest;
     
     for(size_t i=0; i<hitlist.size(); ++i) {
@@ -1063,7 +1063,7 @@ namespace larutil{
 					     Double_t linearlimit,   Double_t ortlimit, 
 					     Double_t lineslopetest)
   {
-    
+    hitlistlocal.clear();
     Double_t locintercept=time_start-wire_start*lineslopetest;
     
     for(size_t i=0; i<hitlist.size(); ++i) {
@@ -1101,9 +1101,8 @@ namespace larutil{
 					     Double_t& lineslopetest,
 					     larutil::PxHit &averageHit) {
 
-    
+    hitlistlocal.clear();
     double locintercept=startHit.t - startHit.w * lineslopetest;
-
     double timesum = 0;
     double wiresum = 0;
     for(size_t i=0; i<hitlist.size(); ++i) {
@@ -1136,5 +1135,217 @@ namespace larutil{
   }
   
 
+  void GeometryUtilities::SelectPolygonHitList(const std::vector<larutil::PxHit>   &hitlist,
+					       std::vector <const larutil::PxHit*> &hitlistlocal)
+  {
+    if(!(hitlist.size())) {
+      throw LArUtilException("Provided empty hit list!");
+      return;
+    }
 
+    hitlistlocal.clear();
+    unsigned char plane = (*hitlist.begin()).plane;
+
+    // Define subset of hits to define polygon
+    std::map<double,const larutil::PxHit*> hitmap;
+    double qtotal=0;
+    for(auto const &h : hitlist){
+      
+      hitmap.insert(std::pair<double,const larutil::PxHit*>(h.charge,&h));
+      qtotal += h.charge;
+
+    }
+    double qintegral=0;
+    std::vector<const larutil::PxHit*> ordered_hits;
+    ordered_hits.reserve(hitlist.size());
+    for(auto hiter = hitmap.begin();
+	hiter!=hitmap.end();
+	++hiter) {
+
+      qintegral += (*hiter).first;
+      ordered_hits.push_back((*hiter).second);
+      if(qintegral > 0.95*qtotal) break; 
+    }
+
+    // Define container to hold found polygon corner PxHit index & distance
+    std::vector<size_t> hit_index(8,0);
+    std::vector<double> hit_distance(8,1e9);
+    
+    // Loop over hits and find corner points in the plane view
+    // Also fill corner edge points
+    std::vector<larutil::PxPoint> edges(4,PxPoint(plane,0,0));
+    double wire_max = geom->Nwires(plane) * fWiretoCm;
+    double time_max = detp->NumberTimeSamples() * fTimetoCm;
+
+    for(size_t index = 0; index<ordered_hits.size(); ++index) {
+
+      if(ordered_hits.at(index)->t < 0 ||
+	 ordered_hits.at(index)->w < 0 ||
+	 ordered_hits.at(index)->t > time_max ||
+	 ordered_hits.at(index)->w > wire_max ) {
+
+	throw LArUtilException(Form("Invalid wire/time (%g,%g) ... range is (0=>%g,0=>%g)",
+				    ordered_hits.at(index)->w,
+				    ordered_hits.at(index)->t,
+				    wire_max,
+				    time_max)
+			       );
+	return;
+      }
+
+      double dist = 0;
+      
+      // Comparison w/ (Wire,0)
+      dist = ordered_hits.at(index)->t;
+      if(dist < hit_distance.at(1)) {
+	hit_distance.at(1) = dist;
+	hit_index.at(1) = index;
+	edges.at(0).t = ordered_hits.at(index)->t;
+	edges.at(1).t = ordered_hits.at(index)->t;
+      }
+
+      // Comparison w/ (WireMax,Time)
+      dist = wire_max - ordered_hits.at(index)->w;
+      if(dist < hit_distance.at(3)) {
+	hit_distance.at(3) = dist;
+	hit_index.at(3) = index;
+	edges.at(1).w = ordered_hits.at(index)->w;
+	edges.at(2).w = ordered_hits.at(index)->w;
+      }
+
+      // Comparison w/ (Wire,TimeMax)
+      dist = time_max - ordered_hits.at(index)->t;
+      if(dist < hit_distance.at(5)) {
+	hit_distance.at(5) = dist;
+	hit_index.at(5) = index;
+	edges.at(2).t = ordered_hits.at(index)->t;
+	edges.at(3).t = ordered_hits.at(index)->t;
+      }
+
+      // Comparison w/ (0,Time)
+      dist = ordered_hits.at(index)->w;
+      if(dist < hit_distance.at(7)) {
+	hit_distance.at(7) = dist;
+	hit_index.at(7) = index;
+	edges.at(0).w = ordered_hits.at(index)->w;
+	edges.at(3).w = ordered_hits.at(index)->w;
+      }
+    }
+
+    std::cout
+      << Form("Corner points: (%g,%g) (%g,%g) (%g,%g) (%g,%g)",
+	      edges.at(0).w, edges.at(0).t,
+	      edges.at(1).w, edges.at(1).t,
+	      edges.at(2).w, edges.at(2).t,
+	      edges.at(3).w, edges.at(3).t)
+      <<std::endl;
+
+    for(size_t index = 0; index<ordered_hits.size(); ++index) {
+
+      double dist = 0;
+      // Comparison w/ (0,0)
+      dist = pow((ordered_hits.at(index)->t - edges.at(0).t),2) + pow((ordered_hits.at(index)->w - edges.at(0).w),2);
+      if(dist < hit_distance.at(0)) {
+	hit_distance.at(0) = dist;
+	hit_index.at(0) = index;
+      }
+      
+      // Comparison w/ (WireMax,0)
+      dist = pow((ordered_hits.at(index)->t - edges.at(1).t),2) + pow((ordered_hits.at(index)->w - edges.at(1).w),2);
+      if(dist < hit_distance.at(2)) {
+	hit_distance.at(2) = dist;
+	hit_index.at(2) = index;
+      }
+
+      // Comparison w/ (WireMax,TimeMax)
+      dist = pow((ordered_hits.at(index)->t - edges.at(2).t),2) + pow((ordered_hits.at(index)->w - edges.at(2).w),2);
+      if(dist < hit_distance.at(4)) {
+	hit_distance.at(4) = dist;
+	hit_index.at(4) = index;
+      }
+
+      // Comparison w/ (0,TimeMax)
+      dist = pow((ordered_hits.at(index)->t - edges.at(3).t),2) + pow((ordered_hits.at(index)->w - edges.at(3).w),2);
+      if(dist < hit_distance.at(6)) {
+	hit_distance.at(6) = dist;
+	hit_index.at(6) = index;
+      }
+
+    }
+
+    // Loop over the resulting hit indexes and append unique hits to define the polygon to the return hit list
+    std::set<size_t> unique_index;
+    std::vector<size_t> candidate_polygon;
+    candidate_polygon.reserve(9);
+    std::cout << "Original polygon: " << std::endl;
+    for(auto &index : hit_index) {
+      
+      if(unique_index.find(index) == unique_index.end()) {
+	//	hitlistlocal.push_back((const larutil::PxHit*)(ordered_hits.at(index)));
+	std::cout << "(" << ordered_hits.at(index)->w << ", " << ordered_hits.at(index)->t << ")" << std::endl;
+	unique_index.insert(index);
+	candidate_polygon.push_back(index);
+      }
+    }
+    for (auto &index: hit_index){
+      candidate_polygon.push_back(index);
+      break;
+    }
+
+    if(unique_index.size()>8) throw LArUtilException("Size of the polygon > 8!");    
+
+    //Untangle Polygon
+    candidate_polygon = PolyOverlap( ordered_hits, candidate_polygon);
+    
+    hitlistlocal.clear();
+    for( unsigned int i=0; i<(candidate_polygon.size()-1); i++){
+      hitlistlocal.push_back((const larutil::PxHit*)(ordered_hits.at(candidate_polygon.at(i))));
+    }
+    //check that polygon does not have more than 8 sides
+    if(unique_index.size()>8) throw LArUtilException("Size of the polygon > 8!");    
+  }
+  
+
+  std::vector<size_t>  GeometryUtilities::PolyOverlap( std::vector<const larutil::PxHit*> ordered_hits ,
+						    std::vector<size_t> candidate_polygon) {
+
+    //loop over edges
+    for ( unsigned int i=0; i<(candidate_polygon.size()-1); i++){
+      double Ax = ordered_hits.at(candidate_polygon.at(i))->w;
+      double Ay = ordered_hits.at(candidate_polygon.at(i))->t;
+      double Bx = ordered_hits.at(candidate_polygon.at(i+1))->w;
+      double By = ordered_hits.at(candidate_polygon.at(i+1))->t;
+      //loop over edges that have not been checked yet...
+      //only ones furhter down in polygon
+      for ( unsigned int j=i+2; j<(candidate_polygon.size()-1); j++){
+	//avoid consecutive segments:
+	if ( candidate_polygon.at(i) == candidate_polygon.at(j+1) )
+	  continue;
+	else{
+	  double Cx = ordered_hits.at(candidate_polygon.at(j))->w;
+	  double Cy = ordered_hits.at(candidate_polygon.at(j))->t;
+	  double Dx = ordered_hits.at(candidate_polygon.at(j+1))->w;
+	  double Dy = ordered_hits.at(candidate_polygon.at(j+1))->t;
+	  
+	  if ( (Clockwise(Ax,Ay,Cx,Cy,Dx,Dy) != Clockwise(Bx,By,Cx,Cy,Dx,Dy))
+	       and (Clockwise(Ax,Ay,Bx,By,Cx,Cy) != Clockwise(Ax,Ay,Bx,By,Dx,Dy)) ){
+	    size_t tmp = candidate_polygon.at(i+1);
+	    candidate_polygon.at(i+1) = candidate_polygon.at(j);
+	    candidate_polygon.at(j) = tmp;
+	    //check that last element is still first (to close circle...)
+	    candidate_polygon.at(candidate_polygon.size()-1) = candidate_polygon.at(0);
+	    //swapped polygon...now do recursion to make sure
+	    return PolyOverlap( ordered_hits, candidate_polygon);
+	  }//if crossing
+	}
+      }//second loop
+    }//first loop
+    std::cout << std::endl;
+    return candidate_polygon;
+  }
+  
+  bool GeometryUtilities::Clockwise(double Ax,double Ay,double Bx,double By,double Cx,double Cy){
+    return (Cy-Ay)*(Bx-Ax) > (By-Ay)*(Cx-Ax);
+  }
+  
 } // namespace

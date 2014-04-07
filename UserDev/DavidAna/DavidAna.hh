@@ -16,6 +16,7 @@
 #define DAVIDANA_HH
 
 #include "ana_base.hh"
+#include "Geometry.hh"
 #include <map>
 #include <vector>
 #include <TH1D.h>
@@ -59,12 +60,14 @@ namespace larlight {
     protected:
 
     TH1D      *compression;
-    TH1D            *noise;
-    TH1D              *rms;
-    int          event_num;
-    int          _NSamples;
-    double         _VarCut;
-    int          _baseline;
+    TH1D      *noise;
+    TH1D      *rms;
+    int       event_num;
+    int       _NSamples;
+    double    _VarCut;
+    int       _baseline;
+    int       _PedInduction;
+    int       _PedCollection;
 
   };
 }

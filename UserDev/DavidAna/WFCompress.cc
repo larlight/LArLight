@@ -10,9 +10,27 @@ namespace larlight {
 
     _event_num      =   0;
     _compressfctr   =   0;
-    hCompress = new TH1D("Compression", "Compression Factor [1/%]", 30, 0, 1);
-    
+    hCompress = new TH1D("Compression", "Compression Factor [1/%]", 30, 0, 30);
+
+    std::ifstream myin;
+    std::string line;
+    std::string params;
+    std::vector<std::string> paramarray;
+    myin.open("compression_parameters.txt");
+    std::getline(myin,line);
+    std::stringstream linestream(line);
+    while ( std::getline(linestream,params,'\t') )
+      paramarray.push_back(params);
+    double varask = atof(paramarray.at(0).c_str());
+    _NVarSamples = atoi(paramarray.at(1).c_str());
+    _NSamplesante = atoi(paramarray.at(2).c_str());
+    _NSamplespost = atoi(paramarray.at(3).c_str());
+    std::cout << "var/bin: " << varask << " _NVarSamples: " << _NVarSamples
+	      << " _NSamplesante: " << _NSamplesante << " NSamplespost: " 
+	      << _NSamplespost << std::endl;
+    myin.close();
     //ask for variance cut:
+    /*
     double varask;
     std::cout << "What variance/bin value to use?" << std::endl;
     std::cin >> varask;
@@ -23,7 +41,7 @@ namespace larlight {
     std::cin >> _NSamplesante;
     std::cout << "Number of samples to write after?" << std::endl;
     std::cin >> _NSamplespost;
-
+    */
     _VarCut        =  _NVarSamples*varask;
     _baseline      =   0;
     std::cout << "The cut on variance is: " << _VarCut << std::endl;
@@ -85,7 +103,7 @@ namespace larlight {
     //replace event_ef with new_event_wf data
     //this will be outputed to output script
     event_wf->clear();
-    for (int i=0; i<new_event_wf.size(); i++){
+    for (unsigned int i=0; i<new_event_wf.size(); i++){
       event_wf->push_back(new_event_wf.at(i));
     }
             
@@ -274,7 +292,9 @@ namespace larlight {
 
 
   bool WFCompress::finalize() {
-
+   
+    float compression = 1.0/(hCompress->GetMean());
+    std::cout << "Compression: " << compression << std::endl;
     hCompress->Write();
     
 

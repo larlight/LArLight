@@ -16,6 +16,7 @@
 #include "LArProperties.hh"
 #include "DetectorProperties.hh"
 #include "PxUtils.h"
+#include "time.h"
 
 ///General LArSoft Utilities
 namespace larutil{
@@ -213,9 +214,19 @@ namespace larutil{
 			    Double_t& lineslopetest,
 			    larutil::PxHit &averageHit);
 
-   Double_t TimeToCm() {return fTimetoCm;};
-   Double_t WireToCm() {return fWiretoCm;};			     
-    
+    void SelectPolygonHitList(const std::vector<larutil::PxHit> &hitlist,
+			      std::vector <const larutil::PxHit*> &hitlistlocal);
+
+    std::vector<size_t> PolyOverlap( std::vector<const larutil::PxHit*> ordered_hits,
+				  std::vector<size_t> candidate_polygon);
+
+    bool Clockwise(double Ax, double Ay, double Bx, double By,
+		   double Cx, double Cy);
+
+    Double_t TimeToCm() const {return fTimetoCm;}
+    Double_t WireToCm() const {return fWiretoCm;}
+    Double_t WireTimeToCmCm() const {return fWireTimetoCmCm;}
+
   private:
 
     larutil::Geometry* geom;

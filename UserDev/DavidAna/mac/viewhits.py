@@ -4,6 +4,7 @@ from ROOT import *
 
 # Now import ana_processor & your class. For this example, ana_base.
 gSystem.Load("libAnalysis")
+gSystem.Load("libLArUtil")
 gSystem.Load("libDavidAna")
 
 filename = sys.argv[1]
@@ -31,13 +32,13 @@ my_proc.add_process(my_ana)
 gStyle.SetOptStat(0)
 
 c=TCanvas("c","Wire v. Time Hit Viewer",900,600)
-c.Divide(1,3)
+#c.Divide(1,3)
 
 while my_proc.process_event():
 
     currentview = 0;
     #First fill the 6 pads on the main canvas with stuff
-    for pad in xrange(1,4,1):
+    for pad in xrange(1,2,1):
         
         c.cd(pad)
         my_ana.GetHisto_Hits(int(currentview)).Draw("COLZ")

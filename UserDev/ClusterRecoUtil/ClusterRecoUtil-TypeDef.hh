@@ -20,12 +20,19 @@ namespace cluster{
   class cluster_params;
   class RecoUtilException;
   class ClusterMergeAlgNew;
+  class SimChannelViewer;
+  class WireViewer;
 }
 
+
 class ClusterParamsExecutor;
+
+
 
 //ADD_EMPTY_CLASS ... do not change this comment line
 
 #endif
+
+
 
 

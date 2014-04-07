@@ -11,12 +11,17 @@
 
 #pragma link C++ namespace cluster+;
 
+#pragma link C++ class std::vector<const larutil::PxHit*>+;
 #pragma link C++ class cluster::ClusterParamsAlgNew+;
 #pragma link C++ class cluster::cluster_params+;
 #pragma link C++ class cluster::ClusterParamsExecutor+;
 #pragma link C++ class cluster::RecoUtilException+;
 #pragma link C++ class cluster::ClusterMergeAlgNew+;
+#pragma link C++ class cluster::SimChannelViewer+;
+#pragma link C++ class cluster::WireViewer+;
 //ADD_NEW_CLASS ... do not change this line
 #endif
+
+
 
 
