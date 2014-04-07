@@ -927,11 +927,10 @@ namespace cluster{
     
     // fParams.start_point
     
-   double current_maximum=0;
-   double curr_max_bin=-1;
-   
-   for( auto hit : fHitVector){
-      
+    double current_maximum=0;
+    double curr_max_bin=-1;
+    
+    for( auto hit : fHitVector){
       
       double omx=fGSer->Get2Dangle((larutil::PxPoint *)&hit,&fParams.start_point);  // in rad and assuming cm/cm space.
       int nbin=(omx+TMath::Pi())*NBINS/(2*TMath::Pi());
@@ -940,23 +939,23 @@ namespace cluster{
       fh_omega_single[nbin]+=hit.charge;
       
       if( fh_omega_single[nbin]>current_maximum )
-	{
-	 current_maximum= fh_omega_single[nbin];
-	 curr_max_bin=nbin;
-	}
+      {
+        current_maximum= fh_omega_single[nbin];
+        curr_max_bin=nbin;
+      }
 	
       
-     }
+    }
     
   
-   fParams.angle_2d=(curr_max_bin/720*2*TMath::Pi())-TMath::Pi();
-  
-   if(cos(fParams.angle_2d))
-    fParams.modified_hit_density=fParams.hit_density_1D/cos(fParams.angle_2d);
-   else 
-    fParams.modified_hit_density=fParams.hit_density_1D;
-     
-   fFinishedGetFinalSlope = true;
+    fParams.angle_2d=(curr_max_bin/720*2*TMath::Pi())-TMath::Pi();
+    
+    if(cos(fParams.angle_2d))
+      fParams.modified_hit_density=fParams.hit_density_1D/cos(fParams.angle_2d);
+    else 
+      fParams.modified_hit_density=fParams.hit_density_1D;
+       
+    fFinishedGetFinalSlope = true;
     return;
   }
   
