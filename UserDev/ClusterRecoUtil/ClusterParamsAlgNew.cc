@@ -593,32 +593,6 @@ namespace cluster{
       ortCanv -> Update();
     }
 
-    fFinishedGetProfileInfo = true;
-    // Report();
-    return;
-  }
-  
-  
-  /**
-   * Calculates the following variables:
-   * length
-   * width
-   * hit_density_1D
-   * hit_density_2D
-   * direction
-   * @param override [description]
-   */
-  void ClusterParamsAlgNew::RefineStartPoints(bool override) {
-    if(!override) { //Override being set, we skip all this logic.
-      //OK, no override. Stop if we're already finshed.
-      if (fFinishedRefineStartPoints) return;
-      //Try to run the previous function if not yet done.
-      if (!fFinishedGetProfileInfo) GetProfileInfo(true);
-    } else {
-      if (!fFinishedGetProfileInfo) GetProfileInfo(true);
-    }
-    
-
     fProfileIntegralForward=0;
     fProfileIntegralBackward=0;
     
@@ -695,6 +669,32 @@ namespace cluster{
     // fRoughEndPoint
     // fRoughEndPoint
     // and use them to get the axis
+
+
+    fFinishedGetProfileInfo = true;
+    // Report();
+    return;
+  }
+  
+  
+  /**
+   * Calculates the following variables:
+   * length
+   * width
+   * hit_density_1D
+   * hit_density_2D
+   * direction
+   * @param override [description]
+   */
+  void ClusterParamsAlgNew::RefineStartPoints(bool override) {
+    if(!override) { //Override being set, we skip all this logic.
+      //OK, no override. Stop if we're already finshed.
+      if (fFinishedRefineStartPoints) return;
+      //Try to run the previous function if not yet done.
+      if (!fFinishedGetProfileInfo) GetProfileInfo(true);
+    } else {
+      if (!fFinishedGetProfileInfo) GetProfileInfo(true);
+    }
     
     
      // need to define physical direction with openind angles and pass that to Ryan's line finder.
@@ -985,10 +985,10 @@ namespace cluster{
       //OK, no override. Stop if we're already finshed.
       if (fFinishedRefineDirection) return;
       //Try to run the previous function if not yet done.
-      if (!fFinishedRefineStartPoints) RefineStartPoints(true);
+      if (!fFinishedGetProfileInfo) GetProfileInfo(true);
     } else {
       //Try to run the previous function if not yet done.
-      if (!fFinishedRefineStartPoints) RefineStartPoints(true);
+      if (!fFinishedGetProfileInfo) GetProfileInfo(true);
     }
     
     // double wire_2_cm = fGSer->WireToCm();
@@ -996,8 +996,20 @@ namespace cluster{
     
     // Removing the conversion since these points are set above in cm-cm space
     //   -- Corey
-    double endStartDiff_x = (fParams.end_point.w - fParams.start_point.w);
-    double endStartDiff_y = (fParams.end_point.t - fParams.start_point.t);
+      
+    larutil::PxPoint this_startPoint, this_endPoint;
+
+    if (fFinishedRefineStartPoints){
+      this_startPoint = fParams.start_point;
+      this_endPoint   = fParams.end_point;
+    }
+    else{
+      this_startPoint = fRoughBeginPoint;
+      this_endPoint   = fRoughEndPoint;
+    }
+
+    double endStartDiff_x = (this_endPoint.w - this_startPoint.w);
+    double endStartDiff_y = (this_endPoint.t - this_startPoint.t);
     double rms_forward   = 0;
     double rms_backward  = 0;
     double mean_forward  = 0;
@@ -1028,38 +1040,91 @@ namespace cluster{
       weight_total = hit.charge; 
 
       // Compute forward mean
-      double hitStartDiff_x = (hit.w - fParams.start_point.w) ;
-      double hitStartDiff_y = (hit.t - fParams.start_point.t) ;
+      double hitStartDiff_x = (hit.w - this_startPoint.w) ;
+      double hitStartDiff_y = (hit.t - this_startPoint.t) ;
       
-      double cosangle = (endStartDiff_x*hitStartDiff_x + 
-                         endStartDiff_y*hitStartDiff_y);
-      cosangle /= ( pow(pow(endStartDiff_x,2)+pow(endStartDiff_y,2),0.5)
-                  * pow(pow(hitStartDiff_x,2)+pow(hitStartDiff_y,2),0.5));
+      double cosangle_start = (endStartDiff_x*hitStartDiff_x + 
+                               endStartDiff_y*hitStartDiff_y);
+      cosangle_start /= ( pow(pow(endStartDiff_x,2)+pow(endStartDiff_y,2),0.5)
+                        * pow(pow(hitStartDiff_x,2)+pow(hitStartDiff_y,2),0.5));
 
-      if(cosangle>0) {
+      if(cosangle_start>0) {
         // Only take into account for hits that are in "front"
         //no weighted average, works better as flat average w/ min charge cut
-        mean_forward += cosangle;
-        rms_forward  += pow(cosangle,2);
+        mean_forward += cosangle_start;
+        rms_forward  += pow(cosangle_start,2);
         hit_counter_forward++;
       }
 
       // Compute backward mean
-      double hitEndDiff_x = (hit.w - fParams.end_point.w);
-      double hitEndDiff_y = (hit.t - fParams.end_point.t);
+      double hitEndDiff_x = (hit.w - this_endPoint.w);
+      double hitEndDiff_y = (hit.t - this_endPoint.t);
       
-      cosangle  = (endStartDiff_x*hitEndDiff_x +
-                   endStartDiff_y*hitEndDiff_y) * (-1.);
-      cosangle /= ( pow(pow(endStartDiff_x,2)+pow(endStartDiff_y,2),0.5) 
-                  * pow(pow(hitEndDiff_x,2)+pow(hitEndDiff_y,2),0.5));
-
-      if(cosangle>0) {
+      double cosangle_end  = (endStartDiff_x*hitEndDiff_x +
+                              endStartDiff_y*hitEndDiff_y) * (-1.);
+      cosangle_end /= ( pow(pow(endStartDiff_x,2)+pow(endStartDiff_y,2),0.5) 
+                      * pow(pow(hitEndDiff_x,2)+pow(hitEndDiff_y,2),0.5));
+      
+      if(cosangle_end>0) {
         //no weighted average, works better as flat average w/ min charge cut
-        mean_backward += cosangle;
-        rms_backward  += pow(cosangle,2);
+        mean_backward += cosangle_end;
+        rms_backward  += pow(cosangle_end,2);
         hit_counter_backward++;
       }
+
+      int N_bins_OPEN = NBINS * acos(cosangle_start)/PI;
+      int N_bins_CLOSE = NBINS * acos(cosangle_end)/PI;
+
+
+      opening_angle_bin[N_bins_OPEN] += wgt;
+      closing_angle_bin[N_bins_CLOSE] += wgt;
+
+      //Also fill bins for high charge hits
+      if(hit.charge > fParams.mean_charge){
+        opening_angle_highcharge_bin[N_bins_OPEN] += wgt;
+        closing_angle_highcharge_bin[N_bins_CLOSE] += wgt;
+      }
+
     }
+
+
+    int iBin(0), jBin(0), kBin(0), lBin(0);  //initialize iterators for the 4 angles
+    double percentage_OPEN(0.0),
+           percentage_CLOSE(0.0),
+           percentage_OPEN_HC(0.0),
+           percentage_CLOSE_HC(0.0); //The last 2 are for High Charge (HC)
+
+    for(iBin = 0; percentage_OPEN<= percentage && iBin < NBINS; iBin++)
+    {
+      percentage_OPEN += opening_angle_bin[iBin];
+    }
+
+    for(jBin = 0; percentage_CLOSE<= percentage && jBin < NBINS; jBin++)
+    {
+      percentage_CLOSE += closing_angle_bin[jBin];
+    }
+
+    for(kBin = 0; percentage_OPEN_HC<= percentage_HC && kBin < NBINS; kBin++)
+    {
+      percentage_OPEN_HC += opening_angle_highcharge_bin[kBin];
+    }
+
+    for(lBin = 0; percentage_CLOSE_HC<= percentage_HC && lBin < NBINS; lBin++)
+    {
+      percentage_CLOSE_HC += closing_angle_highcharge_bin[lBin];
+    }
+
+
+    fParams.opening_angle = iBin * PI /NBINS ;
+    fParams.closing_angle = jBin * PI /NBINS ;
+    fParams.opening_angle_highcharge = kBin * PI /NBINS ;
+    fParams.closing_angle_highcharge = lBin * PI /NBINS ;
+
+    std::cout<<"opening angle: "<<fParams.opening_angle<<std::endl;
+    std::cout<<"closing angle: "<<fParams.closing_angle<<std::endl;
+    std::cout<<"opening high charge angle: "<<fParams.opening_angle_highcharge<<std::endl;
+    std::cout<<"closing high charge angle: "<<fParams.closing_angle_highcharge<<std::endl;
+    std::cout<<"Percentage high charge: "<<percentage_HC<<std::endl;
 
     //no weighted average, works better as flat average w/ min charge cut
 
@@ -1069,18 +1134,21 @@ namespace cluster{
     rms_backward   = pow(rms_backward/hit_counter_backward,0.5);
     mean_backward /= hit_counter_backward;
 
-    std::cout
-      << "mean forward  : " << mean_forward  << std::endl
-      << "mean backward : " << mean_backward << std::endl
-      << "rms_forward   : " << rms_forward   << std::endl
-      << "rms_backward  : " << rms_backward  << std::endl;
+    std::cout << "mean forward  : " << mean_forward  << std::endl
+              << "mean backward : " << mean_backward << std::endl
+              << "rms_forward   : " << rms_forward   << std::endl
+              << "rms_backward  : " << rms_backward  << std::endl;
 
     if(mean_forward > mean_backward && rms_forward > rms_backward) {
       std::cout<<"Not flipping..."<<std::endl;
       return;
     }
     std::cout<<"Flipping!"<<std::endl;
-    std::swap(fParams.start_point,fParams.end_point);
+    if (fFinishedRefineStartPoints)
+      std::swap(fParams.start_point,fParams.end_point);
+    else
+      std::swap(fRoughBeginPoint,fRoughEndPoint);
+
 
     return;
   } //end RefineDirection
