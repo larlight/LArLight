@@ -380,7 +380,7 @@ namespace cluster{
     } else {
       if (!fFinishedGetRoughAxis) GetRoughAxis(true);
     }
-    bool drawOrtHistos = true;
+    bool drawOrtHistos = false;
 
     //these variables need to be initialized to other values? 
     if(fRough2DSlope==-999.999 || fRough2DIntercept==-999.999 ) 
@@ -959,7 +959,12 @@ namespace cluster{
     return;
   }
   
-  
+  /**
+   * This function calculates the opening/closing angles
+   * It also makes a decision on whether or not to flip the direction
+   * the cluster.  Then the start point is refined later.
+   * @param override [description]
+   */
   void ClusterParamsAlgNew::RefineDirection(bool override) {
     if(!override) { //Override being set, we skip all this logic.
       //OK, no override. Stop if we're already finshed.
@@ -971,11 +976,13 @@ namespace cluster{
       if (!fFinishedRefineStartPoints) RefineStartPoints(true);
     }
     
-    double wire_2_cm = fGSer->WireToCm();
-    double time_2_cm = fGSer->TimeToCm();
+    // double wire_2_cm = fGSer->WireToCm();
+    // double time_2_cm = fGSer->TimeToCm();
     
-    double SEP_X = (fParams.end_point.w - fParams.start_point.w) / wire_2_cm;
-    double SEP_Y = (fParams.end_point.t - fParams.start_point.t) / time_2_cm;
+    // Removing the conversion since these points are set above in cm-cm space
+    //   -- Corey
+    double endStartDiff_x = (fParams.end_point.w - fParams.start_point.w);
+    double endStartDiff_y = (fParams.end_point.t - fParams.start_point.t);
     double rms_forward   = 0;
     double rms_backward  = 0;
     double mean_forward  = 0;
@@ -995,11 +1002,13 @@ namespace cluster{
       weight_total = hit.charge; 
 
       // Compute forward mean
-      double SHIT_X = (hit.w - fParams.start_point.w) / wire_2_cm;
-      double SHIT_Y = (hit.t - fParams.start_point.t) / time_2_cm;
+      double hitStartDiff_x = (hit.w - fParams.start_point.w) ;
+      double hitStartDiff_y = (hit.t - fParams.start_point.t) ;
       
-      double cosangle = (SEP_X*SHIT_X + SEP_Y*SHIT_Y);
-      cosangle /= ( pow(pow(SEP_X,2)+pow(SEP_Y,2),0.5) * pow(pow(SHIT_X,2)+pow(SHIT_Y,2),0.5));
+      double cosangle = (endStartDiff_x*hitStartDiff_x + 
+                         endStartDiff_y*hitStartDiff_y);
+      cosangle /= ( pow(pow(endStartDiff_x,2)+pow(endStartDiff_y,2),0.5)
+                  * pow(pow(hitStartDiff_x,2)+pow(hitStartDiff_y,2),0.5));
 
       if(cosangle>0) {
         // Only take into account for hits that are in "front"
@@ -1010,11 +1019,13 @@ namespace cluster{
       }
 
       // Compute backward mean
-      SHIT_X = (hit.w - fParams.end_point.w) / wire_2_cm;
-      SHIT_Y = (hit.t - fParams.end_point.t) / time_2_cm;
+      double hitEndDiff_x = (hit.w - fParams.end_point.w);
+      double hitEndDiff_y = (hit.t - fParams.end_point.t);
       
-      cosangle  = (SEP_X*SHIT_X + SEP_Y*SHIT_Y) * (-1.);
-      cosangle /= ( pow(pow(SEP_X,2)+pow(SEP_Y,2),0.5) * pow(pow(SHIT_X,2)+pow(SHIT_Y,2),0.5));
+      cosangle  = (endStartDiff_x*hitEndDiff_x +
+                   endStartDiff_y*hitEndDiff_y) * (-1.);
+      cosangle /= ( pow(pow(endStartDiff_x,2)+pow(endStartDiff_y,2),0.5) 
+                  * pow(pow(hitEndDiff_x,2)+pow(hitEndDiff_y,2),0.5));
 
       if(cosangle>0) {
         //no weighted average, works better as flat average w/ min charge cut
