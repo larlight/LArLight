@@ -15,7 +15,7 @@
 #define ElecClock_H
 
 #include "ClockConstants.h"
-
+#include <iostream>
 namespace util {
   /**
      \class ElecClock
@@ -108,18 +108,18 @@ namespace util {
     ElecClock& operator--()    { fTime -= 1./fFrequency; return *this;}
     ElecClock  operator--(int) {ElecClock tmp(*this); operator--(); return tmp;}
     ElecClock& operator+=(const ElecClock& rhs) { fTime += rhs.Time(); return *this;}
-    ElecClock& operator-=(const ElecClock& rhs) { fTime += rhs.Time(); return *this;}
+    ElecClock& operator-=(const ElecClock& rhs) { fTime -= rhs.Time(); return *this;}
 
     inline ElecClock operator+(const ElecClock& rhs)
-    { ElecClock tmp(fTime,fFramePeriod,fFrequency); tmp += (*this); tmp += rhs; return tmp; }
+    { return ElecClock(fTime + rhs.Time(),fFramePeriod,fFrequency); }
 
     inline ElecClock operator-(const ElecClock& rhs)
-    { ElecClock tmp(fTime,fFramePeriod,fFrequency); tmp -= (*this); tmp -= rhs; return tmp; }
+    { return ElecClock(fTime - rhs.Time(),fFramePeriod,fFrequency); }
     
-    inline bool operator<  (const ElecClock& rhs) { return fTime <  rhs.Time(); }
-    inline bool operator>  (const ElecClock& rhs) { return fTime >  rhs.Time(); }
-    inline bool operator<= (const ElecClock& rhs) { return fTime <= rhs.Time(); }
-    inline bool operator>= (const ElecClock& rhs) { return fTime >= rhs.Time(); }
+    inline bool operator<  (const ElecClock& rhs) const { return fTime <  rhs.Time(); }
+    inline bool operator>  (const ElecClock& rhs) const { return fTime >  rhs.Time(); }
+    inline bool operator<= (const ElecClock& rhs) const { return fTime <= rhs.Time(); }
+    inline bool operator>= (const ElecClock& rhs) const { return fTime >= rhs.Time(); }
 
   };
 

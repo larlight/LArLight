@@ -13,6 +13,8 @@
 #pragma link C++ class util::TimeServiceException+;
 #pragma link C++ class util::ElecClock+;
 #pragma link C++ class std::vector<util::ElecClock>+;
+#pragma link C++ class std::set<util::ElecClock>+;
+#pragma link C++ class std::pair<std::set<util::ElecClock>::iterator,bool>+;
 #pragma link C++ class util::TimeService+;
 
 #pragma link C++ namespace trigdata;

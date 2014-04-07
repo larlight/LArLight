@@ -12,7 +12,9 @@ namespace util {
   : fTime(time),
     fFramePeriod(frame_period),
     fFrequency(frequency)
-  { if( fFrequency <= 0 ) throw util::TimeServiceException("Negative frequency is prohibited!"); }
+  { 
+    if( fFrequency <= 0 ) throw util::TimeServiceException("Negative frequency is prohibited!"); 
+  }
 
 }
 

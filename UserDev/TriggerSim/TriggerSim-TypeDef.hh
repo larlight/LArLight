@@ -12,7 +12,7 @@
 #include "TriggerData.h"
 #include "UBTriggerTypes.h"
 #include "UBTriggerAlgo.h"
-
+#include <set>
 namespace util {
   class TimeServiceException;
   class ElecClock;
