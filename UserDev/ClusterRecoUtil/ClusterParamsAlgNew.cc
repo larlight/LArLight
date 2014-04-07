@@ -991,6 +991,17 @@ namespace cluster{
     double hit_counter_forward  = 0;
     double hit_counter_backward = 0;
     
+    double percentage = 0.9;
+    double percentage_HC = 0.9*fParams.N_Hits_HC/fParams.N_Hits;
+    const int NBINS=200;
+    const double wgt = 1.0/fParams.N_Hits;
+
+    // Containers for the angle histograms
+    std::vector<float> opening_angle_bin(NBINS,0.0 ) ;
+    std::vector<float> closing_angle_bin(NBINS,0.0 ) ;
+    std::vector<float> opening_angle_highcharge_bin(NBINS,0.0 ) ;
+    std::vector<float> closing_angle_highcharge_bin(NBINS,0.0 ) ;
+
     //hard coding this for now, should use SetRefineDirectionQMin function
     fQMinRefDir  = 25;
 
