@@ -650,7 +650,8 @@ namespace larutil{
       
     if(slope)	
       {
-	invslope=-1./slope*fWireTimetoCmCm*fWireTimetoCmCm;
+// 	invslope=-1./slope*fWireTimetoCmCm*fWireTimetoCmCm;
+       invslope=-1./slope;
       }
   
     double ort_intercept=point1->t - invslope * point1->w;
@@ -727,7 +728,7 @@ namespace larutil{
 
 	invslope=-1./slope;
 
-    invslope *= fWireTimetoCmCm * fWireTimetoCmCm;
+    //invslope *= fWireTimetoCmCm * fWireTimetoCmCm;
   	
     pointonline.w = (ort_intercept - intercept)/(slope-invslope); 
     pointonline.t = slope * pointonline.w + intercept; 

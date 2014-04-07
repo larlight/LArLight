@@ -396,7 +396,8 @@ namespace cluster{
     //get slope of lines orthogonal to those found crossing the shower.
     double inv_2d_slope=0;
     if(fabs(fRough2DSlope)>0.001)
-      inv_2d_slope=-1./fRough2DSlope*pow(fGSer->WireTimeToCmCm(),2);
+//       inv_2d_slope=-1./fRough2DSlope*pow(fGSer->WireTimeToCmCm(),2);
+       inv_2d_slope=-1./fRough2DSlope;//*pow(fGSer->WireTimeToCmCm(),2);
     else
       inv_2d_slope=-999999.;
     // std::cout << " N_Hits is " << fParams.N_Hits << std::endl;
@@ -405,8 +406,8 @@ namespace cluster{
     // std::cout << " conversions " << fWire2Cm.at(fPlane) 
     //           << " " << fTime2Cm << std::endl;
     
-    fInterHigh=-999999;
-    fInterLow=999999;
+    double InterHigh=-999999;
+    double InterLow=999999;
     fInterHigh_side=-999999;
     fInterLow_side=999999;
     //loop over all hits. Create coarse and fine profiles
@@ -421,12 +422,12 @@ namespace cluster{
         
       double side_intercept=hit.t - fRough2DSlope * (double)(hit.w);
         
-      if(intercept > fInterHigh ){
-        fInterHigh=intercept;
+      if(intercept > InterHigh ){
+        InterHigh=intercept;
       }
         
-      if(intercept < fInterLow ){
-        fInterLow=intercept;
+      if(intercept < InterLow ){
+        InterLow=intercept;
       }  
     
       if(side_intercept > fInterHigh_side ){
@@ -448,15 +449,15 @@ namespace cluster{
     
     // get projected points at the beginning and end of the axis.
     
-    larutil::PxPoint HighOnlinePoint, LowOnlinePoint,BeginOnlinePoint;
+    larutil::PxPoint HighOnlinePoint, LowOnlinePoint,BeginOnlinePoint, EndOnlinePoint;
     
     fGSer->GetPointOnLineWSlopes(fRough2DSlope,fRough2DIntercept,
-                                 fInterHigh,HighOnlinePoint);
+                                 InterHigh,HighOnlinePoint);
     fGSer->GetPointOnLineWSlopes(fRough2DSlope,fRough2DIntercept,
-                                 fInterLow,LowOnlinePoint);
+                                 InterLow,LowOnlinePoint);
 
-    std::cout << " extreme intercepts: low: " << fInterLow 
-              << " " << fInterHigh << std::endl;
+    std::cout << " extreme intercepts: low: " << InterLow 
+              << " " << InterHigh << std::endl;
     std::cout << " extreme intercepts: side: " << fInterLow_side 
               << " " << fInterHigh_side << std::endl;
     std::cout << "axis + intercept "  << fRough2DSlope << " " 
@@ -465,18 +466,30 @@ namespace cluster{
     std::cout << " Low online point: " << LowOnlinePoint.w << ", " << LowOnlinePoint.t 
               << " High: " << HighOnlinePoint.w << ", " << HighOnlinePoint.t << std::endl; 
 
-    //define BeginOnlinePoint as the one with lower wire number (for now)
-    
-    BeginOnlinePoint = (HighOnlinePoint.w > LowOnlinePoint.w) ? LowOnlinePoint : HighOnlinePoint;
-    
-    fProjectedLength=fGSer->Get2DDistance(&HighOnlinePoint,&LowOnlinePoint);
+   //define BeginOnlinePoint as the one with lower wire number (for now), adjust intercepts accordingly	      
+   if(HighOnlinePoint.w >= LowOnlinePoint.w)
+    {
+     BeginOnlinePoint=LowOnlinePoint;
+     fBeginIntercept=InterLow;
+     EndOnlinePoint=HighOnlinePoint;
+     fEndIntercept=InterHigh;
+    }
+   else
+   {
+     BeginOnlinePoint=HighOnlinePoint;
+     fBeginIntercept=InterHigh;
+     EndOnlinePoint=LowOnlinePoint;
+     fEndIntercept=InterLow;        
+   }
+   
+   fProjectedLength=fGSer->Get2DDistance(&BeginOnlinePoint,&EndOnlinePoint);
      
-    std::cout << " projected length " << fProjectedLength 
+   std::cout << " projected length " << fProjectedLength 
               << " Begin Point " << BeginOnlinePoint.w << " " 
-              << BeginOnlinePoint.t << std::endl;
+              << BeginOnlinePoint.t  << " End Point " << EndOnlinePoint.w << ","<< EndOnlinePoint.t << std::endl;
     
-    double current_maximum=0; 
-    for(auto& hit : fHitVector)
+   double current_maximum=0; 
+   for(auto& hit : fHitVector)
     {
      
       larutil::PxPoint OnlinePoint;
@@ -569,7 +582,10 @@ namespace cluster{
     // shower. This is done making sure that the running integral until less than 1% is left and the bin is above 
     // a set theshold many empty bins.
     
-    //forward loop
+   
+   
+    
+     //forward loop
     double running_integral=fProfileIntegralForward;
     int startbin,endbin;
     for(startbin=fProfileMaximumBin;startbin>1;startbin--)
@@ -593,7 +609,7 @@ namespace cluster{
     // on bin distance is: 
     // larutil::PxPoint OnlinePoint;
     
-    double ort_intercept_begin=fInterLow+(fInterHigh-fInterLow)/fProfileNbins*startbin;
+    double ort_intercept_begin=fBeginIntercept+(fEndIntercept-fBeginIntercept)/fProfileNbins*startbin;
     
     std::cout << " ort_intercept_begin: " << ort_intercept_begin << std::endl;
     
@@ -602,7 +618,7 @@ namespace cluster{
                                  ort_intercept_begin,
                                  fRoughBeginPoint);
     
-    double ort_intercept_end=fInterLow+(fInterHigh-fInterLow)/fProfileNbins*endbin;
+    double ort_intercept_end=fBeginIntercept+(fEndIntercept-fBeginIntercept)/fProfileNbins*endbin;
     fRoughBeginPoint.plane=fPlane;
     
     std::cout << " ort_intercept_end: " << ort_intercept_end << std::endl;
@@ -613,7 +629,7 @@ namespace cluster{
                                  fRoughEndPoint);
     fRoughEndPoint.plane=fPlane;
     
-    std::cout << fRoughBeginPoint.w << ", " << fRoughBeginPoint.t << " end: " <<  fRoughEndPoint.w << " " << fRoughEndPoint.t << std::endl;
+    std::cout << "  rough start points "  << fRoughBeginPoint.w << ", " << fRoughBeginPoint.t << " end: " <<  fRoughEndPoint.w << " " << fRoughEndPoint.t << std::endl;
     
      // ok. now have fRoughBeginPoint and fRoughEndPoint. No decision about direction has been made yet.
     fParams.start_point = fRoughBeginPoint;
@@ -640,7 +656,7 @@ namespace cluster{
     //startHit.w = fRoughBeginPoint.w;
     //startHit.t = fRoughBeginPoint.t;
     //startHit.plane = fRoughBeginPoint.plane;
-    
+    fParams.direction=1; // this needs to be fixed based on refine direction or OpeningAngle!
     
     if(fParams.direction==1)
       {

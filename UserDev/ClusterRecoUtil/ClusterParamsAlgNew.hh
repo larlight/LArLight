@@ -182,8 +182,10 @@ namespace cluster {
     double fProjectedLength;
     
     //extreme intercepts using the rough_2d_slope
-    double fInterHigh;
-    double fInterLow;
+   // double fInterHigh;
+   // double fInterLow;
+    double fBeginIntercept;
+    double fEndIntercept;
     double fInterHigh_side;
     double fInterLow_side;
     
