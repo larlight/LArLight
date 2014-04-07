@@ -61,12 +61,17 @@ namespace ubpsql {
 			 crate));
     cmd += "'";
 
+    size_t ctr = hstore_values.size() - 1;
     for(auto hstore_iter = hstore_values.begin();
 	hstore_iter != hstore_values.end();
-	++hstore_iter)
+	++hstore_iter) {
 
-      cmd += Form(" \"%s\"=>\"%s\"", (*hstore_iter).first.c_str(), (*hstore_iter).second.c_str());
-
+      if( ctr )
+	cmd += Form(" \"%s\"=>\"%s\",", (*hstore_iter).first.c_str(), (*hstore_iter).second.c_str());
+      else
+	cmd += Form(" \"%s\"=>\"%s\"", (*hstore_iter).first.c_str(), (*hstore_iter).second.c_str());
+      --ctr;
+    }
     cmd += " ');";
 
     PGresult* res = _conn->Execute(cmd);

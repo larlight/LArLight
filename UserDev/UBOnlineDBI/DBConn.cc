@@ -151,6 +151,7 @@ namespace ubpsql{
       switch(PQresultStatus(res)) {
       case PGRES_NONFATAL_ERROR:
 	Print(MSG::kWARNING,__FUNCTION__,PQresultErrorMessage(res));
+	throw QueryError();
       case PGRES_SINGLE_TUPLE:
       case PGRES_TUPLES_OK:
 	done=true;
@@ -160,6 +161,7 @@ namespace ubpsql{
       case PGRES_BAD_RESPONSE:
       case PGRES_FATAL_ERROR:
 	Print(MSG::kERROR,__FUNCTION__,PQresultErrorMessage(res));
+	throw QueryError();
       case PGRES_COMMAND_OK:
 	done = remove_res = true;
 	break;

@@ -38,6 +38,13 @@ namespace ubpsql {
     /// Getter for last sub-run number
     unsigned int GetLastSubRun(unsigned int run);
 
+    /// Getter for a list of config ID from the DB
+    std::vector<int> GetRunConfigIDList();
+
+    /// Getter for a list of config ID for each sub-config types to a given RunConfigID
+    std::map<int,int> GetSubConfigIDList(int run_config_id);
+    
+
   };
 }
 
