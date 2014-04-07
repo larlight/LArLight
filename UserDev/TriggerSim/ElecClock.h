@@ -48,9 +48,19 @@ namespace util {
 
     void SetTime(double time) { fTime = time; }
 
+    void SetTime(int sample,
+		 int frame)
+    { fTime = Time(sample, frame); }
+
     void SetTime(unsigned int sample,
 		 unsigned int frame)
-    { fTime = Time(sample, frame); }
+    { SetTime(int(sample),int(frame)); }
+
+    void SetTime(int ticks)
+    { fTime = Time(ticks,0); }
+
+    void SetTime(unsigned int ticks)
+    { SetTime(int(ticks)); }
 
     //-- Getters --//
 
@@ -110,14 +120,16 @@ namespace util {
     ElecClock  operator++(int) {ElecClock tmp(*this); operator++(); return tmp;}
     ElecClock& operator--()    { fTime -= 1./fFrequency; return *this;}
     ElecClock  operator--(int) {ElecClock tmp(*this); operator--(); return tmp;}
-    ElecClock& operator+=(const ElecClock& rhs) { fTime += rhs.Time(); return *this;}
-    ElecClock& operator-=(const ElecClock& rhs) { fTime -= rhs.Time(); return *this;}
     ElecClock& operator+=(const double &rhs) { fTime += rhs; return *this;}
     ElecClock& operator-=(const double &rhs) { fTime -= rhs; return *this;}
+    ElecClock& operator+=(const float  &rhs) { fTime += (double)rhs; return *this;}
+    ElecClock& operator-=(const float  &rhs) { fTime -= (double)rhs; return *this;}
     ElecClock& operator+=(const int &rhs) { fTime += Time(rhs); return *this;}
     ElecClock& operator-=(const int &rhs) { fTime -= Time(rhs); return *this;}
     ElecClock& operator+=(const unsigned int &rhs) { fTime += Time((int)rhs); return *this;}
     ElecClock& operator-=(const unsigned int &rhs) { fTime -= Time((int)rhs); return *this;}
+    ElecClock& operator+=(const ElecClock& rhs) { fTime += rhs.Time(); return *this;}
+    ElecClock& operator-=(const ElecClock& rhs) { fTime -= rhs.Time(); return *this;}
 
     inline ElecClock operator+(const ElecClock& rhs)
     { return ElecClock(fTime + rhs.Time(),fFramePeriod,fFrequency); }
