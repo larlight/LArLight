@@ -820,8 +820,33 @@ namespace cluster{
      * direction
      */
 
+    //double xangle=Get2DAngleForHit( wstn,tstn, hitlist);
+    const int nbins=720;
+    
+    std::vector< int > fh_omega_single(nbins,0);   //720,-180., 180.
+    
+    // fParams.start_point
+    
+  // this should changed on the loop on the cluster of the shower
+   for( auto hit : fHitVector){
+      
+      
+      double omx=fGSer.Get2Dangle(hit,fParams.start_point);
+      //int nbin=omx/()
+      //calculate the right bin for omx
+      //fh_omega_single->Fill(180*omx/TMath::Pi(), theHit->Charge());
+     }
+    
+  //double omega = fh_omega_single->GetBinCenter(fh_omega_single->GetMaximumBin());// Mean value of the fit
+   
+   // return omega; // in degrees.
+    
+//     if(xangle>90) xangle-=180;
+//     if(xangle<-90) xangle+=180;  
+//     
+    
 
-    fFinishedRefineStartPoints = true;
+    fFinishedGetFinalSlope = true;
     return;
   }
   

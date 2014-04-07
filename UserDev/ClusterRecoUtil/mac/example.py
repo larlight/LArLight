@@ -125,7 +125,7 @@ while mgr.next_event():
         algo.GetRoughAxis(True)
         algo.GetProfileInfo(True)
         algo.RefineStartPoints(True)
-        algo.RefineDirection(True)
+        #algo.RefineDirection(True)
         # algo.GetFinalSlope(True)
         #algo.Report()
         
