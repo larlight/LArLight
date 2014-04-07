@@ -9,8 +9,11 @@ namespace ubpsql {
     
     if(!_conn) _conn = (DBConn*)(DBConn::GetME(_user_type));
 
-    return _conn->Connect();
+    if(_conn->Connect()) return true;
 
+    throw ConnectionError();
+    
+    return false;
   }
 
 }
