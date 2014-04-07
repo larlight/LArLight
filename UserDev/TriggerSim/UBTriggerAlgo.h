@@ -59,6 +59,11 @@ namespace trigger
 
   class UBTriggerAlgo {
 
+  private:
+    
+    /// Utility data type to store time window
+    typedef std::pair<util::ElecClock,util::ElecClock> time_window_t;
+
   public:
 
     /// Default constructor with fhicl parameters
@@ -175,7 +180,9 @@ namespace trigger
        Utility function to check if the given time stamp is inside the provided time_window_t
        assuming sample number provided and used in time_window_t is in trigger clock unit
     */
-    bool InWindow(time_window_t window, unsigned int sample, unsigned int frame) const;
+    bool InWindow(const util::ElecClock &time,
+		  const time_window_t  &window) const
+    { return ( time <= window.second && time >= window.first ); }
 
   protected:
 
@@ -222,7 +229,7 @@ namespace trigger
     ///< Predefined Calibration trigger timings ... not cleared by ClearInputTriggers
     std::vector<util::ElecClock> _calib_timings;
 
-  }; // class ClusterMatchAlg
+  }; // class UBTriggerAlgo
   
 } //namespace cluster
 #endif

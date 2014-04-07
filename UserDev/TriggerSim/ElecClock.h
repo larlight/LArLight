@@ -63,6 +63,9 @@ namespace util {
     /// Given time [ns] w.r.t. electronics clock counting, return discretized time in double precision
     double Time(double time) const { return Time(Sample(time),Frame(time)); }
 
+    /// Given time in ticks w.r.t. electronics clock counting, return discretized time in double precision
+    double Time(int ticks) const {return ticks/fFrequency; }
+
     /// Frequency in Hz
     double Frequency() const { return fFrequency; }
 
@@ -109,6 +112,12 @@ namespace util {
     ElecClock  operator--(int) {ElecClock tmp(*this); operator--(); return tmp;}
     ElecClock& operator+=(const ElecClock& rhs) { fTime += rhs.Time(); return *this;}
     ElecClock& operator-=(const ElecClock& rhs) { fTime -= rhs.Time(); return *this;}
+    ElecClock& operator+=(const double &rhs) { fTime += rhs; return *this;}
+    ElecClock& operator-=(const double &rhs) { fTime -= rhs; return *this;}
+    ElecClock& operator+=(const int &rhs) { fTime += Time(rhs); return *this;}
+    ElecClock& operator-=(const int &rhs) { fTime -= Time(rhs); return *this;}
+    ElecClock& operator+=(const unsigned int &rhs) { fTime += Time((int)rhs); return *this;}
+    ElecClock& operator-=(const unsigned int &rhs) { fTime -= Time((int)rhs); return *this;}
 
     inline ElecClock operator+(const ElecClock& rhs)
     { return ElecClock(fTime + rhs.Time(),fFramePeriod,fFrequency); }

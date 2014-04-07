@@ -243,7 +243,7 @@ namespace trigger{
   {
     auto clock = util::TimeService::GetME().OpticalClock(_pmt_clock.Time(time.Time()));
 
-    clock += (_readout_frame_offset * clock.FrameTicks());
+    clock += _readout_frame_offset * clock.FrameTicks();
 
     return clock;
   }
@@ -636,16 +636,15 @@ namespace trigger{
       
       ShowCandidateTriggers();
 
-    // Create deadtime and PMT-Trigger allow time windows
-    trigger::time_window_t deadtime(0,0,0);
+    // Just make sure trigger clock is only used for sample/frame getter (i.e. no time used)
+    _trig_clock.SetTime(0);
+    util::ElecClock trig_time = _trig_clock;
 
-    trigger::time_window_t bnb_active(0,0,0);
-
-    trigger::time_window_t numi_active(0,0,0);
-
-    trigger::time_window_t bnb_gate(0,0,0);
-
-    trigger::time_window_t numi_gate(0,0,0);
+    time_window_t deadtime    (_trig_clock,_trig_clock);
+    time_window_t bnb_active  (_trig_clock,_trig_clock);
+    time_window_t numi_active (_trig_clock,_trig_clock);
+    time_window_t bnb_gate    (_trig_clock,_trig_clock);
+    time_window_t numi_gate   (_trig_clock,_trig_clock);
 
     auto const mask0 = _mask.at(0);
     auto const mask1 = _mask.at(1);
@@ -675,20 +674,27 @@ namespace trigger{
 				    (*sample_iter).first,
 				    (*frame_iter).first));
 
+	trig_time.SetTime(_trig_clock.Time((*sample_iter).first,(*frame_iter).first));
+
 	// If in deadtime, continue
-	if( InWindow(deadtime, (*sample_iter).first, (*frame_iter).first) ) {
-	  if(_debug_mode) Report(Form("    Skipping as deadtime is (%d,%d) => %d samples",
-				      deadtime.start_sample,
-				      deadtime.start_frame,
-				      deadtime.duration));
+	if( InWindow(trig_time, deadtime) ) {
+
+	  if(_debug_mode) Report(Form("    Skipping as deadtime is (%d,%d) => (%d,%d)",
+				      deadtime.first.Sample(),
+				      deadtime.first.Frame(),
+				      deadtime.second.Sample(),
+				      deadtime.second.Frame())
+				 );
 	  sample_iter++;
 	  continue;
 	}else if(_debug_mode){
-
-	  Report(Form("    Not in deadtime: (%d,%d) => %d samples",
-		      deadtime.start_sample,
-		      deadtime.start_frame,
-		      deadtime.duration));
+	  
+	  Report(Form("    Not in deadtime: (%d,%d) => (%d,%d)",
+		      deadtime.first.Sample(),
+		      deadtime.first.Frame(),
+		      deadtime.second.Sample(),
+		      deadtime.second.Frame())
+		 );
 	}
 
 	auto const pmt0   = (*sample_iter).second.Triggered(trigger::kPMTTriggerCosmic);
@@ -698,23 +704,20 @@ namespace trigger{
 	auto const calib  = (*sample_iter).second.Triggered(trigger::kTriggerCalib);
 	auto const ext    = (*sample_iter).second.Triggered(trigger::kTriggerEXT);
 	auto const pc     = (*sample_iter).second.Triggered(trigger::kTriggerPC);
-	auto const active = ( InWindow(bnb_active, (*sample_iter).first, (*frame_iter).first) ||
-			      InWindow(numi_active, (*sample_iter).first, (*frame_iter).first) );
+	auto const active = ( InWindow(trig_time, bnb_active) || InWindow(trig_time, numi_active) );
 
 	// If BNB or NuMI, open new beam trigger gate
 	if(bnb) {
-	  bnb_gate.start_sample = (*sample_iter).first;
-	  bnb_gate.start_frame  = (*frame_iter).first;
-	  bnb_gate.duration = _bnb_gate_width;
+	  bnb_gate.first.SetTime((*sample_iter).first, (*frame_iter).first);
+	  bnb_gate.second.SetTime(bnb_gate.first.Time() + _trig_clock.Time(_bnb_gate_width));
 	}
 	if(numi) {
-	  numi_gate.start_sample = (*sample_iter).first;
-	  numi_gate.start_frame  = (*frame_iter).first;
-	  numi_gate.duration = _numi_gate_width;
+	  numi_gate.first.SetTime((*sample_iter).first, (*frame_iter).first);
+	  numi_gate.second.SetTime(numi_gate.first.Time() + _trig_clock.Time(_bnb_gate_width));
 	}
 	
-	auto const bnb_gate_active  = InWindow(bnb_gate,  (*sample_iter).first, (*frame_iter).first);
-	auto const numi_gate_active = InWindow(numi_gate, (*sample_iter).first, (*frame_iter).first);
+	auto const bnb_gate_active  = InWindow(trig_time, bnb_gate);
+	auto const numi_gate_active = InWindow(trig_time, numi_gate);
 
 	if(_debug_mode)
 	  {
@@ -775,31 +778,33 @@ namespace trigger{
 	if( p0 || p1 || p8 ) {
 	  // New trigger found. 
 
-	  // Assign deadtime
-	  deadtime.start_sample = (*sample_iter).first;
-	  deadtime.start_frame  = (*frame_iter).first;
-	  deadtime.duration     = _deadtime * _trig_clock.FrameTicks();
+	  deadtime.first.SetTime(trig_time.Time());
+	  deadtime.second.SetTime(trig_time.Time());
+	  deadtime.second += (int)(_deadtime * _trig_clock.FrameTicks() - 1);
+	  if(_debug_mode) {
+	    std::cout<<Form("    Dead time set: (%d,%d) => (%d,%d) with trigger @ (%d,%d)",
+			    deadtime.first.Sample(),
+			    deadtime.first.Frame(),
+			    deadtime.second.Sample(),
+			    deadtime.second.Frame(),
+			    trig_time.Sample(),
+			    trig_time.Frame()
+			    )
+		     << std::endl;
+	  }
 
 	  // Assign active window for bnb/numi
 	  if(bnb) {
-	    unsigned int allow_duration     = _bnb_cosmic_allow_max - _bnb_cosmic_allow_min;
-	    unsigned int allow_start_sample = _trig_clock.Sample((int)((*sample_iter).first + _bnb_cosmic_allow_min));
-	    unsigned int allow_start_frame  = _trig_clock.Frame((int)((*sample_iter).first + _bnb_cosmic_allow_min));
-	    allow_start_frame += (*frame_iter).first;
-	    
-	    bnb_active.start_sample = allow_start_sample;
-	    bnb_active.start_frame  = allow_start_frame;
-	    bnb_active.duration     = allow_duration;
+	    bnb_active.first.SetTime(trig_time.Time());
+	    bnb_active.first  += (int)(_bnb_cosmic_allow_min);
+	    bnb_active.second.SetTime(trig_time.Time());
+	    bnb_active.second += (int)(_bnb_cosmic_allow_max);
 	  }
 	  if(numi) {
-	    unsigned int allow_duration     = _numi_cosmic_allow_max - _numi_cosmic_allow_min;
-	    unsigned int allow_start_sample = _trig_clock.Sample((int)((*sample_iter).first + _numi_cosmic_allow_min));
-	    unsigned int allow_start_frame  = _trig_clock.Frame((int)((*sample_iter).first + _numi_cosmic_allow_min));
-	    allow_start_frame += (*frame_iter).first;
-	    
-	    numi_active.start_sample = allow_start_sample;
-	    numi_active.start_frame  = allow_start_frame;
-	    numi_active.duration     = allow_duration;
+	    numi_active.first.SetTime(trig_time.Time());
+	    numi_active.first  += (int)(_numi_cosmic_allow_min);
+	    numi_active.second.SetTime(trig_time.Time());
+	    numi_active.second += (int)(_numi_cosmic_allow_max);
 	  }
 	  
 	  // Store trigger object
@@ -816,30 +821,6 @@ namespace trigger{
       } // end looping over samples
       frame_iter++;
     } // end looping over frames
-    
-  }
-
-  //###############################################################################################
-  bool UBTriggerAlgo::InWindow(time_window_t window, unsigned int sample, unsigned int frame) const
-  //###############################################################################################
-  {
-    if( frame < window.start_frame ) return false;
-
-    if( frame == window.start_frame ) {
-
-      if( sample < window.start_sample ) return false;
-      else return (sample < (window.start_sample + window.duration));
-
-    } else {
-
-      if(_trig_clock.FrameTicks() < window.start_sample)
-
-	RaiseTriggerException("Logic error: found time window sample number larger than frame size!");
-
-      unsigned int diff_tick = (_trig_clock.FrameTicks()) * (frame - window.start_frame) - window.start_sample + sample;
-      return (diff_tick < window.duration);
-
-    }
     
   }
 
