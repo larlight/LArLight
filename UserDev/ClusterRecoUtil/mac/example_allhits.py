@@ -121,7 +121,7 @@ while mgr.next_event():
         algo.RefineStartPoints(True)
         algo.FillPolygon()
         algo.GetFinalSlope(True)
-        #algo.Report()
+        algo.Report()
         
         result = algo.GetParams()
 
@@ -182,23 +182,23 @@ while mgr.next_event():
 	  func.SetRange(result.end_point.w-50,result.start_point.w+50);
 	 
 	dwire=30;
-	dtime=30*TMath.Tan(result.angle_2d);
-	if result.angle_2d > -TMath.Pi()/2. and  result.angle_2d <0 :
+	dtime=30*TMath.Tan(result.angle_2d*TMath.Pi()/180);
+	if result.angle_2d > -90 and  result.angle_2d <0 :
 	    dwire=30;
-	    dtime=30*TMath.Tan(result.angle_2d);
-	elif result.angle_2d < -TMath.Pi()/2. and  result.angle_2d > -TMath.Pi() :
+	    dtime=30*TMath.Tan(result.angle_2d*TMath.Pi()/180);
+	elif result.angle_2d < -90. and  result.angle_2d > -180 :
 	    dwire=-30;
-	    dtime=30*TMath.Tan(-1*result.angle_2d); 
-	elif result.angle_2d > TMath.Pi()/2. and  result.angle_2d < TMath.Pi() :
+	    dtime=30*TMath.Tan(-1*result.angle_2d*TMath.Pi()/180); 
+	elif result.angle_2d > 90. and  result.angle_2d < 180 :
 	    dwire=-30;
-	    dtime=30*TMath.Tan(-1*result.angle_2d);     
+	    dtime=30*TMath.Tan(-1*result.angle_2d*TMath.Pi()/180);     
 	 
 	 
 	angleline=TLine(result.start_point.w,result.start_point.t,result.start_point.w+dwire,result.start_point.t+dtime);
 	angleline.SetLineColor(kBlack);
 	angleline.SetLineWidth(3);
 	 
-	print "testing slopes: %g   from angle: %g" % ( algo.RoughSlope(),TMath.Tan(result.angle_2d));
+	print "testing slopes: %g   from angle: %g" % ( algo.RoughSlope(),TMath.Tan(result.angle_2d*TMath.Pi()/180));
         # Set Polygon
         gPolygon = None
         if result.container_polygon.size() > 0:

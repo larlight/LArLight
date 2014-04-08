@@ -410,6 +410,7 @@ namespace cluster{
     double InterLow=999999;
     fInterHigh_side=-999999;
     fInterLow_side=999999;
+    double min_ortdist(999), max_ortdist(-999); // needed to calculate width
     //loop over all hits. Create coarse and fine profiles
     // of the charge weight to help refine the start/end 
     // points and have a first guess of direction
@@ -419,9 +420,17 @@ namespace cluster{
       
       //calculate intercepts along   
       double intercept=hit.t - inv_2d_slope * (double)(hit.w);
-        
       double side_intercept=hit.t - fRough2DSlope * (double)(hit.w);
-        
+      
+      larutil::PxPoint OnlinePoint;
+      // get coordinates of point on axis.
+      fGSer->GetPointOnLine(fRough2DSlope,fRough2DIntercept,&hit,OnlinePoint);
+
+      double ortdist=fGSer->Get2DDistance(&OnlinePoint,&hit);
+      if (ortdist < min_ortdist) min_ortdist = ortdist;
+      if (ortdist > max_ortdist) max_ortdist = ortdist;
+      
+      
       if(intercept > InterHigh ){
         InterHigh=intercept;
       }
@@ -490,7 +499,11 @@ namespace cluster{
     
 
     // Some fitting variables to make a histogram:
-    double min_ortdist(999), max_ortdist(-999);
+   
+    std::vector<double> ort_profile;
+    const int NBINS=100;
+    ort_profile.reserve(NBINS);
+    
     std::vector<double> ort_dist_vect;
     ort_dist_vect.reserve(fParams.N_Hits);
 
@@ -508,8 +521,11 @@ namespace cluster{
       double linedist=fGSer->Get2DDistance(&OnlinePoint,&BeginOnlinePoint);
       double ortdist=fGSer->Get2DDistance(&OnlinePoint,&hit);
       ort_dist_vect.push_back(ortdist);
-      if (ortdist < min_ortdist) min_ortdist = ortdist;
-      if (ortdist > max_ortdist) max_ortdist = ortdist;
+     
+      int ortbin=(max_ortdist-min_ortdist)/NBINS*ortdist;
+      ort_profile[ortbin]+=hit.charge;
+      //if (ortdist < min_ortdist) min_ortdist = ortdist;
+      //if (ortdist > max_ortdist) max_ortdist = ortdist;
 
       ////////////////////////////////////////////////////////////////////// 
       //calculate the weight along the axis, this formula is based on rough guessology. 
@@ -549,19 +565,34 @@ namespace cluster{
     }  // end second loop on hits. Now should have filled profile vectors.
       
 
+     double integral=0; 
+     int ix=0;
+    // int fbin=0;
+     for(ix;ix<NBINS;ix++)
+     {
+       integral+=ort_profile[ix];
+       if(integral>=0.95*fParams.sum_charge)
+	{break;
+	}
+     }
+
+    fParams.width=2*(double)ix/(double)NBINS*(max_ortdist-min_ortdist);  // multiply by two because ortdist is folding in both sides. 
+    
+    std::cout << " calculated width: " << fParams.width << "  integral " << integral << " sum " << fParams.sum_charge << std::endl;
+    
     if (drawOrtHistos){
       TH1F * ortDistHist = 
                 new TH1F("ortDistHist", 
                          "Orthogonal Distance to axis;Distance (cm)",
-                         30, min_ortdist, max_ortdist);
+                         100, min_ortdist, max_ortdist);
       TH1F * ortDistHistCharge = 
                 new TH1F("ortDistHistCharge", 
                          "Orthogonal Distance to axis (Charge Weighted);Distance (cm)", 
-                         30, min_ortdist, max_ortdist);
+                         100, min_ortdist, max_ortdist);
       TH1F * ortDistHistAndrzej= 
                 new TH1F("ortDistHistAndrzej",
                          "Orthogonal Distance Andrzej weighting",
-                         30, min_ortdist, max_ortdist);
+                         100, min_ortdist, max_ortdist);
 
       for (int index = 0; index < fParams.N_Hits; index++){
         ortDistHist -> Fill(ort_dist_vect[index]);
@@ -906,10 +937,16 @@ namespace cluster{
     else
       fParams.hit_density_1D=0;
     
+    if(fParams.length && fParams.width)
+      fParams.hit_density_2D=fParams.N_Hits/fParams.length/fParams.width;
+    else
+      fParams.hit_density_2D=0;
+    
+    
     fParams.start_point=startpoint;
     
     fFinishedRefineStartPoints = true;
-    Report();
+   // Report();
     return;
   }
   
@@ -964,8 +1001,8 @@ namespace cluster{
     
   
     fParams.angle_2d=(curr_max_bin/720*(2*TMath::Pi()))-TMath::Pi();
-    
-    std::cout << " Final 2D angle: " << fParams.angle_2d*180/TMath::Pi() << " degrees " << std::endl;
+    fParams.angle_2d*=180/PI;
+    std::cout << " Final 2D angle: " << fParams.angle_2d << " degrees " << std::endl;
     
     if(cos(fParams.angle_2d))
       fParams.modified_hit_density=fParams.hit_density_1D/cos(fParams.angle_2d);
