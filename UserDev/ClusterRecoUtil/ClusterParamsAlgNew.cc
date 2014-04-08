@@ -82,9 +82,9 @@ namespace cluster{
     unsigned int length = 13;
     if (data.size() != length) data.resize(length);
       data[0] = fParams.opening_angle / 180;
-      data[1] = fParams.opening_angle_highcharge / 180;
+      data[1] = fParams.opening_angle_charge_wgt / 180;
       data[2] = fParams.closing_angle / 180;
-      data[3] = fParams.closing_angle_highcharge / 180;
+      data[3] = fParams.closing_angle_charge_wgt / 180;
       data[4] = fParams.eigenvalue_principal;
       data[5] = fParams.eigenvalue_secondary;
       data[6] = fParams.length;
@@ -255,14 +255,14 @@ namespace cluster{
   void ClusterParamsAlgNew::FillParams(bool override_DoGetAverages      ,  
                                        bool override_DoGetRoughAxis     ,  
                                        bool override_DoGetProfileInfo   ,  
+                                       bool override_DoRefineDirection  ,
                                        bool override_DoRefineStartPoints,
-                                       bool override_DoRefineDirection,
                                        bool override_DoGetFinalSlope     ){
     GetAverages      (override_DoGetAverages      );
     GetRoughAxis     (override_DoGetRoughAxis     );
     GetProfileInfo   (override_DoGetProfileInfo   );
-    RefineStartPoints(override_DoRefineStartPoints);
     RefineDirection  (override_DoRefineDirection  );
+    RefineStartPoints(override_DoRefineStartPoints);
     GetFinalSlope    (override_DoGetFinalSlope    );
   }
 
@@ -723,42 +723,29 @@ namespace cluster{
       //OK, no override. Stop if we're already finshed.
       if (fFinishedRefineStartPoints) return;
       //Try to run the previous function if not yet done.
-      if (!fFinishedGetProfileInfo) GetProfileInfo(true);
+      if (!fFinishedRefineDirection) RefineDirection(true);
     } else {
-      if (!fFinishedGetProfileInfo) GetProfileInfo(true);
+      if (!fFinishedRefineDirection) RefineDirection(true);
     }
     
     
      // need to define physical direction with openind angles and pass that to Ryan's line finder.
     
-    GetOpeningAngle();  //Sets opening angle, closing angle, and open/close angles for high charge
-
-    std::cout << "after opening angle" << std::endl;
     
-    //direction decision happens here:
-    // should the opening and closing angle be already defined?
-    // do we care whether they're associated to the start/end point?
+    // Direction decision has been moved entirely to Refine Direction()
+    // opening and closing angles are already set
+    // they are associated with the start and endpoints.
+    // If refine direction opted to switch the shower direction, 
+    // it also switched opening and closing angles.
     
     /////////////////////////////////
     // fParams.direction=  ...
     
+    // Direction is decided by RefineDirection()
     larutil::PxPoint startHit,endHit;
-    //startHit.w = fRoughBeginPoint.w;
-    //startHit.t = fRoughBeginPoint.t;
-    //startHit.plane = fRoughBeginPoint.plane;
-    fParams.direction=1; // this needs to be fixed based on refine direction or OpeningAngle!
-    
-    if(fParams.direction==1)
-    {
-      startHit=fRoughBeginPoint;
-      endHit=fRoughEndPoint;
-    }
-    else
-    {
-      startHit=fRoughEndPoint;
-      endHit=fRoughBeginPoint;
-    }
-    
+    startHit=fRoughBeginPoint;
+    endHit=fRoughEndPoint;
+
     
     ///////////////////////////////
     //Ryan's Shower Strip finder work here. 
@@ -783,7 +770,7 @@ namespace cluster{
 
     if(!(subhit.size())) {
       std::cout<<"Subhit list is empty. Using rough start/end points..."<<std::endl;
-      GetOpeningAngle();
+      // GetOpeningAngle();
       fParams.start_point = fRoughBeginPoint;
       fParams.end_point   = fRoughEndPoint;
       // fRoughEndPoint
@@ -1068,7 +1055,8 @@ namespace cluster{
     std::vector<float> closing_angle_bin(NBINS,0.0 ) ;
     std::vector<float> opening_angle_highcharge_bin(NBINS,0.0 ) ;
     std::vector<float> closing_angle_highcharge_bin(NBINS,0.0 ) ;
-
+    std::vector<float> opening_angle_chargeWgt_bin(NBINS,0.0 ) ;
+    std::vector<float> closing_angle_chargeWgt_bin(NBINS,0.0 ) ;
     //hard coding this for now, should use SetRefineDirectionQMin function
     fQMinRefDir  = 25;
 
@@ -1115,7 +1103,10 @@ namespace cluster{
       int N_bins_OPEN = NBINS * acos(cosangle_start)/PI;
       int N_bins_CLOSE = NBINS * acos(cosangle_end)/PI;
 
-
+      opening_angle_chargeWgt_bin[N_bins_OPEN ] 
+                    += hit.charge/fParams.sum_charge;
+      closing_angle_chargeWgt_bin[N_bins_CLOSE] 
+                    += hit.charge/fParams.sum_charge;
       opening_angle_bin[N_bins_OPEN] += wgt;
       closing_angle_bin[N_bins_CLOSE] += wgt;
 
@@ -1127,12 +1118,14 @@ namespace cluster{
 
     }
 
-
-    int iBin(0), jBin(0), kBin(0), lBin(0);  //initialize iterators for the 4 angles
+    //initialize iterators for the angles
+    int iBin(0), jBin(0), kBin(0), lBin(0), mBin(0), nBin(0);  
     double percentage_OPEN(0.0),
            percentage_CLOSE(0.0),
            percentage_OPEN_HC(0.0),
-           percentage_CLOSE_HC(0.0); //The last 2 are for High Charge (HC)
+           percentage_CLOSE_HC(0.0),  //The last 2 are for High Charge (HC)
+           percentage_OPEN_CHARGEWGT(0.0),
+           percentage_CLOSE_CHARGEWGT(0.0); 
 
     for(iBin = 0; percentage_OPEN<= percentage && iBin < NBINS; iBin++)
     {
@@ -1154,45 +1147,81 @@ namespace cluster{
       percentage_CLOSE_HC += closing_angle_highcharge_bin[lBin];
     }
 
-
-    fParams.opening_angle = iBin * PI /NBINS ;
-    fParams.closing_angle = jBin * PI /NBINS ;
-    fParams.opening_angle_highcharge = kBin * PI /NBINS ;
-    fParams.closing_angle_highcharge = lBin * PI /NBINS ;
-
-    std::cout<<"opening angle: "<<fParams.opening_angle<<std::endl;
-    std::cout<<"closing angle: "<<fParams.closing_angle<<std::endl;
-    std::cout<<"opening high charge angle: "<<fParams.opening_angle_highcharge<<std::endl;
-    std::cout<<"closing high charge angle: "<<fParams.closing_angle_highcharge<<std::endl;
-    std::cout<<"Percentage high charge: "<<percentage_HC<<std::endl;
-
-    std::cout<<"opening/closing: " << fParams.opening_angle/fParams.closing_angle <<"\n";
-    std::cout<<"opening HC/closing HC: " << fParams.opening_angle_highcharge/fParams.closing_angle_highcharge <<"\n";
-    std::cout<<"closing/closing HC: " << fParams.closing_angle/fParams.closing_angle_highcharge <<"\n";
-
-    //no weighted average, works better as flat average w/ min charge cut
-
-    rms_forward   = pow(rms_forward/hit_counter_forward,0.5);
-    mean_forward /= hit_counter_forward;
-
-    rms_backward   = pow(rms_backward/hit_counter_backward,0.5);
-    mean_backward /= hit_counter_backward;
-
-    std::cout << "mean forward  : " << mean_forward  << std::endl
-              << "mean backward : " << mean_backward << std::endl
-              << "rms_forward   : " << rms_forward   << std::endl
-              << "rms_backward  : " << rms_backward  << std::endl;
-
-    if(mean_forward > mean_backward && rms_forward > rms_backward) {
-      std::cout<<"Not flipping..."<<std::endl;
-      return;
+    for(mBin = 0; percentage_OPEN_CHARGEWGT<= percentage && mBin < NBINS; mBin++)
+    {
+      percentage_OPEN_CHARGEWGT += opening_angle_chargeWgt_bin[mBin];
     }
-    std::cout<<"Flipping!"<<std::endl;
-    if (fFinishedRefineStartPoints)
-      std::swap(fParams.start_point,fParams.end_point);
-    else
-      std::swap(fRoughBeginPoint,fRoughEndPoint);
 
+    for(nBin = 0; percentage_CLOSE_CHARGEWGT<= percentage && nBin < NBINS; nBin++)
+    {
+      percentage_CLOSE_CHARGEWGT += closing_angle_chargeWgt_bin[nBin];
+    }
+
+    double opening_angle = iBin * PI /NBINS ;
+    double closing_angle = jBin * PI /NBINS ;
+    double opening_angle_highcharge = kBin * PI /NBINS ;
+    double closing_angle_highcharge = lBin * PI /NBINS ;
+    double opening_angle_charge_wgt = mBin * PI /NBINS ;
+    double closing_angle_charge_wgt = nBin * PI /NBINS ;
+
+    // std::cout<<"opening angle: "<<opening_angle<<std::endl;
+    // std::cout<<"closing angle: "<<closing_angle<<std::endl;
+    // std::cout<<"opening high charge angle: "<<opening_angle_highcharge<<std::endl;
+    // std::cout<<"closing high charge angle: "<<closing_angle_highcharge<<std::endl;
+    // std::cout<<"opening high charge wgt  : "<<opening_angle_charge_wgt<<std::endl;
+    // std::cout<<"closing high charge wgt  : "<<closing_angle_charge_wgt<<std::endl;
+    // std::cout<<"fCoarseChargeProfile     : "<<fCoarseChargeProfile[0] 
+             // << ", " << fCoarseChargeProfile[1] << std::endl;
+
+    double value_1 = closing_angle/opening_angle -1;
+    double value_2 = (fCoarseChargeProfile[0]/fCoarseChargeProfile[1]);
+    if (value_2 < 100.0 && value_2 > 0.01)
+      value_2 = log(value_2);
+    else
+      value_2 = 0.0;
+    double value_3 = closing_angle_charge_wgt/opening_angle_charge_wgt -1;
+
+    // if (value_1 > 1.0) value_1 = -1.0/value_1;
+    // if (value_2 < 1.0) value_2 = -1.0/value_2;
+    // if (value_3 > 1.0) value_3 = -1.0/value_3;
+
+    // std::cout << "value_1 : " << value_1 << std::endl;
+    // std::cout << "value_2 : " << value_2 << std::endl;
+    // std::cout << "value_3 : " << value_3 << std::endl;
+
+    // Using a sigmoid function to determine flipping.
+    // I am going to weigh all of the values above (1, 2, 3) equally.
+    // But, since value 2 in particular, I'm going to cut things off at 5.
+
+    if (value_1 > 3  ) value_1 = 3.0;
+    if (value_1 < -3 ) value_1 = -3.0;
+    if (value_2 > 3  ) value_2 = 3.0;
+    if (value_2 < -3 ) value_2 = -3.0;
+    if (value_3 > 3  ) value_3 = 3.0;
+    if (value_3 < -3 ) value_3 = -3.0;
+
+    double Exp = exp(value_1 + value_2 + value_3);
+    double sigmoid = (Exp - 1)/(Exp + 1);
+
+    // std::cout << "sigmoid: " << sigmoid << std::endl;
+
+    bool flip = false;
+    if (sigmoid < 0) flip = true;
+    if (flip){
+      std::cout << "Flipping!" << std::endl;
+      std::swap(opening_angle,closing_angle);
+      std::swap(opening_angle_highcharge,closing_angle_highcharge);
+      std::swap(opening_angle_charge_wgt,closing_angle_charge_wgt);
+      std::swap(fParams.start_point,fParams.end_point);
+      std::swap(fRoughBeginPoint,fRoughEndPoint);
+    }
+
+    fParams.opening_angle = opening_angle;
+    fParams.opening_angle_charge_wgt = opening_angle_charge_wgt;
+    fParams.closing_angle = closing_angle;
+    fParams.closing_angle_charge_wgt = closing_angle_charge_wgt;
+
+    fFinishedRefineDirection = true;
 
     return;
   } //end RefineDirection
