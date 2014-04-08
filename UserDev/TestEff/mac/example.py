@@ -8,7 +8,7 @@ if len(sys.argv) < 2:
     sys.exit(1)
 
 from ROOT import gSystem
-gSystem.Load("libGeorgiaLArTF")
+gSystem.Load("libTestEff")
 from ROOT import larlight as fmwk
 
 # Create ana_processor instance
@@ -29,7 +29,7 @@ if len(sys.argv) > 2:
 my_proc.set_ana_output_file("from_test_ana_you_can_remove_me.root");
 
 # Attach a template process
-my_proc.add_process(fmwk.GeorgiaLArTF());
+my_proc.add_process(fmwk.TestEff());
 
 print
 print  "Finished configuring ana_processor. Start event loop!"

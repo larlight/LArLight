@@ -257,15 +257,10 @@ CREATE OR REPLACE FUNCTION CreateConfigurationType(configtabletype text,columns 
     query text;  
     BEGIN
         
- -- First find if a config like this exists, if not, insert it.
-  query := 'SELECT * FROM  ConfigLookUp WHERE SubConfigName='''||configtabletype||'''';
-  
-   EXECUTE query INTO myrec;
- 
-  
-   IF FOUND THEN
-       RAISE EXCEPTION '++++++++++ Configuration Type % Already Exists ++++++++++', configtabletype;
-   END IF;
+    -- First find if a config like this exists, if not, insert it.
+    IF EXISTS ( SELECT TRUE FROM ConfigLookUp WHERE SubConfigName = configtabletype )    
+      THEN RAISE EXCEPTION '++++++++++ Configuration Type % Already Exists +++++++++++', configtabletype;
+    END IF;
 
     SELECT INTO myrec * FROM  ConfigLookUp ORDER BY SubConfigType DESC;
     --SELECT INTO myrec * FROM ConfigLookUp WHERE ConfigName=configtabletype ORDER BY SubConfigType DESC;
@@ -287,6 +282,7 @@ CREATE OR REPLACE FUNCTION CreateConfigurationType(configtabletype text,columns 
 
    query := 'CREATE TABLE '|| configtabletype ||' (
    ConfigID  INT NOT NULL   DEFAULT NULL,
+   ParentConfigID  INT NOT NULL  DEFAULT -1,
    Crate  SMALLINT  NOT NULL DEFAULT 0,
    Channel  INT  NOT NULL DEFAULT 0,
    Parameters  HSTORE  NOT NULL DEFAULT ''nchannels=>0 '' ,
@@ -327,7 +323,12 @@ CREATE OR REPLACE FUNCTION InsertConfigurationSet(configtabletype text,insubconf
     query text;  
     BEGIN
         
- -- First find if a config like this exists, if not, insert it.
+ -- First find if this configuration type exists. If not, don't do anything
+    IF NOT EXISTS ( SELECT TRUE FROM ConfigLookUp WHERE SubConfigName = configtabletype )    
+      THEN RAISE EXCEPTION '++++++++++ Configuration % is not defined yet! +++++++++++', configtabletype;
+    END IF;
+
+ -- Second find if a config like this exists, if not, insert it.
    query := 'SELECT * FROM '|| configtabletype || ' WHERE ConfigID='||insubconfid||' AND channel='||inchannel ||'AND crate='||incrate;
 
    EXECUTE query INTO myrec;
