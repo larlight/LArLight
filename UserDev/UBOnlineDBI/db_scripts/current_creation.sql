@@ -17,7 +17,6 @@ CREATE TABLE  MainConfigTable  (
    ConfigID  INT NOT NULL   DEFAULT 0,
    SubConfigType  INT  NOT NULL DEFAULT 0 , -- 'Specifies which subtable we want',
    SubConfigID  INT  NOT NULL DEFAULT 0,
-   SubConfigParentID  SMALLINT NOT NULL DEFAULT -1,
    SubConfigOnMask  BIGINT  NOT NULL DEFAULT 0 , -- 'which subsystems are on',
    ConfigName  VARCHAR NULL DEFAULT NULL,
    userID  VARCHAR NULL DEFAULT NULL,

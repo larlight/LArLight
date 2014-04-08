@@ -287,6 +287,7 @@ CREATE OR REPLACE FUNCTION CreateConfigurationType(configtabletype text,columns 
 
    query := 'CREATE TABLE '|| configtabletype ||' (
    ConfigID  INT NOT NULL   DEFAULT NULL,
+   ParentConfigID  INT NOT NULL  DEFAULT -1,
    Crate  SMALLINT  NOT NULL DEFAULT 0,
    Channel  INT  NOT NULL DEFAULT 0,
    Parameters  HSTORE  NOT NULL DEFAULT ''nchannels=>0 '' ,
