@@ -314,6 +314,18 @@ $$ LANGUAGE plpgsql VOLATILE STRICT;
 
 ----- Syntax: SELECT InsertConfigurationSet('pmtconfig',1,3,5,'"nchannels"=>"4000","gain"=>"300"');
 
+CREATE OR REPLACE FUNCTION GETQUERY2(configtabletype text,insubconfid INT,incrate INT, inchannel INT,columns HSTORE) RETURNS TEXT AS $$
+DECLARE
+  query text;
+  BEGIN
+  
+  query := format('SELECT * FROM %s WHERE ConfigID=%s AND channel=%s AND crate=%s',configtabletype,insubconfid,inchannel,incrate);
+--  return query;
+--  SELECT query;
+  EXECUTE query;
+--  RETURN query;
+  END;
+$$ LANGUAGE plpgsql VOLATILE STRICT;
 
 CREATE OR REPLACE FUNCTION InsertConfigurationSet(configtabletype text,insubconfid INT,incrate INT, inchannel INT,columns HSTORE) RETURNS INT AS $$
     DECLARE
@@ -328,17 +340,17 @@ CREATE OR REPLACE FUNCTION InsertConfigurationSet(configtabletype text,insubconf
       THEN RAISE EXCEPTION '++++++++++ Configuration % is not defined yet! +++++++++++', configtabletype;
     END IF;
 
- -- Second find if a config like this exists, if not, insert it.
-   query := 'SELECT * FROM '|| configtabletype || ' WHERE ConfigID='||insubconfid||' AND channel='||inchannel ||'AND crate='||incrate;
-
-   EXECUTE query INTO myrec;
- 
-   IF FOUND THEN
-       RAISE EXCEPTION '++++++++++ Configuration nr % Already Exists for Crate % and Channel % ++++++++++', insubconfid,incrate,inchannel;
-   END IF;
+ -- Second find if a config like this exists. If does, don't do anything
+    query := format('SELECT TRUE FROM %s WHERE ConfigID=%s AND channel=%s AND crate=%s',configtabletype,insubconfid,inchannel,incrate);
+    EXECUTE query INTO myrec;
+    IF NOT myrec.bool IS NULL THEN
+      RAISE EXCEPTION '++++++++++ Configuration nr % Already Exists for Crate % and Channel % ++++++++++', insubconfid,incrate,inchannel;
+    END IF;
 
  -- INSERT HSTORE checking, i.e. for each(hstore from ConfigLookUp Table, check that hstore key exists). TBD.
-
+   IF NOT EXISTS (SELECT TRUE FROM ConfigLookUp WHERE SubConfigName = configtabletype AND columns ?& AKEYS(SetUpColumns))
+     THEN RAISE EXCEPTION '++++++++++ Provided HSTORE columns are lacking necessary pieces! +++++++++++';
+   END IF;
 
    query := 'INSERT INTO '||configtabletype||'(ConfigID,crate,channel,Parameters) VALUES('||insubconfid||','||incrate||','||inchannel||','''||columns||''')';
   -- RAISE INFO 'Inserted new configuration type with ID %',newconfig;
