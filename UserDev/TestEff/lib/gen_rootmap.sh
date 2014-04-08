@@ -17,7 +17,7 @@ rootlibmap() {
 ######################################################
 # TestEff
 rootlibmap libTestEff.rootmap libTestEff.so $USER_DEV_DIR/TestEff/LinkDef.h \
-    libAnalysis.so
+    libAnalysis.so libClusterRecoUtil.so 
 
 
 
