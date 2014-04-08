@@ -163,7 +163,8 @@ while mgr.next_event():
         end = TGraph(1)
         begin.SetPoint(0,result.start_point.w, result.start_point.t)
         end.SetPoint(0,result.end_point.w, result.end_point.t)
-
+        begin.SetLineWidth(0)
+        end.SetLineWidth(0)
         # Set Start & End point TGraph
         begin.SetLineColor(1)
         begin.SetMarkerStyle(29)
@@ -179,26 +180,26 @@ while mgr.next_event():
         func.SetParameter(1,algo.RoughSlope());   
         func.SetLineWidth(0);   
         if result.start_point.w > result.end_point.w:
-	  func.SetRange(result.end_point.w-50,result.start_point.w+50);
-	 
-	dwire=30;
-	dtime=30*TMath.Tan(result.angle_2d*TMath.Pi()/180);
-	if result.angle_2d > -90 and  result.angle_2d <0 :
-	    dwire=30;
-	    dtime=30*TMath.Tan(result.angle_2d*TMath.Pi()/180);
-	elif result.angle_2d < -90. and  result.angle_2d > -180 :
-	    dwire=-30;
-	    dtime=30*TMath.Tan(-1*result.angle_2d*TMath.Pi()/180); 
-	elif result.angle_2d > 90. and  result.angle_2d < 180 :
-	    dwire=-30;
-	    dtime=30*TMath.Tan(-1*result.angle_2d*TMath.Pi()/180);     
-	 
-	 
-	angleline=TLine(result.start_point.w,result.start_point.t,result.start_point.w+dwire,result.start_point.t+dtime);
-	angleline.SetLineColor(kBlack);
-	angleline.SetLineWidth(3);
-	 
-	print "testing slopes: %g   from angle: %g" % ( algo.RoughSlope(),TMath.Tan(result.angle_2d*TMath.Pi()/180));
+            func.SetRange(result.end_point.w-50,result.start_point.w+50);
+     
+        dwire=30;
+        dtime=30*TMath.Tan(result.angle_2d*TMath.Pi()/180);
+        if result.angle_2d > -90 and  result.angle_2d <0 :
+            dwire=30;
+            dtime=30*TMath.Tan(result.angle_2d*TMath.Pi()/180);
+        elif result.angle_2d < -90. and  result.angle_2d > -180 :
+            dwire=-30;
+            dtime=30*TMath.Tan(-1*result.angle_2d*TMath.Pi()/180); 
+        elif result.angle_2d > 90. and  result.angle_2d < 180 :
+            dwire=-30;
+            dtime=30*TMath.Tan(-1*result.angle_2d*TMath.Pi()/180);     
+         
+         
+        angleline=TLine(result.start_point.w,result.start_point.t,result.start_point.w+dwire,result.start_point.t+dtime);
+        angleline.SetLineColor(kBlack);
+        angleline.SetLineWidth(3);
+         
+        # print "testing slopes: %g   from angle: %g" % ( algo.RoughSlope(),TMath.Tan(result.angle_2d*TMath.Pi()/180));
         # Set Polygon
         gPolygon = None
         if result.container_polygon.size() > 0:
@@ -207,7 +208,7 @@ while mgr.next_event():
                 gPolygon.SetPoint(x,
                                   result.container_polygon.at(x).w,
                                   result.container_polygon.at(x).t)
-                print result.container_polygon.at(x).w, result.container_polygon.at(x).t
+                # print result.container_polygon.at(x).w, result.container_polygon.at(x).t
 
             gPolygon.SetPoint(result.container_polygon.size(),
                               result.container_polygon.at(0).w,
@@ -221,15 +222,23 @@ while mgr.next_event():
         chit.cd()
         hHits = algo.GetHitView()
         hHits.Draw("COLZ")
-	begin.Draw("P same")
-	end.Draw("P same")
-	func.Draw("same");
-	angleline.Draw("same");
+        begin.Draw("P same")
+        end.Draw("P same")
+        func.Draw("same");
+        angleline.Draw("same");
+
+        leg = TLegend(.7,.7,.95,.95)
+        leg.AddEntry(begin, "Start Point (reco)","P")
+        leg.AddEntry(end, "End Point (reco)","P")
+        leg.AddEntry(angleline, "2D Angle")
+        
 
         if(mc_begin):
+            leg.AddEntry(mc_begin, "Start Point (mc)","P")
             mc_begin.Draw("P same")
         if(gPolygon):
             gPolygon.Draw("PL same")
+        leg.Draw("same")
         # Update canvas
         chit.Update()
         sys.stdin.readline()
