@@ -2,24 +2,32 @@
 // type-def file for ROOT
 //
 
-#ifndef TRIGGERSIM_TYPEDEF_HH
-#define TRIGGERSIM_TYPEDEF_HH
+#ifndef TIMESERVICE_TYPEDEF_HH
+#define TIMESERVICE_TYPEDEF_HH
 
 // Header files included here
+#include "TimeServiceException.h"
+#include "ElecClock.h"
+#include "TimeService.h"
 #include "TriggerData.h"
-#include "ClockConstants.h"
 #include "UBTriggerTypes.h"
-#include "SimpleClock.h"
 #include "UBTriggerAlgo.h"
+#include <set>
+namespace util {
+  class TimeServiceException;
+  class ElecClock;
+  class TimeService;
+}
 
-// Class forward declaration here
 namespace trigdata{
-  class Trigger;
+  class TriggerData;
 }
-namespace trigger {
+
+namespace trigger{
   class UBTriggerAlgo;
-  class SimpleClock;
 }
+
 //ADD_EMPTY_CLASS ... do not change this comment line
 
 #endif
+

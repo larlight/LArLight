@@ -1,7 +1,11 @@
 import sys
 import ROOT
-ROOT.gSystem.Load("libTriggerSim")
-from ROOT import trigger, trigdata, std
+#ROOT.gSystem.Load("libTriggerSim")
+ROOT.gSystem.Load("libTimeService")
+from ROOT import trigger, trigdata, std, util
+
+def GetClock(time) :
+    return util.TimeService.GetME().OpticalClock(time)
 
 # Create trigger algorithm instance
 trig = trigger.UBTriggerAlgo()
@@ -14,23 +18,29 @@ trig.SetMask(8,0xfd)
 trig.ReportConfig()
 trig.ClearInputTriggers()
 
-# Add some PMT-cosmic trigger ... unit is in second
-trig.AddTriggerPMTCosmic(0.)
+# Add some PMT-cosmic trigger ... unit is in nano-second
+clock = GetClock(0)
+trig.AddTriggerPMTCosmic(clock)
 
-# Add some calibration trigger ... unit is in second
-trig.AddTriggerCalib(0.0032 + 180.e-6)
+# Add some calibration trigger ... unit is in nano-second
+clock = GetClock(3.2e6 + 180.e3)
+trig.AddTriggerCalib(clock)
 
 # Add some external trigger ... unit is in second
-trig.AddTriggerExt(0.0032 + 120.e-6)
+clock = GetClock(3.2e6 + 120.e3)
+trig.AddTriggerExt(clock)
 
 # This will be picked up
-trig.AddTriggerBNB(0.0016)
+clock = GetClock(1.6e6)
+trig.AddTriggerBNB(clock)
 
 # This will be skipped as it crosses the deadtime boundary
-trig.AddTriggerNuMI(0.0016 + 0.0064 - 1.e-9)
+clock = GetClock(1.6e6 + 6.4e6 - 1)
+trig.AddTriggerNuMI(clock)
 
 # This will be picked up
-trig.AddTriggerNuMI(0.0016 + 0.0064 + 1.e-9)
+clock = GetClock(1.6e6 + 6.4e6 + 1)
+trig.AddTriggerNuMI(clock)
 
 aho=std.vector(trigdata.Trigger)()
 
@@ -41,9 +51,8 @@ print "Done processing Trigger. We found following triggers..."
 print
 for x in xrange(aho.size()):
 
-    print "Found Trigger @ (%d, %d) with bits %d" % (aho.at(x).TriggerSample(),
-                                                     aho.at(x).TriggerFrame(),
-                                                     aho.at(x).TriggerBits())
+    clock = util.TimeService.GetME().TriggerClock(aho.at(x).TriggerTime())
+    print "Found Trigger @ (%d, %d) with bits %d" % (clock.Sample(), clock.Frame(), aho.at(x).TriggerBits())
 
 print
 print "Done listing found triggers."

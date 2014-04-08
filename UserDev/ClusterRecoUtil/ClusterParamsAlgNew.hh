@@ -14,6 +14,8 @@
 #include <TF1.h>
 #include <TH1F.h>
 #include <TPrincipal.h>
+#include <TCanvas.h>
+#include <TLegend.h>
 
 #include "PxUtils.h"
 #include "ClusterParams.hh"
@@ -150,6 +152,10 @@ namespace cluster {
     const larutil::PxPoint& RoughStartPoint() {return fRoughBeginPoint;}
     const larutil::PxPoint& RoughEndPoint() {return fRoughEndPoint;}
 
+    double RoughSlope() {return fRough2DSlope;}
+    double RoughIntercept() {return fRough2DIntercept;}
+    
+       
   protected:
     
     larutil::GeometryUtilities  *fGSer;
@@ -182,17 +188,20 @@ namespace cluster {
     double fProjectedLength;
     
     //extreme intercepts using the rough_2d_slope
-    double fInterHigh;
-    double fInterLow;
+   // double fInterHigh;
+   // double fInterLow;
+    double fBeginIntercept;
+    double fEndIntercept;
     double fInterHigh_side;
     double fInterLow_side;
     
-    bool fFinishedGetAverages;
-    bool fFinishedGetRoughAxis;
-    bool fFinishedGetProfileInfo;
-    bool fFinishedRefineStartPoints;
-    bool fFinishedRefineDirection;
-    bool fFinishedGetFinalSlope;
+    // book keeping variables to validate completion of methods:
+    bool fFinishedGetAverages;       
+    bool fFinishedGetRoughAxis;      
+    bool fFinishedGetProfileInfo;    
+    bool fFinishedRefineStartPoints; 
+    bool fFinishedRefineDirection;   
+    bool fFinishedGetFinalSlope;     
 
 
     double fRough2DSlope;        // slope 
