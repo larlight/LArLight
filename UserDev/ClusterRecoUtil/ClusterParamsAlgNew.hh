@@ -64,6 +64,13 @@ namespace cluster {
      */
     void  GetFANNVector(std::vector<float> & data);
 
+    /**
+     * For debugging purposes, prints the result of GetFANNVector
+     * in a nicely formatted form.
+     * @return [description]
+     */
+    void  PrintFANNVector();
+
 
     /**
       Runs all the functions which calculate cluster params                        
