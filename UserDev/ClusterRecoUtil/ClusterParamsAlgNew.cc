@@ -80,126 +80,48 @@ namespace cluster{
 
   void  ClusterParamsAlgNew::GetFANNVector(std::vector<float> & data){
     unsigned int length = 13;
-    if (data.size() != length) data.resize(length);
-      data[0] = fParams.opening_angle / 180;
-      data[1] = fParams.opening_angle_charge_wgt / 180;
-      data[2] = fParams.closing_angle / 180;
-      data[3] = fParams.closing_angle_charge_wgt / 180;
-      data[4] = fParams.eigenvalue_principal;
-      data[5] = fParams.eigenvalue_secondary;
-      data[6] = fParams.length;
-      data[7] = fParams.width;
-      data[8] = fParams.hit_density_1D;
-      data[9] = fParams.hit_density_2D;
-      data[10] = fParams.multi_hit_wires/fParams.N_Wires;
-      data[11] = fParams.modified_hit_density;
-      data[12] = fParams.offaxis_hits/fParams.N_Hits;
+    if (data.size() != length) 
+      data.resize(length);
+    data[0] = fParams.opening_angle / PI;
+    data[1] = fParams.opening_angle_charge_wgt / PI;
+    data[2] = fParams.closing_angle / PI;
+    data[3] = fParams.closing_angle_charge_wgt / PI;
+    data[4] = fParams.eigenvalue_principal;
+    data[5] = fParams.eigenvalue_secondary;
+    data[6] = fParams.length;
+    data[7] = fParams.width;
+    data[8] = fParams.hit_density_1D;
+    data[9] = fParams.hit_density_2D;
+    data[10] = fParams.multi_hit_wires/fParams.N_Wires;
+    data[11] = fParams.modified_hit_density;
+    data[12] = fParams.offaxis_hits/fParams.N_Hits;
+    return;
   }
 
-  void ClusterParamsAlgNew::GetOpeningAngle()
-  {
-    double distance_end_points ;  // distance between start and end points                                 
-    double distance_hits_OPEN ;   // distance between start and hit points
-    double distance_hits_CLOSE ;  // distance between start and hit points
-    double dot_product_OPEN ;     // dot product for opening angle
-    double dot_product_CLOSE ;    // dot product for closing angle
-    double cos_opening_angle ;    // cos(opening_angle) between hit and axis
-    double cos_closing_angle ;    // cos(closing_angle) between hit and axis
-    double percentage = 0.9;
-    double percentage_HC = 0.9*fParams.N_Hits_HC/fParams.N_Hits;  // fParams.N_Hits_HC/fParams.N_Hits ;
-    const int NBINS=200;
-    const double wgt = 1.0/fParams.N_Hits;
-    
-    //define variables for angle calculation 
-    double start_end_w = fRoughEndPoint.w - fRoughBeginPoint.w ;
-    double start_end_t = fRoughEndPoint.t - fRoughBeginPoint.t ;
-    distance_end_points = sqrt(pow(start_end_w,2)+ pow(start_end_t,2));
-
-    std::vector<float> opening_angle_bin(NBINS,0.0 ) ;
-    std::vector<float> closing_angle_bin(NBINS,0.0 ) ;
-    std::vector<float> opening_angle_highcharge_bin(NBINS,0.0 ) ;
-    std::vector<float> closing_angle_highcharge_bin(NBINS,0.0 ) ;
-
-    // std::cout << " in Opening Angle " << fHitVector.size() << std::endl;
-    
-    for(auto& hit : fHitVector){
-
-      dot_product_OPEN  = (hit.w - fRoughBeginPoint.w) * ( start_end_w)
-                        + (hit.t - fRoughBeginPoint.t) * ( start_end_t);
-      dot_product_CLOSE = (hit.w - fRoughEndPoint.w)   * (-start_end_w)
-                        + (hit.t - fRoughEndPoint.t)   * (-start_end_t);
-
-      distance_hits_OPEN  = sqrt(pow(hit.w - fRoughBeginPoint.w,2) 
-                               + pow(hit.t - fRoughBeginPoint.t,2));
-      distance_hits_CLOSE = sqrt(pow(hit.w - fRoughEndPoint.w,2) 
-                               + pow(hit.t - fRoughEndPoint.t,2));
-
-      cos_opening_angle = dot_product_OPEN/(distance_end_points*distance_hits_OPEN);
-      cos_closing_angle = dot_product_CLOSE/(distance_end_points*distance_hits_CLOSE);
-
-      int N_bins_OPEN = NBINS * acos(cos_opening_angle)/PI;
-      int N_bins_CLOSE = NBINS * acos(cos_closing_angle)/PI;
-      // std::cout << "Binning at N_bins_OPEN "  << N_bins_OPEN  << "\n";
-      // std::cout << "Binning at N_bins_CLOSE " << N_bins_CLOSE << "\n";
-      opening_angle_bin[N_bins_OPEN] += wgt;
-      closing_angle_bin[N_bins_CLOSE] += wgt;
-
-      //Also fill bins for high charge hits
-      if(hit.charge > fParams.mean_charge){
-        opening_angle_highcharge_bin[N_bins_OPEN] += wgt;
-        closing_angle_highcharge_bin[N_bins_CLOSE] += wgt;
-        // std::cout <<"Bin filled (open): "  << N_bins_OPEN  
-                  // << " and number of entries: " 
-                  // << opening_angle_highcharge_bin[N_bins_OPEN]
-                  // << std::endl;
-        // std::cout <<"Bin filled (closed): "<< N_bins_CLOSE 
-                  // << " and number of entries: " 
-                  // << closing_angle_highcharge_bin[N_bins_CLOSE]
-                  // << std::endl << std::endl;
-      }
-    }   
- 
-    int iBin(0), jBin(0), kBin(0), lBin(0);  //initialize iterators for the 4 angles
-    double percentage_OPEN(0.0),
-           percentage_CLOSE(0.0),
-           percentage_OPEN_HC(0.0),
-           percentage_CLOSE_HC(0.0); //The last 2 are for High Charge (HC)
-
-    for(iBin = 0; percentage_OPEN<= percentage && iBin < NBINS; iBin++)
-    {
-      percentage_OPEN += opening_angle_bin[iBin];
-    }
-
-    for(jBin = 0; percentage_CLOSE<= percentage && jBin < NBINS; jBin++)
-    {
-      percentage_CLOSE += closing_angle_bin[jBin];
-    }
-
-    for(kBin = 0; percentage_OPEN_HC<= percentage_HC && kBin < NBINS; kBin++)
-    {
-      percentage_OPEN_HC += opening_angle_highcharge_bin[kBin];
-    }
-
-    for(lBin = 0; percentage_CLOSE_HC<= percentage_HC && lBin < NBINS; lBin++)
-    {
-      percentage_CLOSE_HC += closing_angle_highcharge_bin[lBin];
-    }
-    // std::cout << " OPEN " <<  percentage_OPEN << " and iBin: "<<iBin<<std::endl;
-    // std::cout << " CLOSE " <<  percentage_CLOSE <<" and jBin "<<jBin<< std::endl;  
-    // std::cout << " OPEN_HC " <<  percentage_OPEN_HC << " and kBin "<<kBin<< std::endl; 
-    // std::cout << " CLOSE_HC " <<  percentage_CLOSE_HC <<" and lBin "<<lBin<<std::endl;   
-
-    fParams.opening_angle = iBin * PI /NBINS ;
-    fParams.closing_angle = jBin * PI /NBINS ;
-    fParams.opening_angle_highcharge = kBin * PI /NBINS ;
-    fParams.closing_angle_highcharge = lBin * PI /NBINS ;
-
-    std::cout<<"opening angle: "<<fParams.opening_angle<<std::endl;
-    std::cout<<"closing angle: "<<fParams.closing_angle<<std::endl;
-    std::cout<<"opening high charge angle: "<<fParams.opening_angle_highcharge<<std::endl;
-    std::cout<<"closing high charge angle: "<<fParams.closing_angle_highcharge<<std::endl;
-    std::cout<<"Percentage high charge: "<<percentage_HC<<std::endl;
+  void  ClusterParamsAlgNew::PrintFANNVector(){
+    std::vector<float> data;
+    GetFANNVector(data);
+    std::cout << "Printing FANN input vector:\n"
+              << "   Opening Angle (normalized)  ... : " << data[0] << "\n"
+              << "   Opening Angle charge weight  .. : " << data[1] << "\n"
+              << "   Closing Angle (normalized)  ... : " << data[2] << "\n"
+              << "   Closing Angle charge weight  .. : " << data[3] << "\n"
+              << "   Principal Eigenvalue  ......... : " << data[4] << "\n"
+              << "   Secondary Eigenvalue  ......... : " << data[5] << "\n"
+              << "   Length of Cluster  ............ : " << data[6] << "\n"
+              << "   Width of Cluster  ............. : " << data[7] << "\n"
+              << "   1D Hit Density  ............... : " << data[8] << "\n"
+              << "   2D Hit Density  ............... : " << data[9] << "\n"
+              << "   Percent MultiHit Wires  ....... : " << data[10] << "\n"
+              << "   Modified Hit Density  ......... : " << data[11] << "\n"
+              << "   Percent OffAxis Hits  ......... : " << data[12] << "\n";
+    return;
   }
+
+
+
+
+
 
 
   void ClusterParamsAlgNew::Initialize()

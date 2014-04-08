@@ -121,8 +121,8 @@ while mgr.next_event():
         algo.RefineStartPoints(True)
         algo.FillPolygon()
         algo.GetFinalSlope(True)
-        # algo.Report()
-        
+        algo.Report()
+        algo.PrintFANNVector()
         result = algo.GetParams()
 
         print "(%g,%g) => (%g,%g), plane: %g" % (result.start_point.w,
