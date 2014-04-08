@@ -21,10 +21,12 @@ namespace larlight {
     pmt_nu_rdtype = new TH2D("pmt_nu_rdtype","Number of reads per channel number per type",64,0,64,5,0,5);
 
     //FEM: Relative frame differences (unique in each event)
-    pmt_nu_frdiff = new TGraph("pmt_nu_frdiff","Event Fr (FEM) - Trigger Fr (FEM) vs Event No (FEM);;");
+    pmt_nu_frdiff = new TGraph();
+    pmt_nu_frdiff->SetTitle("Event Fr (FEM) - Trigger Fr (FEM) vs Event No (FEM);;");
 
     //FEM: Relative timeslice differences (unique in each event)
-    pmt_nu_slcdiff = new TGraph("pmt_nu_slcdiff","Event Time (FEM) - Trigger Time (FEM) vs Event No (FEM);;");
+    pmt_nu_slcdiff = new TGraph();
+    pmt_nu_slcdiff->SetTitle("Event Time (FEM) - Trigger Time (FEM) vs Event No (FEM);;");
 
     //TRIG: Variables available through trigger stream (unique in each event)
     trig_trfrm = new TH1D("trig_trfrm","Trigger frame",10000,0,10000);
@@ -41,8 +43,16 @@ namespace larlight {
     trig_rem64 = new TH1D("trig_rem64","Trigger 64MHz remainder",10,0,10);
     trig_rem16 = new TH1D("trig_rem16","Trigger 16MHz remainder",10,0,10);
 
-    trig_frdiff = new TGraph("trig_frdiff","Trigger Fr (FEM) - Trigger Fr (TRIG) vs Event No (FEM);;");
-    trig_slcdiff = new TGraph("trig_slcdiff","Trigger Time (FEM) - Trigger Time (TRIG) vs Event No (FEM);;");
+    trig_frdiff = new TGraph();
+    trig_frdiff->SetTitle("Trigger Fr (FEM) - Trigger Fr (TRIG) vs Event No (FEM);;");
+    trig_slcdiff = new TGraph();
+    trig_slcdiff->SetTitle("Trigger Time (FEM) - Trigger Time (TRIG) vs Event No (FEM);;");
+
+
+    //
+    evt_no = new TGraph();
+    evt_no->SetTitle("Event Number; Trigger Board Event Number; FEM Event Number");
+    
 
     return true;
   }
@@ -61,6 +71,7 @@ namespace larlight {
       return false;
     }
 
+    evt_no->SetPoint(evt_no->GetN()+1,event_wf->event_number(),trig_data->trig_number());
 
     //FEM: fill histograms of event header variables
     pmt_nu_evno->Fill(event_wf->event_number());
@@ -78,7 +89,7 @@ namespace larlight {
 			     event_wf->event_number(),
 			     double(event_wf->event_frame_number())*samples_per_frame - 
 			     (double(event_wf->fem_trig_frame_number())*samples_per_frame+double(event_wf->fem_trig_sample_number_64MHz())) );
-    
+
     //FEM: fill histograms of readout header variables
     //loop over all readouts in this event
     int nrd=0;
@@ -124,6 +135,45 @@ namespace larlight {
   }
 
   bool GeorgiaLArTF::finalize() {
+
+    if(_fout) {
+      _fout->cd();
+      
+      //output histograms
+      
+      evt_no->Write("PLOT_evt_no");
+
+      pmt_nu_evno->Write();
+      pmt_nu_evfrm->Write();
+      pmt_nu_add->Write();
+      pmt_nu_mod->Write();
+      pmt_nu_trfrm->Write();
+      pmt_nu_trslc->Write();
+      pmt_nu_ch->Write();
+      pmt_nu_nrd->Write();
+      pmt_nu_rdtype->Write("KEY_discID_vs_ch");
+    
+      pmt_nu_frdiff->Write("KEY_FEM_evtfrm_vs_trfrm");
+      pmt_nu_slcdiff->Write("KEY_FEM_evtslc_vs_trslc");
+
+      trig_trfrm->Write();
+      trig_trslc->Write();
+      trig_trid->Write();
+      trig_pmid->Write();
+      trig_trpc->Write();
+      trig_extrn->Write();
+      trig_actv->Write();
+      trig_gate1->Write();
+      trig_gate2->Write();
+      trig_veto->Write();
+      trig_calib->Write();
+      trig_rem64->Write();
+      trig_rem16->Write();
+      
+      trig_frdiff->Write("KEY_TRG_trgfrm_vs_trfrm");
+      trig_slcdiff->Write("KEY_TRG_trgslc_vs_trslc");
+
+    }
 
   
     return true;

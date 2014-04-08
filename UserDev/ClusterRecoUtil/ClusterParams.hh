@@ -31,9 +31,9 @@ namespace cluster{
     double cluster_angle_2d;           ///< Linear best fit to high-charge hits in the cluster
     double angle_2d;                   ///< Angle of axis in wire/hit view
     double opening_angle;              ///< Width of angular distubtion wrt vertx
-    double opening_angle_highcharge;   ///< Same for high charge 
+    double opening_angle_charge_wgt;   ///< Same for charge_wgt
     double closing_angle;              ///< Width of angular distubtion wrt endpoint
-    double closing_angle_highcharge;   ///< Same for high charge 
+    double closing_angle_charge_wgt;   ///< Same for charge_wgt
     double eigenvalue_principal;       ///< the principal eigenvalue from PCA
     double eigenvalue_secondary;       ///< the secondary eigenvalue from PCA
     double verticalness;               ///< ???
@@ -71,23 +71,26 @@ namespace cluster{
       rms_y                             = -999.999 ;
       charge_wgt_x                      = -999.999 ;
       charge_wgt_y                      = -999.999 ;
+      cluster_angle_2d                  = -999.999 ;
+      angle_2d                          = -999.999 ;
       eigenvalue_principal              = -999.999 ;
       eigenvalue_secondary              = -999.999 ;
       multi_hit_wires                   = -999.999 ;
       N_Wires                           = -999.999 ;
       verticalness                      = -999.999 ;
       opening_angle                     = -999.999 ;
-      opening_angle_highcharge          = -999.999 ;
+      opening_angle_charge_wgt          = -999.999 ;
       closing_angle                     = -999.999 ;
-      closing_angle_highcharge          = -999.999 ;
+      closing_angle_charge_wgt          = -999.999 ;
       offaxis_hits                      = -999.999 ;
       modified_hit_density              = -999.999 ;    
+      N_Hits                            = -999.999 ;    
+      N_Hits_HC                         = -999.999 ;    
       length                            = -999.999 ;
       width                             = -999.999 ;
       hit_density_1D                    = -999.999 ;
       hit_density_2D                    = -999.999 ;
-      angle_2d                          = -999.999 ;
-      cluster_angle_2d	                = -999.999 ;
+      direction                         =  0        ;
       showerness                        = -999.999 ;
       trackness                         = -999.999 ;
     }
@@ -95,35 +98,38 @@ namespace cluster{
     void Report(std::ostream & os = std::cout){
 
       os << "ClusterParams report: \n"
-	       << "\tstart_point: (" << start_point.w <<","<<start_point.t<<")\n"
-	       << "\tend_point: (" << end_point.w <<","<<end_point.t<<")\n"
-	       << "\tsum_charge: "<< sum_charge << "\n"
-         << "\tmean_charge: " << mean_charge << "\n"
-         << "\tmean_x: " << mean_x << "\n"
-         << "\tmean_y: " << mean_y << "\n"
-         << "\trms_x: " << rms_x << "\n"
-         << "\trms_y: " << rms_y << "\n"
-         << "\tcharge_wgt_x: " << charge_wgt_x << "\n"
-         << "\tcharge_wgt_y: " << charge_wgt_y << "\n"
-         << "\teigenvalue_principal: " << eigenvalue_principal << "\n"
-         << "\teigenvalue_secondary: " << eigenvalue_secondary << "\n"
-         << "\tmulti_hit_wires: " << multi_hit_wires << "\n"
-         << "\tN_Wires: " << N_Wires << "\n"
-         << "\tverticalness: " << verticalness << "\n"
-         << "\topening_angle: " << opening_angle << "\n"
-         << "\topening_angle_highcharge: " << opening_angle_highcharge << "\n"
-         << "\tclosing_angle: " << closing_angle << "\n"
-         << "\tclosing_angle_highcharge: " << closing_angle_highcharge << "\n"
-         << "\toffaxis_hits: " << offaxis_hits << "\n"
-         << "\tmodified_hit_density: " << modified_hit_density << "\n"
-         << "\tlength: " << length << "\n"
-         << "\twidth: " << width << "\n"
-         << "\thit_density_1D: " << hit_density_1D << "\n"
-         << "\thit_density_2D: " << hit_density_2D << "\n"
-         << "\tangle_2d: " << angle_2d << "\n"
-         << "\tcluster_angle_2d: " << cluster_angle_2d << "\n"
-         << "\tshowerness: " << showerness << "\n"
-         << "\ttrackness: " << trackness << "\n";
+	       << "   start_point  ................ : (" << start_point.w <<","<<start_point.t<<")\n"
+	       << "   end_point  .................. : (" << end_point.w <<","<<end_point.t<<")\n"
+	       << "   sum_charge  ................. : "<< sum_charge << "\n"
+         << "   mean_charge   ............... : " << mean_charge << "\n"
+         << "   mean_x  ..................... : " << mean_x << "\n"
+         << "   mean_y  ..................... : " << mean_y << "\n"
+         << "   rms_x  ...................... : " << rms_x << "\n"
+         << "   rms_y  ...................... : " << rms_y << "\n"
+         << "   charge_wgt_x  ............... : " << charge_wgt_x << "\n"
+         << "   charge_wgt_y  ............... : " << charge_wgt_y << "\n"
+         << "   cluster_angle_2d  ........... : " << cluster_angle_2d << "\n"
+         << "   angle_2d  ................... : " << angle_2d         << "\n"
+         << "   eigenvalue_principal  ....... : " << eigenvalue_principal << "\n"
+         << "   eigenvalue_secondary  ....... : " << eigenvalue_secondary << "\n"
+         << "   multi_hit_wires  ............ : " << multi_hit_wires << "\n"
+         << "   N_Wires  .................... : " << N_Wires << "\n"
+         << "   N_Hits  ..................... : " << N_Hits << "\n"
+         << "   N_Hits_HC  .................. : " << N_Hits_HC << "\n"
+         << "   verticalness  ............... : " << verticalness << "\n"
+         << "   opening_angle  .............. : " << opening_angle << "\n"
+         << "   opening_angle_charge_wgt  ... : " << opening_angle_charge_wgt << "\n"
+         << "   closing_angle  .............. : " << closing_angle << "\n"
+         << "   closing_angle_charge_wgt  ... : " << closing_angle_charge_wgt << "\n"
+         << "   offaxis_hits  ............... : " << offaxis_hits << "\n"
+         << "   modified_hit_density  ....... : " << modified_hit_density << "\n"
+         << "   length  ..................... : " << length << "\n"
+         << "   width  ...................... : " << width << "\n"
+         << "   hit_density_1D  ............. : " << hit_density_1D << "\n"
+         << "   hit_density_2D  ............. : " << hit_density_2D << "\n"
+         << "   showerness  ................. : " << showerness << "\n"
+         << "   trackness  .................. : " << trackness << "\n"
+         << "   direction  .................. : " << direction << "\n";
     }
 
   };

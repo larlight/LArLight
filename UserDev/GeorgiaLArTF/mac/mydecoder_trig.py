@@ -1,7 +1,3 @@
-#
-# Example decoder script.
-#
-
 # Basic python module import
 import os, sys, __main__
 

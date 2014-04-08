@@ -14,11 +14,15 @@ namespace larlight {
     //RMS histogram per channel
     //for (int u=0; u<(_ChMax-_ChMin); u++)
     //  RMSperChan[u] = new TH1D(Form("RMS_Ch_%d",u),Form("Noise Ch %d",u), 1000, 0, 100);
-    for (int j=0; j<20000; j++){
-      for (int k=0; k<100; k++){
+    for (short j=0; j<20000; j++){
+      for (short k=0; k<100; k++){
 	ChanRMS[j][k] = -1;
 	ChanBaseline[j][k] = -1;
       }
+    }
+    for (short l=0; l<20; l++){
+      for (short m=0; m<64; m++)
+	BoardVsChanRMSArray[l][m] = 0;
     }
     //NoiseSpec: Frequency spectrum of Noise
     //NoiseSpec needs to be scaled so that x-axis is a frequency range (Hz)
@@ -39,6 +43,12 @@ namespace larlight {
     RMSTrendHisto  = new TH1D("RMSTrend", "RMS Trend", 101, -1, 1);
     //Max ADCs vs. channel for 1 user-selected event
     MaxADCsHisto = new TH1D("MaxADCs", "Max ADCs; Chan Num; ADCs", 20000, 0, 20000);
+    for (int i=0; i<20; i++)
+      RMSperBoard[i] = new TH1D( Form("RMSofBoard_%d",i), Form("RMS of Board %d",i), 100, 0, 1 );
+    for (int i=0; i<64; i++)
+      RMSperChanNum[i] = new TH1D( Form("RMSofChan_%d",i), Form("RMS of Chan %d",i), 100, 0, 1 );
+    BoardVsChanRMS = new TH2D("BoardVsChanRMSMap", "Board vs. Chan RMS Noise Map; FEM #; Chan #", 20, 0, 20, 64, 0, 64);
+    
 
     //Sine example -- to get proper scaling of x-axis
     SineExmpl  = new TH1D("sineexample", "Sine Example",             3000,      0,  2*3.14);
@@ -122,7 +132,9 @@ namespace larlight {
 	ADC_subtracted->SetBinContent( u+1 , (tpc_data->at(u)-baseline) );
       }
       double rmsnoise = sqrt( RMS/ (tpc_data->size() - 1) );
-      //      std::cout << "RMS noise: " << rmsnoise << std::endl;
+      RMSperBoard[tpc_data->module_address()]->Fill(rmsnoise);
+      RMSperChanNum[chan]->Fill(rmsnoise);
+      BoardVsChanRMSArray[(int)(tpc_data->module_address())][chan] += rmsnoise;
       AllRMS->Fill(rmsnoise);
 
       //Fill Histo of corresponding channel with RMS
@@ -228,7 +240,12 @@ namespace larlight {
 	else {std::cout << "This Chan had < 100 events: " << u << std::endl;}
       }//if channel has at least 1 element
     }//loop over all channel numbers
-    
+
+    for (int l=0; l<20; l++){
+      for (int m=0; m<64; m++)
+	BoardVsChanRMS->SetBinContent( l, m, (BoardVsChanRMSArray[l][m]/100.0));
+    }
+    BoardVsChanRMS->Write();
     AllRMS->Write();
     ChannelRMS->Write();
     AllChan->Write();
@@ -238,7 +255,10 @@ namespace larlight {
     BaseMeanHisto->Write();
     BaseRMSHisto->Write();
     MaxADCsHisto->Write();
-
+    for (int i=0; i<20; i++)
+      RMSperBoard[i]->Write();
+    for (int i=0; i<64; i++)
+      RMSperChanNum[i]->Write();
     sine->Write();
     SineExmpl->Write();
     rand->Write();

@@ -87,6 +87,12 @@ namespace larlight {
 
       status = build(out_storage,id);
 
+    else if(_current_event_number > id)
+      
+      print(MSG::WARNING,__FUNCTION__,
+	    Form("data stream for \"%s\" did not find input event with event number %d!", 
+		 DATA::DATA_TREE_NAME[_type].c_str(),id));
+
     // while find_next is false, process 
     while(status && !find_next(id) && !_eof)
       
@@ -95,7 +101,7 @@ namespace larlight {
     return status;
   }
 
-    UInt_t evb_algo_base::get_event_number() const
+  UInt_t evb_algo_base::get_event_number() const
   {
 
     if(_type==DATA::PMTFIFO || _type==DATA::TPCFIFO)
