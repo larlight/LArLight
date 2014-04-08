@@ -1,9 +1,12 @@
 #!/bin/bash
 
-# Find the location of this script:
-me="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-# Find the directory one above.
-export MAKE_TOP_DIR="$( cd "$( dirname "$me" )" && pwd )"
+# If MAKE_TOP_DIR not set, try to guess
+if [[ -z $MAKE_TOP_DIR ]]; then
+    # Find the location of this script:
+    me="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+    # Find the directory one above.
+    export MAKE_TOP_DIR="$( cd "$( dirname "$me" )" && pwd )"
+fi
 
 echo "MAKE_TOP_DIR = $MAKE_TOP_DIR"
 if [[ -z $MAKE_TOP_DIR ]]; then
