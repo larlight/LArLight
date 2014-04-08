@@ -565,16 +565,17 @@ namespace cluster{
     }  // end second loop on hits. Now should have filled profile vectors.
       
 
-     double integral=0; 
-     int ix=0;
+    double integral=0; 
+    int ix=0;
     // int fbin=0;
-     for(ix;ix<NBINS;ix++)
-     {
-       integral+=ort_profile[ix];
-       if(integral>=0.95*fParams.sum_charge)
-	{break;
-	}
-     }
+    for(ix=0;ix<NBINS;ix++)
+    {
+      integral+=ort_profile[ix];
+      if(integral>=0.95*fParams.sum_charge)
+      {
+        break;
+      }
+    }
 
     fParams.width=2*(double)ix/(double)NBINS*(max_ortdist-min_ortdist);  // multiply by two because ortdist is folding in both sides. 
     
@@ -748,15 +749,15 @@ namespace cluster{
     fParams.direction=1; // this needs to be fixed based on refine direction or OpeningAngle!
     
     if(fParams.direction==1)
-      {
+    {
       startHit=fRoughBeginPoint;
       endHit=fRoughEndPoint;
-      }
+    }
     else
-      {
+    {
       startHit=fRoughEndPoint;
       endHit=fRoughBeginPoint;
-      }
+    }
     
     
     ///////////////////////////////
@@ -1057,8 +1058,8 @@ namespace cluster{
     double hit_counter_forward  = 0;
     double hit_counter_backward = 0;
     
-    double percentage = 0.9;
-    double percentage_HC = 0.9*fParams.N_Hits_HC/fParams.N_Hits;
+    double percentage = 0.95;
+    double percentage_HC = 0.95*fParams.N_Hits_HC/fParams.N_Hits;
     const int NBINS=200;
     const double wgt = 1.0/fParams.N_Hits;
 
@@ -1164,6 +1165,10 @@ namespace cluster{
     std::cout<<"opening high charge angle: "<<fParams.opening_angle_highcharge<<std::endl;
     std::cout<<"closing high charge angle: "<<fParams.closing_angle_highcharge<<std::endl;
     std::cout<<"Percentage high charge: "<<percentage_HC<<std::endl;
+
+    std::cout<<"opening/closing: " << fParams.opening_angle/fParams.closing_angle <<"\n";
+    std::cout<<"opening HC/closing HC: " << fParams.opening_angle_highcharge/fParams.closing_angle_highcharge <<"\n";
+    std::cout<<"closing/closing HC: " << fParams.closing_angle/fParams.closing_angle_highcharge <<"\n";
 
     //no weighted average, works better as flat average w/ min charge cut
 
