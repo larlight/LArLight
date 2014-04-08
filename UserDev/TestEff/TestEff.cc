@@ -43,7 +43,9 @@ namespace larlight {
    
    
    
+
    //cluster::ClusterParamsAlgNew  fCPAlg; // = new cluster::ClusterParamsAlgNew();
+
  
     for(auto const clustit : *my_cluster_v) {
       std::cout << " Clust ID " << clustit.ID() << std::endl;    
