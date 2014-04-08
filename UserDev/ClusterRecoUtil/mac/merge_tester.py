@@ -55,6 +55,17 @@ if args.ana_output == None:
     print "\t"+args.ana_output
 
 
+# ana_proc = larlight.ana_processor()
+
+# if args.verbose:
+    # ana_proc.set_verbosity(larlight.MSG.DEBUG)
+
+# Not sure what this does
+# ana_proc.set_io_mode(larlight.storage_manager.BOTH)
+
+# Add the input file.  Not sure if the above takes multiple input files yet
+# ana_proc.add_input_file(args.source)
+
 mgr = fmwk.storage_manager()
 
 mgr.set_io_mode(mgr.READ)
@@ -188,8 +199,11 @@ while mgr.next_event():
         print "Plane Number: ",pl
         for x in xrange(cluster_v.size()):
             if  ( cluster_v.at(x).View() == fGeo.PlaneToView(pl) ):
+                print "Adding polygon"
+
 
         if ( len(ClusterIndexInPlane) != 0 ):
+            print "Number of Clusters in plane: ", len(ClusterIndexInPlane)
             for m in xrange(len(ClusterIndexInPlane)):
                 for n in xrange(m+1,len(ClusterIndexInPlane)):
                     algo1 = cluster.ClusterParamsExecutor()
@@ -200,6 +214,7 @@ while mgr.next_event():
                     algo2.LoadCluster( cluster_v.at(ClusterIndexInPlane[n]), mgr.get_data(cluster_v.get_hit_type()))
                     algo2.FillPolygon()                                        
                     poly_n = algo2.GetParams()
+                    print "Comparing Polygons Number ", n , " and ", m
                     merger.Merge(poly_n,poly_m)
                     del algo1
                     del algo2
