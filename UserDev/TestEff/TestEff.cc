@@ -3,7 +3,7 @@
 
 #include "TestEff.hh"
 // #include "../ClusterRecoUtil/ClusterParamsAlgNew.hh"
-
+#include "ClusterParams.hh"
 
 namespace larlight {
 
@@ -50,14 +50,31 @@ namespace larlight {
     for(auto const clustit : *my_cluster_v) {
       std::cout << " Clust ID " << clustit.ID() << std::endl;    
      //auto const hit_index_v = clustit.association(my_cluster_v->get_hit_type());
-        auto const hit_index_v = clustit.association(DATA::FFTHit);
-     
+        auto const hit_index_v = clustit.association(DATA::GausHit);
+        std::vector<const larlight::hit *> hit_vector;
+	hit_vector.clear();
+	
 	for(auto const hit_index : hit_index_v) {
-      
+               
+	        hit_vector.push_back( const_cast<const larlight::hit *>(&(my_hit_v->at(hit_index))) );
 		my_hit_v->at(hit_index);
        
 	      }
-     
+	std::cout << " +++ in TestEff " << hit_vector.size() << std::endl;      
+	if(hit_vector.size() < 20)   // do not bother with too small hitlists
+	    continue;
+	::cluster::ClusterParamsAlgNew  fCPAlg(hit_vector);
+	fCPAlg.GetAverages(true);
+        fCPAlg.GetRoughAxis(true);
+        fCPAlg.GetProfileInfo(true);
+        fCPAlg.RefineDirection(true);
+        fCPAlg.RefineStartPoints(true);
+        //fCPAlg.FillPolygon()
+        fCPAlg.GetFinalSlope(true);
+        fCPAlg.Report();
+	
+	::cluster::cluster_params fResult=fCPAlg.GetParams();
+	
 	}
   
   
