@@ -17,7 +17,6 @@ CREATE TABLE  MainConfigTable  (
    ConfigID  INT NOT NULL   DEFAULT 0,
    SubConfigType  INT  NOT NULL DEFAULT 0 , -- 'Specifies which subtable we want',
    SubConfigID  INT  NOT NULL DEFAULT 0,
-   SubConfigParentID  SMALLINT NOT NULL DEFAULT -1,
    SubConfigOnMask  BIGINT  NOT NULL DEFAULT 0 , -- 'which subsystems are on',
    ConfigName  VARCHAR NULL DEFAULT NULL,
    userID  VARCHAR NULL DEFAULT NULL,
@@ -97,29 +96,24 @@ CREATE  TYPE subconfigreturntype as
 -- ); -- 'This table stores the Startup configuration parameters commo';
 -- 
 
-CREATE TRIGGER emp_stamp BEFORE INSERT OR UPDATE ON pmtconfig
-    FOR EACH ROW EXECUTE PROCEDURE emp_stamp();
+-- ---
+-- Table 'TriggerConfig'
+-- This stores the Trigger startup configuration variables
+-- ---
 
+DROP TABLE IF EXISTS  TriggerConfig;
+SELECT CreateConfigurationType('TriggerConfig','');
 
+--CREATE TRIGGER emp_stamp BEFORE INSERT OR UPDATE ON pmtconfig
+--   FOR EACH ROW EXECUTE PROCEDURE emp_stamp();
 
+-- ---
+-- Table 'PMTConfig'
+-- This stores the PMT startup configuration variables
+-- ---
 
 DROP TABLE IF EXISTS  PMTConfig ;
-		
-CREATE TABLE  PMTConfig  (
-   ConfigID  INTEGER NOT NULL   DEFAULT NULL,
-   Crate  SMALLINT  NOT NULL DEFAULT 0,
-   Channel  SMALLINT  NOT NULL DEFAULT 0,
-   Parameters  HSTORE  NOT NULL DEFAULT 'nchannels=>0',
-   userID  VARCHAR NULL DEFAULT NULL,
-   TimeStamp  TIMESTAMP NULL DEFAULT NULL,
-  PRIMARY KEY ( ConfigID,Crate,Channel )
-); -- 'This table stores the Startup configuration parameters commo';
-
-
-CREATE TRIGGER emp_stamp BEFORE INSERT OR UPDATE ON pmtconfig
-    FOR EACH ROW EXECUTE PROCEDURE emp_stamp();
-
-
+SELECT CreateConfigurationType('PMTConfig','');
 
 -- ---
 -- Table 'TPCConfig'
@@ -127,36 +121,16 @@ CREATE TRIGGER emp_stamp BEFORE INSERT OR UPDATE ON pmtconfig
 -- ---
 
 DROP TABLE IF EXISTS  TPCConfig ;
+SELECT CreateConfigurationType('TPCConfig','');
 		
-CREATE TABLE  TPCConfig  (
-   ConfigID  INT NOT NULL   DEFAULT NULL,
-   Crate  SMALLINT  NOT NULL DEFAULT 0,
-   Channel  INT  NOT NULL DEFAULT 0,
-   Parameters  HSTORE  NOT NULL DEFAULT 'nchannels=>0' ,
-   userID  VARCHAR NULL DEFAULT NULL,
-   TimeStamp  TIMESTAMP NULL DEFAULT NULL,
-  PRIMARY KEY ( ConfigID,Crate,Channel )
-); -- 'This stores the TPC startup configuration variables';
-
-
-
 -- ---
 -- Table 'CalibrationConfig'
 -- Calibration Hardware parameters
 -- ---
 
 DROP TABLE IF EXISTS  CalibrationConfig ;
+SELECT CreateConfigurationType('CalibrationConfig','');
 		
-CREATE TABLE  CalibrationConfig  (
-   ConfigID  INT NOT NULL   DEFAULT NULL,
-   Crate  SMALLINT  NOT NULL DEFAULT 0,
-   Channel  INT NULL DEFAULT NULL,
-   Parameters  HSTORE  NOT NULL DEFAULT 'nchannels=>0',
-   userID  VARCHAR NULL DEFAULT NULL,
-   TimeStamp  TIMESTAMP NULL DEFAULT NULL,
-  PRIMARY KEY ( ConfigID )
-); -- 'Calibration Hardware parameters';
-
 -- ---
 -- Table 'SlowMonTable'
 -- 

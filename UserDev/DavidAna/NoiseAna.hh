@@ -65,7 +65,10 @@ namespace larlight {
     int maxevt;
     TH1D *AllRMS;
     TH1D *ChannelRMS;
-    TH1D *RMSperChan[100];
+    TH1D *RMSperChanNum[64];
+    TH1D *RMSperBoard[20];
+    double BoardVsChanRMSArray[20][64];
+    TH2D *BoardVsChanRMS;
     //ChanRMS[Chan#][evt#] = RMS for that chan for that event
     double ChanRMS[20000][100];
     //ChanBaseline[Chan#][evt#] = Baseline for that chan for that event
