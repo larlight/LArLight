@@ -115,10 +115,20 @@ namespace larlight {
 
       for(auto const algo : _evb_algo_v) {
 
-	if(algo->data_type() == _ref_data) continue;
+	const DATA::DATA_TYPE type = algo->data_type();
 
-	_out_storage->get_data(algo->data_type())->set_event_id(event_id);
+	if(type == _ref_data) continue;
 
+	_out_storage->get_data(type)->set_event_id(event_id);
+
+	if(type == DATA::PMTFIFO)
+	  
+	  ((event_pmtfifo*)(_out_storage->get_data(type)))->set_event_number(DATA::INVALID_UINT);
+
+	else if(type == DATA::TPCFIFO)
+
+	  ((event_tpcfifo*)(_out_storage->get_data(type)))->set_event_number(DATA::INVALID_UINT);
+	  
 	status = status && algo->process(_out_storage,event_id);
 
 	eof = (eof || algo->eof());
