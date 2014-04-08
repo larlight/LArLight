@@ -51,7 +51,7 @@ namespace larlight {
 
     protected:
 
-    cluster::ClusterParamsAlgNew  fCPAlg; 
+    ::cluster::ClusterParamsAlgNew  fCPAlg; 
       
   };
 }
