@@ -70,6 +70,8 @@ decoder.set_output_filename(outname)
 #decoder.set_verbosity(fmwk.MSG.INFO)
 decoder.set_verbosity(fmwk.MSG.NORMAL)
 
+#decoder.set_read_by_block(True)
+
 # Set debug mode True if you wish to continue in the decoding event
 # loop with exception handling. This avoids saving an event with
 # missing event words or conflicting encoding algorithm, and continue

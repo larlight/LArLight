@@ -21,13 +21,13 @@ my_proc.set_io_mode(fmwk.storage_manager.READ)
 
 # Specify what data to read
 my_proc.set_data_to_read(fmwk.DATA.PMTFIFO)
-#my_proc.set_data_to_read(fmwk.DATA.Trigger)
+my_proc.set_data_to_read(fmwk.DATA.Trigger)
 
 # Set input root file: this is decoder output root file.
 # This time, we use a sample file prepared.
-my_proc.add_input_file("xmit_subrun_2014_04_04_1_nu.root")
-my_proc.add_input_file("xmit_subrun_2014_04_04_0_trigger.root")
-#my_proc.add_input_file(sys.argv[1])
+#my_proc.add_input_file("xmit_subrun_2014_04_08_1_nu.root")
+#my_proc.add_input_file("xmit_subrun_2014_04_08_1_trigger.root")
+my_proc.add_input_file(sys.argv[1]) #use evt-built file
 
 # Set output root file: this is a separate root file in which your
 # analysis module can store anything such as histograms, your own TTree, etc.
