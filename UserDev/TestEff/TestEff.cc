@@ -4,6 +4,7 @@
 #include "TestEff.hh"
 // #include "../ClusterRecoUtil/ClusterParamsAlgNew.hh"
 #include "ClusterParams.hh"
+#include "LArUtilManager.hh"
 
 namespace larlight {
 
@@ -15,7 +16,9 @@ namespace larlight {
     // If you have a histogram to fill in the event loop, for example,
     // here is a good place to create one on the heap (i.e. "new TH1D"). 
     //
+    larutil::LArUtilManager::Reconfigure(larlight::GEO::kArgoNeuT);
 
+    
     return true;
   }
   
