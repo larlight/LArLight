@@ -128,7 +128,7 @@ namespace cluster{
   {
 
     // Set pointer attributes
-    if(!fPrincipal) fPrincipal = new TPrincipal(2);    
+    if(!fPrincipal) fPrincipal = new TPrincipal(2,"D");    
     if(!fGSer) fGSer = (larutil::GeometryUtilities*)(larutil::GeometryUtilities::GetME());
 
     //--- Initilize attributes values ---//
@@ -201,7 +201,8 @@ namespace cluster{
     std::map<double, int> wireMap;
 
     fParams.sum_charge = 0.;
-
+    int uniquewires = 0;
+    int multi_hit_wires = 0;
     for(auto& hit : fHitVector){
       // std::cout << "This hit has charge " <<  hit.charge << "\n";
 
@@ -213,11 +214,21 @@ namespace cluster{
       fParams.charge_wgt_y += hit.t * hit.charge;
       fParams.sum_charge += hit.charge;
 
+
+      if (wireMap[hit.w] == 0) {
+        uniquewires ++;
+      }
+      if (wireMap[hit.w] == 1) {
+        multi_hit_wires ++;
+      }
       wireMap[hit.w] ++;
 
+
     }
-    fParams.N_Wires = wireMap.size();
-    fParams.multi_hit_wires = fParams.N_Hits - fParams.N_Wires;
+
+
+    fParams.N_Wires = uniquewires;
+    fParams.multi_hit_wires = multi_hit_wires;
 
     fParams.charge_wgt_x /= fParams.sum_charge;
     fParams.charge_wgt_y /= fParams.sum_charge;
@@ -641,14 +652,14 @@ namespace cluster{
    * @param override [description]
    */
   void ClusterParamsAlgNew::RefineStartPoints(bool override) {
-    if(!override) { //Override being set, we skip all this logic.
-      //OK, no override. Stop if we're already finshed.
-      if (fFinishedRefineStartPoints) return;
-      //Try to run the previous function if not yet done.
-      if (!fFinishedRefineDirection) RefineDirection(true);
-    } else {
-      if (!fFinishedRefineDirection) RefineDirection(true);
-    }
+    // if(!override) { //Override being set, we skip all this logic.
+    //   //OK, no override. Stop if we're already finshed.
+    //   if (fFinishedRefineStartPoints) return;
+    //   //Try to run the previous function if not yet done.
+    //   if (!fFinishedRefineDirection) RefineDirection(true);
+    // } else {
+    //   if (!fFinishedRefineDirection) RefineDirection(true);
+    // }
     
     
      // need to define physical direction with openind angles and pass that to Ryan's line finder.
@@ -680,7 +691,7 @@ namespace cluster{
    
     double linearlimit=8;
     double ortlimit=12;
-    double lineslopetest;
+    double lineslopetest(fRough2DSlope);
     larutil::PxHit averageHit;
     //also are we sure this is actually doing what it is supposed to???
     //are we sure this works?
@@ -855,6 +866,10 @@ namespace cluster{
     
     fParams.start_point=startpoint;
     
+    static int count(0);
+    count ++;
+    std::cout << "Completed refine start point " << count << " times!\n";
+
     fFinishedRefineStartPoints = true;
    // Report();
     return;
@@ -930,15 +945,15 @@ namespace cluster{
    * @param override [description]
    */
   void ClusterParamsAlgNew::RefineDirection(bool override) {
-    if(!override) { //Override being set, we skip all this logic.
-      //OK, no override. Stop if we're already finshed.
-      if (fFinishedRefineDirection) return;
-      //Try to run the previous function if not yet done.
-      if (!fFinishedGetProfileInfo) GetProfileInfo(true);
-    } else {
-      //Try to run the previous function if not yet done.
-      if (!fFinishedGetProfileInfo) GetProfileInfo(true);
-    }
+    // if(!override) { //Override being set, we skip all this logic.
+    //   //OK, no override. Stop if we're already finshed.
+    //   if (fFinishedRefineDirection) return;
+    //   //Try to run the previous function if not yet done.
+    //   if (!fFinishedGetProfileInfo) GetProfileInfo(true);
+    // } else {
+    //   //Try to run the previous function if not yet done.
+    //   if (!fFinishedGetProfileInfo) GetProfileInfo(true);
+    // }
     
     // double wire_2_cm = fGSer->WireToCm();
     // double time_2_cm = fGSer->TimeToCm();
@@ -982,8 +997,9 @@ namespace cluster{
     //hard coding this for now, should use SetRefineDirectionQMin function
     fQMinRefDir  = 25;
 
+    int index = -1;
     for(auto& hit : fHitVector) {
-
+      index ++;
       //skip this hit if below minimum cutoff param
       if(hit.charge < fQMinRefDir) continue;
 
@@ -993,6 +1009,8 @@ namespace cluster{
       double hitStartDiff_x = (hit.w - this_startPoint.w) ;
       double hitStartDiff_y = (hit.t - this_startPoint.t) ;
       
+      if (hitStartDiff_x == 0 && hitStartDiff_y == 0) continue;
+
       double cosangle_start = (endStartDiff_x*hitStartDiff_x + 
                                endStartDiff_y*hitStartDiff_y);
       cosangle_start /= ( pow(pow(endStartDiff_x,2)+pow(endStartDiff_y,2),0.5)
@@ -1009,7 +1027,8 @@ namespace cluster{
       // Compute backward mean
       double hitEndDiff_x = (hit.w - this_endPoint.w);
       double hitEndDiff_y = (hit.t - this_endPoint.t);
-      
+      if (hitEndDiff_x == 0 && hitEndDiff_y == 0) continue;
+
       double cosangle_end  = (endStartDiff_x*hitEndDiff_x +
                               endStartDiff_y*hitEndDiff_y) * (-1.);
       cosangle_end /= ( pow(pow(endStartDiff_x,2)+pow(endStartDiff_y,2),0.5) 
@@ -1024,6 +1043,7 @@ namespace cluster{
 
       int N_bins_OPEN = NBINS * acos(cosangle_start)/PI;
       int N_bins_CLOSE = NBINS * acos(cosangle_end)/PI;
+
 
       opening_angle_chargeWgt_bin[N_bins_OPEN ] 
                     += hit.charge/fParams.sum_charge;
@@ -1086,16 +1106,17 @@ namespace cluster{
     double opening_angle_charge_wgt = mBin * PI /NBINS ;
     double closing_angle_charge_wgt = nBin * PI /NBINS ;
 
-    // std::cout<<"opening angle: "<<opening_angle<<std::endl;
-    // std::cout<<"closing angle: "<<closing_angle<<std::endl;
-    // std::cout<<"opening high charge angle: "<<opening_angle_highcharge<<std::endl;
-    // std::cout<<"closing high charge angle: "<<closing_angle_highcharge<<std::endl;
-    // std::cout<<"opening high charge wgt  : "<<opening_angle_charge_wgt<<std::endl;
-    // std::cout<<"closing high charge wgt  : "<<closing_angle_charge_wgt<<std::endl;
-    // std::cout<<"fCoarseChargeProfile     : "<<fCoarseChargeProfile[0] 
-             // << ", " << fCoarseChargeProfile[1] << std::endl;
+    std::cout<<"opening angle: "<<opening_angle<<std::endl;
+    std::cout<<"closing angle: "<<closing_angle<<std::endl;
+    std::cout<<"opening high charge angle: "<<opening_angle_highcharge<<std::endl;
+    std::cout<<"closing high charge angle: "<<closing_angle_highcharge<<std::endl;
+    std::cout<<"opening high charge wgt  : "<<opening_angle_charge_wgt<<std::endl;
+    std::cout<<"closing high charge wgt  : "<<closing_angle_charge_wgt<<std::endl;
+    std::cout<<"fCoarseChargeProfile     : "<<fCoarseChargeProfile[0] 
+             << ", " << fCoarseChargeProfile[1] << std::endl;
 
     double value_1 = closing_angle/opening_angle -1;
+    if (fCoarseChargeProfile.size() != 2) std::cout <<" !!!!!!!!!!!!!!!!!! \n\n\n\n";
     double value_2 = (fCoarseChargeProfile[0]/fCoarseChargeProfile[1]);
     if (value_2 < 100.0 && value_2 > 0.01)
       value_2 = log(value_2);
@@ -1107,9 +1128,9 @@ namespace cluster{
     // if (value_2 < 1.0) value_2 = -1.0/value_2;
     // if (value_3 > 1.0) value_3 = -1.0/value_3;
 
-    // std::cout << "value_1 : " << value_1 << std::endl;
-    // std::cout << "value_2 : " << value_2 << std::endl;
-    // std::cout << "value_3 : " << value_3 << std::endl;
+    std::cout << "value_1 : " << value_1 << std::endl;
+    std::cout << "value_2 : " << value_2 << std::endl;
+    std::cout << "value_3 : " << value_3 << std::endl;
 
     // Using a sigmoid function to determine flipping.
     // I am going to weigh all of the values above (1, 2, 3) equally.
@@ -1137,6 +1158,9 @@ namespace cluster{
       std::swap(fParams.start_point,fParams.end_point);
       std::swap(fRoughBeginPoint,fRoughEndPoint);
     }
+    else{
+      std::cout << "Not Flipping!\n";
+    }
 
     fParams.opening_angle = opening_angle;
     fParams.opening_angle_charge_wgt = opening_angle_charge_wgt;
@@ -1157,6 +1181,22 @@ namespace cluster{
       std::cout<<fParams.container_polygon.size()<<std::endl;
     }
   }
+  void ClusterParamsAlgNew::RefineStartPointAndDirection(){
+    // This function is meant to pick the direction.
+    // It refines both the start and end point, and then asks 
+    // if it should flip.
+    RefineStartPoints();
+    std::swap(fParams.start_point,fParams.end_point);
+    std::swap(fRoughBeginPoint,fRoughEndPoint);
+    RefineStartPoints();
+    std::swap(fParams.start_point,fParams.end_point);
+    std::swap(fRoughBeginPoint,fRoughEndPoint);
+    std::cout << "About to refine direction...\n";
+    RefineDirection();
+    std::cout << "Successfully refined direction!\n";
+    return;   
+  }
+
   
 } //end namespace
 

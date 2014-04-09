@@ -4,12 +4,12 @@
 #include "TestEff.hh"
 // #include "../ClusterRecoUtil/ClusterParamsAlgNew.hh"
 #include "ClusterParams.hh"
+#include "LArUtilManager.hh"
 
 namespace larlight {
 
   bool TestEff::initialize() {
 
-    larutil::LArUtilManager::Reconfigure(larlight::GEO::kArgoNeuT);
     //
     // This function is called in the beggining of event loop
     // Do all variable initialization you wish to do here.
@@ -18,8 +18,10 @@ namespace larlight {
     //
    
 //    TH1D *hist1 = new TH1D("hist1","title",Nbins,lowerBin,upperBin) ;	
+    
+	larutil::LArUtilManager::Reconfigure(larlight::GEO::kArgoNeuT);
 
-
+    
     return true;
   }
   
@@ -61,19 +63,17 @@ namespace larlight {
      //auto const hit_index_v = clustit.association(my_cluster_v->get_hit_type());
         auto const hit_index_v = clustit.association(DATA::GausHit);
         std::vector<const larlight::hit *> hit_vector;
-	hit_vector.clear();
-	
-	for(auto const hit_index : hit_index_v) {
-               
-	        hit_vector.push_back( const_cast<const larlight::hit *>(&(my_hit_v->at(hit_index))) );
-		my_hit_v->at(hit_index);
-       
-	      }
-	std::cout << " +++ in TestEff " << hit_vector.size() << std::endl;      
-	if(hit_vector.size() < 20)   // do not bother with too small hitlists
-	    continue;
-	::cluster::ClusterParamsAlgNew  fCPAlg(hit_vector);
-	fCPAlg.GetAverages(true);
+        hit_vector.clear();
+        
+        for(auto const hit_index : hit_index_v) {
+            hit_vector.push_back( const_cast<const larlight::hit *>(&(my_hit_v->at(hit_index))) );
+            my_hit_v->at(hit_index);
+        }
+        std::cout << " +++ in TestEff " << hit_vector.size() << std::endl;      
+        if(hit_vector.size() < 20)   // do not bother with too small hitlists
+            continue;
+        ::cluster::ClusterParamsAlgNew  fCPAlg(hit_vector);
+        fCPAlg.GetAverages(true);
         fCPAlg.GetRoughAxis(true);
         fCPAlg.GetProfileInfo(true);
         fCPAlg.RefineDirection(true);

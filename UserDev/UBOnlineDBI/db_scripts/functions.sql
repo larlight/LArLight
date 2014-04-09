@@ -327,6 +327,13 @@ DECLARE
   END;
 $$ LANGUAGE plpgsql VOLATILE STRICT;
 
+
+
+------------------------------------------------------------------------
+
+
+
+
 CREATE OR REPLACE FUNCTION InsertConfigurationSet(configtabletype text,insubconfid INT,incrate INT, inchannel INT,columns HSTORE) RETURNS INT AS $$
     DECLARE
     myrec RECORD;
@@ -365,13 +372,146 @@ $$ LANGUAGE plpgsql VOLATILE STRICT;
 
 ------------------------------------------------------------------------
 
+DROP FUNCTION IF EXISTS InsertMainConfiguration( text, HSTORE) ;
 
 
+CREATE OR REPLACE FUNCTION InsertMainConfiguration(subconfigparameters HSTORE,confname text DEFAULT 'no_name') RETURNS INT AS $$
+    DECLARE
+    myrec1 RECORD;
+    myrec2 RECORD;
+    myrec3 RECORD;
+    ColumnPair RECORD;
+    SubConfigCount INT;
+   -- maskconfig INT;
+    newconfig INT;
+    query text;  
+    SubConfT INT;
+    --mainconfigexists INT;
+    localconfigexists INT;
+    BEGIN    
+
+    -- 1st CHECK: check if the provided Config ID already exsits in the MainConfigTable or not
+    IF  (confname <> 'no_name' ) AND EXISTS (SELECT ConfigID FROM MainConfigTable WHERE MainConfigTable.ConfigName = confname)
+        THEN RAISE EXCEPTION '+++++++++++++ Config with name % already exists in MainConfigTable! +++++++++++++',confname;
+	RETURN -1;
+    END IF;
+    -- now we know that the name doesn't exist or the user doesn't care.
+
+    -- 2nd CHECK: check if specified SubConfigType and SubConfigID are available or not
+    FOR ColumnPair IN SELECT (each(subconfigparameters)).*
+    LOOP
+        -- Check if SubConfigType is valid or not
+--        RAISE NOTICE 'key:%, value: %', ColumnPair.key, ColumnPair.value;
+	IF NOT EXISTS ( SELECT TRUE FROM ConfigLookUp WHERE SubConfigName = ColumnPair.key)
+	    THEN RAISE EXCEPTION '++++++++++++ Configuration % is not defined! +++++++++++++++', ColumnPair.key;
+	    RETURN 1;
+	END IF;
+	-- Check if SubConfigID is valid or not
+	query := format('SELECT TRUE FROM %s WHERE COnfigID=%s',ColumnPair.key,ColumnPair.value);
+	EXECUTE query INTO myrec2;
+	IF myrec2.bool IS NULL
+	    THEN RAISE EXCEPTION '++++++++++++ Configuration % does not contain ConfigID=%++++++++++++',ColumnPair.key,ColumnPair.value;
+	    RETURN 1;
+	END IF;
+	
+    END LOOP;
+  
+    -- mainconfigexists:=1;  -- assuming it exists. Let's be proven otherwise.
+    --let's check if the configuration exists:
+    -- since we want to check the configuration sets, it's ok if we just choose the first subconfigtype and ID.
+    -- and then we loop over all of the subsets of MainconfigTable to see if they contain all of the other ones.
+
+    -- !!! Still missing. Find that the configuration we havefound does not have more rows than we need. !!!
 
 
+    SELECT (each(subconfigparameters)).* LIMIT 1 INTO ColumnPair;  -- only use the first.
+    --get subconfig type
+    ------------------------------ this repeats the functionality from later.
+
+    SELECT  SubconfigType FROM ConfigLookUp WHERE SubConfigName = ColumnPair.key INTO SubConfT;
+    --looping over all mainconfigs that have the above parameters. 
+    for myrec3 IN SELECT DISTINCT configID FROM MainconfigTable WHERE SubConfigType = SubConfT AND SubConfigID = CAST(ColumnPair.value AS INT)
+      LOOP
+
+         -- Report
+--         RAISE NOTICE 'Checking against Main Config ID %', myrec3;
+
+	 -- First check the # of sub-config types in this configuration. If not same as the # elements in subconfigparameters, continue.
+	 SELECT COUNT(TRUE) FROM MainConfigTable WHERE ConfigID = myrec3.ConfigID INTO SubConfigCount;
+--	 SubConfigCount := SubConfigCount - ARRAY_LENGTH(AKEYS(subconfigparameters));
+--	 SELECT COUNT(TRUE) - SubConfigCount FROM 
+--	 IF SubConfigCount = 0
+	 IF NOT SubConfigCount = ARRAY_LENGTH(AKEYS(subconfigparameters),1)
+	    THEN CONTINUE;
+	 END IF;
+
+         -- loop over all of the new, to be insterted config setting and check if the current configID has them all.
+         localconfigexists := 1;
+	 for ColumnPair IN SELECT (each(subconfigparameters)).*
+	     LOOP
+	     SELECT SubConfigType FROM ConfigLookUp WHERE SubConfigName = ColumnPair.key INTO SubConfT;
+             IF NOT EXISTS( SELECT TRUE FROM MainconfigTable WHERE SubConfigType = SubConfT AND subconfigid=CAST(ColumnPair.value AS INT) AND ConfigID=myrec3.ConfigID )
+		  THEN localconfigexists := 0;
+		  EXIT;   -- break out of loop. We already know, this is not the right config.
+	     END IF;
+             END LOOP;
+         IF localconfigexists = 1    -- we've gone through all of the PMT settings and all exist.
+	    THEN RAISE EXCEPTION '+++++++++++++ This Configuration exists MainConfigTable, with ID: %! +++++++++++++',myrec3.ConfigID;
+	    RETURN -1;
+	 END IF;
+     END LOOP;  -- end of myrec3 FOR loop over all of the subconfigs
 
 
+--     IF mainconfigexists = 1
+--       THEN RAISE EXCEPTION '+++++++++++++ Config already exists in MainConfigTable, with ID: %! +++++++++++++',-1;
+--     END IF;
 
+    ----------- To be improved
+
+    --------------------------------- Find the last entry
+    SELECT configID FROM MainConfigTable ORDER BY configID DESC LIMIT 1 INTO newconfig ;
+    IF newconfig IS NULL
+      THEN  newconfig := 0;
+    ELSE
+       newconfig := newconfig + 1;
+    END IF;
+    
+    RAISE NOTICE 'Inserting a new entry in MainConfigTable: Name=% ... ID=%',confname,newconfig;
+   
+    -- Reaching this point means input values are valid. Let's insert.
+   for myrec1 IN SELECT (each(subconfigparameters)).*
+    LOOP
+    SELECT SubconfigType FROM ConfigLookUp WHERE SubConfigName = myrec1.key INTO SubConfT;
+    INSERT INTO MainconfigTable (ConfigID,
+    	   			 SubConfigType,
+				 SubConfigID, 
+				 SubConfigOnMask,
+				 ConfigName) VALUES(newconfig,SubConfT,CAST(myrec1.value AS INT),65636,confname);
+
+    END LOOP;
+
+   RETURN newconfig;
+   END;
+$$ LANGUAGE plpgsql VOLATILE STRICT;
+
+
+------------------------------------------------------------------------
+
+CREATE OR REPLACE FUNCTION CleanConfigDB() RETURNS INT AS $$
+DECLARE
+  ConfigTable RECORD;
+  query TEXT;
+BEGIN
+    DELETE FROM MainConfigTable;
+    FOR ConfigTable IN SELECT DISTINCT SubConfigName FROM ConfigLookUp
+    LOOP
+        query := 'DROP TABLE IF EXISTS '||ConfigTable.SubConfigName||';';
+	EXECUTE query;
+    END LOOP;
+    DELETE FROM ConfigLookUp;
+    RETURN 0;
+END;
+$$ LANGUAGE plpgsql VOLATILE STRICT;
 
 
 DROP FUNCTION IF EXISTS GetSubConfig( text, INT) ;

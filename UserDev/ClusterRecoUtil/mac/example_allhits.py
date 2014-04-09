@@ -17,7 +17,7 @@ group.add_argument("-v", "--verbose", help="Turn on verbose output",
                     action="store_true")
 group.add_argument("-q", "--quiet", help="Turn off most output",
                     action="store_true")
-parser.add_argument("-s","--source",help="Name of input file")
+parser.add_argument("-s","--source",nargs='*',help="Name of input file")
 parser.add_argument("-o","--data-output",help="Output data file, if event is changed")
 parser.add_argument("-a","--ana-output",help="Analysis output file")
 parser.add_argument("-n","--num-events",help="Number of events to process")
@@ -70,7 +70,9 @@ mgr = fmwk.storage_manager()
 
 mgr.set_io_mode(mgr.READ)
 
-mgr.add_in_filename(args.source)
+for source in args.source:
+    mgr.add_in_filename(source)
+
 if len(sys.argv) > 2:
     mgr.set_in_rootdir("scanner")
 
@@ -117,8 +119,9 @@ while mgr.next_event():
         algo.GetAverages(True)
         algo.GetRoughAxis(True)
         algo.GetProfileInfo(True)
-        algo.RefineDirection(True)
-        algo.RefineStartPoints(True)
+        # algo.RefineStartPoints(True)
+        # algo.RefineDirection(True)
+        algo.RefineStartPointAndDirection()
         algo.FillPolygon()
         algo.GetFinalSlope(True)
         algo.Report()
