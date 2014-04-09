@@ -122,7 +122,7 @@ while mgr.next_event():
         algo.FillPolygon()
         algo.GetFinalSlope(True)
         algo.Report()
-        
+        algo.PrintFANNVector()
         result = algo.GetParams()
 
         print "(%g,%g) => (%g,%g), plane: %g" % (result.start_point.w,
@@ -178,7 +178,7 @@ while mgr.next_event():
         func=TF1("nf","[1]*x+[0]",result.start_point.w-50,result.end_point.w+50);
         func.SetParameter(0,algo.RoughIntercept());     
         func.SetParameter(1,algo.RoughSlope());   
-        func.SetLineWidth(0);   
+        func.SetLineWidth(1);   
         if result.start_point.w > result.end_point.w:
             func.SetRange(result.end_point.w-50,result.start_point.w+50);
      

@@ -74,6 +74,8 @@ namespace larlight {
     TGraph *trig_frdiff;
     TGraph *trig_slcdiff;
 
+    TGraph *evt_no;
+
     //some variables which come from configuration file
     const int samples_per_frame = 102400;
 

@@ -14,7 +14,7 @@ namespace larlight {
 
   bool evb_algo_pmt::build(storage_manager *out_storage, UInt_t id)
   {
-    
+    print(MSG::DEBUG,__FUNCTION__,Form("Building %d %d...",id,_current_event_number));
     event_pmtfifo* out_event_pmtfifo = (event_pmtfifo*)(out_storage->get_data(_type));
 
     event_pmtfifo* in_event_pmtfifo  = (event_pmtfifo*)(_storage->get_data(_type));
