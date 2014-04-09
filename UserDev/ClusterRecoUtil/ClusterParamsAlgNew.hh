@@ -152,6 +152,8 @@ namespace cluster {
 
     void RefineDirection(bool override=false);
 
+    void RefineStartPointAndDirection();
+
     void FillPolygon();
 
     void GetOpeningAngle();

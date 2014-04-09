@@ -4,6 +4,7 @@
 #include "TestEff.hh"
 // #include "../ClusterRecoUtil/ClusterParamsAlgNew.hh"
 #include "ClusterParams.hh"
+#include "LArUtilManager.hh"
 
 namespace larlight {
 
@@ -15,7 +16,9 @@ namespace larlight {
     // If you have a histogram to fill in the event loop, for example,
     // here is a good place to create one on the heap (i.e. "new TH1D"). 
     //
+    larutil::LArUtilManager::Reconfigure(larlight::GEO::kArgoNeuT);
 
+    
     return true;
   }
   
@@ -52,19 +55,17 @@ namespace larlight {
      //auto const hit_index_v = clustit.association(my_cluster_v->get_hit_type());
         auto const hit_index_v = clustit.association(DATA::GausHit);
         std::vector<const larlight::hit *> hit_vector;
-	hit_vector.clear();
-	
-	for(auto const hit_index : hit_index_v) {
-               
-	        hit_vector.push_back( const_cast<const larlight::hit *>(&(my_hit_v->at(hit_index))) );
-		my_hit_v->at(hit_index);
-       
-	      }
-	std::cout << " +++ in TestEff " << hit_vector.size() << std::endl;      
-	if(hit_vector.size() < 20)   // do not bother with too small hitlists
-	    continue;
-	::cluster::ClusterParamsAlgNew  fCPAlg(hit_vector);
-	fCPAlg.GetAverages(true);
+        hit_vector.clear();
+        
+        for(auto const hit_index : hit_index_v) {
+            hit_vector.push_back( const_cast<const larlight::hit *>(&(my_hit_v->at(hit_index))) );
+            my_hit_v->at(hit_index);
+        }
+        std::cout << " +++ in TestEff " << hit_vector.size() << std::endl;      
+        if(hit_vector.size() < 20)   // do not bother with too small hitlists
+            continue;
+        ::cluster::ClusterParamsAlgNew  fCPAlg(hit_vector);
+        fCPAlg.GetAverages(true);
         fCPAlg.GetRoughAxis(true);
         fCPAlg.GetProfileInfo(true);
         fCPAlg.RefineDirection(true);
@@ -72,10 +73,10 @@ namespace larlight {
         //fCPAlg.FillPolygon()
         fCPAlg.GetFinalSlope(true);
         fCPAlg.Report();
-	
-	::cluster::cluster_params fResult=fCPAlg.GetParams();
-	
-	}
+        
+        ::cluster::cluster_params fResult=fCPAlg.GetParams();
+        
+        }
   
   
   

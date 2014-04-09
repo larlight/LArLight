@@ -649,10 +649,10 @@ namespace larutil{
     double invslope=0;
       
     if(slope)	
-      {
+    {
 // 	invslope=-1./slope*fWireTimetoCmCm*fWireTimetoCmCm;
        invslope=-1./slope;
-      }
+    }
   
     double ort_intercept=point1->t - invslope * point1->w;
     
@@ -1104,11 +1104,10 @@ namespace larutil{
     double wiresum = 0;
     for(size_t i=0; i<hitlist.size(); ++i) {
 
-      
       larutil::PxPoint hitonline;
       
       GetPointOnLine( lineslopetest, locintercept, (const larutil::PxHit*)(&hitlist.at(i)), hitonline );
-       
+
       //calculate linear distance from start point and orthogonal distance from axis
       Double_t lindist=Get2DDistance((const larutil::PxPoint*)(&hitonline),(const larutil::PxPoint*)(&startHit));
       Double_t ortdist=Get2DDistance((const larutil::PxPoint*)(&hitlist.at(i)),(const larutil::PxPoint*)(&hitonline));
