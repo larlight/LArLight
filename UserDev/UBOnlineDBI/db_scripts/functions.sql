@@ -379,11 +379,13 @@ CREATE OR REPLACE FUNCTION InsertMainConfiguration(subconfigparameters HSTORE,co
     DECLARE
     myrec1 RECORD;
     myrec2 RECORD;
+    myrec3 RECORD;
    -- maskconfig INT;
     newconfig INT;
     query text;  
     SubConfT INT;
-    mainconfigexists INT;
+    --mainconfigexists INT;
+    localconfigexists INT;
     BEGIN
         
 
@@ -396,25 +398,40 @@ CREATE OR REPLACE FUNCTION InsertMainConfiguration(subconfigparameters HSTORE,co
     
     -- now we know that the name doesn't exist or the user doesn't care.
   
-    mainconfigexists:=1;  -- assuming it exists. Let's be proven otherwise.
+   -- mainconfigexists:=1;  -- assuming it exists. Let's be proven otherwise.
     --let's check if the configuration exists:
-    for myrec1 IN SELECT (each(columns)).*
-	LOOP
-        --get subconfig type
+    -- since we want to check the configuration sets, it's ok if we just choose the first subconfigtype and ID.
+    -- and then we loop over all of the subsets of MainconfigTable to see if they contain all of the other ones.
+
+     -- !!! Still missing. Find that the configuration we havefound does not have more rows than we need. !!!
+
+
+    SELECT (columns).* LIMIT 1 INTO myrec1;  -- only use the first.
+    --get subconfig type
         ------------------------------ this repeats the functionality from later.
-            SELECT  SubconfigType FROM ConfigLookUp WHERE SubConfigName = myrec1.key INTO SubConfT;
-	    IF NOT EXISTS( SELECT TRUE FROM MainconfigTable WHERE SubConfT = myrec1.key AND subconfigid=myrec1.val )
-	      THEN mainconfigexists=0;
-	      EXIT;   -- break out of loop. We already know, we need a new config.
-	    END IF;
-	END LOOP;  -- end checking if mainconfig exists loop.
+    SELECT  SubconfigType FROM ConfigLookUp WHERE SubConfigName = myrec1.key INTO SubConfT;
+   --looping over all mainconfigs that have the above parameters. 
+    for myrec3 IN SELECT configID FROM MainconfigTable WHERE SubConfT = myrec1.key AND subconfigid=myrec1.val
+      LOOP
+         -- loop over all of the new, to be insterted config setting and check if the current configID has them all.
+         localconfigexists:=1;
+	 for myrec2 IN SELECT (each(columns)).*
+	     LOOP
+             IF NOT EXISTS( SELECT TRUE FROM MainconfigTable WHERE SubConfT = myrec1.key AND subconfigid=myrec1.val AND configID=myrec3 )
+		  THEN localconfigexists=0;
+		  EXIT;   -- break out of loop. We already know, this is not the right config.
+	     END IF;
+             END LOOP;
+         if localconfigexists = 1    -- we've gone through all of the PMT settings and all exist.
+	    THEN RAISE EXCEPTION '+++++++++++++ This Configuration exists MainConfigTable, with ID: %! +++++++++++++',myrec3;
+	    RETURN -1;
+	 END IF;
+     END LOOP;  -- end of myrec3 FOR loop over all of the subconfigs
 
-     ---------- !!!!! warning! currently there is no check to make sure all of the above fall into the same mainconfigid!
-     ------------!!!!!!!!!!
 
-    IF mainconfigexists = 1
-      THEN RAISE EXCEPTION '+++++++++++++ Config already exists in MainConfigTable, with ID: %! +++++++++++++',-1;
-    END IF;
+--     IF mainconfigexists = 1
+--       THEN RAISE EXCEPTION '+++++++++++++ Config already exists in MainConfigTable, with ID: %! +++++++++++++',-1;
+--     END IF;
 
     ----------- To be improved
 
