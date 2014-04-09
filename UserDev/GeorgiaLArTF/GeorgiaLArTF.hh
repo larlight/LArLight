@@ -71,14 +71,22 @@ namespace larlight {
     TH1D *trig_rem64;
     TH1D *trig_rem16;
 
-    TGraph *trig_frdiff;
-    TGraph *trig_slcdiff;
 
-    TGraph *evt_no;
+    //key
+    TGraph *key_trig_type_vs_evtno;
+    TGraph *key_trig_type_vs_trfrm;
+    TGraph *key_ntrigs_vs_evtno;
+    TGraph *key_fem_trig_trfrm_vs_trfrm;
+    TGraph *key_fem_trig_evfrm_vs_trfrm;
+    TGraph *key_fem_trig_trfrmdiff_vs_evtno;
+    TGraph *key_fem_trig_trfrmdiff_vs_trfrm;
+    TGraph *key_fem_evfrm_vs_trfrm;
+
 
     //some variables which come from configuration file
     const int samples_per_frame = 102400;
-
+    
+    std::vector<int> trig_type;
 
   };
 }
