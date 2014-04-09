@@ -113,7 +113,18 @@ fGSer = larutil.GeometryUtilities.GetME()
 
 while mgr.next_event():
 
+ for plane in xrange(larutil.Geometry.GetME().Nplanes()):
 	algo.LoadAllHits(mgr.get_data(fmwk.DATA.GausHit), plane)
+	algo.GetAverages(True)
+        algo.GetRoughAxis(True)
+        algo.GetProfileInfo(True)
+        algo.RefineDirection(True)
+        algo.RefineStartPoints(True)
+#        algo.FillPolygon()
+        algo.GetFinalSlope(True)
+        algo.Report()
+        algo.PrintFANNVector()
+        result = algo.GetParams()
 
 # done!
 print

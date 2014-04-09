@@ -9,6 +9,7 @@ namespace larlight {
 
   bool TestEff::initialize() {
 
+    larutil::LArUtilManager::Reconfigure(larlight::GEO::kArgoNeuT);
     //
     // This function is called in the beggining of event loop
     // Do all variable initialization you wish to do here.
@@ -17,7 +18,7 @@ namespace larlight {
     //
    
 //    TH1D *hist1 = new TH1D("hist1","title",Nbins,lowerBin,upperBin) ;	
-	
+
 
     return true;
   }
@@ -46,13 +47,17 @@ namespace larlight {
   
     event_hit * my_hit_v = (event_hit*)(storage->get_data(my_cluster_v->get_hit_type()));
    
-   
-   
+  //  TCanvas *c1 = new TCanvas("c1","Histos",1);
+  //  c1->SetGrid();
+
+   // TH1D *hist1 = new TH1D("hist1","title",100,0,10) ;	
+	
    //cluster::ClusterParamsAlgNew  fCPAlg; // = new cluster::ClusterParamsAlgNew();
 
  
     for(auto const clustit : *my_cluster_v) {
       std::cout << " Clust ID " << clustit.ID() << std::endl;    
+
      //auto const hit_index_v = clustit.association(my_cluster_v->get_hit_type());
         auto const hit_index_v = clustit.association(DATA::GausHit);
         std::vector<const larlight::hit *> hit_vector;
@@ -78,7 +83,10 @@ namespace larlight {
         fCPAlg.Report();
 	
 	::cluster::cluster_params fResult=fCPAlg.GetParams();
-	
+
+//	hist1->Fill(fResult.mean_charge) ;
+//	hist1->Draw();
+		
 	}
   
   
