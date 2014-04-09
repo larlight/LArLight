@@ -15,6 +15,9 @@ namespace larlight {
     // If you have a histogram to fill in the event loop, for example,
     // here is a good place to create one on the heap (i.e. "new TH1D"). 
     //
+   
+//    TH1D *hist1 = new TH1D("hist1","title",Nbins,lowerBin,upperBin) ;	
+	
 
     return true;
   }
@@ -33,6 +36,8 @@ namespace larlight {
     //
     // event_fifo* my_pmtfifo_v = (event_fifo*)(storage->get_data(DATA::PMFIFO));
     //
+
+
     // if( event_fifo )
     //
     //   std::cout << "Event ID: " << my_pmtfifo_v->event_id() << std::endl;
@@ -43,11 +48,18 @@ namespace larlight {
    
    
    
-    ::cluster::ClusterParamsAlgNew  fCPAlg; // = new cluster::ClusterParamsAlgNew();
+   // ::cluster::ClusterParamsAlgNew  fCPAlg; // = new cluster::ClusterParamsAlgNew();
  
     for(auto const clustit : *my_cluster_v) {
       std::cout << " Clust ID " << clustit.ID() << std::endl;    
      //auto const hit_index_v = clustit.association(my_cluster_v->get_hit_type());
+  
+
+	
+       ::cluster::ClusterParamsAlgNew  fCPAlg ; // = new cluster::ClusterParamsAlgNew();
+	fCPAlg.FillParams();
+	fCPAlg.GetParams();
+	
         auto const hit_index_v = clustit.association(DATA::FFTHit);
      
 	for(auto const hit_index : hit_index_v) {
