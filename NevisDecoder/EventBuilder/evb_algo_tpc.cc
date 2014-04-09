@@ -38,8 +38,8 @@ namespace larlight {
     // Fill data
 
     out_event_tpcfifo->set_event_number       ( in_event_tpcfifo->event_number()       );
-    out_event_tpcfifo->set_module_address     ( DATA::INVALID_UINT                  );
-    out_event_tpcfifo->set_module_id          ( DATA::INVALID_UINT                  );
+    out_event_tpcfifo->set_module_address     ( in_event_tpcfifo->module_address()     );
+    out_event_tpcfifo->set_module_id          ( in_event_tpcfifo->module_id()          );
 
     if(out_event_tpcfifo->checksum() == FEM::INVALID_WORD) out_event_tpcfifo->set_checksum(0);
     if(out_event_tpcfifo->nwords()   == FEM::INVALID_WORD) out_event_tpcfifo->set_nwords(0);
