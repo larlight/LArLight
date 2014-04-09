@@ -327,6 +327,13 @@ DECLARE
   END;
 $$ LANGUAGE plpgsql VOLATILE STRICT;
 
+
+
+------------------------------------------------------------------------
+
+
+
+
 CREATE OR REPLACE FUNCTION InsertConfigurationSet(configtabletype text,insubconfid INT,incrate INT, inchannel INT,columns HSTORE) RETURNS INT AS $$
     DECLARE
     myrec RECORD;
@@ -365,8 +372,93 @@ $$ LANGUAGE plpgsql VOLATILE STRICT;
 
 ------------------------------------------------------------------------
 
+DROP FUNCTION IF EXISTS InsertMainConfiguration( text, HSTORE) ;
 
 
+CREATE OR REPLACE FUNCTION InsertMainConfiguration(subconfigparameters HSTORE,confname text DEFAULT 'no_name') RETURNS INT AS $$
+    DECLARE
+    myrec1 RECORD;
+    myrec2 RECORD;
+   -- maskconfig INT;
+    newconfig INT;
+    query text;  
+    SubConfT INT;
+    mainconfigexists INT;
+    BEGIN
+        
+
+ --first loop on HSTORE keys and make sure that the subconfigurations selected exist: 
+      -- First check if the provided Config ID already exsits in the MainConfigTable or not
+    IF  (confname <> 'no_name' ) AND EXISTS (SELECT mainconfID FROM MainConfigTable WHERE MainConfigTable.ConfigName = confname)
+        THEN RAISE EXCEPTION '+++++++++++++ Config with name % already exists in MainConfigTable, with ID: %! +++++++++++++',confname,mainconfID;
+	RETURN -1;
+    END IF;
+    
+    -- now we know that the name doesn't exist or the user doesn't care.
+  
+    mainconfigexists:=1;  -- assuming it exists. Let's be proven otherwise.
+    --let's check if the configuration exists:
+    for myrec1 IN SELECT (each(columns)).*
+	LOOP
+        --get subconfig type
+        ------------------------------ this repeats the functionality from later.
+            SELECT INTO SubConfT SubconfigType FROM ConfigLookUp WHERE SubConfigName = myrec1.key;
+	    IF NOT EXISTS( SELECT TRUE FROM MainconfigTable WHERE SubConfT = myrec1.key AND subconfigid=myrec1.val )
+	      THEN mainconfigexists=0;
+	      EXIT;   -- break out of loop. We already know, we need a new config.
+	    END IF;
+	END LOOP;  -- end checking if mainconfig exists loop.
+
+     ---------- !!!!! warning! currently there is no check to make sure all of the above fall into the same mainconfigid!
+     ------------!!!!!!!!!!
+
+    IF mainconfigexists = 1
+      THEN RAISE EXCEPTION '+++++++++++++ Config already exists in MainConfigTable, with ID: %! +++++++++++++',-1;
+    END IF
+
+    ----------- To be improved
+
+    -- Next check if specified SubConfigType and SubConfigID are available or not
+    for myrec1 IN SELECT (each(columns)).*
+    LOOP
+        -- Check if SubConfigType is valid or not
+        RAISE NOTICE 'key:%, value: %', myrec1.key, myrec1.value;
+	IF NOT EXISTS ( SELECT TRUE FROM ConfigLookUp WHERE SubConfigName = myrec1.key)
+	    THEN RAISE EXCEPTION '++++++++++++ Configuration % is not defined! +++++++++++++++', myrec1.key;
+	    RETURN 1;
+	END IF;
+	-- Check if SubConfigID is valid or not
+	query := format('SELECT TRUE FROM %s WHERE COnfigID=%s',myrec1.key,myrec1.value);
+	EXECUTE query INTO myrec2;
+	IF myrec2.bool IS NULL
+	    THEN RAISE EXCEPTION '++++++++++++ Configuration % does not contain ConfigID=%++++++++++++',myrec1.key,myrec1.value;
+	    RETURN 1;
+	END IF;
+	
+    END LOOP;
+    
+    --------------------------------- Find the last entry
+    SELECT INTO newconfig configID FROM MainConfigTable ORDER BY configID ASC LIMIT 1;
+  
+   
+    -- Reaching this point means input values are valid. Let's insert.
+   for myrec1 IN SELECT (each(columns)).*
+    LOOP
+    SELECT INTO SubConfT SubconfigType FROM ConfigLookUp WHERE SubConfigName = myrec1.key;
+    INSERT INTO MainconfigTable (ConfigID,
+				  SubConfigType,
+				  SubConfigID, 
+				  SubConfigOnMask,
+				  ConfigName) VALUES(newconfig+1,SubConfT,myrec1.val,65636,confname);
+
+    END LOOP;
+
+   RETURN newconfig+1;
+   END;
+$$ LANGUAGE plpgsql VOLATILE STRICT;
+
+
+------------------------------------------------------------------------
 
 
 
