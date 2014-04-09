@@ -402,7 +402,7 @@ CREATE OR REPLACE FUNCTION InsertMainConfiguration(subconfigparameters HSTORE,co
 	LOOP
         --get subconfig type
         ------------------------------ this repeats the functionality from later.
-            SELECT INTO SubConfT SubconfigType FROM ConfigLookUp WHERE SubConfigName = myrec1.key;
+            SELECT  SubconfigType FROM ConfigLookUp WHERE SubConfigName = myrec1.key INTO SubConfT;
 	    IF NOT EXISTS( SELECT TRUE FROM MainconfigTable WHERE SubConfT = myrec1.key AND subconfigid=myrec1.val )
 	      THEN mainconfigexists=0;
 	      EXIT;   -- break out of loop. We already know, we need a new config.
@@ -414,7 +414,7 @@ CREATE OR REPLACE FUNCTION InsertMainConfiguration(subconfigparameters HSTORE,co
 
     IF mainconfigexists = 1
       THEN RAISE EXCEPTION '+++++++++++++ Config already exists in MainConfigTable, with ID: %! +++++++++++++',-1;
-    END IF
+    END IF;
 
     ----------- To be improved
 
@@ -438,13 +438,13 @@ CREATE OR REPLACE FUNCTION InsertMainConfiguration(subconfigparameters HSTORE,co
     END LOOP;
     
     --------------------------------- Find the last entry
-    SELECT INTO newconfig configID FROM MainConfigTable ORDER BY configID ASC LIMIT 1;
+    SELECT configID FROM MainConfigTable ORDER BY configID ASC LIMIT 1 INTO newconfig ;
   
    
     -- Reaching this point means input values are valid. Let's insert.
    for myrec1 IN SELECT (each(columns)).*
     LOOP
-    SELECT INTO SubConfT SubconfigType FROM ConfigLookUp WHERE SubConfigName = myrec1.key;
+    SELECT SubconfigType FROM ConfigLookUp WHERE SubConfigName = myrec1.key INTO SubConfT;
     INSERT INTO MainconfigTable (ConfigID,
 				  SubConfigType,
 				  SubConfigID, 
