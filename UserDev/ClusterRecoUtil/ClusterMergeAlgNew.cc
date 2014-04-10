@@ -25,20 +25,28 @@ namespace cluster {
   bool ClusterMergeAlgNew::Merge(const cluster::cluster_params &param_a, 
 				 const cluster::cluster_params &param_b)
   {    
-    
+
     bool merge = true;
 
-    if(merge && fAlgoSwitch.at(kStartPoint))
+    if(merge && fAlgoSwitch.at(kStartPoint)){
+      if (TestStartPoint(param_a, param_b))
+	std::cout << "Merged with TestStartPoint!" << std::endl;
+    }
 
-      merge = TestStartPoint(param_a, param_b);
+    if(merge && fAlgoSwitch.at(kAngleCompat)){
+      if (Angle2DCompatibility(param_a, param_b))
+	std::cout << "Merged with Angle2DCompatibility!" << std::endl;
+    }
 
-    if(merge && fAlgoSwitch.at(kAngleCompat))
-      
-      merge = Angle2DCompatibility(param_a, param_b);
-
-    if(merge && fAlgoSwitch.at(kPolygonCollision))
-
-      merge = TestPolygonCollision(param_a, param_b);
+    if(merge && fAlgoSwitch.at(kPolygonCollision)){
+      if (TestPolygonCollision(param_a, param_b)){
+	std::cout << "*****************************" << std::endl;
+	std::cout << "*****************************" << std::endl;
+	std::cout << "*****************************" << std::endl;
+	std::cout << "*****************************" << std::endl;
+	std::cout << "Merged with PolygonCollision!" << std::endl;
+      }
+    }
     
     return merge;
   }
@@ -178,11 +186,36 @@ namespace cluster {
 
 
 
+  bool ClusterMergeAlgNew::TestPolygonCollision(const cluster::cluster_params &param_a, 
+			    const cluster::cluster_params &param_b){
 
-
-
-
-
+    std::pair<float,float> tmpvertex;
+    //make Polygon Object as in mac/PolyOverlap.cc
+    std::vector<std::pair<float,float> > vertices_a;
+    for (unsigned int i=0; i<param_a.container_polygon.size(); i++){
+      tmpvertex = std::make_pair( param_a.container_polygon.at(i)->w,
+				  param_a.container_polygon.at(i)->t );
+      vertices_a.push_back( tmpvertex );
+    }
+    std::vector<std::pair<float,float> > vertices_b;
+    for (unsigned int i=0; i<param_b.container_polygon.size(); i++){
+      tmpvertex = std::make_pair( param_b.container_polygon.at(i)->w,
+				  param_b.container_polygon.at(i)->t );
+      vertices_b.push_back( tmpvertex );
+    }
+    Polygon poly_a( vertices_a );
+    Polygon poly_b( vertices_b );
+    
+    bool overlap = poly_a.PolyOverlapSegments( poly_b );
+    if (!overlap){
+      if ( poly_a.PointInside(poly_b.Point(1)) )
+	std::cout << "Poly b in Poly a" << std::endl;
+      if ( poly_b.PointInside(poly_a.Point(1)) )
+	std::cout << "Poly a in Poly b" << std::endl;
+    }
+    return overlap;
+  }
+  
 
 }
 

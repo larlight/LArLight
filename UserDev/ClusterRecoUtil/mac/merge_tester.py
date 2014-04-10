@@ -219,7 +219,7 @@ while mgr.next_event():
                     del algo1
                     del algo2
                     
-        hHits=ROOT.TH2D("AllHits","Hits and Polygons; Wire [cm]; Time [cm]",
+        hHits=ROOT.TH2D("AllHits","Event {0}   Plane {1}; Wire [cm]; Time [cm]".format( processed_events, pl),
                         100, 0.9*wire_min*fGSer.WireToCm(), 1.1*wire_max*fGSer.WireToCm(),
                         100, 0.9*time_min*fGSer.TimeToCm(), 1.1*time_max*fGSer.TimeToCm())
         for x in range(len(hit_wires)):
