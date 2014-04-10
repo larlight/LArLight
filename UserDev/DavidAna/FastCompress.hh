@@ -60,8 +60,9 @@ namespace larlight {
     */
     virtual bool finalize();
 
-    void Compress(larlight::tpcfifo* tpc_data, larlight::event_tpcfifo* new_event_wf);
-    void make_new_wf_simple(larlight::tpcfifo* wf, int start, larlight::event_tpcfifo* new_event_wf);
+    void VarianceCompress(larlight::tpcfifo* tpc_data, larlight::event_tpcfifo* new_event_wf);
+    void ThresholdCompress(larlight::tpcfifo* tpc_data, larlight::event_tpcfifo* new_event_wf);
+    void make_new_wf(larlight::tpcfifo* wf, int ADC_start, int ADC_end, larlight::event_tpcfifo* new_event_wf);
 
     protected:
 
@@ -76,6 +77,10 @@ namespace larlight {
     double _VarCut;
     int    _baseline;
     double _compressfctr;
+    short _PedCollection;
+    short _PedInduction;
+    short _Threshold;
+    std::string _Scheme;
 
   };
 }

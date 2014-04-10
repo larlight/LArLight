@@ -72,13 +72,14 @@ namespace larlight {
 	for ( unsigned int  adc_index=0; adc_index<tpc_data->size(); adc_index++){
 	  int adcs = tpc_data->at(adc_index);
 	  //determine if something interesting happens
-	  if ( (adcs-_baseline > 15) ){
+	  if ( (adcs-_baseline > 10) ){
 	    interesting = true;
-	    std::cout << "interesting!" << std::endl;
 	  }
-	  noise->Fill(adcs-_baseline);
-	  double rmsbin = sqrt((adcs-_baseline)*(adcs-_baseline));
-	  rms->Fill(rmsbin);
+	  else {
+	    noise->Fill(adcs-_baseline);
+	    double rmsbin = sqrt((adcs-_baseline)*(adcs-_baseline));
+	    rms->Fill(rmsbin);
+	  }
 	  ADChist->SetBinContent(adc_index+1,adcs);
 	}
 	

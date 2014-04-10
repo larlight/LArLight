@@ -7,10 +7,23 @@ namespace larlight {
 
   bool FastCompress::initialize() {
 
-    _event_num      =   0;
-    _compressfctr   =   0;
-    hCompress = new TH1D("Compression", "Compression Factor [1/%]", 30, 0, 30);
+    _event_num      =    0;
+    _compressfctr   =    0;
+    _PedCollection  =  400;
+    _PedInduction   = 2048;
+    _baseline       =    0;
+    //First set all parameters for all compression schemes
+    _Threshold      =    10;
+    _NVarSamples    =    10;
+    _NSamplesante   =    15;
+    _NSamplespost   =    30;
+    _VarCut         =   100;
+    _Scheme         = "threshold";
 
+    //Histogram that will store compression factor
+    hCompress = new TH1D("Compression", "Compression Factor [1/%]", 1000, 0, 3);
+
+    //read compression scheme and params from file
     std::ifstream myin;
     std::string line;
     std::string params;
@@ -20,18 +33,29 @@ namespace larlight {
     std::stringstream linestream(line);
     while ( std::getline(linestream,params,'\t') )
       paramarray.push_back(params);
-    double varask = atof(paramarray.at(0).c_str());
-    _NVarSamples = atoi(paramarray.at(1).c_str());
-    _NSamplesante = atoi(paramarray.at(2).c_str());
-    _NSamplespost = atoi(paramarray.at(3).c_str());
-    std::cout << "var/bin: " << varask << " _NVarSamples: " << _NVarSamples
-	      << " _NSamplesante: " << _NSamplesante << " NSamplespost: " 
-	      << _NSamplespost << std::endl;
+    _Scheme = paramarray.at(0).c_str();
+    if ( _Scheme == "threshold" ){
+      _Threshold = atoi(paramarray.at(1).c_str());
+      std::cout << "-----------------------------------------" << std::endl;
+      std::cout << "Scheme chosen: " << _Scheme << std::endl;
+      std::cout << "threshold = " << _Threshold << std::endl;
+      std::cout << "-----------------------------------------" << std::endl;
+    }
+    if ( _Scheme == "variance" ){
+      double varask  = atof(paramarray.at(1).c_str());
+      _NVarSamples   = atoi(paramarray.at(2).c_str());
+      _NSamplesante  = atoi(paramarray.at(3).c_str());
+      _NSamplespost  = atoi(paramarray.at(4).c_str());
+      _VarCut        = _NVarSamples*varask;
+      std::cout << "-----------------------------------------" << std::endl;
+      std::cout << "Scheme chosen: " << _Scheme << std::endl;
+      std::cout << "var/bin = " << varask << std::endl;
+      std::cout << " NVarSamples = " << _NVarSamples << std::endl;
+      std::cout << " NSamplesante = " << _NSamplesante << std::endl;
+      std::cout << " NSamplespost = " << _NSamplespost << std::endl;
+      std::cout << "-----------------------------------------" << std::endl;
+    }
     myin.close();
-    _VarCut        =  _NVarSamples*varask;
-    _baseline      =   0;
-    std::cout << "The cut on variance is: " << _VarCut << std::endl;
-
 
     return true;
   }
@@ -67,7 +91,10 @@ namespace larlight {
       
       _compressfctr = 0;
       //Apply Compression algorithm
-      Compress( tpc_data, &new_event_wf);
+      if ( _Scheme == "threshold" )
+	ThresholdCompress( tpc_data, &new_event_wf);
+      if ( _Scheme == "variance" )
+	VarianceCompress( tpc_data, &new_event_wf);
       //original waveform: if counting header info: +2+10+1+1+2
       double wf_original_size = tpc_data->size();
       _compressfctr = _compressfctr/wf_original_size;
@@ -89,9 +116,62 @@ namespace larlight {
     return true;
   }
 
-  //****************************************************************************************
-  void FastCompress::Compress( larlight::tpcfifo* tpc_data, larlight::event_tpcfifo* new_event_wf) {
-  //****************************************************************************************
+  //---------------------------------------------------------------------------------------------------
+  void FastCompress::ThresholdCompress( larlight::tpcfifo* tpc_data, larlight::event_tpcfifo* new_event_wf) {
+
+    //boolean to see if in interesting segment
+    bool interesting = false;
+    //holders for wf start and end
+    UShort_t wf_start = 0;
+    UShort_t wf_end = 0;
+    //baseline for this wf
+    UInt_t chan = tpc_data->channel_number();
+    short baseline;
+    if ( larutil::Geometry::GetME()->SignalType(chan) == larlight::GEO::kInduction)
+      baseline = _PedInduction;
+    else if ( larutil::Geometry::GetME()->SignalType(chan) == larlight::GEO::kCollection )
+      baseline = _PedCollection;
+    else {
+      //Baseline not found! Save full waveform!
+      //save waveform!
+      make_new_wf(tpc_data, 0, tpc_data->size(), new_event_wf);
+      _compressfctr += tpc_data->size();
+      return;
+    }
+
+    //Get Waveform
+    for (UShort_t adc_index=0; adc_index<tpc_data->size(); adc_index++){
+	
+      short adcs = tpc_data->at(adc_index);
+	
+      //does it make the cut?
+      if ( ((adcs-baseline) > _Threshold) or ((adcs-baseline) < -_Threshold) ){
+	if (!interesting)
+	  wf_start = adc_index;
+	interesting = true;
+      }
+      else {
+	//if interesting is true means end of saving...
+	if (interesting){
+	  wf_end = adc_index;	
+	  make_new_wf(tpc_data, wf_start, wf_end, new_event_wf);
+	  _compressfctr += (wf_end-wf_start);
+	  wf_start = 0;
+	  wf_end = 0;
+	}
+	interesting = false;
+      }
+    }//for ADC Ticks    
+    
+    return;
+      
+  }
+
+
+
+  //---------------------------------------------------------------------------------------------------
+  void FastCompress::VarianceCompress( larlight::tpcfifo* tpc_data, larlight::event_tpcfifo* new_event_wf) {
+
       
       //***************************
       //Start Compression Algorithm
@@ -149,7 +229,7 @@ namespace larlight {
 	    if ( (variance > _VarCut) && (adc_index > prev_recorded) )
 	      {
 		variance = 0;
-		make_new_wf_simple(tpc_data, adc_index, new_event_wf);
+		make_new_wf(tpc_data, adc_index-_NSamplesante, adc_index+_NSamplespost, new_event_wf);
 		prev_recorded = adc_index+_NSamplespost;
 		//calculate compresson
 		_compressfctr += (1+_NSamplesante+_NSamplespost);  //1 16-bit word per ADC sample 
@@ -161,18 +241,19 @@ namespace larlight {
       
   }
 
-  void FastCompress::make_new_wf_simple(larlight::tpcfifo* wf, int start, larlight::event_tpcfifo* new_event_wf) {
+  void FastCompress::make_new_wf(larlight::tpcfifo* wf, int ADC_start,
+				 int ADC_end, larlight::event_tpcfifo* new_event_wf) {
 
     UInt_t wf_time = wf->readout_sample_number_2MHz();
-    wf_time = start-_NSamplesante;
+    wf_time = ADC_start;
 
     //create vector where to store ADCs
     std::vector<UShort_t> new_wf_bins;
   
     //make sure not overflowing before or after original waveform
-    int start_record = start-_NSamplesante;
+    int start_record = ADC_start;
     if (start_record < 0) { start_record = 0; wf_time = 0; }
-    int end_record   = start + _NSamplespost;
+    int end_record   = ADC_end;
     if (end_record > wf->size()) { end_record = wf->size(); }
   
     //get interesting samples +- _NSamples
@@ -190,10 +271,9 @@ namespace larlight {
 			      wf->module_id(), larutil::Geometry::GetME()->View(chan),
 			      larutil::Geometry::GetME()->SignalType(chan), DATA::TPCFIFO, new_wf_bins);
 
-    //std::cout << "NEW WF: " << (&new_wf)->channel_number() << std::endl;
     //write new waveform
     new_event_wf->push_back(new_wf);
-    //std::cout << new_wf.readout_sample_number_RAW() << std::endl;
+
   }
 
 
@@ -202,7 +282,9 @@ namespace larlight {
   bool FastCompress::finalize() {
   
     float compression = 1.0/(hCompress->GetMean());
+    std::cout << "-----------------------------------------" << std::endl;    
     std::cout << "Compression: " << compression << std::endl;
+    std::cout << "-----------------------------------------" << std::endl;
     hCompress->Write();
   
     return true;
