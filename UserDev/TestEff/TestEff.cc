@@ -49,7 +49,7 @@ namespace larlight {
     //
     //   std::cout << "Event ID: " << my_pmtfifo_v->event_id() << std::endl;
     //
-    event_cluster * my_cluster_v = (event_cluster *)(storage->get_data(DATA::FuzzyCluster));
+    event_cluster * my_cluster_v = (event_cluster *)(storage->get_data(DATA::DBCluster));
   
     event_hit * my_hit_v = (event_hit*)(storage->get_data(my_cluster_v->get_hit_type()));
    
@@ -61,7 +61,7 @@ namespace larlight {
       std::cout << " Clust ID " << clustit.ID() << std::endl;    
 
      //auto const hit_index_v = clustit.association(my_cluster_v->get_hit_type());
-        auto const hit_index_v = clustit.association(DATA::GausHit);
+        auto const hit_index_v = clustit.association(DATA::FFTHit);
         std::vector<const larlight::hit *> hit_vector;
         hit_vector.clear();
         
