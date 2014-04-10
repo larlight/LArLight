@@ -90,7 +90,7 @@ namespace cluster {
 		    bool override_DoRefineDirection  =false,
                     bool override_DoGetFinalSlope    =false );
 
-    const cluster_params& GetParams()
+    const cluster_params& GetParams() const
     { return fParams;}
 
     /**
