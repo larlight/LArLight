@@ -12,4 +12,9 @@
 #pragma link C++ class kaleko::KalekoTrackAna+;
 #pragma link C++ class kaleko::UtilFunctions+;
 
+//ADD_NEW_CLASS
 #endif
+
+
+
+
