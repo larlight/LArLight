@@ -10,6 +10,7 @@ larlight::ana_processor proc;
 
 proc.set_io_mode(larlight::storage_manager::READ);
 proc.set_input_rootdir("scanner");
+proc.set_ana_output_file("ana.root");
 proc.add_input_file("mac/larlight_tracks.root");
 proc.add_process(new larlight::TestEff);
 proc.run();

@@ -15,6 +15,8 @@
 #ifndef TESTEFF_HH
 #define TESTEFF_HH
 
+#include <TH1D.h>
+
 #include "ana_base.hh"
 #include "ClusterParamsAlgNew.hh"
 
@@ -32,7 +34,7 @@ namespace larlight {
     TestEff() : ana_base() { _name="TestEff"; }
 
     /// Default destructor
-    virtual ~TestEff(){};
+    virtual ~TestEff(){ h1=0; };
 
     /** IMPLEMENT in TestEff.cc!
         Initialization method to be called before the analysis event loop.
@@ -52,6 +54,9 @@ namespace larlight {
     protected:
 
     ::cluster::ClusterParamsAlgNew  fCPAlg; 
+
+    /// Example histogram to be saved in analysis root file (separate from data product)
+    TH1D* h1;
       
   };
 }
