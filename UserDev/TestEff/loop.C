@@ -1,4 +1,3 @@
-//#include <TCanvas.h>
 
 {
 //gSystem->Load("libAnalysis");
@@ -18,10 +17,6 @@ proc.run();
 cluster::ClusterParamsExecutor algo ;
 
 //larlight::event_cluster evt  ;
-
-//for(auto evt : larlight::event_cluster){
-//	std::cout<<"TEST"<<std::endl;
-//	}
 
 
 }

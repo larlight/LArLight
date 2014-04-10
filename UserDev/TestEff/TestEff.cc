@@ -15,12 +15,10 @@ namespace larlight {
     // Do all variable initialization you wish to do here.
     // If you have a histogram to fill in the event loop, for example,
     // here is a good place to create one on the heap (i.e. "new TH1D"). 
-    //
-   
+    //   
 //    TH1D *hist1 = new TH1D("hist1","title",Nbins,lowerBin,upperBin) ;	
     
 	larutil::LArUtilManager::Reconfigure(larlight::GEO::kArgoNeuT);
-
     
     return true;
   }
@@ -83,6 +81,7 @@ namespace larlight {
         fCPAlg.Report();
 	
 	::cluster::cluster_params fResult=fCPAlg.GetParams();
+
 
 	hist1->Fill(fResult.mean_charge) ;
 	hist1->Draw();
