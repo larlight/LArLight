@@ -15,9 +15,10 @@ namespace larlight {
     // Do all variable initialization you wish to do here.
     // If you have a histogram to fill in the event loop, for example,
     // here is a good place to create one on the heap (i.e. "new TH1D"). 
-    //
-    larutil::LArUtilManager::Reconfigure(larlight::GEO::kArgoNeuT);
-
+    //   
+//    TH1D *hist1 = new TH1D("hist1","title",Nbins,lowerBin,upperBin) ;	
+    
+	larutil::LArUtilManager::Reconfigure(larlight::GEO::kArgoNeuT);
     
     return true;
   }
@@ -36,6 +37,8 @@ namespace larlight {
     //
     // event_fifo* my_pmtfifo_v = (event_fifo*)(storage->get_data(DATA::PMFIFO));
     //
+
+
     // if( event_fifo )
     //
     //   std::cout << "Event ID: " << my_pmtfifo_v->event_id() << std::endl;
@@ -44,14 +47,17 @@ namespace larlight {
   
     event_hit * my_hit_v = (event_hit*)(storage->get_data(my_cluster_v->get_hit_type()));
    
-   
-   
+    TCanvas *c1 = new TCanvas("c1","Histos",1);
+    c1->SetGrid();
 
+    TH1D *hist1 = new TH1D("hist1","title",100,0,10) ;	
+	
    //cluster::ClusterParamsAlgNew  fCPAlg; // = new cluster::ClusterParamsAlgNew();
 
  
     for(auto const clustit : *my_cluster_v) {
       std::cout << " Clust ID " << clustit.ID() << std::endl;    
+
      //auto const hit_index_v = clustit.association(my_cluster_v->get_hit_type());
         auto const hit_index_v = clustit.association(DATA::GausHit);
         std::vector<const larlight::hit *> hit_vector;
@@ -73,10 +79,14 @@ namespace larlight {
         //fCPAlg.FillPolygon()
         fCPAlg.GetFinalSlope(true);
         fCPAlg.Report();
-        
-        ::cluster::cluster_params fResult=fCPAlg.GetParams();
-        
-        }
+	
+	::cluster::cluster_params fResult=fCPAlg.GetParams();
+
+
+	hist1->Fill(fResult.mean_charge) ;
+	hist1->Draw();
+		
+	}
   
   
   
