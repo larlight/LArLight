@@ -20,7 +20,8 @@
 
 #include <vector>
 #include <string>
-#include "fann.h"
+#include "doublefann.h"
+#include "fann_cpp.h"
 
 /**
    \class TrainingModule
@@ -42,7 +43,8 @@ namespace cluster{
     }
 
     /// Default destructor
-    ~TrainingModule(){ if (ann) fann_destroy(ann);}
+    //~TrainingModule(){ if (ann) fann_destroy(ann);}
+    ~TrainingModule(){}
 
     // some functions for controlling the input and output to ANN:
     
@@ -96,7 +98,7 @@ namespace cluster{
     std::vector<int> fHiddenLayerLength;
 
     // this is the actual neural network.  Right now only one per class:
-    struct fann * ann;
+    FANN::neural_net ann;
 
   };
 }
