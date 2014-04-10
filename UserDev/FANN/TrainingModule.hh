@@ -20,7 +20,7 @@
 
 #include <vector>
 #include <string>
-#include "doublefann.h"
+#include "floatfann.h"
 #include "fann_cpp.h"
 
 /**
@@ -80,7 +80,10 @@ namespace cluster{
     void trainOnData(std::vector<float>& data,
                      std::vector<float>& truth);
 
+    void run(float * data);
+    void run(std::vector<float> & data);
 
+    void print_error(){std::cout << "Current Error: "<< ann.get_MSE() << std::endl;}
     /**
      * saves the current state of the fann to a file
      * @param s can override OutputFileName with s

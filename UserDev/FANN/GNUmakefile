@@ -11,6 +11,7 @@ OBJECTS = $(SOURCES:.cc=.o)
 
 # include options for this package
 INCFLAGS = -I. -I./include/                       #Include itself
+INCFLAGS += -p
 INCFLAGS += -I$(LARLIGHT_CORE_DIR)/LArUtil
 INCFLAGS += -I$(LARLIGHT_CORE_DIR)/Base
 INCFLAGS += -I$(LARLIGHT_CORE_DIR)/DataFormat

@@ -79,24 +79,30 @@ namespace cluster{
   }
 
   void  ClusterParamsAlgNew::GetFANNVector(std::vector<float> & data){
-    unsigned int length = 13;
+    unsigned int length = 10;
     if (data.size() != length) 
       data.resize(length);
-    data[0] = fParams.opening_angle / PI;
-    data[1] = fParams.opening_angle_charge_wgt / PI;
-    data[2] = fParams.closing_angle / PI;
-    data[3] = fParams.closing_angle_charge_wgt / PI;
-    data[4] = fParams.eigenvalue_principal;
-    data[5] = fParams.eigenvalue_secondary;
-    data[6] = fParams.length;
-    data[7] = fParams.width;
-    data[8] = fParams.hit_density_1D;
-    data[9] = fParams.hit_density_2D;
-    data[10] = fParams.multi_hit_wires/fParams.N_Wires;
-    data[11] = fParams.modified_hit_density;
-    data[12] = fParams.offaxis_hits/fParams.N_Hits;
+    data[0]  = fParams.opening_angle / PI;
+    data[1]  = fParams.opening_angle_charge_wgt / PI;
+    data[2]  = fParams.closing_angle / PI;
+    data[3]  = fParams.closing_angle_charge_wgt / PI;
+    data[4]  = fParams.eigenvalue_principal;
+    data[5]  = fParams.eigenvalue_secondary;
+    data[6]  = fParams.width / fParams.length;
+    data[7]  = fParams.hit_density_1D / fParams.modified_hit_density;
+    data[8]  = fParams.multi_hit_wires/fParams.N_Wires;
+    data[9]  = fParams.N_Hits_HC / fParams.N_Hits;
+    // data[10] = 0.0;
+    // data[11] = 0.0;
+    // data[12] = 0.0;
     return;
   }
+
+  // std::vector<float> & ClusterParamsAlgNew::GetFANNVector(){
+  //   std::vector<float> result;
+  //   GetFANNVector(result);
+  //   return result;
+  // }
 
   void  ClusterParamsAlgNew::PrintFANNVector(){
     std::vector<float> data;
@@ -108,13 +114,13 @@ namespace cluster{
               << "   Closing Angle charge weight  .. : " << data[3] << "\n"
               << "   Principal Eigenvalue  ......... : " << data[4] << "\n"
               << "   Secondary Eigenvalue  ......... : " << data[5] << "\n"
-              << "   Length of Cluster  ............ : " << data[6] << "\n"
-              << "   Width of Cluster  ............. : " << data[7] << "\n"
-              << "   1D Hit Density  ............... : " << data[8] << "\n"
-              << "   2D Hit Density  ............... : " << data[9] << "\n"
-              << "   Percent MultiHit Wires  ....... : " << data[10] << "\n"
-              << "   Modified Hit Density  ......... : " << data[11] << "\n"
-              << "   Percent OffAxis Hits  ......... : " << data[12] << "\n";
+              << "   Width / Length  ............... : " << data[6] << "\n"
+              << "   Hit Density / M.H.D.  ......... : " << data[7] << "\n"
+              << "   Percent MultiHit Wires  ....... : " << data[8] << "\n"
+              << "   Percent High Charge Hits  ..... : " << data[9] << "\n";
+              // << "   empty  ........................ : " << data[10] << "\n"
+              // << "   empty  ........................ : " << data[11] << "\n"
+              // << "   empty  ........................ : " << data[12] << "\n";
     return;
   }
 
@@ -177,14 +183,16 @@ namespace cluster{
   void ClusterParamsAlgNew::FillParams(bool override_DoGetAverages      ,  
                                        bool override_DoGetRoughAxis     ,  
                                        bool override_DoGetProfileInfo   ,  
-                                       bool override_DoRefineDirection  ,
-                                       bool override_DoRefineStartPoints,
+                                       // bool override_DoRefineDirection  ,
+                                       // bool override_DoRefineStartPoints,
+                                       bool override_DoStartPointsAndDirection,
                                        bool override_DoGetFinalSlope     ){
     GetAverages      (override_DoGetAverages      );
     GetRoughAxis     (override_DoGetRoughAxis     );
     GetProfileInfo   (override_DoGetProfileInfo   );
-    RefineDirection  (override_DoRefineDirection  );
-    RefineStartPoints(override_DoRefineStartPoints);
+    RefineStartPointAndDirection(override_DoStartPointsAndDirection);
+    // RefineDirection  (override_DoRefineDirection  );
+    // RefineStartPoints(override_DoRefineStartPoints);
     GetFinalSlope    (override_DoGetFinalSlope    );
   }
 
@@ -398,37 +406,37 @@ namespace cluster{
     fGSer->GetPointOnLineWSlopes(fRough2DSlope,fRough2DIntercept,
                                  InterLow,LowOnlinePoint);
 
-    std::cout << " extreme intercepts: low: " << InterLow 
-              << " " << InterHigh << std::endl;
-    std::cout << " extreme intercepts: side: " << fInterLow_side 
-              << " " << fInterHigh_side << std::endl;
-    std::cout << "axis + intercept "  << fRough2DSlope << " " 
-              << fRough2DIntercept << std::endl;
-    
-    std::cout << " Low online point: " << LowOnlinePoint.w << ", " << LowOnlinePoint.t 
-              << " High: " << HighOnlinePoint.w << ", " << HighOnlinePoint.t << std::endl; 
+    // std::cout << " extreme intercepts: low: " << InterLow 
+              // << " " << InterHigh << std::endl;
+    // std::cout << " extreme intercepts: side: " << fInterLow_side 
+              // << " " << fInterHigh_side << std::endl;
+    // std::cout << "axis + intercept "  << fRough2DSlope << " " 
+              // << fRough2DIntercept << std::endl;
+    // 
+    // std::cout << " Low online point: " << LowOnlinePoint.w << ", " << LowOnlinePoint.t 
+              // << " High: " << HighOnlinePoint.w << ", " << HighOnlinePoint.t << std::endl; 
 
-   //define BeginOnlinePoint as the one with lower wire number (for now), adjust intercepts accordingly	      
-   if(HighOnlinePoint.w >= LowOnlinePoint.w)
+    //define BeginOnlinePoint as the one with lower wire number (for now), adjust intercepts accordingly	      
+    if(HighOnlinePoint.w >= LowOnlinePoint.w)
     {
-     BeginOnlinePoint=LowOnlinePoint;
-     fBeginIntercept=InterLow;
-     EndOnlinePoint=HighOnlinePoint;
-     fEndIntercept=InterHigh;
+      BeginOnlinePoint=LowOnlinePoint;
+      fBeginIntercept=InterLow;
+      EndOnlinePoint=HighOnlinePoint;
+      fEndIntercept=InterHigh;
     }
-   else
-   {
-     BeginOnlinePoint=HighOnlinePoint;
-     fBeginIntercept=InterHigh;
-     EndOnlinePoint=LowOnlinePoint;
-     fEndIntercept=InterLow;        
-   }
+    else
+    {
+      BeginOnlinePoint=HighOnlinePoint;
+      fBeginIntercept=InterHigh;
+      EndOnlinePoint=LowOnlinePoint;
+      fEndIntercept=InterLow;        
+    }
    
-   fProjectedLength=fGSer->Get2DDistance(&BeginOnlinePoint,&EndOnlinePoint);
+    fProjectedLength=fGSer->Get2DDistance(&BeginOnlinePoint,&EndOnlinePoint);
      
-   std::cout << " projected length " << fProjectedLength 
-              << " Begin Point " << BeginOnlinePoint.w << " " 
-              << BeginOnlinePoint.t  << " End Point " << EndOnlinePoint.w << ","<< EndOnlinePoint.t << std::endl;
+    // std::cout << " projected length " << fProjectedLength 
+    //            << " Begin Point " << BeginOnlinePoint.w << " " 
+    //            << BeginOnlinePoint.t  << " End Point " << EndOnlinePoint.w << ","<< EndOnlinePoint.t << std::endl;
     
 
     // Some fitting variables to make a histogram:
@@ -847,8 +855,8 @@ namespace cluster{
     }//for ghits loop
     
     //This can be the new start point
-    std::cout<<"Here Kazu"<<std::endl;
-    std::cout<<"Ryan This is the new SP ("<<startpoint.w<<" , "<<startpoint.t<<")"<<std::endl;
+    // std::cout<<"Here Kazu"<<std::endl;
+    // std::cout<<"Ryan This is the new SP ("<<startpoint.w<<" , "<<startpoint.t<<")"<<std::endl;
     // double gslope=(n* gwiretime- gwire*gtime)/(n*gwirewire -gwire*gwire);
     // double gcept= gtime/n -gslope*(gwire/n);
     
@@ -868,7 +876,7 @@ namespace cluster{
     
     static int count(0);
     count ++;
-    std::cout << "Completed refine start point " << count << " times!\n";
+    // std::cout << "Completed refine start point " << count << " times!\n";
 
     fFinishedRefineStartPoints = true;
    // Report();
@@ -1106,17 +1114,17 @@ namespace cluster{
     double opening_angle_charge_wgt = mBin * PI /NBINS ;
     double closing_angle_charge_wgt = nBin * PI /NBINS ;
 
-    std::cout<<"opening angle: "<<opening_angle<<std::endl;
-    std::cout<<"closing angle: "<<closing_angle<<std::endl;
-    std::cout<<"opening high charge angle: "<<opening_angle_highcharge<<std::endl;
-    std::cout<<"closing high charge angle: "<<closing_angle_highcharge<<std::endl;
-    std::cout<<"opening high charge wgt  : "<<opening_angle_charge_wgt<<std::endl;
-    std::cout<<"closing high charge wgt  : "<<closing_angle_charge_wgt<<std::endl;
-    std::cout<<"fCoarseChargeProfile     : "<<fCoarseChargeProfile[0] 
-             << ", " << fCoarseChargeProfile[1] << std::endl;
+    // std::cout<<"opening angle: "<<opening_angle<<std::endl;
+    // std::cout<<"closing angle: "<<closing_angle<<std::endl;
+    // std::cout<<"opening high charge angle: "<<opening_angle_highcharge<<std::endl;
+    // std::cout<<"closing high charge angle: "<<closing_angle_highcharge<<std::endl;
+    // std::cout<<"opening high charge wgt  : "<<opening_angle_charge_wgt<<std::endl;
+    // std::cout<<"closing high charge wgt  : "<<closing_angle_charge_wgt<<std::endl;
+    // std::cout<<"fCoarseChargeProfile     : "<<fCoarseChargeProfile[0] 
+    //          << ", " << fCoarseChargeProfile[1] << std::endl;
 
     double value_1 = closing_angle/opening_angle -1;
-    if (fCoarseChargeProfile.size() != 2) std::cout <<" !!!!!!!!!!!!!!!!!! \n\n\n\n";
+    // if (fCoarseChargeProfile.size() != 2) std::cout <<" !!!!!!!!!!!!!!!!!! \n\n\n\n";
     double value_2 = (fCoarseChargeProfile[0]/fCoarseChargeProfile[1]);
     if (value_2 < 100.0 && value_2 > 0.01)
       value_2 = log(value_2);
@@ -1128,9 +1136,9 @@ namespace cluster{
     // if (value_2 < 1.0) value_2 = -1.0/value_2;
     // if (value_3 > 1.0) value_3 = -1.0/value_3;
 
-    std::cout << "value_1 : " << value_1 << std::endl;
-    std::cout << "value_2 : " << value_2 << std::endl;
-    std::cout << "value_3 : " << value_3 << std::endl;
+    // std::cout << "value_1 : " << value_1 << std::endl;
+    // std::cout << "value_2 : " << value_2 << std::endl;
+    // std::cout << "value_3 : " << value_3 << std::endl;
 
     // Using a sigmoid function to determine flipping.
     // I am going to weigh all of the values above (1, 2, 3) equally.
@@ -1181,10 +1189,19 @@ namespace cluster{
       std::cout<<fParams.container_polygon.size()<<std::endl;
     }
   }
-  void ClusterParamsAlgNew::RefineStartPointAndDirection(){
+  void ClusterParamsAlgNew::RefineStartPointAndDirection(bool override){
     // This function is meant to pick the direction.
     // It refines both the start and end point, and then asks 
     // if it should flip.
+    if(!override) { //Override being set, we skip all this logic.
+      //OK, no override. Stop if we're already finshed.
+    if (fFinishedRefineStartPointAndDirection) return;
+      //Try to run the previous function if not yet done.
+    if (!fFinishedGetProfileInfo) GetProfileInfo(true);
+    } else {
+      //Try to run the previous function if not yet done.
+      if (!fFinishedGetProfileInfo) GetProfileInfo(true);
+    }
     RefineStartPoints();
     std::swap(fParams.start_point,fParams.end_point);
     std::swap(fRoughBeginPoint,fRoughEndPoint);

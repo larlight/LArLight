@@ -13,6 +13,9 @@
 namespace cluster {
 class TrainingModule;
 }
+namespace FANN{
+class neural_net;
+}
 //ADD_EMPTY_CLASS ... do not change this comment line
 
 #endif

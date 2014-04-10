@@ -28,7 +28,6 @@ namespace cluster{
     else 
       ann.save(fOutputFileName.c_str());
 
-    // in
     return;
   }
 
@@ -49,7 +48,7 @@ namespace cluster{
     for (unsigned int i = 1; i <= fNumHiddenLayers; i++)
       layers[i] = fHiddenLayerLength[i-1];
     layers[fNumHiddenLayers+1] = fOutputVectorLength;
-    ann.create_standard_array(fFeatureVectorLength, layers); 
+    ann.create_standard_array(fNumHiddenLayers+2, layers); 
     return;
   }
 
@@ -63,6 +62,21 @@ namespace cluster{
       ann.train(&data[0], &truth[0]);
     }
   }
+
+  void TrainingModule::run(float * data){
+    float * result = ann.run(data);
+    for (int i = 0; i < fOutputVectorLength; i ++){
+      std::cout << "result " << i << " is : " << result[i] << std::endl; 
+    }
+  }
+
+  void TrainingModule::run(std::vector<float> & data){
+    float * result = ann.run(&data[0]);
+    for (int i = 0; i < fOutputVectorLength; i ++){
+      std::cout << "result " << i << " is : " << result[i] << std::endl; 
+    }
+  }
+
 }
 
 #endif

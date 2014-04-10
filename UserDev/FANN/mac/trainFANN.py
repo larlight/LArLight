@@ -4,6 +4,8 @@ from ROOT import *
 import ROOT
 gSystem.Load("libClusterRecoUtil")
 gSystem.Load("libFANN")
+gSystem.Load("libLArUtil")
+gSystem.Load("../lib/libfloatfann.dylib")
 from ROOT import larlight as fmwk
 from ROOT import cluster
 
@@ -95,18 +97,19 @@ while mgr.next_event():
         if mctruth_v.at(0).GetParticles().at(0).PdgCode() == 11:      ## electron    
             mct_vtx = mctruth_v.at(0).GetParticles().at(0).Trajectory().at(0).Position()
             print "\n electron \n"
-            my_vec=ROOT.std.vector(ROOT.Float)(2,0)
-            my_vec[0] = 1
+            truth=ROOT.std.vector(float)(2,0)
+            truth[0] = 1
         elif mctruth_v.at(0).GetParticles().at(0).PdgCode() == 22:    
             trajsize= mctruth_v.at(0).GetParticles().at(0).Trajectory().size()
             mct_vtx = mctruth_v.at(0).GetParticles().at(0).Trajectory().at(trajsize-1).Position()
             print "\n gamma \n"
+            continue
         elif mctruth_v.at(0).GetParticles().at(0).PdgCode() == 13:    
             trajsize= mctruth_v.at(0).GetParticles().at(0).Trajectory().size()
             mct_vtx = mctruth_v.at(0).GetParticles().at(0).Trajectory().at(0).Position()
             print "\n muon \n"
-            my_vec=ROOT.std.vector(ROOT.Float)(2,0)
-            my_vec[1] = 1
+            truth=ROOT.std.vector(float)(2,0)
+            truth[1] = 1
 
         #PdgCode
 
@@ -122,6 +125,12 @@ while mgr.next_event():
         featureVec=ROOT.std.vector(float)(10,0)
         algo.GetFANNVector(featureVec)
         
+        # Run the training:
+        fann.trainOnData(featureVec, truth)
+        print "Truth is (%g, %g)" % (truth[0],truth[1])
+        fann.run(featureVec)
+        fann.print_error()
+
         mc_begin=None
         if(mct_vtx):
             print "MC Particle Start Point: (%g,%g,%g)" % (mct_vtx[0],mct_vtx[1],mct_vtx[2])
@@ -205,5 +214,11 @@ while mgr.next_event():
         leg.Draw("same")
         # Update canvas
         display.Update()
-        sys.stdin.readline()
 
+        # Give an update on current status of ANN:
+        
+
+        # sys.stdin.readline()
+
+
+fann.saveFANNToFile()
