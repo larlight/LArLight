@@ -188,7 +188,7 @@ namespace cluster {
 
   bool ClusterMergeAlgNew::TestPolygonCollision(const cluster::cluster_params &param_a, 
 			    const cluster::cluster_params &param_b){
-
+    /*
     std::pair<float,float> tmpvertex;
     //make Polygon Object as in mac/PolyOverlap.cc
     std::vector<std::pair<float,float> > vertices_a;
@@ -203,8 +203,9 @@ namespace cluster {
 				  param_b.container_polygon.at(i)->t );
       vertices_b.push_back( tmpvertex );
     }
-    Polygon poly_a( vertices_a );
-    Polygon poly_b( vertices_b );
+    */
+    Polygon poly_a = param_a.PolyObject;
+    Polygon poly_b = param_b.PolyObject;
     
     bool overlap = poly_a.PolyOverlapSegments( poly_b );
     if (!overlap){
