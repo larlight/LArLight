@@ -16,4 +16,6 @@ rootlibmap() {
 
 ######################################################
 # FANN
-rootlibmap libFANN.rootmap libFANN.so $USER_DEV_DIR/FANN/LinkDef.h 
+rootlibmap libFANN.rootmap libFANN.so $USER_DEV_DIR/FANN/LinkDef.h \
+    libfloatfann.so libBase.so libDataFormat.so libLArUtil.so libClusterRecoUtil.so
+
