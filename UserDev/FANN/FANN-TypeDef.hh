@@ -7,10 +7,11 @@
 
 // Header files included here
 #include "FANN.hh"
+#include "TrainingModule.hh"
 
 // Class forward declaration here
 class FANN;
-class TrainingModule;
+class cluster::TrainingModule;
 //ADD_EMPTY_CLASS ... do not change this comment line
 
 #endif
