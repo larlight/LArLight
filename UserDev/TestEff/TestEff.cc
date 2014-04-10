@@ -49,10 +49,10 @@ namespace larlight {
   
     event_hit * my_hit_v = (event_hit*)(storage->get_data(my_cluster_v->get_hit_type()));
    
-  //  TCanvas *c1 = new TCanvas("c1","Histos",1);
-  //  c1->SetGrid();
+    TCanvas *c1 = new TCanvas("c1","Histos",1);
+    c1->SetGrid();
 
-   // TH1D *hist1 = new TH1D("hist1","title",100,0,10) ;	
+    TH1D *hist1 = new TH1D("hist1","title",100,0,10) ;	
 	
    //cluster::ClusterParamsAlgNew  fCPAlg; // = new cluster::ClusterParamsAlgNew();
 
@@ -84,8 +84,8 @@ namespace larlight {
 	
 	::cluster::cluster_params fResult=fCPAlg.GetParams();
 
-//	hist1->Fill(fResult.mean_charge) ;
-//	hist1->Draw();
+	hist1->Fill(fResult.mean_charge) ;
+	hist1->Draw();
 		
 	}
   
