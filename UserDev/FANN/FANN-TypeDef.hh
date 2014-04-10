@@ -11,7 +11,9 @@
 
 // Class forward declaration here
 class FANN;
-class cluster::TrainingModule;
+namespace cluster {
+class TrainingModule;
+}
 //ADD_EMPTY_CLASS ... do not change this comment line
 
 #endif
