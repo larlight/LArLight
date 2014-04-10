@@ -125,7 +125,9 @@ namespace cluster{
   }
 
 
-
+  void ClusterParamsAlgNew::SetArgoneutGeometry(){
+    larutil::LArUtilManager::Reconfigure(larlight::GEO::kArgoNeuT);
+  }
 
 
 
@@ -1208,9 +1210,7 @@ namespace cluster{
     RefineStartPoints();
     std::swap(fParams.start_point,fParams.end_point);
     std::swap(fRoughBeginPoint,fRoughEndPoint);
-    std::cout << "About to refine direction...\n";
     RefineDirection();
-    std::cout << "Successfully refined direction!\n";
     return;   
   }
 

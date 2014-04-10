@@ -20,6 +20,7 @@
 #include "PxUtils.h"
 #include "ClusterParams.hh"
 #include "RecoUtilException.hh"
+#include "LArUtilManager.hh"
 
 #include <vector>
 
@@ -52,6 +53,8 @@ namespace cluster {
     void SetRefineDirectionQMin(double qmin){ fQMinRefDir = qmin; }
 
     void SetVerbose(){ verbose = true;}
+
+    void SetArgoneutGeometry();
 
     void Report();
 
