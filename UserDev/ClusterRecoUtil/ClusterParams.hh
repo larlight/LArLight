@@ -2,6 +2,7 @@
 #define UTIL_CLUSTERPARAMS_H
 
 #include <ostream>
+#include <Polygon.hh>
 
 namespace cluster{
 
@@ -16,6 +17,8 @@ namespace cluster{
     ~cluster_params(){};
 
     std::vector<const larutil::PxHit*> container_polygon; ///< Polygon that contains hits
+
+    Polygon PolyObject;               ///< Polygon Object...see Polygon.hh
 
     larutil::PxPoint start_point;      ///< start point 
     larutil::PxPoint end_point;        ///< end point 

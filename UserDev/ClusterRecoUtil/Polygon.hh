@@ -26,6 +26,8 @@ private:
   std::vector< std::pair<float,float> > vertices;
   
  public:
+
+  Polygon() { }
   Polygon(std::vector< std::pair<float,float> > points) { vertices = points; }
   unsigned int Size() { return vertices.size(); } 
   std::pair<float,float> Point(unsigned int p); 
