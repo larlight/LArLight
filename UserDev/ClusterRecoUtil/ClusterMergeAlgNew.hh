@@ -18,6 +18,10 @@
 #include "larlight_base.hh"
 #include "LArUtil-TypeDef.hh"
 #include "ClusterParams.hh"
+//#include "mac/Polygon.hh"
+//#include "mac/PolyOverlap.cc"
+#include "Polygon.hh"
+
 
 namespace cluster {
   
