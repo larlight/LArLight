@@ -1154,13 +1154,13 @@ namespace larutil{
     double qintegral=0;
     std::vector<const larutil::PxHit*> ordered_hits;
     ordered_hits.reserve(hitlist.size());
-    for(auto hiter = hitmap.begin();
-	hiter!=hitmap.end();
+    for(auto hiter = hitmap.rbegin();
+	qintegral < qtotal*0.95;
 	++hiter) {
 
       qintegral += (*hiter).first;
       ordered_hits.push_back((*hiter).second);
-      if(qintegral > 0.95*qtotal) break; 
+
     }
 
     // Define container to hold found polygon corner PxHit index & distance
