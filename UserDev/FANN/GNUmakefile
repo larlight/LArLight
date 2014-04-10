@@ -10,12 +10,15 @@ HEADERS = $(wildcard *.hh)
 OBJECTS = $(SOURCES:.cc=.o)
 
 # include options for this package
-INCFLAGS = -I. -I./include/                       #Include itself
-INCFLAGS += -p
+INCFLAGS  = -I. 
+INCFLAGS += -I$(USER_DEV_DIR)/FANN/include
 INCFLAGS += -I$(LARLIGHT_CORE_DIR)/LArUtil
 INCFLAGS += -I$(LARLIGHT_CORE_DIR)/Base
 INCFLAGS += -I$(LARLIGHT_CORE_DIR)/DataFormat
 INCFLAGS += -I$(LARLIGHT_CORE_DIR)/Analysis
+
+# Add -p flag to CINT compilation
+CINTFLAGS += -p
 
 # linking for the fann packages:
 LIBS += -Llib -lfann 
