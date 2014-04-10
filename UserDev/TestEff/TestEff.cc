@@ -21,6 +21,9 @@ namespace larlight {
     if(!h1) h1 = new TH1D("h1","title",100,0,10);
     else h1->Reset();
 
+  //  if(!h2) h2 = new TH1D("h2","title",100,0,1.1);
+  //  else h2->Reset();
+    
     larutil::LArUtilManager::Reconfigure(larlight::GEO::kArgoNeuT);
     
     return true;
@@ -50,10 +53,6 @@ namespace larlight {
   
     event_hit * my_hit_v = (event_hit*)(storage->get_data(my_cluster_v->get_hit_type()));
    
-    //TCanvas *c1 = new TCanvas("c1","Histos",1);
-    //c1->SetGrid();
-
-    //TH1D *hist1 = new TH1D("hist1","title",100,0,10) ;	
 	
    //cluster::ClusterParamsAlgNew  fCPAlg; // = new cluster::ClusterParamsAlgNew();
 
@@ -85,12 +84,10 @@ namespace larlight {
 	
 	::cluster::cluster_params fResult=fCPAlg.GetParams();
 
-
-	//hist1->Fill(fResult.mean_charge) ;
-	//hist1->Draw();
-	h1->Fill(fResult.mean_charge);
+	h1->Fill(fResult.opening_angle);
+ 	h1->Draw();
+//	h2->Fill(fResult.opening_angle);
     }
-  
   
   
     return true;
@@ -105,7 +102,9 @@ namespace larlight {
     //
     // Say you made a histogram pointer h1 to store. You can do this:
     //
-     if(_fout) { _fout->cd(); h1->Write(); }
+     if(_fout) { _fout->cd(); h1->Write(); } 
+
+//h2->Write(); }
     
      else 
 
