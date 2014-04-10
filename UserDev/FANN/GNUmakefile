@@ -28,8 +28,6 @@ OSNAME          = $(shell uname -s)
 HOST            = $(shell uname -n)
 OSNAMEMODE      = $(OSNAME)
 
-
-
 include $(MAKE_TOP_DIR)/Makefile/Makefile.${OSNAME}
 
 # set compiler options for ROOT
@@ -38,5 +36,8 @@ CXXFLAGS +=  `root-config --cflags`
 # call the common GNUmakefile
 include $(MAKE_TOP_DIR)/Makefile/GNUmakefile.CORE
 
+fann:
+	@python $(USER_DEV_DIR)/FANN/bin/fann_build.py
 
-
+clean_fann:
+	@python $(USER_DEV_DIR)/FANN/bin/fann_clean.py

@@ -2,10 +2,13 @@ import sys
 from array import array
 from ROOT import *
 import ROOT
-gSystem.Load("libClusterRecoUtil")
+# Now that rootmap is set correctly, these loading are not necessary
+#gSystem.Load("libClusterRecoUtil")
+#gSystem.Load("libfloatfann.so")
+#gSystem.Load("libfann.dylib")
+#gSystem.Load("libLArUtil")
 gSystem.Load("libFANN")
-gSystem.Load("libLArUtil")
-gSystem.Load("../lib/libfloatfann.dylib")
+
 from ROOT import larlight as fmwk
 from ROOT import cluster
 
