@@ -350,7 +350,7 @@ namespace cluster{
     //these variables need to be initialized to other values? 
     if(fRough2DSlope==-999.999 || fRough2DIntercept==-999.999 ) 
       GetRoughAxis(true);      
-
+    
     fCoarseNbins=2;
     fProfileNbins=100;
     
@@ -523,7 +523,7 @@ namespace cluster{
         ortbin =(int)(ortdist/(max_ortdist-min_ortdist)*(NBINS));
       
        
-      ort_profile[ortbin]+=hit.charge;
+      ort_profile.at(ortbin)+=hit.charge;
       //if (ortdist < min_ortdist) min_ortdist = ortdist;
       //if (ortdist > max_ortdist) max_ortdist = ortdist;
 
@@ -569,7 +569,7 @@ namespace cluster{
     // int fbin=0;
     for(ix=0;ix<NBINS;ix++)
     {
-      integral+=ort_profile[ix];
+      integral+=ort_profile.at(ix);
       if(integral>=0.95*fParams.sum_charge)
       {
         break;
@@ -581,7 +581,7 @@ namespace cluster{
     
     if (drawOrtHistos){
       TH1F * ortDistHist = 
-                new TH1F("ortDistHist", 
+	new TH1F("ortDistHist", 
                          "Orthogonal Distance to axis;Distance (cm)",
                          100, min_ortdist, max_ortdist);
       TH1F * ortDistHistCharge = 
@@ -594,12 +594,12 @@ namespace cluster{
                          100, min_ortdist, max_ortdist);
 
       for (int index = 0; index < fParams.N_Hits; index++){
-        ortDistHist -> Fill(ort_dist_vect[index]);
-        ortDistHistCharge -> Fill(ort_dist_vect[index], fHitVector[index].charge);
-        double weight= (ort_dist_vect[index]<1.) ? 
-                      10 * (fHitVector[index].charge) : 
-                      (5 * (fHitVector[index].charge)/ort_dist_vect[index]);
-        ortDistHistAndrzej -> Fill(ort_dist_vect[index], weight);
+        ortDistHist -> Fill(ort_dist_vect.at(index));
+        ortDistHistCharge -> Fill(ort_dist_vect.at(index), fHitVector.at(index).charge);
+        double weight= (ort_dist_vect.at(index)<1.) ? 
+	  10 * (fHitVector.at(index).charge) : 
+	  (5 * (fHitVector.at(index).charge)/ort_dist_vect.at(index));
+        ortDistHistAndrzej -> Fill(ort_dist_vect.at(index), weight);
       }
       ortDistHist -> Scale(1.0/ortDistHist->Integral());
       ortDistHistCharge -> Scale(1.0/ortDistHistCharge->Integral());
