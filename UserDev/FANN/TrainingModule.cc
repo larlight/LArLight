@@ -24,11 +24,10 @@ namespace cluster{
 
   void TrainingModule::saveFANNToFile(std::string s){
     if (s != "")
-      fann_save(ann, s.c_str());
+      ann.save(s.c_str());
     else 
-      fann_save(ann, fOutputFileName.c_str());
+      ann.save(fOutputFileName.c_str());
 
-    // in
     return;
   }
 
@@ -36,10 +35,12 @@ namespace cluster{
 
     larutil::LArUtilManager::Reconfigure(larlight::GEO::kArgoNeuT);
 
+    /*
     if (ann){
       std::cerr << "ERROR: ann is already initialized, aborting.\n";
       return; 
     }
+    */
 
     unsigned int * layers;
     layers = new unsigned int[fNumHiddenLayers + 2];
@@ -47,20 +48,35 @@ namespace cluster{
     for (unsigned int i = 1; i <= fNumHiddenLayers; i++)
       layers[i] = fHiddenLayerLength[i-1];
     layers[fNumHiddenLayers+1] = fOutputVectorLength;
-    ann = fann_create_standard_array(fFeatureVectorLength, layers); 
+    ann.create_standard_array(fNumHiddenLayers+2, layers); 
     return;
   }
 
   void TrainingModule::trainOnData(float * data, float * truth){
-    fann_train(ann, data, truth);
+    ann.train(data, truth);
   }
 
   void TrainingModule::trainOnData(std::vector<float> & data, std::vector<float> & truth){
 
     if (data.size() != 0 && truth.size() != 0){
-      fann_train(ann, &data[0], &truth[0]);
+      ann.train(&data[0], &truth[0]);
     }
   }
+
+  void TrainingModule::run(float * data){
+    float * result = ann.run(data);
+    for (int i = 0; i < fOutputVectorLength; i ++){
+      std::cout << "result " << i << " is : " << result[i] << std::endl; 
+    }
+  }
+
+  void TrainingModule::run(std::vector<float> & data){
+    float * result = ann.run(&data[0]);
+    for (int i = 0; i < fOutputVectorLength; i ++){
+      std::cout << "result " << i << " is : " << result[i] << std::endl; 
+    }
+  }
+
 }
 
 #endif

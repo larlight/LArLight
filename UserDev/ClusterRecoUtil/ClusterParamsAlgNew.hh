@@ -20,6 +20,7 @@
 #include "PxUtils.h"
 #include "ClusterParams.hh"
 #include "RecoUtilException.hh"
+#include "LArUtilManager.hh"
 
 #include <vector>
 
@@ -54,6 +55,8 @@ namespace cluster {
 
     void SetVerbose(){ verbose = true;}
 
+    void SetArgoneutGeometry();
+
     void Report();
 
     /**
@@ -61,9 +64,10 @@ namespace cluster {
      * This function uses the data from cluster_params but packages it
      * up in a different way, and so is inappropriate to include in 
      * clusterParams.hh.   That's why it's here.
-     * @param  data  takes a reference to a vector, templated to allow double or float
+     * @param  data  takes a reference to a vector< float>
      */
     void  GetFANNVector(std::vector<float> & data);
+    // std::vector<float> & GetFANNVector();
 
     /**
      * For debugging purposes, prints the result of GetFANNVector
@@ -87,8 +91,8 @@ namespace cluster {
     void FillParams(bool override_DoGetAverages      =false,
                     bool override_DoGetRoughAxis     =false,
                     bool override_DoGetProfileInfo   =false,
-                    bool override_DoRefineStartPoints=false,
-		    bool override_DoRefineDirection  =false,
+                    bool override_DoRefineStartPointsAndDirection=false,
+            		    // bool override_DoRefineDirection  =false,
                     bool override_DoGetFinalSlope    =false );
 
     const cluster_params& GetParams() const
@@ -153,7 +157,7 @@ namespace cluster {
 
     void RefineDirection(bool override=false);
 
-    void RefineStartPointAndDirection();
+    void RefineStartPointAndDirection(bool override=false);
 
     void FillPolygon();
 
@@ -212,7 +216,7 @@ namespace cluster {
     bool fFinishedRefineStartPoints; 
     bool fFinishedRefineDirection;   
     bool fFinishedGetFinalSlope;     
-
+    bool fFinishedRefineStartPointAndDirection;
 
     double fRough2DSlope;        // slope 
     double fRough2DIntercept;    // slope 
