@@ -10,25 +10,22 @@
 
 namespace cluster{
 
-  ClusterParamsAlgNew::ClusterParamsAlgNew()
+  ClusterParamsAlgNew::ClusterParamsAlgNew() : fPrincipal(2,"D")
   {
-    fPrincipal=nullptr;
     fGSer=nullptr;
     Initialize();
   }
 
-  ClusterParamsAlgNew::~ClusterParamsAlgNew(){
-    if (fPrincipal != 0) delete fPrincipal;
-  }
-
-  ClusterParamsAlgNew::ClusterParamsAlgNew(const std::vector<const larlight::hit*> &inhitlist){
-    fPrincipal=nullptr;
+  ClusterParamsAlgNew::ClusterParamsAlgNew(const std::vector<const larlight::hit*> &inhitlist)
+    : fPrincipal(2,"D")
+  {
     fGSer=nullptr;
     SetHits(inhitlist);
   }
 
-  ClusterParamsAlgNew::ClusterParamsAlgNew(const std::vector<larutil::PxHit> &inhitlist){
-    fPrincipal=nullptr;
+  ClusterParamsAlgNew::ClusterParamsAlgNew(const std::vector<larutil::PxHit> &inhitlist)
+    : fPrincipal(2,"D")
+  {
     fGSer=nullptr;
     SetHits(inhitlist);
   }
@@ -128,7 +125,8 @@ namespace cluster{
   {
 
     // Set pointer attributes
-    if(!fPrincipal) fPrincipal = new TPrincipal(2,"D");    
+    //if(!fPrincipal) fPrincipal = new TPrincipal(2,"D");
+    fPrincipal.Clear();
     if(!fGSer) fGSer = (larutil::GeometryUtilities*)(larutil::GeometryUtilities::GetME());
 
     //--- Initilize attributes values ---//
@@ -194,7 +192,7 @@ namespace cluster{
       if (fFinishedGetAverages) return;
     }
 
-    fPrincipal -> Clear();
+    fPrincipal.Clear();
 
     fParams.N_Hits = fHitVector.size();
 
@@ -209,7 +207,7 @@ namespace cluster{
       double data[2];
       data[0] = hit.w;
       data[1] = hit.t;
-      fPrincipal -> AddRow(data);
+      fPrincipal.AddRow(data);
       fParams.charge_wgt_x += hit.w * hit.charge;
       fParams.charge_wgt_y += hit.t * hit.charge;
       fParams.sum_charge += hit.charge;
@@ -233,14 +231,19 @@ namespace cluster{
     fParams.charge_wgt_x /= fParams.sum_charge;
     fParams.charge_wgt_y /= fParams.sum_charge;
 
-    fParams.mean_x = (* fPrincipal->GetMeanValues())[0];
-    fParams.mean_y = (* fPrincipal->GetMeanValues())[1];
+    if(fPrincipal.GetMeanValues()->GetNrows()<2) {
+      throw cluster::RecoUtilException();
+      return;
+    }
+
+    fParams.mean_x = (* fPrincipal.GetMeanValues())[0];
+    fParams.mean_y = (* fPrincipal.GetMeanValues())[1];
     fParams.mean_charge = fParams.sum_charge / fParams.N_Hits;
 
-    fPrincipal -> MakePrincipals();
+    fPrincipal.MakePrincipals();
 
-    fParams.eigenvalue_principal = (* fPrincipal -> GetEigenValues() )[0];
-    fParams.eigenvalue_secondary = (* fPrincipal -> GetEigenValues() )[1];
+    fParams.eigenvalue_principal = (* fPrincipal.GetEigenValues() )[0];
+    fParams.eigenvalue_secondary = (* fPrincipal.GetEigenValues() )[1];
 
     fFinishedGetAverages = true;
     // Report();

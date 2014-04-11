@@ -35,11 +35,12 @@ namespace cluster {
   public:
 
     ClusterParamsAlgNew();
-    ~ClusterParamsAlgNew();
 
     ClusterParamsAlgNew(const std::vector<const larlight::hit*>&);
 
     ClusterParamsAlgNew(const std::vector<larutil::PxHit>&);
+
+    ~ClusterParamsAlgNew(){};
 
     void Initialize();
 
@@ -168,7 +169,7 @@ namespace cluster {
   protected:
     
     larutil::GeometryUtilities  *fGSer;
-    TPrincipal *fPrincipal;
+    TPrincipal fPrincipal;
 
     /**
        This vector holds the pointer to hits. 
