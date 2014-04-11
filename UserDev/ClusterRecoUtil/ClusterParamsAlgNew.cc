@@ -372,6 +372,8 @@ namespace cluster{
     
     double InterHigh=-999999;
     double InterLow=999999;
+    double WireHigh=-999999;
+    double WireLow=999999;
     fInterHigh_side=-999999;
     fInterLow_side=999999;
     double min_ortdist(999), max_ortdist(-999); // needed to calculate width
@@ -379,6 +381,8 @@ namespace cluster{
     // of the charge weight to help refine the start/end 
     // points and have a first guess of direction
 
+    std::cout << " inv_2d_slope " << inv_2d_slope << std::endl;
+    
     for(auto& hit : fHitVector)
     {
       
@@ -390,18 +394,32 @@ namespace cluster{
       // get coordinates of point on axis.
       fGSer->GetPointOnLine(fRough2DSlope,fRough2DIntercept,&hit,OnlinePoint);
 
+   //   std::cout << "normal point " << hit.w << ","<<hit.t << " online point " <<  OnlinePoint.w << "," <<  OnlinePoint.t << std::endl; 
+      
       double ortdist=fGSer->Get2DDistance(&OnlinePoint,&hit);
       if (ortdist < min_ortdist) min_ortdist = ortdist;
       if (ortdist > max_ortdist) max_ortdist = ortdist;
       
-      
-      if(intercept > InterHigh ){
-        InterHigh=intercept;
-      }
+      if(inv_2d_slope!=-999999)   //almost all cases
+      {	
+	if(intercept > InterHigh ){
+	  InterHigh=intercept;
+	  }
         
-      if(intercept < InterLow ){
-        InterLow=intercept;
-      }  
+	if(intercept < InterLow ){
+	  InterLow=intercept;
+	  }  
+      }
+      else    //slope is practically horizontal. Care only about wires.
+	{
+	  if(hit.w > WireHigh ){
+	    WireHigh=hit.w;
+	    }
+        
+	  if(hit.w < WireLow ){
+	    WireLow=hit.w;
+	    }
+	}
     
       if(side_intercept > fInterHigh_side ){
         fInterHigh_side=side_intercept;
@@ -424,22 +442,32 @@ namespace cluster{
     
     larutil::PxPoint HighOnlinePoint, LowOnlinePoint,BeginOnlinePoint, EndOnlinePoint;
     
-    fGSer->GetPointOnLineWSlopes(fRough2DSlope,fRough2DIntercept,
+  if(inv_2d_slope!=-999999)   //almost all cases
+     {	
+      fGSer->GetPointOnLineWSlopes(fRough2DSlope,fRough2DIntercept,
                                  InterHigh,HighOnlinePoint);
-    fGSer->GetPointOnLineWSlopes(fRough2DSlope,fRough2DIntercept,
+      fGSer->GetPointOnLineWSlopes(fRough2DSlope,fRough2DIntercept,
                                  InterLow,LowOnlinePoint);
+     }
+  else   //need better treatment of horizontal events.
+    {
+      larutil::PxPoint ptemphigh(fPlane,WireHigh,(fInterHigh_side+fInterLow_side)/2);
+      larutil::PxPoint ptemplow(fPlane,WireLow,(fInterHigh_side+fInterLow_side)/2);
+      fGSer->GetPointOnLine(fRough2DSlope,fRough2DIntercept,&ptemphigh,HighOnlinePoint);
+      fGSer->GetPointOnLine(fRough2DSlope,fRough2DIntercept,&ptemplow,LowOnlinePoint);
+    }
+    
+    std::cout << " extreme intercepts: low: " << InterLow 
+              << " " << InterHigh << std::endl;
+    std::cout << " extreme intercepts: side: " << fInterLow_side 
+              << " " << fInterHigh_side << std::endl;
+    std::cout << "axis + intercept "  << fRough2DSlope << " " 
+              << fRough2DIntercept << std::endl;
+    
+    std::cout << " Low online point: " << LowOnlinePoint.w << ", " << LowOnlinePoint.t 
+              << " High: " << HighOnlinePoint.w << ", " << HighOnlinePoint.t << std::endl; 
 
-
-    // std::cout << " extreme intercepts: low: " << InterLow 
-              // << " " << InterHigh << std::endl;
-    // std::cout << " extreme intercepts: side: " << fInterLow_side 
-              // << " " << fInterHigh_side << std::endl;
-    // std::cout << "axis + intercept "  << fRough2DSlope << " " 
-              // << fRough2DIntercept << std::endl;
-    // 
-    // std::cout << " Low online point: " << LowOnlinePoint.w << ", " << LowOnlinePoint.t 
-              // << " High: " << HighOnlinePoint.w << ", " << HighOnlinePoint.t << std::endl; 
-
+ //   std::cout << " max_min ortdist" << max_ortdist << " " << min_ortdist << std::endl;	      
     //define BeginOnlinePoint as the one with lower wire number (for now), adjust intercepts accordingly	      
     if(HighOnlinePoint.w >= LowOnlinePoint.w)
     {
@@ -458,9 +486,9 @@ namespace cluster{
    
     fProjectedLength=fGSer->Get2DDistance(&BeginOnlinePoint,&EndOnlinePoint);
      
-    // std::cout << " projected length " << fProjectedLength 
-    //            << " Begin Point " << BeginOnlinePoint.w << " " 
-    //            << BeginOnlinePoint.t  << " End Point " << EndOnlinePoint.w << ","<< EndOnlinePoint.t << std::endl;
+//     std::cout << " projected length " << fProjectedLength 
+//                << " Begin Point " << BeginOnlinePoint.w << " " 
+//                << BeginOnlinePoint.t  << " End Point " << EndOnlinePoint.w << ","<< EndOnlinePoint.t << std::endl;
     
 
     // Some fitting variables to make a histogram:
@@ -478,21 +506,22 @@ namespace cluster{
      
       larutil::PxPoint OnlinePoint;
       // get coordinates of point on axis.
-      //std::cout << &BeginOnlinePoint << std::endl;
+     // std::cout << BeginOnlinePoint << std::endl;
       //std::cout << &OnlinePoint << std::endl;
       fGSer->GetPointOnLine(fRough2DSlope,&BeginOnlinePoint,&hit,OnlinePoint);
-
-     //std::cout << " Online Point " << OnlinePoint.w << " " << OnlinePoint.t << std::endl; 
-      double linedist=fGSer->Get2DDistance(&OnlinePoint,&BeginOnlinePoint);
       double ortdist=fGSer->Get2DDistance(&OnlinePoint,&hit);
-      ort_dist_vect.push_back(ortdist);
      
+      
+      double linedist=fGSer->Get2DDistance(&OnlinePoint,&BeginOnlinePoint);
+    //  double ortdist=fGSer->Get2DDistance(&OnlinePoint,&hit);
+      ort_dist_vect.push_back(ortdist);
       int ortbin;
       if (ortdist == 0)
         ortbin = 0;
       else 
-        ortbin =(max_ortdist-min_ortdist)/NBINS*ortdist;
-      std::cout << "ortbin is " << ortbin << std::endl;
+        ortbin =(int)(ortdist/(max_ortdist-min_ortdist)*(NBINS));
+      
+       
       ort_profile[ortbin]+=hit.charge;
       //if (ortdist < min_ortdist) min_ortdist = ortdist;
       //if (ortdist > max_ortdist) max_ortdist = ortdist;
@@ -515,7 +544,7 @@ namespace cluster{
       std::cout << "coarse_bin: " << coarse_bin << std::endl;
       */
 
-      //std::cout << "length" << linedist <<   " fine_bin, coarse " << fine_bin << " " << coarse_bin << std::endl;
+//      std::cout << "length" << linedist <<   " fine_bin, coarse " << fine_bin << " " << coarse_bin << std::endl;
       
       if(fine_bin<fProfileNbins)  //only fill if bin number is in range
       {
@@ -533,7 +562,6 @@ namespace cluster{
         fCoarseChargeProfile.at(coarse_bin)+=weight;
       
     }  // end second loop on hits. Now should have filled profile vectors.
-      
 
     double integral=0; 
     int ix=0;
@@ -549,7 +577,6 @@ namespace cluster{
 
     fParams.width=2*(double)ix/(double)NBINS*(max_ortdist-min_ortdist);  // multiply by two because ortdist is folding in both sides. 
     
-    std::cout << " calculated width: " << fParams.width << "  integral " << integral << " sum " << fParams.sum_charge << std::endl;
     
     if (drawOrtHistos){
       TH1F * ortDistHist = 
@@ -600,6 +627,7 @@ namespace cluster{
     
     //calculate the forward and backward integrals counting int the maximum bin.
     
+    
     for(int ibin=0;ibin<fProfileNbins;ibin++)
     {
       if(ibin<=fProfileMaximumBin)  
@@ -615,7 +643,6 @@ namespace cluster{
     // integral until less than 1% is left and the bin is above 
     // a set theshold many empty bins.
     
-   
    
     
      //forward loop
@@ -643,10 +670,10 @@ namespace cluster{
     // long the rough_2d_axis on bin distance is: 
     // larutil::PxPoint OnlinePoint;
     
+  if(inv_2d_slope!=-999999)   //almost all cases
+     {	   
     double ort_intercept_begin=fBeginIntercept+(fEndIntercept-fBeginIntercept)/fProfileNbins*startbin;
-    
     std::cout << " ort_intercept_begin: " << ort_intercept_begin << std::endl;
-    
     fGSer->GetPointOnLineWSlopes(fRough2DSlope,
                                  fRough2DIntercept,
                                  ort_intercept_begin,
@@ -656,13 +683,30 @@ namespace cluster{
     fRoughBeginPoint.plane=fPlane;
     
     std::cout << " ort_intercept_end: " << ort_intercept_end << std::endl;
-    
     fGSer->GetPointOnLineWSlopes(fRough2DSlope,
                                  fRough2DIntercept,
                                  ort_intercept_end,
                                  fRoughEndPoint);
     fRoughEndPoint.plane=fPlane;
+     }
+   else
+   {
+    double wire_begin=WireLow+(WireHigh-WireLow)/fProfileNbins*startbin;
+    std::cout << " wire_begin: " << wire_begin << std::endl;
+   
+    larutil::PxPoint ptemphigh(fPlane,wire_begin,(fInterHigh_side+fInterLow_side)/2);
+    fGSer->GetPointOnLine(fRough2DSlope,fRough2DIntercept,&ptemphigh,fRoughBeginPoint);
+    fRoughBeginPoint.plane=fPlane;
     
+    double wire_end=WireLow+(WireHigh-WireLow)/fProfileNbins*endbin;
+    std::cout << " wire_end: " << wire_end << std::endl;
+      
+    larutil::PxPoint ptemplow(fPlane,wire_end,(fInterHigh_side+fInterLow_side)/2);
+    fGSer->GetPointOnLine(fRough2DSlope,fRough2DIntercept,&ptemplow,fRoughEndPoint);
+    fRoughEndPoint.plane=fPlane;
+     
+    }
+     
     std::cout << "  rough start points "  << fRoughBeginPoint.w << ", " << fRoughBeginPoint.t << " end: " <<  fRoughEndPoint.w << " " << fRoughEndPoint.t << std::endl;
     
      // ok. now have fRoughBeginPoint and fRoughEndPoint. No decision about direction has been made yet.
@@ -675,6 +719,7 @@ namespace cluster{
 
     fFinishedGetProfileInfo = true;
     // Report();
+    
     return;
   }
   
@@ -732,12 +777,12 @@ namespace cluster{
     larutil::PxHit averageHit;
     //also are we sure this is actually doing what it is supposed to???
     //are we sure this works?
-    //is anybody even listening?  Were they eaten by a grue? 
-      
+    //is anybody even listening?  Were they eaten by a grue?    
     fGSer->SelectLocalHitlist(fHitVector,subhit, startHit,
                               linearlimit,ortlimit,lineslopetest,
                               averageHit);
 
+    
     if(!(subhit.size())) {
       std::cout<<"Subhit list is empty. Using rough start/end points..."<<std::endl;
       // GetOpeningAngle();
@@ -1244,10 +1289,17 @@ namespace cluster{
       std::cout<<fParams.container_polygon.size()<<std::endl;
     }
   }
+  
+  
+  ///////////////////////////////////////////////////////////////////////////////////
+  
   void ClusterParamsAlgNew::RefineStartPointAndDirection(bool override){
     // This function is meant to pick the direction.
     // It refines both the start and end point, and then asks 
     // if it should flip.
+    
+    std::cout << " here!!! "  << std::endl;
+    
     if(!override) { //Override being set, we skip all this logic.
       //OK, no override. Stop if we're already finshed.
     if (fFinishedRefineStartPointAndDirection) return;
