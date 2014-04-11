@@ -104,7 +104,7 @@ while mgr.next_event():
     cluster_v = mgr.get_data(fmwk.DATA.FuzzyCluster)
 
     
-    if mctruth_v.event_id() < 153 :
+    if mctruth_v.event_id() < 1048 :
    	continue;
     
     # Get the primary particl generator vtx position
@@ -132,15 +132,18 @@ while mgr.next_event():
 
         #if algo.LoadAllHits(mgr.get_data(larlight.DATA.FFTHit), plane) == -1 :
 	  #continue;
-    for x in xrange(cluster_v.size()):
+    #for x in xrange(cluster_v.size()):
 
-       # if algo.LoadAllHits(mgr.get_data(larlight.DATA.GausHit), plane) == -1 :
-       #  continue;
+        if algo.LoadAllHits(mgr.get_data(larlight.DATA.GausHit), plane) == -1 :
+         continue;
 
 
-        print "  Cluster ID:",cluster_v.at(x).ID()
-        algo.LoadCluster(cluster_v.at(x),
-                         mgr.get_data(cluster_v.get_hit_type()))
+       # print "  Cluster ID:",cluster_v.at(x).ID()
+       # print " return from", algo.LoadCluster(cluster_v.at(x),
+        #                 mgr.get_data(cluster_v.get_hit_type()));
+       # if algo.LoadCluster(cluster_v.at(x),
+        #                 mgr.get_data(cluster_v.get_hit_type())) == -1 :
+	 #     continue;		     
 
         # algo.FillParams(True,True,True,True,True)
         algo.GetAverages(True)

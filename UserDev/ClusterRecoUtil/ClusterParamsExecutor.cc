@@ -40,7 +40,8 @@ namespace cluster {
 
       cluster_hits.push_back((const larlight::hit*)(&(hits->at(index))));
 
-    return Execute(hits->event_id(), i_cluster.ID(), plane);
+    
+   return Execute(hits->event_id(), i_cluster.ID(), plane);
   }
 
   int ClusterParamsExecutor::LoadAllHits(const larlight::event_hit *hits, const UChar_t plane_id)
@@ -203,7 +204,6 @@ namespace cluster {
      std::cout << "ClusterParamsExecutor: error setting hits. Hitlist may be too small.  " <<std::endl;
      return -1;
     }
-
    return 0; 
   }
 

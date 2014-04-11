@@ -316,6 +316,7 @@ namespace cluster{
         sumtime+=hit.t;
         sumwiretime+=hit.w * hit.t;
         sumwirewire+=pow(hit.w,2);  
+	std::cout << " above average charge " <<  hit . charge << " " << hit.w<<","<<hit.t <<"\n";
       }//for high charge
     }//For hh loop
 
@@ -324,7 +325,12 @@ namespace cluster{
  
     fParams.N_Hits_HC = ncw;
     //Looking for the slope and intercept of the line above avg_charge hits
-    fRough2DSlope= (ncw*sumwiretime- sumwire*sumtime)/(ncw*sumwirewire-sumwire*sumwire);//slope for cw
+
+    std::cout << " ncw, and parentheses " << ncw << " " << (ncw*sumwiretime- sumwire*sumtime) << " " <<(ncw*sumwirewire-sumwire*sumwire) << std::endl;
+    if((ncw*sumwirewire-sumwire*sumwire))
+      fRough2DSlope= (ncw*sumwiretime- sumwire*sumtime)/(ncw*sumwirewire-sumwire*sumwire);//slope for cw
+    else
+      fRough2DSlope=999;
     fRough2DIntercept= fParams.charge_wgt_y  -fRough2DSlope*(fParams.charge_wgt_x);//intercept for cw
     //Getthe 2D_angle
     fParams.cluster_angle_2d = atan(fRough2DSlope)*180/PI;
@@ -496,7 +502,7 @@ namespace cluster{
    
     std::vector<double> ort_profile;
     const int NBINS=100;
-    ort_profile.reserve(NBINS);
+    ort_profile.resize(NBINS);
     
     std::vector<double> ort_dist_vect;
     ort_dist_vect.reserve(fParams.N_Hits);
@@ -511,7 +517,6 @@ namespace cluster{
       //std::cout << &OnlinePoint << std::endl;
       fGSer->GetPointOnLine(fRough2DSlope,&BeginOnlinePoint,&hit,OnlinePoint);
       double ortdist=fGSer->Get2DDistance(&OnlinePoint,&hit);
-     
       
       double linedist=fGSer->Get2DDistance(&OnlinePoint,&BeginOnlinePoint);
     //  double ortdist=fGSer->Get2DDistance(&OnlinePoint,&hit);
@@ -520,9 +525,8 @@ namespace cluster{
       if (ortdist == 0)
         ortbin = 0;
       else 
-        ortbin =(int)(ortdist/(max_ortdist-min_ortdist)*(NBINS));
-      
-       
+        ortbin =(int)(ortdist-min_ortdist)/(max_ortdist-min_ortdist)*(NBINS-1);
+           
       ort_profile.at(ortbin)+=hit.charge;
       //if (ortdist < min_ortdist) min_ortdist = ortdist;
       //if (ortdist > max_ortdist) max_ortdist = ortdist;
@@ -535,8 +539,8 @@ namespace cluster{
       /////////////////////////////////////////////////////////////////////// 
       double weight= (ortdist<1.) ? 10 * (hit.charge) : 5 * (hit.charge) / ortdist;
     
-      int fine_bin  =(int)(linedist/fProjectedLength*fProfileNbins);
-      int coarse_bin=(int)(linedist/fProjectedLength*fCoarseNbins);
+      int fine_bin  =(int)(linedist/fProjectedLength*(fProfileNbins-1));
+      int coarse_bin=(int)(linedist/fProjectedLength*(fCoarseNbins-1));
       /*
       std::cout << "linedist: " << linedist << std::endl;
       std::cout << "fProjectedLength: " << fProjectedLength << std::endl;
@@ -576,7 +580,7 @@ namespace cluster{
       }
     }
 
-    fParams.width=2*(double)ix/(double)NBINS*(max_ortdist-min_ortdist);  // multiply by two because ortdist is folding in both sides. 
+    fParams.width=2*(double)ix/(double)(NBINS-1)*(max_ortdist-min_ortdist);  // multiply by two because ortdist is folding in both sides. 
     
     
     if (drawOrtHistos){
@@ -771,7 +775,7 @@ namespace cluster{
     // Will need to feed in the set of hits that we want. 
     //	const std::vector<larutil::PxHit*> whole;
     std::vector <const larutil::PxHit*> subhit;
-   
+   std::cout << " in Refine Start Points " << std::endl;
     double linearlimit=8;
     double ortlimit=12;
     double lineslopetest(fRough2DSlope);
@@ -784,8 +788,8 @@ namespace cluster{
                               averageHit);
 
     
-    if(!(subhit.size())) {
-      std::cout<<"Subhit list is empty. Using rough start/end points..."<<std::endl;
+    if(!(subhit.size()) || subhit.size()<3) {
+      std::cout<<"Subhit list is empty or too small. Using rough start/end points..."<<std::endl;
       // GetOpeningAngle();
       fParams.start_point = fRoughBeginPoint;
       fParams.end_point   = fRoughEndPoint;
@@ -796,6 +800,8 @@ namespace cluster{
       fFinishedRefineStartPoints = true;
       return;
     }
+    
+    std::cout << " subhit size:: " << subhit.size() << std::endl;
     double avgwire= averageHit.w;
     double avgtime= averageHit.t;
     //vertex in tilda-space pair(x-til,y-til)
@@ -993,7 +999,7 @@ namespace cluster{
     for( auto hit : fHitVector){
       
       double omx=fGSer->Get2Dangle((larutil::PxPoint *)&hit,&fParams.start_point);  // in rad and assuming cm/cm space.
-      int nbin=(omx+TMath::Pi())*NBINS/(2*TMath::Pi());
+      int nbin=(omx+TMath::Pi())*(NBINS-1)/(2*TMath::Pi());
       if(nbin >= NBINS) nbin=NBINS-1;
       if(nbin < 0) nbin=0;
       fh_omega_single[nbin]+=hit.charge;
