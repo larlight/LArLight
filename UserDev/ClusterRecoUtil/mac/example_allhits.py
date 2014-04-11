@@ -100,8 +100,12 @@ while mgr.next_event():
     # Get event_mctruth ... std::vector<larlight::mctruth>
     mctruth_v = mgr.get_data(fmwk.DATA.MCTruth)
 
-    if mctruth_v.event_id() < 39 :
-	continue;
+      # Get event_cluster ... std::vector<larlight::cluster>
+    cluster_v = mgr.get_data(fmwk.DATA.FuzzyCluster)
+
+    
+    if mctruth_v.event_id() < 153 :
+   	continue;
     
     # Get the primary particl generator vtx position
     mct_vtx=None
@@ -123,11 +127,15 @@ while mgr.next_event():
     if args.num_events == processed_events:
         exit()
         
-    for plane in xrange(larutil.Geometry.GetME().Nplanes()):
+    #for plane in xrange(larutil.Geometry.GetME().Nplanes()):
 
-        if algo.LoadAllHits(mgr.get_data(larlight.DATA.FFTHit), plane) == -1 :
-	  continue;
+        #if algo.LoadAllHits(mgr.get_data(larlight.DATA.FFTHit), plane) == -1 :
+	  #continue;
+    for x in xrange(cluster_v.size()):
 
+        print "  Cluster ID:",cluster_v.at(x).ID()
+        algo.LoadCluster(cluster_v.at(x),
+                         mgr.get_data(cluster_v.get_hit_type()))
 
         # algo.FillParams(True,True,True,True,True)
         algo.GetAverages(True)
