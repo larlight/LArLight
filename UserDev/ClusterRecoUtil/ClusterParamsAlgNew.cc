@@ -152,7 +152,6 @@ namespace cluster{
   {
 
     // Set pointer attributes
-    //if(!fPrincipal) fPrincipal = new TPrincipal(2,"D");
     fPrincipal.Clear();
     if(!fGSer) fGSer = (larutil::GeometryUtilities*)(larutil::GeometryUtilities::GetME());
 
@@ -177,9 +176,11 @@ namespace cluster{
     fProfileIntegralBackward=999.999;
     fProfileMaximumBin=-999;
     
-    fChargeCutoffThreshold[0]=500;
-    fChargeCutoffThreshold[1]=500;
-    fChargeCutoffThreshold[2]=1000;
+    fChargeCutoffThreshold.clear();
+    fChargeCutoffThreshold.resize(3,0);
+    fChargeCutoffThreshold.at(0)=500;
+    fChargeCutoffThreshold.at(1)=500;
+    fChargeCutoffThreshold.at(2)=1000;
 
     fHitVector.clear();
 
@@ -624,7 +625,7 @@ namespace cluster{
     for(startbin=fProfileMaximumBin;startbin>1;startbin--)
     {
       running_integral-=fChargeProfile.at(startbin);
-      if( fChargeProfile.at(startbin)<fChargeCutoffThreshold[fPlane] && running_integral/fProfileIntegralForward<0.01 )
+      if( fChargeProfile.at(startbin)<fChargeCutoffThreshold.at(fPlane) && running_integral/fProfileIntegralForward<0.01 )
         break;
     }
     
@@ -633,7 +634,7 @@ namespace cluster{
     for(endbin=fProfileMaximumBin;endbin<fProfileNbins-1;endbin++)
     {
       running_integral-=fChargeProfile.at(endbin);
-      if( fChargeProfile.at(endbin)<fChargeCutoffThreshold[fPlane] && running_integral/fProfileIntegralBackward<0.01 )
+      if( fChargeProfile.at(endbin)<fChargeCutoffThreshold.at(fPlane) && running_integral/fProfileIntegralBackward<0.01 )
         break;
     }
     
