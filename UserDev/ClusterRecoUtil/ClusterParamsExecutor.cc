@@ -16,17 +16,17 @@ namespace cluster {
 
   }
 
-  void ClusterParamsExecutor::LoadCluster(const larlight::cluster &i_cluster,
+  int ClusterParamsExecutor::LoadCluster(const larlight::cluster &i_cluster,
 					  const larlight::event_hit *hits)
   {
     
     larlight::DATA::DATA_TYPE hit_type = i_cluster.get_hit_type();
     if(!hits) {
       throw cluster::RecoUtilException("Invalid hit (didn't find data!)");
-      return;
+      return -1;
     }else if(hit_type != hits->data_type()){
       throw cluster::RecoUtilException("Unmatched hit type!");
-      return;
+      return -1;
     }
 
     cluster_hits.clear();
@@ -40,10 +40,10 @@ namespace cluster {
 
       cluster_hits.push_back((const larlight::hit*)(&(hits->at(index))));
 
-    Execute(hits->event_id(), i_cluster.ID(), plane);
+    return Execute(hits->event_id(), i_cluster.ID(), plane);
   }
 
-  void ClusterParamsExecutor::LoadAllHits(const larlight::event_hit *hits, const UChar_t plane_id)
+  int ClusterParamsExecutor::LoadAllHits(const larlight::event_hit *hits, const UChar_t plane_id)
   {
     
     cluster_hits.clear();
@@ -56,14 +56,13 @@ namespace cluster {
 
     }
 
-    Execute(hits->event_id(), -1, plane_id);
-
+    return Execute(hits->event_id(), -1, plane_id);
   }
 
-  void ClusterParamsExecutor::Execute(Int_t event_id, Int_t cluster_id, UChar_t plane_id) 
+  int ClusterParamsExecutor::Execute(Int_t event_id, Int_t cluster_id, UChar_t plane_id) 
   {
 
-    if(!(cluster_hits.size())) return;
+    if(!(cluster_hits.size())) return -1;
 
 
     if(hCurrentHit) delete hCurrentHit;
@@ -199,8 +198,13 @@ namespace cluster {
     }
     
     this->Initialize();
-    this->SetHits(cluster_hits);
+    if(this->SetHits(cluster_hits) == -1 )
+    {
+     std::cout << "ClusterParamsExecutor: error setting hits. Hitlist may be too small.  " <<std::endl;
+     return -1;
+    }
 
+   return 0; 
   }
 
 }

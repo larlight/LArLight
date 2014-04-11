@@ -91,9 +91,14 @@ fGSer = larutil.GeometryUtilities.GetME()
 
 while mgr.next_event():
 
+   
+
     # Get event_mctruth ... std::vector<larlight::mctruth>
     mctruth_v = mgr.get_data(fmwk.DATA.MCTruth)
 
+    if mctruth_v.event_id() < 39 :
+	continue;
+    
     # Get the primary particl generator vtx position
     mct_vtx=None
     if mctruth_v and mctruth_v.size():
@@ -113,7 +118,8 @@ while mgr.next_event():
         
     for plane in xrange(larutil.Geometry.GetME().Nplanes()):
 
-        algo.LoadAllHits(mgr.get_data(larlight.DATA.GausHit), plane)
+        if algo.LoadAllHits(mgr.get_data(larlight.DATA.FFTHit), plane) == -1 :
+	  continue;
 
         # algo.FillParams(True,True,True,True,True)
         algo.GetAverages(True)

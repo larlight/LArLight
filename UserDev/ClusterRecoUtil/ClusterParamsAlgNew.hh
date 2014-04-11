@@ -45,9 +45,9 @@ namespace cluster {
 
     //void SetHits(const std::vector<larutil::PxHit*>&);
     
-    void SetHits(const std::vector<const larlight::hit*> &);
+    int SetHits(const std::vector<const larlight::hit*> &);
 
-    void SetHits(const std::vector<larutil::PxHit> &);
+    int SetHits(const std::vector<larutil::PxHit> &);
 
     void SetRefineDirectionQMin(double qmin){ fQMinRefDir = qmin; }
 

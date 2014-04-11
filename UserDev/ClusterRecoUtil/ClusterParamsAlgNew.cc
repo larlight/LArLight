@@ -33,7 +33,7 @@ namespace cluster{
     SetHits(inhitlist);
   }
 
-  void ClusterParamsAlgNew::SetHits(const std::vector<larutil::PxHit> &inhitlist){
+  int ClusterParamsAlgNew::SetHits(const std::vector<larutil::PxHit> &inhitlist){
 
     Initialize();
 
@@ -41,7 +41,7 @@ namespace cluster{
     // Is done by the struct
     if(!(inhitlist.size())) {
       throw RecoUtilException("Provided empty hit list!");
-      return;
+      return -1;
     }
 
     fHitVector.reserve(inhitlist.size());
@@ -50,15 +50,25 @@ namespace cluster{
       fHitVector.push_back(h);
     
     fPlane=fHitVector[0].plane;
+    
+      
+    if (fHitVector.size()<10)
+    {
+     std::cout << " the hitlist is too small. Continuing to run may result in crash!!! " <<std::endl;
+     return -1;
+    }
+    else
+      return fHitVector.size();
+    
   }
 
-  void ClusterParamsAlgNew::SetHits(const std::vector<const larlight::hit*> &inhitlist){
+  int ClusterParamsAlgNew::SetHits(const std::vector<const larlight::hit*> &inhitlist){
 
     // Make default values
     // Is done by the struct
     if(!(inhitlist.size())) {
       throw RecoUtilException("Provided empty hit list!");
-      return;
+      return -1;
     }
     
     Initialize();
@@ -75,6 +85,15 @@ namespace cluster{
       (*fHitVector.rbegin()).plane = plane;
     }
     fPlane=fHitVector[0].plane;
+    
+        
+    if (fHitVector.size()<10)
+    {
+     std::cout << " the hitlist is too small. Continuing to run may result in crash!!! " << std::endl;
+     return -1;
+    }
+    else
+      return fHitVector.size();
     
   }
 
@@ -276,6 +295,7 @@ namespace cluster{
 
       //if charge is above avg_charge
       // std::cout << "This hit has charge " <<  hit . charge << "\n";
+       
       if(hit.charge > fParams.mean_charge){
         ncw+=1;
         sumwire+=hit.w;
@@ -295,9 +315,7 @@ namespace cluster{
     //Getthe 2D_angle
     fParams.cluster_angle_2d = atan(fRough2DSlope)*180/PI;
 
-    // std::cout << "fRough2DSlope is " << fRough2DSlope << std::endl;
-
-
+ 
     fFinishedGetRoughAxis = true;    
     // Report();
     return;
@@ -398,6 +416,8 @@ namespace cluster{
     fGSer->GetPointOnLineWSlopes(fRough2DSlope,fRough2DIntercept,
                                  InterLow,LowOnlinePoint);
 
+   // std::cout << " rough2Dslope " << fRough2DSlope <<std::endl;
+    
     std::cout << " extreme intercepts: low: " << InterLow 
               << " " << InterHigh << std::endl;
     std::cout << " extreme intercepts: side: " << fInterLow_side 
