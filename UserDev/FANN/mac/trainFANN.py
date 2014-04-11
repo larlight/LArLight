@@ -2,11 +2,6 @@ import sys
 from array import array
 from ROOT import *
 import ROOT
-# Now that rootmap is set correctly, these loading are not necessary
-#gSystem.Load("libClusterRecoUtil")
-#gSystem.Load("libfloatfann.so")
-#gSystem.Load("libfann.dylib")
-#gSystem.Load("libLArUtil")
 gSystem.Load("libFANN")
 
 from ROOT import larlight as fmwk
@@ -26,6 +21,7 @@ parser.add_argument("-o","--data-output",help="Output data file, if event is cha
 parser.add_argument("-a","--ana-output",help="Analysis output file")
 parser.add_argument("-n","--num-events",help="Number of events to process")
 parser.add_argument("-d","--display",help="Turn on the display to see each view before and after." )
+parser.add_argument("-A","--argoneut",action='store_true',help="Set geometry to argonuet.")
 args = parser.parse_args()
 
 if len(sys.argv) == 1:
@@ -72,6 +68,9 @@ mgr.open()
 
 algo = cluster.ClusterParamsExecutor()
 algo.SetUseHitBlurring(false)
+
+if args.argoneut != None:
+    algo.SetArgoneutGeometry()
 
 fann = cluster.TrainingModule()
 fann.setFeatureVectorLength(10)
@@ -221,7 +220,7 @@ while mgr.next_event():
         # Give an update on current status of ANN:
         
 
-        # sys.stdin.readline()
+        sys.stdin.readline()
 
 
 fann.saveFANNToFile()

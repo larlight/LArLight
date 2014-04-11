@@ -465,7 +465,12 @@ namespace cluster{
       double ortdist=fGSer->Get2DDistance(&OnlinePoint,&hit);
       ort_dist_vect.push_back(ortdist);
      
-      int ortbin=(max_ortdist-min_ortdist)/NBINS*ortdist;
+      int ortbin;
+      if (ortdist == 0)
+        ortbin = 0;
+      else 
+        ortbin =(max_ortdist-min_ortdist)/NBINS*ortdist;
+      std::cout << "ortbin is " << ortbin << std::endl;
       ort_profile[ortbin]+=hit.charge;
       //if (ortdist < min_ortdist) min_ortdist = ortdist;
       //if (ortdist > max_ortdist) max_ortdist = ortdist;
@@ -982,6 +987,11 @@ namespace cluster{
       this_endPoint   = fRoughEndPoint;
     }
 
+    std::cout << "Angle: Start point: (" << this_startPoint.w 
+              << ", " << this_startPoint.t << ")\n";
+    std::cout << "Angle: End point  : (" << this_endPoint.w   
+              << ", " << this_endPoint.t << ")\n";
+
     double endStartDiff_x = (this_endPoint.w - this_startPoint.w);
     double endStartDiff_y = (this_endPoint.t - this_startPoint.t);
     double rms_forward   = 0;
@@ -992,6 +1002,11 @@ namespace cluster{
     double hit_counter_forward  = 0;
     double hit_counter_backward = 0;
     
+    if (endStartDiff_y == 0 && endStartDiff_x == 0) {
+      std::cerr << "Error:  end point and start point are the same!\n";
+      return;
+    }
+
     double percentage = 0.95;
     double percentage_HC = 0.95*fParams.N_Hits_HC/fParams.N_Hits;
     const int NBINS=200;
@@ -1053,7 +1068,12 @@ namespace cluster{
 
       int N_bins_OPEN = NBINS * acos(cosangle_start)/PI;
       int N_bins_CLOSE = NBINS * acos(cosangle_end)/PI;
-
+      // std::cout << "endStartDiff_x :" << endStartDiff_x << std::endl;
+      // std::cout << "endStartDiff_y :" << endStartDiff_y << std::endl;
+      // std::cout << "cosangle_start :" << cosangle_start << std::endl;
+      // std::cout << "cosangle_end   :" << cosangle_end << std::endl;
+      // std::cout << "N_bins_OPEN    :" << N_bins_OPEN << std::endl; 
+      // std::cout << "N_bins_CLOSE   :" << N_bins_CLOSE << std::endl; 
 
       opening_angle_chargeWgt_bin[N_bins_OPEN ] 
                     += hit.charge/fParams.sum_charge;
@@ -1204,13 +1224,34 @@ namespace cluster{
       //Try to run the previous function if not yet done.
       if (!fFinishedGetProfileInfo) GetProfileInfo(true);
     }
+    std::cout << "REFINING .... " << std::endl;
+    std::cout << "  Rough start and end point: " << std::endl; 
+    std::cout << "    s: (" << fParams.start_point.w << ", " 
+              << fParams.start_point.t << ")" << std::endl;
+    std::cout << "    e: (" << fParams.end_point.w << ", " 
+              << fParams.end_point.t << ")" << std::endl;
     RefineStartPoints();
+    std::cout << "  Once Refined start and end point: " << std::endl;
+    std::cout << "    s: (" << fParams.start_point.w << ", " 
+              << fParams.start_point.t << ")" << std::endl;
+    std::cout << "    e: (" << fParams.end_point.w << ", " 
+              << fParams.end_point.t << ")" << std::endl;
     std::swap(fParams.start_point,fParams.end_point);
     std::swap(fRoughBeginPoint,fRoughEndPoint);
     RefineStartPoints();
+    std::cout << "  Twice Refined start and end point: " << std::endl;
+    std::cout << "    s: (" << fParams.start_point.w << ", " 
+              << fParams.start_point.t << ")" << std::endl;
+    std::cout << "    e: (" << fParams.end_point.w << ", " 
+              << fParams.end_point.t << ")" << std::endl;
     std::swap(fParams.start_point,fParams.end_point);
     std::swap(fRoughBeginPoint,fRoughEndPoint);
     RefineDirection();
+    std::cout << "  Final start and end point: " << std::endl;
+    std::cout << "    s: (" << fParams.start_point.w << ", " 
+              << fParams.start_point.t << ")" << std::endl;
+    std::cout << "    e: (" << fParams.end_point.w << ", " 
+              << fParams.end_point.t << ")" << std::endl;
     return;   
   }
 
