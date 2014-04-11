@@ -49,7 +49,7 @@ namespace larlight {
     //
     //   std::cout << "Event ID: " << my_pmtfifo_v->event_id() << std::endl;
     //
-    event_cluster * my_cluster_v = (event_cluster *)(storage->get_data(DATA::DBCluster));
+    event_cluster * my_cluster_v = (event_cluster *)(storage->get_data(DATA::FuzzyCluster));
   
     event_hit * my_hit_v = (event_hit*)(storage->get_data(my_cluster_v->get_hit_type()));
    
@@ -58,7 +58,7 @@ namespace larlight {
 
  
     for(auto const clustit : *my_cluster_v) {
-      std::cout << " Clust ID " << clustit.ID() << std::endl;    
+      std::cout << " Clust ID " << clustit.ID() << " EventID " <<  my_cluster_v->event_id() << std::endl;    
 
      //auto const hit_index_v = clustit.association(my_cluster_v->get_hit_type());
         auto const hit_index_v = clustit.association(DATA::FFTHit);
@@ -72,7 +72,9 @@ namespace larlight {
         std::cout << " +++ in TestEff " << hit_vector.size() << std::endl;      
         if(hit_vector.size() < 20)   // do not bother with too small hitlists
             continue;
-        ::cluster::ClusterParamsAlgNew  fCPAlg(hit_vector);
+        ::cluster::ClusterParamsAlgNew  fCPAlg;
+	if(fCPAlg.SetHits(hit_vector) ==-1 )	
+	  continue;
         fCPAlg.GetAverages(true);
         fCPAlg.GetRoughAxis(true);
         fCPAlg.GetProfileInfo(true);
