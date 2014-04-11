@@ -84,7 +84,7 @@ chit.SetGridx(1)
 chit.SetGridy(1)
 algo = cluster.ClusterParamsExecutor()
 
-if args.argoneut != None:
+if args.argoneut:
     algo.SetArgoneutGeometry()
 
 #algo.SetUseHitBlurring(false);
@@ -125,7 +125,7 @@ while mgr.next_event():
         
     for plane in xrange(larutil.Geometry.GetME().Nplanes()):
 
-        if algo.LoadAllHits(mgr.get_data(larlight.DATA.FFTHit), plane) == -1 :
+        if algo.LoadAllHits(mgr.get_data(larlight.DATA.GausHit), plane) == -1 :
 	  continue;
 
 
