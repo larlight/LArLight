@@ -33,6 +33,14 @@ namespace cluster {
     
     /// Default constructor
     ClusterParamsExecutor();
+
+    ClusterParamsExecutor(const ClusterParamsExecutor& orig)
+      : ::cluster::ClusterParamsAlgNew::ClusterParamsAlgNew(orig),
+	hCurrentHit(nullptr),
+	hHit(),
+	_useHitBlurring(orig._useHitBlurring),
+	_blurFunction(orig._blurFunction)
+    {}
     
     /// Default destructor
     virtual ~ClusterParamsExecutor(){};

@@ -22,7 +22,6 @@ parser.add_argument("-o","--data-output",help="Output data file, if event is cha
 parser.add_argument("-a","--ana-output",help="Analysis output file")
 parser.add_argument("-n","--num-events",help="Number of events to process")
 parser.add_argument("-d","--display",help="Turn on the display to see each view before and after." )
-parser.add_argument("-A","--argoneut",action='store_true',help="Set geometry to argonuet.")
 args = parser.parse_args()
 
 if len(sys.argv) == 1:
@@ -56,6 +55,7 @@ if args.ana_output == None:
     print "\t"+args.ana_output
 
 
+
 # ana_proc = larlight.ana_processor()
 
 # if args.verbose:
@@ -84,10 +84,7 @@ chit.SetGridx(1)
 chit.SetGridy(1)
 algo = cluster.ClusterParamsExecutor()
 
-if args.argoneut:
-    algo.SetArgoneutGeometry()
-
-#algo.SetUseHitBlurring(false);
+algo.SetUseHitBlurring(false);
 
 processed_events=0
 
@@ -95,48 +92,35 @@ fGSer = larutil.GeometryUtilities.GetME()
 
 while mgr.next_event():
 
-   
+    # Get event_cluster ... std::vector<larlight::cluster>
+    cluster_v = mgr.get_data(fmwk.DATA.ShowerAngleCluster)
 
     # Get event_mctruth ... std::vector<larlight::mctruth>
     mctruth_v = mgr.get_data(fmwk.DATA.MCTruth)
 
-      # Get event_cluster ... std::vector<larlight::cluster>
-    cluster_v = mgr.get_data(fmwk.DATA.FuzzyCluster)
-
-    
-    if mctruth_v.event_id() < 153 :
-   	continue;
-    
     # Get the primary particl generator vtx position
     mct_vtx=None
     if mctruth_v and mctruth_v.size():
         if mctruth_v.size()>1:
             print "Found more than 1 MCTruth. Only use the 1st one... \n \n"
         if mctruth_v.at(0).GetParticles().at(0).PdgCode() == 11:      ## electron    
-            mct_vtx = mctruth_v.at(0).GetParticles().at(0).Trajectory().at(0).Position()
-            print "\n electron \n"
-        elif mctruth_v.at(0).GetParticles().at(0).PdgCode() == 22:    
-            trajsize= mctruth_v.at(0).GetParticles().at(0).Trajectory().size()
-            mct_vtx = mctruth_v.at(0).GetParticles().at(0).Trajectory().at(trajsize-1).Position()
-            print "\n gamma \n"
-        if mctruth_v.at(0).GetParticles().at(0).PdgCode() == 13:      ## muon    
-            mct_vtx = mctruth_v.at(0).GetParticles().at(0).Trajectory().at(0).Position()
-            print "\n muon \n"
-    #PdgCode
+	    mct_vtx = mctruth_v.at(0).GetParticles().at(0).Trajectory().at(0).Position()
+	    print "\n electron \n"
+	elif mctruth_v.at(0).GetParticles().at(0).PdgCode() == 22:    
+	    trajsize= mctruth_v.at(0).GetParticles().at(0).Trajectory().size()
+	    mct_vtx = mctruth_v.at(0).GetParticles().at(0).Trajectory().at(trajsize-1).Position()
+	    print "\n gamma \n"
+   #PdgCode
 
     if args.num_events == processed_events:
         exit()
         
-    #for plane in xrange(larutil.Geometry.GetME().Nplanes()):
+    if not cluster_v:
+        continue
 
+    print "Event:",cluster_v.event_id()
 
-        #if algo.LoadAllHits(mgr.get_data(larlight.DATA.FFTHit), plane) == -1 :
-	  #continue;
     for x in xrange(cluster_v.size()):
-
-       # if algo.LoadAllHits(mgr.get_data(larlight.DATA.GausHit), plane) == -1 :
-       #  continue;
-
 
         print "  Cluster ID:",cluster_v.at(x).ID()
         algo.LoadCluster(cluster_v.at(x),
@@ -146,13 +130,13 @@ while mgr.next_event():
         algo.GetAverages(True)
         algo.GetRoughAxis(True)
         algo.GetProfileInfo(True)
-        # algo.RefineStartPoints(True)
-        # algo.RefineDirection(True)
-        algo.RefineStartPointAndDirection()
+        algo.RefineStartPoints(True)
+        algo.RefineDirection(True)
         algo.FillPolygon()
-        algo.GetFinalSlope(True)
-        algo.Report()
-        algo.PrintFANNVector()
+
+        # algo.GetFinalSlope(True)
+        #algo.Report()
+        
         result = algo.GetParams()
 
         print "(%g,%g) => (%g,%g), plane: %g" % (result.start_point.w,
@@ -180,56 +164,30 @@ while mgr.next_event():
             my_vec[2] = mct_vtx[2]
             mcpoint=fGSer.Get2DPointProjectionCM(my_vec,result.start_point.plane)
 
-            # Example 1 & 2 should have the same return here (checked)
-            # print " Start point in w,t  (%g,%g)" % (mcpoint.w,mcpoint.t)   
+           # Example 1 & 2 should have the same return here (checked)
+	   # print " Start point in w,t  (%g,%g)" % (mcpoint.w,mcpoint.t)   
 
             mc_begin = TGraph(1)
             mc_begin.SetPoint(0,mcpoint.w,mcpoint.t)
             mc_begin.SetMarkerStyle(29)
             mc_begin.SetMarkerColor(ROOT.kRed)
             mc_begin.SetMarkerSize(3)
-        #Add black star to mark begin point and black square to mark end point
-        begin = TGraph(1)
-        end = TGraph(1)
-        begin.SetPoint(0,result.start_point.w, result.start_point.t)
-        end.SetPoint(0,result.end_point.w, result.end_point.t)
-        begin.SetLineWidth(0)
-        end.SetLineWidth(0)
+	#Add black star to mark begin point and black square to mark end point
+	begin = TGraph(1)
+	end = TGraph(1)
+	begin.SetPoint(0,result.start_point.w, result.start_point.t)
+	end.SetPoint(0,result.end_point.w, result.end_point.t)
+
         # Set Start & End point TGraph
-        begin.SetLineColor(1)
-        begin.SetMarkerStyle(29)
-        begin.SetMarkerColor(ROOT.kBlack)
+	begin.SetLineColor(1)
+	begin.SetMarkerStyle(29)
+	begin.SetMarkerColor(ROOT.kBlack)
         begin.SetMarkerSize(3)
-        end.SetLineColor(1)
-        end.SetMarkerStyle(21)
-        end.SetMarkerColor(ROOT.kBlack)
+	end.SetLineColor(1)
+	end.SetMarkerStyle(21)
+	end.SetMarkerColor(ROOT.kBlack)
         end.SetMarkerSize(2)
 
-        func=TF1("nf","[1]*x+[0]",result.start_point.w-50,result.end_point.w+50);
-        func.SetParameter(0,algo.RoughIntercept());     
-        func.SetParameter(1,algo.RoughSlope());   
-        func.SetLineWidth(1);   
-        if result.start_point.w > result.end_point.w:
-            func.SetRange(result.end_point.w-50,result.start_point.w+50);
-     
-        dwire=30;
-        dtime=30*TMath.Tan(result.angle_2d*TMath.Pi()/180);
-        if result.angle_2d > -90 and  result.angle_2d <0 :
-            dwire=30;
-            dtime=30*TMath.Tan(result.angle_2d*TMath.Pi()/180);
-        elif result.angle_2d < -90. and  result.angle_2d > -180 :
-            dwire=-30;
-            dtime=30*TMath.Tan(-1*result.angle_2d*TMath.Pi()/180); 
-        elif result.angle_2d > 90. and  result.angle_2d < 180 :
-            dwire=-30;
-            dtime=30*TMath.Tan(-1*result.angle_2d*TMath.Pi()/180);     
-         
-         
-        angleline=TLine(result.start_point.w,result.start_point.t,result.start_point.w+dwire,result.start_point.t+dtime);
-        angleline.SetLineColor(kBlack);
-        angleline.SetLineWidth(3);
-         
-        # print "testing slopes: %g   from angle: %g" % ( algo.RoughSlope(),TMath.Tan(result.angle_2d*TMath.Pi()/180));
         # Set Polygon
         gPolygon = None
         if result.container_polygon.size() > 0:
@@ -238,7 +196,7 @@ while mgr.next_event():
                 gPolygon.SetPoint(x,
                                   result.container_polygon.at(x).w,
                                   result.container_polygon.at(x).t)
-                # print result.container_polygon.at(x).w, result.container_polygon.at(x).t
+                print result.container_polygon.at(x).w, result.container_polygon.at(x).t
 
             gPolygon.SetPoint(result.container_polygon.size(),
                               result.container_polygon.at(0).w,
@@ -252,23 +210,12 @@ while mgr.next_event():
         chit.cd()
         hHits = algo.GetHitView()
         hHits.Draw("COLZ")
-        begin.Draw("P same")
-        end.Draw("P same")
-        func.Draw("same");
-        angleline.Draw("same");
-
-        leg = TLegend(.7,.7,.95,.95)
-        leg.AddEntry(begin, "Start Point (reco)","P")
-        leg.AddEntry(end, "End Point (reco)","P")
-        leg.AddEntry(angleline, "2D Angle")
-        
-
+	begin.Draw("P same")
+	end.Draw("P same")
         if(mc_begin):
-            leg.AddEntry(mc_begin, "Start Point (mc)","P")
             mc_begin.Draw("P same")
         if(gPolygon):
             gPolygon.Draw("PL same")
-        leg.Draw("same")
         # Update canvas
         chit.Update()
         sys.stdin.readline()

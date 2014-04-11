@@ -15,7 +15,7 @@ INCFLAGS += -I$(LARLIGHT_CORE_DIR)/Base
 INCFLAGS += -I$(LARLIGHT_CORE_DIR)/DataFormat
 INCFLAGS += -I$(LARLIGHT_CORE_DIR)/LArUtil
 INCFLAGS += -I$(LARLIGHT_CORE_DIR)/Analysis
-
+INCFLAGS += -I$(USER_DEV_DIR)/ClusterRecoUtil
 
 # platform-specific options
 OSNAME          = $(shell uname -s)
