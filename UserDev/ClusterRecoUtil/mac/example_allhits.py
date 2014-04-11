@@ -22,6 +22,7 @@ parser.add_argument("-o","--data-output",help="Output data file, if event is cha
 parser.add_argument("-a","--ana-output",help="Analysis output file")
 parser.add_argument("-n","--num-events",help="Number of events to process")
 parser.add_argument("-d","--display",help="Turn on the display to see each view before and after." )
+parser.add_argument("-A","--argoneut",action='store_true',help="Set geometry to argonuet.")
 args = parser.parse_args()
 
 if len(sys.argv) == 1:
@@ -83,6 +84,9 @@ chit.SetGridx(1)
 chit.SetGridy(1)
 algo = cluster.ClusterParamsExecutor()
 
+if args.argoneut != None:
+    algo.SetArgoneutGeometry()
+
 #algo.SetUseHitBlurring(false);
 
 processed_events=0
@@ -106,11 +110,14 @@ while mgr.next_event():
             print "Found more than 1 MCTruth. Only use the 1st one... \n \n"
         if mctruth_v.at(0).GetParticles().at(0).PdgCode() == 11:      ## electron    
             mct_vtx = mctruth_v.at(0).GetParticles().at(0).Trajectory().at(0).Position()
-        print "\n electron \n"
-    elif mctruth_v.at(0).GetParticles().at(0).PdgCode() == 22:    
-        trajsize= mctruth_v.at(0).GetParticles().at(0).Trajectory().size()
-        mct_vtx = mctruth_v.at(0).GetParticles().at(0).Trajectory().at(trajsize-1).Position()
-        print "\n gamma \n"
+            print "\n electron \n"
+        elif mctruth_v.at(0).GetParticles().at(0).PdgCode() == 22:    
+            trajsize= mctruth_v.at(0).GetParticles().at(0).Trajectory().size()
+            mct_vtx = mctruth_v.at(0).GetParticles().at(0).Trajectory().at(trajsize-1).Position()
+            print "\n gamma \n"
+        if mctruth_v.at(0).GetParticles().at(0).PdgCode() == 13:      ## muon    
+            mct_vtx = mctruth_v.at(0).GetParticles().at(0).Trajectory().at(0).Position()
+            print "\n muon \n"
     #PdgCode
 
     if args.num_events == processed_events:
@@ -120,6 +127,7 @@ while mgr.next_event():
 
         if algo.LoadAllHits(mgr.get_data(larlight.DATA.FFTHit), plane) == -1 :
 	  continue;
+
 
         # algo.FillParams(True,True,True,True,True)
         algo.GetAverages(True)
