@@ -104,8 +104,8 @@ while mgr.next_event():
     cluster_v = mgr.get_data(fmwk.DATA.FuzzyCluster)
 
     
-    if mctruth_v.event_id() < 1048 :
-   	continue;
+  #  if cluster_v.event_id() != 280 or cluster_v.subrun() != 171 :
+  # 	continue;
     
     # Get the primary particl generator vtx position
     mct_vtx=None
@@ -127,22 +127,23 @@ while mgr.next_event():
     if args.num_events == processed_events:
         exit()
         
-    #for plane in xrange(larutil.Geometry.GetME().Nplanes()):
-
-
-        #if algo.LoadAllHits(mgr.get_data(larlight.DATA.FFTHit), plane) == -1 :
-	  #continue;
-    #for x in xrange(cluster_v.size()):
+    for plane in xrange(larutil.Geometry.GetME().Nplanes()):
 
         if algo.LoadAllHits(mgr.get_data(larlight.DATA.GausHit), plane) == -1 :
-         continue;
+	    continue;
 
 
-       # print "  Cluster ID:",cluster_v.at(x).ID()
+     #   if algo.LoadAllHits(mgr.get_data(larlight.DATA.FFTHit), plane) == -1 :
+	#  continue;
+    #for x in xrange(cluster_v.size()):
+
+        
+
+       # print "  Cluster ID:",cluster_v.at(x).ID()," Event ID ", 
        # print " return from", algo.LoadCluster(cluster_v.at(x),
         #                 mgr.get_data(cluster_v.get_hit_type()));
-       # if algo.LoadCluster(cluster_v.at(x),
-        #                 mgr.get_data(cluster_v.get_hit_type())) == -1 :
+        #if algo.LoadCluster(cluster_v.at(x),
+         #                mgr.get_data(cluster_v.get_hit_type())) == -1 :
 	 #     continue;		     
 
         # algo.FillParams(True,True,True,True,True)

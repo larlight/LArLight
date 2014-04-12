@@ -316,7 +316,6 @@ namespace cluster{
         sumtime+=hit.t;
         sumwiretime+=hit.w * hit.t;
         sumwirewire+=pow(hit.w,2);  
-	std::cout << " above average charge " <<  hit . charge << " " << hit.w<<","<<hit.t <<"\n";
       }//for high charge
     }//For hh loop
 
@@ -326,8 +325,8 @@ namespace cluster{
     fParams.N_Hits_HC = ncw;
     //Looking for the slope and intercept of the line above avg_charge hits
 
-    std::cout << " ncw, and parentheses " << ncw << " " << (ncw*sumwiretime- sumwire*sumtime) << " " <<(ncw*sumwirewire-sumwire*sumwire) << std::endl;
-    if((ncw*sumwirewire-sumwire*sumwire))
+   // std::cout << " ncw, and parentheses " << ncw << " " << (ncw*sumwiretime- sumwire*sumtime) << " " <<(ncw*sumwirewire-sumwire*sumwire) << std::endl;
+    if((ncw*sumwirewire-sumwire*sumwire) > 0.00001)
       fRough2DSlope= (ncw*sumwiretime- sumwire*sumtime)/(ncw*sumwirewire-sumwire*sumwire);//slope for cw
     else
       fRough2DSlope=999;
@@ -388,7 +387,7 @@ namespace cluster{
     // of the charge weight to help refine the start/end 
     // points and have a first guess of direction
 
-    std::cout << " inv_2d_slope " << inv_2d_slope << std::endl;
+    //std::cout << " inv_2d_slope " << inv_2d_slope << std::endl;
     
     for(auto& hit : fHitVector)
     {
@@ -464,17 +463,18 @@ namespace cluster{
       fGSer->GetPointOnLine(fRough2DSlope,fRough2DIntercept,&ptemplow,LowOnlinePoint);
     }
     
-    std::cout << " extreme intercepts: low: " << InterLow 
-              << " " << InterHigh << std::endl;
-    std::cout << " extreme intercepts: side: " << fInterLow_side 
-              << " " << fInterHigh_side << std::endl;
-    std::cout << "axis + intercept "  << fRough2DSlope << " " 
-              << fRough2DIntercept << std::endl;
-    
+//     std::cout << " extreme intercepts: low: " << InterLow 
+//               << " " << InterHigh << std::endl;
+//     std::cout << " extreme intercepts: side: " << fInterLow_side 
+//               << " " << fInterHigh_side << std::endl;
+//     std::cout << "axis + intercept "  << fRough2DSlope << " " 
+//               << fRough2DIntercept << std::endl;
+//     
     std::cout << " Low online point: " << LowOnlinePoint.w << ", " << LowOnlinePoint.t 
               << " High: " << HighOnlinePoint.w << ", " << HighOnlinePoint.t << std::endl; 
 
- //   std::cout << " max_min ortdist" << max_ortdist << " " << min_ortdist << std::endl;	      
+    //std::cout << " max_min ortdist" << max_ortdist << " " << min_ortdist << std::endl;	      
+    //std::cout << " hit list size " << fHitVector.size() << std::endl;
     //define BeginOnlinePoint as the one with lower wire number (for now), adjust intercepts accordingly	      
     if(HighOnlinePoint.w >= LowOnlinePoint.w)
     {
@@ -678,7 +678,7 @@ namespace cluster{
   if(inv_2d_slope!=-999999)   //almost all cases
      {	   
     double ort_intercept_begin=fBeginIntercept+(fEndIntercept-fBeginIntercept)/fProfileNbins*startbin;
-    std::cout << " ort_intercept_begin: " << ort_intercept_begin << std::endl;
+    //std::cout << " ort_intercept_begin: " << ort_intercept_begin << std::endl;
     fGSer->GetPointOnLineWSlopes(fRough2DSlope,
                                  fRough2DIntercept,
                                  ort_intercept_begin,
@@ -687,7 +687,7 @@ namespace cluster{
     double ort_intercept_end=fBeginIntercept+(fEndIntercept-fBeginIntercept)/fProfileNbins*endbin;
     fRoughBeginPoint.plane=fPlane;
     
-    std::cout << " ort_intercept_end: " << ort_intercept_end << std::endl;
+    //std::cout << " ort_intercept_end: " << ort_intercept_end << std::endl;
     fGSer->GetPointOnLineWSlopes(fRough2DSlope,
                                  fRough2DIntercept,
                                  ort_intercept_end,
@@ -697,14 +697,14 @@ namespace cluster{
    else
    {
     double wire_begin=WireLow+(WireHigh-WireLow)/fProfileNbins*startbin;
-    std::cout << " wire_begin: " << wire_begin << std::endl;
+    //std::cout << " wire_begin: " << wire_begin << std::endl;
    
     larutil::PxPoint ptemphigh(fPlane,wire_begin,(fInterHigh_side+fInterLow_side)/2);
     fGSer->GetPointOnLine(fRough2DSlope,fRough2DIntercept,&ptemphigh,fRoughBeginPoint);
     fRoughBeginPoint.plane=fPlane;
     
     double wire_end=WireLow+(WireHigh-WireLow)/fProfileNbins*endbin;
-    std::cout << " wire_end: " << wire_end << std::endl;
+    //std::cout << " wire_end: " << wire_end << std::endl;
       
     larutil::PxPoint ptemplow(fPlane,wire_end,(fInterHigh_side+fInterLow_side)/2);
     fGSer->GetPointOnLine(fRough2DSlope,fRough2DIntercept,&ptemplow,fRoughEndPoint);
@@ -775,7 +775,6 @@ namespace cluster{
     // Will need to feed in the set of hits that we want. 
     //	const std::vector<larutil::PxHit*> whole;
     std::vector <const larutil::PxHit*> subhit;
-   std::cout << " in Refine Start Points " << std::endl;
     double linearlimit=8;
     double ortlimit=12;
     double lineslopetest(fRough2DSlope);
@@ -801,7 +800,6 @@ namespace cluster{
       return;
     }
     
-    std::cout << " subhit size:: " << subhit.size() << std::endl;
     double avgwire= averageHit.w;
     double avgtime= averageHit.t;
     //vertex in tilda-space pair(x-til,y-til)
@@ -862,7 +860,6 @@ namespace cluster{
     //    subhit=returnhits;
     
     //==============================================================================
-    
     //Now we need to do the transformation into "tilda-space"
     for(unsigned int a=0; a<subhit.size();a++){
       for(unsigned int b=a+1;b<subhit.size();b++){
@@ -886,6 +883,20 @@ namespace cluster{
       vs.push_back(vd);
       vd=0.0;
     }//for z loop
+    
+    if(vs.size()==0)   //al hits on same wire?!
+    {
+       std::cout<<"vertil list is empty. all subhits are on the same wire?"<<std::endl;
+      // GetOpeningAngle();
+      fParams.start_point = fRoughBeginPoint;
+      fParams.end_point   = fRoughEndPoint;
+      // fRoughEndPoint
+      // fRoughEndPoint
+      // and use them to get the axis
+      
+      fFinishedRefineStartPoints = true;
+      return;
+    }
     //need to find the min of the distance of vertex in tilda-space
     //this will get me the area where things are most linear
     int minvs= std::min_element(vs.begin(),vs.end())-vs.begin();
@@ -906,7 +917,6 @@ namespace cluster{
         ghits.push_back(subhit.at(a));
       }//if between strip
     }//for a loop
-    
     //=======================Do stuff with the good hits============================
     
     //of these small set of hits just fit a simple line. 
@@ -934,13 +944,13 @@ namespace cluster{
         startpoint.charge = ghits.at(g)->charge;
       }
     }//for ghits loop
-    
     //This can be the new start point
     // std::cout<<"Here Kazu"<<std::endl;
     // std::cout<<"Ryan This is the new SP ("<<startpoint.w<<" , "<<startpoint.t<<")"<<std::endl;
     // double gslope=(n* gwiretime- gwire*gtime)/(n*gwirewire -gwire*gwire);
     // double gcept= gtime/n -gslope*(gwire/n);
     
+    //should this be here? Id argue this might be done once outside.
     fParams.length=fGSer->Get2DDistance((larutil::PxPoint *)&startpoint,&endHit);
     if(fParams.length)
       fParams.hit_density_1D=fParams.N_Hits/fParams.length;

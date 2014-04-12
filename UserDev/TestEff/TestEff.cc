@@ -58,7 +58,7 @@ namespace larlight {
 
  
     for(auto const clustit : *my_cluster_v) {
-      std::cout << " Clust ID " << clustit.ID() << " EventID " <<  my_cluster_v->event_id() << std::endl;    
+      std::cout << " Clust ID " << clustit.ID() << " Run: " << mu_cluster_v->run() << " SubRunID " << my_cluster_v->subrun() << " EventID " <<  my_cluster_v->event_id() << " " << my_cluster_v << std::endl;    
 
      //auto const hit_index_v = clustit.association(my_cluster_v->get_hit_type());
         auto const hit_index_v = clustit.association(DATA::FFTHit);
@@ -71,15 +71,18 @@ namespace larlight {
         }
         std::cout << " +++ in TestEff " << hit_vector.size() << std::endl;      
         if(hit_vector.size() < 20)   // do not bother with too small hitlists
-            continue;
+	    {
+	     continue;
+	    }
         ::cluster::ClusterParamsAlgNew  fCPAlg;
 	if(fCPAlg.SetHits(hit_vector) ==-1 )	
 	  continue;
         fCPAlg.GetAverages(true);
         fCPAlg.GetRoughAxis(true);
         fCPAlg.GetProfileInfo(true);
-        fCPAlg.RefineDirection(true);
-        fCPAlg.RefineStartPoints(true);
+	fCPAlg.RefineStartPointAndDirection(true);
+        //fCPAlg.RefineDirection(true);
+        //fCPAlg.RefineStartPoints(true);
         //fCPAlg.FillPolygon()
         fCPAlg.GetFinalSlope(true);
         fCPAlg.Report();
