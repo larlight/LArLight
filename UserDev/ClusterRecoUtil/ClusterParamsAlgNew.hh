@@ -20,6 +20,7 @@
 #include "PxUtils.h"
 #include "ClusterParams.hh"
 #include "RecoUtilException.hh"
+#include "LArUtilManager.hh"
 
 #include <vector>
 
@@ -34,24 +35,74 @@ namespace cluster {
 
   public:
 
+    /// Default constructor
     ClusterParamsAlgNew();
-    ~ClusterParamsAlgNew();
 
+    /// Alternative constructor with larlight's hits
     ClusterParamsAlgNew(const std::vector<const larlight::hit*>&);
 
+    /// Alternative constructor with larutil::PxHit vector
     ClusterParamsAlgNew(const std::vector<larutil::PxHit>&);
+
+    /// Explicit definition of a copy constructor
+    ClusterParamsAlgNew(const ClusterParamsAlgNew& orig)
+      : fGSer(orig.fGSer),
+	fPrincipal(2,"D"),
+	fHitVector(orig.fHitVector),
+	verbose(orig.verbose),
+	fChargeCutoffThreshold(orig.fChargeCutoffThreshold),
+	fPlane(orig.fPlane),
+	fQMinRefDir(orig.fQMinRefDir),
+	fChargeProfile(orig.fChargeProfile),
+	fCoarseChargeProfile(orig.fCoarseChargeProfile),
+	fCoarseNbins(orig.fCoarseNbins),
+	fProfileNbins(orig.fProfileNbins),
+	fProfileMaximumBin(orig.fProfileMaximumBin),
+	fProfileIntegralForward(orig.fProfileIntegralForward),
+        fProfileIntegralBackward(orig.fProfileIntegralBackward),
+        fProjectedLength(orig.fProjectedLength),
+        fBeginIntercept(orig.fBeginIntercept),
+        fEndIntercept(orig.fEndIntercept),
+        fInterHigh_side(orig.fInterHigh_side),
+        fInterLow_side(orig.fInterLow_side),
+        fFinishedGetAverages(orig.fFinishedGetAverages),
+        fFinishedGetRoughAxis(orig.fFinishedGetRoughAxis),
+        fFinishedGetProfileInfo(orig.fFinishedGetProfileInfo),
+        fFinishedRefineStartPoints(orig.fFinishedRefineStartPoints),
+        fFinishedRefineDirection(orig.fFinishedRefineDirection),
+        fFinishedGetFinalSlope(orig.fFinishedGetFinalSlope),
+        fRough2DSlope(orig.fRough2DSlope),
+        fRough2DIntercept(orig.fRough2DIntercept),
+        fRoughBeginPoint(orig.fRoughBeginPoint),
+        fRoughEndPoint(orig.fRoughEndPoint),
+        fParams(orig.fParams)
+    {
+      if(fFinishedGetAverages) {
+	for(auto& hit : fHitVector){
+	  double data[2];
+	  data[0] = hit.w;
+	  data[1] = hit.t;
+	  fPrincipal.AddRow(data);
+	}
+	fPrincipal.MakePrincipals();
+      }
+    }
+
+    ~ClusterParamsAlgNew(){};
 
     void Initialize();
 
     //void SetHits(const std::vector<larutil::PxHit*>&);
     
-    void SetHits(const std::vector<const larlight::hit*> &);
+    int SetHits(const std::vector<const larlight::hit*> &);
 
-    void SetHits(const std::vector<larutil::PxHit> &);
+    int SetHits(const std::vector<larutil::PxHit> &);
 
     void SetRefineDirectionQMin(double qmin){ fQMinRefDir = qmin; }
 
     void SetVerbose(){ verbose = true;}
+
+    void SetArgoneutGeometry();
 
     void Report();
 
@@ -60,9 +111,10 @@ namespace cluster {
      * This function uses the data from cluster_params but packages it
      * up in a different way, and so is inappropriate to include in 
      * clusterParams.hh.   That's why it's here.
-     * @param  data  takes a reference to a vector, templated to allow double or float
+     * @param  data  takes a reference to a vector< float>
      */
     void  GetFANNVector(std::vector<float> & data);
+    // std::vector<float> & GetFANNVector();
 
     /**
      * For debugging purposes, prints the result of GetFANNVector
@@ -86,11 +138,11 @@ namespace cluster {
     void FillParams(bool override_DoGetAverages      =false,
                     bool override_DoGetRoughAxis     =false,
                     bool override_DoGetProfileInfo   =false,
-                    bool override_DoRefineStartPoints=false,
-		    bool override_DoRefineDirection  =false,
+                    bool override_DoRefineStartPointsAndDirection=false,
+            		    // bool override_DoRefineDirection  =false,
                     bool override_DoGetFinalSlope    =false );
 
-    const cluster_params& GetParams()
+    const cluster_params& GetParams() const
     { return fParams;}
 
     /**
@@ -152,7 +204,7 @@ namespace cluster {
 
     void RefineDirection(bool override=false);
 
-    void RefineStartPointAndDirection();
+    void RefineStartPointAndDirection(bool override=false);
 
     void FillPolygon();
 
@@ -168,7 +220,7 @@ namespace cluster {
   protected:
     
     larutil::GeometryUtilities  *fGSer;
-    TPrincipal *fPrincipal;
+    TPrincipal fPrincipal;
 
     /**
        This vector holds the pointer to hits. 
@@ -181,7 +233,7 @@ namespace cluster {
     bool verbose;
 
     //settable parameters:
-    double fChargeCutoffThreshold[3]; 
+    std::vector<double> fChargeCutoffThreshold;
     int fPlane;
 
     //this is required in RefineDirection
@@ -211,7 +263,7 @@ namespace cluster {
     bool fFinishedRefineStartPoints; 
     bool fFinishedRefineDirection;   
     bool fFinishedGetFinalSlope;     
-
+    bool fFinishedRefineStartPointAndDirection;
 
     double fRough2DSlope;        // slope 
     double fRough2DIntercept;    // slope 

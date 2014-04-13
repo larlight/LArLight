@@ -33,14 +33,22 @@ namespace cluster {
     
     /// Default constructor
     ClusterParamsExecutor();
+
+    ClusterParamsExecutor(const ClusterParamsExecutor& orig)
+      : ::cluster::ClusterParamsAlgNew::ClusterParamsAlgNew(orig),
+	hCurrentHit(nullptr),
+	hHit(),
+	_useHitBlurring(orig._useHitBlurring),
+	_blurFunction(orig._blurFunction)
+    {}
     
     /// Default destructor
     virtual ~ClusterParamsExecutor(){};
     
-    void LoadCluster(const larlight::cluster &i_cluster,
+    int LoadCluster(const larlight::cluster &i_cluster,
 		     const larlight::event_hit *hits);
 
-    void LoadAllHits(const larlight::event_hit *hits, const UChar_t plane_id);
+    int LoadAllHits(const larlight::event_hit *hits, const UChar_t plane_id);
 
     void SetUseHitBlurring(bool flag) { _useHitBlurring = flag; }
 
@@ -49,7 +57,7 @@ namespace cluster {
     
   protected:
 
-    void Execute(Int_t event_id, Int_t cluster_id, UChar_t plane_id);
+    int Execute(Int_t event_id, Int_t cluster_id, UChar_t plane_id);
     std::vector<const larlight::hit*> cluster_hits;
     TH2D* hCurrentHit;
     std::vector<TH2D*> hHit;

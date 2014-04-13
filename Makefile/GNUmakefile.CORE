@@ -19,7 +19,7 @@ endif
 # root class dictionary
 $(DICT).cc: $(HEADERS) LinkDef.h
 	@echo '<< generating CINT >>'
-	rootcint -f $(DICT).cc -c $(INCFLAGS) $(HEADERS) LinkDef.h
+	rootcint -f $(DICT).cc -c $(CINTFLAGS) $(INCFLAGS) $(HEADERS) LinkDef.h
 
 # default rule for making .o files from .cc files
 %.o: %.cc

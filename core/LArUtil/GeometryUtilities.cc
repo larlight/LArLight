@@ -1154,13 +1154,13 @@ namespace larutil{
     double qintegral=0;
     std::vector<const larutil::PxHit*> ordered_hits;
     ordered_hits.reserve(hitlist.size());
-    for(auto hiter = hitmap.begin();
-	hiter!=hitmap.end();
+    for(auto hiter = hitmap.rbegin();
+	qintegral < qtotal*0.95;
 	++hiter) {
 
       qintegral += (*hiter).first;
       ordered_hits.push_back((*hiter).second);
-      if(qintegral > 0.95*qtotal) break; 
+
     }
 
     // Define container to hold found polygon corner PxHit index & distance
@@ -1227,7 +1227,7 @@ namespace larutil{
 	edges.at(3).w = ordered_hits.at(index)->w;
       }
     }
-
+    /*
     std::cout
       << Form("Corner points: (%g,%g) (%g,%g) (%g,%g) (%g,%g)",
 	      edges.at(0).w, edges.at(0).t,
@@ -1235,7 +1235,7 @@ namespace larutil{
 	      edges.at(2).w, edges.at(2).t,
 	      edges.at(3).w, edges.at(3).t)
       <<std::endl;
-
+    */
     for(size_t index = 0; index<ordered_hits.size(); ++index) {
 
       double dist = 0;
@@ -1273,12 +1273,12 @@ namespace larutil{
     std::set<size_t> unique_index;
     std::vector<size_t> candidate_polygon;
     candidate_polygon.reserve(9);
-    std::cout << "Original polygon: " << std::endl;
+    //    std::cout << "Original polygon: " << std::endl;
     for(auto &index : hit_index) {
       
       if(unique_index.find(index) == unique_index.end()) {
 	//	hitlistlocal.push_back((const larutil::PxHit*)(ordered_hits.at(index)));
-	std::cout << "(" << ordered_hits.at(index)->w << ", " << ordered_hits.at(index)->t << ")" << std::endl;
+	//std::cout << "(" << ordered_hits.at(index)->w << ", " << ordered_hits.at(index)->t << ")" << std::endl;
 	unique_index.insert(index);
 	candidate_polygon.push_back(index);
       }
@@ -1336,7 +1336,7 @@ namespace larutil{
 	}
       }//second loop
     }//first loop
-    std::cout << std::endl;
+    //std::cout << std::endl;
     return candidate_polygon;
   }
   

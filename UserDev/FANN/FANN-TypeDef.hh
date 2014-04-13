@@ -6,13 +6,15 @@
 #define FANN_TYPEDEF_HH
 
 // Header files included here
-#include "FANN.hh"
 #include "TrainingModule.hh"
 
 // Class forward declaration here
-class FANN;
+
 namespace cluster {
 class TrainingModule;
+}
+namespace FANN{
+class neural_net;
 }
 //ADD_EMPTY_CLASS ... do not change this comment line
 
