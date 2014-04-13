@@ -10,7 +10,14 @@ larlight::ana_processor proc;
 proc.set_io_mode(larlight::storage_manager::READ);
 proc.set_input_rootdir("scanner");
 proc.set_ana_output_file("ana.root");
-proc.add_input_file("/data/argoneutnu/larlight_filtered_full_nu.root");    //mac/larlight_tracks.root");
+
+
+
+proc.add_input_file("/data/argoneutnu/larlight_showers.root");    //mac/larlight_tracks.root");
+//proc.add_input_file("testing.root") ; //~/data/combined_00.root");    //mac/larlight_tracks.root");
+
+//proc.add_input_file("testing.root") ; //~/data/combined_00.root");    //mac/larlight_tracks.root");
+
 //proc.add_input_file("../../combined_02.root");    //mac/larlight_tracks.root");
 //proc.set_verbosity(larlight::MSG::DEBUG);
 proc.add_process(new larlight::TestEff);

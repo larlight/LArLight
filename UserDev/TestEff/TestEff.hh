@@ -55,9 +55,36 @@ namespace larlight {
 
     ::cluster::ClusterParamsAlgNew  fCPAlg; 
 
+    larutil::GeometryUtilities  *fGSer;
     /// Example histogram to be saved in analysis root file (separate from data product)
     TH1D* h1;
-      
+   
+    TH1D* sumCharge;
+    TH1D* meanCharge;
+    TH1D* meanX;
+    TH1D* meanY; 
+    TH1D* rmsX;
+    TH1D* rmsY;
+    TH1D* chargeWgtX; 
+    TH1D* chargeWgtY;
+    TH1D* clusterAngle2d; 
+    TH1D* angle2d;
+    TH1D* openAngle, *openAngleChargeWgt;
+    TH1D* closeAngle, *closeAngleChargeWgt; 
+   
+    TH1D* hitDensity1d ;
+    TH1D* hitDensity2d ;
+    TH1D* modifiedHitDens ;
+    
+
+
+    TH1D *showerness, *trackness ;
+
+    TH1D *recostartwire, *recostarttime;
+    TH1D *recostartwirenodir, *recostarttimenodir;
+    
+   TH1D *reco2Dangle, *reco2DangleGood;
+   TH1D *recoDir;
   };
 }
 #endif
