@@ -725,8 +725,7 @@ namespace larutil{
     Double_t invslope=0;
   
     if(slope)	
-
-    invslope=-1./slope;
+      invslope=-1./slope;
 
 
     // invslope *= fWireTimetoCmCm * fWireTimetoCmCm;
@@ -929,7 +928,8 @@ namespace larutil{
      
    }
 
-  PxPoint GeometryUtilities::Get2DPointProjectionCM(Double_t *xyz, Int_t plane) const{
+      
+  PxPoint GeometryUtilities::Get2DPointProjectionCM(double *xyz, int plane) const{
   
     PxPoint pN(0,0,0);
     
@@ -949,6 +949,13 @@ namespace larutil{
      
    }
   
+  
+  
+  PxPoint GeometryUtilities::Get2DPointProjectionCM(TLorentzVector *xyz, int plane) const{
+   double xyznew[3]={(*xyz)[0],(*xyz)[1],(*xyz)[2]}; 
+    
+   return  Get2DPointProjectionCM(xyznew,plane);
+  }
   
   
 

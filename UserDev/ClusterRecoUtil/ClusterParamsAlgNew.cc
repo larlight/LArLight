@@ -1354,6 +1354,9 @@ namespace cluster{
               << fParams.start_point.t << ")" << std::endl;
     std::cout << "    e: (" << fParams.end_point.w << ", " 
               << fParams.end_point.t << ")" << std::endl;
+
+    fParams.direction = (fParams.start_point.w < fParams.end_point.w)	 ? 1 : -1;     
+	      
     return;   
   }
 
