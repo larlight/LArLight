@@ -86,7 +86,6 @@ namespace larlight {
     
     
 
-
   //  if(!h7) h7 = new TH1D("h7","Opening angle, charge weighted",10,0,2.0);
  //   else h7->Reset();
   //  if(!h8) h8 = new TH1D("h8","Opening angle, charge weighted",10,0,2.0);
@@ -120,6 +119,7 @@ namespace larlight {
     //
 
 
+
     
     /// /////////////////////////getting the MCTruth info out, if exists
     
@@ -151,6 +151,7 @@ namespace larlight {
     /// /////////////////////////////////////////////// End Getting MC Truth info out.	    
     
     event_cluster * my_cluster_v = (event_cluster *)(storage->get_data(DATA::FuzzyCluster));
+
 
 
   
@@ -280,6 +281,7 @@ namespace larlight {
 
      } // end loop on clusters
 
+
   
   
     return true;
@@ -294,6 +296,7 @@ namespace larlight {
     //
     // Say you made a histogram pointer meanX to store. You can do this:
     //
+
     
     sumCharge->Draw();
     meanCharge->Draw();
