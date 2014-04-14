@@ -338,17 +338,22 @@ namespace larlight {
 	  // First of 2 channel header words. Record the values.
 
 	  // This gives upper 8 bits of 20-bit readout_sample_number number
-	  _ch_data.set_readout_sample_number( (word & 0x1f)<<12 );       
+	  _ch_data.set_readout_sample_number( (word & 0x1f)<<12 );
 
-	  // Lower 3 of 8 bits is the channel frame ID
-	  _ch_data.set_readout_frame_number( ((word & 0xff)>>5) +
-					     (((_event_data->event_frame_number())>>3)<<3) ); 
-	  
 	  // Correct channel frame id roll-over w.r.t. event frame id
-	  _ch_data.set_readout_frame_number(round_diff(_event_data->event_frame_number(),
-						       _ch_data.readout_frame_number(),
-						       0x7));
-	  _channel_header_count++;
+	  _ch_data.set_readout_frame_number(roll_over(_event_data->event_frame_number(),
+						      ((word & 0xff)>>5),
+						      3)
+					    );
+	  // Check if the frame is -1 to +2 w.r.t. event frame number
+	  int diff = ((int)(_ch_data.readout_frame_number())) - ((int)(_event_data->event_frame_number()));
+	  if(diff < -1 || diff > 2) {
+	    print(MSG::ERROR,__FUNCTION__,Form("Found event frame %d and discriminator frame %d (difference too big!)",
+					       _event_data->event_frame_number(),
+					       _ch_data.readout_frame_number()));
+	    status = false;
+	  }
+	  _channel_header_count++; 
 	}else if(last_word_class==FEM::CHANNEL_WORD) {
 	  // Second of 2 channel header words. Record the values & inspect them.
 	  _ch_data.set_readout_sample_number(_ch_data.readout_sample_number_64MHz() + (word & 0xfff)); // This gives lower 12 bits of 20-bit readout_sample_number number

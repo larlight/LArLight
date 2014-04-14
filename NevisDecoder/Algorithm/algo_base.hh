@@ -18,7 +18,7 @@
 #include "storage_manager.hh"
 #include <sstream>
 #include <deque>
-
+#include "decode_algo_exception.hh"
 namespace larlight {
 
   /**

@@ -6,6 +6,7 @@
 #define ALGORITHM_TYPEDEF_HH
 
 // Header files included here
+#include "decode_algo_exception.hh"
 #include "algo_base.hh"
 #include "algo_slow_readout_decoder.hh"
 #include "algo_xmit_decoder.hh"
@@ -17,6 +18,7 @@
 
 // Class forward declaration here
 namespace larlight{
+  class decode_algo_exception;
   class algo_slow_readout_decoder;
   class algo_xmit_decoder;
   class algo_trig_decoder;
