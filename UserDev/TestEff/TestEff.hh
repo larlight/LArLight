@@ -76,11 +76,32 @@ namespace larlight {
     TH1D* hitDensity2d ;
     TH1D* modifiedHitDens ;
     
-
-
-
+    TH1D* openAngle_sh, *openAngleChargeWgt_sh;
+    TH1D* closeAngle_sh, *closeAngleChargeWgt_sh; 
+   
+    TH1D* hitDensity1d_sh ;
+    TH1D* hitDensity2d_sh ;
+    TH1D* modifiedHitDens_sh ;
+    TH1D *multihitw_sh;
+    TH1D *eigenvalue_principal_sh;
+    TH1D *length_sh;
+    TH1D *width_sh;
+    
+    TH1D* openAngle_tr, *openAngleChargeWgt_tr;
+    TH1D* closeAngle_tr, *closeAngleChargeWgt_tr; 
+   
+    TH1D* hitDensity1d_tr ;
+    TH1D* hitDensity2d_tr ;
+    TH1D* modifiedHitDens_tr ;
+    TH1D *multihitw_tr;
+    TH1D *eigenvalue_principal_tr;
+    TH1D *length_tr;
+    TH1D *width_tr;
+    
+    
     TH1D *showerness, *trackness ;
 
+    /// mc reco quality plots
     TH1D *recostartwire, *recostarttime;
     TH1D *recostartwirenodir, *recostarttimenodir;
     
