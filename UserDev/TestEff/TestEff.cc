@@ -198,34 +198,46 @@ namespace larlight {
       {
         if ( mctruth_v->size()>1 )  // this needs to be changed
               std::cout <<  "Found more than 1 MCTruth. \n " << std::endl;
+
+	//Test selection efficiency
         for(int i=0;i<=mctruth_v->size();i++){
+
             if (mctruth_v->at(i).GetParticles().at(i).PdgCode() == 11)  {    // electron
-	        if (i==0)	    
+	        if (i==0){	    
 	       	     mct_vtx = mctruth_v->at(i).GetParticles().at(i).Trajectory().at(i).Position();
+       	             is_mc_shower=true;
+		 }
        	        std::cout << "\n electron " << std::endl; 
-       	        is_mc_shower=true;
        	      }
-	    else if ( mctruth_v->at(i).GetParticles().at(i).PdgCode() == 22 )   { 
+	    else if ( mctruth_v->at(i).GetParticles().at(i).PdgCode() == 111 )   { //  neutral pion 
        	        int trajsize= mctruth_v->at(i).GetParticles().at(i).Trajectory().size();
-		if(i==0)
+		if(i==0){
        	            mct_vtx = mctruth_v->at(i).GetParticles().at(i).Trajectory().at(trajsize-1).Position();
-       	        std::cout <<  "\n gamma " << std::endl;
-                is_mc_shower=true;
-                }
-             else if ( mctruth_v->at(i).GetParticles().at(i).PdgCode() == 13 )  //      ## muon    
+                    is_mc_shower=true;
+		  }
+	   	else{
+  	    	    if ( mctruth_v->at(i).GetParticles().at(i).PdgCode() == 22 )   { 
+       	        	trajsize= mctruth_v->at(i).GetParticles().at(i).Trajectory().size();
+       	        	std::cout <<  "\n gamma " << std::endl;
+		      }
+       	        std::cout <<  "\n pi-0 " << std::endl;
+                    }
+            else if ( mctruth_v->at(i).GetParticles().at(i).PdgCode() == 13 && i==0)  //      ## muon    
                {
-		if(i==0)
-                    mct_vtx = mctruth_v->at(i).GetParticles().at(i).Trajectory().at(i).Position();
+                mct_vtx = mctruth_v->at(i).GetParticles().at(i).Trajectory().at(i).Position();
+                is_mc_track=true;
                 std::cout <<  "\n muon " << std::endl;
-                is_mc_track=true;
                 }
-             else{
-                is_mc_track=true;
-                mct_vtx = mctruth_v->at(i).GetParticles().at(i).Trajectory().at(i).Position();  
+            else{
+		if(i==0){
+                    mct_vtx = mctruth_v->at(i).GetParticles().at(i).Trajectory().at(i).Position(); 
+                    is_mc_track=true;
+		 } 
                 std::cout <<  "\n proton ? " << std::endl;
                  }
-             std::cout << " Truth vertex (" << mct_vtx[0] << "," << mct_vtx[1] << "," << mct_vtx[2] << "," << std::endl;
-      } 
+           }
+       std::cout << " Truth vertex (" << mct_vtx[0] << "," << mct_vtx[1] << "," << mct_vtx[2] << "," << std::endl;
+     } 
 
 /*    if (mctruth_v!=NULL && mctruth_v->size()) 
       {
