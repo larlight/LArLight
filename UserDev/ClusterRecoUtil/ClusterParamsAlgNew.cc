@@ -162,6 +162,8 @@ namespace cluster{
     fFinishedRefineStartPoints = false;
     fFinishedRefineDirection   = false;
     fFinishedGetFinalSlope     = false;
+    fFinishedRefineStartPointAndDirection = false;
+    fFinishedTrackShowerSep    = false;
 
     fRough2DSlope=-999.999;    // slope 
     fRough2DIntercept=-999.999;    // slope 
@@ -186,6 +188,9 @@ namespace cluster{
 
     fParams.Clear();
     
+    // Initialize the neural network:
+    fannModule.LoadFromFile(fNeuralNetPath);
+
   }
 
   void ClusterParamsAlgNew::Report(){
@@ -206,7 +211,8 @@ namespace cluster{
                                        // bool override_DoRefineDirection  ,
                                        // bool override_DoRefineStartPoints,
                                        bool override_DoStartPointsAndDirection,
-                                       bool override_DoGetFinalSlope     ){
+                                       bool override_DoGetFinalSlope    ,
+                                       bool override_DoTrackShowerSep   ){
     GetAverages      (override_DoGetAverages      );
     GetRoughAxis     (override_DoGetRoughAxis     );
     GetProfileInfo   (override_DoGetProfileInfo   );
@@ -214,6 +220,7 @@ namespace cluster{
     // RefineDirection  (override_DoRefineDirection  );
     // RefineStartPoints(override_DoRefineStartPoints);
     GetFinalSlope    (override_DoGetFinalSlope    );
+    TrackShowerSeparation(override_DoTrackShowerSep);
   }
 
   void ClusterParamsAlgNew::GetAverages(bool override){
@@ -1359,6 +1366,15 @@ namespace cluster{
 	      
     return;   
   }
+
+  void ClusterParamsAlgNew::TrackShowerSeparation(bool override){
+    std::vector<float> FeatureVector, outputVector;
+    GetFANNVector(FeatureVector);
+    fannModule.run(FeatureVector,outputVector);
+    fParams.trackness  = outputVector[1];
+    fParams.showerness = outputVector[0];
+  }
+
 
   
 } //end namespace

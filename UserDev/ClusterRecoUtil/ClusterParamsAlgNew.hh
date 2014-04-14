@@ -21,6 +21,7 @@
 #include "ClusterParams.hh"
 #include "RecoUtilException.hh"
 #include "LArUtilManager.hh"
+#include "FANNModule.hh"
 
 #include <vector>
 
@@ -47,18 +48,18 @@ namespace cluster {
     /// Explicit definition of a copy constructor
     ClusterParamsAlgNew(const ClusterParamsAlgNew& orig)
       : fGSer(orig.fGSer),
-	fPrincipal(2,"D"),
-	fHitVector(orig.fHitVector),
-	verbose(orig.verbose),
-	fChargeCutoffThreshold(orig.fChargeCutoffThreshold),
-	fPlane(orig.fPlane),
-	fQMinRefDir(orig.fQMinRefDir),
-	fChargeProfile(orig.fChargeProfile),
-	fCoarseChargeProfile(orig.fCoarseChargeProfile),
-	fCoarseNbins(orig.fCoarseNbins),
-	fProfileNbins(orig.fProfileNbins),
-	fProfileMaximumBin(orig.fProfileMaximumBin),
-	fProfileIntegralForward(orig.fProfileIntegralForward),
+        fPrincipal(2,"D"),
+        fHitVector(orig.fHitVector),
+        verbose(orig.verbose),
+        fChargeCutoffThreshold(orig.fChargeCutoffThreshold),
+        fPlane(orig.fPlane),
+        fQMinRefDir(orig.fQMinRefDir),
+        fChargeProfile(orig.fChargeProfile),
+        fCoarseChargeProfile(orig.fCoarseChargeProfile),
+        fCoarseNbins(orig.fCoarseNbins),
+        fProfileNbins(orig.fProfileNbins),
+        fProfileMaximumBin(orig.fProfileMaximumBin),
+        fProfileIntegralForward(orig.fProfileIntegralForward),
         fProfileIntegralBackward(orig.fProfileIntegralBackward),
         fProjectedLength(orig.fProjectedLength),
         fBeginIntercept(orig.fBeginIntercept),
@@ -140,7 +141,8 @@ namespace cluster {
                     bool override_DoGetProfileInfo   =false,
                     bool override_DoRefineStartPointsAndDirection=false,
             		    // bool override_DoRefineDirection  =false,
-                    bool override_DoGetFinalSlope    =false );
+                    bool override_DoGetFinalSlope    =false,
+                    bool override_DoTrackShowerSep   =false );
 
     const cluster_params& GetParams() const
     { return fParams;}
@@ -206,6 +208,10 @@ namespace cluster {
 
     void RefineStartPointAndDirection(bool override=false);
 
+    void TrackShowerSeparation(bool override=false);
+
+    void setNeuralNetPath(std::string s){fNeuralNetPath = s;}
+
     void FillPolygon();
 
     void GetOpeningAngle();
@@ -264,15 +270,21 @@ namespace cluster {
     bool fFinishedRefineDirection;   
     bool fFinishedGetFinalSlope;     
     bool fFinishedRefineStartPointAndDirection;
+    bool fFinishedTrackShowerSep;
 
     double fRough2DSlope;        // slope 
     double fRough2DIntercept;    // slope 
     larutil::PxPoint fRoughBeginPoint;
     larutil::PxPoint fRoughEndPoint;
 
+
+
     public:
 
     cluster::cluster_params fParams;
+
+    std::string fNeuralNetPath;
+    cluster::FANNModule  fannModule;
 
   }; //class ClusterParamsAlgNew
   
