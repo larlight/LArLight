@@ -92,6 +92,7 @@ namespace cluster{
 
     void configureHiddenLayers(int numLayers, ... );
 
+
   private:
     double fFeatureVectorLength;
     double fOutputVectorLength;
@@ -100,6 +101,7 @@ namespace cluster{
     int    fNumHiddenLayers;
     std::vector<int> fHiddenLayerLength;
 
+  public:
     // this is the actual neural network.  Right now only one per class:
     FANN::neural_net ann;
 
