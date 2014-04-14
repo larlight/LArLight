@@ -191,10 +191,43 @@ namespace larlight {
     
     event_mctruth  *mctruth_v = (event_mctruth *)(storage->get_data(DATA::MCTruth)); 
     
-   //AHACK, begin efficiency testing.
     
     TLorentzVector mct_vtx;
+
     if (mctruth_v!=NULL && mctruth_v->size()) 
+      {
+        if ( mctruth_v->size()>1 )  // this needs to be changed
+              std::cout <<  "Found more than 1 MCTruth. \n " << std::endl;
+        for(int i=0;i<=mctruth_v->size();i++){
+            if (mctruth_v->at(i).GetParticles().at(i).PdgCode() == 11)  {    // electron
+	        if (i==0)	    
+	       	     mct_vtx = mctruth_v->at(i).GetParticles().at(i).Trajectory().at(i).Position();
+       	        std::cout << "\n electron " << std::endl; 
+       	        is_mc_shower=true;
+       	      }
+	    else if ( mctruth_v->at(i).GetParticles().at(i).PdgCode() == 22 )   { 
+       	        int trajsize= mctruth_v->at(i).GetParticles().at(i).Trajectory().size();
+		if(i==0)
+       	            mct_vtx = mctruth_v->at(i).GetParticles().at(i).Trajectory().at(trajsize-1).Position();
+       	        std::cout <<  "\n gamma " << std::endl;
+                is_mc_shower=true;
+                }
+             else if ( mctruth_v->at(i).GetParticles().at(i).PdgCode() == 13 )  //      ## muon    
+               {
+		if(i==0)
+                    mct_vtx = mctruth_v->at(i).GetParticles().at(i).Trajectory().at(i).Position();
+                std::cout <<  "\n muon " << std::endl;
+                is_mc_track=true;
+                }
+             else{
+                is_mc_track=true;
+                mct_vtx = mctruth_v->at(i).GetParticles().at(i).Trajectory().at(i).Position();  
+                std::cout <<  "\n proton ? " << std::endl;
+                 }
+             std::cout << " Truth vertex (" << mct_vtx[0] << "," << mct_vtx[1] << "," << mct_vtx[2] << "," << std::endl;
+      } 
+
+/*    if (mctruth_v!=NULL && mctruth_v->size()) 
       {
         if ( mctruth_v->size()>1 ){  // this needs to be changed
             std::cout <<  "Found more than 1 MCTruth. Only use the 1st one... \n " << std::endl;
@@ -225,7 +258,7 @@ namespace larlight {
 	   }
 	std::cout << " Truth vertex (" << mct_vtx[0] << "," << mct_vtx[1] << "," << mct_vtx[2] << "," << std::endl;
       } 
-    
+*/    
     std::cout << " is shower: " << is_mc_shower << " is track: " << is_mc_track << std::endl;
     /// /////////////////////////////////////////////// End Getting MC Truth info out.	    
     
