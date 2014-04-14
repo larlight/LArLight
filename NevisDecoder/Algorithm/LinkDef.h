@@ -9,6 +9,7 @@
 #pragma link off all classes;
 #pragma link off all functions;
 
+#pragma link C++ class larlight::decode_algo_exception+;
 #pragma link C++ class larlight::algo_base+;
 #pragma link C++ class larlight::algo_slow_readout_decoder+;
 #pragma link C++ class larlight::algo_xmit_decoder+;

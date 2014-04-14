@@ -337,12 +337,11 @@ namespace larlight {
 
   #ifdef INCLUDE_EXTRA_HEADER
 
-    _header_info.fem_trig_frame_number  = ( ((event_header[5] & 0xfff)>>3 & 0xf) +
-					    (((_header_info.event_frame_number)>>3)<<3));
-
-    // Correct for a roll over
-    _header_info.fem_trig_frame_number  = round_diff(_header_info.event_frame_number, _header_info.fem_trig_frame_number, 0x7);
-
+    // Correct for a roll over 
+    _header_info.fem_trig_frame_number  = roll_over(_header_info.event_frame_number, 
+						    ((event_header[5] & 0xfff)>>4 & 0xf),
+						    4);
+    
     _header_info.fem_trig_sample_number = ((((event_header[5]>>16) & 0xf)<<8) + (event_header[5] & 0xff));
 
   #endif
@@ -372,32 +371,52 @@ namespace larlight {
 
 
   //#################################################
-  UInt_t algo_fem_decoder_base::round_diff(UInt_t ref_id, 
-					   UInt_t subject_id, 
-					   UInt_t diff) const
+  UInt_t algo_fem_decoder_base::roll_over(UInt_t ref,
+					  UInt_t subject,
+					  UInt_t nbits) const
   //#################################################
   {
-    // Used to recover pmt/trigger frame id from roll over effect.
-    // One can test this by simply calling this function.
-    // For instance, to test the behavior for a roll-over of 0x7 ...
-    //
-    // > root
-    // root[0] gSystem->Load("libDecoder")
-    // root[1] algo_slow_readout_decoder k
-    // root [6] k.get_pmt_frame(583,584,0x7)
-    // (const unsigned int)584
-    // root [7] k.get_pmt_frame(584,583,0x7)
-    // (const unsigned int)583
-    //
-    // I think this implementation works. ... Aug. 12 2013
-    // No... Kazu Apr 14 2014
-    if( (subject_id > ref_id) && ((subject_id-ref_id) >= diff) )
-      return subject_id - (diff+1);
-    else if( (ref_id > subject_id) && ((ref_id-subject_id) >= diff) )	   
-      return subject_id + (diff+1);
-    else
-      return subject_id;
+    // Return "ref" which lower "nbits" are replaced by that of "subject"
+    // Takes care of roll over effect.
+    // For speed purpose we only accept pre-defined nbits values.
+    UInt_t diff=0; // max diff should be (2^(nbits)-2)/2
+    UInt_t mask=0; // mask to extract lower nbits from subject ... should be 2^(nbits)-1
+    if      (nbits==3) {diff = 3; mask = 0x7;}
+    else if (nbits==4) {diff = 7; mask = 0xf;}
+    else {
+      print(MSG::ERROR,__FUNCTION__,"Only supported for nbits = [3,4]!");
+      throw decode_algo_exception();
+    }
 
+    subject = ( (ref>>nbits) << nbits) + (subject & mask);
+
+    // If exactly same, return
+    if(subject == ref) return subject;
+
+    // If subject is bigger than ref by a predefined diff value, inspect difference
+    else if ( subject > ref && (subject - ref) > diff) {
+
+      // Throw an exception if difference is exactly diff+1
+      if ( (subject - ref) == diff+1 ) {
+	print(MSG::ERROR,__FUNCTION__,Form("Unexpected diff: ref=%d, subject=%d",ref,subject));
+	throw decode_algo_exception();
+      }
+      
+      // Else we have to subtract (mask+1) 
+      else subject = subject - (mask + 1);
+      
+    } 
+    // If subject is smaller than ref by a predefined diff value, inspect difference
+    else if ( subject < ref && (ref - subject) > diff) {
+
+      // Throw an exception if difference is exactly diff+1
+      if ( (ref - subject) == diff+1 ) {
+	print(MSG::ERROR,__FUNCTION__,Form("Unexpected diff: ref=%d, subject=%d",ref,subject));
+	throw decode_algo_exception();
+      }
+      else subject = subject + (mask + 1);
+    }
+    return subject;
   }
 
   //#################################################

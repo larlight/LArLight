@@ -102,8 +102,8 @@ namespace larlight {
     /// Override function to reset the instance
     virtual void reset();
 
-    /// A simple round-diff algorithm for binary words
-    UInt_t round_diff(UInt_t ref_id, UInt_t subject_id, UInt_t diff) const;
+    /// A simple function to compute a result of replacing lower "nbits" of "ref" by that of "subject"
+    UInt_t roll_over(UInt_t ref, UInt_t subject, UInt_t nbits) const;
 
     /// A simple method to inquire if the data storage buffer is currently empty or not
     virtual bool is_event_empty(){ return (_header_info.event_number == FEM::INVALID_WORD);};
