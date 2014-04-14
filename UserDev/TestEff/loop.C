@@ -22,9 +22,5 @@ proc.add_input_file("mac/larlight_tracks.root");   //"/data/argoneutnu/larlight_
 proc.add_process(new larlight::TestEff);
 proc.run();
 
-cluster::ClusterParamsExecutor algo ;
-
-//larlight::event_cluster evt  ;
-
 
 }
