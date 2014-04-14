@@ -57,6 +57,107 @@ namespace larlight {
 
     larutil::GeometryUtilities  *fGSer;
     /// Example histogram to be saved in analysis root file (separate from data product)
+    
+    TTree * fMainTree;
+    ///////////////////TTree variables
+    
+    void init_tree_vectors();
+    
+    int fRun;
+    int fSubRun;
+    int fEvent;
+    int fNPlanes;
+    
+    
+    int fNClusters;
+    int fNParticles;
+    
+    
+    //These are defined per MCparticle  
+    std::vector< int>   fMCPDGstart   ;  
+    std::vector< int>   fMCPDGisPrimary   ;
+    std::vector<double>   fMCenergystart   ;
+    std::vector< double >   fMCPhistart   ;
+    std::vector<double >   fMCThetastart   ;
+    std::vector<double >   fMCXOrig   ;
+    std::vector<double >   fMCYOrig   ;
+    std::vector<double >   fMCZOrig   ;
+    
+    
+    //These are defined per cluster
+    std::vector< int>   mcpdg   ;
+    std::vector<double>   mcenergy   ;
+    std::vector< double >   mcphi   ;
+    std::vector<double >   mctheta   ;
+    std::vector<double >   mcomega   ;
+    std::vector< double >   mcx   ;
+    std::vector<double >   mcy   ;
+    std::vector<double >   mcz   ;
+    
+    std::vector< int>   mcdirection   ;
+    // std::vector< double>   mcenergyfraction   ;
+    std::vector<unsigned int>   mcwirevertex   ;
+    std::vector<double>   mctimevertex   ;
+    // std::vector< double>   mcdistfromorigin   ;
+    
+    
+    ///////////// reconstructed quantities
+    std::vector< int>   plane   ;
+    std::vector<unsigned int>   fWireVertex   ;
+    std::vector<double>   fTimeVertex   ;
+    
+    std::vector<unsigned int>   fWireLast   ;
+    std::vector<double>   fTimeLast   ;
+    
+    std::vector<int>   fDirection   ;
+    
+    std::vector<double>   fOffAxis   ;
+    std::vector<double>   fOffAxisNorm   ;
+    std::vector<int>   fNhits   ;
+    
+    std::vector<double>   fHitDensity   ;
+    std::vector<double>   fLength   ;
+    std::vector<double>   fWidth   ;  
+    
+    //  fOffAxisNormHD   std::vector<double>   fOffAxisNormHD   ;
+    //  fOnAxisNormHD   std::vector<double>   fOnAxisNormHD   ;
+    
+    
+    std::vector<double>   fPrincipal   ;
+    std::vector<double>   slope2D   ;
+    std::vector<int>   fMultiHitWires   ;
+    
+    
+    
+    std::vector<double>   fsumCharge   ;
+    std::vector<double>   fmeanCharge    ;
+    std::vector<double>   frmsX    ;
+    std::vector<double>   frmsY    ;
+    std::vector<double>   fmeanX    ;
+    std::vector<double>   fmeanY    ;
+    std::vector<double>   fchargeWgtX    ;
+    std::vector<double>   fchargeWgtY    ;
+    std::vector<double>   fclusterAngle2d    ;
+    std::vector<double>   fangle2d    ;
+    std::vector<double>   fopenAngle    ;
+    std::vector<double>   fopenAngleChargeWgt    ;
+    std::vector<double>   fcloseAngle    ;
+    std::vector<double>   fcloseAngleChargeWgt    ;
+    std::vector<double>   fhitDensity1d    ;
+    std::vector<double>   fhitDensity2d    ;
+    std::vector<double>   fmodifiedHitDens    ;
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    /////////////////////////////////////
+    
     TH1D* h1;
    
     TH1D* sumCharge;
