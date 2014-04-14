@@ -346,7 +346,7 @@ namespace larlight {
 						      3)
 					    );
 	  // Check if the frame is -1 to +2 w.r.t. event frame number
-	  int diff = _ch_data.readout_frame_number() - _event_data->event_frame_number();
+	  int diff = ((int)(_ch_data.readout_frame_number())) - ((int)(_event_data->event_frame_number()));
 	  if(diff < -1 || diff > 2) {
 	    print(MSG::ERROR,__FUNCTION__,Form("Found event frame %d and discriminator frame %d (difference too big!)",
 					       _event_data->event_frame_number(),
