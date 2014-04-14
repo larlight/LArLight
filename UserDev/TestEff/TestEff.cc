@@ -282,6 +282,22 @@ namespace larlight {
     
     event_mctruth  *mctruth_v = (event_mctruth *)(storage->get_data(DATA::MCTruth)); 
     
+    event_cluster * my_cluster_v = (event_cluster *)(storage->get_data(DATA::FuzzyCluster));
+
+  
+   // event_hit * my_hit_v = (event_hit*)(storage->get_data(my_cluster_v->get_hit_type()));
+    event_hit * my_hit_v = (event_hit*)(storage->get_data(DATA::FFTHit));
+    std::cout << " ful hitlist size: " << my_hit_v->size() << std::endl;
+	
+    
+    
+    fNParticles=1;  // (for now, then should be: mctruth_v->at(0).GetParticles().size(); )
+    
+    fNPlanes=larutil::Geometry::GetME()->Nplanes();
+    fNClusters=fNPlanes;    // then should be" my_cluster_v->size() or fNPlanes
+    init_tree_vectors();
+    
+    
    //AHACK, begin efficiency testing.
     
     TLorentzVector mct_vtx;
@@ -331,20 +347,7 @@ namespace larlight {
     std::cout << " is shower: " << is_mc_shower << " is track: " << is_mc_track << std::endl;
     /// /////////////////////////////////////////////// End Getting MC Truth info out.	    
     
-    event_cluster * my_cluster_v = (event_cluster *)(storage->get_data(DATA::FuzzyCluster));
-
   
-   // event_hit * my_hit_v = (event_hit*)(storage->get_data(my_cluster_v->get_hit_type()));
-     event_hit * my_hit_v = (event_hit*)(storage->get_data(DATA::FFTHit));
-    std::cout << " ful hitlist size: " << my_hit_v->size() << std::endl;
-	
-    
-    
-    fNParticles=1;  // (for now, then should be: mctruth_v->at(0).GetParticles().size(); )
-    
-    fNPlanes=larutil::Geometry::GetME()->Nplanes();
-    init_tree_vectors();
-    fNClusters=fNPlanes;    // then should be" my_cluster_v->size() or fNPlanes
    //cluster::ClusterParamsAlgNew  fCPAlg; // = new cluster::ClusterParamsAlgNew();
 ///  //////////////// start looping on clusters or planes to get all hits.
  
