@@ -148,18 +148,6 @@ namespace larlight {
     else closeAngleChargeWgt_tr->Reset();
     
     
-    
-    
-    
-    
-    
-
-  //  if(!h7) h7 = new TH1D("h7","Opening angle, charge weighted",10,0,2.0);
- //   else h7->Reset();
-  //  if(!h8) h8 = new TH1D("h8","Opening angle, charge weighted",10,0,2.0);
-   // else h8->Reset();
-    
-    
     larutil::LArUtilManager::Reconfigure(larlight::GEO::kArgoNeuT);
     
     return true;
