@@ -390,6 +390,7 @@ namespace larlight {
     // (const unsigned int)583
     //
     // I think this implementation works. ... Aug. 12 2013
+    // No... Kazu Apr 14 2014
     if( (subject_id > ref_id) && ((subject_id-ref_id) >= diff) )
       return subject_id - (diff+1);
     else if( (ref_id > subject_id) && ((ref_id-subject_id) >= diff) )	   
