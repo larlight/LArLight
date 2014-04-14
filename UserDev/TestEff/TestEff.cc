@@ -63,6 +63,13 @@ namespace larlight {
     if(!modifiedHitDens) modifiedHitDens = new TH1D("modifiedHitDens","Modified Hit Density",100,0,20);
     else modifiedHitDens->Reset();
 
+    if(!trackness) trackness = new TH1D("trackness","trackness",100,0,1);
+    else trackness->Reset();
+    if(!showerness) showerness = new TH1D("showerness","Modified Hit Density",100,0,20);
+    else showerness->Reset();
+
+
+
 //////////////////////////////////////////////////////////////
  //   recohists looking at reconstruction vs MCTruth
     if(!recostartwire) recostartwire = new TH1D("recostartwire","Start wire, reco - truth ",150,-50,50);
@@ -148,18 +155,6 @@ namespace larlight {
     else closeAngleChargeWgt_tr->Reset();
     
     
-    
-    
-    
-    
-    
-
-  //  if(!h7) h7 = new TH1D("h7","Opening angle, charge weighted",10,0,2.0);
- //   else h7->Reset();
-  //  if(!h8) h8 = new TH1D("h8","Opening angle, charge weighted",10,0,2.0);
-   // else h8->Reset();
-    
-    
     larutil::LArUtilManager::Reconfigure(larlight::GEO::kArgoNeuT);
     
     return true;
@@ -189,18 +184,23 @@ namespace larlight {
 
     bool is_mc_shower=false;
     bool is_mc_track=false;
-    
+    bool is_electron=false;
+    bool is_gamma=false;    
+
     /// /////////////////////////getting the MCTruth info out, if exists
     
     event_mctruth  *mctruth_v = (event_mctruth *)(storage->get_data(DATA::MCTruth)); 
     
-    
+   //AHACK, begin efficiency testing.
     
     TLorentzVector mct_vtx;
     if (mctruth_v!=NULL && mctruth_v->size()) 
       {
-        if ( mctruth_v->size()>1 )  // this needs to be changed
+        if ( mctruth_v->size()>1 ){  // this needs to be changed
             std::cout <<  "Found more than 1 MCTruth. Only use the 1st one... \n " << std::endl;
+//	    for(int i=0;i<=mctruth_v->size();i++){
+	      }
+//	}
         if (mctruth_v->at(0).GetParticles().at(0).PdgCode() == 11)  {    // electron    
             mct_vtx = mctruth_v->at(0).GetParticles().at(0).Trajectory().at(0).Position();
             std::cout << "\n electron " << std::endl; 
@@ -231,8 +231,6 @@ namespace larlight {
     
     event_cluster * my_cluster_v = (event_cluster *)(storage->get_data(DATA::FuzzyCluster));
 
-
-
   
    // event_hit * my_hit_v = (event_hit*)(storage->get_data(my_cluster_v->get_hit_type()));
      event_hit * my_hit_v = (event_hit*)(storage->get_data(DATA::FFTHit));
@@ -245,7 +243,6 @@ namespace larlight {
      for (int ipl=0;ipl<larutil::Geometry::GetME()->Nplanes();ipl++) {
     
         std::vector<const larlight::hit *> hit_vector;
-	//         hit_vector.clear();
 	
         hit_vector.clear();
         hit_vector.reserve(my_hit_v->size());
@@ -279,17 +276,13 @@ namespace larlight {
         
        /// end cluster comment out   
         
-        std::cout << " +++ in TestEff " << hit_vector.size() << std::endl;  
+  //      std::cout << " +++ in TestEff " << hit_vector.size() << std::endl;  
 	
-   
-	    
 
 	if(hit_vector.size() < 20)   // do not bother with too small hitlists
 	    {
 	     continue;
 	    }
-	    
-	    
 	    
 	    
         ::cluster::ClusterParamsAlgNew  fCPAlg;
@@ -324,6 +317,9 @@ namespace larlight {
 	hitDensity1d->Fill(fResult.hit_density_1D) ;
 	hitDensity2d->Fill(fResult.hit_density_2D) ;
 	modifiedHitDens->Fill(fResult.modified_hit_density) ;
+	trackness->Fill(fResult.trackness) ;
+	showerness->Fill(fResult.showerness) ;
+
 	
 	if(is_mc_shower)
 	{
@@ -419,15 +415,16 @@ namespace larlight {
     clusterAngle2d->Draw();
     angle2d->Draw();
     openAngle->Draw();	
-//	openAngleChargeWgt->SetLineColor(3);
     openAngleChargeWgt->Draw() ; //"P same");
     closeAngle->Draw();
-//	closeAngleChargeWgt->SetLineColor(3);
     closeAngleChargeWgt->Draw() ; //"P same");
     hitDensity1d->Draw();
     hitDensity2d->Draw();
     modifiedHitDens->Draw();
-    
+    trackness->Draw();
+    showerness->Draw();
+   
+ 
     // MCTruth plots:
     
     recostartwire->Draw();
@@ -484,20 +481,11 @@ namespace larlight {
     TCanvas * width_c= new TCanvas("width_c","width_c");
     width_sh ->DrawCopy();
      width_tr ->DrawCopy("same");	  
-	
-   
-    
-    
-   
-   
-   
- 
-   
-   
-  
-  
-    
-    
+/*	
+    TCanvas * track_shower_c= new TCanvas("track_shower_c","track_shower_c");
+    trackness ->DrawCopy();
+    showerness ->DrawCopy("same");	  
+  */  
     
      if(_fout) { 
 	_fout->cd(); 
@@ -519,6 +507,9 @@ namespace larlight {
 /*	
 	hitDensity2d->Write();
 	hitDensity1d->Write();*/
+	
+	trackness->Write();
+	trackness->Write();
 
 	modifiedHitDens->Write(); 
 	recostartwire->Write();

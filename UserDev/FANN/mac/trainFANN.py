@@ -42,7 +42,7 @@ if args.source == None:
     quit()
 
 if args.num_events == None:
-    args.num_events = -1
+    args.num_events = 999999
 
 if args.data_output == None:
     args.data_output = "default_event_output.root"
@@ -78,9 +78,18 @@ fann.setOutputVectorLength(2)
 fann.setOutputFileName("track_shower.net")
 fann.init()
 
+# Here is the neural network that has been more rigorously trained:
+cascadeFANN = cluster.FANNModule()
+cascadeFANN.LoadFromFile("cascade_net.net")
+
+# Output file for FANN vector:
+outputfile = open('training.dat','w')
+# Keep track of how many events were processed
+nWrittenEvents = 0
 
 processed_events=0
 fGSer = larutil.GeometryUtilities.GetME()
+num_events = int(args.num_events)
 
 display=TCanvas("EventDisplay","EventDisplay",600,500)
 display.SetGridx(1)
@@ -112,26 +121,55 @@ while mgr.next_event():
             print "\n muon \n"
             truth=ROOT.std.vector(float)(2,0)
             truth[1] = 1
+        elif mctruth_v.at(0).GetParticles().at(0).PdgCode() == 2212:    
+            trajsize= mctruth_v.at(0).GetParticles().at(0).Trajectory().size()
+            mct_vtx = mctruth_v.at(0).GetParticles().at(0).Trajectory().at(0).Position()
+            print "\n proton \n"
+            truth=ROOT.std.vector(float)(2,0)
+            truth[1] = 1
 
         #PdgCode
-
-    if args.num_events == processed_events:
-        exit()
+    if num_events < processed_events:
+        break
 
     for plane in xrange(larutil.Geometry.GetME().Nplanes()):
         algo.LoadAllHits(mgr.get_data(larlight.DATA.FFTHit), plane)
+        print "Number of hits in this plane is %d" % (algo.GetNHits() )
+        if (algo.GetNHits() < 30 ):
+            continue
         algo.FillParams()
-        algo.Report()
+        # algo.Report()
         algo.PrintFANNVector()
         result = algo.GetParams()
+
         featureVec=ROOT.std.vector(float)(10,0)
         algo.GetFANNVector(featureVec)
         
+        # Print the training to the file:
+        for val in featureVec:
+            s = str(val)
+            outputfile.write(s)
+            outputfile.write(' ')
+        outputfile.write('\n')
+        for val in truth:
+            s = str(val)
+            outputfile.write(s)
+            outputfile.write(' ')           
+
+        # Write a space into the output file:
+        outputfile.write('\n')
+        outputfile.write('\n')
+
+        nWrittenEvents += 1
+
         # Run the training:
         fann.trainOnData(featureVec, truth)
         print "Truth is (%g, %g)" % (truth[0],truth[1])
         fann.run(featureVec)
         fann.print_error()
+        print "Cascade fann results:"
+        cascadeFANN.run(featureVec)
+        cascadeFANN.print_error()
 
         mc_begin=None
         if(mct_vtx):
@@ -220,7 +258,14 @@ while mgr.next_event():
         # Give an update on current status of ANN:
         
 
-        sys.stdin.readline()
+        # sys.stdin.readline()
+        processed_events +=1
+        print ("So far, processed_events is %g") % processed_events
 
+
+s = str(nWrittenEvents)
+outputfile.write(s)
+outputfile.write(' ')
+outputfile.write('10 2 \n')
 
 fann.saveFANNToFile()

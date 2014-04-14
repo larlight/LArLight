@@ -12,6 +12,8 @@
 #pragma link C++ namespace FANN;
 
 #pragma link C++ class cluster::TrainingModule+;
+#pragma link C++ class cluster::FANNModule+;
 #pragma link C++ class FANN::neural_net+;
+#pragma link C++ class FANN::training_data+;
 //ADD_NEW_CLASS ... do not change this line
 #endif
