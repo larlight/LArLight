@@ -20,6 +20,97 @@ namespace larlight {
 
     if(!fGSer) fGSer = (larutil::GeometryUtilities*)(larutil::GeometryUtilities::GetME());
 
+    //////////////////////////Setting up the TTree
+    fMainTree=new TTree("testeff","testeff");
+    
+    fMainTree->Branch("run",&fRun,"run/I");
+    fMainTree->Branch("subrun",&fSubRun,"subrun/I");
+    fMainTree->Branch("event",&fEvent,"event/I");
+    fMainTree->Branch("nplanes",&fNPlanes,"nplanes/I");
+    
+    
+    fMainTree->Branch("nclusters",&fNClusters,"nclusters/I");
+    fMainTree->Branch("nparticles",&fNParticles,"nparticles/I");
+    
+    
+    //These are defined per MCparticle  
+    fMainTree->Branch("MCpdgOrig","std::vector< int>", &fMCPDGstart);  
+    fMainTree->Branch("MCPDGisPrimary","std::vector< int>", &fMCPDGisPrimary);
+    fMainTree->Branch("MCenergyOrig","std::vector<double>", &fMCenergystart);
+    fMainTree->Branch("MCphiOrig","std::vector< double >", &fMCPhistart);
+    fMainTree->Branch("MCthetaOrig","std::vector<double >", &fMCThetastart);
+    fMainTree->Branch("MCXOrig","std::vector<double >", &fMCXOrig);
+    fMainTree->Branch("MCYOrig","std::vector<double >", &fMCYOrig);
+    fMainTree->Branch("MCZOrig","std::vector<double >", &fMCZOrig);
+    
+    
+    //These are defined per cluster
+    fMainTree->Branch("mcpdg","std::vector< int>", &mcpdg);
+    fMainTree->Branch("mcenergy","std::vector<double>", &mcenergy);
+    fMainTree->Branch("mcphi","std::vector< double >", &mcphi);
+    fMainTree->Branch("mctheta","std::vector<double >", &mctheta);
+    fMainTree->Branch("mcomega","std::vector<double >", &mcomega);
+    fMainTree->Branch("mcx","std::vector< double >", &mcx);
+    fMainTree->Branch("mcy","std::vector<double >", &mcy);
+    fMainTree->Branch("mcz","std::vector<double >", &mcz);
+    
+    fMainTree->Branch("mcdirection","std::vector< int>", &mcdirection);
+    //  fMainTree->Branch("mcenergyfraction","std::vector< double>", &mcenergyfraction);
+    fMainTree->Branch("mcwirevertex","std::vector<unsigned int>", &mcwirevertex);
+    fMainTree->Branch("mctimevertex","std::vector<double>", &mctimevertex);
+    //    fMainTree->Branch("mcdistfromorigin","std::vector< double>", &mcdistfromorigin);
+    
+    
+    ///////////// reconstructed quantities
+    fMainTree->Branch("plane","std::vector< int>", &plane);
+    fMainTree->Branch("wire_vertex","std::vector<unsigned int>", &fWireVertex);
+    fMainTree->Branch("time_vertex","std::vector<double>", &fTimeVertex);
+    
+    fMainTree->Branch("wire_last","std::vector<unsigned int>", &fWireLast);
+    fMainTree->Branch("time_last","std::vector<double>", &fTimeLast);
+    
+    fMainTree->Branch("fDirection","std::vector<int>", &fDirection);
+    
+    fMainTree->Branch("fOffAxis","std::vector<double>", &fOffAxis);
+    fMainTree->Branch("fOffAxisNorm","std::vector<double>", &fOffAxisNorm);
+    fMainTree->Branch("fNhits","std::vector<int>", &fNhits);
+    
+    fMainTree->Branch("fHitDensity","std::vector<double>", &fHitDensity);
+    fMainTree->Branch("fLength","std::vector<double>", &fLength);
+    fMainTree->Branch("fWidth","std::vector<double>", &fWidth);  
+    
+    // fMainTree->Branch("fOffAxisNormHD","std::vector<double>", &fOffAxisNormHD);
+    // fMainTree->Branch("fOnAxisNormHD","std::vector<double>", &fOnAxisNormHD);
+    
+    
+    fMainTree->Branch("fPrincipal","std::vector<double>", &fPrincipal);
+    fMainTree->Branch("slope2D","std::vector<double>", &slope2D);
+    fMainTree->Branch("fMultiHitWires","std::vector<int>", &fMultiHitWires);
+       
+    fMainTree->Branch("sumCharge","std::vector<double>",&fsumCharge);
+    fMainTree->Branch("meanCharge","std::vector<double>",&fmeanCharge );
+    fMainTree->Branch("rmsX","std::vector<double>",&frmsX );
+    fMainTree->Branch("rmsY","std::vector<double>",&frmsY );
+    fMainTree->Branch("meanX","std::vector<double>",&fmeanX );
+    fMainTree->Branch("meanY","std::vector<double>",&fmeanY );
+    fMainTree->Branch("chargeWgtX","std::vector<double>",&fchargeWgtX );
+    fMainTree->Branch("chargeWgtY","std::vector<double>",&fchargeWgtY );
+    fMainTree->Branch("clusterAngle2d","std::vector<double>",&fclusterAngle2d );
+    fMainTree->Branch("angle2d","std::vector<double>",&fangle2d );
+    fMainTree->Branch("openAngle","std::vector<double>",&fopenAngle );
+    fMainTree->Branch("openAngleChargeWgt","std::vector<double>",&fopenAngleChargeWgt );
+    fMainTree->Branch("closeAngle","std::vector<double>",&fcloseAngle );
+    fMainTree->Branch("closeAngleChargeWgt","std::vector<double>",&fcloseAngleChargeWgt );
+    fMainTree->Branch("hitDensity1d","std::vector<double>",&fhitDensity1d );
+    fMainTree->Branch("hitDensity2d","std::vector<double>",&fhitDensity2d );
+    fMainTree->Branch("modifiedHitDens","std::vector<double>",&fmodifiedHitDens );
+     
+	
+	 
+	   
+    
+    
+    ////////////////////////////////////////////////
 
     if(!sumCharge) sumCharge = new TH1D("sumCharge","Sum charge",10,-3000,100000);
     else sumCharge->Reset();
@@ -242,33 +333,47 @@ namespace larlight {
 /*    if (mctruth_v!=NULL && mctruth_v->size()) 
       {
         if ( mctruth_v->size()>1 ){  // this needs to be changed
+=======
+	int NPart=0;
+        if ( mctruth_v->size()>1 )  // this needs to be changed
+>>>>>>> 8dab16abdfa7921bfddb21f4e531e10475e46952
             std::cout <<  "Found more than 1 MCTruth. Only use the 1st one... \n " << std::endl;
-//	    for(int i=0;i<=mctruth_v->size();i++){
-	      }
+	 std::cout <<  "Found more than 1 MCTruth. Only use the 1st one... \n " << std::endl;
+  //	    for(int i=0;i<=mctruth_v->size();i++){
+ //	      }
+        if (mctruth_v->at(0).GetParticles().at(NPart).PdgCode() == 11)  {    // electron    
+            mct_vtx = mctruth_v->at(0).GetParticles().at(NPart).Trajectory().at(0).Position();
+           
 //	}
-        if (mctruth_v->at(0).GetParticles().at(0).PdgCode() == 11)  {    // electron    
-            mct_vtx = mctruth_v->at(0).GetParticles().at(0).Trajectory().at(0).Position();
             std::cout << "\n electron " << std::endl; 
 	    is_mc_shower=true;
 	    }
-        else if ( mctruth_v->at(0).GetParticles().at(0).PdgCode() == 22 )   { 
-            int trajsize= mctruth_v->at(0).GetParticles().at(0).Trajectory().size();
-            mct_vtx = mctruth_v->at(0).GetParticles().at(0).Trajectory().at(trajsize-1).Position();
+        else if ( mctruth_v->at(0).GetParticles().at(NPart).PdgCode() == 22 )   { 
+            int trajsize= mctruth_v->at(0).GetParticles().at(NPart).Trajectory().size();
+            mct_vtx = mctruth_v->at(0).GetParticles().at(NPart).Trajectory().at(trajsize-1).Position();
             std::cout <<  "\n gamma " << std::endl;
 	    is_mc_shower=true;
 	    }
-        else if ( mctruth_v->at(0).GetParticles().at(0).PdgCode() == 13 )  //      ## muon    
+        else if ( mctruth_v->at(0).GetParticles().at(NPart).PdgCode() == 13 )  //      ## muon    
 	    {
-            mct_vtx = mctruth_v->at(0).GetParticles().at(0).Trajectory().at(0).Position();
+            mct_vtx = mctruth_v->at(0).GetParticles().at(NPart).Trajectory().at(0).Position();
             std::cout <<  "\n muon " << std::endl;
 	    is_mc_track=true;
 	    }
 	else{
 	   is_mc_track=true;
-	    mct_vtx = mctruth_v->at(0).GetParticles().at(0).Trajectory().at(0).Position();  
+	    mct_vtx = mctruth_v->at(0).GetParticles().at(NPart).Trajectory().at(0).Position();  
 	    std::cout <<  "\n proton ? " << std::endl;
 	   }
 	std::cout << " Truth vertex (" << mct_vtx[0] << "," << mct_vtx[1] << "," << mct_vtx[2] << "," << std::endl;
+	fMCPDGstart[NPart]=mctruth_v->at(0).GetParticles().at(NPart).PdgCode();
+	fMCenergystart[NPart]=mctruth_v->at(0).GetParticles().at(NPart).Trajectory().at(0).Position().E();
+	//fMCPDGisPrimary[NPart]=
+	//fMCPhistart;
+	//fMCThetastart;
+	fMCXOrig[NPart]=mct_vtx[0];
+	fMCYOrig[NPart]=mct_vtx[1];
+	fMCZOrig[NPart]=mct_vtx[2];
       } 
 */    
     std::cout << " is shower: " << is_mc_shower << " is track: " << is_mc_track << std::endl;
@@ -281,19 +386,33 @@ namespace larlight {
      event_hit * my_hit_v = (event_hit*)(storage->get_data(DATA::FFTHit));
     std::cout << " ful hitlist size: " << my_hit_v->size() << std::endl;
 	
+    
+    
+    fNParticles=1;  // (for now, then should be: mctruth_v->at(0).GetParticles().size(); )
+    
+    fNPlanes=larutil::Geometry::GetME()->Nplanes();
+    init_tree_vectors();
+    fNClusters=fNPlanes;    // then should be" my_cluster_v->size() or fNPlanes
    //cluster::ClusterParamsAlgNew  fCPAlg; // = new cluster::ClusterParamsAlgNew();
 ///  //////////////// start looping on clusters or planes to get all hits.
  
+     fRun=my_hit_v->run();
+     fSubRun=my_hit_v->subrun();
+     fEvent=my_hit_v->event_id();
+    
       ///using all hits:	 // comment in or out as needed
-     for (int ipl=0;ipl<larutil::Geometry::GetME()->Nplanes();ipl++) {
+     for (int ipl=0;ipl<fNPlanes;ipl++) {
     
         std::vector<const larlight::hit *> hit_vector;
 	
         hit_vector.clear();
         hit_vector.reserve(my_hit_v->size());
 
-	 std::cout << " plane: " << ipl << " Run: " << my_hit_v->run() << " SubRunID " << my_hit_v->subrun() << " EventID " <<  my_hit_v->event_id() << " " << my_hit_v << std::endl;    
+	 std::cout << " plane: " << ipl << " Run: " << my_hit_v->run() << " SubRunID " << my_hit_v->subrun() << " EventID " <<  my_hit_v->event_id() << " " << my_hit_v << std::endl;   
+	 
 	
+	 
+	int iplane = ipl;
         for(auto &h : *my_hit_v) {
 
         if( larutil::Geometry::GetME()->ChannelToPlane(h.Channel()) == ipl )
@@ -304,7 +423,7 @@ namespace larlight {
          std::cout << " +++ in TestEff " << hit_vector.size() << " at plane: " << ipl << std::endl; 
       /// end using all hits  
 
-	 /// using cluster only. // comment in or out as needed
+	 /// using cluster only. // comment in or out as needed // need to set ipl as counter. and iplane as plane
 //     for(auto const clustit : *my_cluster_v) {
 //       std::cout << " Clust ID " << clustit.ID() << " Run: " << my_cluster_v->run() << " SubRunID " << my_cluster_v->subrun() << " EventID " <<  my_cluster_v->event_id() << " " << my_cluster_v << std::endl;    
 // 
@@ -318,7 +437,8 @@ namespace larlight {
 //             hit_vector.push_back( const_cast<const larlight::hit *>(&(my_hit_v->at(hit_index))) );
 //             //my_hit_v->at(hit_index);
 //         }
-        
+//      int ipl = clustit;
+//      int iplane = larutil::Geometry::GetME()->ChannelToPlane(h.Channel()) ;
        /// end cluster comment out   
         
   //      std::cout << " +++ in TestEff " << hit_vector.size() << std::endl;  
@@ -397,42 +517,125 @@ namespace larlight {
 	  
 	}
 
-   	larutil::PxPoint mcplanevtx;
+	/// fill Reco Tree Info
+	plane[ipl]=iplane;
+	fWireVertex[ipl]=fResult.start_point.w;
+	fTimeVertex[ipl]=fResult.start_point.t;
+	
+	fWireLast[ipl]=fResult.end_point.w;
+	fTimeLast[ipl]=fResult.end_point.t;
+	
+	fDirection[ipl]=fResult.direction;
+	
+	//fOffAxis[ipl]=fResult.direction;
+	//fOffAxisNorm[ipl]=fResult.direction;
+	fNhits[ipl]=fResult.N_Hits;
+	
+	fHitDensity[ipl]=fResult.hit_density_1D;
+	fLength[ipl]=fResult.length;
+	fWidth[ipl]=fResult.width;  
+	
+	//  fOffAxisNormHD      fOffAxisNormHD[ipl]=;
+	//  fOnAxisNormHD      fOnAxisNormHD[ipl]=;
+	
+	
+	fPrincipal[ipl]=TMath::Log(1-fResult.eigenvalue_principal);
+	slope2D[ipl]=fResult.angle_2d;
+	fMultiHitWires[ipl]=fResult.multi_hit_wires;
+	
+	
+	fsumCharge[ipl]=fResult.sum_charge;
+	fmeanCharge[ipl]=fResult.mean_charge;
+	frmsX[ipl]=fResult.rms_x;
+	frmsY[ipl]=fResult.rms_y;
+	fmeanX[ipl]=fResult.mean_x;
+	fmeanY[ipl]=fResult.mean_y;
+	fchargeWgtX[ipl]=fResult.charge_wgt_x;
+	fchargeWgtY[ipl]=fResult.charge_wgt_y;
+	fclusterAngle2d[ipl]=fResult.cluster_angle_2d;
+	fangle2d[ipl]=fResult.angle_2d;
+	fopenAngle[ipl]=fResult.opening_angle;
+	fopenAngleChargeWgt[ipl]=fResult.opening_angle_charge_wgt;
+	fcloseAngle[ipl]=fResult.closing_angle;
+	fcloseAngleChargeWgt[ipl]=fResult.closing_angle_charge_wgt;
+	fhitDensity1d[ipl]=fResult.hit_density_1D;
+	fhitDensity2d[ipl]=fResult.hit_density_2D;
+	fmodifiedHitDens[ipl]=fResult.modified_hit_density;
+	
+	
+	
+	///////////////////////////////////////
+	
+	
+	////////////// Fill MC Truth info
+	
+	larutil::PxPoint mcplanevtx;
 	if (mctruth_v!=NULL && mctruth_v->size()) {
-	    mcplanevtx=fGSer->Get2DPointProjectionCM(&mct_vtx,0);
-	    std::cout << " wire vertex " << mcplanevtx.w << "," << mcplanevtx.t << std::endl;
-	    recostartwire->Fill(fResult.start_point.w-mcplanevtx.w);
-	    recostarttime->Fill(fResult.start_point.t-mcplanevtx.t);
-	
-	    double mindiffwire= ( fabs(fResult.start_point.w-mcplanevtx.w) < fabs(fResult.end_point.w-mcplanevtx.w)  )  ? 
-						fResult.start_point.w-mcplanevtx.w : fResult.end_point.w-mcplanevtx.w;
-	    
-            double mindifftime= ( fabs(fResult.start_point.t-mcplanevtx.t) < fabs(fResult.end_point.t-mcplanevtx.t)  )  ? 
-						fResult.start_point.t-mcplanevtx.t : fResult.end_point.t-mcplanevtx.t;						
-	    recostartwirenodir->Fill(mindiffwire);
-	    recostarttimenodir->Fill(mindifftime);
-	    
-	    TLorentzVector mct_mom = mctruth_v->at(0).GetParticles().at(0).Trajectory().at(0).Momentum();
-	    TVector3 mct_momhelp = TVector3(mct_mom[0],mct_mom[1],mct_mom[2] );
-	    double mct_angle2d=fGSer->Get2DangleFrom3D(ipl,mct_momhelp);
-	    int direction=(fabs(mct_angle2d) < TMath::Pi()/2)  ?  1 : -1;
-	    
-	    reco2Dangle->Fill(fResult.angle_2d-mct_angle2d*180/TMath::Pi());
-	    if ( fabs(fResult.start_point.w-mcplanevtx.w) < fabs(fResult.end_point.w-mcplanevtx.w) )  // got the direction right
-	      reco2DangleGood->Fill(fResult.angle_2d-mct_angle2d*180/TMath::Pi());
-	    
-	    recoDir->Fill(fResult.direction - direction);
-	    //reco2Dangle reco2DangleGood;
-	    //recoDir;
-	    
+	  // Correct for new particles
+	  mcplanevtx=fGSer->Get2DPointProjectionCM(&mct_vtx,0);
+	  std::cout << " wire vertex " << mcplanevtx.w << "," << mcplanevtx.t << std::endl;
+	  recostartwire->Fill(fResult.start_point.w-mcplanevtx.w);
+	  recostarttime->Fill(fResult.start_point.t-mcplanevtx.t);
 	  
+	  double mindiffwire= ( fabs(fResult.start_point.w-mcplanevtx.w) < fabs(fResult.end_point.w-mcplanevtx.w)  )  ? 
+	  fResult.start_point.w-mcplanevtx.w : fResult.end_point.w-mcplanevtx.w;
+	  
+	  double mindifftime= ( fabs(fResult.start_point.t-mcplanevtx.t) < fabs(fResult.end_point.t-mcplanevtx.t)  )  ? 
+	  fResult.start_point.t-mcplanevtx.t : fResult.end_point.t-mcplanevtx.t;						
+	  recostartwirenodir->Fill(mindiffwire);
+	  recostarttimenodir->Fill(mindifftime);
+	  
+	  TLorentzVector mct_mom = mctruth_v->at(0).GetParticles().at(0).Trajectory().at(0).Momentum();
+	  TVector3 mct_momhelp = TVector3(mct_mom[0],mct_mom[1],mct_mom[2] );
+	  double mct_angle2d=fGSer->Get2DangleFrom3D(ipl,mct_momhelp);
+	  int direction=(fabs(mct_angle2d) < TMath::Pi()/2)  ?  1 : -1;
+	  
+	  reco2Dangle->Fill(fResult.angle_2d-mct_angle2d*180/TMath::Pi());
+	  if ( fabs(fResult.start_point.w-mcplanevtx.w) < fabs(fResult.end_point.w-mcplanevtx.w) )  // got the direction right
+	      reco2DangleGood->Fill(fResult.angle_2d-mct_angle2d*180/TMath::Pi());
+	  
+	  recoDir->Fill(fResult.direction - direction);
+	  
+	  
+	  /// these need to be modified, once we have the looping through clusters efficiency.
+	  /// Currently using NPart = 0. Set this to the most appropriate later.
+	  
+	  int NPart=0;
+	  
+	  
+	  mcpdg[ipl]=mctruth_v->at(0).GetParticles().at(NPart).PdgCode();  
+	  mcenergy[ipl]=mctruth_v->at(0).GetParticles().at(NPart).Trajectory().at(0).E();  
+	  // mcphi[ipl]=;  
+	  // mctheta[ipl]=;  
+	  mcomega[ipl]=mct_angle2d*180/TMath::Pi();  
+	  if(mcpdg[ipl]==22)
+	  {
+	    int trajsize= mctruth_v->at(0).GetParticles().at(NPart).Trajectory().size();
+	    mcx[ipl]=mctruth_v->at(0).GetParticles().at(NPart).Trajectory().at(trajsize-1).Position()[0]; 
+	    mcy[ipl]=mctruth_v->at(0).GetParticles().at(NPart).Trajectory().at(trajsize-1).Position()[1];  
+	    mcz[ipl]=mctruth_v->at(0).GetParticles().at(NPart).Trajectory().at(trajsize-1).Position()[2];
+	  }
+	  else  
+	  {
+	    mcx[ipl]=mctruth_v->at(0).GetParticles().at(NPart).Trajectory().at(0).Position()[0];  
+	    mcy[ipl]=mctruth_v->at(0).GetParticles().at(NPart).Trajectory().at(0).Position()[1];  
+	    mcz[ipl]=mctruth_v->at(0).GetParticles().at(NPart).Trajectory().at(0).Position()[2];
+	  }
+	  
+	  mcdirection[ipl]=direction;
+	  //    mcenergyfraction[ipl]=;
+	  mcwirevertex[ipl]=mcplanevtx.w;
+	  mctimevertex[ipl]=mcplanevtx.t;
+	  
+	  //reco2Dangle reco2DangleGood;
+	  //recoDir;
 	}
-	
+	////////////// End Fill MC Truth info
 	
 
      } // end loop on clusters
 
-
+    fMainTree->Fill();
   
   
     return true;
@@ -589,7 +792,7 @@ namespace larlight {
       eigenvalue_principal_tr->Write();
       length_tr->Write();
       width_tr ->Write();
-	
+     fMainTree->Write();
 	
 	
       }
@@ -600,5 +803,175 @@ namespace larlight {
 
     return true;
   }
+  
+  
+  void TestEff::init_tree_vectors(){
+
+    if(!fNParticles && !fNClusters)
+    {
+     std::cout << " no particles and no clusters - nothing to here " << std::endl;
+     return;
+    }
+    
+    //These are defined per MCparticle  
+       fMCPDGstart.clear();  
+       fMCPDGisPrimary.clear();  
+       fMCenergystart.clear();  
+       fMCPhistart.clear();  
+       fMCThetastart.clear();  
+       fMCXOrig.clear();  
+       fMCYOrig.clear();  
+       fMCZOrig.clear();  
+    
+    
+    //These are defined per cluster
+       mcpdg.clear();  
+       mcenergy.clear();  
+       mcphi.clear();  
+       mctheta.clear();  
+       mcomega.clear();  
+       mcx.clear();  
+       mcy.clear();  
+       mcz.clear();
+    
+       mcdirection.clear();
+    //    mcenergyfraction.clear();
+       mcwirevertex.clear();
+       mctimevertex.clear();
+    //    mcdistfromorigin.clear();
+    
+    
+    ///////////// reconstructed quantities
+       plane.clear();
+       fWireVertex.clear();
+       fTimeVertex.clear();
+    
+       fWireLast.clear();
+       fTimeLast.clear();
+    
+       fDirection.clear();
+    
+       fOffAxis.clear();
+       fOffAxisNorm.clear();
+       fNhits.clear();
+    
+       fHitDensity.clear();
+       fLength.clear();
+       fWidth.clear();  
+    
+    //  fOffAxisNormHD      fOffAxisNormHD.clear();
+    //  fOnAxisNormHD      fOnAxisNormHD.clear();
+    
+    
+       fPrincipal.clear();
+       slope2D.clear();
+       fMultiHitWires.clear();
+    
+    
+    
+       fsumCharge.clear();
+       fmeanCharge.clear();
+       frmsX.clear();
+       frmsY.clear();
+       fmeanX.clear();
+       fmeanY.clear();
+       fchargeWgtX.clear();
+       fchargeWgtY.clear();
+       fclusterAngle2d.clear();
+       fangle2d.clear();
+       fopenAngle.clear();
+       fopenAngleChargeWgt.clear();
+       fcloseAngle.clear();
+       fcloseAngleChargeWgt.clear();
+       fhitDensity1d.clear();
+       fhitDensity2d.clear();
+       fmodifiedHitDens.clear();
+     
+    
+    
+    
+    
+    
+    ////////////////////////// now resize.
+    //These are defined per MCparticle  
+       fMCPDGstart.resize(fNParticles);  
+       fMCPDGisPrimary.resize(fNParticles);  
+       fMCenergystart.resize(fNParticles);  
+       fMCPhistart.resize(fNParticles);  
+       fMCThetastart.resize(fNParticles);  
+       fMCXOrig.resize(fNParticles);  
+       fMCYOrig.resize(fNParticles);  
+       fMCZOrig.resize(fNParticles);  
+    
+    
+    //These are defined per cluster
+       mcpdg.resize(fNClusters);  
+       mcenergy.resize(fNClusters);  
+       mcphi.resize(fNClusters);  
+       mctheta.resize(fNClusters);  
+       mcomega.resize(fNClusters);  
+       mcx.resize(fNClusters);  
+       mcy.resize(fNClusters);  
+       mcz.resize(fNClusters);
+    
+       mcdirection.resize(fNClusters);
+    //    mcenergyfraction.resize(fNClusters);
+       mcwirevertex.resize(fNClusters);
+       mctimevertex.resize(fNClusters);
+    //    mcdistfromorigin.resize(fNClusters);
+    
+    
+    ///////////// reconstructed quantities
+       plane.resize(fNClusters);
+       fWireVertex.resize(fNClusters);
+       fTimeVertex.resize(fNClusters);
+    
+       fWireLast.resize(fNClusters);
+       fTimeLast.resize(fNClusters);
+    
+       fDirection.resize(fNClusters);
+    
+       fOffAxis.resize(fNClusters);
+       fOffAxisNorm.resize(fNClusters);
+       fNhits.resize(fNClusters);
+    
+       fHitDensity.resize(fNClusters);
+       fLength.resize(fNClusters);
+       fWidth.resize(fNClusters);  
+    
+    //  fOffAxisNormHD      fOffAxisNormHD.resize(fNClusters);
+    //  fOnAxisNormHD      fOnAxisNormHD.resize(fNClusters);
+    
+    
+       fPrincipal.resize(fNClusters);
+       slope2D.resize(fNClusters);
+       fMultiHitWires.resize(fNClusters);
+    
+    
+    
+       fsumCharge.resize(fNClusters);
+       fmeanCharge.resize(fNClusters);
+       frmsX.resize(fNClusters);
+       frmsY.resize(fNClusters);
+       fmeanX.resize(fNClusters);
+       fmeanY.resize(fNClusters);
+       fchargeWgtX.resize(fNClusters);
+       fchargeWgtY.resize(fNClusters);
+       fclusterAngle2d.resize(fNClusters);
+       fangle2d.resize(fNClusters);
+       fopenAngle.resize(fNClusters);
+       fopenAngleChargeWgt.resize(fNClusters);
+       fcloseAngle.resize(fNClusters);
+       fcloseAngleChargeWgt.resize(fNClusters);
+       fhitDensity1d.resize(fNClusters);
+       fhitDensity2d.resize(fNClusters);
+       fmodifiedHitDens.resize(fNClusters);
+     
+    
+    
+    
+    
+    }
+  
 }
 #endif

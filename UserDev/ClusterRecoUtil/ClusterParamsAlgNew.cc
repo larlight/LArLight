@@ -963,7 +963,7 @@ namespace cluster{
       fParams.hit_density_1D=fParams.N_Hits/fParams.length;
     else
       fParams.hit_density_1D=0;
-    
+       
     if(fParams.length && fParams.width)
       fParams.hit_density_2D=fParams.N_Hits/fParams.length/fParams.width;
     else
