@@ -341,15 +341,21 @@ namespace larlight {
 	  _ch_data.set_readout_sample_number( (word & 0x1f)<<12 );
 
 	  // Correct channel frame id roll-over w.r.t. event frame id
-	  _ch_data.set_readout_frame_number(roll_over(_event_data->event_frame_number(),
+	  //std::cout<<"Checking roll over for 3 bits..."<<std::endl;
+	  if(_header_info.event_frame_number == FEM::INVALID_WORD) {
+	    print(MSG::ERROR,__FUNCTION__,Form("Invalid event frame number: %d",FEM::INVALID_WORD));
+	    throw decode_algo_exception();
+	  }
+	  _ch_data.set_readout_frame_number(roll_over(_header_info.event_frame_number,
 						      ((word & 0xff)>>5),
 						      3)
 					    );
 	  // Check if the frame is -1 to +2 w.r.t. event frame number
-	  int diff = ((int)(_ch_data.readout_frame_number())) - ((int)(_event_data->event_frame_number()));
+
+	  int diff = ((int)(_ch_data.readout_frame_number())) - ((int)(_header_info.event_frame_number));
 	  if(diff < -1 || diff > 2) {
 	    print(MSG::ERROR,__FUNCTION__,Form("Found event frame %d and discriminator frame %d (difference too big!)",
-					       _event_data->event_frame_number(),
+					       _header_info.event_frame_number,
 					       _ch_data.readout_frame_number()));
 	    status = false;
 	  }
@@ -370,7 +376,7 @@ namespace larlight {
 	  if(_verbosity[MSG::INFO]){
 	    sprintf(_buf,"Encountered the last word (%x) for channel %d",word,_ch_data.channel_number());
 	    Message::send(MSG::INFO,_buf);
-	    sprintf(_buf,"Event frame  : %d",_event_data->event_frame_number());
+	    sprintf(_buf,"Event frame  : %d",_header_info.event_frame_number);
 	    Message::send(MSG::INFO,_buf);
 	    sprintf(_buf,"PMT frame    : %d",_ch_data.readout_frame_number());
 	    Message::send(MSG::INFO,_buf);

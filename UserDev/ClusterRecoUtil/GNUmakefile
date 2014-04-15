@@ -16,8 +16,10 @@ INCFLAGS += -I$(LARLIGHT_CORE_DIR)/DataFormat
 INCFLAGS += -I$(LARLIGHT_CORE_DIR)/Analysis
 INCFLAGS += -I$(LARLIGHT_CORE_DIR)/LArUtil
 INCFLAGS += -I$(USER_DEV_DIR)/FANN
-INCFLAGS += -I$(USER_DEV_DIR)/FANN/include -p
+INCFLAGS += -I$(USER_DEV_DIR)/FANN/include
 
+# Add -p flag to CINT compilation
+CINTFLAGS += -p
 
 # platform-specific options
 OSNAME          = $(shell uname -s)

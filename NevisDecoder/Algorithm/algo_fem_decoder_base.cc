@@ -338,11 +338,12 @@ namespace larlight {
   #ifdef INCLUDE_EXTRA_HEADER
 
     // Correct for a roll over 
+    //std::cout<<"checking roll over for header ..."<<std::endl;
     _header_info.fem_trig_frame_number  = roll_over(_header_info.event_frame_number, 
 						    ((event_header[5] & 0xfff)>>4 & 0xf),
 						    4);
     
-    _header_info.fem_trig_sample_number = ((((event_header[5]>>16) & 0xf)<<8) + (event_header[5] & 0xff));
+    _header_info.fem_trig_sample_number = ((((event_header[5]) & 0xf)<<8) + (event_header[5]>>16 & 0xff));
 
   #endif
 
@@ -374,28 +375,31 @@ namespace larlight {
   UInt_t algo_fem_decoder_base::roll_over(UInt_t ref,
 					  UInt_t subject,
 					  UInt_t nbits) const
+  //					  bool use_half_diff) const
   //#################################################
   {
     // Return "ref" which lower "nbits" are replaced by that of "subject"
     // Takes care of roll over effect.
     // For speed purpose we only accept pre-defined nbits values.
+
     UInt_t diff=0; // max diff should be (2^(nbits)-2)/2
     UInt_t mask=0; // mask to extract lower nbits from subject ... should be 2^(nbits)-1
     if      (nbits==3) {diff = 3; mask = 0x7;}
-    else if (nbits==4) {diff = 7; mask = 0xf;}
+    else if (nbits==4) {diff = 0xf; mask = 0xf;}
+    //    else if (nbits==4) {nbits=3; diff = 0x7; mask = 0x7;}
     else {
       print(MSG::ERROR,__FUNCTION__,"Only supported for nbits = [3,4]!");
       throw decode_algo_exception();
     }
 
     subject = ( (ref>>nbits) << nbits) + (subject & mask);
-
+    //std::cout<<ref<<" : "<<subject<<" : "<<nbits<< " : "<<diff<<std::endl;
     // If exactly same, return
     if(subject == ref) return subject;
 
     // If subject is bigger than ref by a predefined diff value, inspect difference
     else if ( subject > ref && (subject - ref) > diff) {
-
+      
       // Throw an exception if difference is exactly diff+1
       if ( (subject - ref) == diff+1 ) {
 	print(MSG::ERROR,__FUNCTION__,Form("Unexpected diff: ref=%d, subject=%d",ref,subject));
@@ -403,7 +407,10 @@ namespace larlight {
       }
       
       // Else we have to subtract (mask+1) 
-      else subject = subject - (mask + 1);
+      else{ 
+	//std::cout<<Form("Correcting %d to %d",subject,(subject-(mask+1)))<<std::endl;
+	subject = subject - (mask + 1);
+      }
       
     } 
     // If subject is smaller than ref by a predefined diff value, inspect difference
@@ -414,7 +421,10 @@ namespace larlight {
 	print(MSG::ERROR,__FUNCTION__,Form("Unexpected diff: ref=%d, subject=%d",ref,subject));
 	throw decode_algo_exception();
       }
-      else subject = subject + (mask + 1);
+      else{
+	//std::cout<<Form("Correcting %d to %d",subject,(subject + (mask+1)))<<std::endl;
+	subject = subject + (mask + 1);
+      }
     }
     return subject;
   }
