@@ -104,8 +104,12 @@ namespace larlight {
     fMainTree->Branch("hitDensity1d","std::vector<double>",&fhitDensity1d );
     fMainTree->Branch("hitDensity2d","std::vector<double>",&fhitDensity2d );
     fMainTree->Branch("modifiedHitDens","std::vector<double>",&fmodifiedHitDens );
-     
+    
+    fMainTree->Branch("fShowerness","std::vector<double>",&fShowerness );
+    fMainTree->Branch("fTrackness","std::vector<double>",&fTrackness );
+    
 	
+   
 	 
 	   
     
@@ -246,8 +250,9 @@ namespace larlight {
     else closeAngleChargeWgt_tr->Reset();
     
     
-    larutil::LArUtilManager::Reconfigure(larlight::GEO::kArgoNeuT);
-    
+    larutil::LArUtilManager::Reconfigure(larlight::GEO::kArgoNeuT);    
+
+
     return true;
   }
   
@@ -282,89 +287,68 @@ namespace larlight {
     
     event_mctruth  *mctruth_v = (event_mctruth *)(storage->get_data(DATA::MCTruth)); 
     
+    event_cluster * my_cluster_v = (event_cluster *)(storage->get_data(DATA::FuzzyCluster));
+
+  
+   // event_hit * my_hit_v = (event_hit*)(storage->get_data(my_cluster_v->get_hit_type()));
+    event_hit * my_hit_v = (event_hit*)(storage->get_data(DATA::FFTHit));
+    std::cout << " full hitlist size: " << my_hit_v->size() << std::endl;
+    std::cout << " number of clusters: " << my_cluster_v->size() << std::endl;	
+    
+    
+    fNParticles=1;  // (for now, then should be: mctruth_v->at(0).GetParticles().size(); )
+    
+    fNPlanes=larutil::Geometry::GetME()->Nplanes();
+   // fNClusters=fNPlanes;    // then should be" my_cluster_v->size() or fNPlanes
+    fNClusters=my_cluster_v->size()+1;    // using clusters
+    init_tree_vectors();
+    
+    
     
     TLorentzVector mct_vtx;
 
-    if (mctruth_v!=NULL && mctruth_v->size()) 
-      {
-        if ( mctruth_v->size()>1 )  // this needs to be changed
-              std::cout <<  "Found more than 1 MCTruth. \n " << std::endl;
-
-	//Test selection efficiency
-        for(int i=0;i<=mctruth_v->size();i++){
-
-            if (mctruth_v->at(i).GetParticles().at(i).PdgCode() == 11)  {    // electron
-	        if (i==0){	    
-	       	     mct_vtx = mctruth_v->at(i).GetParticles().at(i).Trajectory().at(i).Position();
-       	             is_mc_shower=true;
-		 }
-       	        std::cout << "\n electron " << std::endl; 
-       	      }
-	    else if ( mctruth_v->at(i).GetParticles().at(i).PdgCode() == 111 )   { //  neutral pion 
-       	        int trajsize= mctruth_v->at(i).GetParticles().at(i).Trajectory().size();
-		if(i==0){
-       	            mct_vtx = mctruth_v->at(i).GetParticles().at(i).Trajectory().at(trajsize-1).Position();
-                    is_mc_shower=true;
-		  }
-	   	else{
-  	    	    if ( mctruth_v->at(i).GetParticles().at(i).PdgCode() == 22 )   { 
-       	        	trajsize= mctruth_v->at(i).GetParticles().at(i).Trajectory().size();
+	  /* 	else{
+  	    	    if ( mctruth_v->at(NPart).GetParticles().at(NPart).PdgCode() == 22 )   { 
+       	        	trajsize= mctruth_v->at(NPart).GetParticles().at(NPart).Trajectory().size();
        	        	std::cout <<  "\n gamma " << std::endl;
 		      }
        	        std::cout <<  "\n pi-0 " << std::endl;
-                    }
-            else if ( mctruth_v->at(i).GetParticles().at(i).PdgCode() == 13 && i==0)  //      ## muon    
-               {
-                mct_vtx = mctruth_v->at(i).GetParticles().at(i).Trajectory().at(i).Position();
-                is_mc_track=true;
-                std::cout <<  "\n muon " << std::endl;
-                }
-            else{
-		if(i==0){
-                    mct_vtx = mctruth_v->at(i).GetParticles().at(i).Trajectory().at(i).Position(); 
-                    is_mc_track=true;
-		 } 
-                std::cout <<  "\n proton ? " << std::endl;
-                 }
-           }
-       std::cout << " Truth vertex (" << mct_vtx[0] << "," << mct_vtx[1] << "," << mct_vtx[2] << "," << std::endl;
-     } 
+                    }*/
 
-/*    if (mctruth_v!=NULL && mctruth_v->size()) 
+    if (mctruth_v!=NULL && mctruth_v->size()) 
       {
-        if ( mctruth_v->size()>1 ){  // this needs to be changed
-=======
-	int NPart=0;
-        if ( mctruth_v->size()>1 )  // this needs to be changed
->>>>>>> 8dab16abdfa7921bfddb21f4e531e10475e46952
+       	if ( mctruth_v->size()>1 )  // this needs to be changed
             std::cout <<  "Found more than 1 MCTruth. Only use the 1st one... \n " << std::endl;
-	 std::cout <<  "Found more than 1 MCTruth. Only use the 1st one... \n " << std::endl;
-  //	    for(int i=0;i<=mctruth_v->size();i++){
- //	      }
-        if (mctruth_v->at(0).GetParticles().at(NPart).PdgCode() == 11)  {    // electron    
-            mct_vtx = mctruth_v->at(0).GetParticles().at(NPart).Trajectory().at(0).Position();
-           
-//	}
-            std::cout << "\n electron " << std::endl; 
-	    is_mc_shower=true;
-	    }
-        else if ( mctruth_v->at(0).GetParticles().at(NPart).PdgCode() == 22 )   { 
-            int trajsize= mctruth_v->at(0).GetParticles().at(NPart).Trajectory().size();
-            mct_vtx = mctruth_v->at(0).GetParticles().at(NPart).Trajectory().at(trajsize-1).Position();
-            std::cout <<  "\n gamma " << std::endl;
-	    is_mc_shower=true;
-	    }
-        else if ( mctruth_v->at(0).GetParticles().at(NPart).PdgCode() == 13 )  //      ## muon    
-	    {
-            mct_vtx = mctruth_v->at(0).GetParticles().at(NPart).Trajectory().at(0).Position();
-            std::cout <<  "\n muon " << std::endl;
-	    is_mc_track=true;
-	    }
-	else{
-	   is_mc_track=true;
-	    mct_vtx = mctruth_v->at(0).GetParticles().at(NPart).Trajectory().at(0).Position();  
-	    std::cout <<  "\n proton ? " << std::endl;
-	   }
+	int NPart=0;
+        for(int NPart=0;NPart<=mctruth_v->size();NPart++){
+            if (mctruth_v->at(0).GetParticles().at(NPart).PdgCode() == 11)  {    // electron    
+		if(NPart==0)
+                    mct_vtx = mctruth_v->at(0).GetParticles().at(NPart).Trajectory().at(0).Position();
+
+           	 is_mc_shower=true;
+           	 std::cout << "\n electron " << std::endl;
+	    	 is_electron=true; 
+	     }
+            else if ( mctruth_v->at(0).GetParticles().at(NPart).PdgCode() == 22 )   { 
+                int trajsize= mctruth_v->at(0).GetParticles().at(NPart).Trajectory().size();
+                if(NPart==0)
+     		    mct_vtx = mctruth_v->at(0).GetParticles().at(NPart).Trajectory().at(trajsize-1).Position();
+
+                std::cout <<  "\n gamma " << std::endl;
+	        is_mc_shower=true;
+		is_gamma=true;
+	     }
+            else if ( mctruth_v->at(0).GetParticles().at(NPart).PdgCode() == 13 )  //      ## muon    
+	     {
+                mct_vtx = mctruth_v->at(0).GetParticles().at(NPart).Trajectory().at(0).Position();
+                std::cout <<  "\n muon " << std::endl;
+	        is_mc_track=true;
+	     }
+   	    else{
+	        is_mc_track=true;
+	        mct_vtx = mctruth_v->at(0).GetParticles().at(NPart).Trajectory().at(0).Position();  
+	        std::cout <<  "\n proton ? " << std::endl;
+	     }
 	std::cout << " Truth vertex (" << mct_vtx[0] << "," << mct_vtx[1] << "," << mct_vtx[2] << "," << std::endl;
 	fMCPDGstart[NPart]=mctruth_v->at(0).GetParticles().at(NPart).PdgCode();
 	fMCenergystart[NPart]=mctruth_v->at(0).GetParticles().at(NPart).Trajectory().at(0).Position().E();
@@ -375,24 +359,11 @@ namespace larlight {
 	fMCYOrig[NPart]=mct_vtx[1];
 	fMCZOrig[NPart]=mct_vtx[2];
       } 
-*/    
-    std::cout << " is shower: " << is_mc_shower << " is track: " << is_mc_track << std::endl;
+    
+       std::cout << " is shower: " << is_mc_shower << " is track: " << is_mc_track << std::endl;
     /// /////////////////////////////////////////////// End Getting MC Truth info out.	    
-    
-    event_cluster * my_cluster_v = (event_cluster *)(storage->get_data(DATA::FuzzyCluster));
-
+    }
   
-   // event_hit * my_hit_v = (event_hit*)(storage->get_data(my_cluster_v->get_hit_type()));
-     event_hit * my_hit_v = (event_hit*)(storage->get_data(DATA::FFTHit));
-    std::cout << " ful hitlist size: " << my_hit_v->size() << std::endl;
-	
-    
-    
-    fNParticles=1;  // (for now, then should be: mctruth_v->at(0).GetParticles().size(); )
-    
-    fNPlanes=larutil::Geometry::GetME()->Nplanes();
-    init_tree_vectors();
-    fNClusters=fNPlanes;    // then should be" my_cluster_v->size() or fNPlanes
    //cluster::ClusterParamsAlgNew  fCPAlg; // = new cluster::ClusterParamsAlgNew();
 ///  //////////////// start looping on clusters or planes to get all hits.
  
@@ -401,46 +372,50 @@ namespace larlight {
      fEvent=my_hit_v->event_id();
     
       ///using all hits:	 // comment in or out as needed
-     for (int ipl=0;ipl<fNPlanes;ipl++) {
-    
-        std::vector<const larlight::hit *> hit_vector;
-	
-        hit_vector.clear();
-        hit_vector.reserve(my_hit_v->size());
-
-	 std::cout << " plane: " << ipl << " Run: " << my_hit_v->run() << " SubRunID " << my_hit_v->subrun() << " EventID " <<  my_hit_v->event_id() << " " << my_hit_v << std::endl;   
-	 
-	
-	 
-	int iplane = ipl;
-        for(auto &h : *my_hit_v) {
-
-        if( larutil::Geometry::GetME()->ChannelToPlane(h.Channel()) == ipl )
-	    hit_vector.push_back((const larlight::hit*)(&h));
-
-	}
-	
-         std::cout << " +++ in TestEff " << hit_vector.size() << " at plane: " << ipl << std::endl; 
+//      for (int ipl=0;ipl<fNPlanes;ipl++) {
+//     
+//         std::vector<const larlight::hit *> hit_vector;
+// 	
+//         hit_vector.clear();
+//         hit_vector.reserve(my_hit_v->size());
+// 
+// 	 std::cout << " plane: " << ipl << " Run: " << my_hit_v->run() << " SubRunID " << my_hit_v->subrun() << " EventID " <<  my_hit_v->event_id() << " " << my_hit_v << std::endl;   
+// 	 
+// 	
+// 	 
+// 	int iplane = ipl;
+//         for(auto &h : *my_hit_v) {
+// 
+//         if( larutil::Geometry::GetME()->ChannelToPlane(h.Channel()) == ipl )
+// 	    hit_vector.push_back((const larlight::hit*)(&h));
+// 
+// 	}
+// 	
+//          std::cout << " +++ in TestEff " << hit_vector.size() << " at plane: " << ipl << std::endl; 
       /// end using all hits  
 
 	 /// using cluster only. // comment in or out as needed // need to set ipl as counter. and iplane as plane
-//     for(auto const clustit : *my_cluster_v) {
-//       std::cout << " Clust ID " << clustit.ID() << " Run: " << my_cluster_v->run() << " SubRunID " << my_cluster_v->subrun() << " EventID " <<  my_cluster_v->event_id() << " " << my_cluster_v << std::endl;    
-// 
-//      //auto const hit_index_v = clustit.association(my_cluster_v->get_hit_type());
-//     
-//         auto const hit_index_v = clustit.association(DATA::FFTHit);
-//         std::vector<const larlight::hit *> hit_vector;
-//         hit_vector.clear();
-//         
-//         for(auto const hit_index : hit_index_v) {
-//             hit_vector.push_back( const_cast<const larlight::hit *>(&(my_hit_v->at(hit_index))) );
-//             //my_hit_v->at(hit_index);
-//         }
-//      int ipl = clustit;
-//      int iplane = larutil::Geometry::GetME()->ChannelToPlane(h.Channel()) ;
-       /// end cluster comment out   
+     int ipl=-1; // just so that I can increment it at the start and not end of loop. ;-)
+    for(auto const clustit : *my_cluster_v) {
+      std::cout << "loop nr " << ipl+2 << std::endl;
+      std::cout << " Clust ID " << clustit.ID() << " Run: " << my_cluster_v->run() << " SubRunID " << my_cluster_v->subrun() << " EventID " <<  my_cluster_v->event_id() << " " << my_cluster_v << std::endl;    
+
+     //auto const hit_index_v = clustit.association(my_cluster_v->get_hit_type());
+    
+        auto const hit_index_v = clustit.association(DATA::FFTHit);
+        std::vector<const larlight::hit *> hit_vector;
+        hit_vector.clear();
         
+        for(auto const hit_index : hit_index_v) {
+            hit_vector.push_back( const_cast<const larlight::hit *>(&(my_hit_v->at(hit_index))) );
+            //my_hit_v->at(hit_index);
+        }
+      ipl++; // should be zero on first loop.
+      int iplane = larutil::Geometry::GetME()->ChannelToPlane(hit_vector[0]->Channel()) ;
+      std::cout << " ipl " << ipl << " iplane "<< iplane << std::endl;
+       /// end cluster comment out   
+     //   if (ipl>fNPlanes-1)
+	//  continue;
   //      std::cout << " +++ in TestEff " << hit_vector.size() << std::endl;  
 	
 
@@ -449,18 +424,21 @@ namespace larlight {
 	     continue;
 	    }
 	    
-	    
+            
         ::cluster::ClusterParamsAlgNew  fCPAlg;
-	if(fCPAlg.SetHits(hit_vector) ==-1 )	
+        fCPAlg.setNeuralNetPath("../FANN/trained_nets/cascade_net.net");
+        fCPAlg.Initialize();
+        if(fCPAlg.SetHits(hit_vector) ==-1 )	
 	    continue;
         fCPAlg.GetAverages(true);
         fCPAlg.GetRoughAxis(true);
         fCPAlg.GetProfileInfo(true);
-	fCPAlg.RefineStartPointAndDirection(true);
+        fCPAlg.RefineStartPointAndDirection(true);
         //fCPAlg.RefineDirection(true);
         //fCPAlg.RefineStartPoints(true);
         //fCPAlg.FillPolygon()
         fCPAlg.GetFinalSlope(true);
+        fCPAlg.TrackShowerSeparation(true);
         fCPAlg.Report();
 	
 	::cluster::cluster_params fResult=fCPAlg.GetParams();
@@ -562,7 +540,8 @@ namespace larlight {
 	fhitDensity2d[ipl]=fResult.hit_density_2D;
 	fmodifiedHitDens[ipl]=fResult.modified_hit_density;
 	
-	
+	fShowerness[ipl]=fResult.showerness;
+        fTrackness[ipl]=fResult.trackness;
 	
 	///////////////////////////////////////
 	
@@ -587,7 +566,7 @@ namespace larlight {
 	  
 	  TLorentzVector mct_mom = mctruth_v->at(0).GetParticles().at(0).Trajectory().at(0).Momentum();
 	  TVector3 mct_momhelp = TVector3(mct_mom[0],mct_mom[1],mct_mom[2] );
-	  double mct_angle2d=fGSer->Get2DangleFrom3D(ipl,mct_momhelp);
+	  double mct_angle2d=fGSer->Get2DangleFrom3D(plane[ipl],mct_momhelp);
 	  int direction=(fabs(mct_angle2d) < TMath::Pi()/2)  ?  1 : -1;
 	  
 	  reco2Dangle->Fill(fResult.angle_2d-mct_angle2d*180/TMath::Pi());
@@ -886,7 +865,8 @@ namespace larlight {
        fhitDensity1d.clear();
        fhitDensity2d.clear();
        fmodifiedHitDens.clear();
-     
+       fShowerness.clear();
+       fTrackness.clear();
     
     
     
@@ -967,7 +947,8 @@ namespace larlight {
        fhitDensity2d.resize(fNClusters);
        fmodifiedHitDens.resize(fNClusters);
      
-    
+       fShowerness.resize(fNClusters);
+       fTrackness.resize(fNClusters);
     
     
     
