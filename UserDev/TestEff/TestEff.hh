@@ -146,8 +146,8 @@ namespace larlight {
     std::vector<double>   fhitDensity1d    ;
     std::vector<double>   fhitDensity2d    ;
     std::vector<double>   fmodifiedHitDens    ;
-    
-    
+    std::vector<double>   fShowerness;
+    std::vector<double>   fTrackness;
     
     
     

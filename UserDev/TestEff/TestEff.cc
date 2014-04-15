@@ -104,8 +104,12 @@ namespace larlight {
     fMainTree->Branch("hitDensity1d","std::vector<double>",&fhitDensity1d );
     fMainTree->Branch("hitDensity2d","std::vector<double>",&fhitDensity2d );
     fMainTree->Branch("modifiedHitDens","std::vector<double>",&fmodifiedHitDens );
-     
+    
+    fMainTree->Branch("fShowerness","std::vector<double>",&fShowerness );
+    fMainTree->Branch("fTrackness","std::vector<double>",&fTrackness );
+    
 	
+   
 	 
 	   
     
@@ -288,14 +292,15 @@ namespace larlight {
   
    // event_hit * my_hit_v = (event_hit*)(storage->get_data(my_cluster_v->get_hit_type()));
     event_hit * my_hit_v = (event_hit*)(storage->get_data(DATA::FFTHit));
-    std::cout << " ful hitlist size: " << my_hit_v->size() << std::endl;
-	
+    std::cout << " full hitlist size: " << my_hit_v->size() << std::endl;
+    std::cout << " number of clusters: " << my_cluster_v->size() << std::endl;	
     
     
     fNParticles=1;  // (for now, then should be: mctruth_v->at(0).GetParticles().size(); )
     
     fNPlanes=larutil::Geometry::GetME()->Nplanes();
-    fNClusters=fNPlanes;    // then should be" my_cluster_v->size() or fNPlanes
+   // fNClusters=fNPlanes;    // then should be" my_cluster_v->size() or fNPlanes
+    fNClusters=my_cluster_v->size()+1;    // using clusters
     init_tree_vectors();
     
     
@@ -357,46 +362,50 @@ namespace larlight {
      fEvent=my_hit_v->event_id();
     
       ///using all hits:	 // comment in or out as needed
-     for (int ipl=0;ipl<fNPlanes;ipl++) {
-    
-        std::vector<const larlight::hit *> hit_vector;
-	
-        hit_vector.clear();
-        hit_vector.reserve(my_hit_v->size());
-
-	 std::cout << " plane: " << ipl << " Run: " << my_hit_v->run() << " SubRunID " << my_hit_v->subrun() << " EventID " <<  my_hit_v->event_id() << " " << my_hit_v << std::endl;   
-	 
-	
-	 
-	int iplane = ipl;
-        for(auto &h : *my_hit_v) {
-
-        if( larutil::Geometry::GetME()->ChannelToPlane(h.Channel()) == ipl )
-	    hit_vector.push_back((const larlight::hit*)(&h));
-
-	}
-	
-         std::cout << " +++ in TestEff " << hit_vector.size() << " at plane: " << ipl << std::endl; 
+//      for (int ipl=0;ipl<fNPlanes;ipl++) {
+//     
+//         std::vector<const larlight::hit *> hit_vector;
+// 	
+//         hit_vector.clear();
+//         hit_vector.reserve(my_hit_v->size());
+// 
+// 	 std::cout << " plane: " << ipl << " Run: " << my_hit_v->run() << " SubRunID " << my_hit_v->subrun() << " EventID " <<  my_hit_v->event_id() << " " << my_hit_v << std::endl;   
+// 	 
+// 	
+// 	 
+// 	int iplane = ipl;
+//         for(auto &h : *my_hit_v) {
+// 
+//         if( larutil::Geometry::GetME()->ChannelToPlane(h.Channel()) == ipl )
+// 	    hit_vector.push_back((const larlight::hit*)(&h));
+// 
+// 	}
+// 	
+//          std::cout << " +++ in TestEff " << hit_vector.size() << " at plane: " << ipl << std::endl; 
       /// end using all hits  
 
 	 /// using cluster only. // comment in or out as needed // need to set ipl as counter. and iplane as plane
-//     for(auto const clustit : *my_cluster_v) {
-//       std::cout << " Clust ID " << clustit.ID() << " Run: " << my_cluster_v->run() << " SubRunID " << my_cluster_v->subrun() << " EventID " <<  my_cluster_v->event_id() << " " << my_cluster_v << std::endl;    
-// 
-//      //auto const hit_index_v = clustit.association(my_cluster_v->get_hit_type());
-//     
-//         auto const hit_index_v = clustit.association(DATA::FFTHit);
-//         std::vector<const larlight::hit *> hit_vector;
-//         hit_vector.clear();
-//         
-//         for(auto const hit_index : hit_index_v) {
-//             hit_vector.push_back( const_cast<const larlight::hit *>(&(my_hit_v->at(hit_index))) );
-//             //my_hit_v->at(hit_index);
-//         }
-//      int ipl = clustit;
-//      int iplane = larutil::Geometry::GetME()->ChannelToPlane(h.Channel()) ;
-       /// end cluster comment out   
+     int ipl=-1; // just so that I can increment it at the start and not end of loop. ;-)
+    for(auto const clustit : *my_cluster_v) {
+      std::cout << "loop nr " << ipl+2 << std::endl;
+      std::cout << " Clust ID " << clustit.ID() << " Run: " << my_cluster_v->run() << " SubRunID " << my_cluster_v->subrun() << " EventID " <<  my_cluster_v->event_id() << " " << my_cluster_v << std::endl;    
+
+     //auto const hit_index_v = clustit.association(my_cluster_v->get_hit_type());
+    
+        auto const hit_index_v = clustit.association(DATA::FFTHit);
+        std::vector<const larlight::hit *> hit_vector;
+        hit_vector.clear();
         
+        for(auto const hit_index : hit_index_v) {
+            hit_vector.push_back( const_cast<const larlight::hit *>(&(my_hit_v->at(hit_index))) );
+            //my_hit_v->at(hit_index);
+        }
+      ipl++; // should be zero on first loop.
+      int iplane = larutil::Geometry::GetME()->ChannelToPlane(hit_vector[0]->Channel()) ;
+      std::cout << " ipl " << ipl << " iplane "<< iplane << std::endl;
+       /// end cluster comment out   
+     //   if (ipl>fNPlanes-1)
+	//  continue;
   //      std::cout << " +++ in TestEff " << hit_vector.size() << std::endl;  
 	
 
@@ -521,7 +530,8 @@ namespace larlight {
 	fhitDensity2d[ipl]=fResult.hit_density_2D;
 	fmodifiedHitDens[ipl]=fResult.modified_hit_density;
 	
-	
+	fShowerness[ipl]=fResult.showerness;
+        fTrackness[ipl]=fResult.trackness;
 	
 	///////////////////////////////////////
 	
@@ -546,7 +556,7 @@ namespace larlight {
 	  
 	  TLorentzVector mct_mom = mctruth_v->at(0).GetParticles().at(0).Trajectory().at(0).Momentum();
 	  TVector3 mct_momhelp = TVector3(mct_mom[0],mct_mom[1],mct_mom[2] );
-	  double mct_angle2d=fGSer->Get2DangleFrom3D(ipl,mct_momhelp);
+	  double mct_angle2d=fGSer->Get2DangleFrom3D(plane[ipl],mct_momhelp);
 	  int direction=(fabs(mct_angle2d) < TMath::Pi()/2)  ?  1 : -1;
 	  
 	  reco2Dangle->Fill(fResult.angle_2d-mct_angle2d*180/TMath::Pi());
@@ -845,7 +855,8 @@ namespace larlight {
        fhitDensity1d.clear();
        fhitDensity2d.clear();
        fmodifiedHitDens.clear();
-     
+       fShowerness.clear();
+       fTrackness.clear();
     
     
     
@@ -926,7 +937,8 @@ namespace larlight {
        fhitDensity2d.resize(fNClusters);
        fmodifiedHitDens.resize(fNClusters);
      
-    
+       fShowerness.resize(fNClusters);
+       fTrackness.resize(fNClusters);
     
     
     
