@@ -69,6 +69,10 @@ namespace kaleko {
 
     std::vector<cluster::ClusterParamsAlgNew> _clusterparams;
     
+
+    //neural net path needed
+    std::string myNeuralNetPath;
+
     //variables to go into the ttree
     //    std::vector<int> _nhits;
     //    std::vector<double> _cluscharge;

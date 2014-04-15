@@ -17,6 +17,8 @@ namespace kaleko {
     _ana_tree=0;
     PrepareTTree();
 
+    myNeuralNetPath = std::getenv("MAKE_TOP_DIR") + std::string("/UserDev/FANN/trained_nets/cascade_net.net");
+    
     return true;
   }
   
@@ -167,10 +169,9 @@ namespace kaleko {
 
     _clusterparams.clear();
     _clusterparams.reserve(ev_cluster->size());
-    
     //loop over the reconstructed clusters
     for(auto const i_cluster: *ev_cluster){
-      
+
       const std::vector<unsigned short> ass_index(i_cluster.association(hit_type));
       if(ass_index.size()<15) continue;
 
@@ -191,9 +192,11 @@ namespace kaleko {
 	tmp_hits.push_back(h);
       }
       
+
       _clusterparams.push_back(::cluster::ClusterParamsAlgNew());
 	
       try {
+	(*_clusterparams.rbegin()).setNeuralNetPath(myNeuralNetPath);
 	(*_clusterparams.rbegin()).SetHits(tmp_hits);
 	//	(*_clusterparams.rbegin()).FillPolygon();
 	(*_clusterparams.rbegin()).FillParams();

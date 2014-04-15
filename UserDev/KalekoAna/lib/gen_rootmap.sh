@@ -17,7 +17,7 @@ rootlibmap() {
 ######################################################
 # KalekoAna gSystem->Load("KalekoAna") loads ALL OF THESE THINGS
 rootlibmap libKalekoAna.rootmap libKalekoAna.so $USER_DEV_DIR/KalekoAna/LinkDef.h \
-    libAnalysis.so libClusterRecoUtil.so
+    libAnalysis.so libClusterRecoUtil.so libFANN.so
 
 
 
