@@ -246,8 +246,9 @@ namespace larlight {
     else closeAngleChargeWgt_tr->Reset();
     
     
-    larutil::LArUtilManager::Reconfigure(larlight::GEO::kArgoNeuT);
-    
+    larutil::LArUtilManager::Reconfigure(larlight::GEO::kArgoNeuT);    
+
+
     return true;
   }
   
@@ -404,18 +405,21 @@ namespace larlight {
 	     continue;
 	    }
 	    
-	    
+            
         ::cluster::ClusterParamsAlgNew  fCPAlg;
-	if(fCPAlg.SetHits(hit_vector) ==-1 )	
+        fCPAlg.setNeuralNetPath("../FANN/trained_nets/cascade_net.net");
+        fCPAlg.Initialize();
+        if(fCPAlg.SetHits(hit_vector) ==-1 )	
 	    continue;
         fCPAlg.GetAverages(true);
         fCPAlg.GetRoughAxis(true);
         fCPAlg.GetProfileInfo(true);
-	fCPAlg.RefineStartPointAndDirection(true);
+        fCPAlg.RefineStartPointAndDirection(true);
         //fCPAlg.RefineDirection(true);
         //fCPAlg.RefineStartPoints(true);
         //fCPAlg.FillPolygon()
         fCPAlg.GetFinalSlope(true);
+        fCPAlg.TrackShowerSeparation(true);
         fCPAlg.Report();
 	
 	::cluster::cluster_params fResult=fCPAlg.GetParams();
