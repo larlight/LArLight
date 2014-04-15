@@ -343,7 +343,7 @@ namespace larlight {
 						    ((event_header[5] & 0xfff)>>4 & 0xf),
 						    4);
     
-    _header_info.fem_trig_sample_number = ((((event_header[5]>>16) & 0xf)<<8) + (event_header[5] & 0xff));
+    _header_info.fem_trig_sample_number = ((((event_header[5]) & 0xf)<<8) + (event_header[5]>>16 & 0xff));
 
   #endif
 
