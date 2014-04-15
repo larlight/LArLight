@@ -400,26 +400,26 @@ namespace larlight {
             hit_vector.push_back( const_cast<const larlight::hit *>(&(my_hit_v->at(hit_index))) );
             //my_hit_v->at(hit_index);
         }
-      ipl++; // should be zero on first loop.
-      int iplane = larutil::Geometry::GetME()->ChannelToPlane(hit_vector[0]->Channel()) ;
-      std::cout << " ipl " << ipl << " iplane "<< iplane << std::endl;
-       /// end cluster comment out   
-     //   if (ipl>fNPlanes-1)
-	//  continue;
-  //      std::cout << " +++ in TestEff " << hit_vector.size() << std::endl;  
-	
+        ipl++; // should be zero on first loop.
+        int iplane = larutil::Geometry::GetME()->ChannelToPlane(hit_vector[0]->Channel()) ;
+        std::cout << " ipl " << ipl << " iplane "<< iplane << std::endl;
+        /// end cluster comment out   
+        //   if (ipl>fNPlanes-1)
+        //  continue;
+        //      std::cout << " +++ in TestEff " << hit_vector.size() << std::endl;  
 
-	if(hit_vector.size() < 20)   // do not bother with too small hitlists
-	    {
-	     continue;
-	    }
-	    
-            
+
+        if(hit_vector.size() < 20)   // do not bother with too small hitlists
+        {
+            continue;
+        }
+
+
         ::cluster::ClusterParamsAlgNew  fCPAlg;
         fCPAlg.setNeuralNetPath("../FANN/trained_nets/cascade_net.net");
         fCPAlg.Initialize();
         if(fCPAlg.SetHits(hit_vector) ==-1 )	
-	    continue;
+            continue;
         fCPAlg.GetAverages(true);
         fCPAlg.GetRoughAxis(true);
         fCPAlg.GetProfileInfo(true);

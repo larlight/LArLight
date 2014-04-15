@@ -1157,8 +1157,10 @@ namespace cluster{
         hit_counter_backward++;
       }
 
-      int N_bins_OPEN = NBINS * acos(cosangle_start)/PI;
-      int N_bins_CLOSE = NBINS * acos(cosangle_end)/PI;
+      int N_bins_OPEN = (NBINS-1) * acos(cosangle_start)/PI;
+      int N_bins_CLOSE = (NBINS-1) * acos(cosangle_end)/PI;
+      if (N_bins_OPEN  < 0) N_bins_OPEN  = 0;
+      if (N_bins_CLOSE < 0) N_bins_CLOSE = 0;
       // std::cout << "endStartDiff_x :" << endStartDiff_x << std::endl;
       // std::cout << "endStartDiff_y :" << endStartDiff_y << std::endl;
       // std::cout << "cosangle_start :" << cosangle_start << std::endl;
@@ -1290,7 +1292,7 @@ namespace cluster{
 
     fFinishedRefineDirection = true;
 
-    return;
+    // return;
   } //end RefineDirection
   
 
@@ -1304,9 +1306,9 @@ namespace cluster{
       //make Polygon Object as in mac/PolyOverlap.cc
       std::vector<std::pair<float,float> > vertices;
       for (unsigned int i=0; i<fParams.container_polygon.size(); i++){
-	tmpvertex = std::make_pair( fParams.container_polygon.at(i)->w,
-				    fParams.container_polygon.at(i)->t );
-	vertices.push_back( tmpvertex );
+        tmpvertex = std::make_pair( fParams.container_polygon.at(i)->w,
+        fParams.container_polygon.at(i)->t );
+        vertices.push_back( tmpvertex );
       }
       fParams.PolyObject = Polygon( vertices );
 
@@ -1362,7 +1364,7 @@ namespace cluster{
     std::cout << "    e: (" << fParams.end_point.w << ", " 
               << fParams.end_point.t << ")" << std::endl;
 
-    fParams.direction = (fParams.start_point.w < fParams.end_point.w)	 ? 1 : -1;     
+    fParams.direction = (fParams.start_point.w < fParams.end_point.w)   ? 1 : -1;     
 	      
     return;   
   }

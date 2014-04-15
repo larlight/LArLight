@@ -43,7 +43,10 @@ if args.source == None:
     quit()
 
 if args.num_events == None:
-    args.num_events = -1
+    args.num_events = 99999
+
+num_events = int(args.num_events)
+
 
 if args.data_output == None:
     args.data_output = "default_event_output.root"
@@ -125,12 +128,12 @@ while mgr.next_event():
             print "\n muon \n"
     #PdgCode
 
-    if args.num_events == processed_events:
-        exit()
+    if num_events < processed_events:
+        break
         
     for plane in xrange(larutil.Geometry.GetME().Nplanes()):
 
-        if algo.LoadAllHits(mgr.get_data(larlight.DATA.FFTHit), plane) == -1 :
+        if algo.LoadAllHits(mgr.get_data(larlight.DATA.GausHit), plane) == -1 :
             continue;
 
 
@@ -277,7 +280,9 @@ while mgr.next_event():
         leg.Draw("same")
         # Update canvas
         chit.Update()
-        sys.stdin.readline()
+        # sys.stdin.readline()
+        processed_events+=1
+        print "Finished event %g of %s" % (processed_events, num_events)
         
         
 
