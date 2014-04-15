@@ -374,8 +374,8 @@ namespace larlight {
   //#################################################
   UInt_t algo_fem_decoder_base::roll_over(UInt_t ref,
 					  UInt_t subject,
-					  UInt_t nbits,
-					  bool use_half_diff) const
+					  UInt_t nbits) const
+  //					  bool use_half_diff) const
   //#################################################
   {
     // Return "ref" which lower "nbits" are replaced by that of "subject"
