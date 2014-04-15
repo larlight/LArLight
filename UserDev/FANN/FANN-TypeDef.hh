@@ -7,7 +7,7 @@
 
 // Header files included here
 #include "TrainingModule.hh"
-
+#include "FANNModule.hh"
 // Class forward declaration here
 
 namespace cluster {
