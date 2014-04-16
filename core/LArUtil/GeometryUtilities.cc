@@ -516,22 +516,20 @@ namespace larutil{
    // create dummy  xyz point in middle of detector and another one in unit length.
    // calculate correspoding points in wire-time space and use the differnces between those to return 2D a
    // angle
- //  std::cout << " alpha angle " <<alpha*180/TMath::Pi() <<std::endl;
+   
    
    TVector3 start(geom->DetHalfWidth(),0.,geom->DetLength()/2.);
    TVector3 end=start+dir_vector;
    
    
     //the wire coordinate is already in cm. The time needs to be converted.
-   larutil::PxPoint startp(plane,(geom->DetHalfHeight()*sin(fabs(alpha))+start[2]*cos(alpha)+start[1]*sin(alpha)),start[0]);
+   larutil::PxPoint startp(plane,(geom->DetHalfHeight()*sin(fabs(alpha))+start[2]*cos(alpha)-start[1]*sin(alpha)),start[0]);
    
-   larutil::PxPoint endp(plane,(geom->DetHalfHeight()*sin(fabs(alpha))+end[2]*cos(alpha)+end[1]*sin(alpha)),end[0]);
+   larutil::PxPoint endp(plane,(geom->DetHalfHeight()*sin(fabs(alpha))+end[2]*cos(alpha)-end[1]*sin(alpha)),end[0]);
    
-   //std::cout <<" points " << startp.w << "," << startp.t << "   "<< endp.w << "," << endp.t << std::endl;
    double angle=Get2Dangle(&endp,&startp);
    
-   //std::cout << "calculated angle " << angle*180/TMath::Pi() << std::endl;
-   
+      
    return angle;
     
   }
