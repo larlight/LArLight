@@ -386,6 +386,7 @@ namespace larlight {
     UInt_t mask=0; // mask to extract lower nbits from subject ... should be 2^(nbits)-1
     if      (nbits==3) {diff = 3; mask = 0x7;}
     else if (nbits==4) {diff = 0xf; mask = 0xf;}
+    //else if (nbits==4) {diff = 0x7; mask = 0xf;}
     //    else if (nbits==4) {nbits=3; diff = 0x7; mask = 0x7;}
     else {
       print(MSG::ERROR,__FUNCTION__,"Only supported for nbits = [3,4]!");

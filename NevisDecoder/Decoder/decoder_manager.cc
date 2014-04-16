@@ -116,7 +116,15 @@ namespace larlight {
 	word = (_read_by_block) ? _fin.read_multi_word(_read_block_size) : _fin.read_word();
       }
 
-      status=_decoder->process_word(word);
+      try {
+	status=_decoder->process_word(word);
+      }catch(::larlight::decode_algo_exception e){
+
+	std::cerr<<e.what()<<std::endl;
+	status=false;
+	if(_decoder->backtrace_mode())
+	  _decoder->backtrace();
+      }
 
       if(!status){
 	//if(_decoder->backtrace_mode())
