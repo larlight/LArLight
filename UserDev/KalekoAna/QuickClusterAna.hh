@@ -67,6 +67,9 @@ namespace kaleko {
 			    larlight::event_hit* ev_hits, 
 			    const std::vector<cluster::ClusterParamsAlgNew> &_clusterparams);
 
+    bool DKShittyClusterTest(const larlight::mcshower &main_shower,
+			     const larlight::cluster &i_cluster);
+
     std::vector<cluster::ClusterParamsAlgNew> _clusterparams;
     
 
@@ -76,10 +79,14 @@ namespace kaleko {
     //variables to go into the ttree
     //    std::vector<int> _nhits;
     //    std::vector<double> _cluscharge;
-    //    std::vector<double> _mother_energy;
+    //    std::vector<double> _mc_mother_energy;
     int _nhits;
     double _cluscharge;
-    double _mother_energy;
+    double _mc_mother_energy;
+    double _mc_angle_2d;
+    int _view;
+    bool _dk_good_clus;
+
 
     double _sum_charge;                 ///< Sum charge of hits in ADC
     double _mean_charge;                ///< Mean (average) charge of hits in ADC
