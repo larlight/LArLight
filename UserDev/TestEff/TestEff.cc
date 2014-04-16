@@ -17,7 +17,7 @@ namespace larlight {
     // here is a good place to create one on the heap (i.e. "new TH1D"). 
     //   
 //    TH1D *hist1 = new TH1D("hist1","title",Nbins,lowerBin,upperBin) ;	
-
+   // larutil::LArUtilManager::Reconfigure(larlight::GEO::kArgoNeuT);   
     if(!fGSer) fGSer = (larutil::GeometryUtilities*)(larutil::GeometryUtilities::GetME());
 
     //////////////////////////Setting up the TTree
@@ -250,7 +250,7 @@ namespace larlight {
     else closeAngleChargeWgt_tr->Reset();
     
     
-    larutil::LArUtilManager::Reconfigure(larlight::GEO::kArgoNeuT);    
+    
 
 
     return true;
@@ -291,19 +291,22 @@ namespace larlight {
 
   
    // event_hit * my_hit_v = (event_hit*)(storage->get_data(my_cluster_v->get_hit_type()));
-    event_hit * my_hit_v = (event_hit*)(storage->get_data(DATA::FFTHit));
+    event_hit * my_hit_v = (event_hit*)(storage->get_data(DATA::GausHit));
     std::cout << " full hitlist size: " << my_hit_v->size() << std::endl;
     std::cout << " number of clusters: " << my_cluster_v->size() << std::endl;	
     
-    
-    fNParticles=1;  // (for now, then should be: mctruth_v->at(0).GetParticles().size(); )
+    if(mctruth_v!=NULL && mctruth_v->size() )
+      fNParticles= mctruth_v->at(0).GetParticles().size(); 
+    else 
+      fNParticles = 0;
     
     fNPlanes=larutil::Geometry::GetME()->Nplanes();
-   // fNClusters=fNPlanes;    // then should be" my_cluster_v->size() or fNPlanes
-    fNClusters=my_cluster_v->size()+1;    // using clusters
+    fNClusters=fNPlanes;    // then should be" my_cluster_v->size() or fNPlanes
+   // fNClusters=my_cluster_v->size();    // using clusters
     init_tree_vectors();
     
-    
+    std::cout << "after init vectors" << std::endl;
+    std::cout << " fNParticles::  " << fNParticles << std::endl;
     
     TLorentzVector mct_vtx;
 
@@ -317,10 +320,10 @@ namespace larlight {
 
     if (mctruth_v!=NULL && mctruth_v->size()) 
       {
-       	if ( mctruth_v->size()>1 )  // this needs to be changed
+       	if ( mctruth_v->size() > 1)  // this needs to be changed
             std::cout <<  "Found more than 1 MCTruth. Only use the 1st one... \n " << std::endl;
-	int NPart=0;
-        for(int NPart=0;NPart<=mctruth_v->size();NPart++){
+	//int NPart=0;
+        for(int NPart=0;NPart<mctruth_v->at(0).GetParticles().size();NPart++){
             if (mctruth_v->at(0).GetParticles().at(NPart).PdgCode() == 11)  {    // electron    
 		if(NPart==0)
                     mct_vtx = mctruth_v->at(0).GetParticles().at(NPart).Trajectory().at(0).Position();
@@ -340,21 +343,44 @@ namespace larlight {
 	     }
             else if ( mctruth_v->at(0).GetParticles().at(NPart).PdgCode() == 13 )  //      ## muon    
 	     {
-                mct_vtx = mctruth_v->at(0).GetParticles().at(NPart).Trajectory().at(0).Position();
+	        if(NPart==0)
+		  mct_vtx = mctruth_v->at(0).GetParticles().at(NPart).Trajectory().at(0).Position();
                 std::cout <<  "\n muon " << std::endl;
 	        is_mc_track=true;
 	     }
    	    else{
 	        is_mc_track=true;
-	        mct_vtx = mctruth_v->at(0).GetParticles().at(NPart).Trajectory().at(0).Position();  
+		 if(NPart==0)
+		  mct_vtx = mctruth_v->at(0).GetParticles().at(NPart).Trajectory().at(0).Position();  
 	        std::cout <<  "\n proton ? " << std::endl;
 	     }
 	std::cout << " Truth vertex (" << mct_vtx[0] << "," << mct_vtx[1] << "," << mct_vtx[2] << "," << std::endl;
 	fMCPDGstart[NPart]=mctruth_v->at(0).GetParticles().at(NPart).PdgCode();
-	fMCenergystart[NPart]=mctruth_v->at(0).GetParticles().at(NPart).Trajectory().at(0).Position().E();
-	//fMCPDGisPrimary[NPart]=
-	//fMCPhistart;
-	//fMCThetastart;
+	fMCenergystart[NPart]=mctruth_v->at(0).GetParticles().at(NPart).Trajectory().at(0).E();
+	if(mctruth_v->at(0).GetParticles().at(NPart).Trajectory().at(0).E()){
+ 	      double lep_dcosx_truth = mctruth_v->at(0).GetParticles().at(NPart).Trajectory().at(0).Px()/mctruth_v->at(0).GetParticles().at(NPart).Trajectory().at(0).E();
+ 	      double lep_dcosy_truth = mctruth_v->at(0).GetParticles().at(NPart).Trajectory().at(0).Py()/mctruth_v->at(0).GetParticles().at(NPart).Trajectory().at(0).E();
+ 	      double lep_dcosz_truth = mctruth_v->at(0).GetParticles().at(NPart).Trajectory().at(0).Pz()/mctruth_v->at(0).GetParticles().at(NPart).Trajectory().at(0).E();
+//     
+	      std::cout << "-----  cx,cy,cz " << lep_dcosx_truth << " " << lep_dcosy_truth << " " << lep_dcosz_truth << std::endl;
+	      double Px= mctruth_v->at(0).GetParticles().at(NPart).Trajectory().at(0).Px();
+	      double Py= mctruth_v->at(0).GetParticles().at(NPart).Trajectory().at(0).Py();
+	      double Pz= mctruth_v->at(0).GetParticles().at(NPart).Trajectory().at(0).Pz();
+	      std::cout << " Px,Py,Pz, P2 " << Px << " "<< Py << " " <<Pz << " ; " << TMath::Sqrt(Px*Px+Py*Py+Pz*Pz)  << " P, as is: "<< mctruth_v->at(0).GetParticles().at(NPart).Trajectory().at(0).E()  << std::endl;
+//            
+//     
+ 	      fMCPhistart[NPart]=( (lep_dcosx_truth == 0.0 && lep_dcosz_truth == 0.0) ? 0.0 : TMath::ATan2(lep_dcosx_truth,lep_dcosz_truth));
+ 	      fMCThetastart[NPart]=( (lep_dcosx_truth == 0.0 && lep_dcosy_truth == 0.0 && lep_dcosz_truth == 0.0) ? 0.0 : TMath::Pi()*0.5-TMath::ATan2(std::sqrt(lep_dcosx_truth*lep_dcosx_truth + lep_dcosz_truth*lep_dcosz_truth),lep_dcosy_truth) );
+//     
+//    
+	      fMCPhistart[NPart]=(180*fMCPhistart[NPart]/TMath::Pi());
+	      fMCThetastart[NPart]=( 180*fMCThetastart[NPart]/TMath::Pi());
+	      
+	      std::cout << " phi, theta: " << fMCPhistart[NPart] << " " <<  fMCThetastart[NPart] << std::endl;
+	      
+	}
+	fMCPDGisPrimary[NPart]=(mctruth_v->at(0).GetParticles().at(NPart).Process()=="primary");
+	
 	fMCXOrig[NPart]=mct_vtx[0];
 	fMCYOrig[NPart]=mct_vtx[1];
 	fMCZOrig[NPart]=mct_vtx[2];
@@ -372,47 +398,47 @@ namespace larlight {
      fEvent=my_hit_v->event_id();
     
       ///using all hits:	 // comment in or out as needed
-//      for (int ipl=0;ipl<fNPlanes;ipl++) {
-//     
-//         std::vector<const larlight::hit *> hit_vector;
-// 	
-//         hit_vector.clear();
-//         hit_vector.reserve(my_hit_v->size());
-// 
-// 	 std::cout << " plane: " << ipl << " Run: " << my_hit_v->run() << " SubRunID " << my_hit_v->subrun() << " EventID " <<  my_hit_v->event_id() << " " << my_hit_v << std::endl;   
-// 	 
-// 	
-// 	 
-// 	int iplane = ipl;
-//         for(auto &h : *my_hit_v) {
-// 
-//         if( larutil::Geometry::GetME()->ChannelToPlane(h.Channel()) == ipl )
-// 	    hit_vector.push_back((const larlight::hit*)(&h));
-// 
-// 	}
-// 	
-//          std::cout << " +++ in TestEff " << hit_vector.size() << " at plane: " << ipl << std::endl; 
+     for (int ipl=0;ipl<fNPlanes;ipl++) {
+    
+        std::vector<const larlight::hit *> hit_vector;
+	
+        hit_vector.clear();
+        hit_vector.reserve(my_hit_v->size());
+
+	 std::cout << " plane: " << ipl << " Run: " << my_hit_v->run() << " SubRunID " << my_hit_v->subrun() << " EventID " <<  my_hit_v->event_id() << " " << my_hit_v << std::endl;   
+	 
+	
+	 
+	int iplane = ipl;
+        for(auto &h : *my_hit_v) {
+
+        if( larutil::Geometry::GetME()->ChannelToPlane(h.Channel()) == ipl )
+	    hit_vector.push_back((const larlight::hit*)(&h));
+
+	}
+	
+         std::cout << " +++ in TestEff " << hit_vector.size() << " at plane: " << ipl << std::endl; 
       /// end using all hits  
 
 	 /// using cluster only. // comment in or out as needed // need to set ipl as counter. and iplane as plane
-     int ipl=-1; // just so that I can increment it at the start and not end of loop. ;-)
-    for(auto const clustit : *my_cluster_v) {
-      std::cout << "loop nr " << ipl+2 << std::endl;
-      std::cout << " Clust ID " << clustit.ID() << " Run: " << my_cluster_v->run() << " SubRunID " << my_cluster_v->subrun() << " EventID " <<  my_cluster_v->event_id() << " " << my_cluster_v << std::endl;    
-
-     //auto const hit_index_v = clustit.association(my_cluster_v->get_hit_type());
-    
-        auto const hit_index_v = clustit.association(DATA::FFTHit);
-        std::vector<const larlight::hit *> hit_vector;
-        hit_vector.clear();
-        
-        for(auto const hit_index : hit_index_v) {
-            hit_vector.push_back( const_cast<const larlight::hit *>(&(my_hit_v->at(hit_index))) );
-            //my_hit_v->at(hit_index);
-        }
-        ipl++; // should be zero on first loop.
-        int iplane = larutil::Geometry::GetME()->ChannelToPlane(hit_vector[0]->Channel()) ;
-        std::cout << " ipl " << ipl << " iplane "<< iplane << std::endl;
+//      int ipl=-1; // just so that I can increment it at the start and not end of loop. ;-)
+//     for(auto const clustit : *my_cluster_v) {
+//       std::cout << "loop nr " << ipl+2 << std::endl;
+//       std::cout << " Clust ID " << clustit.ID() << " Run: " << my_cluster_v->run() << " SubRunID " << my_cluster_v->subrun() << " EventID " <<  my_cluster_v->event_id() << " " << my_cluster_v << std::endl;    
+// 
+//      //auto const hit_index_v = clustit.association(my_cluster_v->get_hit_type());
+//     
+//         auto const hit_index_v = clustit.association(DATA::FFTHit);
+//         std::vector<const larlight::hit *> hit_vector;
+//         hit_vector.clear();
+//         
+//         for(auto const hit_index : hit_index_v) {
+//             hit_vector.push_back( const_cast<const larlight::hit *>(&(my_hit_v->at(hit_index))) );
+//             //my_hit_v->at(hit_index);
+//         }
+//         ipl++; // should be zero on first loop.
+//         int iplane = larutil::Geometry::GetME()->ChannelToPlane(hit_vector[0]->Channel()) ;
+//         std::cout << " ipl " << ipl << " iplane "<< iplane << std::endl;
         /// end cluster comment out   
         //   if (ipl>fNPlanes-1)
         //  continue;
@@ -566,7 +592,8 @@ namespace larlight {
 	  
 	  TLorentzVector mct_mom = mctruth_v->at(0).GetParticles().at(0).Trajectory().at(0).Momentum();
 	  TVector3 mct_momhelp = TVector3(mct_mom[0],mct_mom[1],mct_mom[2] );
-	  double mct_angle2d=fGSer->Get2DangleFrom3D(plane[ipl],mct_momhelp);
+	  double mct_angle2d=fGSer->Get2DangleFrom3D(plane[ipl],mct_momhelp.Unit());
+	  double mct_angle2dbis=fGSer->Get2DangleFrom3D(plane[ipl],mct_momhelp);
 	  int direction=(fabs(mct_angle2d) < TMath::Pi()/2)  ?  1 : -1;
 	  
 	  reco2Dangle->Fill(fResult.angle_2d-mct_angle2d*180/TMath::Pi());
@@ -791,7 +818,6 @@ namespace larlight {
      std::cout << " no particles and no clusters - nothing to here " << std::endl;
      return;
     }
-    
     //These are defined per MCparticle  
        fMCPDGstart.clear();  
        fMCPDGisPrimary.clear();  
@@ -889,7 +915,7 @@ namespace larlight {
        mcenergy.resize(fNClusters);  
        mcphi.resize(fNClusters);  
        mctheta.resize(fNClusters);  
-       mcomega.resize(fNClusters);  
+       mcomega.resize(fNClusters);
        mcx.resize(fNClusters);  
        mcy.resize(fNClusters);  
        mcz.resize(fNClusters);
