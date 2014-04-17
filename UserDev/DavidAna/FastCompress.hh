@@ -61,12 +61,15 @@ namespace larlight {
     virtual bool finalize();
 
     void VarianceCompress(larlight::tpcfifo* tpc_data, larlight::event_tpcfifo* new_event_wf);
+    void ProductCompress(larlight::tpcfifo* tpc_data, larlight::event_tpcfifo* new_event_wf);
     void ThresholdCompress(larlight::tpcfifo* tpc_data, larlight::event_tpcfifo* new_event_wf);
     void make_new_wf(larlight::tpcfifo* wf, int ADC_start, int ADC_end, larlight::event_tpcfifo* new_event_wf);
 
     protected:
 
     TH1D* hCompress;
+    TH1D* hAvgComp;
+    TH1D* hSamples;
     int _wfnumber;
     //larlight::mctruth event_mc;
     larlight::event_tpcfifo new_event_wf;
@@ -74,6 +77,8 @@ namespace larlight {
     int    _NSamplesante;
     int    _NSamplespost;
     int    _event_num;
+    int    _totWF;
+    double    _AvgComp;
     double _VarCut;
     int    _baseline;
     double _compressfctr;
