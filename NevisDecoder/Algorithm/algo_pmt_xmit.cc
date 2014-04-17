@@ -346,19 +346,25 @@ namespace larlight {
 	    print(MSG::ERROR,__FUNCTION__,Form("Invalid event frame number: %d",FEM::INVALID_WORD));
 	    throw decode_algo_exception();
 	  }
+	  
+	  // Using 3-bit version
 	  _ch_data.set_readout_frame_number(roll_over(_header_info.event_frame_number,
 						      ((word & 0xff)>>5),
 						      3)
-					    );
-	  // Check if the frame is -1 to +2 w.r.t. event frame number
+	  				    );
 
-	  int diff = ((int)(_ch_data.readout_frame_number())) - ((int)(_header_info.event_frame_number));
-	  if(diff < -1 || diff > 2) {
-	    print(MSG::ERROR,__FUNCTION__,Form("Found event frame %d and discriminator frame %d (difference too big!)",
-					       _header_info.event_frame_number,
-					       _ch_data.readout_frame_number()));
-	    status = false;
+	  // Using 4-bit version (no roll-over umbiguity so just replace 4 bits
+	  //_ch_data.set_readout_frame_number( (((_header_info.event_frame_number)>>4)<<4) + ((word & 0x1ff)>>5));
+
+	  // Check if the frame is -1 to +2 w.r.t. event frame number
+	  int diff = ( ((int)(_ch_data.readout_frame_number())) - ((int)(_header_info.event_frame_number)) );
+	  if(diff < 0 || diff > 3) {
+	    print(MSG::WARNING,__FUNCTION__,Form("Found event frame %d and discriminator frame %d (difference too big!)",
+						 _header_info.event_frame_number,
+						 _ch_data.readout_frame_number()));
+	    //status = false;
 	  }
+
 	  _channel_header_count++; 
 	}else if(last_word_class==FEM::CHANNEL_WORD) {
 	  // Second of 2 channel header words. Record the values & inspect them.
