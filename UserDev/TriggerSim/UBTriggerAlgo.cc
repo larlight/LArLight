@@ -16,66 +16,6 @@
 
 namespace trigger{
 
-  /*
-  //##################################################################
-  UBTriggerAlgo::UBTriggerAlgo(fhicl::ParameterSet const& pset)
-    : _tpc_clock(pset.get< fhicl::ParameterSet >("ClockTPC")),
-      _pmt_clock(pset.get< fhicl::ParameterSet >("ClockPMT")),
-      _trigger_clock(pset.get< fhicl::ParameterSet >("ClockTrigger"))
-  //##################################################################
-  {    
-    _trigger_counter=0;
-
-    // Debug flag
-    SetDebugMode(pset.get<bool>("DebugMode"));
-
-    // Deadtime 
-    SetDeadtime(pset.get<uint16_t>("Deadtime") );
-
-    // Mask
-    SetMask(pset.get<std::vector<uint16_t> >("Mask"));
-
-    // Prescale
-    SetPrescale(pset.get<std::vector<bool> >("Prescale"));
-
-    // BNB gate parameters
-    SetBNBParams( pset.get<uint16_t>("GateWidthBNB"),
-                  pset.get<uint16_t>("TrigDelayBNB"),
-		  pset.get<uint16_t>("CosmicStartBNB"),
-		  pset.get<uint16_t>("CosmicEndBNB") );
-
-    // NuMI gate parameters
-    SetNuMIParams( pset.get<uint16_t>("GateWidthNuMI"),
-                   pset.get<uint16_t>("TrigDelayNuMI"),
-		   pset.get<uint16_t>("CosmicStartNuMI"),
-		   pset.get<uint16_t>("CosmicEndNuMI") );
-
-
-    ClearPredefinedTriggers();
-
-    // BNB trigger
-    _bnb_timings = pset.get<std::vector<double> >("PermTriggerBNB",std::vector<double>())
-
-    // NuMI trigger
-    _numi_timings = pset.get<std::vector<double> >("PermTriggerNuMI",std::vector<double>())
-
-    // Calib trigger
-    _calib_timings = pset.get<std::vector<double> >("PermTriggerCalib",std::vector<double>())
-
-    // Calib trigger
-    _calib_timings = pset.get<std::vector<double> >("PermTriggerCalib",std::vector<double>())
-
-    // Ext trigger
-    _ext_timings = pset.get<std::vector<double> >("PermTriggerExt",std::vector<double>())
-
-    // PC trigger
-    _pc_timings = pset.get<std::vector<double> >("PermTriggerPC",std::vector<double>())
-
-    ReportConfig();
-
-    ClearInputTriggers();
-  }
-  */
 
   //##############################################################
   UBTriggerAlgo::UBTriggerAlgo() : _mask(9,0),
@@ -254,12 +194,12 @@ namespace trigger{
   {
     _pmt_clock.SetTime(_pmt_clock.Time(time.Time()));
     // Calibration triggers
-    AddTrigger(trigdata::Trigger(0,
-				 _pmt_clock.Time(),
-				 _pmt_clock.Time(),
-				 ReadOutStartTimeTPC(_pmt_clock).Time(),
-				 ReadOutStartTimeOptical(_pmt_clock).Time(),
-				 ( (0x1) << trigger::kTriggerCalib )) 
+    AddTrigger(raw::Trigger(0,
+			    _pmt_clock.Time(),
+			    _pmt_clock.Time(),
+			    ReadOutStartTimeTPC(_pmt_clock).Time(),
+			    ReadOutStartTimeOptical(_pmt_clock).Time(),
+			    ( (0x1) << trigger::kTriggerCalib )) 
 	       );
     _pmt_clock.SetTime(0);
   }
@@ -270,12 +210,12 @@ namespace trigger{
   {
     _pmt_clock.SetTime(_pmt_clock.Time(time.Time()));
     // EXT triggers
-    AddTrigger(trigdata::Trigger(0,
-				 _pmt_clock.Time(),
-				 _pmt_clock.Time(),
-				 ReadOutStartTimeTPC(_pmt_clock).Time(),
-				 ReadOutStartTimeOptical(_pmt_clock).Time(),
-				 ( (0x1) << trigger::kTriggerEXT ))
+    AddTrigger(raw::Trigger(0,
+			    _pmt_clock.Time(),
+			    _pmt_clock.Time(),
+			    ReadOutStartTimeTPC(_pmt_clock).Time(),
+			    ReadOutStartTimeOptical(_pmt_clock).Time(),
+			    ( (0x1) << trigger::kTriggerEXT ))
 	       );
     _pmt_clock.SetTime(0);
   }
@@ -286,12 +226,12 @@ namespace trigger{
   {
     _pmt_clock.SetTime(_pmt_clock.Time(time.Time()));
     // PC triggers
-    AddTrigger(trigdata::Trigger(0,
-				 _pmt_clock.Time(),
-				 _pmt_clock.Time(),
-				 ReadOutStartTimeTPC(_pmt_clock).Time(),
-				 ReadOutStartTimeOptical(_pmt_clock).Time(),
-				 ( (0x1) << trigger::kTriggerPC ))
+    AddTrigger(raw::Trigger(0,
+			    _pmt_clock.Time(),
+			    _pmt_clock.Time(),
+			    ReadOutStartTimeTPC(_pmt_clock).Time(),
+			    ReadOutStartTimeOptical(_pmt_clock).Time(),
+			    ( (0x1) << trigger::kTriggerPC ))
 	       );
     _pmt_clock.SetTime(0);
   }
@@ -340,8 +280,8 @@ namespace trigger{
   }
 
   //#######################################################################################
-  const trigdata::Trigger UBTriggerAlgo::CombineTriggers(const trigdata::Trigger &trigger1, 
-							 const trigdata::Trigger &trigger2)
+  const raw::Trigger UBTriggerAlgo::CombineTriggers(const raw::Trigger &trigger1, 
+						    const raw::Trigger &trigger2)
   //#######################################################################################
   {
 
@@ -362,17 +302,17 @@ namespace trigger{
 
     if( trig1_number != trig2_number ) {
       RaiseTriggerException("Cannot combine triggers with different trigger counters!");
-      return trigdata::Trigger();
+      return raw::Trigger();
     }
 
     if( _trig_clock.Frame(trig1_time) != _trig_clock.Frame(trig2_time) ) {
       RaiseTriggerException("Cannot combine triggers in different frames!");
-      return trigdata::Trigger();
+      return raw::Trigger();
     }
 
     if( _trig_clock.Sample(trig1_time) != _trig_clock.Sample(trig2_time) ) {
       RaiseTriggerException("Cannot combine triggers in different trigger clock sample number!");
-      return trigdata::Trigger();
+      return raw::Trigger();
     }
 
     auto const res_number = trig1_number;
@@ -390,7 +330,7 @@ namespace trigger{
     if( (trigger1.Triggered(trigger::kTriggerBNB) || trigger1.Triggered(trigger::kTriggerNuMI)) &&
 	(trigger2.Triggered(trigger::kTriggerBNB) || trigger2.Triggered(trigger::kTriggerNuMI)) ) {
       RaiseTriggerException("Combining two beam gates not supported for now!");
-      return trigdata::Trigger();
+      return raw::Trigger();
     }
     // Case2: only trigger 1 is beam
     else if( (trigger1.Triggered(trigger::kTriggerBNB) || trigger1.Triggered(trigger::kTriggerNuMI)) ) {
@@ -429,17 +369,17 @@ namespace trigger{
     
     auto trig_time = util::TimeService::GetME().OpticalClock(res_sample,res_frame);
     auto beam_time = util::TimeService::GetME().OpticalClock(beam_sample,beam_frame);
-    return trigdata::Trigger(res_number,
-			     trig_time.Time(),
-			     beam_time.Time(),
-			     ReadOutStartTimeTPC(trig_time).Time(),
-			     ReadOutStartTimeOptical(trig_time).Time(),
-			     res_bits);
+    return raw::Trigger(res_number,
+			trig_time.Time(),
+			beam_time.Time(),
+			ReadOutStartTimeTPC(trig_time).Time(),
+			ReadOutStartTimeOptical(trig_time).Time(),
+			res_bits);
     
   }
 
   //##################################################################
-  void UBTriggerAlgo::AddTrigger(const trigdata::Trigger &new_trigger)
+  void UBTriggerAlgo::AddTrigger(const raw::Trigger &new_trigger)
   //##################################################################
   {
     auto frame  = _trig_clock.Frame(new_trigger.TriggerTime());
@@ -453,8 +393,8 @@ namespace trigger{
 
     if( frame_iter == _candidates.end() ) {
 
-      _candidates[frame] = std::map<unsigned int,trigdata::Trigger>();
-      _candidates[frame].insert(std::pair<unsigned int,trigdata::Trigger>(sample,new_trigger));
+      _candidates[frame] = std::map<unsigned int,raw::Trigger>();
+      _candidates[frame].insert(std::pair<unsigned int,raw::Trigger>(sample,new_trigger));
       
     }else{
 
@@ -462,11 +402,11 @@ namespace trigger{
 
       if( sample_iter == (*frame_iter).second.end() )
 
-	(*frame_iter).second.insert(std::pair<unsigned int,trigdata::Trigger>(sample,new_trigger));
+	(*frame_iter).second.insert(std::pair<unsigned int,raw::Trigger>(sample,new_trigger));
       
       else {
 
-	trigdata::Trigger combined_trigger = CombineTriggers(new_trigger, (*sample_iter).second);
+	raw::Trigger combined_trigger = CombineTriggers(new_trigger, (*sample_iter).second);
 
 	_candidates[frame][sample]=combined_trigger;
 
@@ -485,12 +425,12 @@ namespace trigger{
     trig_bits += ( (0x1) << kPMTTrigger );
     
     // Create this trigger candidate object
-    trigdata::Trigger trig_candidate(0,
-				     _pmt_clock.Time(),
-				     _pmt_clock.Time(),
-				     ReadOutStartTimeTPC(_pmt_clock).Time(),
-				     ReadOutStartTimeOptical(_pmt_clock).Time(),
-				     trig_bits);
+    raw::Trigger trig_candidate(0,
+				_pmt_clock.Time(),
+				_pmt_clock.Time(),
+				ReadOutStartTimeTPC(_pmt_clock).Time(),
+				ReadOutStartTimeOptical(_pmt_clock).Time(),
+				trig_bits);
 
     // Add this trigger candidate
     AddTrigger(trig_candidate);
@@ -508,12 +448,12 @@ namespace trigger{
     trig_bits += ( (0x1) << kPMTTrigger );
     
     // Create this trigger candidate object
-    trigdata::Trigger trig_candidate(0,
-				     _pmt_clock.Time(),
-				     _pmt_clock.Time(),
-				     ReadOutStartTimeTPC(_pmt_clock).Time(),
-				     ReadOutStartTimeOptical(_pmt_clock).Time(),
-				     trig_bits);
+    raw::Trigger trig_candidate(0,
+				_pmt_clock.Time(),
+				_pmt_clock.Time(),
+				ReadOutStartTimeTPC(_pmt_clock).Time(),
+				ReadOutStartTimeOptical(_pmt_clock).Time(),
+				trig_bits);
 
     // Add this trigger candidate
     AddTrigger(trig_candidate);
@@ -528,12 +468,12 @@ namespace trigger{
     uint32_t trig_bits = ( (0x1) << trigger::kTriggerBNB );
  
     // Create this trigger candidate object
-    trigdata::Trigger trig_candidate(0,
-				     _pmt_clock.Time(),
-				     BNBStartTime(_pmt_clock).Time(),
-				     ReadOutStartTimeTPC(_pmt_clock).Time(),
-				     ReadOutStartTimeOptical(_pmt_clock).Time(),
-				     trig_bits);
+    raw::Trigger trig_candidate(0,
+				_pmt_clock.Time(),
+				BNBStartTime(_pmt_clock).Time(),
+				ReadOutStartTimeTPC(_pmt_clock).Time(),
+				ReadOutStartTimeOptical(_pmt_clock).Time(),
+				trig_bits);
     
     // Add this trigger candidate
     AddTrigger(trig_candidate);
@@ -548,12 +488,12 @@ namespace trigger{
     uint32_t trig_bits = ( (0x1) << trigger::kTriggerNuMI );
 
     // Create this trigger candidate object
-    trigdata::Trigger trig_candidate(0,
-				     _pmt_clock.Time(),
-				     NuMIStartTime(_pmt_clock).Time(),
-				     ReadOutStartTimeTPC(_pmt_clock).Time(),
-				     ReadOutStartTimeOptical(_pmt_clock).Time(),
-				     trig_bits);
+    raw::Trigger trig_candidate(0,
+				_pmt_clock.Time(),
+				NuMIStartTime(_pmt_clock).Time(),
+				ReadOutStartTimeTPC(_pmt_clock).Time(),
+				ReadOutStartTimeOptical(_pmt_clock).Time(),
+				trig_bits);
 
     // Add this trigger candidate
     AddTrigger(trig_candidate);
@@ -627,7 +567,7 @@ namespace trigger{
   }
 
   //#########################################################################
-  void UBTriggerAlgo::ProcessTrigger(std::vector<trigdata::Trigger> &triggers)
+  void UBTriggerAlgo::ProcessTrigger(std::vector<raw::Trigger> &triggers)
   //#########################################################################
   {
     triggers.clear();
@@ -808,12 +748,12 @@ namespace trigger{
 	  }
 	  
 	  // Store trigger object
-	  triggers.push_back( trigdata::Trigger(_trigger_counter,
-						(*sample_iter).second.TriggerTime(),
-						(*sample_iter).second.BeamGateTime(),
-						(*sample_iter).second.ReadOutStartTPC(),
-						(*sample_iter).second.ReadOutStartOptical(),
-						(*sample_iter).second.TriggerBits()) 
+	  triggers.push_back( raw::Trigger(_trigger_counter,
+					   (*sample_iter).second.TriggerTime(),
+					   (*sample_iter).second.BeamGateTime(),
+					   (*sample_iter).second.ReadOutStartTPC(),
+					   (*sample_iter).second.ReadOutStartOptical(),
+					   (*sample_iter).second.TriggerBits()) 
 			      );
 	  _trigger_counter++;
 	} // end if trigger found

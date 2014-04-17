@@ -1,4 +1,16 @@
+/**
+ * \file ClockConstants.h
+ *
+ * \ingroup TimeService
+ * 
+ * \brief Defining constants used in TimeService
+ *
+ * @author kterao
+ */
 
+/** \addtogroup TimeService
+
+    @{*/
 #ifndef CLOCKCONSTANTS_H
 #define CLOCKCONSTANTS_H
 
@@ -30,3 +42,4 @@ namespace util {
 }
 
 #endif
+/** @} */ // end of doxygen group 

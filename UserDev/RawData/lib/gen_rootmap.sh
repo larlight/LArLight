@@ -15,6 +15,5 @@ rootlibmap() {
 }
 
 ######################################################
-# TimeService
-rootlibmap libTriggerSim.rootmap libTriggerSim.so $USER_DEV_DIR/TriggerSim/LinkDef.h \
-    libRawData.so libTimeService.so
+# RawData
+rootlibmap libRawData.rootmap libRawData.so $USER_DEV_DIR/RawData/LinkDef.h 

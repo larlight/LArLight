@@ -3,7 +3,7 @@
 
 #include "TriggerData.h"
 
-namespace trigdata {
+namespace raw {
 
   //****************
   Trigger::Trigger()

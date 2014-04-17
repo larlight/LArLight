@@ -1,5 +1,5 @@
 /**
- * \file TimeServiceException.hh
+ * \file TimeServiceException.h
  *
  * \ingroup TimeService
  * 

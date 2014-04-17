@@ -3,19 +3,14 @@
 #
 
 # specific names for this package
-DICT  = TriggerSimCint
-SHLIB = libTriggerSim.so
+DICT  = RawDataCint
+SHLIB = libRawData.so
 SOURCES = $(wildcard *.cc)
 HEADERS = $(wildcard *.hh)
 OBJECTS = $(SOURCES:.cc=.o)
 
 # include options for this package
-INCFLAGS  = -I.                       #Include itself
-INCFLAGS += -I$(USER_DEV_DIR)/TimeService
-INCFLAGS += -I$(USER_DEV_DIR)/RawData
-#INCFLAGS += -I$(LARLIGHT_CORE_DIR)/Base
-#INCFLAGS += -I$(LARLIGHT_CORE_DIR)/DataFormat
-#INCFLAGS += -I$(LARLIGHT_CORE_DIR)/Analysis
+INCFLAGS = -I.                       #Include itself
 
 # platform-specific options
 OSNAME          = $(shell uname -s)

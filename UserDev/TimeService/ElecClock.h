@@ -1,5 +1,5 @@
 /**
- * \file ElecClock.hh
+ * \file ElecClock.h
  *
  * \ingroup TimeService
  * 
@@ -20,7 +20,7 @@ namespace util {
   /**
      \class ElecClock
      Electronics clock class which holds double precision time in second, 
-     frequency in Hz, and frame period in seconds.
+     frequency in GHz, and frame period in nano-seconds.
   */
   class ElecClock{
     
@@ -76,7 +76,7 @@ namespace util {
     /// Given time in ticks w.r.t. electronics clock counting, return discretized time in double precision
     double Time(int ticks) const {return ticks/fFrequency; }
 
-    /// Frequency in Hz
+    /// Frequency in GHz
     double Frequency() const { return fFrequency; }
 
     /// A single frame period in nano-second

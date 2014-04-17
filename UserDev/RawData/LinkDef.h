@@ -9,9 +9,8 @@
 #pragma link off all classes;
 #pragma link off all functions;
 
-#pragma link C++ namespace trigger;
-#pragma link C++ class trigger::UBTriggerAlgo+;
-
+#pragma link C++ namespace raw;
+#pragma link C++ class raw::Trigger+;
+#pragma link C++ class std::vector<raw::Trigger>+;
 //ADD_NEW_CLASS ... do not change this line
 #endif
-

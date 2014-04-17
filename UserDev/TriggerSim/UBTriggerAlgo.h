@@ -1,28 +1,19 @@
-////////////////////////////////////////////////////////////////////////
-// \file UBTriggerAlgo.h
-//
-// \brief UBTriggerAlgo class header file
-//
-// \author kazuhiro@nevis.columbia.edu
-//
-////////////////////////////////////////////////////////////////////////
+/**
+ * \file UBTriggerAlgo.h
+ *
+ * \ingroup TriggerSim
+ * 
+ * \brief Class def header for a class UBTriggerAlgo
+ *
+ * @author kterao
+ */
+
+/** \addtogroup TriggerSim
+
+    @{*/
 
 #ifndef UBTRIGGERALGO_H
 #define UBTRIGGERALGO_H
-
-// ART includes
-//#include "art/Persistency/Common/Ptr.h" 
-//#include "fhiclcpp/ParameterSet.h"
-//#include "messagefacility/MessageLogger/MessageLogger.h"
-
-// LArSoft
-//#include "Simulation/BeamGateInfo.h"
-//#include "OpticalDetectorData/PMTTrigger.h"
-//#include "UBTriggerTypes.h"
-
-// Uboonecode
-//#include "uboone/TriggerData/TriggerData.h"
-//#include "uboone/ClockManager/SimpleClock.h"
 
 // STL
 #include <map>
@@ -34,29 +25,15 @@
 
 namespace trigger
 {
-  
-  struct time_window_t {
-    
-    unsigned int start_sample;
-    unsigned int start_frame;
-    unsigned int duration;
-
-    time_window_t() {
-      start_sample = 0;
-      start_frame  = 0;
-      duration     = 0;
-    }
-
-    time_window_t(unsigned int sample,
-		  unsigned int frame,
-		  unsigned int period)
-    {
-      start_sample = sample;
-      start_frame  = frame;
-      duration     = period;
-    }
-  };
-
+  /**
+    \class UBTriggerAlgo
+    MicroBooNE trigger simulation algorithm. This algorithm instance takes same configuration
+    parameters as the real trigger electronics module. It is equiped with setter functions for
+    PC, Calib, Ext, BNB, NuMI, PMT-Cosmic, and PMT-Beam trigger inputs, and assess the same
+    trigger logic on those inputs (if the author did not make a mistake). 9 trigger conditions
+    can be configured while only p0, p1, and p8 are implemented at this point as that is the
+    case also for the real trigger module (as of 04/16/14).
+    */
   class UBTriggerAlgo {
 
   private:
@@ -79,17 +56,8 @@ namespace trigger
     /// Method to clear input trigger information
     void ClearInputTriggers();
 
-    /// Method to append PMT-Trigger information
-    //void AppendTriggerPMT(const art::Ptr<optdata::PMTTrigger> pmt_trigger);
-
-    /// Method to append BeamGateInfo for BNB beamgate
-    //void AppendTriggerBNB(const art::Ptr<sim::BeamGateInfo> bgi);
-
-    /// Method to append BeamGateInfo for NuMI beamgate
-    //void AppendTriggerNuMI(const art::Ptr<sim::BeamGateInfo> bgi);
-
     /// Function to process algorithm
-    void ProcessTrigger(std::vector<trigdata::Trigger> &triggers);
+    void ProcessTrigger(std::vector<raw::Trigger> &triggers);
 
     /// Function to print out current list of candidate triggers
     void ShowCandidateTriggers() const;
@@ -170,11 +138,11 @@ namespace trigger
     void Report(const std::string &msg) const;
 
     /// Function to append new trigger candidate to _candidates
-    void AddTrigger(const trigdata::Trigger &new_trigger);
+    void AddTrigger(const raw::Trigger &new_trigger);
 
     /// Function to combine two trigger objects
-    const trigdata::Trigger CombineTriggers(const trigdata::Trigger &trigger1, 
-					    const trigdata::Trigger &trigger2);
+    const raw::Trigger CombineTriggers(const raw::Trigger &trigger1, 
+				       const raw::Trigger &trigger2);
 
     /**
        Utility function to check if the given time stamp is inside the provided time_window_t
@@ -187,7 +155,7 @@ namespace trigger
   protected:
 
     /// stores CANDIDATE readout trigger timestamps 
-    std::map<unsigned int, std::map<unsigned int,trigdata::Trigger> > _candidates;
+    std::map<unsigned int, std::map<unsigned int,raw::Trigger> > _candidates;
 
     /// Various clocks
     util::ElecClock _tpc_clock;
@@ -233,3 +201,4 @@ namespace trigger
   
 } //namespace cluster
 #endif
+/** @} */ // end of doxygen group 

@@ -2,7 +2,7 @@ import sys
 import ROOT
 #ROOT.gSystem.Load("libTriggerSim")
 ROOT.gSystem.Load("libTimeService")
-from ROOT import trigger, trigdata, std, util
+from ROOT import trigger, raw, std, util
 
 def GetClock(time) :
     return util.TimeService.GetME().OpticalClock(time)
@@ -42,7 +42,7 @@ trig.AddTriggerNuMI(clock)
 clock = GetClock(1.6e6 + 6.4e6 + 1)
 trig.AddTriggerNuMI(clock)
 
-aho=std.vector(trigdata.Trigger)()
+aho=std.vector(raw.Trigger)()
 
 trig.ProcessTrigger(aho)
 

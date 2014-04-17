@@ -1,4 +1,17 @@
-// TriggerData/TriggerData.h
+/**
+ * \file TriggerData.h
+ *
+ * \ingroup RawData
+ * 
+ * \brief Class def header for a data product raw::Trigger
+ *
+ * @author kterao
+ */
+
+/** \addtogroup RawData
+
+    @{*/
+
 #ifndef TRIGGER_H
 #define TRIGGER_H
 
@@ -7,8 +20,13 @@
 #include <limits>
 #include <stdexcept>
 #include <iostream>
-namespace trigdata {
+namespace raw {
 
+  /**
+    \class Trigger
+    A Trigger data product class which holds four timings (trigger time, beam-gate start,
+    TPC readout start, and optical readout start) and 32-bits trigger data (trigger bits).
+   */
   class Trigger {
 
   public:
@@ -63,3 +81,4 @@ namespace trigdata {
 } // namespace trigdata
 
 #endif 
+/** @} */ // end of doxygen group 

@@ -20,7 +20,7 @@
 namespace util {
   /**
      \class TimeService
-     This class provides
+     A singleton class to provide pre-defined detector electronics clocks: TPC, Optical, and Trigger.
   */
   class TimeService{
     
@@ -58,6 +58,7 @@ namespace util {
 
   public:
 
+    /// Singleton getter
     static const TimeService& GetME() {
       
       if(!_me) _me = new TimeService;
@@ -97,17 +98,6 @@ namespace util {
     ElecClock TriggerClock(unsigned int sample,
 			   unsigned int frame) const
     { ElecClock clock = TriggerClock(); clock.SetTime(sample,frame); return clock; }
-
-    //
-    // Getters of ElecClock for TPC/Optical readout window start time
-    //
-    // Create TPC clock with time set to the beginning of TPC readout window
-    //ElecClock ReadOutBeginTPC(trigdata::Trigger trig) const
-    //{ return OpticalClock(trig.ReadOutStartTPC()); }
-
-    // Create Optical clock with time set to the beginning of Optical readout window
-    //ElecClock ReadOutBeginOptical(trigdata::Trigger trig) const
-    //{ return OpticalClock(trig.ReadOutStartOptical()); }
 
   };
   
