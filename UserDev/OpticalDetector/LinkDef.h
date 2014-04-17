@@ -14,5 +14,9 @@
 #pragma link C++ class optdata::ChannelDataGroup+;
 #pragma link C++ class optdata::FIFOChannel+;
 #pragma link C++ class optdata::PMTTrigger+;
+
+#pragma link C++ namespace opdet;
+#pragma link C++ class opdet::OpticalWFGen+;
 //ADD_NEW_CLASS ... do not change this line
 #endif
+

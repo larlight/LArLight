@@ -34,6 +34,14 @@ namespace optdata {
     kCosmicPMTTrigger,
   } Optical_Category_t;
 
+  // Use an enum for categories of injection pulse
+  typedef enum _optical_pulse_t {
+    kUnknownPulse,
+    kG4Photon,
+    kDarkNoise,
+    kPulseTypeMax,
+  } Optical_Pulse_t;
+
 } // namespace optdata
 
 #endif // OpticalDetectorData_OpticalTypes_h

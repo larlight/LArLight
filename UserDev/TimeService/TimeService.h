@@ -16,7 +16,6 @@
 
 #include <iostream>
 #include "ElecClock.h"
-#include "TriggerData.h"
 
 namespace util {
   /**

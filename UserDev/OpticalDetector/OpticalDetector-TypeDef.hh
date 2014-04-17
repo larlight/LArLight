@@ -20,7 +20,14 @@ namespace optdata {
   class FIFOChannel;
 }
 
+#include "OpticalWFGen.hh"
+namespace opdet{
+
+  class OpticalWFGen;
+
+}
 
 //ADD_EMPTY_CLASS ... do not change this comment line
 
 #endif
+
