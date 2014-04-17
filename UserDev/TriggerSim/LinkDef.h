@@ -11,7 +11,7 @@
 
 #pragma link C++ namespace trigger;
 #pragma link C++ class trigger::UBTriggerAlgo+;
-
+#pragma link C++ class trigger::UBTrigException+;
 //ADD_NEW_CLASS ... do not change this line
 #endif
 

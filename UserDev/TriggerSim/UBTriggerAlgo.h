@@ -20,6 +20,7 @@
 #include <vector>
 
 //LArLight
+#include "UBTrigException.h"
 #include "TriggerData.h"
 #include "ElecClock.h"
 
@@ -77,7 +78,7 @@ namespace trigger
   public: // Change this to protected for LArSoft and public for LArLight
 
     /// Function to set an individual trigger mask
-    void SetMask(unsigned char index, uint32_t mask);
+    void SetMask(unsigned char index, unsigned short mask);
 
     /// Function to set an individual trigger prescale
     void SetPrescale(unsigned char index, bool prescale);
@@ -131,9 +132,6 @@ namespace trigger
 
   protected:
     
-    /// Function to raise an error
-    void RaiseTriggerException(std::string msg) const;
-
     /// Function to send a string to stdout stream
     void Report(const std::string &msg) const;
 

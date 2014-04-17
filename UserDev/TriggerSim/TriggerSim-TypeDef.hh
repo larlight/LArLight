@@ -6,11 +6,13 @@
 #define TIMESERVICE_TYPEDEF_HH
 
 // Header files included here
+#include "UBTrigException.h"
 #include "UBTriggerTypes.h"
 #include "UBTriggerAlgo.h"
 #include <set>
 
 namespace trigger{
+  class UBTrigException;
   class UBTriggerAlgo;
 }
 
