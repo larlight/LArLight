@@ -19,6 +19,7 @@
 
 
 #include "TVirtualFFT.h"
+#include "TStyle.h"
 #include "TF1.h"
 #include "TMath.h"
 #include "TRandom.h"
@@ -76,6 +77,7 @@ namespace larlight {
     TH1D *RMSperBoard[20];
     double BoardVsChanRMSArray[20][64];
     TH2D *BoardVsChanRMS;
+    TH2D * BaseRMSvsNoise;
     //ChanRMS[Chan#][evt#] = RMS for that chan for that event
     double ChanRMS[20000][100];
     //RMS MAP FOR ALL CHANNELS
