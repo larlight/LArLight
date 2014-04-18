@@ -7,7 +7,7 @@ gSystem.Load("libLArUtil")
 gSystem.Load("libClusterRecoUtil")
 from ROOT import larlight as fmwk
 from ROOT import cluster
-
+from datetime import datetime
 
 import argparse
 
@@ -93,7 +93,7 @@ fGeo  = larutil.Geometry.GetME()
 while mgr.next_event():
 
     # Get event_cluster ... std::vector<larlight::cluster>
-    cluster_v = mgr.get_data(fmwk.DATA.ShowerAngleCluster)
+    cluster_v = mgr.get_data(fmwk.DATA.FuzzyCluster)
 
     # Get event_mctruth ... std::vector<larlight::mctruth>
     mctruth_v = mgr.get_data(fmwk.DATA.MCTruth)
@@ -134,11 +134,15 @@ while mgr.next_event():
         wire_max = 0
         time_min = 10000
         time_max = 0
+        cluster_params = []
         polygons = []
+        polygonsMath = []
         ClusterIndexInPlane = []
         
         print "Number of Clusters in Event: ",cluster_v.size()
         for x in xrange(cluster_v.size()):
+
+
 
             
             if  ( cluster_v.at(x).View() == fGeo.PlaneToView(pl) ):
@@ -149,6 +153,12 @@ while mgr.next_event():
                                  mgr.get_data(cluster_v.get_hit_type()))
                 
                 algo.FillPolygon()
+
+
+                cluster_params.append(cluster.ClusterParamsExecutor())
+                cluster_params[-1].LoadCluster( cluster_v.at(x), mgr.get_data(cluster_v.get_hit_type()))
+                cluster_params[-1].FillPolygon()
+                polygonsMath.append( cluster_params[-1].GetParams())
                 
                 # algo.GetFinalSlope(True)
                 #algo.Report()
@@ -187,9 +197,9 @@ while mgr.next_event():
                                       result.container_polygon.at(0).w,
                                       result.container_polygon.at(0).t)
                         
-                    gPolygon.SetMarkerStyle(cluster_counter+19)
+                    gPolygon.SetMarkerStyle(8)
                     gPolygon.SetMarkerSize(1)
-                    gPolygon.SetMarkerColor(cluster_counter)
+                    gPolygon.SetMarkerColor(cluster_counter%9+2)
                     polygons.append(gPolygon)
 
 
@@ -197,27 +207,32 @@ while mgr.next_event():
         #try merging all polygons from plane
 
         print "Plane Number: ",pl
-        for x in xrange(cluster_v.size()):
-            if  ( cluster_v.at(x).View() == fGeo.PlaneToView(pl) ):
-                print "Adding polygon"
 
-
+        time_begin = datetime.now()
         if ( len(ClusterIndexInPlane) != 0 ):
             print "Number of Clusters in plane: ", len(ClusterIndexInPlane)
-            for m in xrange(len(ClusterIndexInPlane)):
-                for n in xrange(m+1,len(ClusterIndexInPlane)):
-                    algo1 = cluster.ClusterParamsExecutor()
-                    algo2 = cluster.ClusterParamsExecutor()
-                    algo1.LoadCluster( cluster_v.at(ClusterIndexInPlane[m]), mgr.get_data(cluster_v.get_hit_type()))
-                    algo1.FillPolygon()
-                    poly_m = algo1.GetParams()
-                    algo2.LoadCluster( cluster_v.at(ClusterIndexInPlane[n]), mgr.get_data(cluster_v.get_hit_type()))
-                    algo2.FillPolygon()                                        
-                    poly_n = algo2.GetParams()
+            for m in xrange(len(polygonsMath)):
+                for n in xrange(m+1,len(polygonsMath)):
                     print "Comparing Polygons Number ", n , " and ", m
-                    merger.Merge(poly_n,poly_m)
-                    del algo1
-                    del algo2
+                    merger.Merge(polygonsMath[m],polygonsMath[n])
+        time_end = datetime.now()
+        time_diff = time_end-time_begin
+        print "Time to check overlap for {0} polygons: {1} sec {2} microsec".format(len(ClusterIndexInPlane),time_diff.seconds,time_diff.microseconds)
+#            for m in xrange(len(ClusterIndexInPlane)):
+#                for n in xrange(m+1,len(ClusterIndexInPlane)):
+#                    algo1 = cluster.ClusterParamsExecutor()
+#                    algo2 = cluster.ClusterParamsExecutor()
+#                    algo1.LoadCluster( cluster_v.at(ClusterIndexInPlane[m]), mgr.get_data(cluster_v.get_hit_type()))
+#                    algo1.FillPolygon()
+#                    poly_m = algo1.GetParams()
+#                    algo2.LoadCluster( cluster_v.at(ClusterIndexInPlane[n]), mgr.get_data(cluster_v.get_hit_type()))
+#                    algo2.FillPolygon()                                        
+#                    poly_n = algo2.GetParams()
+#                    print "Comparing Polygons Number ", n , " and ", m
+#                    merger.Merge(poly_n,poly_m)
+#                    del algo1
+#                    del algo2
+                    
                     
         hHits=ROOT.TH2D("AllHits","Event {0}   Plane {1}; Wire [cm]; Time [cm]".format( processed_events, pl),
                         100, 0.9*wire_min*fGSer.WireToCm(), 1.1*wire_max*fGSer.WireToCm(),
@@ -227,6 +242,7 @@ while mgr.next_event():
         chit.cd()
         hHits.Draw("BOX")
         poly_counter = 0
+        hHits.SetStats(0)
         for y in polygons:
             y.Draw("PL same")
             legend.AddEntry(y,"Poly {0}".format(poly_counter) )
