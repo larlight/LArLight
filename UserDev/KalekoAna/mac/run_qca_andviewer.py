@@ -49,6 +49,7 @@ print
 print  "Finished configuring ana_processor. Start event loop!"
 print
 
+my_viewer.SetClusterType(larlight.DATA.FuzzyCluster)
 
 
 c_graph=TCanvas("csub","Individual cluster start/end points",500,300)
@@ -61,8 +62,13 @@ while my_proc.process_event():
     c_graph.cd()
     for iview in xrange(0,3):
         for iclus in xrange(my_viewer.GetClusterGraph_Reco(int(iview),bool(true)).size()):
+
+            if int(my_viewer.GetHisto_Reco(int(iview)).at(iclus).GetEntries()) < 15:
+                continue
+
             gstart=my_viewer.GetClusterGraph_Reco(int(iview),bool(true)).at(iclus)
             gend  =my_viewer.GetClusterGraph_Reco(int(iview),bool(false)).at(iclus)
+            print "this cluster has %d hits" % my_viewer.GetHisto_Reco(int(iview)).at(iclus).GetEntries()
             xmin=my_viewer.GetHisto_Hits(int(iview)).GetXaxis().GetXmin()
             xmax=my_viewer.GetHisto_Hits(int(iview)).GetXaxis().GetXmax()
             ymin=my_viewer.GetHisto_Hits(int(iview)).GetYaxis().GetXmin()
