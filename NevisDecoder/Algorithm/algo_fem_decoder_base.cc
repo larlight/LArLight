@@ -152,7 +152,7 @@ namespace larlight {
 
 	Message::send(MSG::ERROR,__FUNCTION__,
 		      Form("Undefined word: %x (previous = %x)",word,_last_word));
-
+	
 	status = false;
       }else if(_verbosity[MSG::INFO]){
 

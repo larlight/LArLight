@@ -272,7 +272,8 @@ namespace larlight {
       //
       // Channel header ... read in channel info from this word
       if(last_word_class!=FEM::FEM_FIRST_WORD && 
-	 last_word_class!=FEM::CHANNEL_LAST_WORD) {
+	 last_word_class!=FEM::CHANNEL_LAST_WORD &&
+	 !( (((*_event_data->rbegin()).size()) & 0x1) && _last_word==0x8000)) {
 	Message::send(MSG::ERROR,__FUNCTION__,
 		      Form("Found channel header (%x) in an unexpected place (previous=%x)!",word,last_word));
 	status=false;
@@ -302,18 +303,37 @@ namespace larlight {
 
 	status=false;
       }else{
-	// Treat a case of missing very first channel header word: happens when there is no time in between two readout data.
+
+	// Treat a case of missing very first channel header word: happens 
+	// when there is no time in between two readout data.
 	if(last_word_class==FEM::CHANNEL_LAST_WORD){
-	  // In this case, we should be missing the CHANNEL_HEADER because this pulse is from the same channel & discriminator id.
-	  // Do an operation that is done for the case of CHANNEL_HEADER, but use a stored value of channel number & disc. id.
-	  _channel_header_count=1;
-	  _ch_data.set_channel_number(_last_channel_number);
-	  _ch_data.set_disc_id(_last_disc_id);
-	  if(_verbosity[MSG::NORMAL])
-	    Message::send(MSG::NORMAL,__FUNCTION__,
-			  Form("Found consecutively readout data arrays @ event %d (missing channel very first header)!",
-			       _header_info.event_number)
-			  );
+	  // Two possible cases: 
+	  //    (1) previous waveform had odd # of ADC samples ... then this should be 0x8000
+	  //    (2) two readout windows are combined
+	  
+	  //case (1)
+	  if( word == 0x8000 ) {
+
+	    if( ((*_event_data->rbegin()).size())%2 ) return true;
+
+	    else { 
+	      Message::send(MSG::ERROR,__FUNCTION__,
+			    "Found a possible padding 0x8000 in an unexpected place (previous readout was even (%zu)!)...");
+	      status = false;
+	    }
+	  }else{
+	    // In this case, we should be missing the CHANNEL_HEADER because this pulse is from 
+	    // the same channel & discriminator id. Do an operation that is done for the case of 
+	    // CHANNEL_HEADER, but use a stored value of channel number & disc. id.
+	    _channel_header_count=1;
+	    _ch_data.set_channel_number(_last_channel_number);
+	    _ch_data.set_disc_id(_last_disc_id);
+	    if(_verbosity[MSG::NORMAL])
+	      Message::send(MSG::NORMAL,__FUNCTION__,
+			    Form("Found consecutively readout data arrays @ event %d (missing channel very first header)!",
+				 _header_info.event_number)
+			    );
+	  }
 	}
 
 	//
@@ -362,13 +382,13 @@ namespace larlight {
 	    print(MSG::WARNING,__FUNCTION__,Form("Found event frame %d and discriminator frame %d (difference too big!)",
 						 _header_info.event_frame_number,
 						 _ch_data.readout_frame_number()));
-	    //status = false;
 	  }
 
 	  _channel_header_count++; 
 	}else if(last_word_class==FEM::CHANNEL_WORD) {
 	  // Second of 2 channel header words. Record the values & inspect them.
-	  _ch_data.set_readout_sample_number(_ch_data.readout_sample_number_64MHz() + (word & 0xfff)); // This gives lower 12 bits of 20-bit readout_sample_number number
+	  // This gives lower 12 bits of 20-bit readout_sample_number number
+	  _ch_data.set_readout_sample_number(_ch_data.readout_sample_number_64MHz() + (word & 0xfff));
 	  _channel_header_count++;
 	  
 	  if(_verbosity[MSG::INFO]){

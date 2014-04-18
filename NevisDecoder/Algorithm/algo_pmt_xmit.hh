@@ -58,7 +58,7 @@ namespace larlight {
 	return FEM::FEM_FIRST_WORD;
       else if( (word & 0xf000) == 0x9000 )
 	return FEM::CHANNEL_HEADER;
-      else if( (word & 0xf000) == 0xa000 )
+      else if( (word & 0xf000) == 0xa000 || (word & 0xf000) == 0x8000)
 	return FEM::CHANNEL_WORD;
       else if( (word & 0xf000) == 0xb000 )
 	return FEM::CHANNEL_LAST_WORD;
