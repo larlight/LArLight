@@ -129,11 +129,12 @@ namespace larlight {
       */
 
       //Foiurier Transform of noise
-
+      /*
       TH1 *fft = ADC_subtracted->FFT(NULL,"MAG");
       for (UInt_t w=0; w<((tpc_data->size())/2+1); w++)
 	NoiseSpec->AddBinContent(w+1,fft->GetBinContent(w));
       delete fft;
+      */
       delete ADC_subtracted;
 
 
@@ -150,32 +151,31 @@ namespace larlight {
 
     
     //Entries for each Channel
-    AllChan    = new TH1D("AllChan",     "Entries in Each Channel; Channel Number; Events",    _TotChans, 0, _TotChans);
+    AllChan         = new TH1D("AllChan",      "Entries in Each Channel; Channel Number; Events",    _TotChans, 0, _TotChans);
     //RMS values for all waveforms for all events
-    AllRMS     = new TH1D("AllRMS",      "All RMS values; RMS [ADCs]",             1000,      0,    5);
+    AllRMS          = new TH1D("AllRMS",       "All RMS values; RMS [ADCs]",                         1000,      0,    1);
     //Avg over all events of Baseline per channel
-    ChannelBaseline = new TH1D("ChanBaseline", "Baseline by Channel; Channel; Baseline [ADCs]", _TotChans, 0, _TotChans);
+    ChannelBaseline = new TH1D("ChanBaseline", "Baseline by Channel; Channel; Baseline [ADCs]",      _TotChans, 0, _TotChans);
     //Avg over all events of RMS noise per channel
-    ChannelRMS = new TH1D("ChannelRMS", "RMS values; Channel; RMS", _TotChans, 0, _TotChans);
+    ChannelRMS      = new TH1D("ChannelRMS",   "RMS values; Channel; RMS",                           _TotChans, 0, _TotChans);
     //Mean of Baseline values -- channel by channel
-    BaseMeanHisto     = new TH1D("BaselineMean", "Mean of Baselines", 3000, 0, 3000);
+    BaseMeanHisto   = new TH1D("BaselineMean", "Mean of Baselines; [ADCs]",                          3000, 0, 3000);
     //RMS of Baseline values -- channel by channel
-    BaseRMSHisto     = new TH1D("BaselineRMS", "RMS of Baseline values by Channel", 1000, 0, 5);
-    //BaseTrendHisto: tendency of baseline for channel to increase (+1) or decrease (-1)
-    BaseTrendHisto  = new TH1D("BaseTrend", "Baseline Trend", 101, -1, 1);
-    //RMSTrendHisto: tendency of RMS noise for channel to increase (+1) or decrease (-1)
-    RMSTrendHisto  = new TH1D("RMSTrend", "RMS Trend", 101, -1, 1);
+    BaseRMSHisto    = new TH1D("BaselineRMS",  "RMS of Baseline values by Channel [ADCs]",           1000, 0, 1);
     //Max ADCs vs. channel for 1 user-selected event
-    MaxADCsHisto = new TH1D("MaxADCs", "Max ADCs; Chan Num; ADCs", 20000, 0, 20000);
-
-    BoardVsChanRMS = new TH2D("BoardVsChanRMSMap", "Board vs. Chan RMS Noise Map; FEM #; Chan #", _NBoards, 0, _NBoards, _NChans, 0, _NChans);
-    BaseRMSvsNoise = new TH2D("BoardRMSvsNoise", "Baseline RMS vs Noise per Chan; Noise [ADC]; Baseline RMS",
-			      100, 0, 5, 100, 0, 5);
+    MaxADCsHisto    = new TH1D("MaxADCs",      "Max ADCs; Chan Num; ADCs",                           20000, 0, 20000);
+    //2D Histograms: Maps and Correlation between Baseline Variation and Noise RMS Level
+    BoardVsChanRMS  = new TH2D("BoardVsChanRMSMap",          "Board vs. Chan RMS Noise Map; FEM #; Chan #",
+			       _NBoards, 0, _NBoards, _NChans, 0, _NChans);
+    BoardVsChanBase = new TH2D("BoardVsChanBaselineMap",     "Board vs. Chan Baseline Map; FEM #; Chan #", 
+			       _NBoards, 0, _NBoards, _NChans, 0, _NChans);
+    BaseRMSvsNoise  = new TH2D("BoardRMSvsNoise",            "Baseline RMS vs Noise per Chan; Noise [ADC]; Baseline RMS",
+			       30, 0, 1, 30, 0, 1);
 
 
 
     TStyle *gStyle = new TStyle("Default","Default Style"); 
-    gStyle->SetHistFillColor(1);
+    gStyle->SetOptStat(0);
 
     //loop over maps and fill histograms
     for (short crate=0; crate < _NCrates; crate++){
@@ -200,6 +200,7 @@ namespace larlight {
 	    BaseMeanHisto->Fill( avgBaseline );
 	    BaseRMSHisto->Fill( avgNoise );
 	    BoardVsChanRMS->SetBinContent( board , channel , avgNoise);
+	    BoardVsChanBase->SetBinContent( board, channel, avgBaseline);
 	    for (int n=0; n < nevents; n++){
 	      varBaseline += (BaselineMap[crate][board][channel][n]-avgBaseline)*
 		(BaselineMap[crate][board][channel][n]-avgBaseline);
@@ -215,47 +216,30 @@ namespace larlight {
 	}
       }
     }
+
+    BaseRMSvsNoise->SetStats(False);
+    BoardVsChanRMS->SetStats(False);
+    BoardVsChanBase->SetStats(False);
+    AllChan->SetStats(False);
+    ChanBaseline->SetStats(False);
+    ChannelRMS->SetStats(False);
+
     AllChan->Write();
     ChannelBaseline->Write();
     ChannelRMS->Write();
     BaseRMSvsNoise->Write();
-    /*
-    //Choose Channel to plot Baselines for
-    int chplot = -1;
-    std::cout << "Plot Baseline value for one channel for all events..." << std::endl;
-    while (chplot == -1){
-      std::cout << "Insert Channel to plot" << std::endl;;
-      std::cin >> chplot;
-      if ( (chplot<_ChMax) and (chplot>_ChMin) ) {
-	if  (ChanBaseline[chplot][99] != -1) 
-	  break;
-	else { std::cout << "Channel not present in this data set..." << std::endl; chplot=-1; }
-      }
-      else { std::cout << "Channel out of bounds..." << std::endl; chplot=-1; }
-    }
-    
-    TH1D *chbaseline =new TH1D(Form("BaselineChan_%d",chplot),Form("BaselineChan_%d",chplot)
-			     ,100, ChanBaseline[chplot][0]-10, ChanBaseline[chplot][0]+10);
-    for (UInt_t k=0; k<100; k++)
-      chbaseline->Fill(ChanBaseline[chplot][k]);
-    chbaseline->Write();
-    */
-
-
     BoardVsChanRMS->Write();
+    BoardVsChanBase->Write();
     AllRMS->Write();
     ChannelRMS->Write();
     AllChan->Write();
-    NoiseSpec->Write();
-    BaseTrendHisto->Write();
-    RMSTrendHisto->Write();
+    //NoiseSpec->Write();
     BaseMeanHisto->Write();
     BaseRMSHisto->Write();
-    MaxADCsHisto->Write();
-    sine->Write();
-    SineExmpl->Write();
-    rand->Write();
-    RandExmpl->Write();
+    //sine->Write();
+    //SineExmpl->Write();
+    //rand->Write();
+    //RandExmpl->Write();
 
     return true;
   }
