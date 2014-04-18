@@ -108,13 +108,16 @@ namespace larlight {
     /// A simple method to inquire if the data storage buffer is currently empty or not
     virtual bool is_event_empty(){ return (_header_info.event_number == FEM::INVALID_WORD);};
 
+    /// A method to clear event-wise data
+    virtual void clear_event(){_event_header_count=0; _header_info.clear_event();};
+
+    /// A method to skip till it finds the next event header
+    virtual void skip_to_next_event() {_search_for_next_event=true;}
+
   protected:
 
     /// A method to store event-wise data
     virtual bool store_event()=0;
-
-    /// A method to clear event-wise data
-    virtual void clear_event(){_event_header_count=0; _header_info.clear_event();};
 
     /// A method to process FEM header word passed from process_word method
     virtual bool process_fem_header(const UInt_t word, UInt_t &last_word);

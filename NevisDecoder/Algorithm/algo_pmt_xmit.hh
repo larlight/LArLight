@@ -58,7 +58,7 @@ namespace larlight {
 	return FEM::FEM_FIRST_WORD;
       else if( (word & 0xf000) == 0x9000 )
 	return FEM::CHANNEL_HEADER;
-      else if( (word & 0xf000) == 0xa000 )
+      else if( (word & 0xf000) == 0xa000 || (word & 0xf000) == 0x8000)
 	return FEM::CHANNEL_WORD;
       else if( (word & 0xf000) == 0xb000 )
 	return FEM::CHANNEL_LAST_WORD;
@@ -71,6 +71,8 @@ namespace larlight {
       else
 	return FEM::UNDEFINED_WORD;
     };
+
+    void check_fifo_overflow(bool doit=true) { _check_fifo_overflow = doit; }
 
   protected:
 
@@ -118,11 +120,11 @@ namespace larlight {
 
     event_pmtfifo* _event_data;
 
-    static const size_t CHANNEL_HEADER_COUNT=3; ///< Number of channel header words
-    FEM::DISCRIMINATOR _last_disc_id;           ///< Holder of last channel data's disc. id
-    UShort_t           _last_channel_number;    ///< Holder of last channel data's channel number
-    size_t             _channel_header_count;   ///< A counter for channel header words
+    bool _check_fifo_overflow;
 
+    static const size_t CHANNEL_HEADER_COUNT=3; ///< Number of channel header words
+    size_t             _channel_header_count;   ///< A counter for channel header words
+    unsigned short     _nword_within_ch;        ///< A counter for channel data words (used to detect fifo overflow)
   };
 }
 #endif
