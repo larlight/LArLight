@@ -14,6 +14,13 @@ namespace larlight {
     //RMS histogram per channel
     //for (int u=0; u<(_ChMax-_ChMin); u++)
     //  RMSperChan[u] = new TH1D(Form("RMS_Ch_%d",u),Form("Noise Ch %d",u), 1000, 0, 100);
+
+    //Crates Being Used:
+    _NCrates = 1;
+    _NBoards = 20;
+    _NChans  = 64;
+    _TotChans = _NCrates*_NBoards*_NChans;
+
     for (short j=0; j<20000; j++){
       for (short k=0; k<100; k++){
 	ChanRMS[j][k] = -1;
@@ -24,17 +31,32 @@ namespace larlight {
       for (short m=0; m<64; m++)
 	BoardVsChanRMSArray[l][m] = 0;
     }
+
+    //Clear all maps
+    for (short i=0; i<_NCrates; i++){
+      for (short j=0; j<_NBoards; j++){
+	for (short k=0; k<_NChans; k++){
+	  for (short e=0; e<100; e++){
+	    RMSNoiseMap[i][j][k][e] = 0;
+	    BaselineMap[i][j][k][e] = 0;
+	  }
+	  ChanEntries[i][j][k] = 0;
+	}
+      }
+    }
     //NoiseSpec: Frequency spectrum of Noise
     //NoiseSpec needs to be scaled so that x-axis is a frequency range (Hz)
     NoiseSpec  = new TH1D("NoiseSpec",   "Noise Freq. Spectrum; w [Hz]",     100,      0,   (2*3.14)/_BinTime);
-    //Channel Numbers
-    AllChan    = new TH1D("AllChan",     "All Channel Numbers",     (_ChMax-_ChMin), _ChMin, _ChMax);
+    //Entries for each Channel
+    AllChan    = new TH1D("AllChan",     "Entries in Each Channel; Channel Number; Events",    _TotChans, 0, _TotChans);
     //RMS values for all waveforms for all events
     AllRMS     = new TH1D("AllRMS",      "All RMS values; RMS [ADCs]",             1000,      0,    5);
+    //Avg over all events of Baseline per channel
+    ChannelBaseline = new TH1D("ChanBaseline", "Baseline by Channel; Channel; Baseline [ADCs]", _TotChans, 0, _TotChans);
     //Avg over all events of RMS noise per channel
-    ChannelRMS = new TH1D("ChannelRMS", "RMS values; Channel; RMS", (_ChMax-_ChMin),  _ChMin, _ChMax);
+    ChannelRMS = new TH1D("ChannelRMS", "RMS values; Channel; RMS", _TotChans, 0, _TotChans);
     //Mean of Baseline values -- channel by channel
-    BaseMeanHisto     = new TH1D("BaselineMean", "Mean of Baseline values by Channel", 3000, 0, 3000);
+    BaseMeanHisto     = new TH1D("BaselineMean", "Mean of Baselines", 3000, 0, 3000);
     //RMS of Baseline values -- channel by channel
     BaseRMSHisto     = new TH1D("BaselineRMS", "RMS of Baseline values by Channel", 1000, 0, 5);
     //BaseTrendHisto: tendency of baseline for channel to increase (+1) or decrease (-1)
@@ -101,30 +123,26 @@ namespace larlight {
 
       //get channel number
       int chan = tpc_data->channel_number();
+      int mod_address = tpc_data->module_address();
+      int mod_id      = tpc_data->module_id();
       int chan_index = (tpc_data->module_address())*100+chan;
-      //      std::cout << "Channel Index: " << chan_index << std::endl;
-      //AllChan->Fill(chan);
 
-      //Baseline subtracted ADCs
+      std::cout << std::endl << "Chan: " << chan << "\tAddrs: " << mod_address << "\tID: " << mod_id << std::endl;
+      ChanEntries[mod_id][mod_address][chan] += 1;
+
+      //Histo for baseline subtracted ADCs
       TH1D *ADC_subtracted = new TH1D("ADC_subtracted", "Baseline subtracted", tpc_data->size(), 0, tpc_data->size());
+
       //loop over ADCs and find baseline
       int ADCsum = 0;
       for (UInt_t u=0; u<tpc_data->size(); u++)
 	ADCsum += tpc_data->at(u);
-
       double baseline = ((float)(ADCsum))/(tpc_data->size());
-      if ( (chan_index >=  _ChMin) and (chan_index <=  _ChMax) )
-	ChanBaseline[chan_index][event_num] = baseline;
-      /*
-      if (event_num > 0){
-	if (ChanBaseline[chan_index][event_num] > ChanBaseline[chan_index][event_num-1])
-	  BaselineTrend[chan_index] += 1;
-	else
-	  BaselineTrend[chan_index] -= 1;
+      if ( (chan_index >=  _ChMin) and (chan_index <=  _ChMax) ){
+	ChannelBaseline[chan_index][event_num] = baseline;
+	BaselineMap[mod_id][mod_address][chan][event_num] = baseline;
       }
-      else   //preset value to 0
-	BaselineTrend[chan_index] = 0;
-      */
+
       //Now subtract baseline and find noise RMS
       double RMS = 0;
       for (UInt_t u=0; u<tpc_data->size(); u++){
@@ -132,6 +150,7 @@ namespace larlight {
 	ADC_subtracted->SetBinContent( u+1 , (tpc_data->at(u)-baseline) );
       }
       double rmsnoise = sqrt( RMS/ (tpc_data->size() - 1) );
+      RMSNoiseMap[mod_id][mod_address][chan][event_num] = baseline;
       RMSperBoard[tpc_data->module_address()]->Fill(rmsnoise);
       RMSperChanNum[chan]->Fill(rmsnoise);
       BoardVsChanRMSArray[(int)(tpc_data->module_address())][chan] += rmsnoise;
@@ -142,18 +161,9 @@ namespace larlight {
 	ChanRMS[chan_index][event_num] = rmsnoise;
       else
 	std::cout << "Channel out of bounds!   Chan Number: " << chan_index  << std::endl;
-      /*
-      //study variation over "time"
-      if (event_num > 0){
-	if (ChanRMS[chan_index][event_num] > ChanRMS[chan_index][event_num-1])
-	  RMSTrend[chan_index] += 1;
-	else
-	  RMSTrend[chan_index] -= 1;
-      }
-      else   //preset value to 0
-	RMSTrend[chan_index] = 0;
-      */
+
       //save waveform if RMS is high
+      /*
       if ( (rmsnoise>30) ){
 	TH1D *waveform =new TH1D(Form("waveform_ev%d_ch%d",event_num,chan_index),Form("waveform_ev%d_ch%d",event_num,chan_index)
 				 ,tpc_data->size(), 0, tpc_data->size());
@@ -161,7 +171,8 @@ namespace larlight {
 	  waveform->SetBinContent(k+1,tpc_data->at(k));
 	waveform->Write();
 	}
-      
+      */
+
       //Foiurier Transform of noise
       /*
       TH1 *fft = ADC_subtracted->FFT(NULL,"MAG");
@@ -183,6 +194,43 @@ namespace larlight {
   }
 
   bool NoiseAna::finalize() {
+
+    //loop over maps and fill histograms
+    for (short crate=0; crate < _NCrates; crate++){
+      for (short board=0; board < _NBoards; board++){
+	for (short channel=0; channel < _NChans; channel++){
+	  int nevents = ChanEntries[crate][board][channel];
+	  double avgBaseline = 0;
+	  double avgNoise    = 0;
+	  double varBaseline = 0;
+	  double varNoise    = 0;
+	  if ( nevents > 0 ){
+	    AllChan->SetBinContent( crate*board*channel+1, nevents);
+	    for (int n=0; n < nevents; n++){
+	      avgBaseline += BaselineMap[crate][board][channel][n];
+	      avgNoise    += RMSNoiseMap[crate][board][channel][n];
+	    }
+	    avgBaseline = avgBaseline/nevents;
+	    avgNoise    = avgNoise/nevents;
+	    for (int n=0; n < nevents; n++){
+	      varBaseline += (BaselineMap[crate][board][channel][n]-avgBaseline)*
+		(BaselineMap[crate][board][channel][n]-avgBaseline);
+	      varNoise    += (RMSNoiseMap[crate][board][channel][n]-avgNoise)*
+		(RMSNoiseMap[crate][board][channel][n]-avgNoise);
+	    }
+	    varBaseline = sqrt( varBaseline / (nevents-1) );
+	    varNoise    = sqrt( varNoise / (nevents-1) );
+	    ChannelRMS->SetBinContent( crate*board*channel+1, avgNoise);
+	    ChannelRMS->SetBinError( crate*board*channel+1, varNoise);
+	    ChannelBaseline->SetBinContent( crate*board*channel+1, avgBaseline);
+	    ChannelBaseline->SetBinError( crate*board*channel+1, varBaseline);
+	  }
+	}
+      }
+    }
+
+    ChannelBaseline->Write();
+    ChannelRMS->Write();
 
     /*
     //Choose Channel to plot Baselines for
