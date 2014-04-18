@@ -22,6 +22,8 @@ namespace larlight {
 
     _event_data = 0;
 
+    _check_fifo_overflow = false;
+
     clear_event();
 
     algo_fem_decoder_base::reset();
@@ -42,9 +44,7 @@ namespace larlight {
     _ch_data.clear_data();
 
     _channel_header_count = 0;
-
-    _last_channel_number=FEM::INVALID_CH;
-    _last_disc_id=FEM::DISC_MAX;
+    _nword_within_ch = 0;
 
   }
 
@@ -87,7 +87,6 @@ namespace larlight {
 		    Form("Disagreement on nwords: counted=%u, expected=%u",_nwords,_header_info.nwords));
 
       status = false;
-
     }
 
     // checksum is only 24 bit!
@@ -123,9 +122,8 @@ namespace larlight {
 
       Message::send(MSG::ERROR,__FUNCTION__,
 		    Form("Unexpected word (%x, previous=%x) while processing event header!",word,last_word));
-
+      
       status = false;
-
     }
 
     last_word = word;
@@ -152,7 +150,7 @@ namespace larlight {
 
       Message::send(MSG::ERROR,__FUNCTION__,
 		    Form("Unexpected word: %x (previous = %x)",word,last_word));
-
+      
       status = false;
 
     }
@@ -326,8 +324,8 @@ namespace larlight {
 	    // the same channel & discriminator id. Do an operation that is done for the case of 
 	    // CHANNEL_HEADER, but use a stored value of channel number & disc. id.
 	    _channel_header_count=1;
-	    _ch_data.set_channel_number(_last_channel_number);
-	    _ch_data.set_disc_id(_last_disc_id);
+	    _ch_data.set_channel_number( (*_event_data->rbegin()).channel_number() );
+	    _ch_data.set_disc_id( (*_event_data->rbegin()).disc_id() );
 	    if(_verbosity[MSG::NORMAL])
 	      Message::send(MSG::NORMAL,__FUNCTION__,
 			    Form("Found consecutively readout data arrays @ event %d (missing channel very first header)!",
@@ -353,6 +351,8 @@ namespace larlight {
 	  else if(word_class!=FEM::CHANNEL_LAST_WORD)
 
 	    _ch_data.push_back(word & 0xfff);	
+	  
+	  ++_nword_within_ch;
 
 	}else if(last_word_class==FEM::CHANNEL_HEADER   ) {
 	  // First of 2 channel header words. Record the values.
@@ -364,7 +364,7 @@ namespace larlight {
 	  //std::cout<<"Checking roll over for 3 bits..."<<std::endl;
 	  if(_header_info.event_frame_number == FEM::INVALID_WORD) {
 	    print(MSG::ERROR,__FUNCTION__,Form("Invalid event frame number: %d",FEM::INVALID_WORD));
-	    throw decode_algo_exception();
+	    return false;
 	  }
 	  
 	  // Using 3-bit version
@@ -384,13 +384,16 @@ namespace larlight {
 						 _ch_data.readout_frame_number()));
 	  }
 
-	  _channel_header_count++; 
+	  ++_channel_header_count; 
+	  ++_nword_within_ch;
+
 	}else if(last_word_class==FEM::CHANNEL_WORD) {
 	  // Second of 2 channel header words. Record the values & inspect them.
 	  // This gives lower 12 bits of 20-bit readout_sample_number number
 	  _ch_data.set_readout_sample_number(_ch_data.readout_sample_number_64MHz() + (word & 0xfff));
+
 	  _channel_header_count++;
-	  
+	  ++_nword_within_ch;
 	  if(_verbosity[MSG::INFO]){
 	    sprintf(_buf,"Read-in headers for Ch. %-3d!",_ch_data.channel_number());
 	    Message::send(MSG::INFO,_buf);
@@ -400,20 +403,20 @@ namespace larlight {
 	// If this is channel's last word, store & clear channel info
 	if(word_class==FEM::CHANNEL_LAST_WORD){
 	  if(_verbosity[MSG::INFO]){
-	    sprintf(_buf,"Encountered the last word (%x) for channel %d",word,_ch_data.channel_number());
-	    Message::send(MSG::INFO,_buf);
-	    sprintf(_buf,"Event frame  : %d",_header_info.event_frame_number);
-	    Message::send(MSG::INFO,_buf);
-	    sprintf(_buf,"PMT frame    : %d",_ch_data.readout_frame_number());
-	    Message::send(MSG::INFO,_buf);
-	    sprintf(_buf,"Disc. ID     : %d",_ch_data.disc_id());
-	    Message::send(MSG::INFO,_buf);
-	    sprintf(_buf,"Start Time   : %d",_ch_data.readout_sample_number_64MHz());
-	    Message::send(MSG::INFO,_buf);
-	    sprintf(_buf,"# ADC sample : %zd",_ch_data.size());
-	    Message::send(MSG::INFO,_buf);
+	    Message::send(MSG::INFO,Form("Encountered the last word (%x) for channel %d",word,_ch_data.channel_number()));
+	    Message::send(MSG::INFO,Form("Event frame  : %d",_header_info.event_frame_number));
+	    Message::send(MSG::INFO,Form("PMT frame    : %d",_ch_data.readout_frame_number()));
+	    Message::send(MSG::INFO,Form("Disc. ID     : %d",_ch_data.disc_id()));
+	    Message::send(MSG::INFO,Form("Start Time   : %d",_ch_data.readout_sample_number_64MHz()));
+	    Message::send(MSG::INFO,Form("# ADC sample : %zd",_ch_data.size()));
 	  }
 	  store_ch_data();
+	}
+	// else check fifo overflow
+	else if( _check_fifo_overflow && _nword_within_ch &&
+		 ((_nword_within_ch % 8) == 0 && ( word & 0xf000 ) != 0x8000) ) {
+	  Message::send(MSG::ERROR,"Bit marker 0x8xxx not found at expected position (possible FIFO overflow)!");
+	  return false;
 	}
       }
       break;
@@ -425,18 +428,14 @@ namespace larlight {
 
   void algo_pmt_xmit::store_ch_data(){
 
+    // Save
     _ch_data.set_module_id(_header_info.module_id);
     _ch_data.set_module_address(_header_info.module_address);
     _event_data->push_back(_ch_data);
 
-    // Store this waveform's channel number and discriminator id.
-    // This may be used in the next pulse in case the next pulse is coming with no time space in between.
-    // In such case, the next pulse is missing the channel very first header word because it is supposed
-    // to be combined.
-    _last_channel_number=_ch_data.channel_number();
-    _last_disc_id=_ch_data.disc_id();
-
+    // Clear
     _channel_header_count=0;
+    _nword_within_ch=0;
     _ch_data.clear_data();
 
   }
