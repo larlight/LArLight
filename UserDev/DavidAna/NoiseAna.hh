@@ -19,6 +19,7 @@
 
 
 #include "TVirtualFFT.h"
+#include "TStyle.h"
 #include "TF1.h"
 #include "TMath.h"
 #include "TRandom.h"
@@ -55,6 +56,12 @@ namespace larlight {
 
     protected:
 
+    //Crates, Boards and Channels being used
+    short _NCrates;
+    short _NBoards;
+    short _NChans;
+    int _TotChans;
+
     //Width in seconds of each bin
     double _BinTime;
     //minimum channel number used
@@ -65,12 +72,18 @@ namespace larlight {
     int maxevt;
     TH1D *AllRMS;
     TH1D *ChannelRMS;
+    TH1D *ChannelBaseline;
     TH1D *RMSperChanNum[64];
     TH1D *RMSperBoard[20];
     double BoardVsChanRMSArray[20][64];
     TH2D *BoardVsChanRMS;
+    TH2D * BaseRMSvsNoise;
     //ChanRMS[Chan#][evt#] = RMS for that chan for that event
     double ChanRMS[20000][100];
+    //RMS MAP FOR ALL CHANNELS
+    double RMSNoiseMap[1][20][64][100];//limit to 1 crate and 100 evts now
+    double BaselineMap[1][20][64][100];
+    int ChanEntries[1][20][64];
     //ChanBaseline[Chan#][evt#] = Baseline for that chan for that event
     double ChanBaseline[20000][100];
     int BaselineTrend[20000];

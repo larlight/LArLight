@@ -67,15 +67,38 @@ namespace kaleko {
 			    larlight::event_hit* ev_hits, 
 			    const std::vector<cluster::ClusterParamsAlgNew> &_clusterparams);
 
+    void PrepareHistos();
+
+    bool DKShittyClusterTest(const larlight::mcshower &main_shower,
+			     const larlight::cluster &i_cluster);
+
     std::vector<cluster::ClusterParamsAlgNew> _clusterparams;
     
+
+    
+    Double_t w2cm;
+    Double_t t2cm;
+    
+    //neural net path needed
+    std::string myNeuralNetPath;
+
+    //angle histograms to determine how cone-like a cluster is
+    TH1F *_hit_angles_forwards, *_hit_angles_backwards;
+    
+
     //variables to go into the ttree
     //    std::vector<int> _nhits;
     //    std::vector<double> _cluscharge;
-    //    std::vector<double> _mother_energy;
+    //    std::vector<double> _mc_mother_energy;
     int _nhits;
     double _cluscharge;
-    double _mother_energy;
+    double _mc_mother_energy;
+    double _mc_angle_2d;
+    int _view;
+    bool _dk_good_clus;
+    double _cluslength;
+    double _poly_area;
+    double _coneness;
 
     double _sum_charge;                 ///< Sum charge of hits in ADC
     double _mean_charge;                ///< Mean (average) charge of hits in ADC

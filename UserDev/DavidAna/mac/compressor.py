@@ -15,6 +15,7 @@ from ROOT import larlight as fmwk
 
 infilename = sys.argv[1]
 outfilename = sys.argv[2]
+outhisto = sys.argv[3]
 
 # Create ana_processor instance
 my_proc=fmwk.ana_processor()
@@ -22,7 +23,7 @@ my_proc=fmwk.ana_processor()
 # Specify IO mode
 #my_proc.set_io_mode(fmwk.storage_manager.READ)
 #my_proc.set_io_mode(storage_manager.WRITE)
-my_proc.set_io_mode(fmwk.storage_manager.BOTH)
+my_proc.set_io_mode(fmwk.storage_manager.READ)
 
 # Specify what data to read
 my_proc.set_data_to_read(fmwk.DATA.TPCFIFO)
@@ -33,14 +34,14 @@ my_proc.set_data_to_read(fmwk.DATA.TPCFIFO)
 #my_proc.add_input_file("./../../../NevisDecoder/Decoder/mac/xmit_subrun_2014_01_13_1_trigger.root")
 my_proc.add_input_file(infilename)
 #set output data file
-my_proc.set_output_file(outfilename)
+#my_proc.set_output_file(outfilename)
 
 # Specify ROOT TDirectory in the file if such structure is present (which is the case for DataScanner output)
 my_proc.set_input_rootdir("scanner")
 
 # Set output root file: this is a separate root file in which your
 # analysis module can store anything such as histograms, your own TTree, etc.
-my_proc.set_ana_output_file("compressed_wfs.root")
+my_proc.set_ana_output_file(outhisto)
 
 #my_proc.set_output_rootdir("scanner")
 # Create analysis class instance. For this example, ana_base.
