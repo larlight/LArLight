@@ -180,10 +180,10 @@ namespace cluster{
     
     fChargeCutoffThreshold.clear();
     fChargeCutoffThreshold.resize(3,0);
-    fChargeCutoffThreshold.at(0)=200;
-    fChargeCutoffThreshold.at(1)=400;
-    //fChargeCutoffThreshold.at(0)=500;
-    //fChargeCutoffThreshold.at(1)=500;
+    //fChargeCutoffThreshold.at(0)=200;
+    //fChargeCutoffThreshold.at(1)=400;
+    fChargeCutoffThreshold.at(0)=500;
+    fChargeCutoffThreshold.at(1)=500;
     fChargeCutoffThreshold.at(2)=1000;
 
     fHitVector.clear();
