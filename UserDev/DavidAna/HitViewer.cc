@@ -94,10 +94,10 @@ namespace larlight {
     TH2D* h=0;
     if(h) delete h;
     
-    double mywiremin=0.9*wiremin;
-    double mywiremax=1.1*wiremax;
-    double mytimemin=0.9*timemin;
-    double mytimemax=1.1*timemax;
+    double mywiremin=wiremin;
+    double mywiremax=wiremax;
+    double mytimemin=timemin;
+    double mytimemax=timemax;
 
     int wirewidth = 50;//(int)(mywiremax-mywiremin)/12;
     int timewidth = 50;//(int)(mytimemax-mytimemin)/12; 

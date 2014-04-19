@@ -5,6 +5,7 @@ import ROOT
 gSystem.Load("libBase")
 gSystem.Load("libLArUtil")
 gSystem.Load("libClusterRecoUtil")
+gSystem.Load("libFANN")
 from ROOT import larlight as fmwk
 from ROOT import cluster
 
@@ -79,10 +80,10 @@ if len(sys.argv) > 2:
 
 mgr.open()
 
-chit=TCanvas("chit","chit",600,500)
-chit.SetGridx(1)
-chit.SetGridy(1)
+
+
 algo = cluster.ClusterParamsExecutor()
+
 
 algo.SetUseHitBlurring(false);
 
@@ -90,29 +91,34 @@ processed_events=0
 
 fGSer = larutil.GeometryUtilities.GetME()
 
-hArea=ROOT.TH1D("PolyArea", "Area for all Polygon",  100, 0, 1000)
+#Setting up TTree to store histograms
+HistoFile=ROOT.TFile("outputhistos.root","recreate")
+HistoTree=ROOT.TTree("HistoTree","Tree for Histograms")
+
+#All Histograms are here
+hArea=ROOT.TH1D("hArea", "Area for all Polygon",  1000, 0, 200)
+hSmallArea=ROOT.TH1D("SmallPolyArea", "Small Area for all Polygon",  500, 0, 10)
+hPolyHitDensity=ROOT.TH1D("Poly Hit Density", "Poly Hit Density",  500, 0, 25)
+hPolyChargeDensity=ROOT.TH1D("Poly Charge Density", "Poly Charge Density",  500, 0, 10000)
+hHitDensityVSHits=ROOT.TH2D("HitDensityVSHits", "hit density vs cluster hits; Hits/Area; Number of Hits in Cluster",
+                            200, 0, 25, 200, 0, 800)
+hHitDensityVSCharge=ROOT.TH2D("HitDensityVSCharge", "hit density vs cluster charge; Hits/Area; Cluster Charge",
+                              200, 0, 25, 200, 0, 300000)
+hHitDensityVSChargePerHit=ROOT.TH2D("HitDensityVSChargePerHit", "hit density vs charge/hit; Hits/Area; Charge in Cluster / Hits in Cluster",
+                                    200, 0, 25, 200, 0, 5000)
+AreaVSHits=ROOT.TH2D("AreaVSHits", "Area vs Hits in Cluster; Area; Number of Hits in Cluster",
+                     1000, 0, 200, 200, 0, 1000)
+AreaVSCharge=ROOT.TH2D("AreaVSCharge", "Area vs Charge in Cluster; Area; Cluster Charge",
+                       1000, 0, 200, 200, 0, 300000)
+AreaVSHitDensity=ROOT.TH2D("AreaVSHitDensity", "Area VS Hit Density; Area; Hit Density",
+                           1000, 0, 200, 200, 0, 25)
 
 
 while mgr.next_event():
 
     # Get event_cluster ... std::vector<larlight::cluster>
-    cluster_v = mgr.get_data(fmwk.DATA.ShowerAngleCluster)
+    cluster_v = mgr.get_data(fmwk.DATA.FuzzyCluster)
 
-    # Get event_mctruth ... std::vector<larlight::mctruth>
-    mctruth_v = mgr.get_data(fmwk.DATA.MCTruth)
-
-    # Get the primary particl generator vtx position
-    mct_vtx=None
-    if mctruth_v and mctruth_v.size():
-        if mctruth_v.size()>1:
-            print "Found more than 1 MCTruth. Only use the 1st one... \n \n"
-        if mctruth_v.at(0).GetParticles().at(0).PdgCode() == 11:      ## electron    
-	    mct_vtx = mctruth_v.at(0).GetParticles().at(0).Trajectory().at(0).Position()
-	    print "\n electron \n"
-	elif mctruth_v.at(0).GetParticles().at(0).PdgCode() == 22:    
-	    trajsize= mctruth_v.at(0).GetParticles().at(0).Trajectory().size()
-	    mct_vtx = mctruth_v.at(0).GetParticles().at(0).Trajectory().at(trajsize-1).Position()
-	    print "\n gamma \n"
    #PdgCode
 
     if args.num_events == processed_events:
@@ -125,16 +131,17 @@ while mgr.next_event():
 
     for x in xrange(cluster_v.size()):
 
-        print "  Cluster ID:",cluster_v.at(x).ID()
+        #Hits as vector of hits
+
         algo.LoadCluster(cluster_v.at(x),
                          mgr.get_data(cluster_v.get_hit_type()))
 
         # algo.FillParams(True,True,True,True,True)
         algo.GetAverages(True)
-        algo.GetRoughAxis(True)
-        algo.GetProfileInfo(True)
-        algo.RefineStartPoints(True)
-        algo.RefineDirection(True)
+        #algo.GetRoughAxis(True)
+        #algo.GetProfileInfo(True)
+        #algo.RefineStartPoints(True)
+        #algo.RefineDirection(True)
         algo.FillPolygon()
 
 
@@ -146,15 +153,33 @@ while mgr.next_event():
         #algo.Report()
         
         result = algo.GetParams()
+        #geometric area of polygon
         polyArea = result.PolyObject.Area()
-        hArea.Fille(polyArea)
+        #number of hits in cluster
+        Nhits = result.N_Hits
+        TotCharge = result.sum_charge
+        #twoDHitDensity = result.hit_density_2D
+        if (polyArea != 0.0 ):
+            PolyHitDensity = Nhits/polyArea
+            PolyChargeDensity = TotCharge/polyArea
+            hPolyHitDensity.Fill(PolyHitDensity)
+            hPolyChargeDensity.Fill(PolyChargeDensity)
+            hHitDensityVSHits.Fill( Nhits/polyArea, Nhits)
+            hHitDensityVSCharge.Fill( Nhits/polyArea, TotCharge)
+            hHitDensityVSChargePerHit.Fill( Nhits/polyArea, TotCharge/Nhits)
+            AreaVSHitDensity.Fill( polyArea, Nhits/polyArea)
+        hArea.Fill(polyArea)
+        AreaVSHits.Fill( polyArea, Nhits)
+        AreaVSCharge.Fill( polyArea, TotCharge)
+        if (polyArea < 50.0):
+            hSmallArea.Fill(polyArea)
 
-# Draw Hit 2D View & points
-chit.cd()
-hArea.Draw()
-# Update canvas
-chit.Update()
-sys.stdin.readline()
+        HistoTree.Fill()
+
+HistoTree.Print()
+HistoFile.Write()
+
+print "Finished Looping over events! Output Histograms in outputhistos.root"
         
         
 

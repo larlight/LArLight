@@ -481,11 +481,14 @@ namespace larlight {
 
     bool status=true;
 
-    if(_nwords){
+    if(_nwords>1){
       sprintf(_buf,"Number words expected - counted = %d",_nwords);
       Message::send(MSG::ERROR,__FUNCTION__,_buf);
       status=false;
     }
+    if(_checksum & 0xffffff)
+      _checksum -= 32768;
+
     if(_checksum & 0xffffff){
       sprintf(_buf,"Checksum expected - recieved = %d",_checksum);
       Message::send(MSG::ERROR,__FUNCTION__,_buf);
@@ -498,7 +501,7 @@ namespace larlight {
 
   bool algo_slow_readout_decoder::decode_ch_word(const UInt_t word, 
 						 const FEM::FEM_WORD last_word_class)  {
-
+    
     FEM::FEM_WORD word_class = get_word_class(word);
     bool status=true;
 
@@ -543,7 +546,8 @@ namespace larlight {
     case FEM::CHANNEL_HEADER:
       //
       // Channel header ... read in channel info from this word
-      if(last_word_class!=FEM::FEM_FIRST_WORD && last_word_class!=FEM::CHANNEL_LAST_WORD) {
+      if(last_word_class!=FEM::FEM_FIRST_WORD && last_word_class!=FEM::CHANNEL_LAST_WORD &&
+	 !( (((*_event_data->rbegin()).size()) & 0x1) && _last_word==0x8000)) {
 	Message::send(MSG::ERROR,__FUNCTION__,
 		      "Found the channel header in wrong place: previous word is missing!");
 	status=false;
@@ -569,18 +573,36 @@ namespace larlight {
 
 	status=false;
       }else{
-	// Treat a case of missing very first channel header word: happens when there is no time in between two readout data.
+
+	// Treat a case of missing very first channel header word
 	if(last_word_class==FEM::CHANNEL_LAST_WORD){
-	  // In this case, we should be missing the CHANNEL_HEADER because this pulse is from the same channel & discriminator id.
-	  // Do an operation that is done for the case of CHANNEL_HEADER, but use a stored value of channel number & disc. id.
-	  init_ch_info();
-	  _ch_data.set_channel_number(_last_channel_number);
-	  _ch_data.set_disc_id(_last_disc_id);
-	  if(_verbosity[MSG::NORMAL])
-	    Message::send(MSG::NORMAL,__FUNCTION__,
-			  Form("Found consecutively readout data arrays @ event %d (missing channel very first header)!",
-			       _event_data->event_number())
-			  );
+	  
+	  // Two possible cases: 
+	  //    (1) previous waveform had odd # of ADC samples ... then this should be 0x8000
+	  //    (2) two readout windows are combined
+	  
+	  //case (1)
+	  if( word == 0x8000 ) {
+
+	    if( ((*_event_data->rbegin()).size())%2 ) return true;
+
+	    else { 
+	      Message::send(MSG::ERROR,__FUNCTION__,
+			    "Found a possible padding 0x8000 in an unexpected place (previous readout was even (%zu)!)...");
+	      status = false;
+	    }
+	  }else{
+	    // Do an operation that is done for the case of CHANNEL_HEADER, 
+	    // but use a stored value of channel number & disc. id.
+	    init_ch_info();
+	    _ch_data.set_channel_number(_last_channel_number);
+	    _ch_data.set_disc_id(_last_disc_id);
+	    if(_verbosity[MSG::NORMAL])
+	      Message::send(MSG::NORMAL,__FUNCTION__,
+			    Form("Found consecutively readout data arrays @ event %d (missing channel very first header)!",
+				 _event_data->event_number())
+			    );
+	  }
 	}
 
 	//

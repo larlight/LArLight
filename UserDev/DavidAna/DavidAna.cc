@@ -23,7 +23,7 @@ namespace larlight {
   
     //Count events (since variable seems set to 0)
     event_num += 1;
-    if (event_num==1){
+    if (event_num%10==0){
 
     const event_tpcfifo *event_wf = (event_tpcfifo*)(storage->get_data(DATA::TPCFIFO));
     //waveform counter
@@ -72,7 +72,7 @@ namespace larlight {
 	for ( unsigned int  adc_index=0; adc_index<tpc_data->size(); adc_index++){
 	  int adcs = tpc_data->at(adc_index);
 	  //determine if something interesting happens
-	  if ( (adcs-_baseline > 10) ){
+	  if ( (adcs-_baseline > 6) or ( adcs-_baseline < -6) ){
 	    interesting = true;
 	  }
 	  else {

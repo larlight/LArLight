@@ -103,6 +103,13 @@ namespace larlight {
 		}
 
 	    }//for all bins in this waveform
+	  if (found_pulse){ // if still in pulse then save hit info
+	    ChargePerPulse->Fill((double)pulse_ADCs);
+	    if ( pulse_ADCs < 100 ) { LowEnPulses->Fill(pulse_ADCs); }
+	    num_hits+=1;
+	    pulse_ADCs = 0;
+	  }
+	  
 	  ChargePerWire->AddBinContent( larutil::Geometry::GetME()->ChannelToWire(chan), wire_ADCs);
 	  wire_ADCs = 0;
 

@@ -152,8 +152,9 @@ namespace larlight {
 
 	Message::send(MSG::ERROR,__FUNCTION__,
 		      Form("Undefined word: %x (previous = %x)",word,_last_word));
-
+	
 	status = false;
+
       }else if(_verbosity[MSG::INFO]){
 
 	// This happens sometimes according to Chi 10/01/13
@@ -236,6 +237,7 @@ namespace larlight {
 	Message::send(MSG::ERROR,__FUNCTION__,
 		      Form("Unexpected word while FEM_HEADER processing: %x (previous word=%x)",word,last_word));
 	status = false;
+
 	break;
       case FEM::CHANNEL_LAST_WORD:
 	// Store data
@@ -276,6 +278,7 @@ namespace larlight {
 			Form("Logic error: event header word counter not working! (%zu/%zu)",
 			     _event_header_count,FEM_HEADER_COUNT));
 	  status=false;
+
 	}
       }
     }
@@ -385,7 +388,8 @@ namespace larlight {
     UInt_t diff=0; // max diff should be (2^(nbits)-2)/2
     UInt_t mask=0; // mask to extract lower nbits from subject ... should be 2^(nbits)-1
     if      (nbits==3) {diff = 3; mask = 0x7;}
-    else if (nbits==4) {diff = 0xf; mask = 0xf;}
+    else if (nbits==4) {diff = 0x7; mask = 0xf;}
+    //else if (nbits==4) {diff = 0x7; mask = 0xf;}
     //    else if (nbits==4) {nbits=3; diff = 0x7; mask = 0x7;}
     else {
       print(MSG::ERROR,__FUNCTION__,"Only supported for nbits = [3,4]!");
@@ -464,6 +468,7 @@ namespace larlight {
       std::cout<<zero_count<<std::endl;
 
       status = false;
+
     }
 
     return status;
