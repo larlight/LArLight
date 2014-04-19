@@ -180,8 +180,10 @@ namespace cluster{
     
     fChargeCutoffThreshold.clear();
     fChargeCutoffThreshold.resize(3,0);
-    fChargeCutoffThreshold.at(0)=500;
-    fChargeCutoffThreshold.at(1)=500;
+    fChargeCutoffThreshold.at(0)=200;
+    fChargeCutoffThreshold.at(1)=400;
+    //fChargeCutoffThreshold.at(0)=500;
+    //fChargeCutoffThreshold.at(1)=500;
     fChargeCutoffThreshold.at(2)=1000;
 
     fHitVector.clear();
@@ -300,7 +302,7 @@ namespace cluster{
 
     double rmsx = 0.0;
     double rmsy = 0.0;
-
+    double rmsq = 0.0;
     //using the charge weighted coordinates find the axis from slope
     double ncw=0;
     double sumtime=0;//from sum averages
@@ -313,7 +315,7 @@ namespace cluster{
       // First, abuse this loop to calculate rms in x and y
       rmsx += pow(fParams.mean_x - hit.w, 2)/fParams.N_Hits;
       rmsy += pow(fParams.mean_y - hit.t, 2)/fParams.N_Hits;
-
+      rmsq += pow(fParams.mean_charge - hit.charge, 2)/fParams.N_Hits;
       //if charge is above avg_charge
       // std::cout << "This hit has charge " <<  hit . charge << "\n";
        
@@ -328,7 +330,8 @@ namespace cluster{
 
     fParams.rms_x = sqrt(rmsx);
     fParams.rms_y = sqrt(rmsy);
- 
+    fParams.RMS_charge = sqrt(rmsq);
+    
     fParams.N_Hits_HC = ncw;
     //Looking for the slope and intercept of the line above avg_charge hits
 
@@ -358,18 +361,14 @@ namespace cluster{
       if (!fFinishedGetRoughAxis) GetRoughAxis(true);
     }
     bool drawOrtHistos = false;
-
+      
     //these variables need to be initialized to other values? 
     if(fRough2DSlope==-999.999 || fRough2DIntercept==-999.999 ) 
       GetRoughAxis(true);      
     
-    fCoarseNbins=2;
-    fProfileNbins=100;
     
-    fChargeProfile.clear();
-    fCoarseChargeProfile.clear();
-    fChargeProfile.resize(fProfileNbins,0);
-    fCoarseChargeProfile.resize(fCoarseNbins,0);
+    
+  
     
     //get slope of lines orthogonal to those found crossing the shower.
     double inv_2d_slope=0;
@@ -504,7 +503,22 @@ namespace cluster{
 //                << " Begin Point " << BeginOnlinePoint.w << " " 
 //                << BeginOnlinePoint.t  << " End Point " << EndOnlinePoint.w << ","<< EndOnlinePoint.t << std::endl;
     
-
+    /////////////////// THe binning is now set here
+    fCoarseNbins=2;
+    
+    fProfileNbins= (fProjectedLength > 100 ) ? 100 : fProjectedLength;
+    if(fProfileNbins<10) fProfileNbins=10;
+    //std::cout << " number of profile bins " << fProfileNbins <<std::endl;
+    
+    fChargeProfile.clear();
+    fCoarseChargeProfile.clear();
+    fChargeProfile.resize(fProfileNbins,0);
+    fCoarseChargeProfile.resize(fCoarseNbins,0);
+    
+ 
+    
+     
+    ////////////////////////// end of new binning
     // Some fitting variables to make a histogram:
    
     std::vector<double> ort_profile;
@@ -556,11 +570,14 @@ namespace cluster{
       std::cout << "coarse_bin: " << coarse_bin << std::endl;
       */
 
-//      std::cout << "length" << linedist <<   " fine_bin, coarse " << fine_bin << " " << coarse_bin << std::endl;
+   //   std::cout << "length" << linedist <<   " fine_bin, coarse " << fine_bin << " " << coarse_bin << std::endl;
+     
+      
       
       if(fine_bin<fProfileNbins)  //only fill if bin number is in range
       {
         fChargeProfile.at(fine_bin)+=weight;
+	
         //find maximum bin on the fly:
         if(fChargeProfile.at(fine_bin)>current_maximum 
           && fine_bin!=0 && fine_bin!=fProfileNbins-1) 
@@ -575,6 +592,8 @@ namespace cluster{
       
     }  // end second loop on hits. Now should have filled profile vectors.
 
+    std::cout << "end second loop " << std::endl;
+    
     double integral=0; 
     int ix=0;
     // int fbin=0;
@@ -587,8 +606,10 @@ namespace cluster{
       }
     }
 
-    fParams.width=2*(double)ix/(double)(NBINS-1)*(max_ortdist-min_ortdist);  // multiply by two because ortdist is folding in both sides. 
-    
+    fParams.width=2*(double)ix/(double)(NBINS-1)*(double)(max_ortdist-min_ortdist);  // multiply by two because ortdist is folding in both sides. 
+  
+    std::cout << " after width  " << std::endl;  
+
     
     if (drawOrtHistos){
       TH1F * ortDistHist = 
@@ -665,6 +686,10 @@ namespace cluster{
       running_integral-=fChargeProfile.at(startbin);
       if( fChargeProfile.at(startbin)<fChargeCutoffThreshold.at(fPlane) && running_integral/fProfileIntegralForward<0.01 )
         break;
+       else if(fChargeProfile.at(startbin)<fChargeCutoffThreshold.at(fPlane) 
+	 && startbin-1>0 && fChargeProfile.at(startbin-1)<fChargeCutoffThreshold.at(fPlane)
+         && startbin-2>0 && fChargeProfile.at(startbin-2)<fChargeCutoffThreshold.at(fPlane))
+	 break;
     }
     
     //backward loop
@@ -673,7 +698,12 @@ namespace cluster{
     {
       running_integral-=fChargeProfile.at(endbin);
       if( fChargeProfile.at(endbin)<fChargeCutoffThreshold.at(fPlane) && running_integral/fProfileIntegralBackward<0.01 )
-        break;
+	 break;
+      else if(fChargeProfile.at(endbin)<fChargeCutoffThreshold.at(fPlane) 
+	&& endbin+1<fProfileNbins-1 && endbin+2<fProfileNbins-1 
+	&& fChargeProfile.at(endbin+1)<fChargeCutoffThreshold.at(fPlane) 
+	&& fChargeProfile.at(endbin+2)<fChargeCutoffThreshold.at(fPlane))
+	 break;
     }
     
     // now have profile start and endpoints. Now translate to wire/time. 
@@ -1035,11 +1065,119 @@ namespace cluster{
     fParams.angle_2d*=180/PI;
     std::cout << " Final 2D angle: " << fParams.angle_2d << " degrees " << std::endl;
     
-    if(cos(fParams.angle_2d))
-      fParams.modified_hit_density=fParams.hit_density_1D/cos(fParams.angle_2d);
+    double mod_angle=(fabs(fParams.angle_2d)<=90) ? fabs(fParams.angle_2d) : 180 - fabs(fParams.angle_2d);  //want to transfer angle to radians and from 0 to 90.
+    
+    if(cos(mod_angle*PI/180.))
+    {  //values here based on fit of hit_density_1D vs. mod_angle defined as above (in ArgoNeuT).
+      if(mod_angle<=75.)
+	fParams.modified_hit_density=fParams.hit_density_1D/(2.45*cos(mod_angle*PI/180.)+0.2595);
+      else
+        fParams.modified_hit_density=fParams.hit_density_1D/(1.036*mod_angle*PI/180.-0.2561);
+      
+      //calculate modified mean_charge:
+        fParams.modmeancharge = fParams.mean_charge/(1264 - 780*cos(mod_angle*PI/180.));	
+      
+    }
     else 
       fParams.modified_hit_density=fParams.hit_density_1D;
        
+    /////////////////// testing
+    // do not use for now.  
+      bool drawProfileHisto=false;
+     if (drawProfileHisto)
+    {
+      
+     fProfileNbins= (fParams.length) ;
+     double corr_factor=1;
+      if(cos(mod_angle*PI/180.))
+ 	{  //values here based on fit of hit_density_1D vs. mod_angle defined as above (in ArgoNeuT).
+ 	
+ 	if(mod_angle<=75.)
+ 	  corr_factor*=(2.45*cos(mod_angle*PI/180.)+0.2595);
+ 	else
+ 	  corr_factor*=(1.036*mod_angle*PI/180.-0.2561);
+ 	}
+     
+       fProfileNbins=(int)(fProfileNbins/2*corr_factor + 0.5);  // +0.5 to round to nearest sensible value
+	//if(fProfileNbins<10) fProfileNbins=10;
+    
+     std::cout << " number of final profile bins " << fProfileNbins <<std::endl;
+    
+     fChargeProfile.clear();
+     fCoarseChargeProfile.clear();
+     fChargeProfile.resize(fProfileNbins,0);
+     fCoarseChargeProfile.resize(fCoarseNbins,0);
+    
+    
+     fChargeProfileNew.clear();
+    // fDiffChargeProfile.clear();
+     fChargeProfileNew.resize(fProfileNbins,0);
+    // fDiffChargeProfile.resize(fProfileNbins,0);
+      
+      
+       larutil::PxPoint BeginOnlinePoint; 
+     
+       fGSer->GetPointOnLine(fRough2DSlope,fRough2DIntercept,&fParams.start_point,BeginOnlinePoint); 
+       
+       for( auto hit : fHitVector){
+	 
+	  larutil::PxPoint OnlinePoint;
+        // get coordinates of point on axis.
+        // std::cout << BeginOnlinePoint << std::endl;
+         //std::cout << &OnlinePoint << std::endl;
+         fGSer->GetPointOnLine(fRough2DSlope,&BeginOnlinePoint,&hit,OnlinePoint);
+       
+      
+         double linedist=fGSer->Get2DDistance(&OnlinePoint,&BeginOnlinePoint);
+    //  double ortdist=fGSer->Get2DDistance(&OnlinePoint,&hit);
+     
+
+         int fine_bin  =(int)(linedist/fProjectedLength*(fProfileNbins-1));
+	 
+	 
+	  if(fine_bin<fProfileNbins)  //only fill if bin number is in range
+	  {
+       		fChargeProfileNew.at(fine_bin)+=hit.charge;
+	    }
+       }
+      
+      
+      
+      
+      TH1F * charge_histo =
+	      new TH1F("charge dist","charge dist",fProfileNbins,0,fProfileNbins);
+      
+      TH1F * charge_diff =
+	      new TH1F("charge diff","charge diff",fProfileNbins,0,fProfileNbins);
+      
+      for(int ix=0;ix<fProfileNbins-1;ix++)	      
+	{
+	charge_histo->SetBinContent(ix,fChargeProfileNew[ix]);
+	
+        if(ix>2 && ix < fProfileNbins-3)
+	{double diff=(1./12.*fChargeProfileNew[ix-2]- 2./3.*fChargeProfileNew[ix-1]+2./3.*fChargeProfileNew[ix+1]- 1./12.*fChargeProfileNew[ix+2])/(double)fProfileNbins;
+        charge_diff->SetBinContent(ix,diff);}
+      
+	}
+	      
+      TCanvas * chCanv = new TCanvas("chCanv","chCanv", 600, 600);
+      chCanv -> cd();
+      charge_histo -> SetLineColor(3);
+      charge_histo -> Draw("");
+      charge_diff -> SetLineColor(2);
+      charge_diff -> Draw("same");
+      
+      
+      
+      
+      
+    }
+    
+    /// end testing
+    
+    
+    
+    
     fFinishedGetFinalSlope = true;
     return;
   }

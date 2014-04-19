@@ -247,6 +247,11 @@ namespace cluster {
     
     std::vector< double > fChargeProfile;
     std::vector< double > fCoarseChargeProfile;
+    
+    std::vector< double > fChargeProfileNew;
+   // double fMaxLinLength;
+   // double fLinBins;
+    
     int fCoarseNbins;
     int fProfileNbins;
     int fProfileMaximumBin;
