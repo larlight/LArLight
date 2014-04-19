@@ -148,7 +148,8 @@ namespace larlight {
     std::vector<double>   fmodifiedHitDens    ;
     std::vector<double>   fShowerness;
     std::vector<double>   fTrackness;
-    
+    std::vector<double>   fModifiedMeanCharge;
+    std::vector<double>   fChargeRMS;
     
     
     
@@ -208,6 +209,21 @@ namespace larlight {
     
    TH1D *reco2Dangle, *reco2DangleGood;
    TH1D *recoDir;
+   
+   /////testing histograms
+   TH1D *  Charge_e[2];
+    
+   TH1D *  Charge_p[2];
+    
+   TH1D *  Charge_mu[2];
+    
+//    TH1D *  Charge_e_c;
+//    TH1D *  Charge_p_c;
+//    TH1D *  Charge_mu_c;
+   std::vector< double > max_charge,max_charge_3;
+    
+   
+   
   };
 }
 #endif

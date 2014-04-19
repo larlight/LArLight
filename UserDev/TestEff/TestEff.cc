@@ -17,7 +17,7 @@ namespace larlight {
     // here is a good place to create one on the heap (i.e. "new TH1D"). 
     //   
 //    TH1D *hist1 = new TH1D("hist1","title",Nbins,lowerBin,upperBin) ;	
-   // larutil::LArUtilManager::Reconfigure(larlight::GEO::kArgoNeuT);   
+    larutil::LArUtilManager::Reconfigure(larlight::GEO::kArgoNeuT);   
     if(!fGSer) fGSer = (larutil::GeometryUtilities*)(larutil::GeometryUtilities::GetME());
 
     //////////////////////////Setting up the TTree
@@ -104,15 +104,22 @@ namespace larlight {
     fMainTree->Branch("hitDensity1d","std::vector<double>",&fhitDensity1d );
     fMainTree->Branch("hitDensity2d","std::vector<double>",&fhitDensity2d );
     fMainTree->Branch("modifiedHitDens","std::vector<double>",&fmodifiedHitDens );
+    fMainTree->Branch("ModifiedMeanCharge","std::vector<double>",&fModifiedMeanCharge );
+    fMainTree->Branch("ChargeRMS","std::vector<double>",&fChargeRMS );
+    
     
     fMainTree->Branch("fShowerness","std::vector<double>",&fShowerness );
     fMainTree->Branch("fTrackness","std::vector<double>",&fTrackness );
     
-	
+    fMainTree->Branch("max_charge","std::vector<double>",&max_charge );
+    fMainTree->Branch("max_charge_3","std::vector<double>",&max_charge_3 );	
    
-	 
-	   
-    
+    fMainTree->SetAlias("electron","mcpgd==11");
+    fMainTree->SetAlias("proton","mcpgd==2212");
+    fMainTree->SetAlias("muon","mcpgd==13");
+    fMainTree->SetAlias("collection","plane==1");
+    fMainTree->SetAlias("induction","plane==0");	   
+    fMainTree->SetAlias("good","fNhits>20");	   
     
     ////////////////////////////////////////////////
 
@@ -192,7 +199,7 @@ namespace larlight {
     if(!hitDensity2d_sh) hitDensity2d_sh = new TH1D("hitDensity2d_sh","Hit Density 2D, Showers",100,0,8);
     else hitDensity2d_sh->Reset();
     hitDensity2d_sh->SetLineColor(kRed);
-    if(!modifiedHitDens_sh) modifiedHitDens_sh = new TH1D("modifiedHitDens_sh","Modified Hit Density 1D, Showers ",100,0,60);
+    if(!modifiedHitDens_sh) modifiedHitDens_sh = new TH1D("modifiedHitDens_sh","Modified Hit Density 1D, Showers ",100,0,25);
     else modifiedHitDens_sh->Reset();
      modifiedHitDens_sh->SetLineColor(kRed);
     if(!multihitw_sh) multihitw_sh = new TH1D("multihitw_sh","MultiHitWire, Showers",120,0,120);
@@ -227,7 +234,7 @@ namespace larlight {
     else hitDensity1d_tr->Reset();
     if(!hitDensity2d_tr) hitDensity2d_tr = new TH1D("hitDensity2d_tr","Hit Density 2D, Tracks",100,0,8);
     else hitDensity2d_tr->Reset();
-    if(!modifiedHitDens_tr) modifiedHitDens_tr = new TH1D("modifiedHitDens_tr","Modified Hit Density 1D, Tracks ",100,0,60);
+    if(!modifiedHitDens_tr) modifiedHitDens_tr = new TH1D("modifiedHitDens_tr","Modified Hit Density 1D, Tracks ",100,0,25);
     else modifiedHitDens_tr->Reset();
     if(!multihitw_tr) multihitw_tr = new TH1D("multihitw_tr","MultiHitWire, Tracks",120,0,120);
     else multihitw_tr->Reset();
@@ -249,9 +256,27 @@ namespace larlight {
     if(!closeAngleChargeWgt_tr) closeAngleChargeWgt_tr = new TH1D("closeAngleChargeWgt_tr","Closing Angle, Charge Wieghted, Tracks",180,0,1.1*TMath::Pi());
     else closeAngleChargeWgt_tr->Reset();
     
+    /////////////////////////////////////
+    ///muons vs protons vs electrons testing of max hit charge
     
+    // total charge distribution
+    // maxcharge, max3charge to TTree
+    // charge histograms for each plane here.
     
-
+    if(!Charge_e[0]) Charge_e[0] = new TH1D("Charge_e[0]","Charge_e[0]",200,-10,10000);
+    else Charge_e[0]->Reset();
+    if(!Charge_p[0]) Charge_p[0] = new TH1D("Charge_p[0]","Charge_p[0]",200,-10,10000);
+    else Charge_p[0]->Reset();
+    if(!Charge_mu[0]) Charge_mu[0] = new TH1D("Charge_mu[0]","Charge_mu[0]",200,-10,10000);
+    else Charge_mu[0]->Reset();
+    
+    if(!Charge_e[1]) Charge_e[1] = new TH1D("Charge_e[1]","Charge_e[1]",200,-10,20000);
+    else Charge_e[1]->Reset();
+    if(!Charge_p[1]) Charge_p[1] = new TH1D("Charge_p[1]","Charge_p[1]",200,-10,20000);
+    else Charge_p[1]->Reset();
+    if(!Charge_mu[1]) Charge_mu[1] = new TH1D("Charge_mu[1]","Charge_mu[1]",200,-10,20000);
+    else Charge_mu[1]->Reset();
+    
 
     return true;
   }
@@ -291,7 +316,8 @@ namespace larlight {
 
   
    // event_hit * my_hit_v = (event_hit*)(storage->get_data(my_cluster_v->get_hit_type()));
-    event_hit * my_hit_v = (event_hit*)(storage->get_data(DATA::GausHit));
+   // event_hit * my_hit_v = (event_hit*)(storage->get_data(DATA::FFTHit));
+    event_hit * my_hit_v = (event_hit*)(storage->get_data(DATA::FFTHit));
     std::cout << " full hitlist size: " << my_hit_v->size() << std::endl;
     std::cout << " number of clusters: " << my_cluster_v->size() << std::endl;	
     
@@ -410,12 +436,55 @@ namespace larlight {
 	
 	 
 	int iplane = ipl;
+	
+	//double locmax=0;
+	std::vector< double > locmaxvec;
+	locmaxvec.resize(3);
+	locmaxvec[0]=0;
+	locmaxvec[1]=1;
+	locmaxvec[2]=2;
         for(auto &h : *my_hit_v) {
-
+    /*      if( larutil::Geometry::GetME()->ChannelToPlane(h.Channel()) == ipl )
+ 	  hit_vector.push_back((const larlight::hit*)(&h));
+	}*/ 
+	  
         if( larutil::Geometry::GetME()->ChannelToPlane(h.Channel()) == ipl )
-	    hit_vector.push_back((const larlight::hit*)(&h));
-
+	  {hit_vector.push_back((const larlight::hit*)(&h));
+	   if(h.Charge()>locmaxvec[0])  
+	      {int xx=0;
+	       while(h.Charge()>locmaxvec[xx] && xx<locmaxvec.size()) //stop at xx element which is the highest.
+		  xx++;
+               
+	    //   std::cout << " found max at location: " << xx-1 << " "<< h.Charge()<< std::endl;
+	       
+	       
+               for(int ix=0;ix<xx-1;ix++)
+                locmaxvec[ix]=locmaxvec[ix+1];		
+ 
+	       locmaxvec[xx-1]=h.Charge();
+	       
+	      }
+	   // std::cout << " filling histograms for ipl = " << ipl << std::endl;  
+	    if(fMCPDGstart[0]==11)
+	      Charge_e[ipl]->Fill(h.Charge());
+	    if(fMCPDGstart[0]==13)
+	      Charge_mu[ipl]->Fill(h.Charge());
+	    if(fMCPDGstart[0]==2212)
+	      Charge_p[ipl]->Fill(h.Charge());
+	  }
 	}
+	
+	max_charge_3[ipl]=0;
+	for(int ix=0;ix<locmaxvec.size();ix++)
+	  {std::cout << "max hits " << locmaxvec[ix] << std::endl;
+	  max_charge_3[ipl]+=locmaxvec[ix];
+	  max_charge[ipl]=locmaxvec[ix];
+	  }
+	
+	
+   
+ 
+	
 	
          std::cout << " +++ in TestEff " << hit_vector.size() << " at plane: " << ipl << std::endl; 
       /// end using all hits  
@@ -569,6 +638,10 @@ namespace larlight {
 	fShowerness[ipl]=fResult.showerness;
         fTrackness[ipl]=fResult.trackness;
 	
+	
+	 fModifiedMeanCharge[ipl]=fResult.modmeancharge;
+         fChargeRMS[ipl]=fResult.RMS_charge;
+	
 	///////////////////////////////////////
 	
 	
@@ -591,9 +664,8 @@ namespace larlight {
 	  recostarttimenodir->Fill(mindifftime);
 	  
 	  TLorentzVector mct_mom = mctruth_v->at(0).GetParticles().at(0).Trajectory().at(0).Momentum();
-	  TVector3 mct_momhelp = TVector3(mct_mom[0],mct_mom[1],mct_mom[2] );
+	  TVector3 mct_momhelp=TVector3(mct_mom[0],mct_mom[1],mct_mom[2]);
 	  double mct_angle2d=fGSer->Get2DangleFrom3D(plane[ipl],mct_momhelp.Unit());
-	  double mct_angle2dbis=fGSer->Get2DangleFrom3D(plane[ipl],mct_momhelp);
 	  int direction=(fabs(mct_angle2d) < TMath::Pi()/2)  ?  1 : -1;
 	  
 	  reco2Dangle->Fill(fResult.angle_2d-mct_angle2d*180/TMath::Pi());
@@ -735,6 +807,29 @@ namespace larlight {
     TCanvas * width_c= new TCanvas("width_c","width_c");
     width_sh ->DrawCopy();
      width_tr ->DrawCopy("same");	  
+     
+     
+    
+    TCanvas * charge_c= new TCanvas("charge distribution_coll","charge distribution_coll");
+    Charge_e[1]->SetLineColor(kRed);
+    Charge_e[1]->DrawCopy(); 
+    Charge_mu[1]->SetLineColor(kBlack);
+    Charge_mu[1]->DrawCopy("same"); 
+    Charge_p[1]->SetLineColor(kBlue);
+    Charge_p[1]->DrawCopy("same"); 
+    
+    
+    TCanvas * charge_i= new TCanvas("charge distribution_ind","charge distribution_ind");
+    Charge_e[0]->SetLineColor(kRed);
+    Charge_e[0]->DrawCopy(); 
+    Charge_mu[0]->SetLineColor(kBlack);
+    Charge_mu[0]->DrawCopy("same"); 
+    Charge_p[0]->SetLineColor(kBlue);
+    Charge_p[0]->DrawCopy("same"); 
+    
+    
+		    
+     
 /*	
     TCanvas * track_shower_c= new TCanvas("track_shower_c","track_shower_c");
     trackness ->DrawCopy();
@@ -893,7 +988,8 @@ namespace larlight {
        fmodifiedHitDens.clear();
        fShowerness.clear();
        fTrackness.clear();
-    
+       fModifiedMeanCharge.clear();;
+       fChargeRMS.clear();;
     
     
     
@@ -976,7 +1072,14 @@ namespace larlight {
        fShowerness.resize(fNClusters);
        fTrackness.resize(fNClusters);
     
-    
+       
+       fModifiedMeanCharge.resize(fNClusters);;
+       fChargeRMS.resize(fNClusters);;
+       
+      max_charge_3.clear();
+	  max_charge.clear();
+      max_charge_3.resize(fNClusters);
+	  max_charge.resize(fNClusters);
     
     }
   
