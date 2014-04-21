@@ -3,6 +3,74 @@
 
 #include "NoiseAna.hh"
 
+#include <complex>
+#include <iostream>
+#include <valarray>
+#include <math.h>
+#include <vector>
+ 
+const double Pi = 3.141592653589793238460;
+ 
+typedef std::complex<double> Complex;
+typedef std::valarray<Complex> CArray;
+ 
+// Cooley–Tukey FFT (in-place)
+void fft(CArray& x)
+{
+  const size_t N = x.size();
+  if (N <= 1) return;
+ 
+  // divide
+  CArray even = x[std::slice(0, N/2, 2)];
+  CArray  odd = x[std::slice(1, N/2, 2)];
+ 
+  // conquer
+  fft(even);
+  fft(odd);
+ 
+  // combine
+  for (size_t k = 0; k < N/2; ++k)
+    {
+      Complex t = std::polar(1.0, -2 * Pi * k / N) * odd[k];
+      x[k    ] = even[k] + t;
+      x[k+N/2] = even[k] - t;
+    }
+}
+ 
+// inverse fft (in-place)
+void ifft(CArray& x)
+{
+  // conjugate the complex numbers
+  x = x.apply(std::conj);
+ 
+  // forward fft
+  fft( x );
+ 
+  // conjugate the complex numbers again
+  x = x.apply(std::conj);
+ 
+  // scale the numbers
+  x /= x.size();
+}
+
+void transform( std::vector<int>& input, std::vector<double>& output ){
+
+  int ticks = input.size();
+
+  Complex time[ticks];
+  for (int i=0; i < ticks; i++)
+    time[i] = input.at(i);
+
+  CArray data(time, ticks);
+  fft(data);
+
+  //now create new array of Freq. spectrum
+  for (int j=0; j < ticks; j++)
+    output.at(j) = sqrt( data[j].imag()*data[j].imag() + data[j].real()*data[j].real() );
+
+}
+
+
 namespace larlight {
 
   bool NoiseAna::initialize() {
@@ -36,7 +104,7 @@ namespace larlight {
     }
 
     //NoiseSpec needs to be scaled so that x-axis is a frequency range (Hz)
-    NoiseSpec  = new TH1D("NoiseSpec",   "Noise Freq. Spectrum; w [Hz]",     100,      0,   (2*3.14)/_BinTime);    
+    NoiseSpec  = new TH1D("NoiseSpec",   "Noise Freq. Spectrum; w [Hz]",     10000,      0,   (2*3.14)/_BinTime);    
 
     //Sine example -- to get proper scaling of x-axis
     SineExmpl  = new TH1D("sineexample", "Sine Example",             3000,      0,  2*3.14);
@@ -99,6 +167,10 @@ namespace larlight {
 
       //Histo for baseline subtracted ADCs
       TH1D *ADC_subtracted = new TH1D("ADC_subtracted", "Baseline subtracted", wfsize, 0, wfsize);
+      std::vector<int> input;
+      input.reserve(wfsize);
+      std::vector<double> output;
+      output.reserve(wfsize);
 
       //loop over ADCs and find baseline
       int ADCsum = 0;
@@ -112,6 +184,8 @@ namespace larlight {
       double RMS = 0;
       for (UInt_t u=0; u < wfsize; u++){
 	RMS += ((tpc_data->at(u))-baseline) * ((tpc_data->at(u))-baseline) ;
+	input.push_back((int)tpc_data->at(u));
+	output.push_back(0.0);
 	ADC_subtracted->SetBinContent( u+1 , (tpc_data->at(u)-baseline) );
       }
       double rmsnoise = sqrt( RMS/ ( wfsize - 1) );
@@ -130,11 +204,15 @@ namespace larlight {
 
       //Foiurier Transform of noise
       /*
+      transform(input,output);
+      for (UInt_t w=0; w < output.size()/2+1; w++)
+	NoiseSpec->AddBinContent(w+1,output.at(w));
+      */
       TH1 *fft = ADC_subtracted->FFT(NULL,"MAG");
       for (UInt_t w=0; w<((tpc_data->size())/2+1); w++)
 	NoiseSpec->AddBinContent(w+1,fft->GetBinContent(w));
       delete fft;
-      */
+
       delete ADC_subtracted;
 
 
@@ -216,13 +294,6 @@ namespace larlight {
 	}
       }
     }
-
-    BaseRMSvsNoise->SetStats(False);
-    BoardVsChanRMS->SetStats(False);
-    BoardVsChanBase->SetStats(False);
-    AllChan->SetStats(False);
-    ChanBaseline->SetStats(False);
-    ChannelRMS->SetStats(False);
 
     AllChan->Write();
     ChannelBaseline->Write();
