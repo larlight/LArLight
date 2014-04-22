@@ -9,6 +9,8 @@
 #pragma link off all classes;
 #pragma link off all functions;
 
+#pragma link C++ class Polygon+;
+
 #pragma link C++ namespace cluster+;
 
 #pragma link C++ class std::vector<const larutil::PxHit*>+;

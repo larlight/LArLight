@@ -191,16 +191,16 @@ while mgr.next_event():
 
         # Set Polygon
         gPolygon = None
-        if result.PolyObject.size() > 0:
-            gPolygon = TGraph(result.PolyObject.size() + 1)
-            for x in xrange(result.PolyObject.size()):
+        if result.PolyObject.Size() > 0:
+            gPolygon = TGraph(result.PolyObject.Size() + 1)
+            for x in xrange(result.PolyObject.Size()):
                 gPolygon.SetPoint(x,
-                                  result.PolyObject.at(x).first,
-                                  result.PolyObject.at(x).second)
+                                  result.PolyObject.Point(x).first,
+                                  result.PolyObject.Point(x).second)
 
-            gPolygon.SetPoint(result.PolyObject.size(),
-                              result.PolyObject.at(0).first,
-                              result.PolyObject.at(0).second)
+            gPolygon.SetPoint(result.PolyObject.Size(),
+                              result.PolyObject.Point(0).first,
+                              result.PolyObject.Point(0).second)
 
             gPolygon.SetMarkerStyle(20)
             gPolygon.SetMarkerSize(1)
