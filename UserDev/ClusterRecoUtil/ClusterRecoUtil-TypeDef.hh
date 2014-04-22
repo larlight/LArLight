@@ -10,7 +10,6 @@
 #include "ClusterRecoUtil.hh"
 #include "RecoUtilException.hh"
 #include "ClusterParamsExecutor.hh"
-#include "ClusterMergeAlgNew.hh"
 #include "CMergeManager.hh"
 #include "CMergeAlgoBase.hh"
 #include "CBookKeeper.hh"
@@ -23,7 +22,6 @@ namespace cluster{
   class ClusterRecoUtils;
   class cluster_params;
   class RecoUtilException;
-  class ClusterMergeAlgNew;
   class SimChannelViewer;
   class WireViewer;
   class CBookKeeper;
