@@ -28,12 +28,15 @@ namespace cluster{
   class CMergeAlgoBase;
   class CMergeManager;
   class ShowerReco2DAlgo;
+  class CMAlgoShortestDist;
 }
 class ClusterParamsExecutor;
 class Polygon;
+
 //ADD_EMPTY_CLASS ... do not change this comment line
 
 #endif
+
 
 
 
