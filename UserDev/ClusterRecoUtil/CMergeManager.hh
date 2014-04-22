@@ -99,9 +99,6 @@ namespace cluster {
     /// Merging priority type
     CMergePriority_t _priority;
 
-    /// Ordered list of indexes for which merging will be run
-    std::map<double,size_t> _prioritized_index;
-    
   };
 }
 

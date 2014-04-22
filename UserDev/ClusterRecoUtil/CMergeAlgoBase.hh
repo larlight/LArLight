@@ -40,6 +40,10 @@ namespace cluster {
     */
     virtual bool Merge(const cluster_params &cluster1,
 		       const cluster_params &cluster2);
+
+    /// Function to reset the algorithm instance ... maybe implemented via child class
+    virtual void Reset(){}
+
   };
 }
 
