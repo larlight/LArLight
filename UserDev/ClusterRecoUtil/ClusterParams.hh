@@ -89,8 +89,8 @@ namespace cluster{
       closing_angle                     = -999.999 ;
       closing_angle_charge_wgt          = -999.999 ;
       offaxis_hits                      = -999.999 ;
-      modmeancharge			 = -999.999 ;
-      RMS_charge 			 = -999.999 ;
+      modmeancharge                     = -999.999 ;
+      RMS_charge                        = -999.999 ;
       modified_hit_density              = -999.999 ;    
       N_Hits                            = -999.999 ;    
       N_Hits_HC                         = -999.999 ;    
@@ -98,7 +98,7 @@ namespace cluster{
       width                             = -999.999 ;
       hit_density_1D                    = -999.999 ;
       hit_density_2D                    = -999.999 ;
-      direction                         =  0        ;
+      direction                         =  0       ;
       showerness                        = -999.999 ;
       trackness                         = -999.999 ;
     }
@@ -131,8 +131,8 @@ namespace cluster{
          << "   closing_angle_charge_wgt  . : " << closing_angle_charge_wgt << "\n"
          << "   offaxis_hits  ............. : " << offaxis_hits << "\n"
          << "   modified_hit_density  ..... : " << modified_hit_density << "\n"
- 	 << "   modified mean charge ...... : " << modmeancharge << "\n"
- 	 << "   charge_RMS ................ : " << RMS_charge << "\n"
+         << "   modified mean charge ...... : " << modmeancharge << "\n"
+         << "   charge_RMS ................ : " << RMS_charge << "\n"
          << "   length  ................... : " << length << "\n"
          << "   width  .................... : " << width << "\n"
          << "   hit_density_1D  ........... : " << hit_density_1D << "\n"
