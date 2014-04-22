@@ -8,28 +8,20 @@ namespace cluster {
 
   CMAlgoShortestDist::CMAlgoShortestDist() {
 
-    //this just sets default values
-    
+    //this just sets default values    
     SetVerbose(true);
     
+    //1e9 is huge; everything will be merged
     SetSquaredDistanceCut(1e9);
 
-    SetWire2Cm(larutil::GeometryUtilities::GetME()->WireToCm());
-    SetTime2Cm(larutil::GeometryUtilities::GetME()->TimeToCm());
+    _wire_2_cm = larutil::GeometryUtilities::GetME()->WireToCm();
+    _time_2_cm = larutil::GeometryUtilities::GetME()->TimeToCm();
 
-    double smaller_factor = (_wire_2_cm < _time_2_cm) ? _wire_2_cm : _time_2_cm;
-    SetMinDistUnit(smaller_factor);
+    //shortest allowable length of a cluster (distance start->end point)
+    //this is used in cases where the start/end points basically overlap
+    _min_distance_unit = (_wire_2_cm < _time_2_cm) ? _wire_2_cm : _time_2_cm;
 
-    this->reconfigure();
   } //end constructor
-
-
-  void CMAlgoShortestDist::reconfigure(){
-
-    //not sure what needs to be reset/reconfigured for this algo
-    
-  }//end reconfigure function
-
 
   bool CMAlgoShortestDist::Merge(const cluster_params &cluster1,
 				 const cluster_params &cluster2){
