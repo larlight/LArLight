@@ -79,13 +79,13 @@ namespace cluster {
         fParams(orig.fParams)
     {
       if(fFinishedGetAverages) {
-	for(auto& hit : fHitVector){
-	  double data[2];
-	  data[0] = hit.w;
-	  data[1] = hit.t;
-	  fPrincipal.AddRow(data);
-	}
-	fPrincipal.MakePrincipals();
+        for(auto& hit : fHitVector){
+          double data[2];
+          data[0] = hit.w;
+          data[1] = hit.t;
+          fPrincipal.AddRow(data);
+        }
+        fPrincipal.MakePrincipals();
       }
     }
 
@@ -222,6 +222,13 @@ namespace cluster {
     double RoughSlope() {return fRough2DSlope;}
     double RoughIntercept() {return fRough2DIntercept;}
     
+    void EnableFANN() {
+      enableFANN = true;
+      fannModule.LoadFromFile(fNeuralNetPath);
+    }
+
+    void DisableFANN(){enableFANN = false;}
+
        
   protected:
     
@@ -281,7 +288,7 @@ namespace cluster {
     double fRough2DIntercept;    // slope 
     larutil::PxPoint fRoughBeginPoint;
     larutil::PxPoint fRoughEndPoint;
-
+    bool enableFANN;
 
 
     public:

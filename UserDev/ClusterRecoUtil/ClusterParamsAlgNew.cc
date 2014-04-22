@@ -95,7 +95,7 @@ namespace cluster{
   }
 
   void  ClusterParamsAlgNew::GetFANNVector(std::vector<float> & data){
-    unsigned int length = 10;
+    unsigned int length = 13;
     if (data.size() != length) 
       data.resize(length);
     data[0]  = fParams.opening_angle / PI;
@@ -108,9 +108,9 @@ namespace cluster{
     data[7]  = fParams.hit_density_1D / fParams.modified_hit_density;
     data[8]  = fParams.multi_hit_wires/fParams.N_Wires;
     data[9]  = fParams.N_Hits_HC / fParams.N_Hits;
-    // data[10] = 0.0;
-    // data[11] = 0.0;
-    // data[12] = 0.0;
+    data[10] = fParams.modified_hit_density;
+    data[11] = fParams.RMS_charge / fParams.mean_charge;
+    data[12] = log(fParams.sum_charge / fParams.length);
     return;
   }
 
@@ -133,10 +133,10 @@ namespace cluster{
               << "   Width / Length  ............... : " << data[6] << "\n"
               << "   Hit Density / M.H.D.  ......... : " << data[7] << "\n"
               << "   Percent MultiHit Wires  ....... : " << data[8] << "\n"
-              << "   Percent High Charge Hits  ..... : " << data[9] << "\n";
-              // << "   empty  ........................ : " << data[10] << "\n"
-              // << "   empty  ........................ : " << data[11] << "\n"
-              // << "   empty  ........................ : " << data[12] << "\n";
+              << "   Percent High Charge Hits  ..... : " << data[9] << "\n"
+              << "   Modified Hit Density  ......... : " << data[10] << "\n"
+              << "   Charge RMS / Mean Charge ...... : " << data[11] << "\n"
+              << "   log(Sum Charge / Length) ...... : " << data[12] << "\n";
     return;
   }
 
@@ -191,7 +191,7 @@ namespace cluster{
     fParams.Clear();
     
     // Initialize the neural network:
-    fannModule.LoadFromFile(fNeuralNetPath);
+    enableFANN = false;
 
   }
 
@@ -613,7 +613,7 @@ namespace cluster{
     
     if (drawOrtHistos){
       TH1F * ortDistHist = 
-	new TH1F("ortDistHist", 
+                new TH1F("ortDistHist", 
                          "Orthogonal Distance to axis;Distance (cm)",
                          100, min_ortdist, max_ortdist);
       TH1F * ortDistHistCharge = 
@@ -629,8 +629,8 @@ namespace cluster{
         ortDistHist -> Fill(ort_dist_vect.at(index));
         ortDistHistCharge -> Fill(ort_dist_vect.at(index), fHitVector.at(index).charge);
         double weight= (ort_dist_vect.at(index)<1.) ? 
-	  10 * (fHitVector.at(index).charge) : 
-	  (5 * (fHitVector.at(index).charge)/ort_dist_vect.at(index));
+                      10 * (fHitVector.at(index).charge) : 
+                      (5 * (fHitVector.at(index).charge)/ort_dist_vect.at(index));
         ortDistHistAndrzej -> Fill(ort_dist_vect.at(index), weight);
       }
       ortDistHist -> Scale(1.0/ortDistHist->Integral());
@@ -1070,7 +1070,7 @@ namespace cluster{
     if(cos(mod_angle*PI/180.))
     {  //values here based on fit of hit_density_1D vs. mod_angle defined as above (in ArgoNeuT).
       if(mod_angle<=75.)
-	fParams.modified_hit_density=fParams.hit_density_1D/(2.45*cos(mod_angle*PI/180.)+0.2595);
+        fParams.modified_hit_density=fParams.hit_density_1D/(2.45*cos(mod_angle*PI/180.)+0.2595);
       else
         fParams.modified_hit_density=fParams.hit_density_1D/(1.036*mod_angle*PI/180.-0.2561);
       
@@ -1083,63 +1083,62 @@ namespace cluster{
        
     /////////////////// testing
     // do not use for now.  
-      bool drawProfileHisto=false;
-     if (drawProfileHisto)
+    bool drawProfileHisto=false;
+    if (drawProfileHisto)
     {
       
-     fProfileNbins= (fParams.length) ;
-     double corr_factor=1;
+      fProfileNbins= (fParams.length) ;
+      double corr_factor=1;
       if(cos(mod_angle*PI/180.))
- 	{  //values here based on fit of hit_density_1D vs. mod_angle defined as above (in ArgoNeuT).
- 	
- 	if(mod_angle<=75.)
- 	  corr_factor*=(2.45*cos(mod_angle*PI/180.)+0.2595);
- 	else
- 	  corr_factor*=(1.036*mod_angle*PI/180.-0.2561);
- 	}
+      {  //values here based on fit of hit_density_1D vs. mod_angle defined as above (in ArgoNeuT).
+
+      if(mod_angle<=75.)
+        corr_factor*=(2.45*cos(mod_angle*PI/180.)+0.2595);
+      else
+        corr_factor*=(1.036*mod_angle*PI/180.-0.2561);
+      }
      
-       fProfileNbins=(int)(fProfileNbins/2*corr_factor + 0.5);  // +0.5 to round to nearest sensible value
-	//if(fProfileNbins<10) fProfileNbins=10;
+      fProfileNbins=(int)(fProfileNbins/2*corr_factor + 0.5);  // +0.5 to round to nearest sensible value
+      //if(fProfileNbins<10) fProfileNbins=10;
     
-     std::cout << " number of final profile bins " << fProfileNbins <<std::endl;
-    
-     fChargeProfile.clear();
-     fCoarseChargeProfile.clear();
-     fChargeProfile.resize(fProfileNbins,0);
-     fCoarseChargeProfile.resize(fCoarseNbins,0);
-    
-    
-     fChargeProfileNew.clear();
-    // fDiffChargeProfile.clear();
-     fChargeProfileNew.resize(fProfileNbins,0);
-    // fDiffChargeProfile.resize(fProfileNbins,0);
-      
-      
-       larutil::PxPoint BeginOnlinePoint; 
-     
-       fGSer->GetPointOnLine(fRough2DSlope,fRough2DIntercept,&fParams.start_point,BeginOnlinePoint); 
-       
-       for( auto hit : fHitVector){
-	 
-	  larutil::PxPoint OnlinePoint;
+      std::cout << " number of final profile bins " << fProfileNbins <<std::endl;
+
+      fChargeProfile.clear();
+      fCoarseChargeProfile.clear();
+      fChargeProfile.resize(fProfileNbins,0);
+      fCoarseChargeProfile.resize(fCoarseNbins,0);
+
+
+      fChargeProfileNew.clear();
+      // fDiffChargeProfile.clear();
+      fChargeProfileNew.resize(fProfileNbins,0);
+      // fDiffChargeProfile.resize(fProfileNbins,0);
+
+
+      larutil::PxPoint BeginOnlinePoint; 
+
+      fGSer->GetPointOnLine(fRough2DSlope,fRough2DIntercept,&fParams.start_point,BeginOnlinePoint); 
+
+      for( auto hit : fHitVector){
+
+        larutil::PxPoint OnlinePoint;
         // get coordinates of point on axis.
         // std::cout << BeginOnlinePoint << std::endl;
-         //std::cout << &OnlinePoint << std::endl;
-         fGSer->GetPointOnLine(fRough2DSlope,&BeginOnlinePoint,&hit,OnlinePoint);
-       
-      
-         double linedist=fGSer->Get2DDistance(&OnlinePoint,&BeginOnlinePoint);
-    //  double ortdist=fGSer->Get2DDistance(&OnlinePoint,&hit);
+        //std::cout << &OnlinePoint << std::endl;
+        fGSer->GetPointOnLine(fRough2DSlope,&BeginOnlinePoint,&hit,OnlinePoint);
+
+        double linedist=fGSer->Get2DDistance(&OnlinePoint,&BeginOnlinePoint);
+        //  double ortdist=fGSer->Get2DDistance(&OnlinePoint,&hit);
      
 
-         int fine_bin  =(int)(linedist/fProjectedLength*(fProfileNbins-1));
-	 
-	 
-	  if(fine_bin<fProfileNbins)  //only fill if bin number is in range
-	  {
-       		fChargeProfileNew.at(fine_bin)+=hit.charge;
-	    }
-       }
+        int fine_bin  =(int)(linedist/fProjectedLength*(fProfileNbins-1));
+   
+   
+        if(fine_bin<fProfileNbins)  //only fill if bin number is in range
+        {
+          fChargeProfileNew.at(fine_bin)+=hit.charge;
+        }
+      }
       
       
       
@@ -1151,14 +1150,19 @@ namespace cluster{
 	      new TH1F("charge diff","charge diff",fProfileNbins,0,fProfileNbins);
       
       for(int ix=0;ix<fProfileNbins-1;ix++)	      
-	{
-	charge_histo->SetBinContent(ix,fChargeProfileNew[ix]);
-	
-        if(ix>2 && ix < fProfileNbins-3)
-	{double diff=(1./12.*fChargeProfileNew[ix-2]- 2./3.*fChargeProfileNew[ix-1]+2./3.*fChargeProfileNew[ix+1]- 1./12.*fChargeProfileNew[ix+2])/(double)fProfileNbins;
-        charge_diff->SetBinContent(ix,diff);}
+      {
+        charge_histo->SetBinContent(ix,fChargeProfileNew[ix]);
       
-	}
+        if(ix>2 && ix < fProfileNbins-3)
+        {
+          double diff=(   1./12.*fChargeProfileNew[ix-2]
+                        - 2./3.*fChargeProfileNew [ix-1]
+                        + 2./3.*fChargeProfileNew [ix+1]
+                        - 1./12.*fChargeProfileNew[ix+2] )
+                        /(double)fProfileNbins;
+          charge_diff->SetBinContent(ix,diff);
+        }
+      }
 	      
       TCanvas * chCanv = new TCanvas("chCanv","chCanv", 600, 600);
       chCanv -> cd();
@@ -1166,7 +1170,7 @@ namespace cluster{
       charge_histo -> Draw("");
       charge_diff -> SetLineColor(2);
       charge_diff -> Draw("same");
-      
+      chCanv -> Update();
       
       
       
@@ -1507,11 +1511,13 @@ namespace cluster{
   }
 
   void ClusterParamsAlgNew::TrackShowerSeparation(bool override){
-    std::vector<float> FeatureVector, outputVector;
-    GetFANNVector(FeatureVector);
-    fannModule.run(FeatureVector,outputVector);
-    fParams.trackness  = outputVector[1];
-    fParams.showerness = outputVector[0];
+    if (enableFANN){
+      std::vector<float> FeatureVector, outputVector;
+      GetFANNVector(FeatureVector);
+      fannModule.run(FeatureVector,outputVector);
+      fParams.trackness  = outputVector[1];
+      fParams.showerness = outputVector[0];
+    }
   }
 
 

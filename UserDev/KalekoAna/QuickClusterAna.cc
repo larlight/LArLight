@@ -26,8 +26,9 @@ namespace kaleko {
     w2cm = larutil::GeometryUtilities::GetME()->WireToCm();
     t2cm = larutil::GeometryUtilities::GetME()->TimeToCm();
     
+    temp_tomerge_count = 0;
+    temp_total_good = 0;
 
-    
     return true;
   }
   
@@ -57,8 +58,19 @@ namespace kaleko {
     //they should calculate variables (in this scope) that you   //
     //want to save to the ttree (filled once per analyze loop)   // 
     //***********************************************************//
+    tempcounter[0] = 0;
+    tempcounter[1] = 0;
+    tempcounter[2] = 0;
+
     FillClusterParamsVector(storage);
-    
+
+    //    std::cout<<Form("The number of clusters that passed this round of cuts is: (%d,%d,%d).",tempcounter[0],tempcounter[1],tempcounter[2])<<std::endl;
+    for(int i=0; i<3; ++i){
+      temp_total_good+=tempcounter[i];
+      if(tempcounter[i] >= 2)
+	temp_tomerge_count+=tempcounter[i];
+    }
+
     return true;
   }
   
@@ -81,6 +93,9 @@ namespace kaleko {
     
     delete _ana_tree;
     
+
+    std::cout<<Form("\n\nAfter all this, %d total clusters pass the reco cuts while %d clusters pass cuts && have another cluster in same view that passes cuts.\n\n",temp_total_good,temp_tomerge_count);
+
     return true;
   }
   
@@ -390,11 +405,13 @@ namespace kaleko {
 								     &tmp.end_point);
       //find out if dk thinks this cluster is a good one
       _dk_good_clus = DKShittyClusterTest(main_shower,ev_cluster->at(clus_index));
-      if(_dk_good_clus)
-	std::cout<<"mc says cluster "<<params_index<<" in view "<<_view+1<<" is GOOD"<<std::endl;
-      else
-	std::cout<<"cluster "<<params_index<<" in view "<<_view+1<<" is BAD"<<std::endl;
+      //      if(_dk_good_clus)
+	//	std::cout<<"mc says cluster "<<params_index<<" in view "<<_view+1<<" is GOOD"<<std::endl;
+	//      else
+	//	std::cout<<"cluster "<<params_index<<" in view "<<_view+1<<" is BAD"<<std::endl;
 
+      if(FinalRecoCutTest(ev_cluster->at(clus_index)))
+	tempcounter[_view]++;
 
       //fill TTree (once per cluster)
       if(_ana_tree)
@@ -417,7 +434,7 @@ namespace kaleko {
   
   bool QuickClusterAna::DKShittyClusterTest(const larlight::mcshower &main_shower,
 					    const larlight::cluster &i_cluster){
-    bool is_shitty = true;
+    bool is_good = true;
    
     //insert code here
     // Kazu: "Maybe you can cut on clusters that have same direction as MCShower 
@@ -425,14 +442,43 @@ namespace kaleko {
     // look like for "good" clusters.
     // so we can use tree.draw("","_dk_good_clus==1","")
 
-    is_shitty = is_shitty && _cluscharge > 10000;
+    //to be a "good" cluster (at first glance):
+    //must have >10k charge
+    is_good = is_good && _cluscharge > 10000;
+    //must have >30 hits
+    is_good = is_good && _nhits > 30;
+    //must have opening angle in [0,pi/2] (otherwise start point is probably bad)
+    is_good = is_good && (_opening_angle > 0 && _opening_angle < 1.570795);
+    //must have MC axis angle different than reco angle by less than half of the opening angle (axis pointing in somewhat of the right direction)
+    is_good = is_good && (
+			      std::abs(_mc_angle_2d - _angle_2d) < 0.5*_opening_angle*(180/3.14159) ||
+			      std::abs(_mc_angle_2d - _angle_2d - 180) < 0.5*_opening_angle*(180/3.14159) ||
+			      std::abs(_mc_angle_2d - _angle_2d + 180) < 0.5*_opening_angle*(180/3.14159)
+			      );
 
-    is_shitty = is_shitty && _nhits > 30;
 
-    is_shitty = is_shitty &&  (std::abs(_mc_angle_2d - _angle_2d) < 10);
+
+    //    is_good = is_good && std::abs(_mc_angle_2d - _angle_2d) < 10;
     
-    
-    return is_shitty;
+
+    return is_good;
   }//end DKShittyClusterTest
+
+
+  bool QuickClusterAna::FinalRecoCutTest(const larlight::cluster &i_cluster){
+
+    bool is_good = true;
+    
+
+    //these values are determiend by drawing abs(mcangle-2dangle):recoparam
+    //and seeing what cut on recoparam isolates the low-angle-difference bits
+    is_good = is_good && _cluscharge > 50000;
+    is_good = is_good && _nhits > 30;
+    is_good = is_good && (_opening_angle > 0 && _opening_angle < 0.40);
+    is_good = is_good && _cluslength > 20;
+
+    return is_good;
+
+  }
 }
 #endif

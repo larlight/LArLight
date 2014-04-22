@@ -72,6 +72,8 @@ namespace kaleko {
     bool DKShittyClusterTest(const larlight::mcshower &main_shower,
 			     const larlight::cluster &i_cluster);
 
+    bool FinalRecoCutTest(const larlight::cluster &i_cluster);
+
     std::vector<cluster::ClusterParamsAlgNew> _clusterparams;
     
 
@@ -86,6 +88,9 @@ namespace kaleko {
     TH1F *_hit_angles_forwards, *_hit_angles_backwards;
     
 
+    int tempcounter[3];
+    int temp_tomerge_count;
+    int temp_total_good;
     //variables to go into the ttree
     //    std::vector<int> _nhits;
     //    std::vector<double> _cluscharge;
