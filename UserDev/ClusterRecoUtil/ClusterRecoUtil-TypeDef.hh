@@ -22,16 +22,20 @@ namespace cluster{
   class ClusterMergeAlgNew;
   class SimChannelViewer;
   class WireViewer;
+  class CBookKeeper;
+  class CMergeAlgoBase;
+  class CMergeManager;
+  class ShowerReco2DAlgo;
 }
-
-
 class ClusterParamsExecutor;
-
-
 
 //ADD_EMPTY_CLASS ... do not change this comment line
 
 #endif
+
+
+
+
 
 
 

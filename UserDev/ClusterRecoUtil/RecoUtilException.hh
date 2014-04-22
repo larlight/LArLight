@@ -30,7 +30,7 @@ namespace cluster {
     {}
 
     virtual ~RecoUtilException() throw(){};
-    virtual const char* msg() const throw() 
+    virtual const char* what() const throw() 
     {return _msg.c_str(); }
 
   private:

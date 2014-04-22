@@ -19,8 +19,16 @@
 #pragma link C++ class cluster::ClusterMergeAlgNew+;
 #pragma link C++ class cluster::SimChannelViewer+;
 #pragma link C++ class cluster::WireViewer+;
+#pragma link C++ class cluster::ShowerReco2DAlgo+;
+#pragma link C++ class cluster::CMergeManager+;
+#pragma link C++ class cluster::CMergeAlgoBase+;
+#pragma link C++ class cluster::CBookKeeper+;
 //ADD_NEW_CLASS ... do not change this line
 #endif
+
+
+
+
 
 
 
