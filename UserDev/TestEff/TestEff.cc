@@ -576,7 +576,10 @@ namespace larlight {
 
 
         ::cluster::ClusterParamsAlgNew  fCPAlg;
-        fCPAlg.setNeuralNetPath("../FANN/trained_nets/cascade_net.net");
+	
+	fCPAlg.setNeuralNetPath("../FANN/trained_nets/cascade_argo_allhits.net");
+	 fCPAlg.EnableFANN();
+      
         fCPAlg.Initialize();
         if(fCPAlg.SetHits(hit_vector) ==-1 )	
             continue;
