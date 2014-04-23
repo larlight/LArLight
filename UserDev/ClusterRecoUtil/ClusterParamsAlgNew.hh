@@ -178,13 +178,11 @@ namespace cluster {
     double RoughSlope() {return fRough2DSlope;}
     double RoughIntercept() {return fRough2DIntercept;}
     
-    void EnableFANN() {
-      enableFANN = true;
-      fannModule.LoadFromFile(fNeuralNetPath);
-    }
+    void EnableFANN();
 
     void DisableFANN(){enableFANN = false;}
 
+    unsigned int GetNHits(){return fHitVector.size();}
     const std::vector<larutil::PxHit>& GetHitVector() const {return fHitVector;}
        
   protected:
