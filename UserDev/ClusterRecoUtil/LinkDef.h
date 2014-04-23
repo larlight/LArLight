@@ -40,8 +40,10 @@
 #pragma link C++ class cluster::CMAlgoShortestDist+;
 #pragma link C++ class cluster::CMAlgoPolyContain+;
 #pragma link C++ class cluster::CMAlgoPolyOverlap+;
+#pragma link C++ class cluster::CMAlgoAngleCompat+;
 //ADD_NEW_CLASS ... do not change this line
 #endif
+
 
 
 

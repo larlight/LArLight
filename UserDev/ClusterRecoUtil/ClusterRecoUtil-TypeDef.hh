@@ -31,13 +31,16 @@ namespace cluster{
   class CMAlgoShortestDist;
   class CMAlgoPolyContain;
   class CMAlgoPolyOverlap;
+  class CMAlgoAngleCompat;
 }
 class ClusterParamsExecutor;
 class Polygon2D;
 
+
 //ADD_EMPTY_CLASS ... do not change this comment line
 
 #endif
+
 
 
 
