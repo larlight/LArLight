@@ -51,6 +51,9 @@ namespace cluster {
     /// Default destructor
     virtual ~CMergeManager(){};
 
+    /// Method to enable debug mode (lots of couts)
+    void DebugMode(bool doit=true) {_debug_mode=doit;}
+
     /// Method to reset itself
     void Reset();
 
@@ -72,14 +75,24 @@ namespace cluster {
     void SetClusters(const std::vector<std::vector<larutil::PxHit> > &clusters);
 
     /// A method to execute merging algorithms
-    void Process(bool merge_till_converge=false);
+    void Process();
 
   protected:
 
     void RunMerge(const std::vector<cluster::ClusterParamsAlgNew > &in_clusters,
 		  CBookKeeper &book_keeper) const;
 
+    void RunMerge(const std::vector<cluster::ClusterParamsAlgNew > &in_clusters,
+		  const std::vector<bool> &merge_flag,
+		  CBookKeeper &book_keeper) const;
+
   protected:
+
+    /// Iterative approach for merging
+    bool _merge_till_converge;
+
+    /// Debug mode switch
+    bool _debug_mode;
 
     /// Input clusters
     std::vector<cluster::ClusterParamsAlgNew> _in_clusters;
