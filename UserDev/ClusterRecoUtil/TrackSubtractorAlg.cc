@@ -7,7 +7,7 @@ namespace cluster{
 
 
   int TrackSubtractorAlg::AddCluster(const larlight::cluster &i_cluster,
-                                     const larlight::event *hits){
+                                     const larlight::event_hit *hits){
 
     larlight::DATA::DATA_TYPE hit_type = i_cluster.get_hit_type();
     if(!hits) {
@@ -18,13 +18,18 @@ namespace cluster{
       return -1;
     }
 
+    const std::vector<UShort_t> &hit_index_v = i_cluster.association(hit_type);
+
+
     cluster_vec.push_back(i_cluster);
-    cluster_hits.push_back(std::vector < larlight:: hit*>() );
-    cluster_hits.back().reserve(hits.size());
+    cluster_hits.push_back(std::vector < const larlight:: hit*>() );
+    cluster_hits.back().reserve(hits->size());
 
-    for(auto const index : hits)
+    for(auto const index : hit_index_v)
 
-      cluster_hits.back().push_back((const larlight::hit*)(&(hits->at(index))));
+      cluster_hits.back().push_back( (const larlight::hit *)(&(hits->at(index))));
+
+    return 0;
 
   }
 
@@ -69,6 +74,8 @@ namespace cluster{
         all_hits.push_back((const larlight::hit*)(&h));
 
     }
+
+    return 0;
 
     // return Execute(hits->event_id(), -1, plane_id);
   }

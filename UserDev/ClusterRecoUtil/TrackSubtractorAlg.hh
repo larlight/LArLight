@@ -15,7 +15,8 @@
  *    hit finders)
  * 2) Externally, loop over the cluster and get their associated 
  *    hits and add them via LoadCluster(cluster, hits). It's expected
- *    that these are the same hits as above in (1) but not all of them.
+ *    that these are the same hits as above in (1) - this method only
+ *    grabs the hits associated with the cluster you passed it.
  *    2a) For each cluster added, it decides if this cluster is clearly a
  *        track and if so adds its hits to track_hits
  * 3) Lastly, loop over all hits and compare to track_hits.  Any hits that
@@ -32,11 +33,12 @@
  */
 
 
-##ifndef TRACKSUBTRACTORALG
+#ifndef TRACKSUBTRACTORALG
 #define TRACKSUBTRACTORALG value
 
 #include "ana_base.hh"
 #include "Geometry.hh"
+#include "RecoUtilException.hh"
 
 
 namespace cluster {
@@ -53,7 +55,7 @@ namespace cluster {
     int LoadAllHits(const larlight::event_hit *hits, const UChar_t plane_id);
 
     int AddCluster (const larlight::cluster &i_cluster,
-                    const larlight::event *hits);
+                    const larlight::event_hit *hits);
 
     int ResolveHits();
     std::vector<const larlight::hit*> GetRemainingHits();
@@ -61,7 +63,7 @@ namespace cluster {
   protected:
     
     bool isTrackLike(const larlight::cluster &i_cluster,
-                     const larlight::event *hits);
+                     const larlight::event_hit *hits);
 
 
     // As far as I know, this class does not take ownership of any hits.
@@ -77,9 +79,9 @@ namespace cluster {
     std::vector<const larlight::hit*> remaining_hits;
 
     // hits associated with clusters are stored here
-    std::vector< std::vector < larlight:: hit*> > cluster_hits;
+    std::vector< std::vector <const larlight::hit*> > cluster_hits;
     // this is where the clusters are stored
-    std::vector<larlight::cluster> cluster_vec;
+    std::vector<const larlight::cluster> cluster_vec;
 
 
     /* data */
