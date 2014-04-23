@@ -3,7 +3,7 @@
 
 #include <ostream>
 #include "PxUtils.h"
-#include "Polygon.hh"
+#include "Polygon2D.hh"
 
 namespace cluster{
 
@@ -17,7 +17,7 @@ namespace cluster{
 
     ~cluster_params(){};
 
-    Polygon PolyObject;               ///< Polygon Object...see Polygon.hh
+    Polygon2D PolyObject;               ///< Polygon Object...see Polygon2D.hh
 
     larutil::PxPoint start_point;      ///< start point 
     larutil::PxPoint end_point;        ///< end point 

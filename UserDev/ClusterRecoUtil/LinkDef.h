@@ -9,7 +9,7 @@
 #pragma link off all classes;
 #pragma link off all functions;
 
-#pragma link C++ class Polygon+;
+#pragma link C++ class Polygon2D+;
 
 #pragma link C++ namespace cluster+;
 
@@ -38,6 +38,8 @@
 #pragma link C++ class std::vector<std::vector<unsigned short> >+;
 
 #pragma link C++ class cluster::CMAlgoShortestDist+;
+#pragma link C++ class cluster::CMAlgoPolyContain+;
+#pragma link C++ class cluster::CMAlgoPolyOverlap+;
 //ADD_NEW_CLASS ... do not change this line
 #endif
 

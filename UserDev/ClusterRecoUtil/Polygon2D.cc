@@ -1,4 +1,4 @@
-#include "Polygon.hh"
+#include "Polygon2D.hh"
 
 
 
@@ -27,7 +27,7 @@ bool SegmentOverlap(double Ax,double Ay,double Bx,double By,double Cx,double Cy,
 
 
 //****************************************************
-float Polygon::Area() const
+float Polygon2D::Area() const
 {
   //how? here:
   //http://www.mathsisfun.com/geometry/area-irregular-polygons.html
@@ -45,7 +45,7 @@ float Polygon::Area() const
 
 
 //****************************************************
-const std::pair<float,float>& Polygon::Point(unsigned int p) const
+const std::pair<float,float>& Polygon2D::Point(unsigned int p) const
 {
   //This function returns the vertex under consideration
   //as a std::pair<float,float> Returns vertex for argument
@@ -65,7 +65,7 @@ const std::pair<float,float>& Polygon::Point(unsigned int p) const
 
 
 //****************************************************
-std::pair<float,float> Polygon::Project(const std::pair<float,float> &p, 
+std::pair<float,float> Polygon2D::Project(const std::pair<float,float> &p, 
 					float theta) const
 {
 
@@ -93,8 +93,8 @@ std::pair<float,float> Polygon::Project(const std::pair<float,float> &p,
 
 
 //*****************************************************
-bool Polygon::Overlap(float slope, 
-		      const Polygon &poly2, 
+bool Polygon2D::Overlap(float slope, 
+		      const Polygon2D &poly2, 
 		      const std::pair<float,float> &origin) const
 {
   //translate and rotate both polygons
@@ -114,7 +114,7 @@ bool Polygon::Overlap(float slope,
 
 
 //*****************************************************
-bool Polygon::PolyOverlap(const Polygon &poly2) const
+bool Polygon2D::PolyOverlap(const Polygon2D &poly2) const
 {
 
   //start from first pair in vector then check all edges.
@@ -144,7 +144,7 @@ bool Polygon::PolyOverlap(const Polygon &poly2) const
 
 
 //*****************************************************
-bool Polygon::PolyOverlapSegments(const Polygon &poly2) const
+bool Polygon2D::PolyOverlapSegments(const Polygon2D &poly2) const
 {
 
   //loop over the two polygons checking wehther
@@ -164,7 +164,7 @@ bool Polygon::PolyOverlapSegments(const Polygon &poly2) const
 
 
 //*****************************************************
-bool Polygon::PointInside(const std::pair<float,float> &point) const
+bool Polygon2D::PointInside(const std::pair<float,float> &point) const
 {
 
   //any ray originating at point will cross polygon
@@ -185,3 +185,19 @@ bool Polygon::PointInside(const std::pair<float,float> &point) const
   
 }
 
+
+
+//*****************************************************
+bool Polygon2D::Contained(const Polygon2D &poly2) const
+{
+
+ //loop over poly2 checking wehther
+  //points of poly2 all inside poly1
+  for (unsigned int i=0; i<poly2.Size(); i++){
+    if ( !(this->PointInside( poly2.Point(i)) ) )
+      return false;
+  }
+  
+  return false;
+
+}

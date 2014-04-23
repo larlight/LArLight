@@ -148,14 +148,14 @@ namespace larlight {
     if(!angle2d) angle2d = new TH1D("angle2d","Angle 2d",150,-200,200);
     else angle2d->Reset();
     
-    if(!openAngle) openAngle = new TH1D("openAngle","Opening angle",100,0,2.25);
+    if(!openAngle) openAngle = new TH1D("openAngle","Opening angle",100,0,3.15);
     else openAngle->Reset();
-    if(!openAngleChargeWgt) openAngleChargeWgt = new TH1D("openAngleChargeWgt","Opening angle, charge weighted",100,0,2.0);
+    if(!openAngleChargeWgt) openAngleChargeWgt = new TH1D("openAngleChargeWgt","Opening angle, charge weighted",100,0,3.15);
     else openAngleChargeWgt->Reset();
     
-    if(!closeAngleChargeWgt) closeAngleChargeWgt = new TH1D("closeAngleChargeWgt","Closing angle, charge weighted",120,0,2.25);
+    if(!closeAngleChargeWgt) closeAngleChargeWgt = new TH1D("closeAngleChargeWgt","Closing angle, charge weighted",120,0,3.15);
     else closeAngleChargeWgt->Reset();
-    if(!closeAngle) closeAngle = new TH1D("closeAngle","Close angle",100,0,2.25);
+    if(!closeAngle) closeAngle = new TH1D("closeAngle","Close angle",100,0,3.15);
     else closeAngle->Reset();
 
     if(!hitDensity1d) hitDensity1d = new TH1D("hitDensity1d","Hit density 1d",120,0,10);
@@ -167,7 +167,7 @@ namespace larlight {
 
     if(!trackness) trackness = new TH1D("trackness","trackness",100,0,1);
     else trackness->Reset();
-    if(!showerness) showerness = new TH1D("showerness","Modified Hit Density",100,0,20);
+    if(!showerness) showerness = new TH1D("showerness","showerness",100,0,1);
     else showerness->Reset();
 
 
@@ -228,7 +228,10 @@ namespace larlight {
     if(!closeAngleChargeWgt_sh) closeAngleChargeWgt_sh = new TH1D("closeAngleChargeWgt_sh","Closing Angle, Charge Wieghted, Showers",180,0,1.1*TMath::Pi());
     else closeAngleChargeWgt_sh->Reset();
      closeAngleChargeWgt_sh->SetLineColor(kRed);
-    
+   
+     if(!showerness_sh) showerness_sh = new TH1D("showerness_sh","showerness_sh",100,0,1);
+    else showerness_sh->Reset();
+    showerness_sh->SetLineColor(kRed);
     ////////////////////////////////////////////////////////////////////////////////
     if(!hitDensity1d_tr) hitDensity1d_tr = new TH1D("hitDensity1d_tr","Hit Density 1D, Tracks ",100,0,30);
     else hitDensity1d_tr->Reset();
@@ -255,7 +258,8 @@ namespace larlight {
     else closeAngle_tr->Reset();
     if(!closeAngleChargeWgt_tr) closeAngleChargeWgt_tr = new TH1D("closeAngleChargeWgt_tr","Closing Angle, Charge Wieghted, Tracks",180,0,1.1*TMath::Pi());
     else closeAngleChargeWgt_tr->Reset();
-    
+    if(!showerness_tr) showerness_tr = new TH1D("showerness_tr","showerness_tr",100,0,1);
+    else showerness_tr->Reset();
     /////////////////////////////////////
     ///muons vs protons vs electrons testing of max hit charge
     
@@ -624,6 +628,7 @@ namespace larlight {
 	  eigenvalue_principal_sh ->Fill(TMath::Log(1-fResult.eigenvalue_principal)) ;
 	  length_sh->Fill(fResult.length) ;
 	  width_sh ->Fill(fResult.width) ;
+	  showerness_sh ->Fill(fResult.showerness) ;
 	  
 	}
 	else if(is_mc_track)
@@ -639,6 +644,7 @@ namespace larlight {
 	  eigenvalue_principal_tr ->Fill(TMath::Log(1-fResult.eigenvalue_principal)) ;
 	  length_tr->Fill(fResult.length) ;
 	  width_tr ->Fill(fResult.width) ;
+	   showerness_tr ->Fill(fResult.showerness) ;
 	  
 	}
 
@@ -860,6 +866,10 @@ namespace larlight {
     width_sh ->DrawCopy();
      width_tr ->DrawCopy("same");	  
      
+      // separation plots
+    TCanvas * Showerness_c= new TCanvas("Showerness_c","Showerness_c");
+    showerness_sh->DrawCopy();
+    showerness_tr->DrawCopy("same"); 
      
     
     TCanvas * charge_c= new TCanvas("charge distribution_coll","charge distribution_coll");
@@ -910,7 +920,7 @@ namespace larlight {
 	hitDensity1d->Write();*/
 	
 	trackness->Write();
-	trackness->Write();
+	showerness->Write();
 
 	modifiedHitDens->Write(); 
 	recostartwire->Write();
@@ -932,7 +942,7 @@ namespace larlight {
       eigenvalue_principal_sh ->Write();
       length_sh->Write();
       width_sh ->Write();
-	  
+	showerness_sh->Write();  
 	
       openAngle_tr->Write();
       openAngleChargeWgt_tr->Write();
@@ -946,7 +956,7 @@ namespace larlight {
       length_tr->Write();
       width_tr ->Write();
      fMainTree->Write();
-	
+	showerness_tr->Write();
 	
       }
 
