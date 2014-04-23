@@ -32,7 +32,7 @@ namespace cluster {
      CBookKeeper keeps track of which clusters are asked to merge together, and it can be
      asked to return a vector of merged cluster indexes.
   */
-  class CBookKeeper {
+  class CBookKeeper : public std::vector<unsigned short>{
     
   public:
     
@@ -53,7 +53,7 @@ namespace cluster {
        is merged with the input cluster index. All indexes here
        are regarding the original cluster index.
     */
-    std::vector<unsigned short> GetMergedSet(unsigned short index1);
+    std::vector<unsigned short> GetMergedSet(unsigned short index1) const;
 
     /**
        Method to ask if a given 2 clusters are already merged.
@@ -61,13 +61,27 @@ namespace cluster {
        a merged cluster sets from GetMergedIndexes and check if
        two clusters are merged.
     */
-    bool IsMerged(unsigned short index1, unsigned short index2);
+    bool IsMerged(unsigned short index1, unsigned short index2) const;
 
     /**
        A method to get the full result. The return is a vector
        of merged cluster indexes (which is a vector of original cluster indexes).
     */
-    std::vector<std::vector<unsigned short> > GetMergedSetAll();
+    void PassResult(std::vector<std::vector<unsigned short> > &result) const;
+
+
+    std::vector<std::vector<unsigned short> > GetResult() const
+    { 
+      std::vector<std::vector<unsigned short> > result; 
+      PassResult(result);
+      return result;
+    }
+
+    /**
+       Method to combine with another CBookKeeper instance.
+     */
+    
+    void Combine(const CBookKeeper &another);
 
   protected:
 
@@ -80,7 +94,7 @@ namespace cluster {
        suggesting there are only 2 output clusters and the input cluster index 0
        and 2 now belong to the output cluster index 0.
      */
-    std::vector<unsigned short> _out_index;
+    //std::vector<unsigned short> _out_index;
     
   };
   

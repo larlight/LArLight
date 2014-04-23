@@ -34,6 +34,9 @@
 #pragma link C++ class std::vector<cluster::CMergeAlgoBase*>+;
 
 #pragma link C++ class cluster::CBookKeeper+;
+#pragma link C++ class std::vector<unsigned short>+;
+#pragma link C++ class std::vector<std::vector<unsigned short> >+;
+
 #pragma link C++ class cluster::CMAlgoShortestDist+;
 //ADD_NEW_CLASS ... do not change this line
 #endif
