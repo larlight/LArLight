@@ -565,15 +565,16 @@ namespace larlight {
         //      std::cout << " +++ in TestEff " << hit_vector.size() << std::endl;  
 
 
-        if(hit_vector.size() < 20)   // do not bother with too small hitlists
+        if(hit_vector.size() < 30)   // do not bother with too small hitlists
         {
             continue;
         }
 
 
         ::cluster::ClusterParamsAlgNew  fCPAlg;
-        fCPAlg.setNeuralNetPath("../FANN/trained_nets/cascade_net.net");
         fCPAlg.Initialize();
+        fCPAlg.setNeuralNetPath("../FANN/trained_nets/cascade_argo_clusters.net");
+        fCPAlg.EnableFANN();
         if(fCPAlg.SetHits(hit_vector) ==-1 )	
             continue;
         fCPAlg.GetAverages(true);

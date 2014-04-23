@@ -2,7 +2,8 @@
 #define UTIL_CLUSTERPARAMS_H
 
 #include <ostream>
-#include <Polygon.hh>
+#include "PxUtils.h"
+#include "Polygon.hh"
 
 namespace cluster{
 
@@ -15,8 +16,6 @@ namespace cluster{
     } 
 
     ~cluster_params(){};
-
-    std::vector<const larutil::PxHit*> container_polygon; ///< Polygon that contains hits
 
     Polygon PolyObject;               ///< Polygon Object...see Polygon.hh
 
@@ -66,7 +65,6 @@ namespace cluster{
     double offaxis_hits;               ///< got brain
 
     void Clear(){
-      container_polygon.clear();
       start_point.Clear();
       end_point.Clear();
       sum_charge                        = -999.999 ;

@@ -78,6 +78,7 @@ namespace cluster {
         fRoughEndPoint(orig.fRoughEndPoint),
         fParams(orig.fParams)
     {
+
       if(fFinishedGetAverages) {
         for(auto& hit : fHitVector){
           double data[2];
@@ -227,6 +228,7 @@ namespace cluster {
     void DisableFANN(){enableFANN = false;}
 
     unsigned int GetNHits(){return fHitVector.size();}
+    const std::vector<larutil::PxHit>& GetHitVector() const {return fHitVector;}
        
   protected:
     

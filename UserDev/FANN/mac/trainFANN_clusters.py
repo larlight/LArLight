@@ -22,6 +22,7 @@ parser.add_argument("-a","--ana-output",help="Analysis output file")
 parser.add_argument("-n","--num-events",help="Number of events to process")
 parser.add_argument("-d","--display",help="Turn on the display to see each view before and after." )
 parser.add_argument("-A","--argoneut",action='store_true',help="Set geometry to argonuet.")
+parser.add_argument("--nskip", help="Number of events to skip before processing.")
 args = parser.parse_args()
 
 if len(sys.argv) == 1:
@@ -74,14 +75,14 @@ if args.argoneut != None:
     algo.SetArgoneutGeometry()
 
 fann = cluster.TrainingModule()
-fann.setFeatureVectorLength(10)
+fann.setFeatureVectorLength(13)
 fann.setOutputVectorLength(2)
 fann.setOutputFileName("track_shower.net")
 fann.init()
 
 # Here is the neural network that has been more rigorously trained:
-# cascadeFANN = cluster.FANNModule()
-# cascadeFANN.LoadFromFile("cascade_net.net")
+cascadeFANN = cluster.FANNModule()
+cascadeFANN.LoadFromFile("cascade_net.net")
 
 # Output file for FANN vector:
 outputfile = open('training.dat','w')
@@ -145,14 +146,15 @@ while mgr.next_event():
         print "  Cluster ID:",cluster_v.at(clust).ID()
         algo.LoadCluster(cluster_v.at(clust),
                          mgr.get_data(cluster_v.get_hit_type()))
-
+        if algo.GetNHits() < 30:
+            continue
 
 
         # print "Number of hits in this cluster is %d" % (algo.GetNHits() )
         # if (algo.GetNHits() < 30 ):
             # continue
         algo.FillParams()
-        # algo.Report()
+        algo.Report()
         algo.PrintFANNVector()
         result = algo.GetParams()
 
@@ -181,9 +183,9 @@ while mgr.next_event():
         print "Truth is (%g, %g)" % (truth[0],truth[1])
         fann.run(featureVec)
         fann.print_error()
-        # print "Cascade fann results:"
-        # cascadeFANN.run(featureVec)
-        # cascadeFANN.print_error()
+        print "Cascade fann results:"
+        cascadeFANN.run(featureVec)
+        cascadeFANN.print_error()
 
         mc_begin=None
         if(mct_vtx):
@@ -272,7 +274,7 @@ while mgr.next_event():
         # Give an update on current status of ANN:
         
 
-        sys.stdin.readline()
+        # sys.stdin.readline()
         processed_events +=1
         print ("So far, processed_events is %g") % processed_events
 
@@ -280,6 +282,6 @@ while mgr.next_event():
 s = str(nWrittenEvents)
 outputfile.write(s)
 outputfile.write(' ')
-outputfile.write('10 2 \n')
+outputfile.write('13 2 \n')
 
 fann.saveFANNToFile()
