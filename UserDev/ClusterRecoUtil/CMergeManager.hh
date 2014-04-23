@@ -42,6 +42,18 @@ namespace cluster {
       /// Merge clusters with many hits first
       kNHits
     };
+
+    /// Enum to specify message output level
+    enum CMergeMSGLevel_t {
+      /// Very verbose (cout per merging)
+      kPerMerging,
+      /// Somewhat verbose (cout per merging iteration)
+      kPerIteration,
+      /// Bit verbose (cout per event)
+      kPerEvent,
+      /// Normal
+      kNone
+    };
     
   public:
     
@@ -52,7 +64,7 @@ namespace cluster {
     virtual ~CMergeManager(){};
 
     /// Method to enable debug mode (lots of couts)
-    void DebugMode(bool doit=true) {_debug_mode=doit;}
+    void DebugMode(CMergeMSGLevel_t level) {_debug_mode=level;}
 
     /// Method to reset itself
     void Reset();
@@ -92,7 +104,7 @@ namespace cluster {
     bool _merge_till_converge;
 
     /// Debug mode switch
-    bool _debug_mode;
+    CMergeMSGLevel_t _debug_mode;
 
     /// Input clusters
     std::vector<cluster::ClusterParamsAlgNew> _in_clusters;

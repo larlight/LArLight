@@ -54,7 +54,7 @@ namespace larlight {
       }
 
     }
-
+    std::cout<<Form("Processing event %d...",ev_cluster->event_id())<<std::endl;
     _mgr.SetClusters(local_clusters);
 
     _mgr.Process();

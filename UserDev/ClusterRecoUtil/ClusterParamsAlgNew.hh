@@ -184,7 +184,8 @@ namespace cluster {
 
     unsigned int GetNHits(){return fHitVector.size();}
     const std::vector<larutil::PxHit>& GetHitVector() const {return fHitVector;}
-       
+    const int Plane() const {return fPlane;}
+    
   protected:
     
     larutil::GeometryUtilities  *fGSer;

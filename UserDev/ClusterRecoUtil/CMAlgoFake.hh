@@ -47,7 +47,7 @@ namespace cluster {
   protected:
 
     bool _flip;
-
+    int _ctr;
   };
 }
 

@@ -7,7 +7,7 @@ namespace cluster {
 
   CMergeManager::CMergeManager(CMergePriority_t priority)
   {
-    _debug_mode = false;
+    _debug_mode = kNone;
     _merge_till_converge = true;
     _priority = priority;
     Reset();
@@ -62,15 +62,20 @@ namespace cluster {
     std::vector<std::vector<unsigned short> > tmp_merged_indexes;
     std::vector<cluster::ClusterParamsAlgNew> tmp_merged_clusters;
     while(keep_going){
-
-      // Clear output
-      _out_clusters.clear();
-
+      
       // Configure input for RunMerge
       CBookKeeper bk;
 
       if(!ctr) tmp_merged_clusters = _in_clusters;
       else tmp_merged_clusters = _out_clusters;
+      _out_clusters.clear();
+
+      if(_debug_mode <= kPerIteration)
+	
+	std::cout 
+	  << std::endl
+	  << Form("  Merging iteration %zu: processing %zu clusters...",ctr,tmp_merged_clusters.size()) 
+	  << std::endl;
 
       std::vector<bool> merge_switch(tmp_merged_clusters.size(),true);
       for(size_t i=0; i<tmp_merged_indexes.size(); ++i)
@@ -88,6 +93,7 @@ namespace cluster {
 
       // Save output
       bk.PassResult(tmp_merged_indexes);
+
       if(bk.size() == tmp_merged_indexes.size())
 	_out_clusters = tmp_merged_clusters;
       else {
@@ -105,9 +111,10 @@ namespace cluster {
 	  std::vector<larutil::PxHit> tmp_hits;
 	  tmp_hits.reserve(tmp_hit_counts);
 	  
-	  for(auto const& index : indexes_v)
+	  for(auto const& index : indexes_v) {
 	    for(auto const& hit : tmp_merged_clusters.at(index).GetHitVector())
 	      tmp_hits.push_back(hit);
+	  }
 	  _out_clusters.push_back(ClusterParamsAlgNew());
 	  (*_out_clusters.rbegin()).SetVerbose(false);
 	  (*_out_clusters.rbegin()).DisableFANN();
@@ -120,8 +127,28 @@ namespace cluster {
 
       book_keepers.push_back(bk);
 
+      if(_debug_mode <= kPerIteration) {
+
+	std::cout
+	  << Form("  Input / Output cluster length: %zu/%zu",tmp_merged_clusters.size(),_out_clusters.size())
+	  << std::endl;
+
+	if(tmp_merged_clusters.size() == _out_clusters.size())
+
+	  std::cout << "  Did not find any newly merged clusters..." <<std::endl;
+	
+	if(_out_clusters.size()==1)
+	  
+	  std::cout << "  Output cluster length is 1 (= no more merging needed)" << std::endl;
+
+	if(!_merge_till_converge) 
+
+	  std::cout << "  Non-iterative option: terminating..." << std::endl;
+
+      }
+
       // Break if necessary
-      if(!_merge_till_converge || tmp_merged_clusters.size() == _out_clusters.size())
+      if(!_merge_till_converge || tmp_merged_clusters.size() == _out_clusters.size() || _out_clusters.size()==1)
 
 	break;
 
@@ -148,6 +175,13 @@ namespace cluster {
 				   merge_flag.size()
 				   )
 			      );
+    if(_debug_mode <= kPerIteration){
+      
+      std::cout
+	<< Form("  Calling %s with %zu clusters...",__FUNCTION__,in_clusters.size())
+	<<std::endl;
+
+    }
 
     // Figure out ordering of clusters to process
     std::multimap<double,size_t> prioritized_index;
@@ -177,9 +211,16 @@ namespace cluster {
 	++citer1) {
       
       auto citer2 = citer1;
+
+      UChar_t plane1 = in_clusters.at((*citer1).second).Plane();
+
       while(1) {
 	citer2++;
 	if(citer2 == prioritized_index.rend()) break;
+
+	// Skip if not on the same plane
+	UChar_t plane2 = in_clusters.at((*citer2).second).Plane();
+	if(plane1 != plane2) continue;
 
 	// Skip if this combination is not meant to be compared
 	if(!(merge_flag.at((*citer2).second))) continue;
@@ -188,7 +229,14 @@ namespace cluster {
 
 	for(size_t i=0; merge && (i<_merge_algo.size()); ++i) {
 
+	  if(_debug_mode <= kPerMerging){
+
+	    std::cout
+	      << Form("    Inspecting a pair (%zu, %zu) ... ",(*citer1).second, (*citer2).second);
+	  }
+
 	  bool merge_local = false;
+
 	  for(auto algo : _merge_algo.at(i)) {
 	    
 	    // for 1st algorithm, simply assign merge_local
@@ -208,8 +256,18 @@ namespace cluster {
 						       in_clusters.at((*citer2).second).GetParams());
 	    
 	  } // end looping over algorithms in this set
-	  
+
 	  merge = merge && merge_local;
+
+	  if(_debug_mode <= kPerMerging){
+
+	    if(merge) std::cout << "found to be merged! " <<std::endl;
+
+	    else std::cout << "found NOT to be merged..." << std::endl;
+
+	  }
+
+	    
 	  
 	} // end looping over all sets of algorithms
 	
@@ -217,6 +275,23 @@ namespace cluster {
 	  book_keeper.Merge((*citer1).second,(*citer2).second);
       } // end looping over all cluster pairs for citer1
     } // end looping over clusters
+    
+    if(_debug_mode <= kPerIteration && book_keeper.GetResult().size() != in_clusters.size()) {
+
+      std::cout << "  Found following clusters to be merged..." << std::endl;
+      for(auto const &indexes_v : book_keeper.GetResult()) {
+
+	if(indexes_v.size()==1) continue;
+	std::cout<<"    ";
+	for(auto index : indexes_v)
+
+	  std::cout<<index<<" ";
+	std::cout<<" ... indexes to be merged!"<<std::endl;
+
+      }
+
+    }
+
   }
 
 }
