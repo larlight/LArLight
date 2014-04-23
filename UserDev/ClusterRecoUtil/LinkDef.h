@@ -9,7 +9,7 @@
 #pragma link off all classes;
 #pragma link off all functions;
 
-#pragma link C++ class Polygon+;
+#pragma link C++ class Polygon2D+;
 
 #pragma link C++ namespace cluster+;
 

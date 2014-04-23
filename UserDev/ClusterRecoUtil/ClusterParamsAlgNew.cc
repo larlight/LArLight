@@ -1441,7 +1441,6 @@ namespace cluster{
   void ClusterParamsAlgNew::FillPolygon()
   {
     if(fHitVector.size()) {
-      std::cout<<"Filling polygon!"<<std::endl;
       std::vector<const larutil::PxHit*> container_polygon;
       fGSer->SelectPolygonHitList(fHitVector,container_polygon);
       //now making Polygon Object
@@ -1453,7 +1452,7 @@ namespace cluster{
         container_polygon.at(i)->t );
         vertices.push_back( tmpvertex );
       }
-      fParams.PolyObject = Polygon( vertices );
+      fParams.PolyObject = Polygon2D( vertices );
     }
   }
   
