@@ -319,8 +319,8 @@ namespace larlight {
     event_cluster * my_cluster_v = (event_cluster *)(storage->get_data(DATA::FuzzyCluster));
 
   
-    event_hit * my_hit_v = (event_hit*)(storage->get_data(my_cluster_v->get_hit_type()));
-   // event_hit * my_hit_v = (event_hit*)(storage->get_data(DATA::FFTHit));
+    // event_hit * my_hit_v = (event_hit*)(storage->get_data(my_cluster_v->get_hit_type()));
+    event_hit * my_hit_v = (event_hit*)(storage->get_data(DATA::FFTHit));
     //event_hit * my_hit_v = (event_hit*)(storage->get_data(DATA::FFTHit));
     std::cout << " full hitlist size: " << my_hit_v->size() << std::endl;
     std::cout << " number of clusters: " << my_cluster_v->size() << std::endl;	
@@ -569,18 +569,17 @@ namespace larlight {
         //      std::cout << " +++ in TestEff " << hit_vector.size() << std::endl;  
 
 
-        if(hit_vector.size() < 20)   // do not bother with too small hitlists
+        if(hit_vector.size() < 30)   // do not bother with too small hitlists
         {
             continue;
         }
 
 
         ::cluster::ClusterParamsAlgNew  fCPAlg;
-	
-	fCPAlg.setNeuralNetPath("../FANN/trained_nets/cascade_argo_allhits.net");
-	 fCPAlg.EnableFANN();
-      
+
         fCPAlg.Initialize();
+        fCPAlg.setNeuralNetPath("../FANN/trained_nets/cascade_argo_clusters.net");
+        fCPAlg.EnableFANN();
         if(fCPAlg.SetHits(hit_vector) ==-1 )	
             continue;
         fCPAlg.GetAverages(true);

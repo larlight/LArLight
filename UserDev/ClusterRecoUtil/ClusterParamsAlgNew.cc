@@ -10,21 +10,19 @@
 
 namespace cluster{
 
-  ClusterParamsAlgNew::ClusterParamsAlgNew() : fPrincipal(2,"D")
+  ClusterParamsAlgNew::ClusterParamsAlgNew()
   {
     fGSer=nullptr;
     Initialize();
   }
 
   ClusterParamsAlgNew::ClusterParamsAlgNew(const std::vector<const larlight::hit*> &inhitlist)
-    : fPrincipal(2,"D")
   {
     fGSer=nullptr;
     SetHits(inhitlist);
   }
 
   ClusterParamsAlgNew::ClusterParamsAlgNew(const std::vector<larutil::PxHit> &inhitlist)
-    : fPrincipal(2,"D")
   {
     fGSer=nullptr;
     SetHits(inhitlist);
@@ -152,7 +150,6 @@ namespace cluster{
   {
 
     // Set pointer attributes
-    fPrincipal.Clear();
     if(!fGSer) fGSer = (larutil::GeometryUtilities*)(larutil::GeometryUtilities::GetME());
 
     //--- Initilize attributes values ---//
@@ -191,8 +188,14 @@ namespace cluster{
     fParams.Clear();
     
     // Initialize the neural network:
-    enableFANN = false;
+    // enableFANN = false;
 
+  }
+
+  void ClusterParamsAlgNew::EnableFANN(){
+      enableFANN = true;
+      fannModule.LoadFromFile(fNeuralNetPath);
+      return;
   }
 
   void ClusterParamsAlgNew::Report(){
@@ -231,7 +234,7 @@ namespace cluster{
       if (fFinishedGetAverages) return;
     }
 
-    fPrincipal.Clear();
+    TPrincipal fPrincipal(2,"D");
 
     fParams.N_Hits = fHitVector.size();
 
@@ -1240,8 +1243,8 @@ namespace cluster{
       return;
     }
 
-    double percentage = 0.95;
-    double percentage_HC = 0.95*fParams.N_Hits_HC/fParams.N_Hits;
+    double percentage = 0.90;
+    double percentage_HC = 0.90*fParams.N_Hits_HC/fParams.N_Hits;
     const int NBINS=200;
     const double wgt = 1.0/fParams.N_Hits;
 
@@ -1510,12 +1513,17 @@ namespace cluster{
   }
 
   void ClusterParamsAlgNew::TrackShowerSeparation(bool override){
+    std::cout << " ---- Trying T/S sep. ------ \n";
     if (enableFANN){
+      std::cout << " ---- Doing T/S sep. ------- \n";
       std::vector<float> FeatureVector, outputVector;
       GetFANNVector(FeatureVector);
       fannModule.run(FeatureVector,outputVector);
       fParams.trackness  = outputVector[1];
       fParams.showerness = outputVector[0];
+    }
+    else{
+      std::cout << " ---- Failed T/S sep. ------ \n";
     }
   }
 

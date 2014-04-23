@@ -45,51 +45,6 @@ namespace cluster {
     /// Alternative constructor with larutil::PxHit vector
     ClusterParamsAlgNew(const std::vector<larutil::PxHit>&);
 
-    /// Explicit definition of a copy constructor
-    ClusterParamsAlgNew(const ClusterParamsAlgNew& orig)
-      : fGSer(orig.fGSer),
-        fPrincipal(2,"D"),
-        fHitVector(orig.fHitVector),
-        verbose(orig.verbose),
-        fChargeCutoffThreshold(orig.fChargeCutoffThreshold),
-        fPlane(orig.fPlane),
-        fQMinRefDir(orig.fQMinRefDir),
-        fChargeProfile(orig.fChargeProfile),
-        fCoarseChargeProfile(orig.fCoarseChargeProfile),
-        fCoarseNbins(orig.fCoarseNbins),
-        fProfileNbins(orig.fProfileNbins),
-        fProfileMaximumBin(orig.fProfileMaximumBin),
-        fProfileIntegralForward(orig.fProfileIntegralForward),
-        fProfileIntegralBackward(orig.fProfileIntegralBackward),
-        fProjectedLength(orig.fProjectedLength),
-        fBeginIntercept(orig.fBeginIntercept),
-        fEndIntercept(orig.fEndIntercept),
-        fInterHigh_side(orig.fInterHigh_side),
-        fInterLow_side(orig.fInterLow_side),
-        fFinishedGetAverages(orig.fFinishedGetAverages),
-        fFinishedGetRoughAxis(orig.fFinishedGetRoughAxis),
-        fFinishedGetProfileInfo(orig.fFinishedGetProfileInfo),
-        fFinishedRefineStartPoints(orig.fFinishedRefineStartPoints),
-        fFinishedRefineDirection(orig.fFinishedRefineDirection),
-        fFinishedGetFinalSlope(orig.fFinishedGetFinalSlope),
-        fRough2DSlope(orig.fRough2DSlope),
-        fRough2DIntercept(orig.fRough2DIntercept),
-        fRoughBeginPoint(orig.fRoughBeginPoint),
-        fRoughEndPoint(orig.fRoughEndPoint),
-        fParams(orig.fParams)
-    {
-
-      if(fFinishedGetAverages) {
-        for(auto& hit : fHitVector){
-          double data[2];
-          data[0] = hit.w;
-          data[1] = hit.t;
-          fPrincipal.AddRow(data);
-        }
-        fPrincipal.MakePrincipals();
-      }
-    }
-
     ~ClusterParamsAlgNew(){};
 
     void Initialize();
@@ -223,19 +178,16 @@ namespace cluster {
     double RoughSlope() {return fRough2DSlope;}
     double RoughIntercept() {return fRough2DIntercept;}
     
-    void EnableFANN() {
-      enableFANN = true;
-      fannModule.LoadFromFile(fNeuralNetPath);
-    }
+    void EnableFANN();
 
     void DisableFANN(){enableFANN = false;}
 
+    unsigned int GetNHits(){return fHitVector.size();}
     const std::vector<larutil::PxHit>& GetHitVector() const {return fHitVector;}
        
   protected:
     
     larutil::GeometryUtilities  *fGSer;
-    TPrincipal fPrincipal;
 
     /**
        This vector holds the pointer to hits. 
