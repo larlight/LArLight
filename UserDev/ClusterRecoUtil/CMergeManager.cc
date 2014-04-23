@@ -54,6 +54,7 @@ namespace cluster {
   
   void CMergeManager::Process()
   {
+    if(!(_merge_algo.size())) throw RecoUtilException("No algorithm to run!");
 
     size_t ctr=0;
     bool keep_going=true;

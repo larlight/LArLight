@@ -28,6 +28,7 @@
 #pragma link C++ class cluster::SimChannelViewer+;
 #pragma link C++ class cluster::WireViewer+;
 #pragma link C++ class cluster::ShowerReco2DAlgo+;
+
 #pragma link C++ class cluster::CMergeManager+;
 
 #pragma link C++ class cluster::CMergeAlgoBase+;
@@ -41,8 +42,13 @@
 #pragma link C++ class cluster::CMAlgoPolyContain+;
 #pragma link C++ class cluster::CMAlgoPolyOverlap+;
 #pragma link C++ class cluster::CMAlgoAngleCompat+;
+#pragma link C++ class cluster::CMAlgoFake+;
+
+#pragma link C++ class larlight::ClusterMerger+;
+
 //ADD_NEW_CLASS ... do not change this line
 #endif
+
 
 
 

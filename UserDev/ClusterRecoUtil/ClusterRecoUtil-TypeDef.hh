@@ -14,7 +14,8 @@
 #include "CMergeAlgoBase.hh"
 #include "CBookKeeper.hh"
 #include "Polygon2D.hh"
-
+#include "CMAlgoFake.hh"
+#include "ClusterMerger.hh"
 // Class forward declaration here
 namespace cluster{
   class ClusterParamsExecutor;
@@ -32,14 +33,21 @@ namespace cluster{
   class CMAlgoPolyContain;
   class CMAlgoPolyOverlap;
   class CMAlgoAngleCompat;
+  class CMAlgoFake;
+
 }
+
+namespace larlight{
+  class ClusterMerger;
+}
+
 class ClusterParamsExecutor;
 class Polygon2D;
-
 
 //ADD_EMPTY_CLASS ... do not change this comment line
 
 #endif
+
 
 
 
