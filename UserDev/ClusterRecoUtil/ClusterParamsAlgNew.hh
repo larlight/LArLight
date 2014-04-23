@@ -57,7 +57,7 @@ namespace cluster {
 
     void SetRefineDirectionQMin(double qmin){ fQMinRefDir = qmin; }
 
-    void SetVerbose(){ verbose = true;}
+    void SetVerbose(bool yes=true){ verbose = yes;}
 
     void SetArgoneutGeometry();
 

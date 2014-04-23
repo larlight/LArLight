@@ -32,11 +32,11 @@ namespace cluster {
     _in_clusters.reserve(clusters.size());
 
     ClusterParamsAlgNew tmp_alg;
+    tmp_alg.SetVerbose(false);
 
     for(auto const &c : clusters) {
       
       _in_clusters.push_back(tmp_alg);
-
       (*_in_clusters.rbegin()).Initialize();
 
       if((*_in_clusters.rbegin()).SetHits(c) < 1) continue;
@@ -72,8 +72,8 @@ namespace cluster {
       if(!ctr) tmp_merged_clusters = _in_clusters;
       else tmp_merged_clusters = _out_clusters;
 
-      std::vector<bool> merge_switch(tmp_merged_indexes.size(),true);
-      for(size_t i=0; (ctr) && i<tmp_merged_indexes.size(); ++i)
+      std::vector<bool> merge_switch(tmp_merged_clusters.size(),true);
+      for(size_t i=0; i<tmp_merged_indexes.size(); ++i)
 	
 	if(tmp_merged_indexes.at(i).size()==1)
 
@@ -109,11 +109,12 @@ namespace cluster {
 	    for(auto const& hit : tmp_merged_clusters.at(index).GetHitVector())
 	      tmp_hits.push_back(hit);
 	  _out_clusters.push_back(ClusterParamsAlgNew());
-	  (*tmp_merged_clusters.rbegin()).DisableFANN();
-	  (*tmp_merged_clusters.rbegin()).Initialize();
-	  (*tmp_merged_clusters.rbegin()).SetHits(tmp_hits);
-	  (*tmp_merged_clusters.rbegin()).FillParams(true,true,true,true,true,false);
-	  (*tmp_merged_clusters.rbegin()).FillPolygon();
+	  (*_out_clusters.rbegin()).SetVerbose(false);
+	  (*_out_clusters.rbegin()).DisableFANN();
+
+	  if((*_out_clusters.rbegin()).SetHits(tmp_hits) < 1) continue;
+	  (*_out_clusters.rbegin()).FillParams(true,true,true,true,true,false);
+	  (*_out_clusters.rbegin()).FillPolygon();
 	}
       }
 
@@ -142,7 +143,11 @@ namespace cluster {
 			       CBookKeeper &book_keeper) const
   {
     if(merge_flag.size() != in_clusters.size())
-      throw RecoUtilException("in_clusters and merge_flag vectors must be of same length!");
+      throw RecoUtilException(Form("in_clusters (%zu) and merge_flag (%zu) vectors must be of same length!",
+				   in_clusters.size(),
+				   merge_flag.size()
+				   )
+			      );
 
     // Figure out ordering of clusters to process
     std::multimap<double,size_t> prioritized_index;
