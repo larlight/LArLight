@@ -10,21 +10,19 @@
 
 namespace cluster{
 
-  ClusterParamsAlgNew::ClusterParamsAlgNew() : fPrincipal(2,"D")
+  ClusterParamsAlgNew::ClusterParamsAlgNew()
   {
     fGSer=nullptr;
     Initialize();
   }
 
   ClusterParamsAlgNew::ClusterParamsAlgNew(const std::vector<const larlight::hit*> &inhitlist)
-    : fPrincipal(2,"D")
   {
     fGSer=nullptr;
     SetHits(inhitlist);
   }
 
   ClusterParamsAlgNew::ClusterParamsAlgNew(const std::vector<larutil::PxHit> &inhitlist)
-    : fPrincipal(2,"D")
   {
     fGSer=nullptr;
     SetHits(inhitlist);
@@ -152,7 +150,6 @@ namespace cluster{
   {
 
     // Set pointer attributes
-    fPrincipal.Clear();
     if(!fGSer) fGSer = (larutil::GeometryUtilities*)(larutil::GeometryUtilities::GetME());
 
     //--- Initilize attributes values ---//
@@ -231,7 +228,7 @@ namespace cluster{
       if (fFinishedGetAverages) return;
     }
 
-    fPrincipal.Clear();
+    TPrincipal fPrincipal(2,"D");
 
     fParams.N_Hits = fHitVector.size();
 
@@ -1441,7 +1438,6 @@ namespace cluster{
   void ClusterParamsAlgNew::FillPolygon()
   {
     if(fHitVector.size()) {
-      std::cout<<"Filling polygon!"<<std::endl;
       std::vector<const larutil::PxHit*> container_polygon;
       fGSer->SelectPolygonHitList(fHitVector,container_polygon);
       //now making Polygon Object
@@ -1453,7 +1449,7 @@ namespace cluster{
         container_polygon.at(i)->t );
         vertices.push_back( tmpvertex );
       }
-      fParams.PolyObject = Polygon( vertices );
+      fParams.PolyObject = Polygon2D( vertices );
     }
   }
   

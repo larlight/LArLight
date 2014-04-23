@@ -15,7 +15,8 @@ namespace cluster {
   {
     _merge_algo.clear();
     _ask_and.clear();
-    _clusters.clear();
+    _in_clusters.clear();
+    _out_clusters.clear();
     _book_keeper.Reset();
   }
 
@@ -24,22 +25,22 @@ namespace cluster {
 
     // Clear & fill cluster info
 
-    _clusters.clear();
+    _in_clusters.clear();
 
-    _clusters.reserve(clusters.size());
+    _in_clusters.reserve(clusters.size());
 
     ClusterParamsAlgNew tmp_alg;
 
     for(auto const &c : clusters) {
       
-      _clusters.push_back(tmp_alg);
+      _in_clusters.push_back(tmp_alg);
 
-      (*_clusters.rbegin()).Initialize();
+      (*_in_clusters.rbegin()).Initialize();
 
-      if((*_clusters.rbegin()).SetHits(c) < 1) continue;
+      if((*_in_clusters.rbegin()).SetHits(c) < 1) continue;
 
-      (*_clusters.rbegin()).FillParams();
-      (*_clusters.rbegin()).FillPolygon();
+      (*_in_clusters.rbegin()).FillParams();
+      (*_in_clusters.rbegin()).FillPolygon();
 
     }    
 
@@ -49,28 +50,68 @@ namespace cluster {
 
   }
   
-  void CMergeManager::Process()
+  void CMergeManager::Process(bool merge_till_converge)
+  {
+
+    size_t ctr=0;
+    bool keep_going=true;
+    std::vector<CBookKeeper> book_keepers;
+    while(keep_going){
+      
+      CBookKeeper bk;
+      if(!ctr) {
+	bk.Reset(_in_clusters.size());
+	RunMerge(_in_clusters, bk);
+      }
+
+      if(!merge_till_converge) {
+
+	keep_going = false;
+	
+	book_keepers.push_back(bk);
+
+	ctr++;
+
+	break;
+
+      }
+
+      else if((*book_keepers.rbegin()).GetResult().size() == bk.GetResult().size())
+
+	keep_going=false;
+      
+      else
+
+	book_keepers.push_back(bk);
+
+      ctr++;
+    }
+    
+  }
+
+  void CMergeManager::RunMerge(const std::vector<cluster::ClusterParamsAlgNew> &in_clusters,
+			       CBookKeeper &book_keeper) const
   {
     // Figure out ordering of clusters to process
     std::map<double,size_t> prioritized_index;
     double key = 0;
     
-    for(size_t i=0; i<_clusters.size(); ++i) {
+    for(size_t i=0; i<in_clusters.size(); ++i) {
 
-      if(_clusters.at(i).GetHitVector().size()<1) continue;
+      if(in_clusters.at(i).GetHitVector().size()<1) continue;
 
       switch(_priority) {
       case ::cluster::CMergeManager::kIndex:
-	key = (double)(_clusters.size()) - (double)i;
+	key = (double)(in_clusters.size()) - (double)i;
 	break;
       case ::cluster::CMergeManager::kPolyArea:
-	key = _clusters.at(i).GetParams().PolyObject.Area();
+	key = in_clusters.at(i).GetParams().PolyObject.Area();
 	break;
       case ::cluster::CMergeManager::kChargeSum:
-	key = _clusters.at(i).GetParams().sum_charge;
+	key = in_clusters.at(i).GetParams().sum_charge;
 	break;
       case ::cluster::CMergeManager::kNHits:
-	key = (double)(_clusters.at(i).GetParams().N_Hits);
+	key = (double)(in_clusters.at(i).GetParams().N_Hits);
 	break;
       }
 
@@ -93,17 +134,37 @@ namespace cluster {
 	citer2++;
 	if(citer2 == prioritized_index.rend()) break;
 
+	bool merge=true;
 
-	for(size_t i=0; i<_merge_algo.size(); ++i) {
-	  
-	  bool status = true;
-	  
+	for(size_t i=0; merge && (i<_merge_algo.size()); ++i) {
+
+	  bool merge_local = false;
 	  for(auto algo : _merge_algo.at(i)) {
 	    
+	    // for 1st algorithm, simply assign merge_local
+	    if(algo == (*_merge_algo.at(i).begin()))
+
+	      merge_local = algo->Merge(in_clusters.at((*citer1).second).GetParams(),
+					in_clusters.at((*citer2).second).GetParams());
+
+	    else if(_ask_and.at(i))
+
+	      merge_local = merge_local && algo->Merge(in_clusters.at((*citer1).second).GetParams(),
+						       in_clusters.at((*citer2).second).GetParams());
 	    
+	    else
+	      
+	      merge_local = merge_local || algo->Merge(in_clusters.at((*citer1).second).GetParams(),
+						       in_clusters.at((*citer2).second).GetParams());
 	    
 	  } // end looping over algorithms in this set
+	  
+	  merge = merge && merge_local;
+	  
 	} // end looping over all sets of algorithms
+
+	if(merge)
+	  book_keeper.Merge((*citer1).second,(*citer2).second);
       } // end looping over all cluster pairs for citer1
     } // end looping over clusters
   }

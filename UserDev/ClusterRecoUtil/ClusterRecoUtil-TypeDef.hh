@@ -13,7 +13,7 @@
 #include "CMergeManager.hh"
 #include "CMergeAlgoBase.hh"
 #include "CBookKeeper.hh"
-#include "Polygon.hh"
+#include "Polygon2D.hh"
 
 // Class forward declaration here
 namespace cluster{
@@ -29,9 +29,11 @@ namespace cluster{
   class CMergeManager;
   class ShowerReco2DAlgo;
   class CMAlgoShortestDist;
+  class CMAlgoPolyContain;
+  class CMAlgoPolyOverlap;
 }
 class ClusterParamsExecutor;
-class Polygon;
+class Polygon2D;
 
 //ADD_EMPTY_CLASS ... do not change this comment line
 
