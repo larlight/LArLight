@@ -241,17 +241,16 @@ while mgr.next_event():
         # print "testing slopes: %g   from angle: %g" % ( algo.RoughSlope(),TMath.Tan(result.angle_2d*TMath.Pi()/180));
         # Set Polygon
         gPolygon = None
-        if result.container_polygon.size() > 0:
-            gPolygon = TGraph(result.container_polygon.size() + 1)
-            for x in xrange(result.container_polygon.size()):
+        if result.PolyObject.Size() > 0:
+            gPolygon = TGraph(result.PolyObject.Size() + 1)
+            for x in xrange(result.PolyObject.Size()):
                 gPolygon.SetPoint(x,
-                                  result.container_polygon.at(x).w,
-                                  result.container_polygon.at(x).t)
-                # print result.container_polygon.at(x).w, result.container_polygon.at(x).t
+                                  result.PolyObject.Point(x).first,
+                                  result.PolyObject.Point(x).second)
 
-            gPolygon.SetPoint(result.container_polygon.size(),
-                              result.container_polygon.at(0).w,
-                              result.container_polygon.at(0).t)
+            gPolygon.SetPoint(result.PolyObject.Size(),
+                              result.PolyObject.Point(0).first,
+                              result.PolyObject.Point(0).second)
 
             gPolygon.SetMarkerStyle(20)
             gPolygon.SetMarkerSize(1)

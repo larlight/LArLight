@@ -1441,20 +1441,18 @@ namespace cluster{
   void ClusterParamsAlgNew::FillPolygon()
   {
     if(fHitVector.size()) {
-      std::cout<<"Filling polygon!"<<std::endl;
-      fGSer->SelectPolygonHitList(fHitVector,fParams.container_polygon);
+      std::vector<const larutil::PxHit*> container_polygon;
+      fGSer->SelectPolygonHitList(fHitVector,container_polygon);
       //now making Polygon Object
       std::pair<float,float> tmpvertex;
       //make Polygon Object as in mac/PolyOverlap.cc
       std::vector<std::pair<float,float> > vertices;
-      for (unsigned int i=0; i<fParams.container_polygon.size(); i++){
-        tmpvertex = std::make_pair( fParams.container_polygon.at(i)->w,
-        fParams.container_polygon.at(i)->t );
+      for (unsigned int i=0; i<container_polygon.size(); i++){
+        tmpvertex = std::make_pair( container_polygon.at(i)->w,
+        container_polygon.at(i)->t );
         vertices.push_back( tmpvertex );
       }
-      fParams.PolyObject = Polygon( vertices );
-
-      std::cout<<fParams.container_polygon.size()<<std::endl;
+      fParams.PolyObject = Polygon2D( vertices );
     }
   }
   

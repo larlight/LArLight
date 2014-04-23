@@ -1,20 +1,24 @@
-#include "Polygon.hh"
+#include "Polygon2D.hh"
 
 
 
 
 //****************************************************
-float FindSlope( std::pair<float,float> p1, std::pair<float,float> p2 ){
+float FindSlope( const std::pair<float,float> &p1, 
+		 const std::pair<float,float> &p2 )
+{
   float slope = (p2.second-p1.second)/(p2.first-p1.first);
   return slope;
 }
 
 
-bool Clockwise(double Ax,double Ay,double Bx,double By,double Cx,double Cy){
+bool Clockwise(double Ax,double Ay,double Bx,double By,double Cx,double Cy)
+{
   return (Cy-Ay)*(Bx-Ax) > (By-Ay)*(Cx-Ax);
 }
 
-bool SegmentOverlap(double Ax,double Ay,double Bx,double By,double Cx,double Cy, double Dx, double Dy){
+bool SegmentOverlap(double Ax,double Ay,double Bx,double By,double Cx,double Cy, double Dx, double Dy)
+{
 
   bool overlap = ( (Clockwise(Ax,Ay,Cx,Cy,Dx,Dy) != Clockwise(Bx,By,Cx,Cy,Dx,Dy))
 		   and (Clockwise(Ax,Ay,Bx,By,Cx,Cy) != Clockwise(Ax,Ay,Bx,By,Dx,Dy)) );
@@ -23,7 +27,8 @@ bool SegmentOverlap(double Ax,double Ay,double Bx,double By,double Cx,double Cy,
 
 
 //****************************************************
-float Polygon::Area(){
+float Polygon2D::Area() const
+{
   //how? here:
   //http://www.mathsisfun.com/geometry/area-irregular-polygons.html
   float area = 0;
@@ -40,7 +45,8 @@ float Polygon::Area(){
 
 
 //****************************************************
-std::pair<float,float> Polygon::Point(unsigned int p){
+const std::pair<float,float>& Polygon2D::Point(unsigned int p) const
+{
   //This function returns the vertex under consideration
   //as a std::pair<float,float> Returns vertex for argument
   //from 0 to N-1. For input N = number of sides then
@@ -59,7 +65,9 @@ std::pair<float,float> Polygon::Point(unsigned int p){
 
 
 //****************************************************
-std::pair<float,float> Polygon::Project(std::pair<float,float> p, float theta){
+std::pair<float,float> Polygon2D::Project(const std::pair<float,float> &p, 
+					float theta) const
+{
 
   std::pair<float,float> range(10000,0);
   std::pair<float,float> ptmp;
@@ -85,7 +93,10 @@ std::pair<float,float> Polygon::Project(std::pair<float,float> p, float theta){
 
 
 //*****************************************************
-bool Polygon::Overlap(float slope, Polygon poly2, std::pair<float,float> origin){
+bool Polygon2D::Overlap(float slope, 
+		      const Polygon2D &poly2, 
+		      const std::pair<float,float> &origin) const
+{
   //translate and rotate both polygons
   float theta = tan(slope);
   //here we translate origin, rotate and find x-coordinates and find range of projection on edge line
@@ -103,7 +114,8 @@ bool Polygon::Overlap(float slope, Polygon poly2, std::pair<float,float> origin)
 
 
 //*****************************************************
-bool Polygon::PolyOverlap(Polygon poly2){
+bool Polygon2D::PolyOverlap(const Polygon2D &poly2) const
+{
 
   //start from first pair in vector then check all edges.
   //edges are (0,1), (1,2), ..., (N,N-1) each pair a pair
@@ -132,7 +144,8 @@ bool Polygon::PolyOverlap(Polygon poly2){
 
 
 //*****************************************************
-bool Polygon::PolyOverlapSegments(Polygon poly2){
+bool Polygon2D::PolyOverlapSegments(const Polygon2D &poly2) const
+{
 
   //loop over the two polygons checking wehther
   //two segments ever intersect
@@ -151,7 +164,8 @@ bool Polygon::PolyOverlapSegments(Polygon poly2){
 
 
 //*****************************************************
-bool Polygon::PointInside(std::pair<float,float> point){
+bool Polygon2D::PointInside(const std::pair<float,float> &point) const
+{
 
   //any ray originating at point will cross polygon
   //even number of times if point outside

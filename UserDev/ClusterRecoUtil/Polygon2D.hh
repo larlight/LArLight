@@ -1,5 +1,5 @@
-#ifndef POLYGON_H
-#define POLYGON_H
+#ifndef POLYGON2D_H
+#define POLYGON2D_H
 
 #include <vector>
 #include <utility>
@@ -20,23 +20,23 @@
 //\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/
 //                BEGIN POLYGON CLASS               //
 //\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/
-class Polygon{
+class Polygon2D{
   
 private:
   std::vector< std::pair<float,float> > vertices;
   
  public:
 
-  Polygon() { }
-  Polygon(std::vector< std::pair<float,float> > points) { vertices = points; }
-  unsigned int Size() { return vertices.size(); } 
-  std::pair<float,float> Point(unsigned int p); 
-  std::pair<float,float> Project(std::pair<float,float>,float);
-  float Area();
-  bool Overlap(float slope, Polygon poly2, std::pair<float,float> origin);
-  bool PolyOverlap(Polygon poly2);
-  bool PolyOverlapSegments(Polygon poly2);
-  bool PointInside(std::pair<float,float> point);
+  Polygon2D() { }
+  Polygon2D(const std::vector< std::pair<float,float> > &points) { vertices = points; }
+  unsigned int Size() const { return vertices.size(); } 
+  const std::pair<float,float>& Point(unsigned int p) const; 
+  std::pair<float,float> Project(const std::pair<float,float>&,float) const;
+  float Area() const;
+  bool Overlap(float slope, const Polygon2D &poly2, const std::pair<float,float> &origin) const;
+  bool PolyOverlap(const Polygon2D &poly2) const;
+  bool PolyOverlapSegments(const Polygon2D &poly2) const;
+  bool PointInside(const std::pair<float,float> &point) const;
 };
 
 

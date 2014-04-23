@@ -10,7 +10,10 @@
 #include "ClusterRecoUtil.hh"
 #include "RecoUtilException.hh"
 #include "ClusterParamsExecutor.hh"
-#include "ClusterMergeAlgNew.hh"
+#include "CMergeManager.hh"
+#include "CMergeAlgoBase.hh"
+#include "CBookKeeper.hh"
+#include "Polygon2D.hh"
 
 // Class forward declaration here
 namespace cluster{
@@ -19,19 +22,25 @@ namespace cluster{
   class ClusterRecoUtils;
   class cluster_params;
   class RecoUtilException;
-  class ClusterMergeAlgNew;
   class SimChannelViewer;
   class WireViewer;
+  class CBookKeeper;
+  class CMergeAlgoBase;
+  class CMergeManager;
+  class ShowerReco2DAlgo;
+  class CMAlgoShortestDist;
 }
-
-
 class ClusterParamsExecutor;
-
-
+class Polygon2D;
 
 //ADD_EMPTY_CLASS ... do not change this comment line
 
 #endif
+
+
+
+
+
 
 
 
