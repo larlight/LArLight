@@ -188,6 +188,7 @@ namespace larlight {
     TH1D *eigenvalue_principal_sh;
     TH1D *length_sh;
     TH1D *width_sh;
+    TH1D *showerness_sh;
     
     TH1D* openAngle_tr, *openAngleChargeWgt_tr;
     TH1D* closeAngle_tr, *closeAngleChargeWgt_tr; 
@@ -199,7 +200,7 @@ namespace larlight {
     TH1D *eigenvalue_principal_tr;
     TH1D *length_tr;
     TH1D *width_tr;
-    
+    TH1D *showerness_tr;
     
     TH1D *showerness, *trackness ;
 
