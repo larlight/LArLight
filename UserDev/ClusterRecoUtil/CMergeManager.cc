@@ -8,7 +8,7 @@ namespace cluster {
   CMergeManager::CMergeManager(CMergePriority_t priority)
   {
     _debug_mode = kNone;
-    _merge_till_converge = true;
+    _merge_till_converge = false;
     _priority = priority;
     Reset();
   }

@@ -89,6 +89,9 @@ namespace cluster {
     /// A method to execute merging algorithms
     void Process();
 
+    /// A method to obtain output clusters
+    const std::vector<cluster::ClusterParamsAlgNew>& GetClusters() const { return _out_clusters; }
+
   protected:
 
     void RunMerge(const std::vector<cluster::ClusterParamsAlgNew > &in_clusters,
