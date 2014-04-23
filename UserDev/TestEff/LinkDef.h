@@ -10,6 +10,7 @@
 #pragma link off all functions;
 
 #pragma link C++ class larlight::TestEff+;
+#pragma link C++ class larlight::CutEff+;
 //ADD_NEW_CLASS ... do not change this line
 
 #endif
