@@ -58,11 +58,11 @@ namespace cluster {
     void AddAlgo(CMergeAlgoBase* alg) 
     { 
       // By default we ask AND condition
-      AddAlgo(std::vector< ::cluster::CMergeAlgoBase*>(1,alg),true);
+      AddAlgo(std::vector<::cluster::CMergeAlgoBase*>(1,alg),true);
     }
 
     /// A simple method to add a group of algorithms
-    void AddAlgo(std::vector< ::cluster::CMergeAlgoBase* > alg_v, bool ask_and)
+    void AddAlgo(std::vector<::cluster::CMergeAlgoBase* > alg_v, bool ask_and)
     {
       _merge_algo.push_back(alg_v);
       _ask_and.push_back(ask_and);
@@ -82,10 +82,10 @@ namespace cluster {
   protected:
 
     /// Input clusters
-    std::vector< ::cluster::ClusterParamsAlgNew> _in_clusters;
+    std::vector<::cluster::ClusterParamsAlgNew> _in_clusters;
 
     /// Output clusters
-    std::vector< ::cluster::ClusterParamsAlgNew> _out_clusters;
+    std::vector<::cluster::ClusterParamsAlgNew> _out_clusters;
 
     /// Book keeper instance
     CBookKeeper _book_keeper;
