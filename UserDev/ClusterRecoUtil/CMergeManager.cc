@@ -89,7 +89,7 @@ namespace cluster {
     
   }
 
-  void CMergeManager::RunMerge(const std::vector<::cluster::ClusterParamsAlgNew> &in_clusters,
+  void CMergeManager::RunMerge(const std::vector<cluster::ClusterParamsAlgNew> &in_clusters,
 			       CBookKeeper &book_keeper) const
   {
     // Figure out ordering of clusters to process

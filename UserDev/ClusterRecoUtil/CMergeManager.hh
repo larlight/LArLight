@@ -58,11 +58,11 @@ namespace cluster {
     void AddAlgo(CMergeAlgoBase* alg) 
     { 
       // By default we ask AND condition
-      AddAlgo(std::vector<::cluster::CMergeAlgoBase*>(1,alg),true);
+      AddAlgo(std::vector<cluster::CMergeAlgoBase*>(1,alg),true);
     }
 
     /// A simple method to add a group of algorithms
-    void AddAlgo(std::vector<::cluster::CMergeAlgoBase* > alg_v, bool ask_and)
+    void AddAlgo(std::vector<cluster::CMergeAlgoBase* > alg_v, bool ask_and)
     {
       _merge_algo.push_back(alg_v);
       _ask_and.push_back(ask_and);
@@ -76,16 +76,16 @@ namespace cluster {
 
   protected:
 
-    void RunMerge(const std::vector< ::cluster::ClusterParamsAlgNew > &in_clusters,
+    void RunMerge(const std::vector<cluster::ClusterParamsAlgNew > &in_clusters,
 		  CBookKeeper &book_keeper) const;
 
   protected:
 
     /// Input clusters
-    std::vector<::cluster::ClusterParamsAlgNew> _in_clusters;
+    std::vector<cluster::ClusterParamsAlgNew> _in_clusters;
 
     /// Output clusters
-    std::vector<::cluster::ClusterParamsAlgNew> _out_clusters;
+    std::vector<cluster::ClusterParamsAlgNew> _out_clusters;
 
     /// Book keeper instance
     CBookKeeper _book_keeper;
@@ -96,7 +96,7 @@ namespace cluster {
        Each of the inner vector contents can be applied with either AND or OR condition
        which is set in _ask_and vector. 
      */
-    std::vector<std::vector< ::cluster::CMergeAlgoBase*> > _merge_algo;
+    std::vector<std::vector<cluster::CMergeAlgoBase*> > _merge_algo;
 
     /**
        A boolean vector that holds user configuration of whether asking AND or OR condition
