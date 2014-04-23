@@ -29,6 +29,8 @@ namespace cluster{
   class CMergeManager;
   class ShowerReco2DAlgo;
   class CMAlgoShortestDist;
+  class CMAlgoPolyContain;
+  class CMAlgoPolyOverlap;
 }
 class ClusterParamsExecutor;
 class Polygon2D;

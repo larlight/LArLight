@@ -185,3 +185,19 @@ bool Polygon2D::PointInside(const std::pair<float,float> &point) const
   
 }
 
+
+
+//*****************************************************
+bool Polygon2D::Contained(const Polygon2D &poly2) const
+{
+
+ //loop over poly2 checking wehther
+  //points of poly2 all inside poly1
+  for (unsigned int i=0; i<poly2.Size(); i++){
+    if ( !(this->PointInside( poly2.Point(i)) ) )
+      return false;
+  }
+  
+  return false;
+
+}
