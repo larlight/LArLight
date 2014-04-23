@@ -43,6 +43,8 @@
 #pragma link C++ class cluster::CMAlgoPolyOverlap+;
 #pragma link C++ class cluster::CMAlgoAngleCompat+;
 #pragma link C++ class cluster::CMAlgoFake+;
+#pragma link C++ class cluster::CMAlgoStartInPoly+;
+#pragma link C++ class cluster::CMAlgoPolyHitOverlap+;
 
 #pragma link C++ class larlight::ClusterMerger+;
 

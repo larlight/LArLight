@@ -34,6 +34,8 @@ namespace cluster{
   class CMAlgoPolyOverlap;
   class CMAlgoAngleCompat;
   class CMAlgoFake;
+  class CMAlgoStartInPoly;
+  class CMAlgoPolyHitOverlap;
 
 }
 
