@@ -13,18 +13,21 @@ namespace cluster{
   ClusterParamsAlgNew::ClusterParamsAlgNew()
   {
     fGSer=nullptr;
+    enableFANN = false;
     Initialize();
   }
 
   ClusterParamsAlgNew::ClusterParamsAlgNew(const std::vector<const larlight::hit*> &inhitlist)
   {
     fGSer=nullptr;
+    enableFANN = false;
     SetHits(inhitlist);
   }
 
   ClusterParamsAlgNew::ClusterParamsAlgNew(const std::vector<larutil::PxHit> &inhitlist)
   {
     fGSer=nullptr;
+    enableFANN = false;
     SetHits(inhitlist);
   }
 
@@ -194,7 +197,7 @@ namespace cluster{
 
   void ClusterParamsAlgNew::EnableFANN(){
       enableFANN = true;
-      fannModule.LoadFromFile(fNeuralNetPath);
+      ::cluster::FANNService::GetME()->GetFANNModule().LoadFromFile(fNeuralNetPath);
       return;
   }
 
@@ -1513,12 +1516,13 @@ namespace cluster{
   }
 
   void ClusterParamsAlgNew::TrackShowerSeparation(bool override){
+    if(!override) return;
     std::cout << " ---- Trying T/S sep. ------ \n";
     if (enableFANN){
       std::cout << " ---- Doing T/S sep. ------- \n";
       std::vector<float> FeatureVector, outputVector;
       GetFANNVector(FeatureVector);
-      fannModule.run(FeatureVector,outputVector);
+      ::cluster::FANNService::GetME()->GetFANNModule().run(FeatureVector,outputVector);
       fParams.trackness  = outputVector[1];
       fParams.showerness = outputVector[0];
     }

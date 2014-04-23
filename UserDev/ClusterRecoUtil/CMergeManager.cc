@@ -40,8 +40,8 @@ namespace cluster {
       (*_in_clusters.rbegin()).Initialize();
 
       if((*_in_clusters.rbegin()).SetHits(c) < 1) continue;
-
-      (*_in_clusters.rbegin()).FillParams();
+      (*_in_clusters.rbegin()).DisableFANN();
+      (*_in_clusters.rbegin()).FillParams(true,true,true,true,true,false);
       (*_in_clusters.rbegin()).FillPolygon();
 
     }    
@@ -109,9 +109,10 @@ namespace cluster {
 	    for(auto const& hit : tmp_merged_clusters.at(index).GetHitVector())
 	      tmp_hits.push_back(hit);
 	  _out_clusters.push_back(ClusterParamsAlgNew());
+	  (*tmp_merged_clusters.rbegin()).DisableFANN();
 	  (*tmp_merged_clusters.rbegin()).Initialize();
 	  (*tmp_merged_clusters.rbegin()).SetHits(tmp_hits);
-	  (*tmp_merged_clusters.rbegin()).FillParams();
+	  (*tmp_merged_clusters.rbegin()).FillParams(true,true,true,true,true,false);
 	  (*tmp_merged_clusters.rbegin()).FillPolygon();
 	}
       }

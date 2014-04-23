@@ -21,7 +21,7 @@
 #include "ClusterParams.hh"
 #include "RecoUtilException.hh"
 #include "LArUtilManager.hh"
-#include "FANNModule.hh"
+#include "FANNService.hh"
 
 #include <vector>
 
@@ -250,7 +250,6 @@ namespace cluster {
     cluster::cluster_params fParams;
 
     std::string fNeuralNetPath;
-    cluster::FANNModule  fannModule;
 
   }; //class ClusterParamsAlgNew
   

@@ -40,7 +40,7 @@ namespace larlight {
 
     for(size_t i=0; i<ev_cluster->size(); ++i) {
 
-      std::vector<unsigned short> hit_indexes(ev_cluster->association(hit_type));
+      std::vector<unsigned short> hit_indexes(ev_cluster->at(i).association(hit_type));
 
       local_clusters.at(i).reserve(hit_indexes.size());
 
