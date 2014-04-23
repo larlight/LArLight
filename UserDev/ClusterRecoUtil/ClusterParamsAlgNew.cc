@@ -191,8 +191,14 @@ namespace cluster{
     fParams.Clear();
     
     // Initialize the neural network:
-    enableFANN = false;
+    // enableFANN = false;
 
+  }
+
+  void ClusterParamsAlgNew::EnableFANN(){
+      enableFANN = true;
+      fannModule.LoadFromFile(fNeuralNetPath);
+      return;
   }
 
   void ClusterParamsAlgNew::Report(){
@@ -1240,8 +1246,8 @@ namespace cluster{
       return;
     }
 
-    double percentage = 0.95;
-    double percentage_HC = 0.95*fParams.N_Hits_HC/fParams.N_Hits;
+    double percentage = 0.90;
+    double percentage_HC = 0.90*fParams.N_Hits_HC/fParams.N_Hits;
     const int NBINS=200;
     const double wgt = 1.0/fParams.N_Hits;
 
@@ -1512,12 +1518,17 @@ namespace cluster{
   }
 
   void ClusterParamsAlgNew::TrackShowerSeparation(bool override){
+    std::cout << " ---- Trying T/S sep. ------ \n";
     if (enableFANN){
+      std::cout << " ---- Doing T/S sep. ------- \n";
       std::vector<float> FeatureVector, outputVector;
       GetFANNVector(FeatureVector);
       fannModule.run(FeatureVector,outputVector);
       fParams.trackness  = outputVector[1];
       fParams.showerness = outputVector[0];
+    }
+    else{
+      std::cout << " ---- Failed T/S sep. ------ \n";
     }
   }
 
