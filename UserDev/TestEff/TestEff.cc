@@ -315,8 +315,8 @@ namespace larlight {
     event_cluster * my_cluster_v = (event_cluster *)(storage->get_data(DATA::FuzzyCluster));
 
   
-    event_hit * my_hit_v = (event_hit*)(storage->get_data(my_cluster_v->get_hit_type()));
-   // event_hit * my_hit_v = (event_hit*)(storage->get_data(DATA::FFTHit));
+    // event_hit * my_hit_v = (event_hit*)(storage->get_data(my_cluster_v->get_hit_type()));
+    event_hit * my_hit_v = (event_hit*)(storage->get_data(DATA::FFTHit));
     //event_hit * my_hit_v = (event_hit*)(storage->get_data(DATA::FFTHit));
     std::cout << " full hitlist size: " << my_hit_v->size() << std::endl;
     std::cout << " number of clusters: " << my_cluster_v->size() << std::endl;	
