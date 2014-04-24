@@ -153,7 +153,7 @@ namespace cluster {
       _hClusterHits.at(plane).at(index)->Fill(h.first,h.second);
     
     // Set Color
-    _hClusterHits.at(plane).at(index)->SetMarkerColor(index);
+    _hClusterHits.at(plane).at(index)->SetMarkerColor(index+1);
     _hClusterHits.at(plane).at(index)->SetMarkerStyle(kFullStar);
 
   }
@@ -205,7 +205,7 @@ namespace cluster {
     _gClusterEnd.at(plane).at(index)->SetPoint(0,cluster_end.first,cluster_end.second);
     
     // Set Color
-    _hClusterHits.at(plane).at(index)->SetMarkerColor(index);
+    _hClusterHits.at(plane).at(index)->SetMarkerColor(index+1);
     _hClusterHits.at(plane).at(index)->SetMarkerStyle(kFullStar);
     _gClusterStart.at(plane).at(index)->SetMarkerSize(3);
     _gClusterStart.at(plane).at(index)->SetMarkerStyle(30);
@@ -271,15 +271,16 @@ namespace cluster {
 						     cluster_polygon.at(i).first,
 						     cluster_polygon.at(i).second);
     // Set Color
-    _hClusterHits.at(plane).at(index)->SetMarkerColor(index);
+    _hClusterHits.at(plane).at(index)->SetMarkerColor(index+1);
     _hClusterHits.at(plane).at(index)->SetMarkerStyle(kFullStar);
     _gClusterStart.at(plane).at(index)->SetMarkerSize(3);
     _gClusterStart.at(plane).at(index)->SetMarkerStyle(30);
     _gClusterEnd.at(plane).at(index)->SetMarkerSize(3);
     _gClusterEnd.at(plane).at(index)->SetMarkerStyle(29);
-    _gClusterPolygon.at(plane).at(index)->SetMarkerColor(index);
+    _gClusterPolygon.at(plane).at(index)->SetMarkerColor(index+1);
+    _gClusterPolygon.at(plane).at(index)->SetLineColor(index+1);
     _gClusterPolygon.at(plane).at(index)->SetMarkerStyle(20);
-    _gClusterPolygon.at(plane).at(index)->SetMarkerSize(2);
+    _gClusterPolygon.at(plane).at(index)->SetMarkerSize(1);
   }
 
   //###############################################################################################
@@ -326,10 +327,12 @@ namespace cluster {
 						     cluster_polygon.at(i).first,
 						     cluster_polygon.at(i).second);
     // Set Color
-    _hClusterHits.at(plane).at(index)->SetMarkerColor(index);
+    _hClusterHits.at(plane).at(index)->SetMarkerColor(index+1);
     _hClusterHits.at(plane).at(index)->SetMarkerStyle(kFullStar);
-    _gClusterPolygon.at(plane).at(index)->SetMarkerColor(index);
+    _gClusterPolygon.at(plane).at(index)->SetMarkerColor(index+1);
+    _gClusterPolygon.at(plane).at(index)->SetLineColor(index+1);
     _gClusterPolygon.at(plane).at(index)->SetMarkerStyle(20);
+    _gClusterPolygon.at(plane).at(index)->SetMarkerSize(1);
   }
 
   //########################################################################
@@ -377,7 +380,7 @@ namespace cluster {
 	if(!cindex) {
 	  _hClusterHits.at(plane).at(cindex)->Draw();
 	  if(_gClusterPolygon.at(plane).at(cindex))
-	    _gClusterPolygon.at(plane).at(cindex)->Draw("APL");
+	    _gClusterPolygon.at(plane).at(cindex)->Draw("PL");
 	}
 	else{
 	  _hClusterHits.at(plane).at(cindex)->Draw("sames");
