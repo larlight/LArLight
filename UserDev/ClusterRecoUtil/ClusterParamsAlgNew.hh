@@ -21,7 +21,7 @@
 #include "ClusterParams.hh"
 #include "RecoUtilException.hh"
 #include "LArUtilManager.hh"
-#include "FANNModule.hh"
+#include "FANNService.hh"
 
 #include <vector>
 
@@ -57,7 +57,7 @@ namespace cluster {
 
     void SetRefineDirectionQMin(double qmin){ fQMinRefDir = qmin; }
 
-    void SetVerbose(){ verbose = true;}
+    void SetVerbose(bool yes=true){ verbose = yes;}
 
     void SetArgoneutGeometry();
 
@@ -184,7 +184,8 @@ namespace cluster {
 
     unsigned int GetNHits(){return fHitVector.size();}
     const std::vector<larutil::PxHit>& GetHitVector() const {return fHitVector;}
-       
+    const int Plane() const {return fPlane;}
+    
   protected:
     
     larutil::GeometryUtilities  *fGSer;
@@ -250,7 +251,6 @@ namespace cluster {
     cluster::cluster_params fParams;
 
     std::string fNeuralNetPath;
-    cluster::FANNModule  fannModule;
 
   }; //class ClusterParamsAlgNew
   

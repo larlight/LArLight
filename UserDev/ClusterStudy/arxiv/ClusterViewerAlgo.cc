@@ -1,27 +1,25 @@
-#ifndef CLUSTERVIEWER_CC
-#define CLUSTERVIEWER_CC
+#ifndef CLUSTERVIEWERALGO_CC
+#define CLUSTERVIEWERALGO_CC
 
-#include "ClusterViewer.hh"
+#include "ClusterViewerAlgo.hh"
 
 namespace larlight {
   //################################################################
-  ClusterViewer::ClusterViewer() : ana_base(), _hRecoCluster_v_0(), _hRecoCluster_v_1(), _hRecoCluster_v_2(), _cluster_v(), _hHits_0(), _hHits_1(), _hHits_2(), _hClusterGraph_v_0_start(), _hClusterGraph_v_1_start(), _hClusterGraph_v_2_start(),_hClusterGraph_v_0_end(), _hClusterGraph_v_1_end(), _hClusterGraph_v_2_end()
+  ClusterViewerAlgo::ClusterViewerAlgo() : ana_base()
   //################################################################
   {
     // Class name
-    _name = "ClusterViewer";
-    // Set initialization values for pointers
-    _fout     = 0;
-    _hHits_0 = 0; 
-    _hHits_1 = 0;
-    _hHits_2 = 0;
-    //  _hMCStep  = 0;
-    cluster_type=DATA::ShowerAngleCluster;
+    _name = "ClusterViewerAlgo";
+
+    _hAllHits.clear();
+    _hClusterHits.clear();
+    _gClusterStart.clear();
+    _gClusterEnd.clear();
   }
 
-  //#######################################
-  void ClusterViewer::SetClusterType(DATA::DATA_TYPE type)
-  //#######################################
+  //##########################################################
+  void ClusterViewerAlgo::SetClusterType(DATA::DATA_TYPE type)
+  //##########################################################
   {
     if( type != DATA::Cluster &&
 	type != DATA::FuzzyCluster &&
@@ -36,43 +34,29 @@ namespace larlight {
 
   }
   
-  //################################################################
-  bool ClusterViewer::initialize()
-  //################################################################
-  {
-    g = new TGraph();
-    return true;
-  }
-  
-  //################################################################
-  bool ClusterViewer::analyze(storage_manager* storage)
-  //################################################################
+  //#############################
+  bool ClusterViewerAlgo::Reset()
+  //#############################
   {
     
     // Clean up histograms if they already exist (from previous event)
-    if(_hHits_0)  {delete _hHits_0;  _hHits_0  = 0;}; 
-    if(_hHits_1)  {delete _hHits_1;  _hHits_1  = 0;}; 
-    if(_hHits_2)  {delete _hHits_2;  _hHits_2  = 0;}; 
-    for(auto h : _hRecoCluster_v_0) {delete h; h=0;};
-    for(auto h : _hRecoCluster_v_1) {delete h; h=0;};
-    for(auto h : _hRecoCluster_v_2) {delete h; h=0;};
-    for(auto h : _hClusterGraph_v_0_start) {delete h; h=0;};
-    for(auto h : _hClusterGraph_v_1_start) {delete h; h=0;};
-    for(auto h : _hClusterGraph_v_2_start) {delete h; h=0;};
-    for(auto h : _hClusterGraph_v_0_end) {delete h; h=0;};
-    for(auto h : _hClusterGraph_v_1_end) {delete h; h=0;};
-    for(auto h : _hClusterGraph_v_2_end) {delete h; h=0;};
-    _hRecoCluster_v_0.clear();
-    _hRecoCluster_v_1.clear();
-    _hRecoCluster_v_2.clear();
-    _hClusterGraph_v_0_start.clear();
-    _hClusterGraph_v_1_start.clear();
-    _hClusterGraph_v_2_start.clear();
-    _hClusterGraph_v_0_end.clear();
-    _hClusterGraph_v_1_end.clear();
-    _hClusterGraph_v_2_end.clear();
+    for(auto &h : _hAllHits)      { delete h; h=0; }
+    for(auto &h : _hClusterHits)  { delete h; h=0; }
+    for(auto &g : _gClusterStart) { delete g; g=0; }
+    for(auto &g : _gClusterEnd)   { delete g; g=0; }
+
+    _hAllHits.clear();
+    _hClusterHits.clear();
+    _gClusterStart.clear();
+    _gClusterEnd.clear();
     _cluster_v.clear();
-    
+  }
+
+  //############################################################################
+  void ClusterViewerAlgo::AppendCluster( const std::vector<larutil::PxHit>& hits,
+					 const cluster::cluster_params& cluster)
+  //############################################################################
+  {
     //
     // Obtain event-wise data object pointers
     //
@@ -199,7 +183,7 @@ namespace larlight {
   };
   
   //################################################################
-  TH2D* ClusterViewer::Prepare2DHisto(std::string name, 
+  TH2D* ClusterViewerAlgo::Prepare2DHisto(std::string name, 
 				      double wiremin, double wiremax,
 				      double timemin, double timemax)
   //################################################################
@@ -222,27 +206,14 @@ namespace larlight {
   
   
   //################################################################
-  TGraph* ClusterViewer::PrepareGraph()
+  TGraph* ClusterViewerAlgo::PrepareGraph()
   //################################################################
   {
-    TGraph* g=0;
-    if(g) delete g;
-    
-    g = new TGraph();
+    TGraph* g = new TGraph;
     g->Set(0);
-    
     return g;
   }
 
-  bool ClusterViewer::finalize() {
-    
-    // This function is called at the end of event loop.
-    // Do all variable finalization you wish to do here.
-    // If you need, you can store your ROOT class instance in the output
-    // file. You have an access to the output file through "_fout" pointer.
-    
-    return true;
-  }
 }
 #endif
 
