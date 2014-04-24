@@ -54,7 +54,7 @@ namespace larlight{
     virtual bool finalize();
 
     /// Setter for a cluster type to be viewed
-    void SetClusterType(DATA::DATA_TYPE type);
+    virtual void SetClusterType(DATA::DATA_TYPE type);
 
     /// Function to get number of clusters in the given plane
     size_t ClusterCount(UChar_t plane) {return _algo.ClusterCount(plane); }

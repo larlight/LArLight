@@ -5,7 +5,8 @@
 
 namespace larlight {
   //################################################################
-  ClusterViewer::ClusterViewer() : ana_base()
+  ClusterViewer::ClusterViewer() : ana_base(),
+				   _algo("ClusterViewer")
   //################################################################
   {
     // Class name

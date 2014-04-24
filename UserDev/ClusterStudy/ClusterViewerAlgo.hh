@@ -32,7 +32,7 @@ namespace cluster {
   public:
     
     /// Default constructor
-    ClusterViewerAlgo();
+    ClusterViewerAlgo(std::string name="DeafultViewer");
     
     /// Default destructor
     virtual ~ClusterViewerAlgo(){};
@@ -102,6 +102,8 @@ namespace cluster {
   protected:
 
     //--- Run control variables ---//
+    /// Name ... has to be unique per algo instance
+    std::string _name;
     /// Stores # of planes
     UChar_t _nplanes;
     /// Edge of wire vs. time view per plane

@@ -4,14 +4,16 @@
 #include "ClusterViewerAlgo.hh"
 
 namespace cluster {
-  //####################################
-  ClusterViewerAlgo::ClusterViewerAlgo()
-  //####################################
+  //##################################################################
+  ClusterViewerAlgo::ClusterViewerAlgo(std::string name) : _name(name)
+  //##################################################################
   {
     _nplanes = larutil::Geometry::GetME()->Nplanes();
-    _cAllCluster = new TCanvas("cAllCluster","Wire vs. Time Cluster Viewer",900,600);
+    _cAllCluster = new TCanvas(Form("cAllClusterFor%s",_name.c_str()),
+			       "Wire vs. Time Cluster Viewer",900,600);
     _cAllCluster->Divide(2,_nplanes);
-    _cOneCluster = new TCanvas("cOneCluster","Individual Cluster Start/End Points",500,300);
+    _cOneCluster = new TCanvas(Form("cOneClusterFor%s",_name.c_str()),
+			       "Individual Cluster Start/End Points",500,300);
 
   }
 
@@ -337,7 +339,8 @@ namespace cluster {
   //########################################################################
   {
     if(plane >= _nplanes) throw ViewerException(Form("Invalid plane ID: %d",plane));
-    TH2D* h = new TH2D(name.c_str(), title.c_str(),
+    TH2D* h = new TH2D(Form("%sFor%s",name.c_str(),_name.c_str()),
+		       title.c_str(),
 		       100, _xrange.at(plane).first * 0.9, _xrange.at(plane).second * 1.1,
 		       100, _yrange.at(plane).first * 0.9, _yrange.at(plane).second * 1.1);
     return h;
@@ -357,7 +360,7 @@ namespace cluster {
     g->SetMaximum(_yrange.at(plane).second * 1.1);
     g->SetMinimum(_yrange.at(plane).first * 0.9);
     g->SetTitle(title.c_str());
-    g->SetName(name.c_str());
+    g->SetName(Form("%sFor%s",name.c_str(),_name.c_str()));
     return g;
   }
 
