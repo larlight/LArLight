@@ -53,7 +53,7 @@ namespace cluster {
     for(auto &h : *hits) {
 
       if( larutil::Geometry::GetME()->ChannelToPlane(h.Channel()) == plane_id )
-	cluster_hits.push_back((const larlight::hit*)(&h));
+        cluster_hits.push_back((const larlight::hit*)(&h));
 
     }
 
@@ -117,84 +117,84 @@ namespace cluster {
     for(auto h : cluster_hits) {
 
       if(!_useHitBlurring)
-	hCurrentHit->Fill(h->Wire()*(fGSer->WireToCm()), 
-			  h->PeakTime()*(fGSer->TimeToCm()), 
-			  h->Charge());
+          hCurrentHit->Fill(h->Wire()*(fGSer->WireToCm()), 
+                            h->PeakTime()*(fGSer->TimeToCm()), 
+                            h->Charge());
 
 
       else{
-	//center of peak = hit.PeakTime
-	_blurFunction->SetParameter(1,h->PeakTime()*(fGSer->TimeToCm()));
+          //center of peak = hit.PeakTime
+          _blurFunction->SetParameter(1,h->PeakTime()*(fGSer->TimeToCm()));
 
-	//width of peak (estimated) = avg time b/t peak&start, and peak&end
-	double blurfnsigma = 
-	  ( (h->PeakTime() - h->StartTime() )
-	   +(h->EndTime()  - h->PeakTime()) ) / 2;
-	blurfnsigma *= (fGSer->TimeToCm());
-	_blurFunction->SetParameter(2,blurfnsigma);
-	
-	//height of peak = changes to normalize gaussian area to 1 (2.5066 is sqrt(2pi))
-	_blurFunction->SetParameter(0, (1/(blurfnsigma*2.5066)) );
+          //width of peak (estimated) = avg time b/t peak&start, and peak&end
+          double blurfnsigma = 
+            ( (h->PeakTime() - h->StartTime() )
+             +(h->EndTime()  - h->PeakTime()) ) / 2;
+          blurfnsigma *= (fGSer->TimeToCm());
+          _blurFunction->SetParameter(2,blurfnsigma);
+          
+          //height of peak = changes to normalize gaussian area to 1 (2.5066 is sqrt(2pi))
+          _blurFunction->SetParameter(0, (1/(blurfnsigma*2.5066)) );
 
-	//fill the histogram in y outward from the peak until 97% of charge is added
-	Int_t peak_bin = hCurrentHit->GetYaxis()->FindBin(h->PeakTime()*(fGSer->TimeToCm()));
-	
-	double peak_bin_low  = hCurrentHit->GetYaxis()->GetBinLowEdge(peak_bin);
-	double peak_bin_high = hCurrentHit->GetYaxis()->GetBinUpEdge(peak_bin);
-	double bin_width = hCurrentHit->GetYaxis()->GetBinWidth(peak_bin);
+          //fill the histogram in y outward from the peak until 97% of charge is added
+          Int_t peak_bin = hCurrentHit->GetYaxis()->FindBin(h->PeakTime()*(fGSer->TimeToCm()));
+          
+          double peak_bin_low  = hCurrentHit->GetYaxis()->GetBinLowEdge(peak_bin);
+          double peak_bin_high = hCurrentHit->GetYaxis()->GetBinUpEdge(peak_bin);
+          double bin_width = hCurrentHit->GetYaxis()->GetBinWidth(peak_bin);
 
-	double charge_filled = 0.; 
-	unsigned int counter = 0;
-	double charge_in_bin, bin_low, bin_high;
-	
-	while( (charge_filled)/(h->Charge()) < 0.97
-	       && counter < hCurrentHit->GetNbinsY() ){
+          double charge_filled = 0.; 
+          unsigned int counter = 0;
+          double charge_in_bin, bin_low, bin_high;
+          
+          while( (charge_filled)/(h->Charge()) < 0.97
+                 && counter < hCurrentHit->GetNbinsY() ){
 
-	  //if you're dealing with the one peak bin
-	  if(!counter){
-	    charge_in_bin = (_blurFunction->Integral(peak_bin_low,peak_bin_high)) * h->Charge();
-	    
-	    hCurrentHit->Fill(h->Wire()*(fGSer->WireToCm()), 
-			      h->PeakTime()*(fGSer->TimeToCm()), 
-			      charge_in_bin);
-	    
-	    charge_filled += charge_in_bin;
-	  }
+            //if you're dealing with the one peak bin
+            if(!counter){
+              charge_in_bin = (_blurFunction->Integral(peak_bin_low,peak_bin_high)) * h->Charge();
+              
+              hCurrentHit->Fill(h->Wire()*(fGSer->WireToCm()), 
+                                h->PeakTime()*(fGSer->TimeToCm()), 
+                                charge_in_bin);
+              
+              charge_filled += charge_in_bin;
+            }
 
-	  //if not dealing with the one peak bin, fill next bin above/below
-	  else{
+            //if not dealing with the one peak bin, fill next bin above/below
+            else{
 
-	    Int_t current_bin_above_peak = 
-	      hCurrentHit->GetYaxis()->FindBin(h->PeakTime()*(fGSer->TimeToCm()) + (counter*bin_width));
+              Int_t current_bin_above_peak = 
+                hCurrentHit->GetYaxis()->FindBin(h->PeakTime()*(fGSer->TimeToCm()) + (counter*bin_width));
 
-	    bin_low = hCurrentHit->GetYaxis()->GetBinLowEdge(current_bin_above_peak);
-	    bin_high = hCurrentHit->GetYaxis()->GetBinUpEdge(current_bin_above_peak);
-	    
-	    charge_in_bin = (_blurFunction->Integral(bin_low,bin_high)) * h->Charge();
+              bin_low = hCurrentHit->GetYaxis()->GetBinLowEdge(current_bin_above_peak);
+              bin_high = hCurrentHit->GetYaxis()->GetBinUpEdge(current_bin_above_peak);
+              
+              charge_in_bin = (_blurFunction->Integral(bin_low,bin_high)) * h->Charge();
 
-	    if(charge_in_bin > 1e-4)
-	      hCurrentHit->Fill(h->Wire()*(fGSer->WireToCm()),
-				hCurrentHit->GetYaxis()->GetBinCenter(current_bin_above_peak),
-				charge_in_bin);
-	    charge_filled += charge_in_bin;
+              if(charge_in_bin > 1e-4)
+                hCurrentHit->Fill(h->Wire()*(fGSer->WireToCm()),
+                                  hCurrentHit->GetYaxis()->GetBinCenter(current_bin_above_peak),
+                                  charge_in_bin);
+              charge_filled += charge_in_bin;
 
-	    Int_t current_bin_below_peak = 
-	      hCurrentHit->GetYaxis()->FindBin(h->PeakTime()*(fGSer->TimeToCm()) - (counter*bin_width));
-	    bin_low = hCurrentHit->GetYaxis()->GetBinLowEdge(current_bin_below_peak);
-	    bin_high = hCurrentHit->GetYaxis()->GetBinUpEdge(current_bin_below_peak);
+              Int_t current_bin_below_peak = 
+                hCurrentHit->GetYaxis()->FindBin(h->PeakTime()*(fGSer->TimeToCm()) - (counter*bin_width));
+              bin_low = hCurrentHit->GetYaxis()->GetBinLowEdge(current_bin_below_peak);
+              bin_high = hCurrentHit->GetYaxis()->GetBinUpEdge(current_bin_below_peak);
 
-	    charge_in_bin = (_blurFunction->Integral(bin_low,bin_high)) * h->Charge();
+              charge_in_bin = (_blurFunction->Integral(bin_low,bin_high)) * h->Charge();
 
-	    if(charge_in_bin > 1e-4)
-	      hCurrentHit->Fill(h->Wire()*(fGSer->WireToCm()),
-				hCurrentHit->GetYaxis()->GetBinCenter(current_bin_below_peak),
-				charge_in_bin);
-	    charge_filled += charge_in_bin;
+              if(charge_in_bin > 1e-4)
+                hCurrentHit->Fill(h->Wire()*(fGSer->WireToCm()),
+                                  hCurrentHit->GetYaxis()->GetBinCenter(current_bin_below_peak),
+                                  charge_in_bin);
+              charge_filled += charge_in_bin;
 
-	  }
-	  counter++;
+            }
+            counter++;
 
-	}
+          }
       }
     }
     

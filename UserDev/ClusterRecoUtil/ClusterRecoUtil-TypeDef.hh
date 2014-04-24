@@ -14,6 +14,7 @@
 #include "CMergeAlgoBase.hh"
 #include "CBookKeeper.hh"
 #include "Polygon2D.hh"
+#include "TrackSubtractorAlg.hh"
 
 // Class forward declaration here
 namespace cluster{
@@ -35,7 +36,9 @@ namespace cluster{
 }
 class ClusterParamsExecutor;
 class Polygon2D;
-
+namespace clusteralg{
+  class TrackSubtractorAlg;
+}
 
 //ADD_EMPTY_CLASS ... do not change this comment line
 

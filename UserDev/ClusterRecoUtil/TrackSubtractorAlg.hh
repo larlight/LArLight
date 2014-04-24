@@ -14,7 +14,7 @@
  *    make sure there aren't multiple sets (like from multiple 
  *    hit finders)
  * 2) Externally, loop over the cluster and get their associated 
- *    hits and add them via LoadCluster(cluster, hits). It's expected
+ *    hits and add them via AddCluster(cluster, hits). It's expected
  *    that these are the same hits as above in (1) - this method only
  *    grabs the hits associated with the cluster you passed it.
  *    2a) For each cluster added, it decides if this cluster is clearly a
@@ -39,32 +39,47 @@
 #include "ana_base.hh"
 #include "Geometry.hh"
 #include "RecoUtilException.hh"
+#include <TH2D.h>
+#include "LArUtilManager.hh"
+#include "ClusterParamsAlgNew.hh"
 
 
-namespace cluster {
+namespace clusteralg {
 
   class TrackSubtractorAlg
   {
   public:
-    TrackSubtractorAlg();
-    ~TrackSubtractorAlg();
-  
-    int LoadCluster(const larlight::cluster &i_cluster,
-                    const larlight::event_hit *hits);
+    // TrackSubtractorAlg();
+
+    // virtual ~TrackSubtractorAlg();
+ 
+    void Initialize(); 
 
     int LoadAllHits(const larlight::event_hit *hits, const UChar_t plane_id);
 
-    int AddCluster (const larlight::cluster &i_cluster,
+    int AddCluster (const UChar_t plane_id,
+                    const larlight::cluster &i_cluster,
                     const larlight::event_hit *hits);
 
     int ResolveHits();
-    std::vector<const larlight::hit*> GetRemainingHits();
+    std::vector<const larlight::hit*> GetRemainingHits(){
+      return remaining_hits;
+    }
+
+    TH2D * GetAllHitsHist(){return all_hitsHIST;}
+    TH2D * GetTrackHitsHist(){return track_hitsHIST;}
+
+    void FillHists();
 
   protected:
     
     bool isTrackLike(const larlight::cluster &i_cluster,
-                     const larlight::event_hit *hits);
+                     std::vector<const larlight::hit*> & hits);
 
+    // Used for drawing help
+    larutil::GeometryUtilities  *fGSer;
+
+    cluster::ClusterParamsAlgNew  fCPAN;
 
     // As far as I know, this class does not take ownership of any hits.
     // It simply takes pointers to hits and returns the ones that either
@@ -81,8 +96,11 @@ namespace cluster {
     // hits associated with clusters are stored here
     std::vector< std::vector <const larlight::hit*> > cluster_hits;
     // this is where the clusters are stored
-    std::vector<const larlight::cluster> cluster_vec;
+    std::vector<larlight::cluster> cluster_vec;
 
+
+    TH2D * all_hitsHIST;
+    TH2D * track_hitsHIST;
 
     /* data */
   };

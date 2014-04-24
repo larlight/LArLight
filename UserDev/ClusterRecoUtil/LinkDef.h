@@ -24,6 +24,8 @@
 #pragma link C++ class cluster::ClusterParamsExecutor+;
 #pragma link C++ class std::vector<cluster::ClusterParamsExecutor>+;
 
+#pragma link C++ class clusteralg::TrackSubtractorAlg+;
+
 #pragma link C++ class cluster::RecoUtilException+;
 #pragma link C++ class cluster::SimChannelViewer+;
 #pragma link C++ class cluster::WireViewer+;
