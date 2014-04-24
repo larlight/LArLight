@@ -14,6 +14,7 @@ namespace clusteralg
     }
     all_hitsHIST   = 0;
     track_hitsHIST = 0;
+    cluster_hitsHIST = 0;
     fCPAN.Initialize();
     std::cout << "Done initializing!" << std::endl;
   }
@@ -40,10 +41,9 @@ namespace clusteralg
     cluster_hits.push_back(std::vector < const larlight:: hit*>() );
     cluster_hits.back().reserve(hits->size());
 
-    for(auto const index : hit_index_v)
-
+    for(auto const index : hit_index_v){
       cluster_hits.back().push_back( (const larlight::hit *)(&(hits->at(index))));
-
+    }
     if (isTrackLike(i_cluster, cluster_hits.back())){
       for (auto &hit : cluster_hits.back())
         track_hits.push_back(hit);
@@ -60,6 +60,7 @@ namespace clusteralg
     remaining_hits.clear();
     cluster_hits.clear();
     cluster_vec.clear();
+
 
     all_hits.clear();
     all_hits.reserve(hits->size());
@@ -107,14 +108,15 @@ namespace clusteralg
     // return true;
 
     fCPAN.SetHits(hits);
-    fCPAN.setNeuralNetPath("~/LArLight/FANN/trained_nets/cascade_argo_clusters.net");
+    // fCPAN.setNeuralNetPath("/Users/cja33/LArLight/UserDev/FANN/trained_nets/cascade_argo_clusters.net");
+    fCPAN.setNeuralNetPath("/Users/cja33/LArLight/UserDev/FANN/trained_nets/cascade_argo_cctracks_fcshowers.net");
     fCPAN.EnableFANN();
     fCPAN.FillParams();
 
-    std::cout << "This cluster has trackness " << fCPAN.fParams.trackness 
-              << " and showerness " << fCPAN.fParams.showerness << std::endl;
+    // std::cout << "This cluster has trackness " << fCPAN.fParams.trackness 
+    //           << " and showerness " << fCPAN.fParams.showerness << std::endl;
 
-    if (fCPAN.fParams.trackness == 1) return true;
+    if (fCPAN.fParams.trackness - fCPAN.fParams.showerness > 0.5) return true;
     else return false;
 
   }
@@ -124,9 +126,11 @@ namespace clusteralg
   }
 
   void TrackSubtractorAlg::FillHists(){
-
-
-
+    
+    // all_hitsHIST -> Clear();
+    // cluster_hitsHIST -> Clear();
+    // track_hitsHIST -> Clear();
+    
     double wire_min=1e9;
     double wire_max=0;
     double time_min=1e9;
@@ -143,22 +147,22 @@ namespace clusteralg
 
     }
 
-    wire_min -= ((wire_max - wire_min)*0.25);
-    wire_max += ((wire_max - wire_min)*0.25);
-    time_min -= ((time_max - time_min)*0.25);
-    time_max += ((time_max - time_min)*0.25);
+    wire_min -= ((wire_max - wire_min)*0.05);
+    wire_max += ((wire_max - wire_min)*0.05);
+    time_min -= ((time_max - time_min)*0.05);
+    time_max += ((time_max - time_min)*0.05);
 
-    std::cout << "Wire min, max: " << wire_min << ", " << wire_max << std::endl;
-    std::cout << "Time min, max: " << time_min << ", " << time_max << std::endl;
+    // std::cout << "Wire min, max: " << wire_min << ", " << wire_max << std::endl;
+    // std::cout << "Time min, max: " << time_min << ", " << time_max << std::endl;
 
-    std::cout << "Wire to Cm: " << fGSer->WireToCm() << std::endl;
-    std::cout << "Time to Cm: " << fGSer->TimeToCm() << std::endl;
+    // std::cout << "Wire to Cm: " << fGSer->WireToCm() << std::endl;
+    // std::cout << "Time to Cm: " << fGSer->TimeToCm() << std::endl;
 
 
     all_hitsHIST = new TH2D("allhitsHIST",
          "All Hits in event",
-         100, (fGSer->WireToCm())*wire_min, (fGSer->WireToCm())*wire_max,
-         100, (fGSer->TimeToCm())*time_min, (fGSer->TimeToCm())*time_max);
+         260, (fGSer->WireToCm())*wire_min, (fGSer->WireToCm())*wire_max,
+         130, (fGSer->TimeToCm())*time_min, (fGSer->TimeToCm())*time_max);
 
     all_hitsHIST->SetTitleFont(22);
     all_hitsHIST->GetXaxis()->SetTitleFont(22);
@@ -172,8 +176,8 @@ namespace clusteralg
 
     track_hitsHIST = new TH2D("trackhitsHIST",
          "Track Hits in event",
-         100, (fGSer->WireToCm())*wire_min, (fGSer->WireToCm())*wire_max,
-         100, (fGSer->TimeToCm())*time_min, (fGSer->TimeToCm())*time_max);
+         260, (fGSer->WireToCm())*wire_min, (fGSer->WireToCm())*wire_max,
+         130, (fGSer->TimeToCm())*time_min, (fGSer->TimeToCm())*time_max);
 
     track_hitsHIST->SetTitleFont(22);
     track_hitsHIST->GetXaxis()->SetTitleFont(22);
@@ -185,16 +189,42 @@ namespace clusteralg
     track_hitsHIST->GetYaxis()->SetLabelFont(22);
     track_hitsHIST->GetYaxis()->SetLabelSize(0.05);
 
+
+
+    cluster_hitsHIST = new TH2D("clusthitsHIST",
+         "Clustered Hits in event",
+         200, (fGSer->WireToCm())*wire_min, (fGSer->WireToCm())*wire_max,
+         200, (fGSer->TimeToCm())*time_min, (fGSer->TimeToCm())*time_max);
+
+    cluster_hitsHIST->SetTitleFont(22);
+    cluster_hitsHIST->GetXaxis()->SetTitleFont(22);
+    cluster_hitsHIST->GetXaxis()->SetTitleSize(0.05);
+    cluster_hitsHIST->GetXaxis()->SetLabelFont(22);
+    cluster_hitsHIST->GetXaxis()->SetLabelSize(0.05);
+    cluster_hitsHIST->GetYaxis()->SetTitleFont(22);
+    cluster_hitsHIST->GetYaxis()->SetTitleSize(0.05);
+    cluster_hitsHIST->GetYaxis()->SetLabelFont(22);
+    cluster_hitsHIST->GetYaxis()->SetLabelSize(0.05);
+
+
     for(auto h : all_hits) {
       all_hitsHIST->Fill(h->Wire()*(fGSer->WireToCm()), 
-                        h->PeakTime()*(fGSer->TimeToCm()), 
-                        h->Charge());
+                         h->PeakTime()*(fGSer->TimeToCm()), 
+                         h->Charge());
     }
 
     for(auto h : track_hits) {
       track_hitsHIST->Fill(h->Wire()*(fGSer->WireToCm()), 
-                        h->PeakTime()*(fGSer->TimeToCm()), 
-                        h->Charge());
+                           h->PeakTime()*(fGSer->TimeToCm()), 
+                           h->Charge());
+    }
+
+    for(auto clust : cluster_hits){
+      for (auto h : clust){
+        cluster_hitsHIST->Fill(h->Wire()*(fGSer->WireToCm()), 
+                               h->PeakTime()*(fGSer->TimeToCm()), 
+                               h->Charge());
+      }
     }
 
 
@@ -202,5 +232,49 @@ namespace clusteralg
 
   }
 
+  int TrackSubtractorAlg::GetRemainingHitsNumber(){
+    int nClusterHits = 0;
+    int nTrackHits = track_hits.size();
+
+    for(auto clust : cluster_hits){
+      nClusterHits += clust.size();
+    }
+
+    return nClusterHits - nTrackHits;
+  }
+
+  double TrackSubtractorAlg::GetPercentTracks(){
+    double nClusterHits = 0.0;
+    double nTrackHits = track_hits.size();
+
+    for(auto clust : cluster_hits){
+      nClusterHits += clust.size();
+    }
+
+    // std::cout << "nTrackHits " << nTrackHits << std::endl;
+    // std::cout << "nClusterHits " << nClusterHits << std::endl;
+    // std::cout << "nTrackHits/nClusterHits " << nTrackHits/nClusterHits << std::endl;
+
+    return nTrackHits/nClusterHits;
+  }
+
+  void TrackSubtractorAlg::LoopClusters(const UChar_t plane_id,
+                                        const std::vector<larlight::cluster> & cluster_v,
+                                        const larlight::event_hit *hits){
+
+    for(auto clust : cluster_v ){
+      AddCluster(plane_id, clust, hits);
+    }
+
+    return;
+
+  }
+
+  bool TrackSubtractorAlg::FailsCuts(){
+    if (GetRemainingHitsNumber() < 50 || GetPercentTracks() > 0.8)
+      return true;
+    else
+      return false;
+  }
 
 }

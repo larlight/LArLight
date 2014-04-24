@@ -14,7 +14,7 @@ namespace cluster{
   {
     fGSer=nullptr;
     enableFANN = false;
-    verbose=true;
+    verbose=false;
     Initialize();
   }
 
@@ -22,7 +22,7 @@ namespace cluster{
   {
     fGSer=nullptr;
     enableFANN = false;
-    verbose=true;
+    verbose=false;
     SetHits(inhitlist);
   }
 
@@ -30,7 +30,7 @@ namespace cluster{
   {
     fGSer=nullptr;
     enableFANN = false;
-    verbose=true;
+    verbose=false;
     SetHits(inhitlist);
   }
 
@@ -197,7 +197,7 @@ namespace cluster{
     fParams.Clear();
     
     // Initialize the neural network:
-    // enableFANN = false;
+    enableFANN = false;
 
   }
 
@@ -1533,7 +1533,7 @@ namespace cluster{
   }
 
   void ClusterParamsAlgNew::TrackShowerSeparation(bool override){
-    if(!override) return;
+    // if(!override) return;
     if(verbose) std::cout << " ---- Trying T/S sep. ------ \n";
     if (enableFANN){
       if(verbose) std::cout << " ---- Doing T/S sep. ------- \n";

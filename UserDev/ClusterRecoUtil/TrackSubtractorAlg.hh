@@ -68,6 +68,17 @@ namespace clusteralg {
 
     TH2D * GetAllHitsHist(){return all_hitsHIST;}
     TH2D * GetTrackHitsHist(){return track_hitsHIST;}
+    TH2D * GetClustHitsHist(){return cluster_hitsHIST;}
+
+    int GetRemainingHitsNumber();
+    double GetPercentTracks();
+
+    bool FailsCuts();
+
+    void LoopClusters(const UChar_t plane_id,
+                      const std::vector<larlight::cluster> & cluster_v,
+                      const larlight::event_hit *hits);
+
 
     void FillHists();
 
@@ -101,6 +112,7 @@ namespace clusteralg {
 
     TH2D * all_hitsHIST;
     TH2D * track_hitsHIST;
+    TH2D * cluster_hitsHIST;
 
     /* data */
   };
