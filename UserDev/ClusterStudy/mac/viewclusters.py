@@ -49,7 +49,17 @@ while true:
 
     my_ana.DrawAllClusters();
 
+    for plane in xrange(larutil.Geometry.GetME().Nplanes()):
+
+        print "    Plane:", plane
+        
+        for cindex in xrange(my_ana.ClusterCount(plane)):
+
+            print "        Cluster:",cindex
+            my_ana.DrawOneCluster(plane,cindex)
+
+            sys.stdin.readline()
+    
+    print "    Hit enter to go next event..."
     sys.stdin.readline()
-
-
 # done!

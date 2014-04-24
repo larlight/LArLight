@@ -85,7 +85,7 @@ namespace cluster {
     bool status = true;
     for(auto b : _range_set) status = status && b;
 
-    if(raise)
+    if(raise && !status)
       throw ViewerException("X and Y min/max range not yet set for all planes!");
 
     return status;
@@ -277,6 +277,7 @@ namespace cluster {
     _gClusterEnd.at(plane).at(index)->SetMarkerStyle(29);
     _gClusterPolygon.at(plane).at(index)->SetMarkerColor(index);
     _gClusterPolygon.at(plane).at(index)->SetMarkerStyle(20);
+    _gClusterPolygon.at(plane).at(index)->SetMarkerSize(2);
   }
 
   //###############################################################################################
@@ -405,10 +406,10 @@ namespace cluster {
     
     _hClusterHits.at(plane).at(index)->Draw();
 
-    if( _gClusterStart.at(plane).at(index)   ) _gClusterStart.at(plane).at(index)->Draw("AP");
+    if( _gClusterStart.at(plane).at(index)   ) _gClusterStart.at(plane).at(index)->Draw("P");
     if( _gClusterEnd.at(plane).at(index)     ) _gClusterEnd.at(plane).at(index)->Draw("P");
     if( _gClusterPolygon.at(plane).at(index) ) _gClusterPolygon.at(plane).at(index)->Draw("PL");
-
+    _cOneCluster->Update();
   }
 
   //###################################################
