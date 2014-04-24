@@ -26,8 +26,16 @@ namespace cluster {
 
   public:
 
-    ViewerException(std::string msg="") : std::exception(), _msg(msg)
-    {}
+    ViewerException(std::string msg="") : std::exception(),
+					  _msg("")
+    {
+      _msg += "\033[93m";
+      _msg += "[EXCEPTION] : ";
+      _msg += "\033[0m";
+      _msg += "\033[91m";
+      _msg += msg;
+      _msg += "\033[0m";
+    }
 
     virtual ~ViewerException() throw(){};
     virtual const char* what() const throw() 

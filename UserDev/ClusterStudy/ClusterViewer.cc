@@ -5,18 +5,12 @@
 
 namespace larlight {
   //################################################################
-  ClusterViewer::ClusterViewer() : ana_base(), _hRecoCluster_v_0(), _hRecoCluster_v_1(), _hRecoCluster_v_2(), _cluster_v(), _hHits_0(), _hHits_1(), _hHits_2(), _hClusterGraph_v_0_start(), _hClusterGraph_v_1_start(), _hClusterGraph_v_2_start(),_hClusterGraph_v_0_end(), _hClusterGraph_v_1_end(), _hClusterGraph_v_2_end()
+  ClusterViewer::ClusterViewer() : ana_base()
   //################################################################
   {
     // Class name
     _name = "ClusterViewer";
-    // Set initialization values for pointers
-    _fout     = 0;
-    _hHits_0 = 0; 
-    _hHits_1 = 0;
-    _hHits_2 = 0;
-    //  _hMCStep  = 0;
-    cluster_type=DATA::ShowerAngleCluster;
+    cluster_type=DATA::FuzzyCluster;
   }
 
   //#######################################
@@ -40,7 +34,6 @@ namespace larlight {
   bool ClusterViewer::initialize()
   //################################################################
   {
-    g = new TGraph();
     return true;
   }
   
@@ -48,201 +41,98 @@ namespace larlight {
   bool ClusterViewer::analyze(storage_manager* storage)
   //################################################################
   {
+    _algo.Reset();
     
-    // Clean up histograms if they already exist (from previous event)
-    if(_hHits_0)  {delete _hHits_0;  _hHits_0  = 0;}; 
-    if(_hHits_1)  {delete _hHits_1;  _hHits_1  = 0;}; 
-    if(_hHits_2)  {delete _hHits_2;  _hHits_2  = 0;}; 
-    for(auto h : _hRecoCluster_v_0) {delete h; h=0;};
-    for(auto h : _hRecoCluster_v_1) {delete h; h=0;};
-    for(auto h : _hRecoCluster_v_2) {delete h; h=0;};
-    for(auto h : _hClusterGraph_v_0_start) {delete h; h=0;};
-    for(auto h : _hClusterGraph_v_1_start) {delete h; h=0;};
-    for(auto h : _hClusterGraph_v_2_start) {delete h; h=0;};
-    for(auto h : _hClusterGraph_v_0_end) {delete h; h=0;};
-    for(auto h : _hClusterGraph_v_1_end) {delete h; h=0;};
-    for(auto h : _hClusterGraph_v_2_end) {delete h; h=0;};
-    _hRecoCluster_v_0.clear();
-    _hRecoCluster_v_1.clear();
-    _hRecoCluster_v_2.clear();
-    _hClusterGraph_v_0_start.clear();
-    _hClusterGraph_v_1_start.clear();
-    _hClusterGraph_v_2_start.clear();
-    _hClusterGraph_v_0_end.clear();
-    _hClusterGraph_v_1_end.clear();
-    _hClusterGraph_v_2_end.clear();
-    _cluster_v.clear();
+    const ::larutil::Geometry* geo = ::larutil::Geometry::GetME();
+    const ::larutil::GeometryUtilities* geo_util = ::larutil::GeometryUtilities::GetME();
     
+    UChar_t nplanes = geo->Nplanes();
+    double  wire2cm = geo_util->WireToCm();
+    double  time2cm = geo_util->TimeToCm();
+
     //
     // Obtain event-wise data object pointers
     //
-    //  event_mc*      ev_mc   = (event_mc*)      ( storage->get_data(DATA::MCTruth)            );
     event_cluster* ev_clus = (event_cluster*) ( storage->get_data(cluster_type));
-    event_hit*     ev_hit  = (event_hit*) ( storage->get_data(ev_clus->get_hit_type()));
+    if(!ev_clus)
+      throw ::cluster::ViewerException(Form("Did not find %s data product!",
+					    DATA::DATA_TREE_NAME[cluster_type].c_str()
+					    )
+				       );
 
-    // Define utility variables to hold max/min of each axis range, for each of 3 views
-    //vector of length 3 initialized to -1
-    std::vector<double> chmax, chmin, wiremax, wiremin, timemax, timemin;
-    
-    // Find max/min boundary for all axis (clusters)
-    
-    if(ev_clus && ev_hit) {
-      ev_hit->get_axis_range(chmax, chmin, wiremax, wiremin, timemax, timemin);
+    const DATA::DATA_TYPE hit_type = ev_clus->get_hit_type();
+					  
+    event_hit*     ev_hit  = (event_hit*) ( storage->get_data(hit_type));
+
+    if(!ev_hit)
+      throw ::cluster::ViewerException(Form("Did not find %s data product!",
+					    DATA::DATA_TREE_NAME[hit_type].c_str()
+					    )
+				       );
+
+    // Find hit range & fill all-hits vector
+    std::vector<std::pair<double,double> > xrange(nplanes,std::pair<double,double>(1e9,0));
+    std::vector<std::pair<double,double> > yrange(nplanes,std::pair<double,double>(1e9,0));
+    std::vector<std::vector<std::pair<double,double> > > hits_xy(nplanes,std::vector<std::pair<double,double> >());
+    std::vector<std::vector<double> > hits_charge(nplanes,std::vector<double>());
+    for(auto const &h : *ev_hit) {
+
+      UChar_t plane = geo->ChannelToPlane(h.Channel());
+      double x = h.Wire() * wire2cm;
+      double y = h.PeakTime() * time2cm;
+      
+      if(xrange.at(plane).first > x ) xrange.at(plane).first = x;
+      if(xrange.at(plane).second < x ) xrange.at(plane).second = x;
+
+      if(yrange.at(plane).first > y ) yrange.at(plane).first = y;
+      if(yrange.at(plane).second < y ) yrange.at(plane).second = y;
+      
+      hits_xy.at(plane).push_back(std::pair<double,double>(x,y));
+      hits_charge.at(plane).push_back(h.Charge());
     }
 
-    if(!wiremax.size()) {
+    // Inform the algorithm about the range
+    for(size_t i=0; i<nplanes; ++i)
+      _algo.SetRange(i,xrange.at(i),yrange.at(i));
 
-      print(MSG::ERROR,__FUNCTION__,
-	    "Something went wrong. Did not find hit or not even event_hit... Aborting!");
+    // Provide plane-hits to the algorithm
+    for(size_t i=0; i<nplanes; ++i)
+      _algo.AddHits(i,hits_xy.at(i),hits_charge.at(i));
 
-      return false;
-    }
-    
-    // Proceed only if minimum/maximum are set to some values other than the defaults
-    if(wiremax[0] == -1) {
+    // Find hits-per-cluster
+    for(auto const &cl : *ev_clus) {
+
+      UChar_t plane = nplanes;
+
+      std::vector<std::pair<double,double> > cluster_hits;
+      std::pair<double,double> cluster_start  ( cl.StartPos().at(0), cl.StartPos().at(1) );
+      std::pair<double,double> cluster_end    ( cl.EndPos().at(0),   cl.EndPos().at(1)     );
       
-      print(MSG::WARNING,__FUNCTION__,
-	    "Did not find any reconstructed clusters in view 0. Skipping this event...");
+      for(auto const& index : cl.association(hit_type)) {
+
+	cluster_hits.push_back(std::pair<double,double>( ev_hit->at(index).Wire() * wire2cm,
+							 ev_hit->at(index).PeakTime() * time2cm )
+			       );
+	if(plane == nplanes)
+
+	  plane = geo->ChannelToPlane(ev_hit->at(index).Channel());
       
-      return true;
-    }
-    
-    //
-    // Make & fill vertex histograms
-    //
-    
-    // Clusters
-    if(ev_clus) {
-      
-      _hHits_0 = Prepare2DHisto("hitshist0",wiremin[0],wiremax[0],timemin[0],timemax[0]);
-      _hHits_1 = Prepare2DHisto("hitshist1",wiremin[1],wiremax[1],timemin[1],timemax[1]);
-      _hHits_2 = Prepare2DHisto("hitshist2",wiremin[2],wiremax[2],timemin[2],timemax[2]);
+      }
 
-      int tmpcounter = 0;
-      //loop over the clusters in the event
-      for(auto clus : *ev_clus) {
-	tmpcounter++;
-
-	//check from which view the cluster comes
-	iview = clus.View();
-
-	//prepare the cluster th2d histogram
-	TH2D* h=0;
-	h = Prepare2DHisto(Form("_hRecoCluster_%03d",tmpcounter), 
-			   wiremin[iview], 
-			   wiremax[iview], 
-			   timemin[iview], 
-			   timemax[iview]);
-
-	TGraph* g_start=0;
-	if(g_start) delete g_start;
-	g_start = PrepareGraph();
-	TGraph* g_end=0;
-	if(g_end) delete g_end;
-	g_end = PrepareGraph();
-
-	//prepare the cluster start/endpoint graph
-	//clear any old points that might be in the graph
-	//	g->Set(0);
-	//fill the graph with start and end point
-	g_start->SetPoint(0,clus.StartPos()[0],clus.StartPos()[1]);
-	g_end->SetPoint(0,clus.EndPos()[0],clus.EndPos()[1]);
-
-	//then loop through its hits, and plot wire/time for each hit in the right _hRecoCluster_v_blah histo
-	for(auto const index :clus.association(clus.get_hit_type())) {
-	  
-
-	  
-	  if ((ev_hit->at(index)).View() != iview) std::cout<<"diff views? dunno what's going on."<<std::endl;
-	  //fill those hits into the cluster plot
-	  h->Fill((ev_hit->at(index)).Wire(),(ev_hit->at(index)).PeakTime());
-	  
-	  //fill the hits histogram, weight is the charge of the hit
-	  if((ev_hit->at(index)).View() == 0)
-	    _hHits_0->Fill((ev_hit->at(index)).Wire(),(ev_hit->at(index)).PeakTime(),(ev_hit->at(index)).Charge());
-	  if((ev_hit->at(index)).View() == 1)
-	    _hHits_1->Fill((ev_hit->at(index)).Wire(),(ev_hit->at(index)).PeakTime(),(ev_hit->at(index)).Charge());
-	  if((ev_hit->at(index)).View() == 2)
-	    _hHits_2->Fill((ev_hit->at(index)).Wire(),(ev_hit->at(index)).PeakTime(),(ev_hit->at(index)).Charge());
-
-	} //end looping over hits
-
-	
-	//need to make each cluster a different color... 
-	//there's probably a better way to do this. implement later
-	h->SetMarkerStyle(kFullStar);
-	h->SetMarkerColor(tmpcounter);	
-
-	if((int)iview == 0){
-	  _hRecoCluster_v_0.push_back(h);
-	  _hClusterGraph_v_0_start.push_back(g_start);
-	  _hClusterGraph_v_0_end.push_back(g_end);
-	}
-	else if ((int)iview == 1){
-	  _hRecoCluster_v_1.push_back(h);
-	  _hClusterGraph_v_1_start.push_back(g_start);	 
-	  _hClusterGraph_v_1_end.push_back(g_end);
-	}
-	else if ((int)iview == 2){
-	  _hRecoCluster_v_2.push_back(h);
-	  _hClusterGraph_v_2_start.push_back(g_start);
-	  _hClusterGraph_v_2_end.push_back(g_end);
-	}
-	else
-	  std::cout<<"iview is not 0, 1, or 2... wtf?"<<std::endl;
-
-      }//end loop over clusters in the event
-
+      _algo.AddCluster(plane,
+		       cluster_hits,
+		       cluster_start,
+		       cluster_end);
     }
     
     return true;
   };
   
-  //################################################################
-  TH2D* ClusterViewer::Prepare2DHisto(std::string name, 
-				      double wiremin, double wiremax,
-				      double timemin, double timemax)
-  //################################################################
-  {
-    
-    TH2D* h=0;
-    if(h) delete h;
-    
-    double mywiremin=0.9*wiremin;
-    double mywiremax=1.1*wiremax;
-    double mytimemin=0.9*timemin;
-    double mytimemax=1.1*timemax;
-
-    h = new TH2D(name.c_str(),"2D Viewer; Wire; Time;",
-		 50,  mywiremin, mywiremax,
-		 50,  mytimemin, mytimemax);
-    
-    return h;
-  }
-  
-  
-  //################################################################
-  TGraph* ClusterViewer::PrepareGraph()
-  //################################################################
-  {
-    TGraph* g=0;
-    if(g) delete g;
-    
-    g = new TGraph();
-    g->Set(0);
-    
-    return g;
-  }
-
   bool ClusterViewer::finalize() {
-    
-    // This function is called at the end of event loop.
-    // Do all variable finalization you wish to do here.
-    // If you need, you can store your ROOT class instance in the output
-    // file. You have an access to the output file through "_fout" pointer.
     
     return true;
   }
+
 }
 #endif
 

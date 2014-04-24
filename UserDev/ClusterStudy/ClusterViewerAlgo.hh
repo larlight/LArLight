@@ -53,7 +53,8 @@ namespace cluster {
 
     /// Appender for hits
     void AddHits(const UChar_t plane, 
-		 const std::vector<std::pair<double,double> > &hits);
+		 const std::vector<std::pair<double,double> > &hits_xy,
+		 const std::vector<double> &hits_charge);
 
     /// Appender for clusters
     void AddCluster(const UChar_t plane,
@@ -82,6 +83,9 @@ namespace cluster {
 
     /// A function to draw each cluster on a separate canvas than the one with all clusters
     void DrawOneCluster(UChar_t plane, size_t index) const;
+    
+    /// A function to count # clusters in the given plane
+    size_t ClusterCount(UChar_t plane);
     
   protected:
 

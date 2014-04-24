@@ -17,7 +17,7 @@ rootlibmap() {
 ######################################################
 # ClusterStudy
 rootlibmap libClusterStudy.rootmap libClusterStudy.so $USER_DEV_DIR/ClusterStudy/LinkDef.h \
-    libBase.so libDataFormat.so libAnalysis.so libLArUtil.so 
+    libBase.so libDataFormat.so libAnalysis.so libLArUtil.so libGpad.so
 
 
 

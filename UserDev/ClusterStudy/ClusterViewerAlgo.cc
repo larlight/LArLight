@@ -91,23 +91,30 @@ namespace cluster {
     return status;
   }
 
-  //#################################################################################
+  //####################################################################################
   void ClusterViewerAlgo::AddHits(const UChar_t plane, 
-				  const std::vector<std::pair<double,double> > &hits)
-  //#################################################################################
+				  const std::vector<std::pair<double,double> > &hits_xy,
+				  const std::vector<double> &hits_charge)
+  //####################################################################################
   {
     if(!ReadyTakeData(true)) return;
     if(plane >= _nplanes)
       throw ViewerException(Form("Invalid plane ID: %d",plane));
+    if(hits_xy.size() != hits_charge.size())
+      throw ViewerException(Form("hits_xy (length %zu) and hits_charge (length %zu) must have same length!",
+				 hits_xy.size(),
+				 hits_charge.size()
+				 )
+			    );
 
     if(_hAllHits.at(plane)) { delete _hAllHits.at(plane); _hAllHits.at(plane) = nullptr; }
 
     _hAllHits.at(plane) = GetPlaneViewHisto(plane,
 					    Form("hAllHitsPlane%02d",plane),
 					    Form("Hits for Plane %d; Wire; Time",plane));
-    for(auto const& h : hits) 
+    for(size_t i=0; i<hits_xy.size(); ++i)
 
-      _hAllHits.at(plane)->Fill(h.first,h.second);
+      _hAllHits.at(plane)->Fill(hits_xy.at(i).first,hits_xy.at(i).second,hits_charge.at(i));
   }
 
   //############################################################################################
@@ -401,6 +408,16 @@ namespace cluster {
     if( _gClusterStart.at(plane).at(index)   ) _gClusterStart.at(plane).at(index)->Draw("AP");
     if( _gClusterEnd.at(plane).at(index)     ) _gClusterEnd.at(plane).at(index)->Draw("P");
     if( _gClusterPolygon.at(plane).at(index) ) _gClusterPolygon.at(plane).at(index)->Draw("PL");
+
+  }
+
+  //###################################################
+  size_t ClusterViewerAlgo::ClusterCount(UChar_t plane)
+  //###################################################
+  {
+    if(plane >= _nplanes) throw ViewerException(Form("Invalid plane ID: %d",plane));
+
+    return _hClusterHits.at(plane).size();
 
   }
   
