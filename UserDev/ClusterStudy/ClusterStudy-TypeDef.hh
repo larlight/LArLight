@@ -9,16 +9,19 @@
 #include "ClusterViewer.hh"
 #include "ViewerException.hh"
 #include "ClusterViewerAlgo.hh"
-//ADD_NEW_HEADER ... do not change this line
+//ADD_NEW_HEADER ... do not change this comment line
 
 // Class forward declaration here
 namespace larlight {
   class ClusterViewer;
+//ADD_ANA_CLASS ... do not change this comment line
 }
 namespace cluster {
   class ClusterViewerAlgo;
   class ViewerException;
 }
 
-//ADD_NEW_CLASS ... do not change this line
+//ADD_EMPTY_CLASS ... do not change this comment line
 #endif
+
+
