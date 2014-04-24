@@ -16,7 +16,8 @@ namespace cluster {
   void CMergeManager::Reset()
   {
     _merge_algo.clear();
-    _ask_and.clear();
+    _ask_and_in_algos.clear();
+    _ask_and_in_sets.clear();
     _in_clusters.clear();
     _out_clusters.clear();
     _book_keeper.Reset();
@@ -210,6 +211,11 @@ namespace cluster {
 	break;
       }
     }
+
+    // Call prepare functions
+    for(auto &algo_set : _merge_algo)
+      for(auto &algo : algo_set)
+	algo->Prepare(in_clusters);
     
     // Run over clusters and execute merging algorithms
     for(auto citer1 = prioritized_index.rbegin();
@@ -235,13 +241,24 @@ namespace cluster {
 
 	for(size_t i=0; merge && (i<_merge_algo.size()); ++i) {
 
-	  if(_debug_mode <= kPerMerging){
+	  if(_debug_mode <= kPerAlgoSet){
 
 	    std::cout
-	      << Form("    Inspecting a pair (%zu, %zu) ... ",(*citer1).second, (*citer2).second);
+	      << Form("    \033[93mInspecting a pair (%zu, %zu) ... \033[00m",(*citer1).second, (*citer2).second)
+	      << std::endl;
 	  }
 
-	  bool merge_local = false;
+	  // In case this is not i==0
+	  if(!i) {
+
+	    // If this set of algos are to be asked in AND condition with the previous... BREAK
+	    if(!merge &&  _ask_and_in_sets.at(i)) break;
+	    // If this set of algos are to be asked in OR condition with the previous... CONTINUE
+	    if(merge  && !_ask_and_in_sets.at(i)) continue;
+	    
+	  }
+
+	  bool merge_local = true;
 
 	  for(auto algo : _merge_algo.at(i)) {
 	    
@@ -251,30 +268,50 @@ namespace cluster {
 	      merge_local = algo->Merge(in_clusters.at((*citer1).second).GetParams(),
 					in_clusters.at((*citer2).second).GetParams());
 
-	    else if(_ask_and.at(i))
+	    else if(_ask_and_in_algos.at(i))
 
 	      merge_local = merge_local && algo->Merge(in_clusters.at((*citer1).second).GetParams(),
 						       in_clusters.at((*citer2).second).GetParams());
-	    
+	      
 	    else
 	      
 	      merge_local = merge_local || algo->Merge(in_clusters.at((*citer1).second).GetParams(),
 						       in_clusters.at((*citer2).second).GetParams());
 	    
+	    if(_debug_mode <= kPerMerging)
+	      algo->Report();
+
+	    // AND condition, and this is already false... BREAK
+	    if( !merge_local && _ask_and_in_algos.at(i)  ) break;
+	    // OR condition, and this is already true... BREAK
+	    if(  merge_local && !_ask_and_in_algos.at(i) ) break;
+
 	  } // end looping over algorithms in this set
 
-	  merge = merge && merge_local;
+	  if(!i) merge = merge_local;
 
-	  if(_debug_mode <= kPerMerging){
+	  else if(_ask_and_in_sets.at(i))
 
-	    if(merge) std::cout << "found to be merged! " <<std::endl;
+	    merge = merge && merge_local;
 
-	    else std::cout << "found NOT to be merged..." << std::endl;
+	  else
 
-	  }
+	    merge = merge || merge_local;
 
-	    
+	}
+
+	if(_debug_mode <= kPerAlgoSet) {
 	  
+	  if(merge) 
+	    std::cout << "    \033[93mfound to be merged!\033[00m " 
+		      << std::endl
+		      << std::endl;
+	  
+	  else 
+	    std::cout << "    \033[93mfound NOT to be merged...\033[00m" 
+		      << std::endl
+		      << std::endl;
+
 	} // end looping over all sets of algorithms
 	
 	if(merge)

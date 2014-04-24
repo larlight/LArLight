@@ -21,6 +21,10 @@ namespace cluster {
     return _flip;
   }
 
+  void CMAlgoFake::Report()
+  {
+    std::cout<< "  I am just flpping every 64 counts... " << std::endl;
+  }
 
 }
 

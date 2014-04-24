@@ -15,7 +15,7 @@
 #define CMERGEALGOBASE_HH
 
 #include <iostream>
-#include "ClusterParams.hh"
+#include "ClusterParamsAlgNew.hh"
 
 namespace cluster {
   /**
@@ -40,6 +40,19 @@ namespace cluster {
     */
     virtual bool Merge(const cluster_params &cluster1,
 		       const cluster_params &cluster2);
+
+    /**
+       Optional function: called at the beggining of iterating over all pairs of clusters. 
+       This provides all clusters' information in case merge algorithm need them 
+     */
+    virtual void Prepare(const std::vector<cluster::ClusterParamsAlgNew> &clusters)
+    { return; }
+
+    /**
+       Optional function: called after each Merge() function call by CMergeManager IFF
+       CMergeManager is run with verbosity level kPerMerging. Maybe useful for debugging.
+     */
+    virtual void Report() {return;}
 
     /// Function to reset the algorithm instance ... maybe implemented via child class
     virtual void Reset(){}
