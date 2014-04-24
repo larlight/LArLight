@@ -363,8 +363,17 @@ namespace cluster {
       _cAllCluster->cd((plane*2 + 1));
       for(size_t cindex=0; cindex<_hClusterHits.at(plane).size(); ++cindex) {
 
-	if(!cindex) _hClusterHits.at(plane).at(cindex)->Draw();
-	else  _hClusterHits.at(plane).at(cindex)->Draw("sames");
+	if(!cindex) {
+	  _hClusterHits.at(plane).at(cindex)->Draw();
+	  if(_gClusterPolygon.at(plane).at(cindex))
+	    _gClusterPolygon.at(plane).at(cindex)->Draw("APL");
+	}
+	else{
+	  _hClusterHits.at(plane).at(cindex)->Draw("sames");
+	  if(_gClusterPolygon.at(plane).at(cindex))
+	    _gClusterPolygon.at(plane).at(cindex)->Draw("PL");
+	}
+
 
       }
 
