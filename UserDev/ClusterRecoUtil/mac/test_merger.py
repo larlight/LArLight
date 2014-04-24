@@ -24,7 +24,21 @@ proc.GetManager().DebugMode(cluster.CMergeManager.kPerIteration)
 
 mgr.add_process(proc)
 
-mgr.run(0,1)
+while mgr.process_event():
+
+    print 
+    bk=proc.GetManager().GetBookKeeper()
+
+    res = bk.GetResult()
+
+    for x in xrange(res.size()):
+
+        for y in xrange(res.at(x).size()):
+
+            print res.at(x).at(y),
+        print
+
+    sys.stdin.readline()
 
 
 

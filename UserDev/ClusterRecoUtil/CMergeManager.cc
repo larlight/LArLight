@@ -28,6 +28,7 @@ namespace cluster {
     // Clear & fill cluster info
 
     _in_clusters.clear();
+    _out_clusters.clear();
 
     _in_clusters.reserve(clusters.size());
 
@@ -154,6 +155,11 @@ namespace cluster {
 
       ctr++;
     }
+    
+    // Gather the full book keeping result
+    for(auto const& bk : book_keepers)
+
+      _book_keeper.Combine(bk);
     
   }
 
