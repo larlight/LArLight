@@ -10,7 +10,8 @@
 #pragma link off all functions;
 
 #pragma link C++ class larlight::ClusterViewer+;
-
+#pragma link C++ class cluster::ClusterViewerAlgo+;
+#pragma link C++ class cluster::ViewerException+;
 //ADD_NEW_CLASS ... do not change this line
 #endif
 
