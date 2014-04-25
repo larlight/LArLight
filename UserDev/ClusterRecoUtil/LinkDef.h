@@ -45,11 +45,14 @@
 #pragma link C++ class cluster::CMAlgoFake+;
 #pragma link C++ class cluster::CMAlgoStartInPoly+;
 #pragma link C++ class cluster::CMAlgoPolyHitOverlap+;
+#pragma link C++ class cluster::CMAlgoStartInCone+;
 
 #pragma link C++ class larlight::ClusterMerger+;
 
+
 //ADD_NEW_CLASS ... do not change this line
 #endif
+
 
 
 

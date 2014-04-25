@@ -36,6 +36,7 @@ namespace cluster{
   class CMAlgoFake;
   class CMAlgoStartInPoly;
   class CMAlgoPolyHitOverlap;
+  class CMAlgoStartInCone;
 
 }
 
@@ -46,9 +47,11 @@ namespace larlight{
 class ClusterParamsExecutor;
 class Polygon2D;
 
+
 //ADD_EMPTY_CLASS ... do not change this comment line
 
 #endif
+
 
 
 
