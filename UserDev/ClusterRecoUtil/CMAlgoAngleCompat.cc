@@ -14,6 +14,8 @@ namespace cluster {
     
     SetAllow180Ambig(false);
 
+    SetUseOpeningAngle(false);
+
   } //end constructor
 
   bool CMAlgoAngleCompat::Merge(const ClusterParamsAlgNew &cluster1,
@@ -26,23 +28,31 @@ namespace cluster {
     
     bool compatible = false;
     
+    double my_cut_value;
+    //if using opening angle, have angle cutoff be the smaller of the two opening angles
+    if(_use_opening_angle) 
+      my_cut_value = std::min(cluster1.GetParams().opening_angle, cluster2.GetParams().opening_angle);
+    
+    else my_cut_value = _max_allowed_2D_angle_diff;
+    
+    //if you don't care if clusters have been reconstructed backwards
     if(_allow_180_ambig)
       compatible = ( abs(angle1-angle2)     < _max_allowed_2D_angle_diff ||
 		     abs(angle1-angle2-180) < _max_allowed_2D_angle_diff ||
 		     abs(angle1-angle2+180) < _max_allowed_2D_angle_diff   );
-    
     else
       compatible = ( abs(angle1-angle2)     < _max_allowed_2D_angle_diff );
     
+  
     if(_verbose) {
-      if(compatible) std::cout<<"These two clusters are compatible in angle."<<std::endl;
-      else std::cout<<"These two clusters are NOT compatible in angle."<<std::endl;
+	if(compatible) std::cout<<"These two clusters are compatible in angle."<<std::endl;
+	else std::cout<<"These two clusters are NOT compatible in angle."<<std::endl;
     }
     
     return compatible;
-
+    
   } // end Merge function 
-
+  
 
 
 }//end namespace cluster

@@ -47,6 +47,8 @@ namespace cluster {
     /// Method to set cut value in degrees for angle compatibility test
     void SetAngleCut(double angle) { _max_allowed_2D_angle_diff = angle; }
 
+    /// Method to set angle cut value to be based on opening angle
+    void SetUseOpeningAngle(bool on) { _use_opening_angle = on; }
 
   protected:
 
@@ -54,9 +56,16 @@ namespace cluster {
 
     ///bool to allow "backwards" clusters (swapped start/end points)
     ///to still match in angle, even though they are 180 degrees apart
+    ///only valid for _use_opening_angle==false
     bool _allow_180_ambig; 
 
+    /// hard shower-axis angle cutoff (only valid for _use_opening_angle==false)
     double _max_allowed_2D_angle_diff; //in degrees
+
+    /// bool set to true if you want to use opening angle as the cutoff
+    /// angle instead of whatever you set with SetAngleCut
+    bool _use_opening_angle;
+
 
 
   };
