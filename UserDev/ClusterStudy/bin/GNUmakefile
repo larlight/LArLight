@@ -10,16 +10,18 @@ CXXFLAGS += -I$(LARLIGHT_CORE_DIR)/Base
 CXXFLAGS += -I$(LARLIGHT_CORE_DIR)/DataFormat
 CXXFLAGS += -I$(LARLIGHT_CORE_DIR)/Analysis
 CXXFLAGS += -I$(LARLIGHT_CORE_DIR)/LArUtil
-CXXFLAGS += -I$(USER_DEV_DIR)/ClusterRecoAlg
+CXXFLAGS += -I$(USER_DEV_DIR)/FANN
+CXXFLAGS += -I$(USER_DEV_DIR)/FANN/include
+CXXFLAGS += -I$(USER_DEV_DIR)/ClusterRecoUtil
 CXXFLAGS += -I$(USER_DEV_DIR)/ClusterStudy
 CXXFLAGS += -I. $(shell root-config --cflags) -g
 
 # Include your shared object lib location
-LDFLAGS += -L$(LARLIGHT_LIBDIR) -lBase -lDataFormat -lAnalysis -lClusterStudy -lClusterRecoAlg
+LDFLAGS += -L$(LARLIGHT_LIBDIR) -lClusterStudy -lClusterRecoUtil -lFANN -lAnalysis -lDataFormat -lLArUtil -lBase -lHist -lGpad 
 
 # Add your program below with a space after the previous one.
 # This makefile compiles all binaries specified below.
-PROGRAMS = run_cluster_merge
+PROGRAMS = run_merge_viewer
 
 all:		$(PROGRAMS)
 	@rm -rf *.dSYM

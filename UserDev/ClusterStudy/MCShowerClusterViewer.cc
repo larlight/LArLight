@@ -72,8 +72,13 @@ namespace larlight {
     for(auto const &mcs : *ev_mcs) {
 
       for(UChar_t plane=0; plane<nplanes; ++plane) {
-	
-	larutil::PxPoint start_vtx = geo_util->Get2DPointProjectionCM(mcs.MotherPosition(),plane);
+
+	larutil::PxPoint start_vtx;
+	try{
+	  start_vtx = geo_util->Get2DPointProjectionCM(mcs.MotherPosition(),plane);
+	}catch(larutil::LArUtilException e){
+	  std::cout<<e.what()<<std::endl;
+	}
 
 	larutil::PxPoint end_vtx = start_vtx;
 
@@ -82,14 +87,19 @@ namespace larlight {
 	std::vector<double> raw_vtx(4,0);
 
 	for(auto const& vtx : mcs.DaughterPoints()) {
-
+	  
 	  raw_vtx.at(0) = vtx.at(0);
 	  raw_vtx.at(1) = vtx.at(1);
 	  raw_vtx.at(2) = vtx.at(2);
 	  raw_vtx.at(3) = vtx.at(3);
 
-	  const larutil::PxPoint this_vtx = geo_util->Get2DPointProjectionCM(raw_vtx,plane);
-	  
+	  larutil::PxPoint this_vtx;
+	  try{
+	    this_vtx = geo_util->Get2DPointProjectionCM(raw_vtx,plane);
+	  }catch(larutil::LArUtilException e){
+	    std::cout<<e.what()<<std::endl;
+	  }
+
 	  double this_dist = pow(start_vtx.t - this_vtx.t,2) + pow(start_vtx.w - this_vtx.w,2);
 	  
 	  double end_dist  = pow(start_vtx.t - end_vtx.t,2) + pow(start_vtx.w - end_vtx.w,2);
