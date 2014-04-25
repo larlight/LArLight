@@ -35,8 +35,8 @@ namespace cluster {
     virtual ~CMAlgoAngleCompat(){};
         
     /// Overloaded (from CMergeAlgoBase) Merge function
-    virtual bool Merge(const cluster_params &cluster1,
-		       const cluster_params &cluster2);
+    virtual bool Merge(const ClusterParamsAlgNew &cluster1,
+		       const ClusterParamsAlgNew &cluster2);
     
     /// Method to set verbose mode
     void SetVerbose(bool on) { _verbose = on; }

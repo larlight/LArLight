@@ -26,13 +26,13 @@ namespace cluster {
   }//end reconfigure function
 
   
-  bool CMAlgoStartInCone::Merge(const cluster_params &cluster1,
-				     const cluster_params &cluster2)
+  bool CMAlgoStartInCone::Merge(const ClusterParamsAlgNew &cluster1,
+				const ClusterParamsAlgNew &cluster2)
   {
 
     //apply filter immediately
-    if ( (cluster1.length < _lenMin) and (cluster2.length < _lenMin)
-	 and (cluster1.N_Hits < _NhitsMin) and (cluster2.N_Hits < _NhitsMin) )
+    if ( (cluster1.GetParams().length < _lenMin) and (cluster2.GetParams().length < _lenMin)
+	 and (cluster1.GetParams().N_Hits < _NhitsMin) and (cluster2.GetParams().N_Hits < _NhitsMin) )
       return false;
 
     //A cluster has an associated cone defined as the cone originating
@@ -42,17 +42,17 @@ namespace cluster {
     //by the cone of cluster B (A), and if cluster B (A) is good enough
     // (enough hits, charge, length...) then the two are merged.
 
-    double w_start1 = cluster1.start_point.w * _wire_2_cm;
-    double t_start1 = cluster1.start_point.t * _time_2_cm;
+    double w_start1 = cluster1.GetParams().start_point.w * _wire_2_cm;
+    double t_start1 = cluster1.GetParams().start_point.t * _time_2_cm;
 
-    double w_start2 = cluster2.start_point.w * _wire_2_cm;
-    double t_start2 = cluster2.start_point.t * _time_2_cm;
+    double w_start2 = cluster2.GetParams().start_point.w * _wire_2_cm;
+    double t_start2 = cluster2.GetParams().start_point.t * _time_2_cm;
 
-    double direction_1 = cluster1.angle_2d;
-    double direction_2 = cluster2.angle_2d;
+    double direction_1 = cluster1.GetParams().angle_2d;
+    double direction_2 = cluster2.GetParams().angle_2d;
 
-    double opening_angle_1 = cluster1.opening_angle;
-    double opening_angle_2 = cluster2.opening_angle;
+    double opening_angle_1 = cluster1.GetParams().opening_angle;
+    double opening_angle_2 = cluster2.GetParams().opening_angle;
 
     //find if start point of A (B) in cone of B (A)
     //do this by translating point A (B) such that
@@ -68,17 +68,17 @@ namespace cluster {
     w_start2_rot =   w_start2*cos(direction_1) + t_start2*sin(direction_1);
     t_start2_rot = - w_start2*sin(direction_1) + t_start2*cos(direction_1);
 
-    if ( (w_start1_rot < cluster2.length) and 
+    if ( (w_start1_rot < cluster2.GetParams().length) and 
 	 (t_start1_rot < (w_start1_rot*sin(opening_angle_2))) and
-	 (cluster2.length < _lenMin) and 
-	 (cluster2.N_Hits < _NhitsMin) ){
+	 (cluster2.GetParams().length < _lenMin) and 
+	 (cluster2.GetParams().N_Hits < _NhitsMin) ){
       std::cout << "Start point of Cluster 1 in cone of Cluster 2!" << std::endl;
       return true;
     }
-    if ( (w_start2_rot < cluster1.length ) and
+    if ( (w_start2_rot < cluster1.GetParams().length ) and
 	 (t_start2_rot < (w_start2_rot*sin(opening_angle_1))) and
-	 (cluster1.length < _lenMin) and 
-	 (cluster1.N_Hits < _NhitsMin) ){
+	 (cluster1.GetParams().length < _lenMin) and 
+	 (cluster1.GetParams().N_Hits < _NhitsMin) ){
       std::cout << "Start point of Cluster 2 in cone of Cluster 1!" << std::endl;
       return true;
     }

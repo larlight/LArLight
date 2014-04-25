@@ -16,13 +16,13 @@ namespace cluster {
 
   } //end constructor
 
-  bool CMAlgoAngleCompat::Merge(const cluster_params &cluster1,
-				const cluster_params &cluster2){
+  bool CMAlgoAngleCompat::Merge(const ClusterParamsAlgNew &cluster1,
+				const ClusterParamsAlgNew &cluster2){
     
     //pretty sure we don't need conversion factors here. 
     //already in cm/cm units, degrees? need to check that
-    double angle1 = cluster1.angle_2d;// * _time_2_cm / _wire_2_cm;
-    double angle2 = cluster2.angle_2d;// * _time_2_cm / _wire_2_cm;
+    double angle1 = cluster1.GetParams().angle_2d;// * _time_2_cm / _wire_2_cm;
+    double angle2 = cluster2.GetParams().angle_2d;// * _time_2_cm / _wire_2_cm;
     
     bool compatible = false;
     

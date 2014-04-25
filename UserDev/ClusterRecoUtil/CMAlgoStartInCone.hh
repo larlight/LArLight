@@ -36,8 +36,8 @@ namespace cluster {
     virtual ~CMAlgoStartInCone(){};
   
     /// Merging Algorithm is Here
-    virtual bool Merge(const cluster_params &cluster1,
-		       const cluster_params &cluster2);
+    virtual bool Merge(const ClusterParamsAlgNew &cluster1,
+		       const ClusterParamsAlgNew &cluster2);
     
     /// Method to re-configure the instance
     void reconfigure();

@@ -265,18 +265,18 @@ namespace cluster {
 	    // for 1st algorithm, simply assign merge_local
 	    if(algo == (*_merge_algo.at(i).begin()))
 
-	      merge_local = algo->Merge(in_clusters.at((*citer1).second).GetParams(),
-					in_clusters.at((*citer2).second).GetParams());
+	      merge_local = algo->Merge(in_clusters.at((*citer1).second),
+					in_clusters.at((*citer2).second));
 
 	    else if(_ask_and_in_algos.at(i))
 
-	      merge_local = merge_local && algo->Merge(in_clusters.at((*citer1).second).GetParams(),
-						       in_clusters.at((*citer2).second).GetParams());
+	      merge_local = merge_local && algo->Merge(in_clusters.at((*citer1).second),
+						       in_clusters.at((*citer2).second));
 	      
 	    else
 	      
-	      merge_local = merge_local || algo->Merge(in_clusters.at((*citer1).second).GetParams(),
-						       in_clusters.at((*citer2).second).GetParams());
+	      merge_local = merge_local || algo->Merge(in_clusters.at((*citer1).second),
+						       in_clusters.at((*citer2).second));
 	    
 	    if(_debug_mode <= kPerMerging)
 	      algo->Report();

@@ -23,18 +23,18 @@ namespace cluster {
 
   } //end constructor
 
-  bool CMAlgoShortestDist::Merge(const cluster_params &cluster1,
-				 const cluster_params &cluster2){
+  bool CMAlgoShortestDist::Merge(const ClusterParamsAlgNew &cluster1,
+				 const ClusterParamsAlgNew &cluster2){
     
-    double w_start1 = cluster1.start_point.w * _wire_2_cm;
-    double t_start1 = cluster1.start_point.t * _time_2_cm;
-    double w_end1   = cluster1.end_point.w   * _wire_2_cm;
-    double t_end1   = cluster1.end_point.t   * _time_2_cm;
+    double w_start1 = cluster1.GetParams().start_point.w * _wire_2_cm;
+    double t_start1 = cluster1.GetParams().start_point.t * _time_2_cm;
+    double w_end1   = cluster1.GetParams().end_point.w   * _wire_2_cm;
+    double t_end1   = cluster1.GetParams().end_point.t   * _time_2_cm;
 
-    double w_start2 = cluster2.start_point.w * _wire_2_cm;
-    double t_start2 = cluster2.start_point.t * _time_2_cm;
-    double w_end2   = cluster2.end_point.w   * _wire_2_cm;
-    double t_end2   = cluster2.end_point.t   * _time_2_cm;
+    double w_start2 = cluster2.GetParams().start_point.w * _wire_2_cm;
+    double t_start2 = cluster2.GetParams().start_point.t * _time_2_cm;
+    double w_end2   = cluster2.GetParams().end_point.w   * _wire_2_cm;
+    double t_end2   = cluster2.GetParams().end_point.t   * _time_2_cm;
     
     //First, pretend the first cluster is a 2D line segment, from its start point to end point
     //Find the shortest distance between start point of the second cluster to this line segment.

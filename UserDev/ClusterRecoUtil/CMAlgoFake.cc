@@ -12,8 +12,8 @@ namespace cluster {
     // Nothing to be done in the base class
   }
   
-  bool CMAlgoFake::Merge(const cluster_params &cluster1,
-			 const cluster_params &cluster2)
+  bool CMAlgoFake::Merge(const ClusterParamsAlgNew &cluster1,
+			 const ClusterParamsAlgNew &cluster2)
   {
     _ctr++;
     if( (_ctr%64) == 0)

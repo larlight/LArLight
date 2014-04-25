@@ -10,8 +10,8 @@ namespace cluster {
     // Nothing to be done in the base class
   }
   
-  bool CMergeAlgoBase::Merge(const cluster_params &cluster1,
-				     const cluster_params &cluster2)
+  bool CMergeAlgoBase::Merge(const ClusterParamsAlgNew &cluster1,
+			     const ClusterParamsAlgNew &cluster2)
   {
     // Return false for the stupid base class
     return false;

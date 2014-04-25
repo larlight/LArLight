@@ -38,8 +38,8 @@ namespace cluster {
        Core function: given the cluster_params input, return whether a cluster should be
        merged or not.
     */
-    virtual bool Merge(const cluster_params &cluster1,
-		       const cluster_params &cluster2);
+    virtual bool Merge(const ClusterParamsAlgNew &cluster1,
+		       const ClusterParamsAlgNew &cluster2);
 
     /**
        Optional function: called at the beggining of iterating over all pairs of clusters. 
