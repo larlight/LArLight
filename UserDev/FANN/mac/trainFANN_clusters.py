@@ -85,7 +85,7 @@ cascadeFANN = cluster.FANNModule()
 cascadeFANN.LoadFromFile("cascade_net.net")
 
 # Output file for FANN vector:
-outputfile = open('training.dat','w')
+outputfile = open('fcshowers.dat','w')
 # Keep track of how many events were processed
 nWrittenEvents = 0
 
@@ -101,8 +101,11 @@ while mgr.next_event():
 
     # Get event_mctruth ... std::vector<larlight::mctruth>
     mctruth_v = mgr.get_data(fmwk.DATA.MCTruth)
+
     # Get event_cluster ... std::vector<larlight::cluster>
     cluster_v = mgr.get_data(fmwk.DATA.FuzzyCluster)
+    # cluster_v = mgr.get_data(fmwk.DATA.CrawlerCluster)
+
     print "Number of clusters in this event is %d" % cluster_v.size()
     # Get the primary particl generator vtx position
     mct_vtx=None
@@ -114,6 +117,7 @@ while mgr.next_event():
             print "\n electron \n"
             truth=ROOT.std.vector(float)(2,0)
             truth[0] = 1
+            # continue;
         elif mctruth_v.at(0).GetParticles().at(0).PdgCode() == 22:    
             trajsize= mctruth_v.at(0).GetParticles().at(0).Trajectory().size()
             mct_vtx = mctruth_v.at(0).GetParticles().at(0).Trajectory().at(trajsize-1).Position()
@@ -125,12 +129,14 @@ while mgr.next_event():
             print "\n muon \n"
             truth=ROOT.std.vector(float)(2,0)
             truth[1] = 1
+            continue
         elif mctruth_v.at(0).GetParticles().at(0).PdgCode() == 2212:    
             trajsize= mctruth_v.at(0).GetParticles().at(0).Trajectory().size()
             mct_vtx = mctruth_v.at(0).GetParticles().at(0).Trajectory().at(0).Position()
             print "\n proton \n"
             truth=ROOT.std.vector(float)(2,0)
             truth[1] = 1
+            continue
 
         #PdgCode
     if num_events < processed_events:
@@ -146,7 +152,7 @@ while mgr.next_event():
         print "  Cluster ID:",cluster_v.at(clust).ID()
         algo.LoadCluster(cluster_v.at(clust),
                          mgr.get_data(cluster_v.get_hit_type()))
-        if algo.GetNHits() < 30:
+        if algo.GetNHits() < 20:
             continue
 
 
