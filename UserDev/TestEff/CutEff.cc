@@ -5,6 +5,8 @@
 // #include "../ClusterRecoUtil/ClusterParamsAlgNew.hh"
 #include "ClusterParams.hh"
 #include "LArUtilManager.hh"
+#include "argoana.hh"
+
 
 namespace larlight {
 
@@ -113,7 +115,58 @@ namespace larlight {
     
     fMainTree->Branch("max_charge","std::vector<double>",&max_charge );
     fMainTree->Branch("max_charge_3","std::vector<double>",&max_charge_3 );	
+  
+    //cut variables
     fMainTree->Branch("PassCut","std::vector<bool>",&fPassCut );	
+    fMainTree->Branch("PassFANNCut","std::vector<bool>",&fPassFANNCut );	
+    
+    fMainTree->Branch("NshowersPerPlane","std::vector<int>",&fNshowersPerPlane );	
+    fMainTree->Branch("NFANNshowersPerPlane","std::vector<int>",&fNFANNshowersPerPlane );	
+    
+    //fMainTree->Branch("SmallestDist","std::vector<double>",&fSmallestDist );	
+    fMainTree->Branch("ClusterDist","std::vector<double>",&fClusterDist );
+    
+    fMainTree->Branch("SmallestDist",&fSmallestDist,"SmallestDist/D");
+     fMainTree->Branch("SmallestReasonDist",&fSmallestReasonDist,"SmallestReasonDist/D");
+    
+    fMainTree->Branch("EventPassCut",&fEventPassCut,"EventPassCut/I");
+    fMainTree->Branch("EventPassFANNCut",&fEventPassFANNCut,"EventPassFANNCut/I");
+    
+    fMainTree->Branch("EventPassCut2Planes",&fEventPassCut2Planes,"EventPassCut2Planes/I");
+    fMainTree->Branch("EventPassFANNCut2Planes",&fEventPassFANNCut2Planes,"EventPassFANNCut2Planes/I");
+    
+    fMainTree->Branch("EventPassCut2Planes1Only",&fEventPassCut2Planes1Only,"EventPassCut2Planes1Only/I");
+    fMainTree->Branch("EventPassFANNCut2Planes1Only",&fEventPassFANNCut2Planes1Only,"EventPassFANNCut2Planes1Only/I");
+    
+    fMainTree->Branch("EventPassCut2PlanesTimeMatched",&fEventPassCut2PlanesTimeMatched,"EventPassCut2PlanesTimeMatched/I");
+    fMainTree->Branch("EventPassFANNCut2PlanesTimeMatched",&fEventPassFANNCut2PlanesTimeMatched,"EventPassFANNCut2PlanesTimeMatched/I");
+    
+    fMainTree->Branch("EventPassCut2PlanesMatched",&fEventPassCut2PlanesMatched,"EventPassCut2PlanesMatched/I");
+    fMainTree->Branch("EventPassFANNCut2PlanesMatched",&fEventPassFANNCut2PlanesMatched,"EventPassFANNCut2PlanesMatched/I");
+    
+     fMainTree->Branch("minos_matched_mcpdg",&minos_matched_mcpdg,"minos_matched_mcpdg/I");
+    fMainTree->Branch("minos_matched_recopdg",&minos_matched_recopdg,"minos_matched_recopdg/I");
+     fMainTree->Branch("fEventMinosMatched",&fEventMinosMatched,"fEventMinosMatched/I");
+    
+    
+    
+    
+  
+    
+    
+    fMainTree->Branch("fChargeRMSAll","std::vector<double>",&fChargeRMSAll );
+    fMainTree->Branch("fShowernessAll","std::vector<double>",&fShowernessAll );
+    
+     fMainTree->Branch("fPrincipalAll","std::vector<double>",&fPrincipalAll );
+    fMainTree->Branch("allplane","std::vector<int>",&allplane );
+         
+    
+    
+
+      
+
+   
+    
     
     
     fMainTree->SetAlias("electron","mcpgd==11");
@@ -145,6 +198,14 @@ namespace larlight {
     else bothplaneShowerEventsmatched->Reset();
     
     
+
+    if(!bothplaneShowerEventsTimematched) bothplaneShowerEventsTimematched = new TH1D("bothplaneShowerEventsTimematched","bothplaneShowerEventsTimematched",100,0,30);
+    else bothplaneShowerEventsTimematched->Reset();
+    
+    
+
+    
+    
     if(!anyShowerClusters_FANN) anyShowerClusters_FANN = new TH1D("anyShowerClusters_FANN","anyShowerClusters_FANN",100,0,30);
     else anyShowerClusters_FANN->Reset();
     if(!anyShowerEvents_FANN) anyShowerEvents_FANN = new TH1D("anyShowerEvents_FANN","anyShowerEvents_FANN",100,0,30);
@@ -154,41 +215,54 @@ namespace larlight {
     else bothplaneShowerEvents_FANN->Reset();
     if(!bothplaneShowerEventsmatched_FANN) bothplaneShowerEventsmatched_FANN = new TH1D("bothplaneShowerEventsmatched_FANN","bothplaneShowerEventsmatched_FANN",100,0,30);
     else bothplaneShowerEventsmatched_FANN->Reset();
+     if(!bothplaneShowerEventsTimematched_FANN) bothplaneShowerEventsTimematched_FANN = new TH1D("bothplaneShowerEventsTimematched_FANN","bothplaneShowerEventsTimematched_FANN",100,0,30);
+    else bothplaneShowerEventsTimematched_FANN->Reset();
     
     
-// 		
-//     if(!chargeWgtX) chargeWgtX = new TH1D("chargeWgtX","Charge weighted x",120,10,100);
-//     else chargeWgtX->Reset();
-//     if(!chargeWgtY) chargeWgtY = new TH1D("chargeWgtY","Charge weigthed y",100,0,60);
-//     else chargeWgtY->Reset();
-//     
-//     if(!clusterAngle2d) clusterAngle2d = new TH1D("clusterAngle2d","Cluster angle 2d",120,0,100);
-//     else clusterAngle2d->Reset();
-//     if(!angle2d) angle2d = new TH1D("angle2d","Angle 2d",150,-200,200);
-//     else angle2d->Reset();
-//     
-//     if(!openAngle) openAngle = new TH1D("openAngle","Opening angle",100,0,2.25);
-//     else openAngle->Reset();
-//     if(!openAngleChargeWgt) openAngleChargeWgt = new TH1D("openAngleChargeWgt","Opening angle, charge weighted",100,0,2.0);
-//     else openAngleChargeWgt->Reset();
-//     
-//     if(!closeAngleChargeWgt) closeAngleChargeWgt = new TH1D("closeAngleChargeWgt","Closing angle, charge weighted",120,0,2.25);
-//     else closeAngleChargeWgt->Reset();
-//     if(!closeAngle) closeAngle = new TH1D("closeAngle","Close angle",100,0,2.25);
-//     else closeAngle->Reset();
-// 
-//     if(!hitDensity1d) hitDensity1d = new TH1D("hitDensity1d","Hit density 1d",120,0,10);
-//     else hitDensity1d->Reset();
-//     if(!hitDensity2d) hitDensity2d = new TH1D("hitDensity2d","Hit density 2d",100,0,60);
-//     else hitDensity2d->Reset();
-//     if(!modifiedHitDens) modifiedHitDens = new TH1D("modifiedHitDens","Modified Hit Density",100,0,20);
-//     else modifiedHitDens->Reset();
-// 
-//     if(!trackness) trackness = new TH1D("trackness","trackness",100,0,1);
-//     else trackness->Reset();
-//     if(!showerness) showerness = new TH1D("showerness","Modified Hit Density",100,0,20);
-//     else showerness->Reset();
-// 
+    if(!bothplaneShowerEventOnlyOne) bothplaneShowerEventOnlyOne = new TH1D("bothplaneShowerEventOnlyOne","bothplaneShowerEventOnlyOne",100,0,30);
+    else bothplaneShowerEventOnlyOne->Reset();
+     if(!bothplaneShowerEventOnlyOne_FANN) bothplaneShowerEventOnlyOne_FANN = new TH1D("bothplaneShowerEventOnlyOne_FANN","bothplaneShowerEventOnlyOne_FANN",100,0,30);
+    else bothplaneShowerEventOnlyOne_FANN->Reset();
+    
+    
+     if(!bothplaneShowerFANNEventsandAllHitsPassedAndMinosMatched) bothplaneShowerFANNEventsandAllHitsPassedAndMinosMatched = new TH1D("bothplaneShowerFANNEventsandAllHitsPassedAndMinosMatched","bothplaneShowerFANNEventsandAllHitsPassedAndMinosMatched",100,0,30);
+    else bothplaneShowerFANNEventsandAllHitsPassedAndMinosMatched->Reset();
+     if(!bothplaneShowerEventsandAllHitsPassedAndMinosMatched) bothplaneShowerEventsandAllHitsPassedAndMinosMatched = new TH1D("bothplaneShowerEventsandAllHitsPassedAndMinosMatched","bothplaneShowerEventsandAllHitsPassedAndMinosMatched",100,0,30);
+    else bothplaneShowerEventsandAllHitsPassedAndMinosMatched->Reset();
+    
+    
+          
+    
+      if(!bothplaneShowerEventsandAllHitsPassed) bothplaneShowerEventsandAllHitsPassed = new TH1D("bothplaneShowerEventsandAllHitsPassed","bothplaneShowerEventsandAllHitsPassed",100,0,30);
+    else bothplaneShowerEventsandAllHitsPassed->Reset();
+    
+     if(!bothplaneShowerFANNEventsandAllHitsPassed) bothplaneShowerFANNEventsandAllHitsPassed = new TH1D("bothplaneShowerFANNEventsandAllHitsPassed","bothplaneShowerFANNEventsandAllHitsPassed",100,0,30);
+    else bothplaneShowerFANNEventsandAllHitsPassed->Reset();
+    
+        if(!notbothplaneShowerEventsandAllHitsPassed) notbothplaneShowerEventsandAllHitsPassed = new TH1D("notbothplaneShowerEventsandAllHitsPassed","notbothplaneShowerEventsandAllHitsPassed",100,0,30);
+    else notbothplaneShowerEventsandAllHitsPassed->Reset();
+    
+     if(!notbothplaneShowerFANNEventsandAllHitsPassed) notbothplaneShowerFANNEventsandAllHitsPassed = new TH1D("notbothplaneShowerFANNEventsandAllHitsPassed","notbothplaneShowerFANNEventsandAllHitsPassed",100,0,30);
+    else notbothplaneShowerFANNEventsandAllHitsPassed->Reset();
+    
+    
+
+    
+    
+    
+    
+    
+    
+    if(!smallest_dist) smallest_dist = new TH1D("smallest_dist","smallest_dist",200,0,45);
+     else smallest_dist->Reset();
+    if(!smallest_reason_dist) smallest_reason_dist = new TH1D("smallest_reason_dist","smallest_reason_dist",200,0,45);
+     else smallest_reason_dist->Reset();
+    if(!cluster_dist_diff) cluster_dist_diff = new TH1D("cluster_dist_diff","cluster_dist_diff",200,0,45);
+     else cluster_dist_diff->Reset();
+    
+    
+  
+    
 // 
 // 
 // //////////////////////////////////////////////////////////////
@@ -210,94 +284,7 @@ namespace larlight {
     else recoDir->Reset();
     
     
-    
-    
-//  ///////////////////////////////////////////////////////////////
-//     // shower vs track parameters
-//     
-//     if(!hitDensity1d_sh) hitDensity1d_sh = new TH1D("hitDensity1d_sh","Hit Density 1D, Showers ",100,0,30);
-//     else hitDensity1d_sh->Reset();
-//     hitDensity1d_sh->SetLineColor(kRed);
-//     if(!hitDensity2d_sh) hitDensity2d_sh = new TH1D("hitDensity2d_sh","Hit Density 2D, Showers",100,0,8);
-//     else hitDensity2d_sh->Reset();
-//     hitDensity2d_sh->SetLineColor(kRed);
-//     if(!modifiedHitDens_sh) modifiedHitDens_sh = new TH1D("modifiedHitDens_sh","Modified Hit Density 1D, Showers ",100,0,25);
-//     else modifiedHitDens_sh->Reset();
-//      modifiedHitDens_sh->SetLineColor(kRed);
-//     if(!multihitw_sh) multihitw_sh = new TH1D("multihitw_sh","MultiHitWire, Showers",120,0,120);
-//     else multihitw_sh->Reset();
-//      multihitw_sh->SetLineColor(kRed);
-//     if(!eigenvalue_principal_sh) eigenvalue_principal_sh = new TH1D("eigenvalue_principal_sh","EigenValue Principal, Showers ",100,-15,0);
-//     else eigenvalue_principal_sh->Reset();
-//      eigenvalue_principal_sh->SetLineColor(kRed);
-//     if(!length_sh) length_sh = new TH1D("length_sh","length, showers",100,0,100);
-//     else length_sh->Reset();
-//      length_sh->SetLineColor(kRed);
-//     if(!width_sh) width_sh = new TH1D("width_sh","width, showers",20,0,40);
-//     else width_sh->Reset();
-//      width_sh->SetLineColor(kRed);
-//     
-//     if(!openAngle_sh) openAngle_sh = new TH1D("openAngle_sh","Opening Angle, Showers",180,0,1.1*TMath::Pi());
-//     else openAngle_sh->Reset();
-//      openAngle_sh->SetLineColor(kRed);
-//     if(!openAngleChargeWgt_sh) openAngleChargeWgt_sh = new TH1D("openAngleChargeWgt_sh","Opening Angle, Charge Wieghted, Showers",180,0,1.1*TMath::Pi());
-//     else openAngleChargeWgt_sh->Reset();
-//      openAngleChargeWgt_sh->SetLineColor(kRed);
-//     
-//     if(!closeAngle_sh) closeAngle_sh = new TH1D("closeAngle_sh","Closing Angle, Showers",180,0,1.1*TMath::Pi());
-//     else closeAngle_sh->Reset();
-//      closeAngle_sh->SetLineColor(kRed);
-//     if(!closeAngleChargeWgt_sh) closeAngleChargeWgt_sh = new TH1D("closeAngleChargeWgt_sh","Closing Angle, Charge Wieghted, Showers",180,0,1.1*TMath::Pi());
-//     else closeAngleChargeWgt_sh->Reset();
-//      closeAngleChargeWgt_sh->SetLineColor(kRed);
-//     
-//     ////////////////////////////////////////////////////////////////////////////////
-//     if(!hitDensity1d_tr) hitDensity1d_tr = new TH1D("hitDensity1d_tr","Hit Density 1D, Tracks ",100,0,30);
-//     else hitDensity1d_tr->Reset();
-//     if(!hitDensity2d_tr) hitDensity2d_tr = new TH1D("hitDensity2d_tr","Hit Density 2D, Tracks",100,0,8);
-//     else hitDensity2d_tr->Reset();
-//     if(!modifiedHitDens_tr) modifiedHitDens_tr = new TH1D("modifiedHitDens_tr","Modified Hit Density 1D, Tracks ",100,0,25);
-//     else modifiedHitDens_tr->Reset();
-//     if(!multihitw_tr) multihitw_tr = new TH1D("multihitw_tr","MultiHitWire, Tracks",120,0,120);
-//     else multihitw_tr->Reset();
-//     
-//     if(!eigenvalue_principal_tr) eigenvalue_principal_tr = new TH1D("eigenvalue_principal_tr","EigenValue Principal, Tracks ",100,-15,0);
-//     else eigenvalue_principal_tr->Reset();
-//     if(!length_tr) length_tr = new TH1D("length_tr","length, Tracks",100,0,100);
-//     else length_tr->Reset();
-//     if(!width_tr) width_tr = new TH1D("width_tr","width, Tracks",20,0,40);
-//     else width_tr->Reset();
-//     
-//     if(!openAngle_tr) openAngle_tr = new TH1D("openAngle_tr","Opening Angle, Tracks",180,0,1.1*TMath::Pi());
-//     else openAngle_tr->Reset();
-//     if(!openAngleChargeWgt_tr) openAngleChargeWgt_tr = new TH1D("openAngleChargeWgt_tr","Opening Angle, Charge Wieghted, Tracks",180,0,1.1*TMath::Pi());
-//     else openAngleChargeWgt_tr->Reset();
-//     
-//     if(!closeAngle_tr) closeAngle_tr = new TH1D("closeAngle_tr","Closing Angle, Tracks",180,0,1.1*TMath::Pi());
-//     else closeAngle_tr->Reset();
-//     if(!closeAngleChargeWgt_tr) closeAngleChargeWgt_tr = new TH1D("closeAngleChargeWgt_tr","Closing Angle, Charge Wieghted, Tracks",180,0,1.1*TMath::Pi());
-//     else closeAngleChargeWgt_tr->Reset();
-//     
-//     /////////////////////////////////////
-//     ///muons vs protons vs electrons testing of max hit charge
-//     
-//     // total charge distribution
-//     // maxcharge, max3charge to TTree
-//     // charge histograms for each plane here.
-//     
-//     if(!Charge_e[0]) Charge_e[0] = new TH1D("Charge_e[0]","Charge_e[0]",200,-10,10000);
-//     else Charge_e[0]->Reset();
-//     if(!Charge_p[0]) Charge_p[0] = new TH1D("Charge_p[0]","Charge_p[0]",200,-10,10000);
-//     else Charge_p[0]->Reset();
-//     if(!Charge_mu[0]) Charge_mu[0] = new TH1D("Charge_mu[0]","Charge_mu[0]",200,-10,10000);
-//     else Charge_mu[0]->Reset();
-//     
-//     if(!Charge_e[1]) Charge_e[1] = new TH1D("Charge_e[1]","Charge_e[1]",200,-10,20000);
-//     else Charge_e[1]->Reset();
-//     if(!Charge_p[1]) Charge_p[1] = new TH1D("Charge_p[1]","Charge_p[1]",200,-10,20000);
-//     else Charge_p[1]->Reset();
-//     if(!Charge_mu[1]) Charge_mu[1] = new TH1D("Charge_mu[1]","Charge_mu[1]",200,-10,20000);
-//     else Charge_mu[1]->Reset();
+   
     
 
     return true;
@@ -330,6 +317,9 @@ namespace larlight {
     bool is_electron=false;
     bool is_gamma=false;    
 
+    
+
+    
     /// /////////////////////////getting the MCTruth info out, if exists
     
     event_mctruth  *mctruth_v = (event_mctruth *)(storage->get_data(DATA::MCTruth)); 
@@ -533,8 +523,8 @@ namespace larlight {
     int nclustershowers=0;  // number of cluster like showers.  
     int nclusterFANNshowers=0;  // number of cluster like showers.   
     
-    int nclustershowersperplane[2]={0,0};  // number of cluster like showers.  
-    int nclusterFANNshowersperplane[2]={0,0};  // number of cluster like showers.   
+    //int nclustershowersperplane[2]={0,0};  // number of cluster like showers.  
+   // int nclusterFANNshowersperplane[2]={0,0};  // number of cluster like showers.   
     
     //new cuts
     const double modhitcut=1.05;
@@ -623,7 +613,7 @@ namespace larlight {
         //  continue;
         //      std::cout << " +++ in CutEff " << hit_vector.size() << std::endl;  
 
-
+       plane[ipl]=iplane;
         if(hit_vector.size() < 20)   // do not bother with too small hitlists
         {
             continue;
@@ -631,8 +621,9 @@ namespace larlight {
 
 
         ::cluster::ClusterParamsAlgNew  fCPAlg;
-        fCPAlg.setNeuralNetPath("../FANN/trained_nets/cascade_net.net");
         fCPAlg.Initialize();
+        fCPAlg.setNeuralNetPath("../FANN/trained_nets/cascade_argo_clusters.net");
+        fCPAlg.EnableFANN();
         if(fCPAlg.SetHits(hit_vector) ==-1 )	
             continue;
         fCPAlg.GetAverages(true);
@@ -650,7 +641,7 @@ namespace larlight {
 
 
 	/// fill Reco Tree Info
-	plane[ipl]=iplane;
+	
 	fWireVertex[ipl]=fResult.start_point.w;
 	fTimeVertex[ipl]=fResult.start_point.t;
 	
@@ -794,46 +785,276 @@ namespace larlight {
       {std::cout << " stand cuts good" << iplane << std::endl;
       anyShowerClusters->Fill(mcenergy[ipl]);
 	nclustershowers++;
-        nclustershowersperplane[iplane]++;
+        fNshowersPerPlane[iplane]++;
+	fPassCut[ipl]=1;
       }
       if(fShowerness[ipl] > showernesscut )
       {
 	std::cout << " FANN cuts good" << iplane << std::endl;
 	anyShowerClusters_FANN->Fill(mcenergy[ipl]);
 	nclusterFANNshowers++;
-	nclusterFANNshowersperplane[iplane]++;
+	fNFANNshowersPerPlane[iplane]++;
+	fPassFANNCut[ipl]=1;
       }
       
       std::cout << " nclustershowers: " << nclustershowers << " FANN clusters " << nclusterFANNshowers << std::endl;
-      std::cout << " nclustershowers, per plane: " << nclustershowersperplane[0] << " " << nclustershowersperplane[1] << " FANN clusters " << nclusterFANNshowersperplane[0] <<" " << nclusterFANNshowersperplane[1]<< std::endl;
+      std::cout << " nclustershowers, per plane: " << fNshowersPerPlane[0] << " " << fNshowersPerPlane[1] << " FANN clusters " << fNFANNshowersPerPlane[0] <<" " << fNFANNshowersPerPlane[1]<< std::endl;
       
     // }  
 
        
-       
+     
        /// /// /// end cut testing
      } // end loop on clusters
 
-    fMainTree->Fill();
-  
-//     if(fMCPDGstart[0]==11)
-//     if(fMCPDGstart[0]==2212 || fMCPDGstart[0]==13 )
-  //  {
+     
+     
     fMCenergystart.resize(1,1);
     // fill Event histograms
     if(nclustershowers>=2)
-      anyShowerEvents->Fill(fMCenergystart[0]);
+    { anyShowerEvents->Fill(fMCenergystart[0]);
+     fEventPassCut=1;
+    }
     
     if(nclusterFANNshowers>=2)
+    {
       anyShowerEvents_FANN->Fill(fMCenergystart[0]);  
-    
-    
-    if(nclustershowersperplane[0]>0 && nclustershowersperplane[1]>0)
+      fEventPassFANNCut=1;
+    }
+    //////////////////////////////////////////////////
+    if(fNshowersPerPlane[0]>0 && fNshowersPerPlane[1]>0)
+    {
       bothplaneShowerEvents->Fill(fMCenergystart[0]);
+      fEventPassCut2Planes=1;
+    }
+      
     
-    
-    if(nclusterFANNshowersperplane[0]>0 && nclusterFANNshowersperplane[1]>0)
+    if(fNFANNshowersPerPlane[0]>0 && fNFANNshowersPerPlane[1]>0)
+    {
       bothplaneShowerEvents_FANN->Fill(fMCenergystart[0]);
+      fEventPassFANNCut2Planes=1;
+    }
+     
+     /////////////////////////////////////////////
+      if(fNshowersPerPlane[0]==1 && fNshowersPerPlane[1]==1)
+    {
+      bothplaneShowerEventOnlyOne->Fill(fMCenergystart[0]);
+      fEventPassCut2Planes1Only=1;
+    }
+      
+      
+            
+      
+    
+    if(fNFANNshowersPerPlane[0]==1 && fNFANNshowersPerPlane[1]==1)
+    {
+      bothplaneShowerEventOnlyOne_FANN->Fill(fMCenergystart[0]);
+      fEventPassFANNCut2Planes1Only=1;
+    }
+     
+     /////////////////Matching cut 
+       /////////////////////////////////////////////
+   
+   
+   
+   
+     
+    double Mindist=1000000;
+    double MinReasdist=1000000;
+    for(int ix=0;ix<fNClusters;ix++)
+    {
+      if(!fPassCut[ix] || plane[ix]!=0) // bad shower or wrong plane
+	 continue;
+     for(int jx=0;jx<fNClusters;jx++) 
+     {
+       if(!fPassCut[jx] || plane[jx]!=1) // bad plane
+         continue;
+       
+      double  dist=fabs(fmeanY[ix]-fmeanY[jx]);
+      fClusterDist.push_back(dist);
+      cluster_dist_diff->Fill(dist);
+      if (Mindist > dist) Mindist = dist;
+      double yz[2];
+      larutil::PxPoint pl0=larutil::PxPoint(0,fmeanX[ix],fmeanY[ix]);
+       larutil::PxPoint pl1=larutil::PxPoint(1,fmeanX[jx],fmeanY[jx]);
+    //   std::cout << " before " << std::endl;
+       int res=-1;
+      try { 
+       res=fGSer->GetYZCMspace(&pl0, &pl1, yz);
+       std::cout << "------- yz " << yz[0] << " " << yz[1] << std::endl;
+      }
+      catch(...){
+	std::cout << "caught exception " << std::endl;
+	res=-1;
+      }
+      // std::cout << "after " << std::endl;
+      
+      if (res!=-1 && MinReasdist > dist && yz[1]>1. && yz[1]<89. && yz[0]<19. && yz[0] > -19. ) MinReasdist = dist;
+     }
+      
+    }
+    
+    
+         //smallest distance between MeanY
+    smallest_dist->Fill(Mindist); 
+    fSmallestDist=Mindist;
+    fSmallestReasonDist=MinReasdist;
+    smallest_reason_dist->Fill(MinReasdist);
+    //all distances between MeanY
+   
+   if(Mindist < 2.5 && fNshowersPerPlane[0]>0 && fNshowersPerPlane[1]>0 )
+    {
+      bothplaneShowerEventsTimematched->Fill(fMCenergystart[0]);
+      fEventPassCut2PlanesTimeMatched=1;
+    }
+      
+    
+    if(Mindist < 2.5 && fNFANNshowersPerPlane[0]>0 && fNFANNshowersPerPlane[1]>0)
+    {
+      bothplaneShowerEventsTimematched_FANN->Fill(fMCenergystart[0]);
+      fEventPassFANNCut2PlanesTimeMatched=1;
+    } 
+    
+    
+    if(MinReasdist < 2.5 && fNshowersPerPlane[0]>0 && fNshowersPerPlane[1]>0 )
+    {
+      bothplaneShowerEventsmatched->Fill(fMCenergystart[0]);
+      fEventPassCut2PlanesMatched=1;
+      std::cout << " =   =========  standard matched" << std::endl;
+      
+    }
+      
+    
+    if(MinReasdist < 2.5 && fNFANNshowersPerPlane[0]>0 && fNFANNshowersPerPlane[1]>0)
+    {
+      bothplaneShowerEventsmatched_FANN->Fill(fMCenergystart[0]);
+      fEventPassFANNCut2PlanesMatched=1;
+        std::cout << " =   =========  fann matched" << std::endl;
+    } 
+    
+    
+    
+    //       ///using all hits:	 // comment in or out as needed
+     for (int ipl=0;ipl<fNPlanes;ipl++) {
+    
+        std::vector<const larlight::hit *> hit_vector;
+	
+        hit_vector.clear();
+        hit_vector.reserve(my_hit_v->size());
+
+	 std::cout << " plane: " << ipl << " Run: " << my_hit_v->run() << " SubRunID " << my_hit_v->subrun() << " EventID " <<  my_hit_v->event_id() << " " << my_hit_v << std::endl;   
+	 
+	
+	 
+	int iplane = ipl;
+	allplane[ipl]=iplane;
+	//double locmax=0;
+        for(auto &h : *my_hit_v) {
+          if( larutil::Geometry::GetME()->ChannelToPlane(h.Channel()) == ipl )
+	    hit_vector.push_back((const larlight::hit*)(&h));
+	  }
+	
+	
+         std::cout << " +++ in CutEff " << hit_vector.size() << " at plane: " << ipl << std::endl; 
+//       /// end using all hits  
+        ::cluster::ClusterParamsAlgNew  fCPAlg;
+        fCPAlg.Initialize();
+        fCPAlg.setNeuralNetPath("../FANN/trained_nets/cascade_argo_clusters.net");
+        fCPAlg.EnableFANN();
+        if(fCPAlg.SetHits(hit_vector) ==-1 )	
+            continue;
+        fCPAlg.GetAverages(true);
+        fCPAlg.GetRoughAxis(true);
+        fCPAlg.GetProfileInfo(true);
+        fCPAlg.RefineStartPointAndDirection(true);
+        //fCPAlg.RefineDirection(true);
+        //fCPAlg.RefineStartPoints(true);
+        //fCPAlg.FillPolygon()
+        fCPAlg.GetFinalSlope(true);
+        fCPAlg.TrackShowerSeparation(true);
+        //fCPAlg.Report();
+	
+	::cluster::cluster_params fResult=fCPAlg.GetParams();
+
+
+	/// fill Reco Tree Info
+	fShowernessAll[ipl]=fResult.showerness;
+//         fTrackness[ipl]=fResult.trackness;
+// 	
+// 	
+// 	fModifiedMeanCharge[ipl]=fResult.modmeancharge;
+        fChargeRMSAll[ipl]=fResult.RMS_charge;
+	fPrincipalAll[ipl]=TMath::Log(1-fResult.eigenvalue_principal);
+    
+    
+	    
+    
+     }
+    
+    
+    if( fShowernessAll[0] > 0.98 && fShowernessAll[1] > 0.98 ) 
+      fEventPassAllHitsShowerness=1;
+      
+    if((fChargeRMSAll[1]>400 ) && (fChargeRMSAll[0]>150 ))
+      fEventPassAllHitsChargerms=1;
+      
+     if ( fPrincipalAll[0] > -4 && fPrincipalAll[1] > -4)
+       fEventPassAllHitsTPrincipal=1;
+       
+      
+     
+      
+      
+    if( fEventPassAllHitsShowerness && fEventPassAllHitsChargerms && fEventPassAllHitsTPrincipal)
+    {
+      if( fEventPassFANNCut2PlanesMatched )
+	bothplaneShowerFANNEventsandAllHitsPassed->Fill(fMCenergystart[0]);
+      else
+	notbothplaneShowerFANNEventsandAllHitsPassed->Fill(fMCenergystart[0]);	
+      
+      if(fEventPassCut2PlanesMatched)
+	bothplaneShowerEventsandAllHitsPassed->Fill(fMCenergystart[0]);
+      else
+	notbothplaneShowerEventsandAllHitsPassed->Fill(fMCenergystart[0]);
+      
+      
+    }
+    
+    
+    //////////////////////////////////////////////////////////////////////////////////////////
+    //Minos match tets:
+    int mcpdg=0,recopdg=0;
+    argoana anobject;
+    fEventMinosMatched=anobject.is_matched_Loop(fRun,fSubRun,fEvent,minos_matched_mcpdg,minos_matched_recopdg);
+    
+    if( fEventPassAllHitsShowerness && fEventPassAllHitsChargerms && fEventPassAllHitsTPrincipal && !fEventMinosMatched )
+    {
+       if( fEventPassFANNCut2PlanesMatched )
+          bothplaneShowerFANNEventsandAllHitsPassedAndMinosMatched->Fill(fMCenergystart[0]);
+       
+         if(fEventPassCut2PlanesMatched)
+	    bothplaneShowerEventsandAllHitsPassedAndMinosMatched->Fill(fMCenergystart[0]);
+    }
+   
+    
+    //TH1D* minos_matched_mcpdg; TH1D* minos_matched_recopdg; 
+
+
+    //////////////////////////////////////////////////////////////////////////////////////////
+    
+    
+    fMainTree->Fill();
+  
+    
+   
+
+   
+    
+    
+//     if(fMCPDGstart[0]==11)
+//     if(fMCPDGstart[0]==2212 || fMCPDGstart[0]==13 )
+  //  {
+   
     
     //any event that has two shower clusters one in eache plane that match/reconstruct inside fid vol.  
   //  TH1D* bothplaneShowerEventsmatched;
@@ -932,6 +1153,26 @@ namespace larlight {
 //      bothplaneShowerEventsmatched_FANN->DrawCopy("same");
      
      
+     TCanvas * surviveplaneevtsonlyone_c_FANN= new TCanvas("Events with one showers in each plane  FANN","Events with one showers in each plane  FANN");
+     allEvts->DrawCopy();
+     bothplaneShowerEventOnlyOne_FANN->SetLineColor(kRed);
+     bothplaneShowerEventOnlyOne_FANN->DrawCopy("same");
+     
+     
+     TCanvas * surviveplaneevtsonlyone_c= new TCanvas("Events with one showers in each plane  ","Events with one showers in each plane  ");
+     allEvts->DrawCopy();
+     bothplaneShowerEventOnlyOne->SetLineColor(kRed);
+     bothplaneShowerEventOnlyOne->DrawCopy("same");
+     
+     
+     
+     
+     TCanvas * distances_c= new TCanvas("Distances  ","Distances  ");
+     cluster_dist_diff->DrawCopy();
+     smallest_dist->SetLineColor(kRed);
+     smallest_dist->DrawCopy("same");
+     smallest_reason_dist->SetLineColor(kGreen);
+     smallest_reason_dist->DrawCopy("same");
     std::cout << "+++++All Clusters: " << allClusters->GetEntries() << std::endl;
    
     std::cout << " All Clusters passing cuts: " << anyShowerClusters->GetEntries() << std::endl;
@@ -943,11 +1184,33 @@ namespace larlight {
 
     
     std::cout << " All events with two showers cuts: " << anyShowerEvents->GetEntries() << std::endl;
-    std::cout << " All events with two showers, two planes cuts: " << bothplaneShowerEvents->GetEntries() << std::endl; 
+    std::cout << " All events with at least two showers, two planes cuts: " << bothplaneShowerEvents->GetEntries() << std::endl; 
+    std::cout << " All events with exactly two showers, two planes cuts: " << bothplaneShowerEventOnlyOne->GetEntries() << std::endl; 
+     std::cout << " All events with time matched , two planes cuts: " << bothplaneShowerEventsTimematched->GetEntries() << std::endl << std::endl; 
+    std::cout << " All events with matched , two planes cuts: " << bothplaneShowerEventsmatched->GetEntries() << std::endl << std::endl; 
+    
     
     std::cout << " All events with two FANN showers cuts: " << anyShowerEvents_FANN->GetEntries() << std::endl;
-    std::cout << " All events with two FANN showers, two planes cuts: " << bothplaneShowerEvents_FANN->GetEntries() << std::endl;
+    std::cout << " All events with at least two FANN showers, two planes cuts: " << bothplaneShowerEvents_FANN->GetEntries() << std::endl;
+    std::cout << " All events with exactly two FANN showers, two planes cuts: " << bothplaneShowerEventOnlyOne_FANN->GetEntries() << std::endl;
+    std::cout << " All events with time matched FANN , two planes cuts: " << bothplaneShowerEventsTimematched_FANN->GetEntries() << std::endl << std::endl; 
+    std::cout << " All events with matched FANN showers, two planes cuts: " << bothplaneShowerEventsmatched_FANN->GetEntries() << std::endl << std::endl;; 
     
+    std::cout << " +++ All hits cuts  " << std::endl;
+    
+     std::cout << " passed standard and allhit cuts " << bothplaneShowerEventsandAllHitsPassed->GetEntries() << " FANN: " << bothplaneShowerFANNEventsandAllHitsPassed->GetEntries() << std::endl;
+    
+      std::cout << " did not pass standard but allhit cuts " << notbothplaneShowerEventsandAllHitsPassed->GetEntries() << " FANN: " << notbothplaneShowerFANNEventsandAllHitsPassed->GetEntries() << std::endl;
+     
+      std::cout << " passed standard all above and not MINOS matched " << bothplaneShowerEventsandAllHitsPassedAndMinosMatched->GetEntries() << " FANN: " << bothplaneShowerFANNEventsandAllHitsPassedAndMinosMatched->GetEntries() << std::endl;
+    
+        /*
+      TH1D* bothplaneShowerEventOnlyOne;
+    TH1D* bothplaneShowerEventOnlyOne_FANN;
+    //smallest distance between MeanY
+    TH1D* smallest_dist; 
+    //all distances between MeanY
+    TH1D* cluster_dist_diff; */
     
 //     //any cluster that passes cuts
 //     TH1D* anyShowerClusters;
@@ -1031,7 +1294,7 @@ namespace larlight {
 //       eigenvalue_principal_tr->Write();
 //       length_tr->Write();
 //       width_tr ->Write();
-//      fMainTree->Write();
+      fMainTree->Write();
 // 	
 	
       }
@@ -1131,7 +1394,10 @@ namespace larlight {
     
     
     
-    
+       fChargeRMSAll.clear();
+       fShowernessAll.clear();
+       allplane.clear();
+       fPrincipalAll.clear();
     ////////////////////////// now resize.
     //These are defined per MCparticle  
        fMCPDGstart.resize(fNParticles);  
@@ -1209,16 +1475,62 @@ namespace larlight {
      
        fShowerness.resize(fNClusters);
        fTrackness.resize(fNClusters);
-    
+       
        
        fModifiedMeanCharge.resize(fNClusters);;
        fChargeRMS.resize(fNClusters);;
        
-      max_charge_3.clear();
-	  max_charge.clear();
-      max_charge_3.resize(fNClusters);
-	  max_charge.resize(fNClusters);
+       max_charge_3.clear();
+       max_charge.clear();
+       max_charge_3.resize(fNClusters);
+       max_charge.resize(fNClusters);
+       
+       
+       
+       fPassCut.clear(); // per cluster
+       fPassFANNCut.clear(); //per cluster
+       fNshowersPerPlane.clear();  // per plane
+       fNFANNshowersPerPlane.clear(); //per plane
+       
+       //fSmallestDist.clear();  //perplane
+       
+       fPassCut.resize(fNClusters,0); // per cluster
+       fPassFANNCut.resize(fNClusters,0); //per cluster
+       fNshowersPerPlane.resize(fNPlanes,0);  // per plane
+       fNFANNshowersPerPlane.resize(fNPlanes,0); //per plane
+       
+       
+       ////allhits loop
+       fChargeRMSAll.resize(fNPlanes,0);
+       fShowernessAll.resize(fNPlanes,0);
+       allplane.resize(fNPlanes);
+       fPrincipalAll.resize(fNPlanes);
+       //fSmallestDist.resize(fNPlanes,0);  //perplane
+       
     
+        fEventPassCut =0;
+    fEventPassFANNCut =0;
+    
+    fEventPassCut2Planes =0;
+    fEventPassFANNCut2Planes =0;
+    
+    fEventPassCut2Planes1Only =0;
+    fEventPassFANNCut2Planes1Only =0;
+    
+    fEventPassCut2PlanesMatched =0;
+    fEventPassFANNCut2PlanesMatched =0;
+    
+    fEventPassCut2PlanesTimeMatched=0;
+    fEventPassFANNCut2PlanesTimeMatched=0;
+
+    fEventPassAllHitsShowerness=0;
+    fEventPassAllHitsChargerms=0;
+    fEventPassAllHitsTPrincipal=0;
+	  
+    minos_matched_mcpdg=0;
+    minos_matched_recopdg=0;
+    fEventMinosMatched=0;	  
+	  
     }
   
 }
