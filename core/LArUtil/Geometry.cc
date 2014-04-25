@@ -316,7 +316,7 @@ namespace larutil {
   UInt_t Geometry::PlaneWireToChannel(const UInt_t plane,
 				      const UInt_t wire) const
   {
-    if(plane >= Nplanes() || fPlaneWireToChannelMap.at(plane).size() >= wire) {
+    if(plane >= Nplanes() || fPlaneWireToChannelMap.at(plane).size() <= wire) {
       throw LArUtilException(Form("Invalid (plane, wire) = (%d, %d)",plane,wire));
       return larlight::DATA::INVALID_UINT;
     }
