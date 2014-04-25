@@ -45,8 +45,10 @@ namespace cluster {
 
     /// Enum to specify message output level
     enum CMergeMSGLevel_t {
-      /// Very verbose (cout per merging)
+      /// Extremely verbose (cout per individual algorithm execution)
       kPerMerging,
+      /// Very verbose (cout per set of algorithms execution)
+      kPerAlgoSet,
       /// Somewhat verbose (cout per merging iteration)
       kPerIteration,
       /// Bit verbose (cout per event)
@@ -66,21 +68,34 @@ namespace cluster {
     /// Method to enable debug mode (lots of couts)
     void DebugMode(CMergeMSGLevel_t level) {_debug_mode=level;}
 
+    /// Switch to continue merging till converges
+    void MergeTillConverge(bool doit=true) {_merge_till_converge = doit;}
+
+    /// Choose ordering for clusters to be merged
+    void SetMergePriority(CMergePriority_t level) { _priority=level; }
+
     /// Method to reset itself
     void Reset();
 
     /// A simple method to add a one merging step
-    void AddAlgo(CMergeAlgoBase* alg) 
+    void AddAlgo(CMergeAlgoBase* alg,
+		 bool ask_and_in_algos = true,
+		 bool ask_and_in_sets  = true) 
     { 
       // By default we ask AND condition
-      AddAlgo(std::vector<cluster::CMergeAlgoBase*>(1,alg),true);
+      AddAlgo(std::vector<cluster::CMergeAlgoBase*>(1,alg),
+	      ask_and_in_algos,
+	      ask_and_in_sets);
     }
 
     /// A simple method to add a group of algorithms
-    void AddAlgo(std::vector<cluster::CMergeAlgoBase* > alg_v, bool ask_and)
+    void AddAlgo(std::vector<cluster::CMergeAlgoBase* > alg_v, 
+		 bool ask_and_in_algos = true,
+		 bool ask_and_in_sets = true)
     {
       _merge_algo.push_back(alg_v);
-      _ask_and.push_back(ask_and);
+      _ask_and_in_algos.push_back(ask_and_in_algos);
+      _ask_and_in_sets.push_back(ask_and_in_sets);
     }
 
     /// A simple method to add a cluster
@@ -131,9 +146,15 @@ namespace cluster {
 
     /**
        A boolean vector that holds user configuration of whether asking AND or OR condition
-       for the specified set of algorithms in _merge_algo.
+       among algorithm in the specified set in _merge_algo
      */
-    std::vector<bool> _ask_and;
+    std::vector<bool> _ask_and_in_algos;
+
+    /**
+       A boolean vector that holds user configuration of whether asking AND or OR condition
+       w.r.t. the previous set of algorithms in _merge_algo
+     */
+    std::vector<bool> _ask_and_in_sets;
 
     /// Merging priority type
     CMergePriority_t _priority;
