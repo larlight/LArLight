@@ -79,10 +79,10 @@ namespace cluster {
 		    const std::vector<std::pair<double,double> > &cluster_polygon);
     
     /// A function to draw all clusters on a dedicated canvas
-    void DrawAllClusters() const;
+    void DrawAllClusters();
 
     /// A function to draw each cluster on a separate canvas than the one with all clusters
-    void DrawOneCluster(UChar_t plane, size_t index) const;
+    void DrawOneCluster(UChar_t plane, size_t index);
     
     /// A function to count # clusters in the given plane
     size_t ClusterCount(UChar_t plane);
