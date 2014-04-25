@@ -369,7 +369,8 @@ namespace cluster {
   {
     if(!_cAllCluster) {
       _cAllCluster = new TCanvas(Form("cAllClusterFor%s",_name.c_str()),
-				 "Wire vs. Time Cluster Viewer",900,600);
+				 Form("%s: Cluster Hits Wire vs. Time",_name.c_str()),
+				 900,600);
       _cAllCluster->Divide(2,_nplanes);
     }
 
@@ -406,7 +407,8 @@ namespace cluster {
   {
     if(!_cOneCluster)
       _cOneCluster = new TCanvas(Form("cOneClusterFor%s",_name.c_str()),
-				 "Individual Cluster Start/End Points",500,300);
+				 Form("%s : Individual Cluster Start/End Points",_name.c_str()),
+				 500,300);
 
     if(plane >= _nplanes) throw ViewerException(Form("Invalid plane ID: %d",plane));
 

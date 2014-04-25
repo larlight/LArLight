@@ -13,6 +13,7 @@
 #pragma link C++ class cluster::ViewerException+;
 #pragma link C++ class larlight::ClusterViewer+;
 #pragma link C++ class larlight::MergeViewer+;
+#pragma link C++ class larlight::MCShowerClusterViewer+;
 
 //ADD_NEW_CLASS ... do not change this line
 #endif

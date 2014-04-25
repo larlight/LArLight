@@ -31,6 +31,7 @@ my_proc.set_ana_output_file("")
 
 raw_viewer   = larlight.ClusterViewer()
 merge_viewer = larlight.MergeViewer()
+mc_viewer    = larlight.MCShowerClusterViewer()
 
 # attach merge algo
 merge_viewer.GetManager().AddAlgo(cluster.CMAlgoFake())
@@ -38,6 +39,8 @@ merge_viewer.GetManager().AddAlgo(cluster.CMAlgoFake())
 my_proc.add_process(raw_viewer)
 
 my_proc.add_process(merge_viewer)
+
+my_proc.add_process(mc_viewer)
 
 gStyle.SetOptStat(0)
 
@@ -56,6 +59,8 @@ while true:
     raw_viewer.DrawAllClusters();
 
     merge_viewer.DrawAllClusters();
+
+    mc_viewer.DrawAllClusters();
 
     print "    Hit enter to go next event..."
     sys.stdin.readline()

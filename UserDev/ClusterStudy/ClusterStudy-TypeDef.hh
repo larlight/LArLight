@@ -10,6 +10,7 @@
 #include "ClusterViewerAlgo.hh"
 #include "ClusterViewer.hh"
 #include "MergeViewer.hh"
+#include "MCShowerClusterViewer.hh"
 //ADD_NEW_HEADER ... do not change this comment line
 
 // Class forward declaration here
@@ -21,6 +22,7 @@ namespace cluster {
 namespace larlight {
   class ClusterViewer;
   class MergeViewer;
+  class MCShowerClusterCiewer;
 //ADD_ANA_CLASS ... do not change this comment line
 }
 
