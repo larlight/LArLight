@@ -32,7 +32,6 @@ namespace cluster{
   class FANNModule{
 
   public:
-
     /// Default constructor
     FANNModule(){
       fInputFileName = "default.net";
@@ -40,8 +39,7 @@ namespace cluster{
 
     /// Default destructor
     //~FANNModule(){ if (ann) fann_destroy(ann);}
-    ~FANNModule(){}    
-
+    ~FANNModule(){}
 
 
     /**

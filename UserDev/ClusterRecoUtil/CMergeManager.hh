@@ -42,6 +42,18 @@ namespace cluster {
       /// Merge clusters with many hits first
       kNHits
     };
+
+    /// Enum to specify message output level
+    enum CMergeMSGLevel_t {
+      /// Very verbose (cout per merging)
+      kPerMerging,
+      /// Somewhat verbose (cout per merging iteration)
+      kPerIteration,
+      /// Bit verbose (cout per event)
+      kPerEvent,
+      /// Normal
+      kNone
+    };
     
   public:
     
@@ -50,6 +62,9 @@ namespace cluster {
     
     /// Default destructor
     virtual ~CMergeManager(){};
+
+    /// Method to enable debug mode (lots of couts)
+    void DebugMode(CMergeMSGLevel_t level) {_debug_mode=level;}
 
     /// Method to reset itself
     void Reset();
@@ -72,14 +87,27 @@ namespace cluster {
     void SetClusters(const std::vector<std::vector<larutil::PxHit> > &clusters);
 
     /// A method to execute merging algorithms
-    void Process(bool merge_till_converge=false);
+    void Process();
+
+    /// A method to obtain output clusters
+    const std::vector<cluster::ClusterParamsAlgNew>& GetClusters() const { return _out_clusters; }
 
   protected:
 
     void RunMerge(const std::vector<cluster::ClusterParamsAlgNew > &in_clusters,
 		  CBookKeeper &book_keeper) const;
 
+    void RunMerge(const std::vector<cluster::ClusterParamsAlgNew > &in_clusters,
+		  const std::vector<bool> &merge_flag,
+		  CBookKeeper &book_keeper) const;
+
   protected:
+
+    /// Iterative approach for merging
+    bool _merge_till_converge;
+
+    /// Debug mode switch
+    CMergeMSGLevel_t _debug_mode;
 
     /// Input clusters
     std::vector<cluster::ClusterParamsAlgNew> _in_clusters;

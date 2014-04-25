@@ -28,13 +28,14 @@ namespace cluster {
 
     if(out_index1 == out_index2) return;
 
-    auto merged_index = ( out_index1 > out_index2 ? out_index2 : out_index1 );
-
+    // Make out_index1 to be the smaller one
+    if(out_index1 > out_index2) std::swap(out_index1,out_index2);
+	
     for(auto &v : (*this)) {
 
       if( v == out_index1 || v == out_index2 )
-	v = merged_index;
-      else if( v > merged_index )
+	v = out_index1;
+      else if( v > out_index2 )
 	v -= 1;
     }
     
@@ -74,7 +75,6 @@ namespace cluster {
 
     for(size_t i=0; i<this->size(); ++i)
       result.at(this->at(i)).push_back(i);
-    
   }
 
   void CBookKeeper::Combine(const CBookKeeper &another)
