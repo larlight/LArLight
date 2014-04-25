@@ -9,12 +9,8 @@ namespace cluster {
   //##################################################################
   {
     _nplanes = larutil::Geometry::GetME()->Nplanes();
-    _cAllCluster = new TCanvas(Form("cAllClusterFor%s",_name.c_str()),
-			       "Wire vs. Time Cluster Viewer",900,600);
-    _cAllCluster->Divide(2,_nplanes);
-    _cOneCluster = new TCanvas(Form("cOneClusterFor%s",_name.c_str()),
-			       "Individual Cluster Start/End Points",500,300);
-
+    _cAllCluster = nullptr;
+    _cOneCluster = nullptr;
   }
 
   //#############################
@@ -371,6 +367,12 @@ namespace cluster {
   void ClusterViewerAlgo::DrawAllClusters() const
   //#############################################
   {
+    if(!_cAllCluster) {
+      _cAllCluster = new TCanvas(Form("cAllClusterFor%s",_name.c_str()),
+				 "Wire vs. Time Cluster Viewer",900,600);
+      _cAllCluster->Divide(2,_nplanes);
+    }
+
     _cAllCluster->cd();
     for(UChar_t plane=0; plane<_nplanes; ++plane) {
       
@@ -402,6 +404,10 @@ namespace cluster {
   void ClusterViewerAlgo::DrawOneCluster(UChar_t plane, size_t index) const
   //#######################################################################
   {
+    if(!_cOneCluster)
+      _cOneCluster = new TCanvas(Form("cOneClusterFor%s",_name.c_str()),
+				 "Individual Cluster Start/End Points",500,300);
+
     if(plane >= _nplanes) throw ViewerException(Form("Invalid plane ID: %d",plane));
 
     if(index >= _hClusterHits.at(plane).size()) throw ViewerException(Form("Invalid cluster index: %zu (for plane %d)",
