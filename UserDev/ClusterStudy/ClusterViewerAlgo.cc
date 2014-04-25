@@ -363,9 +363,9 @@ namespace cluster {
     return g;
   }
 
-  //#############################################
-  void ClusterViewerAlgo::DrawAllClusters() const
-  //#############################################
+  //#######################################
+  void ClusterViewerAlgo::DrawAllClusters() 
+  //#######################################
   {
     if(!_cAllCluster) {
       _cAllCluster = new TCanvas(Form("cAllClusterFor%s",_name.c_str()),
@@ -400,9 +400,9 @@ namespace cluster {
     _cAllCluster->Update();
   }
 
-  //#######################################################################
-  void ClusterViewerAlgo::DrawOneCluster(UChar_t plane, size_t index) const
-  //#######################################################################
+  //#################################################################
+  void ClusterViewerAlgo::DrawOneCluster(UChar_t plane, size_t index)
+  //#################################################################
   {
     if(!_cOneCluster)
       _cOneCluster = new TCanvas(Form("cOneClusterFor%s",_name.c_str()),
