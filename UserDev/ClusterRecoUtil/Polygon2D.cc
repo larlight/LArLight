@@ -198,6 +198,6 @@ bool Polygon2D::Contained(const Polygon2D &poly2) const
       return false;
   }
   
-  return false;
+  return true;
 
 }
