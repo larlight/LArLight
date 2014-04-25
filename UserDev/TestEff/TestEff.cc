@@ -165,9 +165,9 @@ namespace larlight {
     if(!modifiedHitDens) modifiedHitDens = new TH1D("modifiedHitDens","Modified Hit Density",100,0,20);
     else modifiedHitDens->Reset();
 
-    if(!trackness) trackness = new TH1D("trackness","trackness",100,0,1);
+    if(!trackness) trackness = new TH1D("trackness","trackness",100,-0.05,1.05);
     else trackness->Reset();
-    if(!showerness) showerness = new TH1D("showerness","showerness",100,0,1);
+    if(!showerness) showerness = new TH1D("showerness","showerness",100,-0.05,1.05);
     else showerness->Reset();
 
 
@@ -229,7 +229,7 @@ namespace larlight {
     else closeAngleChargeWgt_sh->Reset();
      closeAngleChargeWgt_sh->SetLineColor(kRed);
    
-     if(!showerness_sh) showerness_sh = new TH1D("showerness_sh","showerness_sh",100,0,1);
+     if(!showerness_sh) showerness_sh = new TH1D("showerness_sh","showerness_sh",100,-0.05,1.05);
     else showerness_sh->Reset();
     showerness_sh->SetLineColor(kRed);
     ////////////////////////////////////////////////////////////////////////////////
@@ -258,7 +258,7 @@ namespace larlight {
     else closeAngle_tr->Reset();
     if(!closeAngleChargeWgt_tr) closeAngleChargeWgt_tr = new TH1D("closeAngleChargeWgt_tr","Closing Angle, Charge Wieghted, Tracks",180,0,1.1*TMath::Pi());
     else closeAngleChargeWgt_tr->Reset();
-    if(!showerness_tr) showerness_tr = new TH1D("showerness_tr","showerness_tr",100,0,1);
+    if(!showerness_tr) showerness_tr = new TH1D("showerness_tr","showerness_tr",100,-0.05,1.05);
     else showerness_tr->Reset();
     /////////////////////////////////////
     ///muons vs protons vs electrons testing of max hit charge
@@ -331,8 +331,8 @@ namespace larlight {
       fNParticles = 0;
     
     fNPlanes=larutil::Geometry::GetME()->Nplanes();
-   // fNClusters=fNPlanes;    // then should be" my_cluster_v->size() or fNPlanes
-    fNClusters=my_cluster_v->size();    // using clusters
+    fNClusters=fNPlanes;    // then should be" my_cluster_v->size() or fNPlanes
+   // fNClusters=my_cluster_v->size();    // using clusters
     init_tree_vectors();
     
     std::cout << "after init vectors" << std::endl;
@@ -428,98 +428,32 @@ namespace larlight {
      fEvent=my_hit_v->event_id();
     
       ///using all hits:	 // comment in or out as needed
-//      for (int ipl=0;ipl<fNPlanes;ipl++) {
-//     
-//         std::vector<const larlight::hit *> hit_vector;
-// 	
-//         hit_vector.clear();
-//         hit_vector.reserve(my_hit_v->size());
-// 
-// 	 std::cout << " plane: " << ipl << " Run: " << my_hit_v->run() << " SubRunID " << my_hit_v->subrun() << " EventID " <<  my_hit_v->event_id() << " " << my_hit_v << std::endl;   
-// 	 
-// 	
-// 	 
-// 	int iplane = ipl;
-// 	
-// 	//double locmax=0;
-// 	std::vector< double > locmaxvec;
-// 	locmaxvec.resize(3);
-// 	locmaxvec[0]=0;
-// 	locmaxvec[1]=1;
-// 	locmaxvec[2]=2;
-//         for(auto &h : *my_hit_v) {
-//     /*      if( larutil::Geometry::GetME()->ChannelToPlane(h.Channel()) == ipl )
-//  	  hit_vector.push_back((const larlight::hit*)(&h));
-// 	}*/ 
-// 	  
-//         if( larutil::Geometry::GetME()->ChannelToPlane(h.Channel()) == ipl )
-// 	  {hit_vector.push_back((const larlight::hit*)(&h));
-// 	   if(h.Charge()>locmaxvec[0])  
-// 	      {int xx=0;
-// 	       while(h.Charge()>locmaxvec[xx] && xx<locmaxvec.size()) //stop at xx element which is the highest.
-// 		  xx++;
-//                
-// 	    //   std::cout << " found max at location: " << xx-1 << " "<< h.Charge()<< std::endl;
-// 	       
-// 	       
-//                for(int ix=0;ix<xx-1;ix++)
-//                 locmaxvec[ix]=locmaxvec[ix+1];		
-//  
-// 	       locmaxvec[xx-1]=h.Charge();
-// 	       
-// 	      }
-// 	   // std::cout << " filling histograms for ipl = " << ipl << std::endl;  
-// 	    if(fMCPDGstart[0]==11)
-// 	      Charge_e[ipl]->Fill(h.Charge());
-// 	    if(fMCPDGstart[0]==13)
-// 	      Charge_mu[ipl]->Fill(h.Charge());
-// 	    if(fMCPDGstart[0]==2212)
-// 	      Charge_p[ipl]->Fill(h.Charge());
-// 	  }
-// 	}
-// 	
-// 	max_charge_3[ipl]=0;
-// 	for(int ix=0;ix<locmaxvec.size();ix++)
-// 	  {std::cout << "max hits " << locmaxvec[ix] << std::endl;
-// 	  max_charge_3[ipl]+=locmaxvec[ix];
-// 	  max_charge[ipl]=locmaxvec[ix];
-// 	  }
-// 	
-// 	
-//    
-//  
-// 	
-// 	
-//          std::cout << " +++ in TestEff " << hit_vector.size() << " at plane: " << ipl << std::endl; 
-      /// end using all hits  
-
-	 /// using cluster only. // comment in or out as needed // need to set ipl as counter. and iplane as plane
-     int ipl=-1; // just so that I can increment it at the start and not end of loop. ;-)
-    for(auto const clustit : *my_cluster_v) {
-      std::cout << "loop nr " << ipl+2 << std::endl;
-      std::cout << " Clust ID " << clustit.ID() << " Run: " << my_cluster_v->run() << " SubRunID " << my_cluster_v->subrun() << " EventID " <<  my_cluster_v->event_id() << " " << my_cluster_v << std::endl;    
-
-     //auto const hit_index_v = clustit.association(my_cluster_v->get_hit_type());
+     for (int ipl=0;ipl<fNPlanes;ipl++) {
     
-        auto const hit_index_v = clustit.association(DATA::FFTHit);
         std::vector<const larlight::hit *> hit_vector;
-	std::cout << " cluster hits: " << hit_index_v.size() << std::endl;
+	
         hit_vector.clear();
+        hit_vector.reserve(my_hit_v->size());
+
+	 std::cout << " plane: " << ipl << " Run: " << my_hit_v->run() << " SubRunID " << my_hit_v->subrun() << " EventID " <<  my_hit_v->event_id() << " " << my_hit_v << std::endl;   
+	 
+	
+	 
+	int iplane = ipl;
+	
+	//double locmax=0;
 	std::vector< double > locmaxvec;
 	locmaxvec.resize(3);
 	locmaxvec[0]=0;
 	locmaxvec[1]=1;
 	locmaxvec[2]=2;
-	ipl++; // should be zero on first loop.
-        int iplane = larutil::Geometry::GetME()->ChannelToPlane(my_hit_v->at(hit_index_v[0]).Channel()) ;
-        std::cout << " ipl " << ipl << " iplane "<< iplane << std::endl;
-	
-	
-        for(auto const hit_index : hit_index_v) {
-            hit_vector.push_back( const_cast<const larlight::hit *>(&(my_hit_v->at(hit_index))) );
-             auto h=my_hit_v->at(hit_index);
-//        }
-	 //  std::cout << " in hit index " << std::endl;  
+        for(auto &h : *my_hit_v) {
+    /*      if( larutil::Geometry::GetME()->ChannelToPlane(h.Channel()) == ipl )
+ 	  hit_vector.push_back((const larlight::hit*)(&h));
+	}*/ 
+	  
+        if( larutil::Geometry::GetME()->ChannelToPlane(h.Channel()) == ipl )
+	  {hit_vector.push_back((const larlight::hit*)(&h));
 	   if(h.Charge()>locmaxvec[0])  
 	      {int xx=0;
 	       while(h.Charge()>locmaxvec[xx] && xx<locmaxvec.size()) //stop at xx element which is the highest.
@@ -534,30 +468,99 @@ namespace larlight {
 	       locmaxvec[xx-1]=h.Charge();
 	       
 	      }
-          //  std::cout << " in hit index after locmacvec " << " ipl " << ipl << std::endl;  	      
-  	   // std::cout << " filling histograms for ipl = " << ipl << std::endl;  
+	   // std::cout << " filling histograms for ipl = " << ipl << std::endl;  
+	   if(fMCPDGstart.size())
+	   {
 	    if(fMCPDGstart[0]==11)
-	      Charge_e[iplane]->Fill(h.Charge());
+	      Charge_e[ipl]->Fill(h.Charge());
 	    if(fMCPDGstart[0]==13)
-	      Charge_mu[iplane]->Fill(h.Charge());
+	      Charge_mu[ipl]->Fill(h.Charge());
 	    if(fMCPDGstart[0]==2212)
-	      Charge_p[iplane]->Fill(h.Charge());
+	      Charge_p[ipl]->Fill(h.Charge());
+	   }
 	  }
+	}
 	
 	max_charge_3[ipl]=0;
 	for(int ix=0;ix<locmaxvec.size();ix++)
-	  {std::cout << "max hits " << locmaxvec[ix] << " " << ix << " ipl " << ipl << " " << max_charge_3.size() << std::endl;
-	  max_charge_3.at(ipl)+=locmaxvec[ix];
-	  max_charge.at(ipl)=locmaxvec[ix];
+	  {std::cout << "max hits " << locmaxvec[ix] << std::endl;
+	  max_charge_3[ipl]+=locmaxvec[ix];
+	  max_charge[ipl]=locmaxvec[ix];
 	  }
-        
-        
-        
-        
-        
-        
-        
-        
+	
+	
+   
+ 
+	
+	
+         std::cout << " +++ in TestEff " << hit_vector.size() << " at plane: " << ipl << std::endl; 
+      /// end using all hits  
+
+	 /// using cluster only. // comment in or out as needed // need to set ipl as counter. and iplane as plane
+//      int ipl=-1; // just so that I can increment it at the start and not end of loop. ;-)
+//     for(auto const clustit : *my_cluster_v) {
+//       std::cout << "loop nr " << ipl+2 << std::endl;
+//       std::cout << " Clust ID " << clustit.ID() << " Run: " << my_cluster_v->run() << " SubRunID " << my_cluster_v->subrun() << " EventID " <<  my_cluster_v->event_id() << " " << my_cluster_v << std::endl;    
+// 
+//      //auto const hit_index_v = clustit.association(my_cluster_v->get_hit_type());
+//     
+//         auto const hit_index_v = clustit.association(DATA::FFTHit);
+//         std::vector<const larlight::hit *> hit_vector;
+// 	std::cout << " cluster hits: " << hit_index_v.size() << std::endl;
+//         hit_vector.clear();
+// 	std::vector< double > locmaxvec;
+// 	locmaxvec.resize(3);
+// 	locmaxvec[0]=0;
+// 	locmaxvec[1]=1;
+// 	locmaxvec[2]=2;
+// 	ipl++; // should be zero on first loop.
+//         int iplane = larutil::Geometry::GetME()->ChannelToPlane(my_hit_v->at(hit_index_v[0]).Channel()) ;
+//         std::cout << " ipl " << ipl << " iplane "<< iplane << std::endl;
+// 	
+// 	
+//         for(auto const hit_index : hit_index_v) {
+//             hit_vector.push_back( const_cast<const larlight::hit *>(&(my_hit_v->at(hit_index))) );
+//              auto h=my_hit_v->at(hit_index);
+// //        }
+// 	 //  std::cout << " in hit index " << std::endl;  
+// 	   if(h.Charge()>locmaxvec[0])  
+// 	      {int xx=0;
+// 	       while(h.Charge()>locmaxvec[xx] && xx<locmaxvec.size()) //stop at xx element which is the highest.
+// 		  xx++;
+//                
+// 	    //   std::cout << " found max at location: " << xx-1 << " "<< h.Charge()<< std::endl;
+// 	       
+// 	       
+//                for(int ix=0;ix<xx-1;ix++)
+//                 locmaxvec[ix]=locmaxvec[ix+1];		
+//  
+// 	       locmaxvec[xx-1]=h.Charge();
+// 	       
+// 	      }
+//           //  std::cout << " in hit index after locmacvec " << " ipl " << ipl << std::endl;  	      
+//   	   // std::cout << " filling histograms for ipl = " << ipl << std::endl;  
+// 	    if(fMCPDGstart[0]==11)
+// 	      Charge_e[iplane]->Fill(h.Charge());
+// 	    if(fMCPDGstart[0]==13)
+// 	      Charge_mu[iplane]->Fill(h.Charge());
+// 	    if(fMCPDGstart[0]==2212)
+// 	      Charge_p[iplane]->Fill(h.Charge());
+// 	  }
+// 	
+// 	max_charge_3[ipl]=0;
+// 	for(int ix=0;ix<locmaxvec.size();ix++)
+// 	  {std::cout << "max hits " << locmaxvec[ix] << " " << ix << " ipl " << ipl << " " << max_charge_3.size() << std::endl;
+// 	  max_charge_3.at(ipl)+=locmaxvec[ix];
+// 	  max_charge.at(ipl)=locmaxvec[ix];
+// 	  }
+//         
+//         
+//         
+//         
+//         
+//         
+//         
+//         
         
         
         

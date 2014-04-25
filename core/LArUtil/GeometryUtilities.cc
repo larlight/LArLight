@@ -876,6 +876,27 @@ namespace larutil{
     return 0;
   }
 
+  
+    //////////////////////////////////////////////////////////
+  Int_t GeometryUtilities::GetYZCMspace(const PxPoint *p0,
+				 const PxPoint *p1,
+				 Double_t* yz) const
+  {
+    Double_t y,z;
+
+    UInt_t chan1 = geom->PlaneWireToChannel(p0->plane, (int)(p0->w/fWiretoCm+0.1)); // to make sure we get the rounding errors
+    UInt_t chan2 = geom->PlaneWireToChannel(p1->plane, (int)(p1->w/fWiretoCm+0.1));
+
+    if(! geom->ChannelsIntersect(chan1,chan2,y,z) )
+      return -1;
+  
+    yz[0]=y;
+    yz[1]=z;
+  
+    return 0;
+  }
+  
+  
   //////////////////////////////////////////////////////////////
   
   PxPoint GeometryUtilities::Get2DPointProjection(Double_t *xyz, Int_t plane) const{

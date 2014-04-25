@@ -152,12 +152,52 @@ namespace larlight {
     std::vector<double>   fModifiedMeanCharge;
     std::vector<double>   fChargeRMS;
     
-    std::vector<bool>     fPassCut;
+    std::vector<bool>     fPassCut; // per cluster
+    std::vector<bool>     fPassFANNCut; //per cluster
+    std::vector<int>      fNshowersPerPlane;  // per plane
+    std::vector<int>      fNFANNshowersPerPlane; //per plane
     
+    double   fSmallestDist;  
+    double   fSmallestReasonDist;  
+    std::vector<double>   fClusterDist;  //per combination of clusters 
     
+    int    fEventPassCut;
+    int    fEventPassFANNCut;
     
+    int    fEventPassCut2Planes;
+    int    fEventPassFANNCut2Planes;
     
+    int    fEventPassCut2Planes1Only;
+    int    fEventPassFANNCut2Planes1Only;
     
+    int    fEventPassCut2PlanesTimeMatched;
+    int    fEventPassFANNCut2PlanesTimeMatched;
+  
+    int    fEventPassCut2PlanesMatched;
+    int    fEventPassFANNCut2PlanesMatched;
+    
+    ////////////////////////////////// allhits loop.
+    int    fEventPassAllHitsShowerness;
+    int    fEventPassAllHitsChargerms;
+    int    fEventPassAllHitsTPrincipal;
+    std::vector<double>   fChargeRMSAll;
+    std::vector<double>   fShowernessAll;
+    std::vector<double>   fPrincipalAll;
+    std::vector<int>   allplane;
+       //any event that has two shower clusters one in eache plane that match in time.  
+    TH1D* bothplaneShowerEventsandAllHitsPassed;
+    TH1D* bothplaneShowerFANNEventsandAllHitsPassed;
+    
+    TH1D* notbothplaneShowerEventsandAllHitsPassed;
+    TH1D* notbothplaneShowerFANNEventsandAllHitsPassed;
+    
+    TH1D* bothplaneShowerEventsandAllHitsPassedAndMinosMatched;
+    TH1D* bothplaneShowerFANNEventsandAllHitsPassedAndMinosMatched;
+    
+    //TH1D* minos_matched_mcpdg; TH1D* minos_matched_recopdg; 
+    int minos_matched_mcpdg;
+    int minos_matched_recopdg;
+    int    fEventMinosMatched;
     
     /////////////////////////////////////
     
@@ -169,19 +209,34 @@ namespace larlight {
     TH1D* anyShowerClusters;
     //any event that has two shower clusters (no 2 plane req) 
     TH1D* anyShowerEvents;
-    //any event that has two shower clusters one in eache plane  
+    //any event that has at least two shower clusters one in each plane  
     TH1D* bothplaneShowerEvents;
-    //any event that has two shower clusters one in eache plane that match/reconstruct inside fid vol.  
+         //any event that has two shower clusters one in eache plane that match in time.  
+    TH1D* bothplaneShowerEventsTimematched;
+    //any event that has at least two shower clusters one in each plane that match/reconstruct inside fid vol.  
     TH1D* bothplaneShowerEventsmatched;
-        
+    //any event that has only shower clusters one in eache plane   
+    TH1D* bothplaneShowerEventOnlyOne;
+    
+    
     TH1D* anyShowerClusters_FANN;
     //any event that has two shower clusters (no 2 plane req) 
     TH1D* anyShowerEvents_FANN;
     //any event that has two shower clusters one in eache plane  
     TH1D* bothplaneShowerEvents_FANN;
+     //any event that has two shower clusters one in eache plane that match in time.  
+    TH1D* bothplaneShowerEventsTimematched_FANN;
     //any event that has two shower clusters one in eache plane that match/reconstruct inside fid vol.  
     TH1D* bothplaneShowerEventsmatched_FANN;
+    //any event that has only shower clusters one in eache plane   
+    TH1D* bothplaneShowerEventOnlyOne_FANN;
     
+    
+    //smallest distance between MeanY
+    TH1D* smallest_dist; 
+    TH1D* smallest_reason_dist; 
+    //all distances between MeanY
+    TH1D* cluster_dist_diff; 
     
     
 //     TH1D* rmsX;

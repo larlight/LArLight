@@ -11,6 +11,7 @@
 
 #pragma link C++ class larlight::TestEff+;
 #pragma link C++ class larlight::CutEff+;
+#pragma link C++ class larlight::argoana+;
 //ADD_NEW_CLASS ... do not change this line
 
 #endif

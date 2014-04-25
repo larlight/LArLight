@@ -184,6 +184,12 @@ namespace larutil{
 		const PxPoint *p1, 
 		Double_t* yz) const;
     
+		
+    Int_t GetYZCMspace(const PxPoint *p0,
+				 const PxPoint *p1,
+				 Double_t* yz) const;
+		
+		
     Double_t PitchInView(UInt_t plane,
 			 Double_t phi,
 			 Double_t theta) const;
