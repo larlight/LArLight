@@ -6,6 +6,19 @@
 #define CLUSTERSTUDY_TYPEDEF_HH
 
 // Header files included here
+
+#include "CBookKeeper.hh"
+#include "CMergeAlgoBase.hh"
+#include "CMergeManager.hh"
+#include "CMAlgoShortestDist.hh"
+#include "CMAlgoPolyContain.hh"
+#include "CMAlgoPolyOverlap.hh"
+#include "CMAlgoAngleCompat.hh"
+#include "CMAlgoFake.hh"
+#include "CMAlgoStartInPoly.hh"
+#include "CMAlgoPolyHitOverlap.hh"
+#include "CMAlgoStartInCone.hh"
+
 #include "ViewerException.hh"
 #include "ClusterViewerAlgo.hh"
 #include "ClusterViewer.hh"
@@ -15,11 +28,27 @@
 
 // Class forward declaration here
 namespace cluster {
+
+  class CBookKeeper;
+  class CMergeAlgoBase;
+  class CMergeManager;
+  class CMAlgoShortestDist;
+  class CMAlgoPolyContain;
+  class CMAlgoPolyOverlap;
+  class CMAlgoAngleCompat;
+  class CMAlgoFake;
+  class CMAlgoStartInPoly;
+  class CMAlgoPolyHitOverlap;
+  class CMAlgoStartInCone;
+
   class ViewerException;
   class ClusterViewerAlgo;
 }
 
 namespace larlight {
+
+  class ClusterMerger;
+
   class ClusterViewer;
   class MergeViewer;
   class MCShowerClusterCiewer;

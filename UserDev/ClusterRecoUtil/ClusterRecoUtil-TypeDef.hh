@@ -10,12 +10,7 @@
 #include "ClusterRecoUtil.hh"
 #include "RecoUtilException.hh"
 #include "ClusterParamsExecutor.hh"
-#include "CMergeManager.hh"
-#include "CMergeAlgoBase.hh"
-#include "CBookKeeper.hh"
 #include "Polygon2D.hh"
-#include "CMAlgoFake.hh"
-#include "ClusterMerger.hh"
 // Class forward declaration here
 namespace cluster{
   class ClusterParamsExecutor;
@@ -25,23 +20,7 @@ namespace cluster{
   class RecoUtilException;
   class SimChannelViewer;
   class WireViewer;
-  class CBookKeeper;
-  class CMergeAlgoBase;
-  class CMergeManager;
   class ShowerReco2DAlgo;
-  class CMAlgoShortestDist;
-  class CMAlgoPolyContain;
-  class CMAlgoPolyOverlap;
-  class CMAlgoAngleCompat;
-  class CMAlgoFake;
-  class CMAlgoStartInPoly;
-  class CMAlgoPolyHitOverlap;
-  class CMAlgoStartInCone;
-
-}
-
-namespace larlight{
-  class ClusterMerger;
 }
 
 class ClusterParamsExecutor;

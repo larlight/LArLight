@@ -48,7 +48,7 @@ namespace larutil {
 	    Form("Failed loading data for %s...",_name.c_str()));
 
       print(larlight::MSG::ERROR, __FUNCTION__,
-	    e.msg());
+	    e.what());
       
       throw e;
       status = false;

@@ -26,12 +26,16 @@ namespace larutil {
 
   public:
 
-    LArUtilException(std::string msg="") : std::exception(), _msg(msg)
-    {}
+    LArUtilException(std::string msg="") : std::exception()
+    {
+      _msg = "\033[93m";
+      _msg += msg;
+      _msg += "\033[00m";
+    }
 
     virtual ~LArUtilException() throw(){};
-    virtual const char* msg() const throw() 
-    {return _msg.c_str(); }
+    virtual const char* what() const throw() 
+    { return _msg.c_str(); }
 
   private:
 
