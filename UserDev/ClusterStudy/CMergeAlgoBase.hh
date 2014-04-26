@@ -29,17 +29,18 @@ namespace cluster {
   public:
     
     /// Default constructor
-    CMergeAlgoBase();
+    CMergeAlgoBase(){};
     
     /// Default destructor
     virtual ~CMergeAlgoBase(){};
  
     /**
-       Core function: given the cluster_params input, return whether a cluster should be
+       Core function: given the CPAN input, return whether a cluster should be
        merged or not.
     */
     virtual bool Merge(const ClusterParamsAlgNew &cluster1,
-		       const ClusterParamsAlgNew &cluster2);
+		       const ClusterParamsAlgNew &cluster2)
+    {return false;}
 
     /**
        Optional function: called at the beggining of iterating over all pairs of clusters. 

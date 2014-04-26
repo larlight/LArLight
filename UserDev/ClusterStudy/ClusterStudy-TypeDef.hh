@@ -24,6 +24,7 @@
 #include "ClusterViewer.hh"
 #include "MergeViewer.hh"
 #include "MCShowerClusterViewer.hh"
+#include "Test.hh"
 //ADD_NEW_HEADER ... do not change this comment line
 
 // Class forward declaration here
@@ -40,6 +41,7 @@ namespace cluster {
   class CMAlgoStartInPoly;
   class CMAlgoPolyHitOverlap;
   class CMAlgoStartInCone;
+//ADD_CMALGO_CLASS ... do not change this comment line
 
   class ViewerException;
   class ClusterViewerAlgo;
@@ -57,5 +59,6 @@ namespace larlight {
 
 //ADD_EMPTY_CLASS ... do not change this comment line
 #endif
+
 
 
