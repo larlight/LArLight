@@ -17,7 +17,7 @@ mgr.set_ana_output_file("")
 
 proc = fmwk.ClusterMerger()
 
-proc.GetManager().AddAlgo(cluster.CMAlgoFake())
+proc.GetManager().AddMergeAlgo(cluster.CMAlgoFake())
 
 proc.GetManager().DebugMode(cluster.CMergeManager.kPerIteration)
 #proc.GetManager().DebugMode(cluster.CMergeManager.kPerAlgoSet)

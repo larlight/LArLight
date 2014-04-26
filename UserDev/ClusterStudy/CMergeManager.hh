@@ -78,25 +78,7 @@ namespace cluster {
     void Reset();
 
     /// A simple method to add a one merging step
-    void AddAlgo(CMergeAlgoBase* alg,
-		 bool ask_and_in_algos = true,
-		 bool ask_and_in_sets  = true) 
-    { 
-      // By default we ask AND condition
-      AddAlgo(std::vector<cluster::CMergeAlgoBase*>(1,alg),
-	      ask_and_in_algos,
-	      ask_and_in_sets);
-    }
-
-    /// A simple method to add a group of algorithms
-    void AddAlgo(std::vector<cluster::CMergeAlgoBase* > alg_v, 
-		 bool ask_and_in_algos = true,
-		 bool ask_and_in_sets = true)
-    {
-      _merge_algo.push_back(alg_v);
-      _ask_and_in_algos.push_back(ask_and_in_algos);
-      _ask_and_in_sets.push_back(ask_and_in_sets);
-    }
+    void AddMergeAlgo(CMergeAlgoBase* algo) {_algo = algo;}
 
     /// A simple method to add a cluster
     void SetClusters(const std::vector<std::vector<larutil::PxHit> > &clusters);
@@ -136,26 +118,9 @@ namespace cluster {
     /// Book keeper instance
     CBookKeeper _book_keeper;
 
-    /**
-       A list of algorithms to be run over.
-       It's a vector of vector of algorithms.
-       Each of the inner vector contents can be applied with either AND or OR condition
-       which is set in _ask_and vector. 
-     */
-    std::vector<std::vector<cluster::CMergeAlgoBase*> > _merge_algo;
-
-    /**
-       A boolean vector that holds user configuration of whether asking AND or OR condition
-       among algorithm in the specified set in _merge_algo
-     */
-    std::vector<bool> _ask_and_in_algos;
-
-    /**
-       A boolean vector that holds user configuration of whether asking AND or OR condition
-       w.r.t. the previous set of algorithms in _merge_algo
-     */
-    std::vector<bool> _ask_and_in_sets;
-
+    /// Merging algorithm
+    ::cluster::CMergeAlgoBase* _algo;
+    
     /// Merging priority type
     CMergePriority_t _priority;
 

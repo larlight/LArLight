@@ -10,14 +10,12 @@ namespace cluster {
     _debug_mode = kNone;
     _merge_till_converge = false;
     _priority = priority;
+    _algo = nullptr;
     Reset();
   }
 
   void CMergeManager::Reset()
   {
-    _merge_algo.clear();
-    _ask_and_in_algos.clear();
-    _ask_and_in_sets.clear();
     _in_clusters.clear();
     _out_clusters.clear();
     _book_keeper.Reset();
@@ -56,7 +54,7 @@ namespace cluster {
   
   void CMergeManager::Process()
   {
-    if(!(_merge_algo.size())) throw RecoUtilException("No algorithm to run!");
+    if(!_algo) throw RecoUtilException("No algorithm to run!");
 
     size_t ctr=0;
     bool keep_going=true;
@@ -213,9 +211,7 @@ namespace cluster {
     }
 
     // Call prepare functions
-    for(auto &algo_set : _merge_algo)
-      for(auto &algo : algo_set)
-	algo->Prepare(in_clusters);
+    _algo->Prepare(in_clusters);
     
     // Run over clusters and execute merging algorithms
     for(auto citer1 = prioritized_index.rbegin();
@@ -237,68 +233,14 @@ namespace cluster {
 	// Skip if this combination is not meant to be compared
 	if(!(merge_flag.at((*citer2).second))) continue;
 
-	bool merge=true;
-
-	for(size_t i=0; merge && (i<_merge_algo.size()); ++i) {
-
-	  if(_debug_mode <= kPerAlgoSet){
-
-	    std::cout
-	      << Form("    \033[93mInspecting a pair (%zu, %zu) ... \033[00m",(*citer1).second, (*citer2).second)
-	      << std::endl;
-	  }
-
-	  // In case this is not i==0
-	  if(!i) {
-
-	    // If this set of algos are to be asked in AND condition with the previous... BREAK
-	    if(!merge &&  _ask_and_in_sets.at(i)) break;
-	    // If this set of algos are to be asked in OR condition with the previous... CONTINUE
-	    if(merge  && !_ask_and_in_sets.at(i)) continue;
-	    
-	  }
-
-	  bool merge_local = true;
-
-	  for(auto algo : _merge_algo.at(i)) {
-	    
-	    // for 1st algorithm, simply assign merge_local
-	    if(algo == (*_merge_algo.at(i).begin()))
-
-	      merge_local = algo->Merge(in_clusters.at((*citer1).second),
-					in_clusters.at((*citer2).second));
-
-	    else if(_ask_and_in_algos.at(i))
-
-	      merge_local = merge_local && algo->Merge(in_clusters.at((*citer1).second),
-						       in_clusters.at((*citer2).second));
-	      
-	    else
-	      
-	      merge_local = merge_local || algo->Merge(in_clusters.at((*citer1).second),
-						       in_clusters.at((*citer2).second));
-	    
-	    if(_debug_mode <= kPerMerging)
-	      algo->Report();
-
-	    // AND condition, and this is already false... BREAK
-	    if( !merge_local && _ask_and_in_algos.at(i)  ) break;
-	    // OR condition, and this is already true... BREAK
-	    if(  merge_local && !_ask_and_in_algos.at(i) ) break;
-
-	  } // end looping over algorithms in this set
-
-	  if(!i) merge = merge_local;
-
-	  else if(_ask_and_in_sets.at(i))
-
-	    merge = merge && merge_local;
-
-	  else
-
-	    merge = merge || merge_local;
-
+	if(_debug_mode <= kPerAlgoSet){
+	  
+	  std::cout
+	    << Form("    \033[93mInspecting a pair (%zu, %zu) ... \033[00m",(*citer1).second, (*citer2).second)
+	    << std::endl;
 	}
+	
+	bool merge = _algo->Merge(in_clusters.at((*citer1).second),in_clusters.at((*citer2).second));
 
 	if(_debug_mode <= kPerAlgoSet) {
 	  
@@ -315,12 +257,15 @@ namespace cluster {
 	} // end looping over all sets of algorithms
 	
 	if(merge)
+
 	  book_keeper.Merge((*citer1).second,(*citer2).second);
+
       } // end looping over all cluster pairs for citer1
+
     } // end looping over clusters
     
     if(_debug_mode <= kPerIteration && book_keeper.GetResult().size() != in_clusters.size()) {
-
+      
       std::cout << "  Found following clusters to be merged..." << std::endl;
       for(auto const &indexes_v : book_keeper.GetResult()) {
 

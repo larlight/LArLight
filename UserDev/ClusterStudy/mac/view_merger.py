@@ -34,7 +34,7 @@ merge_viewer = larlight.MergeViewer()
 mc_viewer    = larlight.MCShowerClusterViewer()
 
 # attach merge algo
-merge_viewer.GetManager().AddAlgo(cluster.CMAlgoFake())
+merge_viewer.GetManager().AddMergeAlgo(cluster.CMAlgoFake())
 
 my_proc.add_process(raw_viewer)
 

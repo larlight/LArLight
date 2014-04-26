@@ -86,15 +86,9 @@ namespace cluster {
   protected:
 
     /**
-       This vector is initialized to the length of the clusters to run book keeping.
-       The index number therefore corresponds to the original clusters' index number.
-       The value at a given index number corresponds to the merged output cluster
-       index. For instance it is originally [0,1,2] if the CBookKeeper instance
-       is created for length 3. After a user call Merge(0,1), it becomes [0,0,1],
-       suggesting there are only 2 output clusters and the input cluster index 0
-       and 2 now belong to the output cluster index 0.
+
      */
-    //std::vector<unsigned short> _out_index;
+    std::vector<std::vector<bool> > _prohibit_merge;
     
   };
   
