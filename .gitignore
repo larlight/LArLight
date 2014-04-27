@@ -10,5 +10,7 @@
 *.bin
 *.dat
 *.info
+*.pcm
+*.cmake
 *~
 /GNUmakefile

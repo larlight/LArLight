@@ -15,6 +15,6 @@ rootlibmap() {
 }
 
 ######################################################
-# lar1Osc
-rootlibmap liblar1Osc.rootmap liblar1Osc.so $USER_DEV_DIR/lar1Osc/LinkDef.h \
-    libBase.so libAnalysis.so
+# lar1Sens
+rootlibmap liblar1Sens.rootmap liblar1Sens.so $USER_DEV_DIR/lar1Sens/LinkDef.h \
+    libBase.so libAnalysis.so 

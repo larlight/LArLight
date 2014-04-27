@@ -9,11 +9,13 @@
 #pragma link off all functions;
 #pragma link C++ nestedclasses;
 
-#pragma link C++ class LorentzVectorLight+;
-#pragma link C++ class FluxRW+;
-#pragma link C++ class FluxRWnubar+;
-#pragma link C++ class Utils+;
-#pragma link C++ class NtupleReprocessing+;
+#pragma link C++ class lar1::LorentzVectorLight+;
+#pragma link C++ class lar1::FluxRW+;
+#pragma link C++ class lar1::FluxRWnubar+;
+#pragma link C++ class lar1::Utils+;
+#pragma link C++ class lar1::NtupleReprocessing+;
+#pragma link C++ class lar1Osc+;
+
 
 //ADD_NEW_CLASS ... do not change this line
 #endif /* __CINT__ */

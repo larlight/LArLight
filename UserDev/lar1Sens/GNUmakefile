@@ -3,16 +3,14 @@
 #
 
 # specific names for this package
-DICT  = lar1OscCint
-SHLIB = liblar1Osc.so
+DICT  = lar1SensCint
+SHLIB = liblar1Sens.so
 SOURCES = $(wildcard *.cc)
 HEADERS = $(wildcard *.hh)
 OBJECTS = $(SOURCES:.cc=.o)
 
 # include options for this package
 INCFLAGS = -I.                       #Include itself
-INCFLAGS += -IFluxRW
-INCFLAGS += -IFluxRWnubar
 
 # platform-specific options
 OSNAME          = $(shell uname -s)

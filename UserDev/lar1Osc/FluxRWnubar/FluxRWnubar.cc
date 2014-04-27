@@ -7,7 +7,7 @@
 #include <string>
 #include <cmath>
 
-using namespace std;
+namespace lar1{
 
 	FluxRWnubar::FluxRWnubar()
 	{
@@ -145,3 +145,4 @@ using namespace std;
   
 	  return h;
 	}
+}

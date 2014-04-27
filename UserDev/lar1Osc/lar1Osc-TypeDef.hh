@@ -10,15 +10,18 @@
 #include "LorentzVectorLight.hh"
 #include "NtupleReprocessing.hh"
 #include "Utils.hh"
-#include "FluxRW.hh";
-#include "FluxRWnubar.hh";
+#include "FluxRW.hh"
+#include "FluxRWnubar.hh"
 
 // Class forward declaration here
 class lar1Osc;
-class Utils;
-class FluxRW;
-class FluxRWnubar;
-class NtupleReprocessing;
+namespace lar1{
+  class LorentzVectorLight;
+  class Utils;
+  class FluxRW;
+  class FluxRWnubar;
+  class NtupleReprocessing;
+}
 //ADD_EMPTY_CLASS ... do not change this comment line
 
 #endif
