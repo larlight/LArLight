@@ -25,8 +25,8 @@ namespace cluster {
   }//end reconfigure function
 
   
-  bool CMAlgoStartInPoly::Merge(const ClusterParamsAlgNew &cluster1,
-				const ClusterParamsAlgNew &cluster2)
+  bool CMAlgoStartInPoly::Bool(const ClusterParamsAlgNew &cluster1,
+			       const ClusterParamsAlgNew &cluster2)
   {
 
     //If start point of one cluster is inside the other's polygon

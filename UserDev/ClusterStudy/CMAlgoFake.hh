@@ -15,7 +15,7 @@
 #define CMALGOFAKE_HH
 
 #include <iostream>
-#include "CMergeAlgoBase.hh"
+#include "CBoolAlgoBase.hh"
 
 namespace cluster {
   /**
@@ -24,7 +24,7 @@ namespace cluster {
      to have a better overall design of various merging for iterative approach.
      The algorithms are run through CMergeManager.
   */
-  class CMAlgoFake : public CMergeAlgoBase {
+  class CMAlgoFake : public CBoolAlgoBase {
     
   public:
     
@@ -38,8 +38,8 @@ namespace cluster {
        Core function: given the ClusterParamsAlgNew input, return whether a cluster should be
        merged or not.
     */
-    virtual bool Merge(const ClusterParamsAlgNew &cluster1,
-		       const ClusterParamsAlgNew &cluster2);
+    virtual bool Bool(const ClusterParamsAlgNew &cluster1,
+		      const ClusterParamsAlgNew &cluster2);
 
     /// Function to reset the algorithm instance ... maybe implemented via child class
     virtual void Reset(){}

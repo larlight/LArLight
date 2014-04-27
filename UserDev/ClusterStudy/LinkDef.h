@@ -17,8 +17,8 @@
 
 #pragma link C++ class cluster::CMergeManager+;
 
-#pragma link C++ class cluster::CMergeAlgoBase+;
-#pragma link C++ class std::vector<cluster::CMergeAlgoBase*>+;
+#pragma link C++ class cluster::CBoolAlgoBase+;
+#pragma link C++ class cluster::CMAlgoArray+;
 
 #pragma link C++ class cluster::CBookKeeper+;
 #pragma link C++ class std::vector<unsigned short>+;

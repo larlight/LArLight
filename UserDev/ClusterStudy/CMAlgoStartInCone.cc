@@ -26,8 +26,8 @@ namespace cluster {
   }//end reconfigure function
 
   
-  bool CMAlgoStartInCone::Merge(const ClusterParamsAlgNew &cluster1,
-				const ClusterParamsAlgNew &cluster2)
+  bool CMAlgoStartInCone::Bool(const ClusterParamsAlgNew &cluster1,
+			       const ClusterParamsAlgNew &cluster2)
   {
 
     //apply filter immediately

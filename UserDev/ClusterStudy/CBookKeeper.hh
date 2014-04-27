@@ -45,6 +45,9 @@ namespace cluster {
     /// Reset method
     void Reset(unsigned short nclusters=0);
 
+    /// Method to set a pair of clusters to prohibit from merging
+    void ProhibitMerge(unsigned short index1, unsigned short index2);
+
     /// Method to merge 2 clusters via index numbers
     void Merge(unsigned short index1, unsigned short index2);
 
@@ -86,9 +89,12 @@ namespace cluster {
   protected:
 
     /**
-
+       A 2D-map vector that stores pair of clusters for which merging is prohibited
      */
     std::vector<std::vector<bool> > _prohibit_merge;
+
+    /// Number of output clusters
+    size_t _out_cluster_count;
     
   };
   

@@ -10,7 +10,8 @@ namespace cluster {
     _debug_mode = kNone;
     _merge_till_converge = false;
     _priority = priority;
-    _algo = nullptr;
+    _merge_algo = nullptr;
+    _separate_algo = nullptr;
     Reset();
   }
 
@@ -54,7 +55,7 @@ namespace cluster {
   
   void CMergeManager::Process()
   {
-    if(!_algo) throw RecoUtilException("No algorithm to run!");
+    if(!_merge_algo) throw RecoUtilException("No algorithm to run!");
 
     size_t ctr=0;
     bool keep_going=true;
@@ -211,7 +212,7 @@ namespace cluster {
     }
 
     // Call prepare functions
-    _algo->Prepare(in_clusters);
+    _merge_algo->Prepare(in_clusters);
     
     // Run over clusters and execute merging algorithms
     for(auto citer1 = prioritized_index.rbegin();
@@ -240,7 +241,7 @@ namespace cluster {
 	    << std::endl;
 	}
 	
-	bool merge = _algo->Merge(in_clusters.at((*citer1).second),in_clusters.at((*citer2).second));
+	bool merge = _merge_algo->Bool(in_clusters.at((*citer1).second),in_clusters.at((*citer2).second));
 
 	if(_debug_mode <= kPerAlgoSet) {
 	  

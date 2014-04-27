@@ -19,8 +19,8 @@ namespace cluster {
   }//end reconfigure function
 
   
-  bool CMAlgoPolyContain::Merge(const ClusterParamsAlgNew &cluster1,
-				const ClusterParamsAlgNew &cluster2)
+  bool CMAlgoPolyContain::Bool(const ClusterParamsAlgNew &cluster1,
+			       const ClusterParamsAlgNew &cluster2)
   {
 
     if ( (cluster1.GetParams().PolyObject.Size() < 3) or (cluster2.GetParams().PolyObject.Size() < 3) )

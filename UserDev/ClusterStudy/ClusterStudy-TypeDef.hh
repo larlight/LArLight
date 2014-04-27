@@ -8,7 +8,7 @@
 // Header files included here
 
 #include "CBookKeeper.hh"
-#include "CMergeAlgoBase.hh"
+#include "CBoolAlgoBase.hh"
 #include "CMergeManager.hh"
 #include "CMAlgoShortestDist.hh"
 #include "CMAlgoPolyContain.hh"
@@ -31,8 +31,12 @@
 namespace cluster {
 
   class CBookKeeper;
-  class CMergeAlgoBase;
+
+  class CBoolAlgoBase;
+  class CMAlgoArray;
+
   class CMergeManager;
+
   class CMAlgoShortestDist;
   class CMAlgoPolyContain;
   class CMAlgoPolyOverlap;
@@ -41,7 +45,6 @@ namespace cluster {
   class CMAlgoStartInPoly;
   class CMAlgoPolyHitOverlap;
   class CMAlgoStartInCone;
-  class CMAlgoArray;
 //ADD_CMALGO_CLASS ... do not change this comment line
 
   class ViewerException;

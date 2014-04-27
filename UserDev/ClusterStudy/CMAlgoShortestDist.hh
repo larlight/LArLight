@@ -15,7 +15,7 @@
 #define CMALGOSHORTESTDIST_HH
 
 #include <iostream>
-#include "CMergeAlgoBase.hh"
+#include "CBoolAlgoBase.hh"
 #include "GeometryUtilities.hh"
 
 
@@ -25,7 +25,7 @@ namespace cluster {
      User defined class CMAlgoShortestDist ... these comments are used to generate
      doxygen documentation!
   */
-  class CMAlgoShortestDist : public CMergeAlgoBase{
+  class CMAlgoShortestDist : public CBoolAlgoBase{
     
   public:
     
@@ -35,9 +35,9 @@ namespace cluster {
     /// Default destructor
     virtual ~CMAlgoShortestDist(){};
     
-    /// Overloaded (from CMergeAlgoBase) Merge function
-    virtual bool Merge(const ClusterParamsAlgNew &cluster1,
-		       const ClusterParamsAlgNew &cluster2);
+    /// Overloaded (from CBoolAlgoBase) Bool function
+    virtual bool Bool(const ClusterParamsAlgNew &cluster1,
+		      const ClusterParamsAlgNew &cluster2);
     
     
     /// Method to set cut value in cm^2 for distance compatibility test

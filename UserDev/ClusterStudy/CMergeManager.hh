@@ -18,7 +18,7 @@
 
 #include "ClusterParamsAlgNew.hh"
 #include "CBookKeeper.hh"
-#include "CMergeAlgoBase.hh"
+#include "CBoolAlgoBase.hh"
 
 namespace cluster {
 
@@ -77,8 +77,11 @@ namespace cluster {
     /// Method to reset itself
     void Reset();
 
-    /// A simple method to add a one merging step
-    void AddMergeAlgo(CMergeAlgoBase* algo) {_algo = algo;}
+    /// A simple method to add an algorithm for merging
+    void AddMergeAlgo(CBoolAlgoBase* algo) {_merge_algo = algo;}
+
+    /// A simple method to add an algorithm for separation
+    void AddSeparateAlgo(CBoolAlgoBase* algo) {_separate_algo = algo;}
 
     /// A simple method to add a cluster
     void SetClusters(const std::vector<std::vector<larutil::PxHit> > &clusters);
@@ -119,7 +122,10 @@ namespace cluster {
     CBookKeeper _book_keeper;
 
     /// Merging algorithm
-    ::cluster::CMergeAlgoBase* _algo;
+    ::cluster::CBoolAlgoBase* _merge_algo;
+
+    /// Separation algorithm
+    ::cluster::CBoolAlgoBase* _separate_algo;
     
     /// Merging priority type
     CMergePriority_t _priority;

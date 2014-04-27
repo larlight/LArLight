@@ -5,15 +5,19 @@
 
 namespace cluster {
 
-  CMAlgoFake::CMAlgoFake()
+  //----------------------------------------
+  CMAlgoFake::CMAlgoFake() : CBoolAlgoBase()
+  //----------------------------------------
   {
     _flip = false;
     _ctr  = 0;
     // Nothing to be done in the base class
   }
-  
-  bool CMAlgoFake::Merge(const ClusterParamsAlgNew &cluster1,
-			 const ClusterParamsAlgNew &cluster2)
+
+  //--------------------------------------------------------
+  bool CMAlgoFake::Bool(const ClusterParamsAlgNew &cluster1,
+			const ClusterParamsAlgNew &cluster2)
+  //--------------------------------------------------------
   {
     _ctr++;
     if( (_ctr%64) == 0)
@@ -21,7 +25,9 @@ namespace cluster {
     return _flip;
   }
 
+  //-----------------------
   void CMAlgoFake::Report()
+  //-----------------------
   {
     std::cout<< "  I am just flpping every 64 counts... " << std::endl;
   }

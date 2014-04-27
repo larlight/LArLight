@@ -15,7 +15,7 @@
 #define CMALGOPOLYHITOVERLAP_HH
 
 #include <iostream>
-#include "CMergeAlgoBase.hh"
+#include "CBoolAlgoBase.hh"
 #include "GeometryUtilities.hh"
 
 namespace cluster {
@@ -23,7 +23,7 @@ namespace cluster {
      \class CMalgoPolyContain
      Merge Polygons if one is completely inside the other
   */
-  class CMAlgoPolyHitOverlap : public CMergeAlgoBase{
+  class CMAlgoPolyHitOverlap : public CBoolAlgoBase{
     
   public:
     
@@ -37,8 +37,8 @@ namespace cluster {
        Core function: given the ClusterParamsAlgNew input, return whether a cluster should be
        merged or not.
     */
-    virtual bool Merge(const ClusterParamsAlgNew &cluster1,
-		       const ClusterParamsAlgNew &cluster2);
+    virtual bool Bool(const ClusterParamsAlgNew &cluster1,
+		      const ClusterParamsAlgNew &cluster2);
 
     /// Method to re-configure the instance
     void reconfigure();

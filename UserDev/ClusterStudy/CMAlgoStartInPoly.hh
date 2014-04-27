@@ -15,7 +15,7 @@
 #define CMALGOSTARTINPOLY_HH
 
 #include <iostream>
-#include "CMergeAlgoBase.hh"
+#include "CBoolAlgoBase.hh"
 #include "GeometryUtilities.hh"
 
 namespace cluster {
@@ -23,7 +23,7 @@ namespace cluster {
      \class CMalgoStartInPoly
      If start point of one cluster inside other's polygon -> merge
   */
-  class CMAlgoStartInPoly : public CMergeAlgoBase{
+  class CMAlgoStartInPoly : public CBoolAlgoBase{
     
   public:
     
@@ -43,8 +43,8 @@ namespace cluster {
 
 
     /// Merging Algorithm is Here
-    virtual bool Merge(const ClusterParamsAlgNew &cluster1,
-		       const ClusterParamsAlgNew &cluster2);
+    virtual bool Bool(const ClusterParamsAlgNew &cluster1,
+		      const ClusterParamsAlgNew &cluster2);
 
     /// Method to re-configure the instance
     void reconfigure();

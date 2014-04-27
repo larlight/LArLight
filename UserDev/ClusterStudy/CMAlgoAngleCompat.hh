@@ -15,8 +15,7 @@
 #define CMALGOANGLECOMPAT_HH
 
 #include <iostream>
-#include "CMergeAlgoBase.hh"
-
+#include "CBoolAlgoBase.hh"
 
 namespace cluster {
   /**
@@ -24,7 +23,7 @@ namespace cluster {
      User defined class CMAlgoAngleCompat ... these comments are used to generate
      doxygen documentation!
   */
-  class CMAlgoAngleCompat : public CMergeAlgoBase{
+  class CMAlgoAngleCompat : public CBoolAlgoBase{
     
   public:
     
@@ -34,9 +33,9 @@ namespace cluster {
     /// Default destructor
     virtual ~CMAlgoAngleCompat(){};
         
-    /// Overloaded (from CMergeAlgoBase) Merge function
-    virtual bool Merge(const ClusterParamsAlgNew &cluster1,
-		       const ClusterParamsAlgNew &cluster2);
+    /// Overloaded (from CBoolAlgoBase) Bool function
+    virtual bool Bool(const ClusterParamsAlgNew &cluster1,
+		      const ClusterParamsAlgNew &cluster2);
     
     /// Method to set verbose mode
     void SetVerbose(bool on) { _verbose = on; }

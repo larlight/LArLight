@@ -23,8 +23,9 @@ namespace cluster {
 
   } //end constructor
 
-  bool CMAlgoShortestDist::Merge(const ClusterParamsAlgNew &cluster1,
-				 const ClusterParamsAlgNew &cluster2){
+  bool CMAlgoShortestDist::Bool(const ClusterParamsAlgNew &cluster1,
+				const ClusterParamsAlgNew &cluster2)
+  {
     
     double w_start1 = cluster1.GetParams().start_point.w * _wire_2_cm;
     double t_start1 = cluster1.GetParams().start_point.t * _time_2_cm;
@@ -86,7 +87,7 @@ namespace cluster {
     return compatible;
 
 
-  }//end Merge function
+  }//end Bool function
 
   double CMAlgoShortestDist::ShortestDistanceSquared(double point_x, double point_y, 
 						     double start_x, double start_y,

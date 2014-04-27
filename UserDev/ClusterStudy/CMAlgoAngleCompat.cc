@@ -18,8 +18,9 @@ namespace cluster {
 
   } //end constructor
 
-  bool CMAlgoAngleCompat::Merge(const ClusterParamsAlgNew &cluster1,
-				const ClusterParamsAlgNew &cluster2){
+  bool CMAlgoAngleCompat::Bool(const ClusterParamsAlgNew &cluster1,
+			       const ClusterParamsAlgNew &cluster2)
+  {
     
     //pretty sure we don't need conversion factors here. 
     //already in cm/cm units, degrees? need to check that

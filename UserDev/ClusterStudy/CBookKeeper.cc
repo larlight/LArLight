@@ -12,25 +12,66 @@ namespace cluster {
 
   void CBookKeeper::Reset(unsigned short nclusters)
   {
+    _prohibit_merge.clear();
+    _prohibit_merge.reserve(nclusters);
     std::vector<unsigned short>::clear();
     std::vector<unsigned short>::reserve(nclusters);
-    //for(size_t i=0; i<nclusters; ++i) std::vector<unsigned short>::push_back(i);
-    for(size_t i=0; i<nclusters; ++i) this->push_back(i);
+
+    for(size_t i=0; i<nclusters; ++i) {
+      this->push_back(i);
+      _prohibit_merge.push_back(std::vector<bool>(nclusters-i,false));
+    }
+    _out_cluster_count = nclusters;
+    
+  }
+
+  void CBookKeeper::ProhibitMerge(unsigned short index1, unsigned short index2)
+  {
+    if(index1 == index2)
+
+      throw RecoUtilException(Form("<<%s>> Two input clusters identical (%d)",__FUNCTION__,index1));
+
+
+    if( index1 >= this->size() || index2 >= this->size() )
+
+      throw RecoUtilException(Form("Input cluster index (%d and/or %d) out of range",index1,index2));
+
+    auto out_index1 = this->at(index1);
+    auto out_index2 = this->at(index2);
+
+    if(out_index1 == out_index2)
+      throw RecoUtilException(Form("Cluster %d and %d already merged!",index1,index2));    
+
+    if(out_index2 < out_index1) std::swap(out_index1,out_index2);
+
+    _prohibit_merge.at(index1).at(index2) = true;
+
   }
 
   void CBookKeeper::Merge(unsigned short index1, unsigned short index2)
   {
+
+    if(index1 == index2)
+
+      throw RecoUtilException(Form("<<%s>> Two input clusters identical (%d)",__FUNCTION__,index1));
+
+
     if( index1 >= this->size() || index2 >= this->size() )
-      throw RecoUtilException(Form("Invalid cluster index: %d or %d",index1,index2));
+
+      throw RecoUtilException(Form("Input cluster index (%d and/or %d) out of range",index1,index2));
 
     auto out_index1 = this->at(index1);
     auto out_index2 = this->at(index2);
 
     if(out_index1 == out_index2) return;
 
-    // Make out_index1 to be the smaller one
-    if(out_index1 > out_index2) std::swap(out_index1,out_index2);
-	
+    if(out_index2 < out_index1) std::swap(out_index1,out_index2);
+
+    //if(_prohibit_merge.at(index1).at(index2)) return;
+
+    //
+    // Merge cluster indexes
+    //
     for(auto &v : (*this)) {
 
       if( v == out_index1 || v == out_index2 )
@@ -38,7 +79,38 @@ namespace cluster {
       else if( v > out_index2 )
 	v -= 1;
     }
-    
+
+    /*
+    //
+    // Merge prohibit rule
+    //
+    // (1) handle index < out_index1
+    for(size_t index=0; index < out_index1; ++index) {
+      
+      size_t tmp_out_index1 = out_index1 - index;
+      size_t tmp_out_index2 = out_index2 - index;
+
+      _prohibit_merge.at(index).at(tmp_out_index1) = ( _prohibit_merge.at(index).at(tmp_out_index1)
+						       ||
+						       _prohibit_merge.at(index).at(tmp_out_index2)
+						       );
+      
+      for(size_t in_index=tmp_out_index2; 
+	  in_index < _prohibit_merge.at(index).size();
+	  ++in_index) {
+	
+	if(in_index >= (_out_cluster_count - 1 - index)) 
+
+	  _prohibit_merge.at(index).at(in_index) = false;
+
+	else
+	  
+	  _prohibit_merge.at(index).at(in_index) = _prohibit_merge.at(index).at(in_index+1);
+      }
+    }
+    // (2) handle index == out_index1
+    */    
+
   }
 
   bool CBookKeeper::IsMerged(unsigned short index1, unsigned short index2) const
@@ -67,11 +139,9 @@ namespace cluster {
 
   void CBookKeeper::PassResult(std::vector<std::vector<unsigned short> > &result) const
   {
-    size_t cluster_index_max=0;
-    for(auto const &v : (*this)) if(v > cluster_index_max) cluster_index_max = v;
 
     result.clear();
-    result.resize(cluster_index_max + 1, std::vector<unsigned short>());
+    result.resize(_out_cluster_count, std::vector<unsigned short>());
 
     for(size_t i=0; i<this->size(); ++i)
       result.at(this->at(i)).push_back(i);
@@ -93,7 +163,8 @@ namespace cluster {
     // Check if "another" result is different from input
     std::vector<std::vector<unsigned short> > another_result;
     another.PassResult(another_result);
-    if(another_result.size() == my_result.size()) return;
+    if(another_result.size() >= my_result.size())
+      throw RecoUtilException("The input has equal or more number of output clusters");
 
     // Combine
     for(auto const& ares : another_result) {

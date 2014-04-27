@@ -19,8 +19,8 @@ namespace cluster {
   }//end reconfigure function
 
   
-  bool CMAlgoPolyHitOverlap::Merge(const ClusterParamsAlgNew &cluster1,
-				   const ClusterParamsAlgNew &cluster2)
+  bool CMAlgoPolyHitOverlap::Bool(const ClusterParamsAlgNew &cluster1,
+				  const ClusterParamsAlgNew &cluster2)
   {
 
     //Check and see if a certain fraction of hits of a cluster

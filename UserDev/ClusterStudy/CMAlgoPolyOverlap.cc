@@ -19,8 +19,8 @@ namespace cluster {
   }//end reconfigure function
 
   
-  bool CMAlgoPolyOverlap::Merge(const ClusterParamsAlgNew &cluster1,
-				const ClusterParamsAlgNew &cluster2)
+  bool CMAlgoPolyOverlap::Bool(const ClusterParamsAlgNew &cluster1,
+			       const ClusterParamsAlgNew &cluster2)
   {
     //if either has < 4 hits do not merge!
     if ( (cluster1.GetParams().PolyObject.Size() < 3) or
