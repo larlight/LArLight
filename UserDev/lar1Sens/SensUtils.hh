@@ -40,9 +40,6 @@ namespace lar1{
     std::vector<float> collapseVector(std::vector<float> input,
                                       int nbinsE, int nL);
 
-    void add_plot_label(char* label, double x, double y,
-                        double size = 0.05, int color = 1,
-                        int font = 62, int align = 22 );
 
   private:
 

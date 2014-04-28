@@ -8,14 +8,18 @@
 // Header files included here
 #include "lar1Sens.hh"
 #include "NtupleReader.hh"
+#include "NueAppearanceFitter.hh"
+#include "PlotUtils.hh"
 #include "SensUtils.hh"
 
 // Class forward declaration here
 class lar1Sens;
 namespace lar1{
 class SensUtils;
-}
+class PlotUtils;
+class NueAppearanceFitter;
 class NtupleReader;
+}
 //ADD_EMPTY_CLASS ... do not change this comment line
 
 #endif

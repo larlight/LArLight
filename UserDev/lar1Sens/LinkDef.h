@@ -11,7 +11,9 @@
 
 #pragma link C++ class lar1Sens+;
 #pragma link C++ class lar1::SensUtils+;
-#pragma link C++ class NtupleReader+;
+#pragma link C++ class lar1::PlotUtils+;
+#pragma link C++ class lar1::NtupleReader+;
+#pragma link C++ class lar1::NueAppearanceFitter+;
 
 //ADD_NEW_CLASS ... do not change this line
 #endif

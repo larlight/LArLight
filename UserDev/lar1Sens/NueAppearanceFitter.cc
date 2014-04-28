@@ -769,11 +769,11 @@ namespace lar1{
                   x90[dm2point] = sin22th;
                   y90[dm2point] = dm2;
               }
-              if (chisq<=deltachisq99)
-              {
-                  x99[dm2point] = sin22th;
-                  y99[dm2point] = dm2;
-              }
+              // if (chisq<=deltachisq99)
+              // {
+              //     x99[dm2point] = sin22th;
+              //     y99[dm2point] = dm2;
+              // }
               
           if (verbose) std::cout << "dm2: " << dm2 << ",\tsin22th: " << sin22th << ",\tchisq: " << chisq << std::endl;    
           if (debug) std::cout << "\n\n";
@@ -870,7 +870,7 @@ namespace lar1{
     //     
     //Determine the lines in the legend.  Print the detectors first:
     // TString detectors.
-    // add_plot_label()
+    // plotUtils.add_plot_label()
     //if (mode == "nu") legt ->AddEntry("", "#nu mode", "");
     //else if (mode == "nubar") legt ->AddEntry("", "#nubar mode", "");
     
@@ -901,11 +901,11 @@ namespace lar1{
     
     for (int i = 0; i < nL;i++){
         std::cout << "Name is " << name[i] << std::endl;
-        add_plot_label(name[i],  0.77, 0.87-i*0.04, 0.026, 1, 62);
+        plotUtils.add_plot_label(name[i],  0.77, 0.87-i*0.04, 0.026, 1, 62);
     }  
 
-    add_plot_label(label2, 0.77, 0.76, 0.023, 1, 62);
-    add_plot_label(label1, 0.77, 0.73, 0.023, 1, 62);
+    plotUtils.add_plot_label(label2, 0.77, 0.76, 0.023, 1, 62);
+    plotUtils.add_plot_label(label1, 0.77, 0.73, 0.023, 1, 62);
     // legt->AddEntry("",label,"");
 
     sens90->Draw("l same");
@@ -922,14 +922,14 @@ namespace lar1{
     // if (specialNameText != ""){
     //     char tempChar[20];
     //     sprintf(tempChar, "%s",specialNameText.c_str());
-    //     add_plot_label(tempChar, 0.75, 0.25);
+    //     plotUtils.add_plot_label(tempChar, 0.75, 0.25);
     // }
     // if (specialNameTextOsc != "") {
     //     char tempChar[20];
     //     sprintf(tempChar, "%s",specialNameTextOsc.c_str());
-    //     add_plot_label(tempChar, 0.75, 0.3);
+    //     plotUtils.add_plot_label(tempChar, 0.75, 0.3);
     // }
-    //add_plot_label(label, label_x, label_y, 0.05, 1, 62, 22 );
+    //plotUtils.add_plot_label(label, label_x, label_y, 0.05, 1, 62, 22 );
 
     TLegend* leg3=new TLegend(0.2,0.2,0.4,0.35);
     leg3->SetFillStyle(0);
@@ -980,7 +980,7 @@ namespace lar1{
             c3 -> Print(fileNameRoot+mode+"_flatStats.png", "png");
         }
     }
-    cout<<"\nEnd of routine.\n";
+    std::cout<<"\nEnd of routine.\n";
     
     return 0;
   }

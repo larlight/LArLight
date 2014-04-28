@@ -22,13 +22,16 @@
 #include "TCanvas.h"
 #include "TLegend.h"
 #include "TMatrix.h"
-
+#include "TMarker.h"
+#include "TH2D.h"
+#include "TImage.h"
 
 #include <vector>
 #include <iostream>
 
 #include "NtupleReader.hh"
 #include "SensUtils.hh"
+#include "PlotUtils.hh"
 
 /**
    \class NueAppearanceFitter
@@ -82,6 +85,7 @@ namespace lar1{
     private:
 
       SensUtils utils;
+      PlotUtils plotUtils;
 
       // All of the variables below are settable.
       //Self explanatory, this is where the ntuples you want to use are located:
@@ -187,7 +191,7 @@ namespace lar1{
       std::vector<float> nullVec;
 
       // output ntuple with chi2 values and sensitivity contour
-      TNtuple chi2;
+      TNtuple * chi2;
       //sensitivity contours
       double * x90;
       double * y90;
