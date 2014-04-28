@@ -19,6 +19,34 @@ namespace cluster {
 
   }
 
+  //------------------------------------------------------------------------------------------
+  void CMAlgo_Class_Name::EventBegin(const std::vector<cluster::ClusterParamsAlgNew> &clusters)
+  //------------------------------------------------------------------------------------------
+  {
+
+  }
+
+  //-------------------------------
+  void CMAlgo_Class_Name::EventEnd()
+  //-------------------------------
+  {
+
+  }
+
+  //-----------------------------------------------------------------------------------------------
+  void CMAlgo_Class_Name::IterationBegin(const std::vector<cluster::ClusterParamsAlgNew> &clusters)
+  //-----------------------------------------------------------------------------------------------
+  {
+
+  }
+
+  //------------------------------------
+  void CMAlgo_Class_Name::IterationEnd()
+  //------------------------------------
+  {
+
+  }
+  
   //----------------------------------------------------------------
   bool CMAlgo_Class_Name::Bool(const ClusterParamsAlgNew &cluster1,
 			       const ClusterParamsAlgNew &cluster2)
@@ -27,13 +55,6 @@ namespace cluster {
     return false;
   }
 
-  //----------------------------------------------------------------------------------------
-  void CMAlgo_Class_Name::Prepare(const std::vector<cluster::ClusterParamsAlgNew> &clusters)
-  //----------------------------------------------------------------------------------------
-  {
-
-  }
-  
   //------------------------------
   void CMAlgo_Class_Name::Report()
   //------------------------------
