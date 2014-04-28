@@ -104,6 +104,9 @@ namespace cluster {
 		  const std::vector<bool> &merge_flag,
 		  CBookKeeper &book_keeper) const;
 
+    void RunSeparate(const std::vector<cluster::ClusterParamsAlgNew > &in_clusters,
+		     CBookKeeper &book_keeper) const;
+
   protected:
 
     /// Iterative approach for merging

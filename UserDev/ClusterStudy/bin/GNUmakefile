@@ -21,7 +21,7 @@ LDFLAGS += -L$(LARLIGHT_LIBDIR) -lClusterStudy -lClusterRecoUtil -lFANN -lAnalys
 
 # Add your program below with a space after the previous one.
 # This makefile compiles all binaries specified below.
-PROGRAMS = run_merge_viewer
+PROGRAMS = run_merge_viewer test_merge
 
 all:		$(PROGRAMS)
 	@rm -rf *.dSYM

@@ -48,6 +48,9 @@ namespace cluster {
     /// Method to set a pair of clusters to prohibit from merging
     void ProhibitMerge(unsigned short index1, unsigned short index2);
 
+    /// Method to inqury if a combination is prohibited to merge
+    bool MergeAllowed(unsigned short index1, unsigned short index2);
+
     /// Method to merge 2 clusters via index numbers
     void Merge(unsigned short index1, unsigned short index2);
 
@@ -85,6 +88,8 @@ namespace cluster {
      */
     
     void Combine(const CBookKeeper &another);
+
+    void Report() const;
 
   protected:
 

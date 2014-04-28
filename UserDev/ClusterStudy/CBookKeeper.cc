@@ -44,8 +44,32 @@ namespace cluster {
 
     if(out_index2 < out_index1) std::swap(out_index1,out_index2);
 
-    _prohibit_merge.at(index1).at(index2) = true;
+    _prohibit_merge.at(out_index1).at(out_index2-out_index1) = true;
 
+  }
+
+  bool CBookKeeper::MergeAllowed(unsigned short index1,
+				 unsigned short index2)
+  {
+
+    if(index1 == index2)
+
+      throw RecoUtilException(Form("<<%s>> Two input clusters identical (%d)",__FUNCTION__,index1));
+
+
+    if( index1 >= this->size() || index2 >= this->size() )
+
+      throw RecoUtilException(Form("Input cluster index (%d and/or %d) out of range",index1,index2));
+
+    auto out_index1 = this->at(index1);
+    auto out_index2 = this->at(index2);
+
+    if(out_index1 == out_index2) return true;
+
+    if(out_index2 < out_index1) std::swap(out_index1,out_index2);
+
+    return !(_prohibit_merge.at(out_index1).at(out_index2-out_index1));
+    
   }
 
   void CBookKeeper::Merge(unsigned short index1, unsigned short index2)
@@ -67,7 +91,11 @@ namespace cluster {
 
     if(out_index2 < out_index1) std::swap(out_index1,out_index2);
 
-    //if(_prohibit_merge.at(index1).at(index2)) return;
+    if(_prohibit_merge.at(out_index1).at(out_index2-out_index1))
+      
+      throw RecoUtilException(Form("Clusters (%d,%d) correspond to output (%d,%d) which is prohibited to merge",
+				   index1,index2,
+				   out_index1,out_index2));
 
     //
     // Merge cluster indexes
@@ -80,7 +108,6 @@ namespace cluster {
 	v -= 1;
     }
 
-    /*
     //
     // Merge prohibit rule
     //
@@ -96,20 +123,119 @@ namespace cluster {
 						       );
       
       for(size_t in_index=tmp_out_index2; 
-	  in_index < _prohibit_merge.at(index).size();
+	  //in_index < _prohibit_merge.at(index).size() - 1;
+	  in_index < (_out_cluster_count - index - 1);
 	  ++in_index) {
-	
+
+	/*
 	if(in_index >= (_out_cluster_count - 1 - index)) 
 
 	  _prohibit_merge.at(index).at(in_index) = false;
 
 	else
-	  
-	  _prohibit_merge.at(index).at(in_index) = _prohibit_merge.at(index).at(in_index+1);
+	*/	  
+	_prohibit_merge.at(index).at(in_index) = _prohibit_merge.at(index).at(in_index+1);
+      }
+
+      //(*_prohibit_merge.at(index).rbegin()) = false;
+      _prohibit_merge.at(index).at(_out_cluster_count - index - 1) = false;
+
+    }
+
+    // (2) handle index == out_index1
+    for(size_t in_index = 1; 
+	//in_index < _prohibit_merge.at(out_index1).size() - 1; 
+	in_index < (_out_cluster_count - out_index1 - 1);
+	++in_index) {
+      if( (in_index + out_index1) < out_index2 ) {
+	/*
+	std::cout<<Form("Inspecting1 : (%d,%zu) to (%zu,%zu)",
+			out_index1,in_index,
+			(in_index + out_index1),(out_index2 - (in_index+out_index1)))
+		 << std::endl;
+	*/
+	_prohibit_merge.at(out_index1).at(in_index) = ( _prohibit_merge.at(out_index1).at(in_index)
+							||
+							_prohibit_merge.at(in_index + out_index1).at(out_index2 - (in_index+out_index1))
+							);
+      }
+      else {
+	/*
+	std::cout<<Form("Inspecting2 : (%d,%zu) to (%d,%zu) ...",
+			out_index1,in_index+1,
+			out_index2,(in_index+out_index1-out_index2));
+	if(_prohibit_merge.at(out_index1).at(in_index+1)) std::cout<<"T";
+	else std::cout<<"F";
+	std::cout<<",";
+	if(_prohibit_merge.at(out_index2).at(in_index+out_index1-out_index2)) std::cout<<"T";
+	else std::cout<<"F";
+	std::cout<<std::endl;
+	*/
+	_prohibit_merge.at(out_index1).at(in_index) = ( _prohibit_merge.at(out_index1).at(in_index+1)
+							||
+							_prohibit_merge.at(out_index2).at(in_index+1+out_index1-out_index2)
+							);
+	
       }
     }
-    // (2) handle index == out_index1
-    */    
+    //(*_prohibit_merge.at(out_index1).rbegin()) = false;
+    _prohibit_merge.at(out_index1).at(_out_cluster_count - out_index1 - 1) = false;
+
+    // (3) handle out_index1 < index < out_index2
+    for(size_t index = out_index1+1; 
+	index < out_index2;
+	++index){
+      for(size_t in_index = (out_index2 - index);
+	  //in_index < (_prohibit_merge.at(index).size() - 1);
+	  in_index < (_out_cluster_count - index - 1);
+	  ++in_index)
+
+	_prohibit_merge.at(index).at(in_index) = _prohibit_merge.at(index).at(in_index+1);
+      
+      //(*_prohibit_merge.at(index).rbegin()) = false;
+      _prohibit_merge.at(index).at(_out_cluster_count - index - 1) = false;
+    }
+    // (4) handle out_index2 <= index
+    for(size_t index = out_index2;
+	//index < (_prohibit_merge.size() - 1);
+	index < (_out_cluster_count - 1);
+	++index) {
+      
+      for(size_t in_index = 0;
+	  in_index < _prohibit_merge.at(index).size();
+	  ++in_index)
+
+	if(in_index < _prohibit_merge.at(index+1).size())
+	  _prohibit_merge.at(index).at(in_index) = _prohibit_merge.at(index+1).at(in_index);
+
+	else
+	  _prohibit_merge.at(index).at(in_index) = false;
+
+    }
+
+    _out_cluster_count -=1;
+
+  }
+
+  void CBookKeeper::Report() const 
+  {
+    std::cout<<"Merge Result:"<<std::endl;
+    for(auto const& v : *this)
+      std::cout<<v<< " ";
+    std::cout<<std::endl<<std::endl;
+
+    std::cout<<"Prohibit Status:"<<std::endl;
+    for(auto const &bs : _prohibit_merge) {
+      
+      for(auto const &b : bs) {
+
+	if(b) std::cout<<"\033[93mT\033[00m ";
+	else std::cout<<"\033[95mF\033[00m ";
+
+      }
+      std::cout<<std::endl;
+    }
+    std::cout<<std::endl;
 
   }
 
@@ -164,7 +290,10 @@ namespace cluster {
     std::vector<std::vector<unsigned short> > another_result;
     another.PassResult(another_result);
     if(another_result.size() >= my_result.size())
-      throw RecoUtilException("The input has equal or more number of output clusters");
+      throw RecoUtilException(Form("The input has equal or more number of output clusters (%zu>=%zu)",
+				   another_result.size(),
+				   my_result.size())
+			      );
 
     // Combine
     for(auto const& ares : another_result) {

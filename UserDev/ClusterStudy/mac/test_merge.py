@@ -19,6 +19,8 @@ proc = fmwk.ClusterMerger()
 
 proc.GetManager().AddMergeAlgo(cluster.CMAlgoFake())
 
+proc.GetManager().AddSeparateAlgo(cluster.CMAlgoFake())
+
 proc.GetManager().DebugMode(cluster.CMergeManager.kPerIteration)
 #proc.GetManager().DebugMode(cluster.CMergeManager.kPerAlgoSet)
 #proc.GetManager().DebugMode(cluster.CMergeManager.kPerMerging)

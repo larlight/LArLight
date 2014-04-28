@@ -78,19 +78,24 @@ namespace cluster {
 	  << Form("  Merging iteration %zu: processing %zu clusters...",ctr,tmp_merged_clusters.size()) 
 	  << std::endl;
 
+      bk.Reset(tmp_merged_clusters.size());
+
       std::vector<bool> merge_switch(tmp_merged_clusters.size(),true);
       for(size_t i=0; i<tmp_merged_indexes.size(); ++i)
 	
 	if(tmp_merged_indexes.at(i).size()==1)
-
+	  
 	  merge_switch.at(i) = false;
 
-      bk.Reset(tmp_merged_clusters.size());
+      // Run separation algorithm
+      if(_separate_algo)
 
-      // Run algorithm
-      RunMerge(tmp_merged_clusters,
-	       merge_switch,
-	       bk);
+	RunSeparate(tmp_merged_clusters, bk);
+
+      // Run merging algorithm
+      if(_merge_algo)
+
+	RunMerge(tmp_merged_clusters, merge_switch, bk);
 
       // Save output
       bk.PassResult(tmp_merged_indexes);
@@ -124,9 +129,8 @@ namespace cluster {
 	  (*_out_clusters.rbegin()).FillParams(true,true,true,true,true,false);
 	  (*_out_clusters.rbegin()).FillPolygon();
 	}
+	book_keepers.push_back(bk);
       }
-
-      book_keepers.push_back(bk);
 
       if(_debug_mode <= kPerIteration) {
 
@@ -211,7 +215,10 @@ namespace cluster {
       }
     }
 
-    // Call prepare functions
+    //
+    // Merging
+    //
+    // Call prepare function for merging
     _merge_algo->Prepare(in_clusters);
     
     // Run over clusters and execute merging algorithms
@@ -234,10 +241,13 @@ namespace cluster {
 	// Skip if this combination is not meant to be compared
 	if(!(merge_flag.at((*citer2).second))) continue;
 
+	// Skip if this combination is not allowed to merge
+	if(!(book_keeper.MergeAllowed((*citer1).second,(*citer2).second))) continue;
+
 	if(_debug_mode <= kPerAlgoSet){
 	  
 	  std::cout
-	    << Form("    \033[93mInspecting a pair (%zu, %zu) ... \033[00m",(*citer1).second, (*citer2).second)
+	    << Form("    \033[93mInspecting a pair (%zu, %zu) for merging... \033[00m",(*citer1).second, (*citer2).second)
 	    << std::endl;
 	}
 	
@@ -281,6 +291,100 @@ namespace cluster {
 
     }
 
+  }
+
+  void CMergeManager::RunSeparate(const std::vector<cluster::ClusterParamsAlgNew> &in_clusters,
+				  CBookKeeper &book_keeper) const
+  {
+    /*
+    if(separate_flag.size() != in_clusters.size())
+      throw RecoUtilException(Form("in_clusters (%zu) and separate_flag (%zu) vectors must be of same length!",
+				   in_clusters.size(),
+				   separate_flag.size()
+				   )
+			      );
+    */
+    if(_debug_mode <= kPerIteration){
+      
+      std::cout
+	<< Form("  Calling %s with %zu clusters...",__FUNCTION__,in_clusters.size())
+	<<std::endl;
+
+    }
+
+    // Figure out ordering of clusters to process
+    std::multimap<double,size_t> prioritized_index;
+    for(size_t i=0; i<in_clusters.size(); ++i) {
+
+      if(in_clusters.at(i).GetHitVector().size()<1) continue;
+
+      switch(_priority) {
+      case ::cluster::CMergeManager::kIndex:
+	prioritized_index.insert(std::pair<double,size_t>(((double)(in_clusters.size()) - (double)i),i));
+	break;
+      case ::cluster::CMergeManager::kPolyArea:
+	prioritized_index.insert(std::pair<double,size_t>(in_clusters.at(i).GetParams().PolyObject.Area(),i));
+	break;
+      case ::cluster::CMergeManager::kChargeSum:
+	prioritized_index.insert(std::pair<double,size_t>(in_clusters.at(i).GetParams().sum_charge,i));
+	break;
+      case ::cluster::CMergeManager::kNHits:
+	prioritized_index.insert(std::pair<double,size_t>((double)(in_clusters.at(i).GetParams().N_Hits),i));
+	break;
+      }
+    }
+
+    //
+    // Separation
+    //
+
+    // Call prepare functions for separation
+    _separate_algo->Prepare(in_clusters);
+    
+    // Run over clusters and execute merging algorithms
+    for(size_t cindex1 = 0; cindex1 < in_clusters.size(); ++cindex1) {
+      
+      UChar_t plane1 = in_clusters.at(cindex1).Plane();
+      
+      for(size_t cindex2 = cindex1+1; cindex2 < in_clusters.size(); ++cindex2) {
+	
+	// Skip if not on the same plane
+	UChar_t plane2 = in_clusters.at(cindex2).Plane();
+	if(plane1 != plane2) continue;
+	
+	// Skip if this combination is not meant to be compared
+	//if(!(separate_flag.at(cindex2))) continue;
+	
+	if(_debug_mode <= kPerAlgoSet){
+	  
+	  std::cout
+	    << Form("    \033[93mInspecting a pair (%zu, %zu) for separation... \033[00m",cindex1,cindex2)
+	    << std::endl;
+	}
+	
+	bool separate = _separate_algo->Bool(in_clusters.at(cindex1),in_clusters.at(cindex2));
+	
+	if(_debug_mode <= kPerAlgoSet) {
+	  
+	  if(separate) 
+	    std::cout << "    \033[93mfound to be separated!\033[00m " 
+		      << std::endl
+		      << std::endl;
+	  
+	  else 
+	    std::cout << "    \033[93mfound NOT to be separated...\033[00m" 
+		      << std::endl
+		      << std::endl;
+	  
+	} // end looping over all sets of algorithms
+	
+	if(separate)
+	  
+	  book_keeper.ProhibitMerge(cindex1,cindex2);
+	  
+      } // end looping over all cluster pairs for citer1
+      
+    } // end looping over clusters
   }
 
 }
