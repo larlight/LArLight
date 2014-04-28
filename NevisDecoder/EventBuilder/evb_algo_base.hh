@@ -17,7 +17,7 @@
 
 #include "Base-TypeDef.hh"
 #include "DataFormat-TypeDef.hh"
-
+#include "evb_exception.hh"
 namespace larlight {
 
   class evb_algo_base : public larlight_base {
@@ -40,6 +40,8 @@ namespace larlight {
 
     virtual bool finalize();
 
+    void SetPlotFile(TFile* fout) { _fout = fout; _analyze=true;}
+
   protected:
 
     UInt_t get_event_number() const;
@@ -53,6 +55,8 @@ namespace larlight {
 
     bool _eof;
 
+    bool _analyze;
+
     UInt_t _current_event_number;
 
     std::vector<std::string> _input_files;
@@ -60,6 +64,8 @@ namespace larlight {
     DATA::DATA_TYPE _type;
 
     storage_manager *_storage;
+
+    TFile *_fout;
     
   };
 }

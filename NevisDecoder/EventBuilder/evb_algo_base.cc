@@ -9,6 +9,8 @@ namespace larlight {
   {
     _name = "evb_algo_base";
     
+    _fout = 0;
+
     if( type != DATA::PMTFIFO &&
 	type != DATA::TPCFIFO &&
 	type != DATA::Trigger ) {

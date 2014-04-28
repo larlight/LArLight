@@ -44,6 +44,9 @@ namespace larlight {
 
     /// Method to set the output file name
     void set_output_filename(std::string name){ _out_storage->set_out_filename(name);}
+
+    /// Method to set the analysis output file (users' plots/data product)
+    void set_ana_output_filename(std::string name) { _ana_filename = name; }
     
     /// Method to add an algorithm/input file
     bool add_input(DATA::DATA_TYPE type, std::string fname);
@@ -65,6 +68,10 @@ namespace larlight {
     DATA::DATA_TYPE _ref_data;
 
     storage_manager* _out_storage;
+
+    std::string _ana_filename;
+
+    TFile* _fout;
 
   };
 }
