@@ -124,7 +124,7 @@ bool fileExists(const char *filename)
 }
 #endif
 
-
+// adds a plot label to the current canvas
 void add_plot_label( char* label, double x, double y, double size = 0.05, int color = 1, int font = 62, int align = 22 ){
 
   TLatex *latex = new TLatex( x, y, label );
@@ -134,7 +134,6 @@ void add_plot_label( char* label, double x, double y, double size = 0.05, int co
   latex->SetTextFont(font);
   latex->SetTextAlign(align);
   latex->Draw();
-
 }
 
 
