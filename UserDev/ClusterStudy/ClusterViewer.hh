@@ -65,6 +65,9 @@ namespace larlight{
     /// Function to draw a secondary canvas (where individual cluster is shown)
     void DrawOneCluster(UChar_t plane, size_t index) {_algo.DrawOneCluster(plane,index);}
 
+    /// Function to draw a tertiary canvas w/ two clusters on it
+    void DrawTwoClusters(UChar_t plane, size_t index1, size_t index2) {_algo.DrawTwoClusters(plane,index1,index2);}
+
   protected:
     /// Type of cluster to view
     DATA::DATA_TYPE cluster_type;

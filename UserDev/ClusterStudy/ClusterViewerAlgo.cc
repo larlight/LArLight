@@ -11,6 +11,7 @@ namespace cluster {
     _nplanes = larutil::Geometry::GetME()->Nplanes();
     _cAllCluster = nullptr;
     _cOneCluster = nullptr;
+    _cTwoClusters= nullptr;
   }
 
   //#############################
@@ -425,6 +426,47 @@ namespace cluster {
     if( _gClusterPolygon.at(plane).at(index) ) _gClusterPolygon.at(plane).at(index)->Draw("PL");
     _cOneCluster->Update();
   }
+
+
+  //#################################################################
+  void ClusterViewerAlgo::DrawTwoClusters(UChar_t plane, size_t index1, size_t index2)
+  //#################################################################
+  {
+    if(!_cTwoClusters)
+      _cTwoClusters = new TCanvas(Form("cTwoClustersFor%s",_name.c_str()),
+				  Form("%s : Two Cluster Start/End Points",_name.c_str()),
+				  500,300);
+    
+    if(plane >= _nplanes) throw ViewerException(Form("Invalid plane ID: %d",plane));
+    
+    if(index1 >= _hClusterHits.at(plane).size())
+      throw ViewerException(Form("Invalid cluster index: %zu (for plane %d)",
+				 index1,
+				 plane)
+			    );
+    if(index2 >= _hClusterHits.at(plane).size()) 
+      throw ViewerException(Form("Invalid cluster index: %zu (for plane %d)",
+				 index2,
+				 plane)
+			    );
+    _cTwoClusters->cd();
+    
+    _hClusterHits.at(plane).at(index1)->Draw();
+    _hClusterHits.at(plane).at(index2)->Draw("same");
+
+    if( _gClusterStart.at(plane).at(index1)   ) _gClusterStart.at(plane).at(index1)->Draw("P");
+    if( _gClusterEnd.at(plane).at(index1)     ) _gClusterEnd.at(plane).at(index1)->Draw("P");
+    if( _gClusterPolygon.at(plane).at(index1) ) _gClusterPolygon.at(plane).at(index1)->Draw("PL");
+
+    if( _gClusterStart.at(plane).at(index2)   ) _gClusterStart.at(plane).at(index2)->Draw("P");
+    if( _gClusterEnd.at(plane).at(index2)     ) _gClusterEnd.at(plane).at(index2)->Draw("P");
+    if( _gClusterPolygon.at(plane).at(index2) ) _gClusterPolygon.at(plane).at(index2)->Draw("PL");
+
+    _cTwoClusters->Update();
+  }
+
+
+
 
   //###################################################
   size_t ClusterViewerAlgo::ClusterCount(UChar_t plane)
