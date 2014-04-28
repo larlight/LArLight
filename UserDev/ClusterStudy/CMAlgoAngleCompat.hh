@@ -36,7 +36,12 @@ namespace cluster {
     /// Overloaded (from CBoolAlgoBase) Bool function
     virtual bool Bool(const ClusterParamsAlgNew &cluster1,
 		      const ClusterParamsAlgNew &cluster2);
-    
+
+    /// Overloaded function called at beginning of iterating over all pairs of clusters
+    /// Currently using just to initialize some debugging histograms
+    /// should rewrite it to not take an input argument...
+    virtual void Prepare(const std::vector<cluster::ClusterParamsAlgNew> &clusters);
+
     /// Method to set verbose mode
     void SetVerbose(bool on) { _verbose = on; }
 
@@ -48,6 +53,8 @@ namespace cluster {
 
     /// Method to set angle cut value to be based on opening angle
     void SetUseOpeningAngle(bool on) { _use_opening_angle = on; }
+
+    TH1F* GetAngleDistHisto() const{ return angle_dist_histo; };
 
   protected:
 
@@ -65,6 +72,9 @@ namespace cluster {
     /// angle instead of whatever you set with SetAngleCut
     bool _use_opening_angle;
 
+
+    /// Histogram used for debugging/cut value settings
+    TH1F *angle_dist_histo;
 
 
   };

@@ -16,6 +16,8 @@ namespace cluster {
 
     SetUseOpeningAngle(false);
 
+    angle_dist_histo = new TH1F("angle_dist_histo","Cluster Angle Differences",100,-360,360);
+
   } //end constructor
 
   bool CMAlgoAngleCompat::Bool(const ClusterParamsAlgNew &cluster1,
@@ -26,7 +28,20 @@ namespace cluster {
     //already in cm/cm units, degrees? need to check that
     double angle1 = cluster1.GetParams().angle_2d;// * _time_2_cm / _wire_2_cm;
     double angle2 = cluster2.GetParams().angle_2d;// * _time_2_cm / _wire_2_cm;
-    
+  
+    //for some reason angles are frequently -999.99.
+    //if either angle is this, clearly the cluster 2d angle is not well defined
+    //and this algorithm does not apply
+    if(angle1 < -998 || angle2 < -998)
+      return false;
+
+    if(angle_dist_histo){
+      angle_dist_histo->Fill(angle1-angle2);
+      std::cout<<"filling histo with "<<angle1<<"-"<<angle2<<"="<<angle1-angle2<<std::endl;
+    }
+    else
+      std::cout<<"\n\n\nSOMETHING WENT HORRIBLY WRONG\n\n\n\n\n\n\n"<<std::endl;
+
     bool compatible = false;
     
     double my_cut_value;
@@ -54,7 +69,13 @@ namespace cluster {
     
   } // end Merge function 
   
+  void CMAlgoAngleCompat::Prepare(const std::vector<cluster::ClusterParamsAlgNew> &clusters){
+    
+    if(angle_dist_histo) angle_dist_histo->Reset();
 
+    std::cout<<"Prepare function being called within CMAlgoAngleCompat!"<<std::endl;
+
+  }
 
 }//end namespace cluster
 #endif
