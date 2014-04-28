@@ -6,7 +6,7 @@
 namespace cluster {
 
   //-------------------------------------------------------
-  CMAlgo_Class_Name::CMAlgo_Class_Name() : CMergeAlgoBase()
+  CMAlgo_Class_Name::CMAlgo_Class_Name() : CBoolAlgoBase()
   //-------------------------------------------------------
   {
 
@@ -20,8 +20,8 @@ namespace cluster {
   }
 
   //----------------------------------------------------------------
-  bool CMAlgo_Class_Name::Merge(const ClusterParamsAlgNew &cluster1,
-				const ClusterParamsAlgNew &cluster2)
+  bool CMAlgo_Class_Name::Bool(const ClusterParamsAlgNew &cluster1,
+			       const ClusterParamsAlgNew &cluster2)
   //----------------------------------------------------------------
   {
     return false;

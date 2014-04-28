@@ -15,15 +15,15 @@
 #define CMALGO_CLASS_NAME_HH
 
 #include <iostream>
-#include "CMergeAlgoBase.hh"
+#include "CBoolAlgoBase.hh"
 
 namespace cluster {
   /**
      \class CMAlgo_Class_Name
-     User implementation for CMergeAlgoBase class
+     User implementation for CBoolAlgoBase class
      doxygen documentation!
   */
-  class CMAlgo_Class_Name : public CMergeAlgoBase {
+  class CMAlgo_Class_Name : public CBoolAlgoBase {
     
   public:
     
@@ -37,8 +37,8 @@ namespace cluster {
        Core function: given the CPAN input, return whether a cluster should be
        merged or not.
     */
-    virtual bool Merge(const ClusterParamsAlgNew &cluster1,
-		       const ClusterParamsAlgNew &cluster2);
+    virtual bool Bool(const ClusterParamsAlgNew &cluster1,
+		      const ClusterParamsAlgNew &cluster2);
 
     /**
        Optional function: Called before iterating over 
