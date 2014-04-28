@@ -43,16 +43,34 @@ namespace cluster {
     }
 
     /**
+       Optional function: called at the beginning of 1st iteration. This is called per event.
+     */
+    virtual void EventBegin(const std::vector<cluster::ClusterParamsAlgNew> &clusters);
+
+    /**
+       Optional function: called at the end of event ... after the last merging iteration is over.
+     */
+    virtual void EventEnd();
+
+    /**
+       Optional function: Called at the beginning of each iteration over possible pairs of clusters
+     */
+    virtual void IterationBegin(const std::vector<cluster::ClusterParamsAlgNew> &clusters);
+
+    /**
+       Optional function: Called at the end of each iteration over possible pairs of clusters
+     */
+    virtual void IterationEnd();
+
+    /**
        Core function: given the CPAN input, return whether a cluster should be
        merged or not.
     */
     virtual bool Bool(const ClusterParamsAlgNew &cluster1,
 		      const ClusterParamsAlgNew &cluster2);
 
-    /**
-       Optional function: Called before iterating over 
-     */
-    virtual void Prepare(const std::vector<cluster::ClusterParamsAlgNew> &clusters);
+    
+
     
     /**
        Optional function: called after each Merge() function call by CMergeManager IFF

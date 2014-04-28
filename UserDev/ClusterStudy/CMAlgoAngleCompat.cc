@@ -5,7 +5,7 @@
 
 namespace cluster {
 
-  CMAlgoAngleCompat::CMAlgoAngleCompat() {
+  CMAlgoAngleCompat::CMAlgoAngleCompat() : CBoolAlgoBase() {
 
     //this just sets default values
     SetVerbose(true);
@@ -16,8 +16,12 @@ namespace cluster {
 
     SetUseOpeningAngle(false);
 
-    angle_dist_histo = new TH1F("angle_dist_histo","Cluster Angle Differences",100,-360,360);
+    if(_fout) {
 
+      _fout->cd();
+      angle_dist_histo = new TH1F("angle_dist_histo","Cluster Angle Differences",100,-360,360);
+
+    }
   } //end constructor
 
   bool CMAlgoAngleCompat::Bool(const ClusterParamsAlgNew &cluster1,
