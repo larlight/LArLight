@@ -95,6 +95,9 @@ namespace cluster {
     /// A method to obtain book keeper
     const CBookKeeper& GetBookKeeper() const { return _book_keeper; }
 
+    /// A setter for an analysis output file
+    void SetAnaFile(TFile* fout) { _fout = fout; }
+
   protected:
 
     void RunMerge(const std::vector<cluster::ClusterParamsAlgNew > &in_clusters,
@@ -132,6 +135,9 @@ namespace cluster {
     
     /// Merging priority type
     CMergePriority_t _priority;
+
+    /// Output analysis plot TFile
+    TFile* _fout;
 
   };
 }

@@ -30,25 +30,45 @@ namespace cluster {
   public:
     
     /// Default constructor
-    CBoolAlgoBase(){}
+    CBoolAlgoBase(){ _fout = 0; }
     
     /// Default destructor
     virtual ~CBoolAlgoBase(){}
 
     /// Function to reset the algorithm instance ... maybe implemented via child class
     virtual void Reset(){}
+
+    /**
+       Optional function: called at the beginning of 1st iteration. This is called per event.
+     */
+    virtual void EventBegin(const std::vector<cluster::ClusterParamsAlgNew> &clusters)
+    { return; }
+
+    /**
+       Optional function: called at the end of event ... after the last merging iteration is over.
+     */
+    virtual void EventEnd()
+    { return; }
  
     /**
-       Optional function: called at the beggining of iterating over all pairs of clusters. 
-       This provides all clusters' information in case the algorithm need them 
+       Optional function: called at the beggining of each iteration over all pairs of clusters. 
+       This provides all clusters' information in case the algorithm need them. Note this
+       is called per iteration which may be more than once per event.
      */
-    virtual void Prepare(const std::vector<cluster::ClusterParamsAlgNew> &clusters)
+    virtual void IterationBegin(const std::vector<cluster::ClusterParamsAlgNew> &clusters)
+    { return; }
+
+    /**
+       Optional function: called at the end of each iteration over all pairs of clusters.
+     */
+    virtual void IterationEnd()
     { return; }
 
     /**
        Core function: given the CPAN input, return whether a cluster should be
        merged or not.
     */
+
     virtual bool Bool(const ClusterParamsAlgNew &cluster1,
 		      const ClusterParamsAlgNew &cluster2)
     {return false;}
@@ -58,6 +78,14 @@ namespace cluster {
        CMergeManager is run with verbosity level kPerMerging. Maybe useful for debugging.
      */
     virtual void Report() {return;}
+
+    /// Setter function for an output plot TFile pointer
+    void SetAnaFile(TFile* fout) { _fout = fout; }
+
+  protected:
+
+    /// TFile pointer to an output file
+    TFile* _fout;
 
   };
 

@@ -15,15 +15,15 @@
 #define CMALGO_CLASS_NAME_HH
 
 #include <iostream>
-#include "CMergeAlgoBase.hh"
+#include "CBoolAlgoBase.hh"
 
 namespace cluster {
   /**
      \class CMAlgo_Class_Name
-     User implementation for CMergeAlgoBase class
+     User implementation for CBoolAlgoBase class
      doxygen documentation!
   */
-  class CMAlgo_Class_Name : public CMergeAlgoBase {
+  class CMAlgo_Class_Name : public CBoolAlgoBase {
     
   public:
     
@@ -34,17 +34,34 @@ namespace cluster {
     virtual ~CMAlgo_Class_Name(){};
 
     /**
+       Optional function: called at the beginning of 1st iteration. This is called per event.
+     */
+    virtual void EventBegin(const std::vector<cluster::ClusterParamsAlgNew> &clusters);
+
+    /**
+       Optional function: called at the end of event ... after the last merging iteration is over.
+     */
+    virtual void EventEnd();
+ 
+    /**
+       Optional function: called at the beggining of each iteration over all pairs of clusters. 
+       This provides all clusters' information in case the algorithm need them. Note this
+       is called per iteration which may be more than once per event.
+     */
+    virtual void IterationBegin(const std::vector<cluster::ClusterParamsAlgNew> &clusters);
+
+    /**
+       Optional function: called at the end of each iteration over all pairs of clusters.
+     */
+    virtual void IterationEnd();
+
+    /**
        Core function: given the CPAN input, return whether a cluster should be
        merged or not.
     */
-    virtual bool Merge(const ClusterParamsAlgNew &cluster1,
-		       const ClusterParamsAlgNew &cluster2);
+    virtual bool Bool(const ClusterParamsAlgNew &cluster1,
+		      const ClusterParamsAlgNew &cluster2);
 
-    /**
-       Optional function: Called before iterating over 
-     */
-    virtual void Prepare(const std::vector<cluster::ClusterParamsAlgNew> &clusters);
-    
     /**
        Optional function: called after each Merge() function call by CMergeManager IFF
        CMergeManager is run with verbosity level kPerMerging. Maybe useful for debugging.

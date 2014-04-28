@@ -5,9 +5,9 @@
 
 namespace cluster {
 
-  //-------------------------------------------------------
+  //------------------------------------------
   CMAlgoArray::CMAlgoArray() : CBoolAlgoBase()
-  //-------------------------------------------------------
+  //------------------------------------------
   {
     _algo_array.clear();
     _ask_and.clear();
@@ -18,6 +18,34 @@ namespace cluster {
   //-----------------------
   {
     for(auto &algo : _algo_array) algo->Reset();
+  }
+
+  //-------------------------------------------------------------------------------------
+  void CMAlgoArray::EventBegin(const std::vector<cluster::ClusterParamsAlgNew> &clusters)
+  //-------------------------------------------------------------------------------------
+  {
+    for(auto &algo : _algo_array) algo->EventBegin(clusters);
+  }
+
+  //--------------------------
+  void CMAlgoArray::EventEnd()
+  //--------------------------
+  {
+    for(auto &algo : _algo_array) algo->EventEnd();
+  }
+
+  //-------------------------------------------------------------------------------------
+  void CMAlgoArray::IterationBegin(const std::vector<cluster::ClusterParamsAlgNew> &clusters)
+  //-------------------------------------------------------------------------------------
+  {
+    for(auto &algo : _algo_array) algo->IterationBegin(clusters);
+  }
+
+  //--------------------------
+  void CMAlgoArray::IterationEnd()
+  //--------------------------
+  {
+    for(auto &algo : _algo_array) algo->IterationEnd();
   }
 
   //---------------------------------------------------------
@@ -63,13 +91,6 @@ namespace cluster {
     return status;
   }
 
-  //----------------------------------------------------------------------------------
-  void CMAlgoArray::Prepare(const std::vector<cluster::ClusterParamsAlgNew> &clusters)
-  //----------------------------------------------------------------------------------
-  {
-    for(auto &algo : _algo_array) algo->Prepare(clusters);
-  }
-  
   //------------------------
   void CMAlgoArray::Report()
   //------------------------

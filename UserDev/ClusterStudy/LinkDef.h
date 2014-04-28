@@ -33,6 +33,8 @@
 #pragma link C++ class cluster::CMAlgoPolyHitOverlap+;
 #pragma link C++ class cluster::CMAlgoStartInCone+;
 #pragma link C++ class cluster::CMAlgoArray+;
+#pragma link C++ class cluster::CMAlgoTrackSeparate+;
+#pragma link C++ class cluster::CMAlgoMergeAll+;
 //ADD_CMALGO_CLASS ... do not change this line
 
 #pragma link C++ class larlight::ClusterMerger+;
@@ -40,6 +42,9 @@
 
 //ADD_NEW_CLASS ... do not change this line
 #endif
+
+
+
 
 
 

@@ -7,6 +7,7 @@ namespace cluster {
 
   CMergeManager::CMergeManager(CMergePriority_t priority)
   {
+    _fout = 0;
     _debug_mode = kNone;
     _merge_till_converge = false;
     _priority = priority;
@@ -57,6 +58,12 @@ namespace cluster {
   {
     if(!_merge_algo) throw RecoUtilException("No algorithm to run!");
 
+    _merge_algo->SetAnaFile(_fout);
+    if(_separate_algo) _merge_algo->SetAnaFile(_fout);
+    
+    _merge_algo->EventBegin(_in_clusters);
+    if(_separate_algo) _separate_algo->EventBegin(_in_clusters);
+    
     size_t ctr=0;
     bool keep_going=true;
     std::vector<CBookKeeper> book_keepers;
@@ -93,9 +100,7 @@ namespace cluster {
 	RunSeparate(tmp_merged_clusters, bk);
 
       // Run merging algorithm
-      if(_merge_algo)
-
-	RunMerge(tmp_merged_clusters, merge_switch, bk);
+      RunMerge(tmp_merged_clusters, merge_switch, bk);
 
       // Save output
       bk.PassResult(tmp_merged_indexes);
@@ -164,6 +169,9 @@ namespace cluster {
     for(auto const& bk : book_keepers)
 
       _book_keeper.Combine(bk);
+
+    _merge_algo->EventEnd();
+    if(_separate_algo) _separate_algo->EventEnd();
     
   }
 
@@ -219,7 +227,7 @@ namespace cluster {
     // Merging
     //
     // Call prepare function for merging
-    _merge_algo->Prepare(in_clusters);
+    _merge_algo->IterationBegin(in_clusters);
     
     // Run over clusters and execute merging algorithms
     for(auto citer1 = prioritized_index.rbegin();
@@ -274,6 +282,8 @@ namespace cluster {
       } // end looping over all cluster pairs for citer1
 
     } // end looping over clusters
+
+    _merge_algo->IterationEnd();
     
     if(_debug_mode <= kPerIteration && book_keeper.GetResult().size() != in_clusters.size()) {
       
@@ -288,7 +298,6 @@ namespace cluster {
 	std::cout<<" ... indexes to be merged!"<<std::endl;
 
       }
-
     }
 
   }
@@ -339,7 +348,7 @@ namespace cluster {
     //
 
     // Call prepare functions for separation
-    _separate_algo->Prepare(in_clusters);
+    _separate_algo->IterationBegin(in_clusters);
     
     // Run over clusters and execute merging algorithms
     for(size_t cindex1 = 0; cindex1 < in_clusters.size(); ++cindex1) {
@@ -385,6 +394,8 @@ namespace cluster {
       } // end looping over all cluster pairs for citer1
       
     } // end looping over clusters
+
+    _separate_algo->IterationEnd();
   }
 
 }

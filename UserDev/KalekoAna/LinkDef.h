@@ -13,6 +13,8 @@
 #pragma link C++ class kaleko::UtilFunctions+;
 
 #pragma link C++ class kaleko::QuickClusterAna+;
+#pragma link C++ class larlight::MCShowerStudy+;
+
 //ADD_NEW_CLASS
 #endif
 
