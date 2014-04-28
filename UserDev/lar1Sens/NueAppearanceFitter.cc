@@ -856,7 +856,7 @@ namespace lar1{
     hr1->GetYaxis()->SetTitleSize(0.05);
     hr1->SetStats(kFALSE);
     hr1->Draw();
-    gROOT->ProcessLine(".x ./lsnd_plot.c+(c3)");
+    plotUtils.lsnd_plot(c3);
 
     //======================================================
 
