@@ -11,6 +11,7 @@ namespace larlight {
 
   { 
     _name = "event_builder"; 
+    _ana_filename = "";
     _ref_data = DATA::Trigger;
     _out_storage = 0;
     // Create output data stream
@@ -88,8 +89,16 @@ namespace larlight {
 
     if(!_out_storage->open()) return false;
 
+    if(!_ana_filename.empty())
+      
+      _fout = TFile::Open(_ana_filename.c_str(),"RECREATE");
+
+    for(auto &algo : _evb_algo_v)
+
+      algo->SetPlotFile(_fout);
+
     // Initialize all algorithms
-    for(auto const algo : _evb_algo_v)
+    for(auto &algo : _evb_algo_v)
 
       status = status && algo->initialize();
 
@@ -176,6 +185,8 @@ namespace larlight {
 	status = status && algo->finalize();
       
     }
+
+    if(_fout) _fout->Close();
 
     _out_storage->close();
 

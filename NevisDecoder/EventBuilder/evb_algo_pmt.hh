@@ -16,6 +16,8 @@
 #define EVB_ALGO_PMT_HH
 
 #include "evb_algo_base.hh"
+#include <TGraph.h>
+#include <TH1D.h>
 
 namespace larlight {
 
@@ -34,6 +36,24 @@ namespace larlight {
   protected:
 
     virtual bool build(storage_manager *out_storage, UInt_t id);
+
+    /// FEM's trigger frame number ... length = # events & # FEMs
+    std::vector<std::vector<UInt_t> > _fem_trig_frame;
+
+    /// FEM's event frame number ... length = # events & # FEMs
+    std::vector<std::vector<UInt_t> > _fem_event_frame;
+
+    /// FEM's trigger sample number ... length = # events & # FEMs
+    std::vector<std::vector<UInt_t> > _fem_trig_sample;
+
+    /// FEM module count
+    UChar_t _num_fem;
+    
+    /// Last event number
+    UInt_t _last_event_number;
+
+    /// First event number
+    UInt_t _first_event_number;
 
   };
 }

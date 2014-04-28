@@ -13,5 +13,5 @@
 #pragma link C++ class larlight::evb_algo_tpc+;
 #pragma link C++ class larlight::evb_algo_pmt+;
 #pragma link C++ class larlight::evb_algo_trigger+;
-
+#pragma link C++ class larlight::evb_exception+;
 #endif
