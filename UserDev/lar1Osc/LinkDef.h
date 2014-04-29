@@ -9,7 +9,7 @@
 #pragma link off all functions;
 #pragma link C++ nestedclasses;
 
-#pragma link C++ class lar1::LorentzVectorLight+;
+#pragma link C++ class gan::LorentzVectorLight+;
 #pragma link C++ class lar1::FluxRW+;
 #pragma link C++ class lar1::FluxRWnubar+;
 #pragma link C++ class lar1::Utils+;

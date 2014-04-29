@@ -31,10 +31,10 @@ namespace lar1{
     Double_t VertexEnergy( std::vector<Int_t> *pdg, std::vector<Double_t> *energy, 
   			 Double_t prot_thresh = 0.0, Double_t pion_thresh = 0.0, bool verbose = false );
     Double_t TotalPhotonEnergy( Int_t idet, 
-                                std::vector<lar1::LorentzVectorLight> *p1pos,
-                                std::vector<lar1::LorentzVectorLight> *p1mom,
-                                std::vector<lar1::LorentzVectorLight> *p2pos,
-                                std::vector<lar1::LorentzVectorLight> *p2mom );
+                                std::vector<gan::LorentzVectorLight> *p1pos,
+                                std::vector<gan::LorentzVectorLight> *p1mom,
+                                std::vector<gan::LorentzVectorLight> *p2pos,
+                                std::vector<gan::LorentzVectorLight> *p2mom );
 
     // bool PhotonsAreParallel(TVector3 & photon1_start, TVector3 & photon1_mom
     //                         TVector3 & photon2_start, TVector3 & photon2_mom);

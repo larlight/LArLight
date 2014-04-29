@@ -25,6 +25,7 @@
 #include "TMarker.h"
 #include "TH2D.h"
 #include "TImage.h"
+#include "THStack.h"
 
 #include <vector>
 #include <iostream>
@@ -54,6 +55,7 @@ namespace lar1{
       int ReadData();
       int Loop();
       int MakePlots();
+      int MakeEventRatePlots();
 
 
       // Functions to switch the general configuration variables on and off:
@@ -103,7 +105,8 @@ namespace lar1{
       std::string specialNameText_far;
       std::string specialNameTextOsc_far;
 
-
+      bool useHighDm;
+      bool useGlobBF;
 
       TString fileNameRoot;
       double flatSystematicError;  // Only used if nearDetStats = false.
@@ -125,8 +128,8 @@ namespace lar1{
       double LAr1FDScale;     //Scale the event rates (uniformly across all events), far det
 
       //Histogram definitions
-      // double emin = 0.2;        //GeV
-      // double emax = 3.0;        //GeV
+      const double emin = 0.2;        //GeV
+      const double emax = 3.0;        //GeV
       const Int_t nbinsE = 10;    //number of energy bins in each baseline, for each distribution (fosc, nue, or numu)
       
       std::string energyType;
@@ -166,7 +169,7 @@ namespace lar1{
       double dm2,sin22th;
       //const double dm2BF=1.2, sin22thBF=0.003; //The LSND best fit values of the parameters
       double chisq;
-      const double deltachisq90=1.64, deltachisq3s=9.00, deltachisq5s=25.00, deltachisq99=2.58;
+      const double deltachisq90=1.64, deltachisq3s=9.00, deltachisq5s=25.00;
 
 
       std::vector < std::vector< float> > eventsnLVec;      //has osc in it
@@ -199,6 +202,21 @@ namespace lar1{
       double * y3s;
       double * x5s;
       double * y5s;
+
+
+      // For making event rate plots:
+      // Vectors for reading in the backgrounds
+      std::vector< std::vector<float> >  NueFromNueCC_muonVec;
+      std::vector< std::vector<float> >  NueFromNueCC_chargeKaonVec;
+      std::vector< std::vector<float> >  NueFromNueCC_neutKaonVec;
+      std::vector< std::vector<float> >  NueFromEScatterVec;
+      std::vector< std::vector<float> >  NueFromNC_pi0Vec;
+      std::vector< std::vector<float> >  NueFromNC_delta0Vec;
+      std::vector< std::vector<float> >  NueFromNumuCCVec;
+      std::vector< std::vector<float> >  DirtVec;
+      std::vector< std::vector<float> >  OtherVec;
+
+
 
   };
 

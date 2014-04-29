@@ -73,16 +73,16 @@ namespace lar1{
     Double_t        PhiLepSmeared;
     Double_t        Elep;
     Double_t        ElepSmeared;
-    std::vector<LorentzVectorLight> *MuonPos;
-    std::vector<LorentzVectorLight> *MuonMom;
-    std::vector<LorentzVectorLight> *p1PhotonConversionPos;
-    std::vector<LorentzVectorLight> *p1PhotonConversionMom;
-    std::vector<LorentzVectorLight> *p2PhotonConversionPos;
-    std::vector<LorentzVectorLight> *p2PhotonConversionMom;
-    std::vector<LorentzVectorLight> *miscPhotonConversionPos;
-    std::vector<LorentzVectorLight> *miscPhotonConversionMom;
-    std::vector<LorentzVectorLight> *PionPos;
-    std::vector<LorentzVectorLight> *PionMom;
+    std::vector<gan::LorentzVectorLight> *MuonPos;
+    std::vector<gan::LorentzVectorLight> *MuonMom;
+    std::vector<gan::LorentzVectorLight> *p1PhotonConversionPos;
+    std::vector<gan::LorentzVectorLight> *p1PhotonConversionMom;
+    std::vector<gan::LorentzVectorLight> *p2PhotonConversionPos;
+    std::vector<gan::LorentzVectorLight> *p2PhotonConversionMom;
+    std::vector<gan::LorentzVectorLight> *miscPhotonConversionPos;
+    std::vector<gan::LorentzVectorLight> *miscPhotonConversionMom;
+    std::vector<gan::LorentzVectorLight> *PionPos;
+    std::vector<gan::LorentzVectorLight> *PionMom;
     // vector<vector< LorentzVectorLight> > * chargedPionPos;
     // vector<vector< LorentzVectorLight> > * chargedPionMom;
     // vector<LorentzVectorLight> * chargedPionSign;
@@ -180,7 +180,7 @@ namespace lar1{
 
     // if parameter tree is not specified (or zero), connect the file
     // used to generate this class and read the Tree.
-    gROOT -> ProcessLine(".L LorentzVectorLight.h+");
+    // gROOT -> ProcessLine(".L LorentzVectorLight.h+");
 
     TTree *tree;
     if (file.Length() == 0){

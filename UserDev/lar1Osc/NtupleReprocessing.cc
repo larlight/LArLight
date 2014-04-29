@@ -617,7 +617,8 @@ namespace lar1{
                   << "\t p2PhotonConversionMom->size(): " << p2PhotonConversionMom->size() << "\n"
                   << "\t NPi0FinalState: " << NPi0FinalState << "\n"
                   << "\t miscPhotonConversionPos->size(): " << miscPhotonConversionPos->size() << "\n"
-                  << "\t NGamma: " << NGamma << "\n";
+                  << "\t NGamma: " << NGamma << "\n"
+                  << "\t egammaThreshold " << egammaThreshold << "\n";
 
       }
 
@@ -760,10 +761,16 @@ namespace lar1{
                                          prot_thresh ) + photon_energy;
       }
 
-      if (isCC && MuonMom -> size() == 0) {
+      if (isCC && abs(inno) == 14 && MuonMom -> size() == 0) {
         N_continue_CC_muon ++;
         continue;
       }
+      // if (isCC && abs(inno) == 14 && MuonMom -> size() != 0) {
+        // std::cout << "at least that worked..." <<std::endl;
+        // for (auto point : * MuonMom)
+        //    std::cout << point.E() << std::endl;
+      // }
+
       if( signal != "fosc" && signal != "numi" && isFid && isCC && abs(inno) == 14 && MuonMom->at(0).E() > egammaThreshold ){
 
 
@@ -791,6 +798,7 @@ namespace lar1{
                                          prot_thresh ) + photon_energy;
         }
         else if( signal == "nue" ){
+          // std::cout << "Should be making a muon entry in the nue table!\n";
           ibkg = 7;
           efficiency = muonCCMisID;
           wgt = fluxweight*efficiency;

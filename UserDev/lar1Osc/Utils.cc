@@ -480,10 +480,11 @@ namespace lar1{
   //=========================================================================================
   // Get total photon energies in fiducial volume
   //=========================================================================================
-  Double_t Utils::TotalPhotonEnergy( Int_t idet, std::vector<lar1::LorentzVectorLight> *p1pos,
-  				   std::vector<lar1::LorentzVectorLight> *p1mom,
-  				   std::vector<lar1::LorentzVectorLight> *p2pos,
-  				   std::vector<lar1::LorentzVectorLight> *p2mom ){
+  Double_t Utils::TotalPhotonEnergy(Int_t idet, 
+                                    std::vector<gan::LorentzVectorLight> *p1pos,
+                                    std::vector<gan::LorentzVectorLight> *p1mom,
+                                    std::vector<gan::LorentzVectorLight> *p2pos,
+                                    std::vector<gan::LorentzVectorLight> *p2mom ){
     
     if( p1pos->size() != p1mom->size() || p2pos->size() != p2mom->size() ){
       std::cout << "photon vectors don't match!!" << std::endl;

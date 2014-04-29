@@ -9,7 +9,7 @@
 
 #include "TLorentzVector.h"
 
-namespace lar1 {
+namespace gan {
 
 	class LorentzVectorLight {
 	public:

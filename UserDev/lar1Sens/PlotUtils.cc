@@ -9,7 +9,13 @@ namespace lar1{
 
   void PlotUtils::lsnd_plot(TCanvas * c){
     c->cd();
-    const char* data_dir = "lsnd_data/";
+
+    std::string path = GetEnv("MAKE_TOP_DIR");
+    path.append("/UserDev/lar1Sens/");
+    std::string data_dir= path;
+    data_dir.append("lsnd_data/");
+
+    // const char* data_dir = "lsnd_data/";
     Double_t  dm2BF[] = {1.2};
     Double_t sin22thBF[] = {0.003};
 
@@ -35,12 +41,12 @@ namespace lar1{
     for (Int_t ifile = 0; ifile<NDATAFILES; ifile++) {
       nlines = 0;
       for (Int_t i=0;i<500;i++){x[i]=0.0;y[i]=0.0;}
-      char  filename[100];
-    strcpy(filename, data_dir);
-    //printf("%s\n",filename);
-    strcat(filename, file_list[ifile]);
-    //printf("%s\n",filename);
-    std::cout << std::endl;
+      char  filename[200];
+      strcpy(filename, data_dir.c_str());
+      //printf("%s\n",filename);
+      strcat(filename, file_list[ifile]);
+      //printf("%s\n",filename);
+      std::cout << std::endl;
       ifstream datafile;
       datafile.open(filename, std::ios_base::in);
       //check if the file is open: 
@@ -279,9 +285,15 @@ namespace lar1{
 
   std::vector<std::vector<double > >  PlotUtils::readGFData(){
     std::vector<std::vector<double> > nullData;
-    const char* data_file = "lsnd_data/dm41th14th24-app.dat";
+    std::string path = GetEnv("MAKE_TOP_DIR");
+    path.append("/UserDev/lar1Sens/");
+    std::string data_file= path;
+    data_file.append("lsnd_data/dm41th14th24-app.dat");
+    // const char* data_file = "lsnd_data/dm41th14th24-app.dat";
     ifstream datafile;
-    datafile.open(data_file, std::ios_base::in);
+    std::cout << "Trying to open Global Best Fit data from: \n"
+              << "  " << data_file << std::endl;
+    datafile.open(data_file.c_str(), std::ios_base::in);
     //check if the file is open: 
     if (!datafile.is_open() ) {std::cerr << "readGFData.C: file not opened" <<std::endl; return nullData;}
     //else {std::cout << "Successfully opened " << filename << std::endl;}
@@ -407,6 +419,14 @@ namespace lar1{
     }
     return min;
   }
-
+  std::string PlotUtils::GetEnv( const std::string & var ){
+    const char * val = std::getenv( var.c_str() );
+    if ( val == 0 ) {
+        return "";
+    }
+    else {
+        return val;
+    }
+  }
 
 }

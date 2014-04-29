@@ -17,9 +17,11 @@ namespace lar1{
   class PlotUtils
   {
   public:
-    PlotUtils();
-    ~PlotUtils();
+    PlotUtils(){};
+    ~PlotUtils(){};
     
+    std::string GetEnv( const std::string & var );
+
     // Add the lsnd_data to a plot
     void lsnd_plot (TCanvas* c);
 

@@ -15,8 +15,8 @@
 
 // Class forward declaration here
 class lar1Osc;
-namespace lar1{
-  class LorentzVectorLight;
+class gan::LorentzVectorLight;
+namespace lar1{  
   class Utils;
   class FluxRW;
   class FluxRWnubar;

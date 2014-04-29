@@ -1,6 +1,6 @@
 #include "LorentzVectorLight.hh"
 
-namespace lar1
+namespace gan
 {
   LorentzVectorLight::LorentzVectorLight(){
     fX = 0.0;
