@@ -84,6 +84,9 @@ namespace cluster {
     /// A function to draw each cluster on a separate canvas than the one with all clusters
     void DrawOneCluster(UChar_t plane, size_t index);
     
+    /// A function to draw two clusters on a separat canvas than the one with all clusters.
+    void DrawTwoClusters(UChar_t plane, size_t index1, size_t index2);
+
     /// A function to count # clusters in the given plane
     size_t ClusterCount(UChar_t plane);
     
@@ -114,6 +117,7 @@ namespace cluster {
     //---- Canvas ----//
     TCanvas* _cAllCluster;
     TCanvas* _cOneCluster;
+    TCanvas* _cTwoClusters;
 
     //---- Things to be drawn (DATA) ----//
 
