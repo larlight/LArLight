@@ -58,7 +58,7 @@ namespace larlight {
     void set_master_stream(DATA::DATA_TYPE type);
     
     /// Method to run in debug mode
-    void set_debug_mode(bool debug_mode){ _debug_mode = debug_mode;}
+    void debug_mode(bool debug_mode){ _debug_mode = debug_mode;}
 
   protected:
 
