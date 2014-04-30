@@ -156,7 +156,7 @@ namespace lar1{
     }  
     TTree *newt = new TTree("EventsTot", "Event info for ALL types");
 
-   
+    double ElectContainedDist = 0;
     //===========================================================
     // This is all of the information that winds up in the tree, 
     // which is in turn what the sensitivity code gets.
@@ -226,6 +226,7 @@ namespace lar1{
     newt->Branch("LepPhiSmeared", &PhiLepSmeared, "LepPhiSmeared/D");
     newt->Branch("LepE", &Elep, "LepE/D");
     newt->Branch("LepESmeared", &ElepSmeared, "LepESmeared/D");
+    newt->Branch("ElectContainedDist",&ElectContainedDist,"ElectContainedDist/D");
 
     //------------------------------------------------------------------
     // These are new variables that get added at the reprocessing stage
@@ -514,6 +515,9 @@ namespace lar1{
     TH1D * ProtonMultiplicity = new TH1D("ProtonMultiplicity", "Proton Multiplicity (21MeV KE Threshold)", 5, 0, 5);
     TH1D * ProtonMomentum = new TH1D("ProtonMomentum", "Proton Momentum (21 MeV KE Threshold)",120,0,3);
 
+    TH2D * elecAngleVsEnergy = new TH2D("ElectronAngleVsEnergy",
+                                        "ElectronAngleVsEnergy;Electron Energy (GeV);Electron Angle (Rad)",
+                                        ebins,emin,emax,30,0,180);
 
     TH2D *photonCCQE = new TH2D("PhotonCCQE","PhotonCCQE;CCQE Energy (GeV);Photon Energy (GeV)",ebins,emin,emax,20*ebins,emin,emax);
     TH1D *EMShowers = new TH1D("EMShowers","EMShowers;Number of Showers in Event;Number of Events",6,-1,5);
@@ -555,7 +559,7 @@ namespace lar1{
       // verbose = false;
       // if (NPi0FinalState > 0) verbose = true;
 
-      if (verbose || jentry % 10000 == 0) std::cout << "========== Event " << ientry << " of " << nentries << " ==========" << std::endl;
+      if (verbose || jentry % 50000 == 0) std::cout << "========== Event " << ientry << " of " << nentries << " ==========" << std::endl;
       
       // Clear ntuple variables
       ConversionDist.clear();
@@ -566,6 +570,7 @@ namespace lar1{
       enuccqe = 0.0;
       enucalo1 = 0.0;
       enucalo2 = 0.0;
+      ElectContainedDist = -1;
       
       // Calculate the FS lepton's 4-vector and return neutrino path length
       nuleng = CalcLepton( detect_dist );
@@ -633,6 +638,10 @@ namespace lar1{
           efficiency = electronIDeff;
           wgt = fluxweight*efficiency;
 
+          TVector3 vertex(Vx, Vy, Vz);
+          TVector3 lepDir(LepPx, LepPy, LepPz);
+          ElectContainedDist = utils.GetContainedLength(vertex, lepDir, iDet);
+
           electron_cand_energy = Elep;
           electron_cand_angle = ThetaLep;
           enuccqe = utils.NuEnergyCCQE( 1000*electron_cand_energy, sqrt(pow(1000*electron_cand_energy,2) - pow(0.511,2)), 
@@ -696,6 +705,15 @@ namespace lar1{
           CcqeVsTrueE->Fill( energy, enuccqe, wgt );
           Calo1VsTrueE->Fill( energy, enucalo1, wgt );
           Calo2VsTrueE->Fill( energy, enucalo2, wgt );
+
+          TVector3 vertex(Vx, Vy, Vz);
+          TVector3 lepDir(LepPx, LepPy, LepPz);
+          ElectContainedDist = utils.GetContainedLength(vertex, lepDir, iDet);
+
+          // Calculate the angle to z direction for the electron
+          double Theta= acos(LepPz/lepDir.Mag()); 
+          Theta *= 180/3.14159;
+          elecAngleVsEnergy->Fill(Elep, Theta, wgt);
 
           if (ndecay < 5 && ndecay > 0){  // K0
             ibkg = 3;
@@ -921,6 +939,7 @@ namespace lar1{
         {
           ProtonMomentum -> Fill(sqrt(*i), fluxweight);
         }
+
       }
 
       //Now set the channel:
@@ -949,6 +968,7 @@ namespace lar1{
       double photonTheta = 0;
       double photonConvDist = 0;
       TVector3 photonPos;
+      TVector3 photonMom;
 
       // ncpi0 gets filled in here, so clear the info first
       ncpi0en = 0;
@@ -1020,6 +1040,7 @@ namespace lar1{
             photonTheta = utils.GetTheta( photon1Mom );
             photonConvDist = dist1.Mag();
             photonPos = photon1Pos;
+            photonMom = photon1Mom;
             //photonConv->Fill( photon1Pos.X(), photon1Pos.Y(), photon1Pos.Z() );
             //photonConvX->Fill( photon1Pos.X() );
             //photonConvY->Fill( photon1Pos.Y() );
@@ -1032,6 +1053,7 @@ namespace lar1{
             photonTheta = utils.GetTheta( photon2Mom );
             photonConvDist = dist2.Mag();
             photonPos = photon2Pos;
+            photonMom = photon2Mom;
             //photonConv->Fill( photon2Pos.X(), photon2Pos.Y(), photon2Pos.Z() );
             //photonConvX->Fill( photon2Pos.X() );
             //photonConvY->Fill( photon2Pos.Y() );
@@ -1089,6 +1111,10 @@ namespace lar1{
             NCpizeroVtxKEConvD->Fill( 1000*utils.VertexEnergy( geniePDG, genieE ), photonConvDist, wgt );
           }
 
+          // std::cout << "photonPos is (" << photonPos.X() << ", " << photonPos.Y() << ", " << photonPos.Z() << ")\n";
+          // std::cout << "photonMom is (" << photonMom.X() << ", " << photonMom.Y() << ", " << photonMom.Z() << ")\n";
+          ElectContainedDist = utils.GetContainedLength(photonPos, photonMom, iDet);
+          if (verbose) std::cout << "The contained length of this shower is " << ElectContainedDist << std::endl;
           // if( !(isFid && utils.VertexEnergy( geniePDG, genieE ) > vtxEcut && photonConvDist > convDistCut) || !isFid ){  // >25 MeV vtx energy and 5cm separation
 
             ibkg = 5;

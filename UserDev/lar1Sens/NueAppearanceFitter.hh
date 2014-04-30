@@ -78,11 +78,14 @@ namespace lar1{
       void setLAr1FDScale(double d){LAr1FDScale = d;}
       void setEnergyType(std::string s){energyType = s;}
 
+      void setForceRemake(bool b){forceRemake = b;}
+
       void setNpoints(int n){npoints = n;}
       void setUseNearDetStats(bool b){useNearDetStats = b;}
       void setShapeOnlyFit(bool b){shapeOnlyFit = b;}
       void setNearDetSystematicError(double d){nearDetSystematicError = d;}
 
+      void setElectContainedDist(double d){ElectContainedDist = d;}
 
     private:
 
@@ -217,6 +220,7 @@ namespace lar1{
       std::vector< std::vector<float> >  OtherVec;
 
 
+      double ElectContainedDist;
 
   };
 

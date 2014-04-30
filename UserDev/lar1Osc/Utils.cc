@@ -77,8 +77,8 @@ namespace lar1{
     // I think this is about the closest I can come:
     // Length 15m, make a square in x and y at lengths 4.76 meters.
     // iDet = 5
-    ic_xmin =  -238.0;
-    ic_xmax =  238.0;
+    ic_xmin =  -288.0;
+    ic_xmax =  288.0;
     ic_ymin =  -238.0;
     ic_ymax =  238.0;
     ic_zmin =  0.0;
@@ -443,7 +443,7 @@ namespace lar1{
   // Get the visible energy near the interaction vertex
   //=========================================================================================
   Double_t Utils::VertexEnergy( std::vector<Int_t> *pdg, std::vector<Double_t> *energy, 
-  			      Double_t prot_thresh, Double_t pion_thresh, bool verbose  ){
+                                Double_t prot_thresh, Double_t pion_thresh, bool verbose  ){
 
     if ( verbose ) std::cout << "Determining kinetic energy near vertex" << std::endl;
 
@@ -600,13 +600,13 @@ namespace lar1{
     zmin += fidCut_zUp; 
     zmax -= fidCut_zDown;
 
-    // if( idet == kND ){  // Cut out volume around each side of the center of x:
-      
-    //   Double_t xcenter = (nd_xmax + nd_xmin)/2;  // gets the center.  If the cuts above on x aren't symmetric, this is wrong.
+    if( idet == kIC ){  // Cut out volume around each side of the center of x:
+       
+      // gets the center.  If the cuts above on x aren't symmetric, this is wrong.
+      Double_t xcenter = (ic_xmax + ic_xmin)/2; 
+      if ( vtx.X() < (xcenter + 50 + fidCut_x) && vtx.X() > (xcenter - 50 -fidCut_x) ) return false; //cut around the center APA
 
-    //   if ( vtx.X() < (xcenter + fidCut_x) && vtx.X() > (xcenter - fidCut_x) ) return false; //cut around the center APA
-
-    // }
+    }
 
     if( vtx.X() > xmin && vtx.X() < xmax && vtx.Y() > ymin && vtx.Y() < ymax && vtx.Z() > zmin && vtx.Z() < zmax )
       return true;
@@ -635,7 +635,13 @@ namespace lar1{
     Double_t xmin(0.0), xmax(0.0), ymin(0.0), ymax(0.0), zmin(0.0), zmax(0.0);
 
     GetDetBoundary( idet, xmin, xmax, ymin, ymax, zmin, zmax );
-
+    
+    if( idet == kIC ){  // Cut out volume around each side of the center of x:   
+      // gets the center.  If the cuts above on x aren't symmetric, this is wrong.
+      Double_t xcenter = (ic_xmax + ic_xmin)/2; 
+      //cut around the center APA
+      if ( vtx.X() < (xcenter + 50 + cut) && vtx.X() > (xcenter - 50 - cut) ) return false; 
+    }
     if( vtx.X() > xmin+cut && vtx.X() < xmax-cut && vtx.Y() > ymin+cut && vtx.Y() < ymax-cut && vtx.Z() > zmin+cut && vtx.Z() < zmax-cut )
       return true;
     else
@@ -664,7 +670,8 @@ namespace lar1{
     Double_t rho = 1.4;  // g/cm^3 = tons/m^3
 
     Double_t total_vol = (xmax-xmin)*(ymax-ymin)*(zmax-zmin)/pow(100.0,3) * rho;
-
+    if (idet == kIC) 
+      total_vol = (xmax-xmin-100-34)*(ymax-ymin)*(zmax-zmin)/pow(100.0,3) * rho;
     // if( idet == kND ){  // Cut out volume around each side of the center of x:
     //   Double_t xcenter = (nd_xmax + nd_xmin)/2;  // gets the center.  If the cuts above on x aren't symmetric, this is wrong.
     //   total_vol -= ((xcenter + fidCut_x) - (xcenter - fidCut_x))*(ymax-ymin)*(zmax-zmin)/pow(100.0,3) * rho;
@@ -687,7 +694,10 @@ namespace lar1{
 
     Double_t rho = 1.4;  // g/cm^3 = tons/m^3
 
-    return (xmax-xmin)*(ymax-ymin)*(zmax-zmin)/pow(100.0,3) * rho;
+    double total_mass = (xmax-xmin)*(ymax-ymin)*(zmax-zmin)/pow(100.0,3) * rho;
+    if (idet == kIC) 
+      total_mass = (xmax-xmin-100)*(ymax-ymin)*(zmax-zmin)/pow(100.0,3) * rho;
+    return total_mass;
 
   }
 
@@ -779,6 +789,26 @@ namespace lar1{
     return false;
 
   }
+
+  double  Utils::GetContainedLength(TVector3 startPoint, TVector3 startDir, int idet){
+
+    if (!IsActive(idet, startPoint)){
+      // std::cout << "Failed the IsActive cut!\n";
+      return 0;
+    }
+    startDir *= 1.0/startDir.Mag();
+    double distance = 1;
+    while (IsActive(idet, startPoint + startDir*distance)){
+      // std::cout << "Current pos is (" 
+      //           << (startPoint + startDir*distance).X() << ", "
+      //           << (startPoint + startDir*distance).Y() << ", "
+      //           << (startPoint + startDir*distance).Z() << ")\n";
+      distance ++;
+    }
+    return distance;
+
+  }
+
 
   // bool PhotonsAreParallel(TVector3 & photon1_start, TVector3 & photon1_mom
   //                         TVector3 & photon2_start, TVector3 & photon2_mom)

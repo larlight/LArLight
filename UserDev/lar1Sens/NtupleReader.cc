@@ -18,6 +18,8 @@ namespace lar1{
     scale = 1;
     specialNameText = "";
 
+    showerContainmentDist = -999;
+
     std::vector<float> defaultBins;
 
     // Default to 10 equal length bins from 0.2 GeV to 3 GeV:
@@ -83,6 +85,9 @@ namespace lar1{
     specialNameTextOsc = s;
   }
 
+  void NtupleReader::setContainedShowers(double d){
+    showerContainmentDist = d;
+  }
 
   //Not passing references here, since it's small and called infrequently
   std::vector<float> NtupleReader::GetData() const{
@@ -155,6 +160,13 @@ namespace lar1{
     fileNameHists = fileNameSource;
     fileNameHistsOsc = fileNameSourceOsc;
     fileNameHists += "_";
+    if(showerContainmentDist != -999){
+      sprintf(tempstring, "cont%g",showerContainmentDist );
+      fileNameHists += tempstring;
+      fileNameHists += "_";
+      fileNameHistsOsc += "_";
+      fileNameHistsOsc += tempstring;
+    }
     sprintf(tempstring, "%g", emin);
     fileNameHists += tempstring;
     fileNameHists += "_";
@@ -224,12 +236,14 @@ namespace lar1{
       std::cout << "\tFile " << fileNameHists << " found." << std::endl;
       // Check that the hists file is newer than the source file:
       if (!UpToDate(filePath+fileNameSource,filePath+fileNameHists)){
+        std::cout << "\tThe hist file exists but isn't up to date.\n";
         int val(0);
         if (signal == "nue") val = LoopNue();
         if (signal == "numu") val = LoopNumu();
         if (val != 0) return val;
       }
       else{ // Everything is good, just read in the files:
+        std::cout << "\tThe hist file exists and is up to date.\n";
         int val(0);
         if (signal == "nue") val = ReadNue();
         if (signal == "numu") val = ReadNumu();
@@ -237,6 +251,7 @@ namespace lar1{
       }
     }
     else { // No hists file exists, make it.
+      std::cout << "\tNo hist file exists.\n";
       int val(0);
       if (signal == "nue") val = LoopNue();
       if (signal == "numu") val = LoopNumu();
@@ -248,8 +263,8 @@ namespace lar1{
       // Check that the hists file is newer than the source file:
       if (!UpToDate(filePath+fileNameSourceOsc,filePath+fileNameHistsOsc)){
         int val(0);
-        if (signal == "nue") val = LoopNue();
-        if (signal == "numu") val = LoopNumu();
+        if (signal == "nue") val = LoopNueOsc();
+        if (signal == "numu") val = LoopNumuOsc();
         if (val != 0) return val;
       }
       else{ // Everything is good, just read in the files:
@@ -276,8 +291,8 @@ namespace lar1{
 
   bool NtupleReader::UpToDate(const char * sourceFile, const char * testFile) const{
     if (fileExists(sourceFile)){
+      std::cout << "\tFound source file.  Verifying up to date." << std::endl;
       if (fileExists(testFile)){
-        std::cout << "\tFound source file.  Verifying up to date." << std::endl;
 
         struct stat attrib;
         stat(testFile, &attrib);
@@ -361,6 +376,9 @@ namespace lar1{
     Double_t ElecCandEnergy;
     Double_t Eccqe;
     Double_t ecalo1, ecalo2;
+    Double_t ElectContainedDist;
+
+
 
     Int_t nbytes = 0,nb = 0;
     Int_t evtcounter;
@@ -387,6 +405,7 @@ namespace lar1{
     c->SetBranchAddress("Eccqe", &Eccqe);
     c->SetBranchAddress("Ecalo1", &ecalo1);
     c->SetBranchAddress("Ecalo2", &ecalo2);
+    c->SetBranchAddress("ElectContainedDist",&ElectContainedDist);
 
     // These backgrounds are nue specific but really they're just an enumeration of ibkgs
     // Can be reused and recycled at will...
@@ -404,23 +423,41 @@ namespace lar1{
     double emin = bins.front();
     double emax = bins.back();
     int nbins = bins.size() - 1;
-
+    static int iHateROOTitSucksSoMuch=0;
+    iHateROOTitSucksSoMuch++;
     //the various backgrounds:
-    TH1F * nue_kNueFromNueCC_muon       = new TH1F("kNueFromNueCC_muon      ", "NueFromNueCC_muon      ", nbins,emin, emax);
-    TH1F * nue_kNueFromNueCC_chargeKaon = new TH1F("kNueFromNueCC_chargeKaon", "NueFromNueCC_chargeKaon", nbins,emin, emax);
-    TH1F * nue_kNueFromNueCC_neutKaon   = new TH1F("kNueFromNueCC_neutKaon  ", "NueFromNueCC_neutKaon  ", nbins,emin, emax);
-    TH1F * nue_kNueFromEScatter         = new TH1F("kNueFromEScatter        ", "NueFromEScatter        ", nbins,emin, emax);
-    TH1F * nue_kNueFromNC_pi0           = new TH1F("kNueFromNC_pi0          ", "NueFromNC_pi0          ", nbins,emin, emax);
-    TH1F * nue_kNueFromNC_delta0        = new TH1F("kNueFromNC_delta0       ", "NueFromNC_delta0       ", nbins,emin, emax);
-    TH1F * nue_kNueFromNumuCC           = new TH1F("kNueFromNumuCC          ", "NueFromNumuCC          ", nbins,emin, emax);
-    TH1F * nue_kDirt                    = new TH1F("kDirt                   ", "Dirt                   ", nbins,emin, emax);
-    TH1F * nue_kOther                   = new TH1F("kOther                  ", "Other                  ", nbins,emin, emax);
-   
+    TH1F * nue_kNueFromNueCC_muon       = new TH1F(Form("kNueFromNueCC_muon%d",iHateROOTitSucksSoMuch),
+                                                   "NueFromNueCC_muon",
+                                                    nbins,emin, emax);
+    TH1F * nue_kNueFromNueCC_chargeKaon = new TH1F(Form("kNueFromNueCC_chargeKaon%d",iHateROOTitSucksSoMuch),
+                                                   "NueFromNueCC_chargeKaon",
+                                                    nbins,emin, emax);
+    TH1F * nue_kNueFromNueCC_neutKaon   = new TH1F(Form("kNueFromNueCC_neutKaon%d",iHateROOTitSucksSoMuch),
+                                                   "NueFromNueCC_neutKaon",
+                                                    nbins,emin, emax);
+    TH1F * nue_kNueFromEScatter         = new TH1F(Form("kNueFromEScatter%d",iHateROOTitSucksSoMuch),
+                                                   "NueFromEScatter",
+                                                    nbins,emin, emax);
+    TH1F * nue_kNueFromNC_pi0           = new TH1F(Form("kNueFromNC_pi0%d",iHateROOTitSucksSoMuch),
+                                                   "NueFromNC_pi0",
+                                                    nbins,emin, emax);
+    TH1F * nue_kNueFromNC_delta0        = new TH1F(Form("kNueFromNC_delta0%d",iHateROOTitSucksSoMuch),
+                                                   "NueFromNC_delta0",
+                                                    nbins,emin, emax);
+    TH1F * nue_kNueFromNumuCC           = new TH1F(Form("kNueFromNumuCC%d",iHateROOTitSucksSoMuch),
+                                                   "NueFromNumuCC",
+                                                    nbins,emin, emax);
+    TH1F * nue_kDirt                    = new TH1F(Form("kDirt%d",iHateROOTitSucksSoMuch),
+                                                   "Dirt",
+                                                    nbins,emin, emax);
+    TH1F * nue_kOther                   = new TH1F(Form("kOther%d",iHateROOTitSucksSoMuch),
+                                                   "Other",
+                                                    nbins,emin, emax);
     // This histogram holds the total nue hist.
     char edistName[100];
     sprintf(edistName,"Background %s event distribution",signal.c_str() );
-    TH1F * edistrnue     = new TH1F("edistrnue",edistName,nbins,emin,emax);
-    TH1F * eLeptonEnergy   = new TH1F("eLeptonDist", "Distribution of lepton candidate energies.", nbins, 0.0, emax);
+    TH1F * edistrnue     = new TH1F(Form("edistrnue%d",iHateROOTitSucksSoMuch),edistName,nbins,emin,emax);
+    TH1F * eLeptonEnergy   = new TH1F(Form("eLeptonDist%d",iHateROOTitSucksSoMuch), "Distribution of lepton candidate energies.", nbins, 0.0, emax);
 
     // Have the capacity to change the binning, not that I've ever used it:
     double binsArray[nbins+1];
@@ -473,7 +510,17 @@ namespace lar1{
       if (energy == "ecalo1") fill_energy = ecalo1;
       if (energy == "ecalo2") fill_energy = ecalo2;
 
-
+      if (ibkg == kNueFromNueCC_muon       || 
+          ibkg == kNueFromNueCC_chargeKaon || 
+          ibkg == kNueFromNueCC_neutKaon   || 
+          ibkg == kNueFromEScatter         || 
+          ibkg == kNueFromNC_pi0           || 
+          ibkg == kNueFromNC_delta0        
+         ){
+        if(ElectContainedDist < showerContainmentDist){
+          continue;
+        }
+      }
       
       //use all the events because the weight, eff is already calculated
       weight=wgt; 
@@ -535,8 +582,8 @@ namespace lar1{
     t-> Branch("eLeptonEnergyVec", &eLeptonEnergyVec);
 
     t->Fill();
-    edistrnue             -> Write();
-    eLeptonEnergy           -> Write();
+    edistrnue                     -> Write();
+    eLeptonEnergy                 -> Write();
     nue_kNueFromNueCC_muon        -> Write();
     nue_kNueFromNueCC_chargeKaon  -> Write();
     nue_kNueFromNueCC_neutKaon    -> Write();
@@ -546,7 +593,7 @@ namespace lar1{
     nue_kNueFromNumuCC            -> Write();
     nue_kDirt                     -> Write();
     nue_kOther                    -> Write();
-    t               -> Write("tvecnue");
+    t                             -> Write("tvecnue");
     delete t;
     f -> Close();
 
@@ -596,6 +643,8 @@ namespace lar1{
     Double_t ElecCandEnergy;
     Double_t Eccqe;
     Double_t ecalo1, ecalo2;
+    Double_t ElectContainedDist;
+
 
     Int_t nbytes = 0,nb = 0;
     Int_t evtcounter;
@@ -618,7 +667,7 @@ namespace lar1{
 
     const Int_t nentries2 = Int_t(c->GetEntries());
 
-    std::cout<<"Input filename:\t" << dummytarget << std::endl;
+    std::cout<<"Fosc Input filename:\t" << dummytarget << std::endl;
     printf("Number of entries L=%im:\t %i\n",baseline,nentries2);
     c->SetBranchAddress("energy",&fill_energy);
     c->SetBranchAddress("inno",&inno);
@@ -631,6 +680,8 @@ namespace lar1{
     c->SetBranchAddress("Eccqe", &Eccqe);
     c->SetBranchAddress("Ecalo1", &ecalo1);
     c->SetBranchAddress("Ecalo2", &ecalo2);
+    c->SetBranchAddress("ElectContainedDist",&ElectContainedDist);
+
 
     //loop through events once, fill in events[iL][idm2] arrays
     std::cout<<"Evaluating histograms... Progress...\n";
@@ -647,15 +698,32 @@ namespace lar1{
     int nbins = bins.size() - 1;
     double emin = bins.front();
     double emax = bins.back();
-
-    TH1F *edistrnueosc      = new TH1F("edistrnueosc","Oscillated #nu_{e} event distribution",nbins,emin,emax);
-    TH1F *edistrnuefosc     = new TH1F("edistrnuefosc","Fully-oscillated #nu_{e} event distribution",nbins,emin,emax);
-    TH1F *edistrnueBestFitNu  = new TH1F("edistrnueBestFitNu", "Signal values of nue appearance at LSND best fit", nbins, emin, emax);
-    TH1F *edistrnueBestFitNubar = new TH1F("edistrnueBestFitNubar", "Signal values of nue appearance at LSND best fit", nbins, emin, emax);
-    TH1F *edistrnueHighDmNu  = new TH1F("edistrnueHighDmNu", "Signal values of nue appearance at high dm2", nbins, emin, emax);
-    TH1F *edistrnueHighDmNubar = new TH1F("edistrnueHighDmNubar", "Signal values of nue appearance at high dm2", nbins, emin, emax);
-    TH1F *edistrnueBestFit_globNu  = new TH1F("edistrnueBestFit_globNu", "Signal values of nue appearance at high dm2", nbins, emin, emax);
-    TH1F *edistrnueBestFit_globNubar = new TH1F("edistrnueBestFit_globNubar", "Signal values of nue appearance at high dm2", nbins, emin, emax);
+    static int iHateROOTitSucksSoMuch = 0;
+    iHateROOTitSucksSoMuch ++;
+    TH1F *edistrnueosc      = new TH1F(Form("edistrnueosc%d",iHateROOTitSucksSoMuch),
+                                      "Oscillated #nu_{e} event distribution",
+                                      nbins,emin,emax);
+    TH1F *edistrnuefosc     = new TH1F(Form("edistrnuefosc%d",iHateROOTitSucksSoMuch),
+                                      "Fully-oscillated #nu_{e} event distribution",
+                                      nbins,emin,emax);
+    TH1F *edistrnueBestFitNu  = new TH1F(Form("edistrnueBestFitNu%d",iHateROOTitSucksSoMuch),
+                                     "Signal values of nue appearance at LSND best fit", 
+                                     nbins, emin, emax);
+    TH1F *edistrnueBestFitNubar = new TH1F(Form("edistrnueBestFitNubar%d",iHateROOTitSucksSoMuch),
+                                     "Signal values of nue appearance at LSND best fit", 
+                                     nbins, emin, emax);
+    TH1F *edistrnueHighDmNu  = new TH1F(Form("edistrnueHighDmNu%d",iHateROOTitSucksSoMuch),
+                                     "Signal values of nue appearance at high dm2", 
+                                     nbins, emin, emax);
+    TH1F *edistrnueHighDmNubar = new TH1F(Form("edistrnueHighDmNubar%d",iHateROOTitSucksSoMuch),
+                                     "Signal values of nue appearance at high dm2", 
+                                     nbins, emin, emax);
+    TH1F *edistrnueBestFit_globNu  = new TH1F(Form("edistrnueBestFit_globNu%d",iHateROOTitSucksSoMuch),
+                                     "Signal values of nue appearance at high dm2", 
+                                     nbins, emin, emax);
+    TH1F *edistrnueBestFit_globNubar = new TH1F(Form("edistrnueBestFit_globNubar%d",iHateROOTitSucksSoMuch),
+                                     "Signal values of nue appearance at high dm2", 
+                                     nbins, emin, emax);
 
 
     //Need vectors to save out the important information:
@@ -712,6 +780,11 @@ namespace lar1{
       if (energy == "eccqe") fill_energy = Eccqe;
       if (energy == "ecalo1") fill_energy = ecalo1;
       if (energy == "ecalo2") fill_energy = ecalo2;
+
+      if(ElectContainedDist < showerContainmentDist){
+        // std::cout << "Skipping this fosc event in the containment cut.\n";
+        continue;
+      }
 
       //Need to loop over dm2 points...
       for (int i=0; i<=npoints; i++){
@@ -905,10 +978,11 @@ namespace lar1{
     double emin = bins.front();
     double emax = bins.back();
     int nbins = bins.size() - 1;
-
+    static int iHateROOTitSucksSoMuch = 0;
+    iHateROOTitSucksSoMuch ++;
     // This histogram holds the total nue hist.
-    TH1F * edistrnumu     = new TH1F("edistrnumu","Background #nu_{\{mu}} event distribution",nbins,emin,emax);
-    TH1F * muLeptonEnergy   = new TH1F("muLeptonDist", "Distribution of muon energies.", nbins, 0.0, emax);
+    TH1F * edistrnumu     = new TH1F(Form("edistrnumu%d",iHateROOTitSucksSoMuch),"Background #nu_{\{mu}} event distribution",nbins,emin,emax);
+    TH1F * muLeptonEnergy   = new TH1F(Form("muLeptonDist%d",iHateROOTitSucksSoMuch), "Distribution of muon energies.", nbins, 0.0, emax);
 
     std::vector<float> edistrnumuVec(nbins,0);
     std::vector<float> muLeptonEnergyVec(nbins, 0);
@@ -1037,10 +1111,17 @@ namespace lar1{
     double emin = bins.front();
     double emax = bins.back();
 
-    TH1F *edistrnumuosc      = new TH1F("edistrnumuosc","Oscillated #nu_{e} event distribution",nbins,emin,emax);
-    TH1F *edistrnumufosc     = new TH1F("edistrnumufosc","Fully-oscillated #nu_{e} event distribution",nbins,emin,emax);
-    TH1F *edistrnumuBestFitNu  = new TH1F("edistrnumuBestFitNu", "Signal values of numu appearance at LSND best fit", nbins, emin, emax);
-    TH1F *edistrnumuBestFitNubar = new TH1F("edistrnumuBestFitNubar", "Signal values of numu appearance at LSND best fit", nbins, emin, emax);
+    static int iHateROOTitSucksSoMuch = 0;
+    iHateROOTitSucksSoMuch++;
+
+    TH1F *edistrnumuosc      = new TH1F(Form("edistrnumuosc%d",iHateROOTitSucksSoMuch),
+                                  "Oscillated #nu_{e} event distribution",nbins,emin,emax);
+    TH1F *edistrnumufosc     = new TH1F(Form("edistrnumufosc%d",iHateROOTitSucksSoMuch),
+                                  "Fully-oscillated #nu_{e} event distribution",nbins,emin,emax);
+    TH1F *edistrnumuBestFitNu  = new TH1F(Form("edistrnumuBestFitNu%d",iHateROOTitSucksSoMuch),
+                                   "Signal values of numu appearance at LSND best fit", nbins, emin, emax);
+    TH1F *edistrnumuBestFitNubar = new TH1F(Form("edistrnumuBestFitNubar%d",iHateROOTitSucksSoMuch),
+                                   "Signal values of numu appearance at LSND best fit", nbins, emin, emax);
 
 
     //Need vectors to save out the important information:

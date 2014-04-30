@@ -60,6 +60,8 @@ namespace lar1{
     //on the very first pass!  (subsequent runs are much faster)
     npoints = 250;
     
+    ElectContainedDist=-999;
+
     //grid boundaries
     
     useNearDetStats = true;           // Only matters if the covariance matrix vector is empty.
@@ -140,9 +142,16 @@ namespace lar1{
     if (use470m) fileNameRoot += "uB_";
     if (use700m) fileNameRoot += "FD_";
     if (useT600) fileNameRoot += "IC_";
-    
+    if (ElectContainedDist != -999) {
+        char tempstring[100];
+        sprintf(tempstring,"cont%g_",ElectContainedDist);
+        fileNameRoot += tempstring;
+    }
+
+
     if (use100m){
       NtupleReader a("nue",fileSource, 100, mode, energyType, npoints, forceRemake);
+      a.setContainedShowers(ElectContainedDist);
       a.setSpecialNameText(specialNameText);
       a.setSpecialNameTextOsc(specialNameTextOsc);
       readerNue.push_back(a);
@@ -153,6 +162,7 @@ namespace lar1{
     }
     if (use100mLong){
       NtupleReader a("nue",fileSource, 100, mode, energyType, npoints, forceRemake);
+      a.setContainedShowers(ElectContainedDist);
       a.setSpecialNameText("long");
       a.setSpecialNameTextOsc("long");
       readerNue.push_back(a);
@@ -164,6 +174,7 @@ namespace lar1{
     }
     if (use470m){
       NtupleReader a("nue",fileSource, 470, mode, energyType, npoints, forceRemake);
+      a.setContainedShowers(ElectContainedDist);
       // a.setSpecialNameText(specialNameText);
       a.setSpecialNameTextOsc(specialNameTextOsc);
       readerNue.push_back(a);
@@ -175,6 +186,7 @@ namespace lar1{
     }
     if (use700m) {
       NtupleReader a("nue",fileSource, 700, mode, energyType, npoints, forceRemake);
+      a.setContainedShowers(ElectContainedDist);
       a.setSpecialNameText(specialNameText);
       a.setSpecialNameTextOsc(specialNameTextOsc);
       readerNue.push_back(a);
@@ -186,6 +198,7 @@ namespace lar1{
     }
     if (useT600) {
       NtupleReader a("nue",fileSource, 700, mode, energyType, npoints, forceRemake);
+      a.setContainedShowers(ElectContainedDist);
       specialNameText_far.append("IC");
       specialNameTextOsc_far.append("IC");
       a.setSpecialNameText(specialNameText_far);
@@ -1117,15 +1130,15 @@ namespace lar1{
       //add in all the plots    
       
 
-      std::cout << " NueFromNueCC_muonVec[j].front() is " << NueFromNueCC_muonVec[j].front() << std::endl;
-      std::cout << " NueFromNueCC_chargeKaonVec[j].front() is " << NueFromNueCC_chargeKaonVec[j].front() << std::endl;
-      std::cout << " NueFromNueCC_neutKaonVec[j].front() is " << NueFromNueCC_neutKaonVec[j].front() << std::endl;
-      std::cout << " NueFromEScatterVec[j].front() is " << NueFromEScatterVec[j].front() << std::endl;
-      std::cout << " NueFromNC_pi0Vec[j].front() is " << NueFromNC_pi0Vec[j].front() << std::endl;
-      std::cout << " NueFromNC_delta0Vec[j].front() is " << NueFromNC_delta0Vec[j].front() << std::endl;
-      std::cout << " NueFromNumuCCVec[j].front() is " << NueFromNumuCCVec[j].front() << std::endl;
-      std::cout << " DirtVec[j].front() is " << DirtVec[j].front() << std::endl;
-      std::cout << " OtherVec[j].front() is " << OtherVec[j].front() << std::endl;
+      // std::cout << " NueFromNueCC_muonVec[j].front() is " << NueFromNueCC_muonVec[j].front() << std::endl;
+      // std::cout << " NueFromNueCC_chargeKaonVec[j].front() is " << NueFromNueCC_chargeKaonVec[j].front() << std::endl;
+      // std::cout << " NueFromNueCC_neutKaonVec[j].front() is " << NueFromNueCC_neutKaonVec[j].front() << std::endl;
+      // std::cout << " NueFromEScatterVec[j].front() is " << NueFromEScatterVec[j].front() << std::endl;
+      // std::cout << " NueFromNC_pi0Vec[j].front() is " << NueFromNC_pi0Vec[j].front() << std::endl;
+      // std::cout << " NueFromNC_delta0Vec[j].front() is " << NueFromNC_delta0Vec[j].front() << std::endl;
+      // std::cout << " NueFromNumuCCVec[j].front() is " << NueFromNumuCCVec[j].front() << std::endl;
+      // std::cout << " DirtVec[j].front() is " << DirtVec[j].front() << std::endl;
+      // std::cout << " OtherVec[j].front() is " << OtherVec[j].front() << std::endl;
 
       
       TH1F * NueFromNueCC_muon = utils.makeHistogram(NueFromNueCC_muonVec[j], emin, emax);
@@ -1206,6 +1219,15 @@ namespace lar1{
       // stack -> Add(Other);
       // stack ->Add(MBPhotExcess);
 
+      double integral = 0;
+      integral += NueFromNueCC_muon->Integral();
+      integral += NueFromNueCC_chargeKaon->Integral();
+      integral += NueFromNueCC_neutKaon->Integral();
+      integral += NueFromNC_pi0->Integral();
+      // integral += NueFromNumuCC->Integral();
+
+      std::cout << "Total number of events in the background at L = " 
+                << baselines[j] << ": " << integral << std::endl;
 
       // stack -> Add(SignalNu);
 
@@ -1253,7 +1275,8 @@ namespace lar1{
       chr->GetYaxis()->SetTitleOffset(.7);
       char name[200];
       if (baselines[j] == 100){
-        sprintf(name, "LAr1-ND (%im)", baselines[j]);
+        if (use100mLong) sprintf(name, "2*LAr1-ND (%im)", baselines[j]);
+        else sprintf(name, "LAr1-ND (%im)", baselines[j]);
       }
       else if (baselines[j] == 470){
         sprintf(name, "MicroBooNE (%im)", baselines[j]);
@@ -1272,8 +1295,9 @@ namespace lar1{
       }
       else chr->GetXaxis()->SetTitle("Energy (GeV)");
 
-
-      chr->GetXaxis()->SetTitle("Reconstructed Neutrino Energy (GeV)");
+      TString EnergyLabel = label2;
+      EnergyLabel += " (GeV)";
+      chr->GetXaxis()->SetTitle(EnergyLabel);
       chr->GetXaxis()->SetTitleOffset(1);
       chr->GetXaxis()->SetTitleSize(0.07);
       chr->GetXaxis()->SetLimits(emin-0.01,emax);
@@ -1300,7 +1324,6 @@ namespace lar1{
     }
     
 
-    
 
     if (specialNameText != "") fileNameRoot = fileNameRoot + specialNameText + "_";
     if (specialNameTextOsc != "") fileNameRoot = fileNameRoot + specialNameTextOsc + "_";
@@ -1314,7 +1337,7 @@ namespace lar1{
         sprintf(fileName, "%s%i_%s_%s_globBF.pdf", fileNameRoot.Data(), baselines[i], mode.c_str(),energyType.c_str());
       else sprintf(fileName, "%s%i_%s_%s.pdf", fileNameRoot.Data(), baselines[i], mode.c_str(),energyType.c_str());
       stackedCanvas[i] -> Print(fileName, "pdf");
-      stackedCanvas[i] -> Print(fileName, "png");
+      // stackedCanvas[i] -> Print(fileName, "eps");
     }
    
     return 0;

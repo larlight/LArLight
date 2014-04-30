@@ -11,6 +11,10 @@
 #include <sstream>
 #include <cmath>
 #include "TH2D.h"
+#include "TStyle.h" //for gStyle
+#include "TLegend.h"
+#include "TMarker.h"
+
 
 namespace lar1{
 
@@ -21,6 +25,14 @@ namespace lar1{
     ~PlotUtils(){};
     
     std::string GetEnv( const std::string & var );
+
+    TLegend * getLSNDLegend();
+
+    TH2D * getEmptySensPlot(double sin22thmin=0.0001,
+                            double sin22thmax=1.0,
+                            double dm2min=0.01,
+                            double dm2max=100.0);
+
 
     // Add the lsnd_data to a plot
     void lsnd_plot (TCanvas* c);

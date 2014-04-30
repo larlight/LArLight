@@ -50,6 +50,8 @@ namespace lar1{
     Double_t GetPOTNorm( Int_t iflux, Int_t iDet );
     Double_t GetPOTNormNuMI( Int_t iflux, Int_t iDet );
 
+    double   GetContainedLength(TVector3 startPoint, TVector3 startDir, int idet);
+
     void ScaleFarDet(double scaleFactor=1);
 
     //This function returns true if the line along direction startDir that starts at startPos

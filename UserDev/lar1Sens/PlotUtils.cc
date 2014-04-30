@@ -97,6 +97,65 @@ namespace lar1{
     latex->Draw();
   }
 
+  TLegend * PlotUtils::getLSNDLegend(){
+
+    TLegend* leg3=new TLegend(0.2,0.2,0.4,0.35);
+    leg3->SetFillStyle(0);
+    leg3->SetFillColor(0);
+    leg3->SetBorderSize(0);
+    leg3->SetTextSize(0.03);
+    TGraph *gdummy1 = new TGraph();
+    gdummy1->SetFillColor(29);
+    TGraph *gdummy2 = new TGraph();
+    gdummy2->SetFillColor(38);
+    TMarker *gdummy3 = new TMarker();
+    gdummy3 -> SetMarkerStyle(3);
+    gdummy3 -> SetMarkerColor(1);
+    TMarker *gdummy4 = new TMarker();
+    gdummy4 -> SetMarkerStyle(34);
+    gdummy4 -> SetMarkerColor(1);
+    TGraph *gdummy0 = new TGraph();
+    gdummy0 -> SetFillColor(1);
+    gdummy0 -> SetFillStyle(3254);
+    leg3->AddEntry(gdummy2,"LSND 90% CL","F");
+    leg3->AddEntry(gdummy1,"LSND 99% CL","F");
+    leg3->AddEntry(gdummy3,"LSND Best Fit","P*");
+    leg3->AddEntry(gdummy4,"Global Best Fit","P*");
+    leg3->AddEntry(gdummy0,"Global Fit 90% CL (J. Kopp et al. arXiv:1303.3011)");
+
+    return leg3;
+
+  }
+
+  TH2D* PlotUtils::getEmptySensPlot(double sin22thmin,
+                                    double sin22thmax,
+                                    double dm2min,
+                                    double dm2max)
+  {
+    gStyle->SetOptStat(0000);
+    gStyle->SetOptFit(0000);
+    gStyle->SetPadBorderMode(0);
+    gStyle->SetPadBottomMargin(0.15);
+    gStyle->SetPadLeftMargin(0.15);
+    gStyle->SetPadRightMargin(0.05);
+    gStyle->SetFrameBorderMode(0);
+    gStyle->SetCanvasBorderMode(0);
+    gStyle->SetPalette(0);
+    gStyle->SetCanvasColor(0);
+    gStyle->SetPadColor(0);
+
+    TH2D* hr1=new TH2D("hr1","hr1",500,sin22thmin,sin22thmax,500,dm2min,dm2max);
+    hr1->Reset();
+    hr1->SetFillColor(0);
+    hr1->SetTitle(";sin^{2}2#theta_{#mue};#Deltam^{2} (eV^{2})");
+    hr1->GetXaxis()->SetTitleOffset(1.1);
+    hr1->GetYaxis()->SetTitleOffset(1.2);
+    hr1->GetXaxis()->SetTitleSize(0.05);
+    hr1->GetYaxis()->SetTitleSize(0.05);
+    hr1->SetStats(kFALSE);
+    return hr1;
+  }
+
   int PlotUtils::plotGFData(TCanvas * c ){
     std::vector<std::vector<double> > data = readGFData();
 

@@ -66,6 +66,8 @@ namespace lar1{
     void setScale(double);
     void setSpecialNameText(std::string s);
     void setSpecialNameTextOsc(std::string s);
+    void setContainedShowers(double d = 150);
+
 
     int LoopNue();
     int LoopNumu();
@@ -93,6 +95,8 @@ namespace lar1{
     std::string specialNameTextOsc;
     bool isScaling;
     double scale;
+
+    double showerContainmentDist;
 
     TString fileNameHists;
     TString fileNameHistsOsc;
