@@ -17,7 +17,7 @@ rootlibmap() {
 ######################################################
 # CMergePerformance
 rootlibmap libCMergePerformance.rootmap libCMergePerformance.so $USER_DEV_DIR/CMergePerformance/LinkDef.h \
-    libAnalysis.so libClusterRecoUtil.so libFANN.so libClusterStudy.so
+    libAnalysis.so libClusterRecoUtil.so libFANN.so libClusterStudy.so libMcshowerLookback.so
 
 
 

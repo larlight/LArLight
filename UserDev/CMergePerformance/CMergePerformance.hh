@@ -18,7 +18,10 @@
 #include "ana_base.hh"
 #include "ClusterParamsAlgNew.hh"
 #include "CMergeManager.hh"
+#include "McshowerLookback.hh"
+
 #include "CMAlgoShortestDist.hh"
+
 
 namespace larlight {
   /**
@@ -67,6 +70,8 @@ namespace larlight {
 
     void FillFOMHistos(bool before_merging,
 		       event_mcshower* ev_mcshower,
+		       event_simch* ev_simch,
+		       event_hit* ev_hits,
 		       const std::vector<::cluster::ClusterParamsAlgNew> &_clusterparams);
 
 
@@ -81,7 +86,8 @@ namespace larlight {
     //declare a member of CBoolAlgoBase class called _shortest_dist_algo
     ::cluster::CMAlgoShortestDist _shortest_dist_algo;
     
-
+    //declare mcshowerlookback object only once, not once per event
+    McshowerLookback _mcslb;
 
 
     Double_t w2cm, t2cm;

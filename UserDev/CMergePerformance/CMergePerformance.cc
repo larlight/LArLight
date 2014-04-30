@@ -19,7 +19,7 @@ namespace larlight {
 
     _mgr.MergeTillConverge(false);
 
-    _shortest_dist_algo.SetSquaredDistanceCut(200.);
+    _shortest_dist_algo.SetSquaredDistanceCut(20000.);
     _shortest_dist_algo.SetVerbose(false);
 
     //define what algos you want to use for merging, etc
@@ -27,8 +27,7 @@ namespace larlight {
     //IMPORTANT INHERITANCE IDEA THAT I REALLY SHOULD HAVE KNOWN:
     //addmergealgo() wants to receive a pointer to CBoolAlgoBase object
     //but I am passing it a pointer to CMAlgoShortestDist object
-    //wtf? it CASTS it as a CBoolAlgoBase. it COULD NOT DO THIS
-    //had i passed it a CMAlgoShortestDist object instead of a pointer to one.
+    //wtf? it CASTS it as a CBoolAlgoBase.
     _mgr.AddMergeAlgo(&_shortest_dist_algo);
 
     return true;
@@ -59,19 +58,28 @@ namespace larlight {
       return false;
     }
 
+    //grab the simchannels
+    larlight::event_simch* ev_simch = (larlight::event_simch*)storage->get_data(larlight::DATA::SimChannel);
+    if(!ev_simch) {
+      print(larlight::MSG::ERROR,__FUNCTION__,Form("Did not find specified data product, SimChannel!"));
+      return false;
+    }
+
     //first start with the raw fuzzyclusters and find their CPAN params
     FillClusterParamsVector(ev_cluster,ev_hits);
 
     //once that is done, _clusterparams is filled, calculate figure
     //of merit and fill histos with it
-    FillFOMHistos(true,ev_mcshower,_clusterparams);
+    bool after_merging = false;
+    FillFOMHistos(after_merging,ev_mcshower,ev_simch,ev_hits,_clusterparams);
 
     //now run merging with whatever algos you want
-    //this overwite _clusterparams with the new (merged) clusters
+    //this overwites _clusterparams with the new (merged) clusters
     RunMerging(ev_cluster,ev_hits);
 
     //now fill the other FOM histos
-    FillFOMHistos(false,ev_mcshower,_clusterparams);
+    after_merging = true;
+    FillFOMHistos(after_merging,ev_mcshower,ev_simch,ev_hits,_clusterparams);
 
     return true;
   }
@@ -114,13 +122,13 @@ namespace larlight {
     hNClusOverNMCShowers.push_back(
 				   new TH1D("hNClusOverNMCShowers_before_merging",
 					    "NClusOverNMCShowers before Merging",
-					    100,0,100)
+					    50,-0.5,49.5)
 				   );
     
     hNClusOverNMCShowers.push_back(
 				   new TH1D("hNClusOverNMCShowers_after_merging",
 					    "NClusOverNMCShowers after Merging",
-					    100,0,100)
+					    50,-0.5,49.5)
 				   );
   }
 
@@ -174,31 +182,76 @@ namespace larlight {
     return;
   }//end FillClusterParamsVector
   
-  void CMergePerformance::FillFOMHistos(bool before_merging,
+  void CMergePerformance::FillFOMHistos(bool after_merging,
 					event_mcshower* ev_mcshower,
+					event_simch* ev_simch,
+					event_hit* ev_hits,
 					const std::vector<::cluster::ClusterParamsAlgNew> &_clusterparams){
 
-    unsigned int histo_index = before_merging ? 0 : 1;
+    //shower_idmap is (G4trackid => MCShower index in ev_mcshower)
+    std::map<UInt_t,UInt_t> shower_idmap;
+    _mcslb.FillShowerMap(ev_mcshower,shower_idmap);
 
-
-
-    //This is where stuff needs to be coded up
-
-    //loop over the MC Showers
-    //implement bryce stuff here
-    int n_viable_mcshowers = 0;
-    for(auto i_mcshower: *ev_mcshower){
-
-      //sometimes there are more than one shower, cut out those
-      if(i_mcshower.MotherMomentum().at(3) > 0.01)
-	n_viable_mcshowers++;
-
+    //now simch_map is (channel => larlight::simch)
+    std::map<UShort_t, larlight::simch> simch_map;
+    _mcslb.FillSimchMap(ev_simch,simch_map);
+    
+    //make a vector of MCShower indices (cutting out MCShowers with
+    //super-low-energy mothers... i only want the big-uns
+    std::vector<UInt_t> MCShower_indices;
+    for(UInt_t i=0; i < ev_mcshower->size(); ++i){
+      //      if(ev_mcshower->at(i).MotherMomentum().at(3) > 0.01)
+      MCShower_indices.push_back(i);
     }
 
-    double NClusOverNMCShowers = 
-      (double)_clusterparams.size()/(double)n_viable_mcshowers;
-    hNClusOverNMCShowers.at(histo_index)->Fill(NClusOverNMCShowers);
+    //loop over hits, for each: compute the % of its charge that belongs to each MCShower
+    for(auto const i_hit: *ev_hits){
+      
+      std::vector<float> hit_charge_frac = 
+	_mcslb.MatchHitsAll(i_hit,
+			    simch_map,
+			    shower_idmap,
+			    MCShower_indices);
+      //debug
+      //      std::cout<<"This hit is made up of (";
+      //      for(int i=0; i<hit_charge_frac.size()-1; ++i)
+      //	std::cout<<hit_charge_frac.at(i)<<", ";
+      //      std::cout<<") fractional charge from "<<
+      //	hit_charge_frac.size()-1<<" known MCShowers and "<<
+      //	(float)hit_charge_frac.back()<<" from unknown ones."<<std::endl;
+      //end debug
+
+    }
+    //debug: print contents of shower_idmap map
+    //    for(std::map<UInt_t,UInt_t>::iterator it=shower_idmap.begin(); it!=shower_idmap.end(); ++it)
+    //      std::cout<<"viewing whoer_idmap: "<<it->first << " => "<<it->second <<std::endl;
+
     
+
+    ////////////////////////////////////////////
+    //now we're done with getting all the data//
+    //let's fill some histograms w/ it        //
+    ////////////////////////////////////////////
+
+    double NClusOverNMCShowers = 
+      (double)_clusterparams.size()/(double)MCShower_indices.size();
+    hNClusOverNMCShowers.at(after_merging)->Fill(NClusOverNMCShowers);
+
+
+    //fill hPurity plot here... need to decide what purity means...
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     
   }//end fillFOMhistos

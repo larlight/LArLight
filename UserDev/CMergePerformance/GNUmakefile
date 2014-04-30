@@ -19,6 +19,7 @@ INCFLAGS += -I$(USER_DEV_DIR)/ClusterRecoUtil
 INCFLAGS += -I$(USER_DEV_DIR)/FANN
 INCFLAGS += -I$(USER_DEV_DIR)/FANN/include
 INCFLAGS += -I$(USER_DEV_DIR)/ClusterStudy
+INCFLAGS += -I$(USER_DEV_DIR)/McshowerLookback
 
 # platform-specific options
 OSNAME          = $(shell uname -s)
