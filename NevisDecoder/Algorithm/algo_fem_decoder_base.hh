@@ -177,6 +177,10 @@ namespace larlight {
     /// A run control boolean: skips any action till it finds the new event header.
     bool      _search_for_next_event;  
     InfoFEM_t _header_info;
+
+    /// Algorithm dependent FEM last word
+    FEM::FEM_WORD _algo_fem_last_word;
+    
   };
 
 }

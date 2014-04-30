@@ -33,6 +33,8 @@ namespace larlight {
 
     virtual bool finalize();
 
+    virtual bool check_event_quality();
+
   protected:
 
     virtual bool build(storage_manager *out_storage, UInt_t id);

@@ -110,6 +110,8 @@ namespace larlight {
 
     event_tpcfifo* _event_data;
 
+    FEM::FEM_WORD _algo_fem_last_word;
+
   };
 }
 #endif

@@ -56,6 +56,9 @@ namespace larlight {
 
     /// Method to set the reference (main) readout stream. Default=trigger.
     void set_master_stream(DATA::DATA_TYPE type);
+    
+    /// Method to run in debug mode
+    void set_debug_mode(bool debug_mode){ _debug_mode = debug_mode;}
 
   protected:
 
@@ -72,6 +75,8 @@ namespace larlight {
     std::string _ana_filename;
 
     TFile* _fout;
+
+    bool _debug_mode;
 
   };
 }

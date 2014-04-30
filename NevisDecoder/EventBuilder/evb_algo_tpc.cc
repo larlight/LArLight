@@ -98,18 +98,8 @@ namespace larlight {
 	_fem_event_frame.push_back(std::vector<UInt_t>());
 	_fem_trig_sample.push_back(std::vector<UInt_t>());
 	
-	// If not 1st event, do check of last event & reserve of FEM entries
+	// If not 1st event,  reserve of FEM entries
 	if(_first_event_number != in_event_tpcfifo->event_number()) {
-	  
-	  // Check previous event
-	  if(_num_fem != _fem_trig_frame.at(_fem_trig_frame.size()-2).size())
-	    
-	    throw evb_exception(Form("Previous event (%d) has different # of FEMs (%zu) than other events (%d)",
-				     _last_event_number,
-				     _fem_trig_frame.at(_fem_trig_frame.size()-2).size(),
-				     _num_fem)
-				);
-	  
 	  (*_fem_trig_frame.rbegin()).reserve(_num_fem);
 	  (*_fem_event_frame.rbegin()).reserve(_num_fem);
 	  (*_fem_trig_sample.rbegin()).reserve(_num_fem);
@@ -123,6 +113,17 @@ namespace larlight {
       _last_event_number = in_event_tpcfifo->event_number();
     }
 
+    return true;
+  }
+
+  bool evb_algo_tpc::check_event_quality()
+  {
+    if((*_fem_trig_frame.rbegin()).size() != _num_fem) 
+
+      throw evb_exception(Form("This event has different # of FEMs (%zu) than normal events (%d)",
+			       (*_fem_trig_frame.rbegin()).size(),
+			       _num_fem)
+			  );
     return true;
   }
   

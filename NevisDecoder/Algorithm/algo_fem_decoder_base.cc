@@ -11,6 +11,7 @@ namespace larlight {
   //#################################################
   {
     _name = "algo_fem_decoder_base";
+    _algo_fem_last_word = FEM::FEM_LAST_WORD;
     reset();
   }
 
@@ -184,10 +185,10 @@ namespace larlight {
     return status;
   }
 
-  //#################################################
-  bool algo_fem_decoder_base::process_fem_header(const UInt_t word, UInt_t &last_word) {
-  //#################################################
-
+  //##################################################################################
+  bool algo_fem_decoder_base::process_fem_header(const UInt_t word, UInt_t &last_word) 
+  //##################################################################################
+  {
     bool status=true;
     //
     // Check if this is an event header word or not
@@ -222,39 +223,19 @@ namespace larlight {
       //
       // Check the last word type
       //
-      switch(get_word_class(last_word)){
-      case FEM::EVENT_HEADER:      
-      case FEM::FEM_HEADER:
-      case FEM::FEM_LAST_WORD:
-	// Expected. Nothing to do
-	break;
-      case FEM::FEM_FIRST_WORD:
-      case FEM::CHANNEL_HEADER:
-      case FEM::CHANNEL_WORD:
-      case FEM::UNDEFINED_WORD:
-      case FEM::EVENT_LAST_WORD:
+      FEM::FEM_WORD last_word_class = get_word_class(word);
+      if( last_word_class == _algo_fem_last_word )
+
+	store_event();
+
+      else if( last_word_class != FEM::FEM_HEADER && last_word_class != FEM::EVENT_HEADER ) {
+		
 	// ERROR
 	Message::send(MSG::ERROR,__FUNCTION__,
 		      Form("Unexpected word while FEM_HEADER processing: %x (previous word=%x)",word,last_word));
 	status = false;
-
-	break;
-      case FEM::CHANNEL_LAST_WORD:
-	// Store data
-	status = store_event();
-	if(_debug_mode) {
-	  // We have to handle this case separately from a uniifed handling @ process_word
-	  // Because "this" header word is still good. Make a warning to a user.
-
-	  Message::send(MSG::WARNING,__FUNCTION__,"DEBUG MODE => Continue to the next event...\n");
-
-	  clear_event();
-
-	  status = true; 
-	}
-	break;
       }
-
+      
       if(status){
 
 	// Process the subject word as an event header
@@ -269,6 +250,8 @@ namespace larlight {
 
 	    // Decode header words
 	    status = decode_fem_header(_event_header_words);
+
+	    _event_header_count = 0;
 
 	  }
 	}else{
@@ -342,10 +325,13 @@ namespace larlight {
 
     // Correct for a roll over 
     //std::cout<<"checking roll over for header ..."<<std::endl;
+
     _header_info.fem_trig_frame_number  = roll_over(_header_info.event_frame_number, 
 						    ((event_header[5] & 0xfff)>>4 & 0xf),
 						    4);
-    
+
+    //_header_info.fem_trig_frame_number = (_header_info.event_frame_number & 0xfff0) + ((event_header[5] & 0xfff)>>4 & 0xf);
+
     _header_info.fem_trig_sample_number = ((((event_header[5]) & 0xf)<<8) + (event_header[5]>>16 & 0xff));
 
   #endif
