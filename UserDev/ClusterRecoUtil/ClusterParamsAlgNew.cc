@@ -544,7 +544,7 @@ namespace cluster{
   std::vector<double> ort_dist_vect;
   ort_dist_vect.reserve(fParams.N_Hits);
   
-  double current_maximum=0; 
+  double current_maximum=-300; 
   for(auto& hit : fHitVector)
     {
       
@@ -676,7 +676,6 @@ namespace cluster{
     
     //calculate the forward and backward integrals counting int the maximum bin.
     
-    
     for(int ibin=0;ibin<fProfileNbins;ibin++)
     {
       if(ibin<=fProfileMaximumBin)  
@@ -693,8 +692,9 @@ namespace cluster{
     // a set theshold many empty bins.
     
    
-    
      //forward loop
+     if(fProfileMaximumBin<0) fProfileMaximumBin=fProfileNbins/2.;
+     
     double running_integral=fProfileIntegralForward;
     int startbin,endbin;
     for(startbin=fProfileMaximumBin;startbin>1;startbin--)
@@ -722,6 +722,7 @@ namespace cluster{
 	 break;
     }
     
+     
     // now have profile start and endpoints. Now translate to wire/time. 
     // Will use wire/time that are on the rough axis.
     // fProjectedLength is the length from fInterLow to interhigh a
