@@ -48,12 +48,10 @@ namespace cluster {
 
     bool compatible = false;
     
-    double my_cut_value;
+    double my_cut_value = _max_allowed_2D_angle_diff;
     //if using opening angle, have angle cutoff be the smaller of the two opening angles
     if(_use_opening_angle) 
       my_cut_value = std::min(cluster1.GetParams().opening_angle, cluster2.GetParams().opening_angle);
-    
-    else my_cut_value = _max_allowed_2D_angle_diff;
     
     //if you don't care if clusters have been reconstructed backwards
     if(_allow_180_ambig)

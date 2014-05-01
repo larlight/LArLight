@@ -42,13 +42,13 @@ namespace cluster {
        Optional function: called at the beginning of 1st iteration. This is called per event.
      */
     virtual void EventBegin(const std::vector<cluster::ClusterParamsAlgNew> &clusters)
-    { return; }
+    { if(clusters.size()) return; }
 
     /**
        Optional function: called at the end of event ... after the last merging iteration is over.
      */
     virtual void EventEnd()
-    { return; }
+    {return;}
  
     /**
        Optional function: called at the beggining of each iteration over all pairs of clusters. 
@@ -56,13 +56,13 @@ namespace cluster {
        is called per iteration which may be more than once per event.
      */
     virtual void IterationBegin(const std::vector<cluster::ClusterParamsAlgNew> &clusters)
-    { return; }
+    { if(clusters.size()) return;}
 
     /**
        Optional function: called at the end of each iteration over all pairs of clusters.
      */
     virtual void IterationEnd()
-    { return; }
+    {return; }
 
     /**
        Core function: given the CPAN input, return whether a cluster should be
@@ -71,13 +71,16 @@ namespace cluster {
 
     virtual bool Bool(const ClusterParamsAlgNew &cluster1,
 		      const ClusterParamsAlgNew &cluster2)
-    {return false;}
+    { if(cluster1.Plane() != cluster2.Plane()) return false;
+      else return true;
+    }
 
     /**
        Optional function: called after each Merge() function call by CMergeManager IFF
        CMergeManager is run with verbosity level kPerMerging. Maybe useful for debugging.
      */
-    virtual void Report() {return;}
+    virtual void Report()
+    {return;}
 
     /// Setter function for an output plot TFile pointer
     void SetAnaFile(TFile* fout) { _fout = fout; }

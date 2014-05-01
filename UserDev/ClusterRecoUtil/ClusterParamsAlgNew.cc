@@ -792,6 +792,12 @@ namespace cluster{
    * @param override [description]
    */
   void ClusterParamsAlgNew::RefineStartPoints(bool override) {
+
+    //
+    // Why override is not used here? Kazu 05/01/2014
+    // Put a stupid line here to avoid compiler warning
+    if(!override) override = true;
+
     // if(!override) { //Override being set, we skip all this logic.
     //   //OK, no override. Stop if we're already finshed.
     //   if (fFinishedRefineStartPoints) return;
@@ -1209,6 +1215,11 @@ namespace cluster{
    * @param override [description]
    */
   void ClusterParamsAlgNew::RefineDirection(bool override) {
+    //
+    // We don't use "override"? Should we remove? 05/01/14
+    //
+    if(!override) override = true;
+
     // if(!override) { //Override being set, we skip all this logic.
     //   //OK, no override. Stop if we're already finshed.
     //   if (fFinishedRefineDirection) return;
@@ -1247,7 +1258,7 @@ namespace cluster{
     double rms_backward  = 0;
     double mean_forward  = 0;
     double mean_backward = 0;
-    double weight_total  = 0;
+    //double weight_total  = 0;
     double hit_counter_forward  = 0;
     double hit_counter_backward = 0;
     
@@ -1277,7 +1288,7 @@ namespace cluster{
       //skip this hit if below minimum cutoff param
       if(hit.charge < fQMinRefDir) continue;
 
-      weight_total = hit.charge; 
+      //weight_total = hit.charge; 
 
       // Compute forward mean
       double hitStartDiff_x = (hit.w - this_startPoint.w) ;
