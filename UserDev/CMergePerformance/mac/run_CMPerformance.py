@@ -9,7 +9,7 @@ if len(sys.argv) < 2:
 
 from ROOT import gSystem
 gSystem.Load("libCMergePerformance")
-from ROOT import larlight
+from ROOT import larlight, cluster
 
 # Create ana_processor instance
 my_proc = larlight.ana_processor()
@@ -32,10 +32,10 @@ my_proc.add_process(my_CMP)
 
 #For now, CMergePerformance only works with one merging iteration, will have to change this later
 my_CMP.GetManager().MergeTillConverge(False)
-my_CMP.GetManager().DebugMode(larlight.cluster.CMergeManager.kPerAlgoSet)
+my_CMP.GetManager().DebugMode(cluster.CMergeManager.kPerAlgoSet)
 
 #Configure the merge algos you want to use here
-short_dist_algo = larlight.cluster.CMAlgoShortestDist()
+short_dist_algo = cluster.CMAlgoShortestDist()
 short_dist_algo.SetSquaredDistanceCut(200.)
 short_dist_algo.SetVerbose(False)
 my_CMP.GetManager().AddMergeAlgo(short_dist_algo)

@@ -168,7 +168,7 @@ namespace larlight {
 					event_mcshower* ev_mcshower,
 					event_simch* ev_simch,
 					event_hit* ev_hits,
-					const std::vector<::cluster::ClusterParamsAlgNew> &_clusterparams){
+					const std::vector< ::cluster::ClusterParamsAlgNew> &_clusterparams){
 
     //shower_idmap is (G4trackid => MCShower index in ev_mcshower)
     std::map<UInt_t,UInt_t> shower_idmap;

@@ -75,13 +75,13 @@ namespace larlight {
 		       event_mcshower* ev_mcshower,
 		       event_simch* ev_simch,
 		       event_hit* ev_hits,
-		       const std::vector<::cluster::ClusterParamsAlgNew> &_clusterparams);
+		       const std::vector< ::cluster::ClusterParamsAlgNew> &_clusterparams);
 
 
     void RunMerging(event_cluster* ev_cluster,
 		    event_hit* ev_hits);
 
-    std::vector<::cluster::ClusterParamsAlgNew> _clusterparams;
+    std::vector< ::cluster::ClusterParamsAlgNew> _clusterparams;
 
     //declare a member of CMergeManager class called _mgr
     ::cluster::CMergeManager _mgr;
