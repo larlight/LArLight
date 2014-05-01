@@ -103,12 +103,10 @@ namespace larlight {
 	// the returned vector is (0.2, 0.8, 0.0, 0.10)
 	// (the unknown MCShower is always the last entry in the return vector)
 
-	if(hit_fraction_breakdown.size()-1 != MCShower_indices.size()){
-	  std::cerr<<"Something horrible has happened. "
-		   <<"hit_fraction_breakdown.size()-1 != MCShower_indices.size()\n"
-		   <<"the first is "<<hit_fraction_breakdown.size()-1
-		   <<"the second is "<< MCShower_indices.size()
-		   <<"this means McshowerLookback probably returned a bad vector. skipping this hit."
+	if(hit_fraction_breakdown.size() == 0){
+	  std::cerr<<"Something horrible has happened in McshowerLookback. "
+		   <<"hit_fraction_breakdown.size() is zero\n"
+		   <<"This means McshowerLookback returned a bad vector. skipping this hit."
 		   <<std::endl;
 	  break;
 	}

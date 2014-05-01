@@ -74,7 +74,7 @@ std::vector<float> McshowerLookback::MatchHitsAll(const larlight::hit &this_hit,
     //sometimes you find a reco hit that doesn't correspond to an IDE
     //probably the IDE does not fall within the reco-d hit range (start->end time)
     if(matchedides.size()==0){
-      std::vector<float> bad(1,-1);
+      std::vector<float> bad(0,-1);
       return bad;
     }
     
@@ -113,7 +113,7 @@ std::vector<float> McshowerLookback::MatchHitsAll(const larlight::hit &this_hit,
 
   if(tot_ides_charge<=0) {
     std::cerr<<"something is bad. tot_ides_charge is "<<tot_ides_charge<<"... less than one?!"<<std::endl;
-    std::vector<float> bad(1,-1);
+    std::vector<float> bad(0,-1);
     return bad;
   }
 
