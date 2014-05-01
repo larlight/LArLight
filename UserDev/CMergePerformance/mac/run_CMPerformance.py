@@ -9,32 +9,43 @@ if len(sys.argv) < 2:
 
 from ROOT import gSystem
 gSystem.Load("libCMergePerformance")
-from ROOT import larlight as fmwk
+from ROOT import larlight
 
 # Create ana_processor instance
-my_proc = fmwk.ana_processor()
+my_proc = larlight.ana_processor()
 
 # Set input root file
 my_proc.add_input_file(sys.argv[1])
 
 # Specify IO mode
-my_proc.set_io_mode(fmwk.storage_manager.READ)
+my_proc.set_io_mode(larlight.storage_manager.READ)
 
 # Specify input TDirectory name
 my_proc.set_input_rootdir("scanner")
 
 # Specify output root file name
-my_proc.set_ana_output_file("from_test_ana_you_can_remove_me.root");
+my_proc.set_ana_output_file("CMP_ana_out.root");
 
-# Attach a template process
-my_proc.add_process(fmwk.CMergePerformance());
+#attach the CMergePerformance process
+my_CMP = larlight.CMergePerformance()
+my_proc.add_process(my_CMP)
+
+#For now, CMergePerformance only works with one merging iteration, will have to change this later
+my_CMP.GetManager().MergeTillConverge(False)
+my_CMP.GetManager().DebugMode(larlight.cluster.CMergeManager.kPerAlgoSet)
+
+#Configure the merge algos you want to use here
+short_dist_algo = larlight.cluster.CMAlgoShortestDist()
+short_dist_algo.SetSquaredDistanceCut(200.)
+short_dist_algo.SetVerbose(False)
+my_CMP.GetManager().AddMergeAlgo(short_dist_algo)
 
 print
 print  "Finished configuring ana_processor. Start event loop!"
 print
 
 # Let's run it.
-my_proc.run();
+my_proc.run(1,5);
 
 # done!
 print

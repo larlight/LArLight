@@ -61,6 +61,9 @@ namespace larlight {
     */
     virtual bool finalize();
 
+    /// Getter for the CMergeManager so user can configure merge algos etc
+    ::cluster::CMergeManager& GetManager() { return _mgr; }
+
     protected:
 
     void PrepareHistos();

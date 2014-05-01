@@ -12,24 +12,6 @@ namespace larlight {
     w2cm = larutil::GeometryUtilities::GetME()->WireToCm();
     t2cm = larutil::GeometryUtilities::GetME()->TimeToCm();
 
-
-    ////////////////////////////
-    //Merging algorithm stuff://
-    ////////////////////////////
-
-    _mgr.MergeTillConverge(false);
-
-    _shortest_dist_algo.SetSquaredDistanceCut(20000.);
-    _shortest_dist_algo.SetVerbose(false);
-
-    //define what algos you want to use for merging, etc
-    //algos should be initialized in intialize function
-    //IMPORTANT INHERITANCE IDEA THAT I REALLY SHOULD HAVE KNOWN:
-    //addmergealgo() wants to receive a pointer to CBoolAlgoBase object
-    //but I am passing it a pointer to CMAlgoShortestDist object
-    //wtf? it CASTS it as a CBoolAlgoBase.
-    _mgr.AddMergeAlgo(&_shortest_dist_algo);
-
     return true;
   }
   
@@ -241,18 +223,6 @@ namespace larlight {
     //fill hPurity plot here... need to decide what purity means...
 
 
-
-
-
-
-
-
-
-
-
-
-
-
     
   }//end fillFOMhistos
 
@@ -284,10 +254,9 @@ namespace larlight {
       }
 
     }
-    std::cout<<Form("Processing event %d...",ev_cluster->event_id())<<std::endl;
-
 
     //do the actual merging with those algos
+    //user needs to add algos etc w/ python, via GetManager() function
     _mgr.SetClusters(local_clusters);
     _mgr.Process();
 
