@@ -3,7 +3,6 @@
 
 #include "McshowerLookback.hh"
 
-
 ///////////////////////////////////////////////////
 //Make map of trackIDs for each shower           //
 ///////////////////////////////////////////////////
@@ -38,13 +37,13 @@ void McshowerLookback::FillSimchMap(larlight::event_simch* my_simch,
 //Find % of each shower in a single hit          //
 ///////////////////////////////////////////////////
 std::vector<float> McshowerLookback::MatchHitsAll(const larlight::hit &this_hit, 
-						  std::map<UShort_t, larlight::simch> &simch_map, 
-						  std::map<UInt_t,UInt_t> &shower_idmap, 
-						  std::vector<UInt_t> MCShower_indices)
+						  const std::map<UShort_t, larlight::simch> &simch_map, 
+						  const std::map<UInt_t,UInt_t> &shower_idmap, 
+						  const std::vector<UInt_t> &MCShower_indices)
 {
-  //std::cout<<"Going through Here?"<<std::endl;
-
+  ////////////////////////////////////////////////////////////////
   //setup variables for holding charge info from various mcshowers
+  ////////////////////////////////////////////////////////////////
 
   //total MC charge deposited on that hit's wire during that hit's start->end time
   float tot_ides_charge = 0;
@@ -53,34 +52,59 @@ std::vector<float> McshowerLookback::MatchHitsAll(const larlight::hit &this_hit,
   //amount of MC charge deposited "" "" belonging to MCShower not in the map
   float part_ides_charge_unknown_MCShower = 0;
 
-  
+  ////////////////////////////////////////////////////////////////
   //Search for simchannels on hit's channel number
+  ////////////////////////////////////////////////////////////////
+  
   auto simch_iter = simch_map.find(this_hit.Channel());
   if(simch_iter==simch_map.end()) 
     std::cerr<<"Hit has no matched simchannel!!"<<std::endl;
 
   else{
 
-    //Matched, so try to find ides
-    auto matchedsimch = (*simch_iter).second;
-    auto matchedides = (std::vector<larlight::ide>)matchedsimch.TrackIDsAndEnergies(this_hit.StartTime(),this_hit.EndTime());
+    ////////////////////////////////////////////////////////////////
+    //Found the right simchannel, so try to find ides on this simch
+    ////////////////////////////////////////////////////////////////
+   
+    //(*simch_iter).second is the larlight::simch object
+    //maybe i can speed up code here by not making this big vector<ide> object... how?
+    //std::vector<larlight::ide> matchedides = (*simch_iter).second.TrackIDsAndEnergies(this_hit.StartTime(),this_hit.EndTime());
+    std::vector<larlight::ide> matchedides((*simch_iter).second.TrackIDsAndEnergies(this_hit.StartTime(),this_hit.EndTime()));
+    
+    //sometimes you find a reco hit that doesn't correspond to an IDE
+    //probably the IDE does not fall within the reco-d hit range (start->end time)
+    if(matchedides.size()==0){
+      std::vector<float> bad(1,-1);
+      return bad;
+    }
+    
+    ////////////////////////////////////////////////////////////////
+    //Look for the trackIDs in MCShower that belong to each found IDE
+    ////////////////////////////////////////////////////////////////
 
-    //Assign ide charge to a particular MCShower using channel:mcshower mapping
-    //loop over the (MC) IDEs (particles) that correspond to this reconstructed hit
-    for(auto this_ide : matchedides){
+    for(auto const &this_ide : matchedides){
+
       unsigned int this_trackID = abs(this_ide.trackID);
       tot_ides_charge+=this_ide.numElectrons;
 
-      //find this IDE's trackID in the shower mapping to get its MCShower index
       auto show_iter=shower_idmap.find(this_trackID);
+
       //if you can't find the IDE's trackID in the MCShower mapping
       //(it was a particle not belonging to a shower, IE excited argon decay photon)
       if(show_iter==shower_idmap.end()){
 	part_ides_charge_unknown_MCShower+=this_ide.numElectrons;
       }
       else{
-	//note: if the code is crashing, it's likely here
-	part_ides_charge.at((*show_iter).second)+=this_ide.numElectrons;
+	//let's say MCShower_indices is (0,    1,   3) [shower 2 had too little energy to count]
+	//part_ides should be like      (0.2, 0.6, 0.1, 0.1)
+	//if it is 20% from shower0, 60% shower1, 10% shower3, and 10% from 2 OR unknown showers
+	auto it = std::find(MCShower_indices.begin(),
+			    MCShower_indices.end(),
+			    (*show_iter).second);
+	if(it != MCShower_indices.end())
+	  part_ides_charge.at(*it)+=this_ide.numElectrons;
+	else
+	  part_ides_charge.back()+=this_ide.numElectrons;
       }
 
     }//end loop over matchedides
@@ -99,7 +123,6 @@ std::vector<float> McshowerLookback::MatchHitsAll(const larlight::hit &this_hit,
   //  for(int j = 0; j < part_ides_charge.size(); ++j)
   //    std::cout<<part_ides_charge.at(j)<<", ";
   //  std::cout<<"), with size "<<part_ides_charge.size()<<std::endl;
-
 
 
   //compute the actual fractions function returns

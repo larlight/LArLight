@@ -46,12 +46,12 @@ public:
   /// For example, if the list of MCShowers indicies was (0, 1, 3)
   /// and the hit's charge is 20% in MCShower 0, 70% in MCShower1, 
   /// 0% in MCShower3, and 10% in an unknown MCShower, 
-  /// the returned vector is (0.2, 0.8, 0.0, 0.10)
-  /// (the unknown MCShower is always the last entry in the return vector)
+  /// the returned vector is (0.2, 0.8, 0.0, 0.the)
+  /// (10 unknown MCShower is always the last entry in the return vector)
   std::vector<float> MatchHitsAll(const larlight::hit &this_hit, 
-				  std::map<UShort_t, larlight::simch> &simch_map, 
-				  std::map<UInt_t,UInt_t> &shower_idmap, 
-				  std::vector<UInt_t> MCShower_indices);
+				  const std::map<UShort_t, larlight::simch> &simch_map, 
+				  const std::map<UInt_t,UInt_t> &shower_idmap, 
+				  const std::vector<UInt_t> &MCShower_indices);
 
 
   //std::vector<double> MatchHitsAll;
