@@ -150,9 +150,11 @@ namespace larlight {
     
     
     
-    
-  
-    
+
+     fMainTree->Branch("fEventPassAllHitsChargerms",&fEventPassAllHitsChargerms,"fEventPassAllHitsChargerms/I");
+    fMainTree->Branch("fEventPassAllHitsShowerness",&fEventPassAllHitsShowerness,"fEventPassAllHitsShowerness/I");
+     fMainTree->Branch("fEventPassAllHitsTPrincipal",&fEventPassAllHitsTPrincipal,"fEventPassAllHitsTPrincipal/I");
+       
     
     fMainTree->Branch("fChargeRMSAll","std::vector<double>",&fChargeRMSAll );
     fMainTree->Branch("fShowernessAll","std::vector<double>",&fShowernessAll );
@@ -1506,7 +1508,7 @@ namespace larlight {
        fChargeRMSAll.resize(fNPlanes,0);
        fShowernessAll.resize(fNPlanes,0);
        allplane.resize(fNPlanes);
-       fPrincipalAll.resize(fNPlanes);
+       fPrincipalAll.resize(fNPlanes,0);
        //fSmallestDist.resize(fNPlanes,0);  //perplane
        
     
