@@ -625,11 +625,12 @@ namespace larlight {
 
         std::cout << " after hits " << std::endl;  
         ::cluster::ClusterParamsAlgNew  fCPAlg;
+	if(fCPAlg.SetHits(hit_vector) ==-1 )	
+            continue;
         fCPAlg.Initialize();
         fCPAlg.setNeuralNetPath("../FANN/trained_nets/cascade_argo_clusters.net");
         fCPAlg.EnableFANN();
-        if(fCPAlg.SetHits(hit_vector) ==-1 )	
-            continue;
+       
 	std::cout << " after check on hits " << std::endl;
         fCPAlg.GetAverages(true);
         fCPAlg.GetRoughAxis(true);
@@ -966,11 +967,12 @@ namespace larlight {
 	   continue;
 //       /// end using all hits  
         ::cluster::ClusterParamsAlgNew  fCPAlg;
+	 if(fCPAlg.SetHits(hit_vector) ==-1 )	
+            continue;
         fCPAlg.Initialize();
         fCPAlg.setNeuralNetPath("../FANN/trained_nets/cascade_argo_clusters.net");
         fCPAlg.EnableFANN();
-        if(fCPAlg.SetHits(hit_vector) ==-1 )	
-            continue;
+       
         fCPAlg.GetAverages(true);
         fCPAlg.GetRoughAxis(true);
         fCPAlg.GetProfileInfo(true);
