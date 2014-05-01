@@ -39,7 +39,7 @@ namespace larutil {
     
     static bool SetDetector(larlight::GEO::DetId_t type);
     
-    static const larlight::GEO::DetId_t Detector() { return _detector;}
+    static larlight::GEO::DetId_t Detector() { return _detector;}
     
   };
 }
