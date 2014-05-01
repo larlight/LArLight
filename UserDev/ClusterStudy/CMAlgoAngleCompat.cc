@@ -71,7 +71,7 @@ namespace cluster {
     
   } // end Merge function 
   
-  void CMAlgoAngleCompat::Prepare(const std::vector<cluster::ClusterParamsAlgNew> &clusters){
+  void CMAlgoAngleCompat::IterationBegin(const std::vector<cluster::ClusterParamsAlgNew> &clusters){
     
     if(angle_dist_histo) angle_dist_histo->Reset();
 
