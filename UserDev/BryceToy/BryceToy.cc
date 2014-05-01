@@ -70,12 +70,16 @@ namespace larlight {
       MCShower_indices.push_back(i);
     
 
+
+
     //Loop through clusters
     for(auto this_cluster : *my_clusters) {      
 
       double tot_clus_charge = 0;
-      double part_clus_charge[(const int)MCShower_indices.size()];
-      for(int i=0;i<MCShower_indices.size();i++)
+      //the +1 is because sometimes charge comes from non MCShower stuff
+      //so the last element will be charge from unknown origin
+      double part_clus_charge[(const int)MCShower_indices.size()+1];
+      for(int i=0;i<MCShower_indices.size()+1;i++)
 	part_clus_charge[i]=0;
 
       //Get hits and loop over them
@@ -90,7 +94,7 @@ namespace larlight {
 			 simch_map,
 			 shower_idmap,
 			 MCShower_indices);
-
+	
 	//DK: hit_fraction_breakdown is a vector of charge fractions
 	//from the different MCShowers the hit belongs to.
 	// For example, if the list of MCShowers indicies was (0, 1, 2)
@@ -99,17 +103,22 @@ namespace larlight {
 	// the returned vector is (0.2, 0.8, 0.0, 0.10)
 	// (the unknown MCShower is always the last entry in the return vector)
 
-	if(hit_fraction_breakdown.size()-1 != MCShower_indices.size())
-	  std::cerr<<"Something horrible has happened."
-		   <<"hit_fraction_breakdown.size()-1 != MCShower_indices.size()"
-		   <<", the first is "<<hit_fraction_breakdown.size()-1
-		   <<", the second is "<< MCShower_indices.size()
+	if(hit_fraction_breakdown.size()-1 != MCShower_indices.size()){
+	  std::cerr<<"Something horrible has happened. "
+		   <<"hit_fraction_breakdown.size()-1 != MCShower_indices.size()\n"
+		   <<"the first is "<<hit_fraction_breakdown.size()-1
+		   <<"the second is "<< MCShower_indices.size()
+		   <<"this means McshowerLookback probably returned a bad vector. skipping this hit."
 		   <<std::endl;
+	  break;
+	}
 
-	for(int i=0;i<hit_fraction_breakdown.size();i++){
+	for(int i=0;i<MCShower_indices.size()+1;i++){
 	  //multiply fraction (returned by MatchHitsAll) by actual charge
+	  //	  std::cout<<"hi"<<std::endl;
 	  part_clus_charge[i] += 
 	    (hit_fraction_breakdown.at(i) * this_hit.Charge());
+	  //	  std::cout<<"hi2"<<std::endl;
 	}
 
 
