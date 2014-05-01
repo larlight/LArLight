@@ -10,11 +10,14 @@ larlight::ana_processor proc;
 
 proc.set_io_mode(larlight::storage_manager::READ);
 proc.set_input_rootdir("scanner");
-proc.set_ana_output_file("test_fullnu.root");
+proc.set_ana_output_file("test_full_anu_cuts.root");
 
 // proc.add_input_file("/data/argoneutnu/larlight_tracks_showers.root");  
 //proc.add_input_file("/data/argoneutnu/larlight_reco_electrons_events.root");  
-proc.add_input_file("/data/argoneutnu/larlight_filtered_full_nu.root");
+//proc.add_input_file("/data/argoneutnu/larlight_filtered_full_nu.root");
+proc.add_input_file("/data/argoneutanu/larlight_anu_R65X.root");
+
+
 //proc.add_input_file("/data/argoneutnu/larlight_reco_electrons_wbadwires.root"); 
 //proc.add_input_file("../../combined_00.root") ; //~/data/combined_00.root");    //mac/larlight_tracks.root");
 

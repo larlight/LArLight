@@ -956,6 +956,8 @@ namespace larlight {
 	
 	
          std::cout << " +++ in CutEff " << hit_vector.size() << " at plane: " << ipl << std::endl; 
+	 if(hit_vector.size()<20)
+	   continue;
 //       /// end using all hits  
         ::cluster::ClusterParamsAlgNew  fCPAlg;
         fCPAlg.Initialize();
