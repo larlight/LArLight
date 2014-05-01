@@ -19,9 +19,12 @@
 
 #include "ana_base.hh"
 #include "ClusterParamsAlgNew.hh"
-
+#include "argoana.hh"
 
 namespace larlight {
+  
+ // class argoana;
+  
   /**
      \class CutEff
      User custom analysis class made by andrzej
@@ -198,7 +201,7 @@ namespace larlight {
     int minos_matched_mcpdg;
     int minos_matched_recopdg;
     int    fEventMinosMatched;
-    
+    argoana anobject;
     /////////////////////////////////////
     
     // one entry per event

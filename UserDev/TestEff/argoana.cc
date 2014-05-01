@@ -253,7 +253,7 @@ larlight::argoana::argoana(TTree *tree) : fChain(0)
       // of trees.
       TChain * chain = new TChain("anatree","");
       //chain->Add("/data/argoneutnu/tjelectrons_hist.root/analysistree/anatree");
-        chain->Add("/data/argoneutnu/tjneutrinos_hist.root/analysistree/anatree");
+        chain->Add("/argoneut/data/users/andrzejs/tj_tracking/tjelectrons_hist.root/analysistree/anatree");
       tree = chain;
 #endif // SINGLE_TREE
 

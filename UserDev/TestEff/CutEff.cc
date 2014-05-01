@@ -546,7 +546,8 @@ namespace larlight {
     const double showernesscut=0.9;
     //first pass:
     // modhitcut + chargeRMScutcol
-    
+    if(!fNClusters)
+       return false;
     
 	 /// using cluster only. // comment in or out as needed // need to set ipl as counter. and iplane as plane
      int ipl=-1; // just so that I can increment it at the start and not end of loop. ;-)
@@ -603,7 +604,7 @@ namespace larlight {
 	
 	max_charge_3[ipl]=0;
 	for(int ix=0;ix<locmaxvec.size();ix++)
-	  {std::cout << "max hits " << locmaxvec[ix] << " " << ix << " ipl " << ipl << " " << max_charge_3.size() << std::endl;
+	  {std::cout << "max hits " << locmaxvec[ix] << " " << ix << " ipl " << ipl << " " << max_charge_3.size() << " "<< max_charge.size() << std::endl;
 	  max_charge_3.at(ipl)+=locmaxvec[ix];
 	  max_charge.at(ipl)=locmaxvec[ix];
 	  }
@@ -615,23 +616,26 @@ namespace larlight {
         //  continue;
         //      std::cout << " +++ in CutEff " << hit_vector.size() << std::endl;  
 
-       plane[ipl]=iplane;
+        std::cout << " bef hits " << std::endl;  
+        plane[ipl]=iplane;
         if(hit_vector.size() < 20)   // do not bother with too small hitlists
         {
             continue;
         }
 
-
+        std::cout << " after hits " << std::endl;  
         ::cluster::ClusterParamsAlgNew  fCPAlg;
         fCPAlg.Initialize();
         fCPAlg.setNeuralNetPath("../FANN/trained_nets/cascade_argo_clusters.net");
         fCPAlg.EnableFANN();
         if(fCPAlg.SetHits(hit_vector) ==-1 )	
             continue;
+	std::cout << " after check on hits " << std::endl;
         fCPAlg.GetAverages(true);
         fCPAlg.GetRoughAxis(true);
         fCPAlg.GetProfileInfo(true);
         fCPAlg.RefineStartPointAndDirection(true);
+	std::cout << " after Start Point and Dir " << std::endl;
         //fCPAlg.RefineDirection(true);
         //fCPAlg.RefineStartPoints(true);
         //fCPAlg.FillPolygon()
@@ -641,7 +645,7 @@ namespace larlight {
 	
 	::cluster::cluster_params fResult=fCPAlg.GetParams();
 
-
+        std::cout << " filling tree " << std::endl;  
 	/// fill Reco Tree Info
 	
 	fWireVertex[ipl]=fResult.start_point.w;
@@ -1028,7 +1032,7 @@ namespace larlight {
     //////////////////////////////////////////////////////////////////////////////////////////
     //Minos match tets:
     int mcpdg=0,recopdg=0;
-    argoana anobject;
+ 
     fEventMinosMatched=anobject.is_matched_Loop(fRun,fSubRun,fEvent,minos_matched_mcpdg,minos_matched_recopdg);
     
     if( fEventPassAllHitsShowerness && fEventPassAllHitsChargerms && fEventPassAllHitsTPrincipal && !fEventMinosMatched )
