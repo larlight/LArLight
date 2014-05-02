@@ -30,9 +30,8 @@ my_proc.set_ana_output_file("CMP_ana_out.root");
 my_CMP = larlight.CMergePerformance()
 my_proc.add_process(my_CMP)
 
-#For now, CMergePerformance only works with one merging iteration, will have to change this later
-my_CMP.GetManager().MergeTillConverge(False)
-my_CMP.GetManager().DebugMode(cluster.CMergeManager.kPerAlgoSet)
+my_CMP.GetManager().MergeTillConverge(True)
+my_CMP.GetManager().DebugMode(cluster.CMergeManager.kNone)
 
 #Configure the merge algos you want to use here
 short_dist_algo = cluster.CMAlgoShortestDist()
@@ -45,7 +44,7 @@ print  "Finished configuring ana_processor. Start event loop!"
 print
 
 # Let's run it.
-my_proc.run(1,5);
+my_proc.run();
 
 # done!
 print

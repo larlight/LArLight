@@ -4,35 +4,39 @@
 #include "CMergePerformance.hh"
 
 namespace larlight {
-
+  
   bool CMergePerformance::initialize() {
+    
+    ana_tree=0;
+    PrepareTTree();
     
     PrepareHistos();
     
     w2cm = larutil::GeometryUtilities::GetME()->WireToCm();
     t2cm = larutil::GeometryUtilities::GetME()->TimeToCm();
-
+    
     return true;
   }
   
   bool CMergePerformance::analyze(storage_manager* storage) {
     //this function is called once per event
-
+    
     //grab the reconstructed clusters
     larlight::event_cluster* ev_cluster = (larlight::event_cluster*)storage->get_data(larlight::DATA::FuzzyCluster);
+    //larlight::event_cluster* ev_cluster = (larlight::event_cluster*)storage->get_data(larlight::DATA::ShowerAngleCluster);
     if(!ev_cluster) {
       print(larlight::MSG::ERROR,__FUNCTION__,Form("Did not find specified data product, FuzzyCluster!"));
       return false;
     }
     
     //grab the reconstructed hits
-    const larlight::DATA::DATA_TYPE hit_type = ev_cluster->get_hit_type();
+    hit_type = ev_cluster->get_hit_type();
     larlight::event_hit* ev_hits = (larlight::event_hit*)storage->get_data(hit_type);
     if(!ev_hits) {
       print(larlight::MSG::ERROR,__FUNCTION__,Form("Did not find specified data product, Hits!"));
       return false;
     }
-      
+    
     //grab the MC showers
     larlight::event_mcshower* ev_mcshower = (larlight::event_mcshower*)storage->get_data(larlight::DATA::MCShower);
     if(!ev_mcshower) {
@@ -47,21 +51,28 @@ namespace larlight {
       return false;
     }
 
+    //fill some std::maps that are constant through the whole event
+    //_shower_idmap is (G4trackid => MCShower index in ev_mcshower)
+    _mcslb.FillShowerMap(ev_mcshower,_shower_idmap);
+
+    //_simch_map is (channel => larlight::simch)
+    _mcslb.FillSimchMap(ev_simch,_simch_map);
+
     //first start with the raw fuzzyclusters and find their CPAN params
     FillClusterParamsVector(ev_cluster,ev_hits);
-
+    
     //once that is done, _clusterparams is filled, calculate figure
     //of merit and fill histos with it
-    bool after_merging = false;
-    FillFOMHistos(after_merging,ev_mcshower,ev_simch,ev_hits,_clusterparams);
+    _after_merging = false;
+    FillFOMHistos(_after_merging,ev_mcshower,ev_cluster,ev_hits,_clusterparams);
 
     //now run merging with whatever algos you want
     //this overwites _clusterparams with the new (merged) clusters
     RunMerging(ev_cluster,ev_hits);
 
     //now fill the other FOM histos
-    after_merging = true;
-    FillFOMHistos(after_merging,ev_mcshower,ev_simch,ev_hits,_clusterparams);
+    _after_merging = true;
+    FillFOMHistos(_after_merging,ev_mcshower,ev_cluster,ev_hits,_clusterparams);
 
     return true;
   }
@@ -72,10 +83,14 @@ namespace larlight {
       _fout->cd(); 
       for(int before_after = 0; before_after < 2; ++before_after){
 	hPurity.at(before_after)->Write();
-	hNClusOverNMCShowers.at(before_after)->Write();
+	hNMCSoverNClus.at(before_after)->Write();
 
 	delete hPurity.at(before_after);
-	delete hNClusOverNMCShowers.at(before_after);
+	delete hNMCSoverNClus.at(before_after);
+      }
+      if(ana_tree){
+	ana_tree->Write();
+	delete ana_tree;
       }
       
     }
@@ -92,35 +107,61 @@ namespace larlight {
     hPurity.push_back(
 		      new TH1D("hPurity_before_merging",
 			       "Clus Purity before Merging",
-			       100,0,1)
+			       100,-0.1,1.1)
 		      );
 
     hPurity.push_back(
 		      new TH1D("hPurity_after_merging",
-			   "Clus Purity after Merging",
-			   100,0,1)
+			       "Clus Purity after Merging",
+			       100,-0.1,1.1)
 		      );
-
-    hNClusOverNMCShowers.push_back(
-				   new TH1D("hNClusOverNMCShowers_before_merging",
-					    "NClusOverNMCShowers before Merging",
-					    50,-0.5,49.5)
-				   );
     
-    hNClusOverNMCShowers.push_back(
-				   new TH1D("hNClusOverNMCShowers_after_merging",
-					    "NClusOverNMCShowers after Merging",
-					    50,-0.5,49.5)
-				   );
+    hNMCSoverNClus.push_back(
+			     new TH1D("hNMCSoverNClus_before_merging",
+				      "# MCShowers / # Clusters per evt [before Merging]", 
+				      100,-0.1,1.1)
+			     );
+    
+    hNMCSoverNClus.push_back(
+			     new TH1D("hNMCSoverNClus_after_merging",
+				      "# MCShowers / # Clusters per evt [after Merging]",
+				      100,-0.1,1.1)
+			     );
+
+    hClusQoverMCQ.push_back(
+			    new TH1D("hClusQoverMCQ_before_merging",
+				     "Cluster Charge / Dominant MCShower Charge [before Merging]",
+				     100,-0.1,10)
+			    );
+
+    hClusQoverMCQ.push_back(
+			    new TH1D("hClusQoverMCQ_after_merging",
+				     "Cluster Charge / Dominant MCShower Charge [after Merging]",
+				     100,-0.1,10)
+			    );
+
+
   }
 
+  void CMergePerformance::PrepareTTree(){
+    
+    if(!ana_tree) {
+
+      ana_tree = new TTree("ana_tree","");
+
+      ana_tree->Branch("clus_purity",&_clus_purity,"clus_purity/D");
+      ana_tree->Branch("clusQ_over_MCQ",&_clusQ_over_MCQ,"clusQ_over_MCQ/D");
+      ana_tree->Branch("tot_clusQ",&_tot_clus_charge,"tot_clus_charge/D");
+      ana_tree->Branch("after_merging",&_after_merging,"after_merging/O");
+    }
+
+  }
 
   void CMergePerformance::FillClusterParamsVector(event_cluster* ev_cluster,
 						  event_hit* ev_hits){
 
     // Now we make ClusterParamsAlgNew instance per cluster
     _clusterparams.clear();
-    //    _clusterparams.reserve(ev_cluster->size());
 
     //loop over the reconstructed clusters
     const larlight::DATA::DATA_TYPE hit_type = ev_cluster->get_hit_type();
@@ -149,6 +190,7 @@ namespace larlight {
       _clusterparams.push_back(::cluster::ClusterParamsAlgNew());
 	
       try {
+	(*_clusterparams.rbegin()).SetVerbose(false);
 	(*_clusterparams.rbegin()).setNeuralNetPath(myNeuralNetPath);
 	(*_clusterparams.rbegin()).SetHits(tmp_hits);
 	(*_clusterparams.rbegin()).FillPolygon();
@@ -166,66 +208,194 @@ namespace larlight {
   
   void CMergePerformance::FillFOMHistos(bool after_merging,
 					event_mcshower* ev_mcshower,
-					event_simch* ev_simch,
+					event_cluster* ev_cluster,
 					event_hit* ev_hits,
 					const std::vector< ::cluster::ClusterParamsAlgNew> &_clusterparams){
 
-    //shower_idmap is (G4trackid => MCShower index in ev_mcshower)
-    std::map<UInt_t,UInt_t> shower_idmap;
-    _mcslb.FillShowerMap(ev_mcshower,shower_idmap);
-
-    //now simch_map is (channel => larlight::simch)
-    std::map<UShort_t, larlight::simch> simch_map;
-    _mcslb.FillSimchMap(ev_simch,simch_map);
-    
     //make a vector of MCShower indices (cutting out MCShowers with
     //super-low-energy mothers... i only want the big-uns
     std::vector<UInt_t> MCShower_indices;
     for(UInt_t i=0; i < ev_mcshower->size(); ++i){
-      //      if(ev_mcshower->at(i).MotherMomentum().at(3) > 0.01)
-      MCShower_indices.push_back(i);
+      if(ev_mcshower->at(i).MotherMomentum().at(3) > 0.01)
+	MCShower_indices.push_back(i);
     }
 
-    //loop over hits, for each: compute the % of its charge that belongs to each MCShower
-    for(auto const i_hit: *ev_hits){
+    
+
+    //Here we try to loop over clusters based on the _clusterparams vector, *not* ev_cluster vector,
+    //because the merging algorithm returns an altered _clusterparams vector but it does *not*
+    //modify the actual ev_cluster vector. 
+    //Before merging, we make a vector of vectors like { {1}, {2}, {3}, ...}
+    //where each entry is a vector of length 1, corresponding to the index in ev_cluster we are looping on
+    //After merging, we retrieve this vector from CBookKeeper and it will look more like
+    // { {1, 2}, {3}, {4, 5, 6, 7}, ...} showing which ev_cluster elements should be combined
+    //That way, when we can easily combine the hits in different clusters to loop over,
+    //as if the clusters were really merged
+
+    //solution: get the bookkeeper instance and use the GetResult() function
+    //this returns a vector of vector whose length = # of output clusters
+    //(index number matches with the std::vector<CPAN> you get from CMergeManager::GetClusters()
+    //the internal vector is the input clusters indices that were merged
+
+    
+    clus_idx_vec.clear();
+    if(!after_merging){
+      for(int i = 0; i < ev_cluster->size(); ++i){
+	std::vector<unsigned short> temporary(1,i);
+     	clus_idx_vec.push_back(temporary);
+      }
+    }
+    else{
+      clus_idx_vec = _mgr.GetBookKeeper().GetResult();
+    }
+    ///////////////////////////////////////////////
+    //Loop over reconstructed clusters
+    ///////////////////////////////////////////////
+
+    //    std::cout<<"after_merging? = "<<after_merging
+    //	     <<". This event has "<<clus_idx_vec.size()
+    //	     <<" clusters and "<<MCShower_indices.size()
+    //	     <<" viable MCShowers"<<std::endl;
+
+    //    for(auto const i_cluster: *ev_cluster) {
+    for(int outer_clus_idx=0; outer_clus_idx<clus_idx_vec.size(); ++outer_clus_idx){
+      //total cluster charge
+      _tot_clus_charge = 0;
+      //charge from each MCShower object... last element is from unknown MCShower
+      //or from MCShowers that were too low energy to pass to McshowerLookback
+      std::vector<double> part_clus_charge(MCShower_indices.size()+1,0);
+
+      //container to hold the fractional hit charge returned by McshowerLookback
+      std::vector<float> hit_charge_frac;
+
+      //Get the hits from each cluster and loop over them
+      //if after merging, this may be hits from multiple clusters
+      //combine the assiciations from all merged clusters into one vector of hit indices to loop over
+      //container to hold the final list of hit indices for this(these) cluster(s)
+      std::vector<unsigned short> ass_index;
+      //loop over this(these) cluster(s) index(indices)
+      for(int in_clus_idx = 0; in_clus_idx < clus_idx_vec.at(outer_clus_idx).size(); ++in_clus_idx){
+	//grab the hit associations for each cluster
+	const std::vector<unsigned short> tmp_ass_index(ev_cluster->at(clus_idx_vec.at(outer_clus_idx).at(in_clus_idx)).association(hit_type));
+	// and concatenate it to ass_index
+	ass_index.insert( ass_index.end(), tmp_ass_index.begin(), tmp_ass_index.end() );
+      }
+
+      ///////////////////////////////////////////////
+      //Loop over hits in this cluster 
+      ///////////////////////////////////////////////
+
+      for(auto const hit_index: ass_index){
+
+	tot_clus_charge += ev_hits->at(hit_index).Charge();
+
+	hit_charge_frac.clear();
+	
+	hit_charge_frac = 
+	  _mcslb.MatchHitsAll(ev_hits->at(hit_index),
+			      _simch_map,
+			      _shower_idmap,
+			      MCShower_indices);
+
+	//sometimes mcslb returns a null vector if the reco hit couldn't be matched with an IDE
+	//in this case, just skip this hit
+	if(hit_charge_frac.size() == 0) break;
+
+	//debug
+	/*
+	std::cout<<"Debug: just got back hit_charge_frac as (";
+	for(int j = 0; j < hit_charge_frac.size(); ++j)
+	  std::cout<<hit_charge_frac.at(j)<<", ";
+	std::cout<<")."<<std::endl;
+	*/
+
+	
+
+
+	for(int i = 0; i < hit_charge_frac.size(); ++i)
+	  part_clus_charge.at(i) += hit_charge_frac.at(i)*ev_hits->at(hit_index).Charge();
+
+
+	//debug
+	/*
+	  std::cout<<"This hit is made up of (";
+	  for(int i=0; i<hit_charge_frac.size()-1; ++i)
+	  std::cout<<hit_charge_frac.at(i)<<", ";
+	  std::cout<<") fractional charge from "<<
+	  hit_charge_frac.size()-1<<" known MCShowers and "<<
+	  (float)hit_charge_frac.back()<<" from unknown ones."<<std::endl;
+	*/
+	  //end debug
+	
+      } //end looping over hits in this cluster
       
-      std::vector<float> hit_charge_frac = 
-	_mcslb.MatchHitsAll(i_hit,
-			    simch_map,
-			    shower_idmap,
-			    MCShower_indices);
-      //debug
-      //      std::cout<<"This hit is made up of (";
-      //      for(int i=0; i<hit_charge_frac.size()-1; ++i)
-      //	std::cout<<hit_charge_frac.at(i)<<", ";
-      //      std::cout<<") fractional charge from "<<
-      //	hit_charge_frac.size()-1<<" known MCShowers and "<<
-      //	(float)hit_charge_frac.back()<<" from unknown ones."<<std::endl;
-      //end debug
 
-    }
-    //debug: print contents of shower_idmap map
-    //    for(std::map<UInt_t,UInt_t>::iterator it=shower_idmap.begin(); it!=shower_idmap.end(); ++it)
-    //      std::cout<<"viewing whoer_idmap: "<<it->first << " => "<<it->second <<std::endl;
+      
 
+
+      //debug: print contents of _shower_idmap map
+      //    for(std::map<UInt_t,UInt_t>::iterator it=_shower_idmap.begin(); it!=_shower_idmap.end(); ++it)
+      //      std::cout<<"viewing whoer_idmap: "<<it->first << " => "<<it->second <<std::endl;
+      
+    
+      ///////////////////////////////////////////////
+      // Fill histograms/tree that need once-per-cluster filling
+      ///////////////////////////////////////////////
+
+      //purity of a cluster: highest charge fraction belonging to an MCShower
+      int dominant_MCshower_index = 0;
+      _clus_purity = 0;
+      for(int i = 0; i < part_clus_charge.size(); ++i){	
+	if( (double)(part_clus_charge.at(i)/tot_clus_charge) > _clus_purity){
+	  _clus_purity = (double)(part_clus_charge.at(i)/tot_clus_charge);
+	  dominant_MCshower_index = i;
+	}
+      }
+      hPurity.at(after_merging)->Fill(_clus_purity);
+      
+      //cluster charge divided by charge of dominant MC shower
+      //if dominant_index points to the "unknown" element, set ratio to -1
+      if(dominant_MCshower_index == ev_mcshower->size())
+	_clusQ_over_MCQ = -1;
+      else{
+	_clusQ_over_MCQ = 
+	  tot_clus_charge /
+	  ev_mcshower->at(dominant_MCshower_index).Charge(
+							  ev_cluster->at(clus_idx_vec.
+									 at(outer_clus_idx).
+									 at(0)
+									 ).View()
+							  );
+	//	std::cout<<"tot clus charge is "<<tot_clus_charge<<", mcshower charge is "
+	//		 << ev_mcshower->at(dominant_MCshower_index).Charge(
+	//								    ev_cluster->at(clus_idx_vec.
+	//										   at(outer_clus_idx).
+	//										   at(0)
+	//										   ).View())
+	//		 <<std::endl;
+      }
+      
+
+      //Fill ana TTree once per cluster
+      if(ana_tree)
+	ana_tree->Fill();
+    
+    }//end loop over clusters
+
+
+    ///////////////////////////////////////////////
+    // Fill histograms/tree that need once-per-event filling
+    ///////////////////////////////////////////////
+    
+    //efficiency of clustering for the event
+    double NMCSoverNClus = 
+      (double)MCShower_indices.size()/(double)_clusterparams.size();
+    hNMCSoverNClus.at(after_merging)->Fill(NMCSoverNClus);
+    
     
 
-    ////////////////////////////////////////////
-    //now we're done with getting all the data//
-    //let's fill some histograms w/ it        //
-    ////////////////////////////////////////////
-
-    double NClusOverNMCShowers = 
-      (double)_clusterparams.size()/(double)MCShower_indices.size();
-    hNClusOverNMCShowers.at(after_merging)->Fill(NClusOverNMCShowers);
-
-
-    //fill hPurity plot here... need to decide what purity means...
-
-
-    
   }//end fillFOMhistos
-
+    
 
   void CMergePerformance::RunMerging(event_cluster* ev_cluster,
 				     event_hit* ev_hits)
@@ -235,9 +405,6 @@ namespace larlight {
 							     std::vector<larutil::PxHit>()
 							     );
 
-    DATA::DATA_TYPE hit_type = ev_cluster->get_hit_type();
-
-    
     for(size_t i=0; i<ev_cluster->size(); ++i) {
       
       std::vector<unsigned short> hit_indexes(ev_cluster->at(i).association(hit_type));

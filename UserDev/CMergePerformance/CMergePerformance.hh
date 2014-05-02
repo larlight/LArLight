@@ -68,12 +68,14 @@ namespace larlight {
 
     void PrepareHistos();
     
+    void PrepareTTree();
+
     void FillClusterParamsVector(event_cluster* ev_cluster,
 				 event_hit* ev_hits);
 
     void FillFOMHistos(bool before_merging,
 		       event_mcshower* ev_mcshower,
-		       event_simch* ev_simch,
+		       event_cluster* ev_cluster,
 		       event_hit* ev_hits,
 		       const std::vector< ::cluster::ClusterParamsAlgNew> &_clusterparams);
 
@@ -81,28 +83,49 @@ namespace larlight {
     void RunMerging(event_cluster* ev_cluster,
 		    event_hit* ev_hits);
 
+    ///vector of CPAN objects (before, and overwritten after merging)
     std::vector< ::cluster::ClusterParamsAlgNew> _clusterparams;
+
+    /// vector of vector of cluster indices for looping over _clusterparmas
+    /// before merging it is just {{1},{2},{3},{4},...} since 
+    /// _clusterparams has 1:1 mapping to ev_cluster
+    /// after merging it is something like {{1,2,3},{4},...} and will be
+    /// retreived from a CBookKeeper function
+    std::vector<std::vector<unsigned short> > clus_idx_vec;
 
     //declare a member of CMergeManager class called _mgr
     ::cluster::CMergeManager _mgr;
-
-    //declare a member of CBoolAlgoBase class called _shortest_dist_algo
-    ::cluster::CMAlgoShortestDist _shortest_dist_algo;
     
+    
+
     //declare mcshowerlookback object only once, not once per event
     McshowerLookback _mcslb;
 
+    //some maps that mcshowerlookback fills once per event
+    std::map<UInt_t,UInt_t> _shower_idmap;
+    std::map<UShort_t,larlight::simch> _simch_map;
 
     Double_t w2cm, t2cm;
     
     //neural net path needed
     std::string myNeuralNetPath;
 
+    //hit type used in lots of functions, putting it here to make it more global
+    larlight::DATA::DATA_TYPE hit_type;
+
     //[0] is before merging, [1] is after merging
     std::vector< TH1D* > hPurity;
-    std::vector< TH1D* > hNClusOverNMCShowers;
+    std::vector< TH1D* > hNMCSoverNClus;
+    std::vector< TH1D* > hClusQoverMCQ;
 
+    //might as well save stuff in a TTree too
+    TTree* ana_tree;
 
+    //TTree variables
+    double _clus_purity;
+    double _clusQ_over_MCQ;
+    double _tot_clus_charge;
+    bool _after_merging;
 
 
   };
