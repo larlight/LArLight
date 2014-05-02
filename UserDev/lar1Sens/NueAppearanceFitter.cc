@@ -66,6 +66,9 @@ namespace lar1{
 
     ElectContainedDist=-999;
 
+    systematicInflationAmount = 0.0;
+    inflateSystematics = false;
+
     //grid boundaries
     
     useNearDetStats = true;           // Only matters if the covariance matrix vector is empty.
@@ -572,6 +575,12 @@ namespace lar1{
         }
     }
   
+    if (inflateSystematics){
+      for (int i = 0; i < nbinsE*2; ++i)
+      {
+          nearDetStats[i+nbinsE] +=systematicInflationAmount;
+      }
+    }
 
 
   // }
@@ -617,19 +626,25 @@ namespace lar1{
         if (useNearDetStats){
           if (i == 0)
             systematicErrors[i].at(bin) = nearDetSystematicError;
-          else
+          else{
             systematicErrors[i].at(bin) = 1/sqrt(eventsnueVec[0].at(bin));
+            if (inflateSystematics) systematicErrors[i].at(bin) += systematicInflationAmount;
+          }
         }
         else{
           systematicErrors[i].at(bin) = flatSystematicError;
         }
-        if (!useInfiniteStatistics)
+        if (!useInfiniteStatistics){
           statisticalErrors[i].at(bin) =  1/sqrt(eventsnueVec[i].at(bin));
+          if (inflateSystematics) systematicErrors[i].at(bin) += systematicInflationAmount;
+        }
         else
           if (i == nL-1)
             statisticalErrors[i].at(bin) = 0.0;
-          else 
+          else {
             statisticalErrors[i].at(bin) =  1/sqrt(eventsnueVec[i].at(bin));
+            if (inflateSystematics) systematicErrors[i].at(bin) += systematicInflationAmount;
+}
 
       }
     }
@@ -747,7 +762,12 @@ namespace lar1{
                 nearDetStats[i+nbinsE] = 1/sqrt( nullVec.at(i+nbinsE) );
             }
         }
-        
+        if (shapeOnlyFit && inflateSystematics){
+            for (int i = 0; i < nbinsE*2; ++i)
+            {
+                nearDetStats[i+nbinsE] +=systematicInflationAmount;
+            }
+        }        
         if (dm2point == dm2FittingPoint && sin22thpoint == sin22thFittingPoint){
           for (int i = 0; i < nL; i++){
             for (int bin = 0; bin < nbinsE; ++ bin)
@@ -774,6 +794,7 @@ namespace lar1{
         }
         //initialize the covariance matrix array:
         std::vector< std::vector<float> > entries( nbins, std::vector<float> ( nbins, 0.0 ) );
+
 
         
         if (cov_max_name.size() == 0){

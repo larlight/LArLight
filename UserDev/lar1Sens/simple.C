@@ -25,9 +25,11 @@
   n.setShapeOnlyFit(true);
   n.setNearDetSystematicError(0.2);
   n.setForceRemake(false);
-  n.setUseInfiniteStatistics(true);
+  n.setUseInfiniteStatistics(false);
   // n.setElectContainedDist(150);
 
+  n.setInflateSystematics(true);
+  n.setSystematicInflationAmount(0.04);
 
   n.setNpoints(250);
 

@@ -95,6 +95,9 @@ namespace lar1{
 
       void setUseInfiniteStatistics(bool b){useInfiniteStatistics = b;}
 
+      void setSystematicInflationAmount(double d){systematicInflationAmount =d;}
+      void setInflateSystematics(bool b){inflateSystematics = b;}
+
     private:
 
       SensUtils utils;
@@ -189,7 +192,9 @@ namespace lar1{
       std::vector <float> eventsnLcvVec;                    //has fullosc*flat0.3% osc prob in it
 
       bool useInfiniteStatistics;
-
+      double systematicInflationAmount;
+      bool inflateSystematics;
+      
       //except for oscVev, its name[b_line][energy_bin]
       std::vector< std::vector <float> >    eventsnumuVec;
       std::vector< std::vector <float> >     eventsnueVec;
