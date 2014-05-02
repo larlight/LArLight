@@ -189,7 +189,7 @@ namespace larlight {
 
 	ctr++;
 	
-	if(ctr%10==0) 
+	if(ctr%100==0) 
 	  print(MSG::NORMAL,__FUNCTION__,
 		Form("  Done %d events @ %g [s]",ctr,clock.RealTime()));
 
