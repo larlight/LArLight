@@ -14,7 +14,7 @@
 #include "TStyle.h" //for gStyle
 #include "TLegend.h"
 #include "TMarker.h"
-
+#include "TPad.h"
 
 namespace lar1{
 
@@ -35,7 +35,8 @@ namespace lar1{
 
 
     // Add the lsnd_data to a plot
-    void lsnd_plot (TCanvas* c);
+    void lsnd_plot (TPad* c);
+    // void lsnd_plot (TCanvas* c);
 
     void add_plot_label(char* label, double x, double y,
                         double size = 0.05, int color = 1,
@@ -55,7 +56,8 @@ namespace lar1{
     std::vector<std::vector<double > >  readGFData();
 
     // Plots the GF data on the Canvas given, like the lsnd_plot function above
-    int plotGFData(TCanvas * c);
+    int plotGFData(TPad * c);
+    // int plotGFData(TCanvas * c);
 
 
   protected:

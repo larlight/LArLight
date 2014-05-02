@@ -40,6 +40,8 @@ namespace lar1{
     use700m = false;     //Include the detector at 700m?
     useT600 = false;
      
+    useInfiniteStatistics = false;
+
     forceRemake = false;
 
     //Note: there is no infrastructure to handle more than 3 baselines.
@@ -59,7 +61,9 @@ namespace lar1{
     //Note: most of the run time is in looping over ntuples, which only takes awhile
     //on the very first pass!  (subsequent runs are much faster)
     npoints = 250;
-    
+    dm2FittingPoint = 0.9*npoints/2;
+    sin22thFittingPoint = 0.25*npoints/2;
+
     ElectContainedDist=-999;
 
     //grid boundaries
@@ -118,13 +122,18 @@ namespace lar1{
     if (use100m) baselines.push_back(100);
     if (use100mLong) baselines.push_back(100);
     if (use470m) baselines.push_back(470);
-    if (use700m || useT600) baselines.push_back(700);
+    if (use700m) baselines.push_back(700);
+    if (useT600){
+      if (specialNameText_far == "600") baselines.push_back(600);
+      else if (specialNameText_far == "800") baselines.push_back(800);
+      else baselines.push_back(700);
+    }
     //and they're corresponding scaling factors:
     if (use100m) scales.push_back(LAr1NDScale);
     if (use100mLong) scales.push_back(LAr1NDScale);
     if (use470m) scales.push_back(ubooneScale);
     if (use700m) scales.push_back(LAr1FDScale);
-    if (useT600) scales.push_back(1.0);
+    if (useT600) scales.push_back(LAr1FDScale);
     //some detector names just for fun:
     if (use100m) names.push_back("LAr1-ND");
     if (use100mLong) names.push_back("2*LAr1-ND");
@@ -199,10 +208,23 @@ namespace lar1{
     if (useT600) {
       NtupleReader a("nue",fileSource, 700, mode, energyType, npoints, forceRemake);
       a.setContainedShowers(ElectContainedDist);
-      specialNameText_far.append("IC");
-      specialNameTextOsc_far.append("IC");
+      std::cout << "before: " << specialNameText_far << std::endl;
+      if (specialNameText_far == "")
+        specialNameText_far = "IC";
+      else
+        specialNameText_far.insert(0,"IC_");
+      std::cout << "after: " << specialNameText_far << std::endl;
+
+      if (specialNameTextOsc_far == "")
+        specialNameTextOsc_far = "IC";
+      else
+        specialNameTextOsc_far.insert(0,"IC_");
+
+
       a.setSpecialNameText(specialNameText_far);
       a.setSpecialNameTextOsc(specialNameTextOsc_far);
+      // a.setSpecialNameText("IC");
+      // a.setSpecialNameTextOsc("IC");
       readerNue.push_back(a);
       a.setSignal("numu");
       a.setSpecialNameText("");
@@ -579,6 +601,43 @@ namespace lar1{
     x3s = new double[npoints+1]; y3s = new double[npoints+1];
     x5s = new double[npoints+1]; y5s = new double[npoints+1];
 
+    systematicErrors.clear();
+    statisticalErrors.clear();
+    systematicErrors.resize(nL);
+    statisticalErrors.resize(nL);
+
+    // populate the vectors that hold the fractional errors
+    // for plotting purposes.
+    // statistical errors doesn't include any signal
+    // systematic error assumes no shape only fit
+    for (int i = 0; i < nL; i++){
+      systematicErrors[i].resize(nbinsE);
+      statisticalErrors[i].resize(nbinsE);
+      for (int bin = 0; bin < nbinsE; bin++ ){
+        if (useNearDetStats){
+          if (i == 0)
+            systematicErrors[i].at(bin) = nearDetSystematicError;
+          else
+            systematicErrors[i].at(bin) = 1/sqrt(eventsnueVec[0].at(bin));
+        }
+        else{
+          systematicErrors[i].at(bin) = flatSystematicError;
+        }
+        if (!useInfiniteStatistics)
+          statisticalErrors[i].at(bin) =  1/sqrt(eventsnueVec[i].at(bin));
+        else
+          if (i == nL-1)
+            statisticalErrors[i].at(bin) = 0.0;
+          else 
+            statisticalErrors[i].at(bin) =  1/sqrt(eventsnueVec[i].at(bin));
+
+      }
+    }
+
+    fittingSignal.resize(nL);
+    fittingBackgr.resize(nL);
+    fittingErrors.resize(nL);
+
 
     //This loop is actually doing the chisq calculation
     //It loops over npoints twice.  First over dm2, and second over sin22th
@@ -631,26 +690,50 @@ namespace lar1{
         predictionVec = utils.collapseVector(eventsFitVecTemp, nbinsE, nL);
         // Now predictionVec and nullVec hold 
         if(shapeOnlyFit){
-        // Loop over the near det and determine the ratio between 
-        // background and background + signal
-        for(int i = 0; i < nbinsE; i ++){
-            intSignalND = predictionVec[i];
-            intNooscND  = nullVec[i];
-            scalefac.push_back(intSignalND / intNooscND);
-        }
-        // if (verbose) for (auto & point : scalefac) std::cout << " Scalefac: " << point << "\n";
-        
-        // next scale the nue background for each det
-        for(int n = 0; n < nL; n++)
-        {
-          for (int i = 0; i < nbinsE; ++ i)
+
+          // Do the shape correction before the rate correction
+          shapeCorrection.resize(nL);
+          std::vector<double> total;
+          total.resize(nL);
+          for (int i = 0; i < nL; i++){
+            shapeCorrection[i].resize(nbinsE);
+            for (int bin = 0; bin < nbinsE; bin++){
+              shapeCorrection[i][bin] = nullVec[bin];
+              shapeCorrection[i][bin] *= 1.0/nullVec[2*i*nbinsE + bin];
+              total[i] += shapeCorrection[i][bin];
+            }
+          }
+          // Normalize the shape correction for each bin:
+          for (int i = 0; i < nL; i++){
+            for (int bin = 0; bin < nbinsE; bin++){
+              shapeCorrection[i][bin] /= (total[i]/nbinsE);
+              // std::cout << "Shape correction ("<<i<<","<<bin<<") is "<<shapeCorrection[i][bin]<<"\n";
+            }
+          }
+          // Loop over the near det and determine the ratio between 
+          // background and background + signal
+          for(int i = 0; i < nbinsE; i ++){
+              intSignalND = predictionVec[i];
+              intNooscND  = nullVec[i];
+              scalefac.push_back(intSignalND / intNooscND);
+          }
+          // if (verbose) for (auto & point : scalefac) std::cout << " Scalefac: " << point << "\n";
+          
+          // next scale the nue background for each det
+          for(int n = 0; n < nL; n++)
+          {
+            for (int i = 0; i < nbinsE; ++ i)
             {
                 if (debug) std::cout << "\nScaled from: " << nullVec[2*n*nbinsE + i] << std::endl;
+                // nullVec[2*n*nbinsE + i] *= scalefac[i]/shapeCorrection[n][i];
                 nullVec[2*n*nbinsE + i] *= scalefac[i];
                 if (debug) std::cout << "Scaled to: " << nullVec[2*n*nbinsE + i] << std::endl;
             }
           }
         }
+
+
+
         // At this point, prediction vec is the 2*nbinsE*nL long vector that holds
         // the null+signal
         // nullVec is the (corrected, if necessary) background
@@ -661,10 +744,34 @@ namespace lar1{
         {
             for (int i = 0; i < nbinsE*2; ++i)
             {
-                nearDetStats[i] = 1/sqrt( nullVec.at(i+nbinsE) );
+                nearDetStats[i+nbinsE] = 1/sqrt( nullVec.at(i+nbinsE) );
             }
         }
-
+        
+        if (dm2point == dm2FittingPoint && sin22thpoint == sin22thFittingPoint){
+          for (int i = 0; i < nL; i++){
+            for (int bin = 0; bin < nbinsE; ++ bin)
+            {
+              fittingSignal[i].push_back(predictionVec.at(bin + 2*i*nbinsE));
+              fittingBackgr[i].push_back(nullVec.at(bin + 2*i*nbinsE));
+              double error = 0;
+              if (useNearDetStats){
+                error = pow(nullVec.at(bin + 2*i*nbinsE)*nearDetStats.at(bin),2);
+                if (!useInfiniteStatistics || i != nL-1){
+                  error += sqrt(nullVec.at(bin + 2*i*nbinsE));
+                }
+                else
+                  error += 0.0;
+              }
+              else{
+                error = pow(nullVec.at(bin + 2*i*nbinsE)*flatSystematicError,2);
+                if (!useInfiniteStatistics || i != nL-1)
+                  error += sqrt(nullVec.at(bin + 2*i*nbinsE));
+              }
+              fittingErrors[i].push_back(sqrt(error));
+            }
+          }
+        }
         //initialize the covariance matrix array:
         std::vector< std::vector<float> > entries( nbins, std::vector<float> ( nbins, 0.0 ) );
 
@@ -711,12 +818,27 @@ namespace lar1{
               } // end if on "is near det"
               
               else{ //on far detectors
-                entries[ibin][ibin] = cvi + pow(nearDetStats[ibin % (3*nbinsE)]*cvi, 2);
+                if(!useInfiniteStatistics)
+                  entries[ibin][ibin] = cvi + pow(nearDetStats[ibin % (3*nbinsE)]*cvi, 2);
+                else{
+                  if (ibin > 2*nL*nbinsE)
+                    entries[ibin][ibin] = pow(nearDetStats[ibin % (3*nbinsE)]*cvi, 2);
+                  else
+                    entries[ibin][ibin] = cvi + pow(nearDetStats[ibin % (3*nbinsE)]*cvi, 2);
+                }
+
               } // end else, end section on far dets
             } //end if on useNearDetStats
             
             else{ //using flat systematics on everything
-              entries[ibin][ibin] = cvi + pow(flatSystematicError*cvi, 2);
+              if(!useInfiniteStatistics)
+                entries[ibin][ibin] = cvi + pow(flatSystematicError*cvi, 2);
+              else{
+                if (ibin > 2*nL*nbinsE)
+                  entries[ibin][ibin] = pow(flatSystematicError*cvi, 2);
+                else
+                  entries[ibin][ibin] = cvi + pow(flatSystematicError*cvi, 2);
+              }
             } //end else on 5% flat stats
           
             if (isinf(entries[ibin][ibin])) {
@@ -856,7 +978,14 @@ namespace lar1{
                               std::cout << " M^-1: " << (*cov)(ibin-1,jbin-1) << std::endl;
                           }
                       }
-                    
+                      if (sin22thpoint == sin22thFittingPoint && dm2point == dm2FittingPoint){
+                        if (ibin == jbin){
+                          std::cout << "On bin " << ibin << ", adding chi2 = " << (predictioni-cvi)*(predictionj-cvj)* (*cov)(ibin-1,jbin-1) << std::endl;
+                          std::cout << "  nearDetStats error on this bin is "<< nearDetStats[ibin%(2*nbinsE)] << std::endl;
+                          std::cout << "  ibin: "<< ibin << " Prediction: " << predictioni << " cvi: " << cvi;
+                          std::cout << "  M^-1: " << (*cov)(ibin-1,jbin-1) << std::endl;
+                        }
+                      }
                       chisq += (predictioni-cvi)*(predictionj-cvj)* (*cov)(ibin-1,jbin-1);
 
                   }
@@ -954,9 +1083,22 @@ namespace lar1{
 
     std::cout<<"Drawing LSND intervals...\n\n";
 
-    TCanvas* c3 = new TCanvas("c3","Sensitivity",700,700);
-    c3->SetLogx();
-    c3->SetLogy();
+    TCanvas* c3 = new TCanvas("c3","Sensitivity",900,800);
+    // c3->Divide(1,2);
+    TPad * pad1 = new TPad("pad1","pad1",0,0.25,2.0/3.0,1);
+    TPad * pad2 = new TPad("pad2","pad2",0,0,2.0/3.0,0.25);
+    TPad * pad3 = new TPad("pad3","pad3",2.0/3.0,0,1,1);
+
+    pad1 -> Draw();
+    pad2 -> Draw();
+    pad3 -> Draw();
+
+    pad1 -> cd();
+    // pad2 -> cd();
+
+    // pad1->cd(1);
+    pad1->SetLogx();
+    pad1->SetLogy();
 
     TH2D* hr1=new TH2D("hr1","hr1",500,sin22thmin,sin22thmax,500,dm2min,dm2max);
     hr1->Reset();
@@ -968,7 +1110,149 @@ namespace lar1{
     hr1->GetYaxis()->SetTitleSize(0.05);
     hr1->SetStats(kFALSE);
     hr1->Draw();
-    plotUtils.lsnd_plot(c3);
+    plotUtils.lsnd_plot(pad1);
+
+    // Draw the systematic and statistical errors
+ 
+    std::cout << "systematicErrors  ... " << systematicErrors [nL-1].at(0)  << std::endl;
+    std::cout << "systematicErrors  ... " << systematicErrors [nL-1].at(1)  << std::endl;
+    std::cout << "systematicErrors  ... " << systematicErrors [nL-1].at(2)  << std::endl;
+    std::cout << "systematicErrors  ... " << systematicErrors [nL-1].at(3)  << std::endl;
+    std::cout << "statisticalErrors ... " << statisticalErrors[nL-1].at(0) << std::endl;
+    std::cout << "statisticalErrors ... " << statisticalErrors[nL-1].at(1) << std::endl;
+    std::cout << "statisticalErrors ... " << statisticalErrors[nL-1].at(2) << std::endl;
+    std::cout << "statisticalErrors ... " << statisticalErrors[nL-1].at(3) << std::endl;
+    std::vector<TH1F *> systematicHist;
+    std::vector<TH1F *> statisticalHist;
+
+    systematicHist.resize(nL);
+    statisticalHist.resize(nL);
+
+
+    std::cout << "fittingSignal ... " << fittingSignal[nL-1].at(0)  << std::endl;
+    std::cout << "fittingSignal ... " << fittingSignal[nL-1].at(1)  << std::endl;
+    std::cout << "fittingSignal ... " << fittingSignal[nL-1].at(2)  << std::endl;
+    std::cout << "fittingSignal ... " << fittingSignal[nL-1].at(3)  << std::endl;
+    std::cout << "fittingBackgr ... " << fittingBackgr[nL-1].at(0) << std::endl;
+    std::cout << "fittingBackgr ... " << fittingBackgr[nL-1].at(1) << std::endl;
+    std::cout << "fittingBackgr ... " << fittingBackgr[nL-1].at(2) << std::endl;
+    std::cout << "fittingBackgr ... " << fittingBackgr[nL-1].at(3) << std::endl;
+
+    std::vector<TH1F *> fittingSignalHist;
+    std::vector<TH1F *> fittingBackgrHist;
+
+    fittingSignalHist.resize(nL);
+    fittingBackgrHist.resize(nL);
+    // for (int i = 0; i < nL; i++){
+    //   systematicHist[i] = utils.makeHistogram(systematicErrors[i],0.2,3.0);
+    // }
+
+    // TH1F * dummy = new TH1F("dummy", "dummy", nbinsE,0.2, 3.0);
+
+
+
+    // for (int i = 0; i < nL; i++){
+    //   dummy -> GetXaxis()->SetBinLabel(i*nbinsE + 1, "0.2");
+    //   dummy -> GetXaxis()->SetBinLabel(i*nbinsE + 10, "3.0");
+    // }
+
+    // dummy->SetLabelSize(0.2);
+    // dummy->SetTitle("Fractional Errors");
+    // pad2->cd();
+    // dummy-> Draw();
+    for (int i = 0; i < nL; i++){
+      pad2 -> cd();
+      char name[100];
+      sprintf(name,"padtemp%d",i);
+      TPad * padtemp = new TPad(name,name,i*(1.0/nL)+0.01,0.05,(i+1)*(1.0/nL)-0.01,1);
+      std::cout << "1/nL is " << 1.0/nL << std::endl;
+      padtemp->Draw();
+      padtemp -> cd();
+      systematicHist[i]  = utils.makeHistogram(systematicErrors[i],0.2,3.0);
+      statisticalHist[i] = utils.makeHistogram(statisticalErrors[i],0.2,3.0);
+      systematicHist[i] -> SetTitle(Form("%s Fractional Errors",names[i].c_str()));
+      systematicHist[i] -> SetTitleSize(12);
+      // systematicHist[i] -> GetYaxis()->SetTitle("");
+      if (i == 0){
+        systematicHist[i] -> GetYaxis()->SetLabelSize(0.08);
+        systematicHist[i] -> GetYaxis()->SetTitle("Uncert. [\%]");
+      }
+      else{
+        systematicHist[i] -> GetYaxis()->SetLabelSize(0.0);
+      }
+      systematicHist[i] -> GetYaxis()->SetTitleSize(0.08);
+      systematicHist[i] -> GetXaxis()->SetTitleSize(0.08);
+      systematicHist[i] -> GetXaxis()->SetLabelSize(0.08);
+      systematicHist[i] -> GetXaxis()->SetTitleOffset(0.9);
+      systematicHist[i] -> GetXaxis()->SetTitle("Energy (GeV)");
+      systematicHist[i] -> SetMaximum(0.4);
+      systematicHist[i] -> SetMinimum(0);
+      systematicHist[i] -> SetLineColor(2);
+      statisticalHist[i]-> SetLineColor(1);
+      systematicHist[i] -> SetLineWidth(2);
+      statisticalHist[i]-> SetLineWidth(2);      
+      systematicHist[i] ->Draw("L");
+      statisticalHist[i] ->Draw("L same");
+
+    }
+
+     for (int i = 0; i < nL; i++){
+      pad3 -> cd();
+      char name[100];
+      sprintf(name,"pad3temp%d",i);
+      TPad * padtemp = new TPad(name,name,0,(i)*(1.0/nL),1,(i+1)*(1.0/nL));
+      std::cout << "1/nL is " << 1.0/nL << std::endl;
+      padtemp->Draw();
+      padtemp -> cd();
+      fittingSignalHist[i]  = utils.makeHistogram(fittingSignal[i],0.2,3.0);
+      fittingBackgrHist[i] = utils.makeHistogram(fittingBackgr[i],0.2,3.0);
+      fittingSignalHist[i] -> SetTitle(Form("%s Signal and Background",names[i].c_str()));
+      fittingSignalHist[i] -> SetTitleSize(12);
+      // fittingSignalHist[i] -> GetYaxis()->SetTitle("");
+      if (i == 0){
+        // fittingSignalHist[i] -> GetYaxis()->SetLabelSize(0.08);
+        // fittingSignalHist[i] -> GetYaxis()->SetTitle("Uncert. [\%]");
+      }
+      else{
+        // fittingSignalHist[i] -> GetYaxis()->SetLabelSize(0.0);
+      }
+      fittingSignalHist[i] -> GetYaxis()->SetTitle("Events");
+      // fittingSignalHist[i] -> GetXaxis()->SetTitleSize(0.08);
+      // fittingSignalHist[i] -> GetXaxis()->SetLabelSize(0.08);
+      // fittingSignalHist[i] -> GetXaxis()->SetTitleOffset(0.9);
+      fittingSignalHist[i] -> GetXaxis()->SetTitle("Energy (GeV)");
+      // fittingSignalHist[i] -> SetMaximum(0.4);
+      // fittingSignalHist[i] -> SetMinimum(0);
+      fittingSignalHist[i] -> SetLineColor(2);
+      fittingBackgrHist[i] -> SetLineColor(1);
+      fittingSignalHist[i] -> SetLineWidth(2);
+      fittingBackgrHist[i] -> SetLineWidth(2);
+      for (int bin = 0; bin < nbinsE; bin++)
+        fittingBackgrHist[i]->SetBinError(bin+1,fittingErrors[i][bin]); 
+      fittingSignalHist[i] -> Draw("hist");
+      fittingBackgrHist[i] -> Draw("E hist same");
+      if (i == nL-1){
+        TLegend * legSig = new TLegend(0.5,0.7,0.9,0.85);
+        legSig->SetFillColor(0);
+        legSig->SetFillStyle(0);
+        legSig->SetBorderSize(0);
+        legSig->AddEntry(fittingBackgrHist[i],"Background");
+        legSig->AddEntry(fittingSignalHist[i],"Signal");
+        dm2 = pow(10.,(TMath::Log10(dm2min)+(dm2FittingPoint*1./npoints)*
+                       TMath::Log10(dm2max/dm2min)));
+        sin22th = pow(10.,(TMath::Log10(sin22thmin)+(sin22thFittingPoint*1./npoints)*
+                           TMath::Log10(sin22thmax/sin22thmin)));        
+        plotUtils.add_plot_label(Form("(%.2geV^{2},%.1g)",dm2,sin22th),0.7,0.6);
+        legSig->Draw();
+        // fittingSignalHist[i] -> GetYaxis()->SetTitle("Uncert. [\%]");
+      }
+
+    }   
+
+    // systematicHist->Draw("same");
+    // statisticalHist->Draw("same");
+
+    pad1->cd();
 
     //======================================================
 
@@ -1005,6 +1289,12 @@ namespace lar1{
         else if (baselines[j] == 700){
             if (use700m) sprintf(name[j], "LAr1-FD (%im)", baselines[j]);
             else if (useT600) sprintf(name[j], "T600 (%im)", baselines[j]);
+        }
+        else if (baselines[j] == 600){
+            sprintf(name[j], "T600 (%im)", baselines[j]);
+        }
+        else if (baselines[j] == 800){
+            sprintf(name[j], "T600 (%im)", baselines[j]);
         }
     }
 
@@ -1285,7 +1575,12 @@ namespace lar1{
         if (use700m) sprintf(name, "LAr1-FD (%im)", baselines[j]);
         if (useT600) sprintf(name, "ICARUS (%im)", baselines[j]);
       }
-
+      else if (baselines[j] == 600){
+        sprintf(name, "ICARUS (%im)", baselines[j]);
+      }
+      else if (baselines[j] == 800){
+        sprintf(name, "ICARUS (%im)", baselines[j]);
+      }
       
       chr->GetXaxis()->CenterTitle();
       chr->GetXaxis()->SetLabelSize(0.05);

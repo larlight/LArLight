@@ -60,7 +60,10 @@ namespace lar1{
     if (iDet == 0) detect_dist = 10000.0;
     else if (iDet == 1) detect_dist = 47000.0;
     else if (iDet == 2) detect_dist = 70000.0;
-    else if (iDet == 3 || iDet == 4) detect_dist = 70000.0; // 3 is MB using FD monte carlo
+    else if (iDet == 3) detect_dist = 70000.0; // 3 is MB using FD monte carlo
+    else if (iDet == 4) detect_dist = 70000.0; // 4 is IC using FD monte carlo
+    else if (iDet == 6) detect_dist = 60000.0; // 4 is IC @ 600m using FD monte carlo
+    else if (iDet == 7) detect_dist = 80000.0; // 4 is IC @ 600m using FD monte carlo
 
     //---------------------------------------------
 
@@ -140,6 +143,8 @@ namespace lar1{
     TString outfile = InFile().Remove(InFile().Length()-5) + "_processed_";
     if (iDet == 3) outfile += "MB_";
     if (iDet == 4) outfile += "IC_";
+    if (iDet == 6) outfile += "IC_600_";
+    if (iDet == 7) outfile += "IC_800_";
     if (scale != 1.0) {
       outfile += "scale_";
       outfile += scale;

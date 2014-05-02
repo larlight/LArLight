@@ -183,8 +183,10 @@ namespace lar1{
         // POT_Sim = 1.64e21;
         POT_Sim = 2.8173e21;
       }
-      else if (iDet == kFD || iDet == kIC){ //LAr1-FD
+      else if (iDet == kFD || iDet == kIC || iDet == kIC_600 || iDet == kIC_800){ //LAr1-FD
         POT_Sim = 3.63e20;
+        if (iDet == kIC_600) POT_Sim /= (700.0/600.0)*(700.0/600.0);
+        if (iDet == kIC_800) POT_Sim /= (700.0/800.0)*(700.0/800.0);
       }
       else if (iDet == kMB){ //MiniBooNE Shape
         POT_Sim = 3.63e20; // using FD file
@@ -206,8 +208,10 @@ namespace lar1{
       else if (iDet == kUB){ //uboone
         POT_Sim = 3.70E+22;
       }
-      else if (iDet == kFD || iDet == kIC){ //LAr1-FD
+      else if (iDet == kFD || iDet == kIC || iDet == kIC_600 || iDet == kIC_800){ //LAr1-FD
         POT_Sim = 1.30e21;
+        if (iDet == kIC_600) POT_Sim /= (700.0/600.0)*(700.0/600.0);
+        if (iDet == kIC_800) POT_Sim /= (700.0/800.0)*(700.0/800.0);
       }
       else if (iDet == kMB){ //MiniBooNE Shape
         POT_Sim = 1.30e21; // using FD file
@@ -226,8 +230,10 @@ namespace lar1{
       else if (iDet == kUB){ //uboone
         POT_Sim = 5.37e21;
       }
-      else if (iDet == kFD || iDet == kIC){ //LAr1-FD
+      else if (iDet == kFD || iDet == kIC || iDet == kIC_600 || iDet == kIC_800){ //LAr1-FD
         POT_Sim = 5.32e20;
+        if (iDet == kIC_600) POT_Sim /= (700.0/600.0)*(700.0/600.0);
+        if (iDet == kIC_800) POT_Sim /= (700.0/800.0)*(700.0/800.0);
       }
       else if (iDet == kMB){ //MiniBooNE Shape
         POT_Sim = 5.32e20; // using FD file
@@ -249,8 +255,10 @@ namespace lar1{
       else if (iDet == kUB){ //uboone
         POT_Sim = 3.58e22;
       }
-      else if (iDet == kFD || iDet == kIC){ //LAr1-FD
+      else if (iDet == kFD || iDet == kIC || iDet == kIC_600 || iDet == kIC_800){ //LAr1-FD
         POT_Sim = 1.35e21;
+        if (iDet == kIC_600) POT_Sim /= (700.0/600.0)*(700.0/600.0);
+        if (iDet == kIC_800) POT_Sim /= (700.0/800.0)*(700.0/800.0);
       }
       else if (iDet == kMB){ //MiniBooNE Shape
         POT_Sim = 1.35e21; // using FD file
@@ -554,7 +562,7 @@ namespace lar1{
       zmin = 0;
       zmax = 0;
     }
-    else if (idet == kIC){
+    else if (idet == kIC || idet == kIC_600 || kIC_800){
       xmin = ic_xmin;
       xmax = ic_xmax;
       ymin = ic_ymin;

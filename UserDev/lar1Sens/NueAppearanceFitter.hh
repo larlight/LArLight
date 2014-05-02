@@ -26,6 +26,7 @@
 #include "TH2D.h"
 #include "TImage.h"
 #include "THStack.h"
+#include "TPad.h"
 
 #include <vector>
 #include <iostream>
@@ -80,12 +81,19 @@ namespace lar1{
 
       void setForceRemake(bool b){forceRemake = b;}
 
-      void setNpoints(int n){npoints = n;}
+      void setNpoints(int n)
+      {
+            npoints = n;
+            dm2FittingPoint = 0.5*npoints;
+            sin22thFittingPoint = 0.25*npoints;
+      }
       void setUseNearDetStats(bool b){useNearDetStats = b;}
       void setShapeOnlyFit(bool b){shapeOnlyFit = b;}
       void setNearDetSystematicError(double d){nearDetSystematicError = d;}
 
       void setElectContainedDist(double d){ElectContainedDist = d;}
+
+      void setUseInfiniteStatistics(bool b){useInfiniteStatistics = b;}
 
     private:
 
@@ -180,6 +188,7 @@ namespace lar1{
       std::vector <float> eventsnLnullVec;                  //has no osc in it
       std::vector <float> eventsnLcvVec;                    //has fullosc*flat0.3% osc prob in it
 
+      bool useInfiniteStatistics;
 
       //except for oscVev, its name[b_line][energy_bin]
       std::vector< std::vector <float> >    eventsnumuVec;
@@ -190,11 +199,22 @@ namespace lar1{
       std::vector< std::vector <float> >    eventsSignalBestFitNuVec;
       std::vector< std::vector <float> >    eventsSignalBestFitNubarVec;
 
+      std::vector< std::vector <float> >    shapeCorrection;
+
+      std::vector< std::vector <float> >    fittingSignal;
+      std::vector< std::vector <float> >    fittingBackgr;
+      std::vector< std::vector <float> >    fittingErrors;
+      int dm2FittingPoint;
+      int sin22thFittingPoint;
+
       //Input fractional systematics covariance matrix
       //This is going to come from a txt file, from Georgia
       std::vector<std::vector<float> > fracentries;
       std::vector<float> nearDetStats;
       std::vector<float> nullVec;
+
+      std::vector<std::vector<float> > systematicErrors;
+      std::vector<std::vector<float> > statisticalErrors;
 
       // output ntuple with chi2 values and sensitivity contour
       TNtuple * chi2;
@@ -218,6 +238,7 @@ namespace lar1{
       std::vector< std::vector<float> >  NueFromNumuCCVec;
       std::vector< std::vector<float> >  DirtVec;
       std::vector< std::vector<float> >  OtherVec;
+
 
 
       double ElectContainedDist;

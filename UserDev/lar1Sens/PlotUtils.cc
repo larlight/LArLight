@@ -7,7 +7,7 @@ namespace lar1{
 
   // PlotUtils::PlotUtils(){}
 
-  void PlotUtils::lsnd_plot(TCanvas * c){
+  void PlotUtils::lsnd_plot(TPad * c){
     c->cd();
 
     std::string path = GetEnv("MAKE_TOP_DIR");
@@ -156,7 +156,7 @@ namespace lar1{
     return hr1;
   }
 
-  int PlotUtils::plotGFData(TCanvas * c ){
+  int PlotUtils::plotGFData(TPad * c ){
     std::vector<std::vector<double> > data = readGFData();
 
     int npoints = 250;

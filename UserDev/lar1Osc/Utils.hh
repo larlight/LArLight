@@ -73,7 +73,7 @@ namespace lar1{
     double PotNormNu;
 
     const static Int_t kNu         = 0;
-    const static Int_t kNu_Fosc 	 = 1;
+    const static Int_t kNu_Fosc    = 1;
     const static Int_t kNubar 	   = 2;
     const static Int_t kNubar_Fosc = 3; 
 
@@ -83,6 +83,8 @@ namespace lar1{
     const static Int_t kMB = 3;
     const static Int_t kIC = 4;
     const static Int_t kND_long = 5;
+    const static Int_t kIC_600 = 6;
+    const static Int_t kIC_800 = 7;
 
     double fidCut_x, fidCut_y, fidCut_zUp, fidCut_zDown;
     double nd_xmin, nd_xmax, nd_ymin, nd_ymax, nd_zmin, nd_zmax;
