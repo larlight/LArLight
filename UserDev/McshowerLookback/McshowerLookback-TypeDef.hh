@@ -9,7 +9,13 @@
 #include "McshowerLookback.hh"
 
 // Class forward declaration here
-class McshowerLookback;
+namespace larlight {
+  
+  class McshowerLookback;
+
+//ADD_ANA_CLASS ... do not change this comment line
+
+}
 //ADD_EMPTY_CLASS ... do not change this comment line
 
 #endif
