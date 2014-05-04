@@ -15,6 +15,8 @@ namespace cluster {
 
     SetMinHits(40);
     SetMinLen(15);
+    SetVerbose(true);
+    SetDebug(false);
 
   }
 
@@ -30,7 +32,7 @@ namespace cluster {
 			       const ClusterParamsAlgNew &cluster2)
   {
 
-    //apply filter immediately
+    //apply filter on hit number and length immediately
     if ( (cluster1.GetParams().length < _lenMin) and (cluster2.GetParams().length < _lenMin)
 	 and (cluster1.GetParams().N_Hits < _NhitsMin) and (cluster2.GetParams().N_Hits < _NhitsMin) )
       return false;
@@ -42,15 +44,21 @@ namespace cluster {
     //by the cone of cluster B (A), and if cluster B (A) is good enough
     // (enough hits, charge, length...) then the two are merged.
 
-    double w_start1 = cluster1.GetParams().start_point.w * _wire_2_cm;
-    double t_start1 = cluster1.GetParams().start_point.t * _time_2_cm;
+    double w_start1 = cluster1.GetParams().start_point.w;// * _wire_2_cm;
+    double t_start1 = cluster1.GetParams().start_point.t;// * _time_2_cm;
 
-    double w_start2 = cluster2.GetParams().start_point.w * _wire_2_cm;
-    double t_start2 = cluster2.GetParams().start_point.t * _time_2_cm;
-
-    double direction_1 = cluster1.GetParams().angle_2d;
-    double direction_2 = cluster2.GetParams().angle_2d;
-
+    double w_start2 = cluster2.GetParams().start_point.w;// * _wire_2_cm;
+    double t_start2 = cluster2.GetParams().start_point.t;// * _time_2_cm;
+    
+    if (_debug){
+      std::cout << "Start Cluster1: ( " << w_start1 << ", " << t_start1 << " )" << std::endl;
+      std::cout << "Start Cluster2: ( " << w_start2 << ", " << t_start2 << " )" << std::endl;
+    }
+    
+    //original in degree
+    double direction_1 = cluster1.GetParams().angle_2d*(3.14/180);
+    double direction_2 = cluster2.GetParams().angle_2d*(3.14/180);
+    //original in rad
     double opening_angle_1 = cluster1.GetParams().opening_angle;
     double opening_angle_2 = cluster2.GetParams().opening_angle;
 
@@ -72,14 +80,14 @@ namespace cluster {
 	 (t_start1_rot < (w_start1_rot*sin(opening_angle_2))) and
 	 (cluster2.GetParams().length < _lenMin) and 
 	 (cluster2.GetParams().N_Hits < _NhitsMin) ){
-      std::cout << "Start point of Cluster 1 in cone of Cluster 2!" << std::endl;
+      if (_verbose) { std::cout << "Start point of Cluster 1 in cone of Cluster 2!" << std::endl; }
       return true;
     }
     if ( (w_start2_rot < cluster1.GetParams().length ) and
 	 (t_start2_rot < (w_start2_rot*sin(opening_angle_1))) and
 	 (cluster1.GetParams().length < _lenMin) and 
 	 (cluster1.GetParams().N_Hits < _NhitsMin) ){
-      std::cout << "Start point of Cluster 2 in cone of Cluster 1!" << std::endl;
+      if (_verbose) { std::cout << "Start point of Cluster 2 in cone of Cluster 1!" << std::endl; }
       return true;
     }
 

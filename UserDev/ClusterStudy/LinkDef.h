@@ -35,6 +35,7 @@
 #pragma link C++ class cluster::CMAlgoArray+;
 #pragma link C++ class cluster::CMAlgoTrackSeparate+;
 #pragma link C++ class cluster::CMAlgoMergeAll+;
+#pragma link C++ class cluster::CMAlgoStartNearEnd+;
 //ADD_CMALGO_CLASS ... do not change this line
 
 #pragma link C++ class larlight::ClusterMerger+;

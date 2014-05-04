@@ -148,7 +148,6 @@ bool Polygon2D::PolyOverlapSegments(const Polygon2D &poly2) const
 {
   //if contained in one another then they also overlap:
   if ( (this->Contained(poly2)) or (poly2.Contained(*this)) ){
-    std::cout << "\tContained!" << std::endl;
     return true;
   }
   //loop over the two polygons checking wehther
@@ -159,7 +158,6 @@ bool Polygon2D::PolyOverlapSegments(const Polygon2D &poly2) const
 			  this->Point(i+1).first, this->Point(i+1).second,
 			  poly2.Point(j).first, poly2.Point(j).second,
 			  poly2.Point(j+1).first, poly2.Point(j+1).second) ){
-	std::cout << "Overlap between segments!" << std::endl;
 	return true;
       }
     }
