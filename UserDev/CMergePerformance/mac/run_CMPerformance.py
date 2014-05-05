@@ -34,10 +34,12 @@ my_CMP.GetManager().MergeTillConverge(True)
 my_CMP.GetManager().DebugMode(cluster.CMergeManager.kNone)
 
 #Configure the merge algos you want to use here
-short_dist_algo = cluster.CMAlgoShortestDist()
-short_dist_algo.SetSquaredDistanceCut(200.)
-short_dist_algo.SetVerbose(False)
-my_CMP.GetManager().AddMergeAlgo(short_dist_algo)
+#short_dist_algo = cluster.CMAlgoShortestDist()
+#short_dist_algo.SetSquaredDistanceCut(200000.)
+#short_dist_algo.SetVerbose(False)
+#my_CMP.GetManager().AddMergeAlgo(short_dist_algo)
+merge_all_algo = cluster.CMAlgoMergeAll()
+my_CMP.GetManager().AddMergeAlgo(merge_all_algo)
 
 print
 print  "Finished configuring ana_processor. Start event loop!"
