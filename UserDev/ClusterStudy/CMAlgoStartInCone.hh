@@ -48,12 +48,20 @@ namespace cluster {
     /// Set Minimum number of hits for cone-cluster
     void SetMinLen(double l){ _lenMin = l; }
 
+    /// Set Verbosity of messages
+    void SetVerbose(bool verbosity){ _verbose = verbosity; }
+
+    /// Set Debug for messages
+    void SetDebug(bool debug){ _debug = debug; }
+
   protected:
 
     double _wire_2_cm, _time_2_cm; /// Conversion factors ogtten from GeometryUtilities
 
     int _NhitsMin;
     double _lenMin;
+    bool _verbose;
+    bool _debug;
     
   };
 
