@@ -43,7 +43,11 @@ namespace larlight {
   public:
 
     /// Default constructor
-    CMergePerformance() : ana_base() { _name="CMergePerformance"; _fout=0;}
+    CMergePerformance() : ana_base() { 
+      _name="CMergePerformance"; 
+      _fout=0;
+      _run_merging=true;
+    }
 
     /// Default destructor
     virtual ~CMergePerformance(){};
@@ -66,6 +70,12 @@ namespace larlight {
     /// Getter for the CMergeManager so user can configure merge algos etc
     ::cluster::CMergeManager& GetManager() { return _mgr; }
 
+    /// Option to not bother with cluster merging and just make FOM plots
+    /// for raw fuzzycluster data. The after-merge FOM histos
+    /// will just be left blank.
+    /// This is useful because merging can take the most time to run
+    void SetRunMerging(bool flag) { _run_merging = flag; }
+    
     protected:
 
     void PrepareHistos();
@@ -98,6 +108,7 @@ namespace larlight {
     //declare a member of CMergeManager class called _mgr
     ::cluster::CMergeManager _mgr;
     
+    bool _run_merging;
     
 
     //declare mcshowerlookback object only once, not once per event

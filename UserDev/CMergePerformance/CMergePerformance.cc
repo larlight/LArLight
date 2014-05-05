@@ -83,16 +83,19 @@ namespace larlight {
     //this overwites _clusterparams with the new (merged) clusters
     //    std::cout<<"fill FOM histos just took: "<<std::endl;
     // ts->Print("u"); ts->Start();
-    RunMerging(ev_cluster,ev_hits);
-
-    //now fill the other FOM histos
-    _after_merging = true;
-    //    std::cout<<"merging just took: "<<std::endl;
-    // ts->Print("u"); ts->Start();
-    FillFOMHistos(_after_merging,ev_mcshower,ev_cluster,ev_hits,_clusterparams);
-
+    if(_run_merging){
+      RunMerging(ev_cluster,ev_hits);
+      
+      //now fill the other FOM histos
+      _after_merging = true;
+      //    std::cout<<"merging just took: "<<std::endl;
+      // ts->Print("u"); ts->Start();
+      FillFOMHistos(_after_merging,ev_mcshower,ev_cluster,ev_hits,_clusterparams);
+    
     //    std::cout<<"fill FOM histos (2) just took: "<<std::endl;
     // ts->Print("u"); ts->Start();
+    }
+
     return true;
   }
 
@@ -152,7 +155,7 @@ namespace larlight {
       tmp.push_back(
 		    new TH1D(Form("hEff_before_merging_view%d",i_view),
 			     Form("# MCShowers / # Clusters per evt [before Merging], view %d",i_view), 
-			     100,-0.1,1.1)
+			     300,-0.1,3.1)
 		    );
     hEff.push_back(tmp);
     
@@ -161,7 +164,7 @@ namespace larlight {
       tmp.push_back(
 		    new TH1D(Form("hEff_after_merging_view%d",i_view),
 			     Form("# MCShowers / # Clusters per evt [after Merging], view %d",i_view), 
-			     100,-0.1,1.1)
+			     300,-0.1,3.1)
 		    );
     hEff.push_back(tmp);
     
@@ -487,8 +490,9 @@ namespace larlight {
     for (int iplane = 0; iplane < 3; ++iplane){
       double NMCSoverNClus = 
 	(double)MCShower_indices.size()/(double)n_clusters_in_plane[iplane];
-      //      std::cout<<Form("Merged yet? %o. In plane %d there were %d clusters, which makes the ratio %f\n",
-		      //		      after_merging,iplane,n_clusters_in_plane[iplane],NMCSoverNClus);
+      //      std::cout<<Form("Merged yet? %o. In plane %d there were %d MCShowers and %d clusters, which makes the ratio %f\n",
+      //		      after_merging,iplane,(int)MCShower_indices.size(),n_clusters_in_plane[iplane],NMCSoverNClus);
+
       hEff.at(after_merging).at(iplane)->Fill(NMCSoverNClus);
     }
     
