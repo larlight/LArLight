@@ -23,6 +23,8 @@
 #include "CMAlgoShortestDist.hh"
 
 
+#include <TStopwatch.h>
+
 namespace larlight {
   /**
      \class CMergePerformance
@@ -99,7 +101,7 @@ namespace larlight {
     
 
     //declare mcshowerlookback object only once, not once per event
-    McshowerLookback _mcslb;
+    larlight::McshowerLookback _mcslb;
 
     //some maps that mcshowerlookback fills once per event
     std::map<UInt_t,UInt_t> _shower_idmap;
@@ -113,18 +115,24 @@ namespace larlight {
     //hit type used in lots of functions, putting it here to make it more global
     larlight::DATA::DATA_TYPE hit_type;
 
-    //[0] is before merging, [1] is after merging
-    std::vector< TH1D* > hPurity;
-    std::vector< TH1D* > hNMCSoverNClus;
-    std::vector< TH1D* > hClusQoverMCQ;
+    //.at(0) is before merging, .at(1) is after merging
+    //.at(0).at(0) is before merging, plane 0
+    //.at(0).at(1) is before merging, plane 1
+    std::vector<std::vector<TH1D*> > hPurity;
+    std::vector<std::vector<TH1D*> > hEff;
+    std::vector<std::vector<TH1D*> > hClusQoverMCQ;
 
     //might as well save stuff in a TTree too
     TTree* ana_tree;
 
     //TTree variables
-    double _clus_purity;
+    //double _purity;
+    double _clusQfrac_over_totclusQ;
     double _clusQ_over_MCQ;
     double _tot_clus_charge;
+    double _frac_clusQ;
+    double _dom_MCS_Q;
+    GEO::View_t _plane;
     bool _after_merging;
 
 
