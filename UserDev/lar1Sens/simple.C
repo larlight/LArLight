@@ -1,10 +1,10 @@
 
 
 {
-  gSystem->Load("liblar1Sens.so");
+  gSystem->Load("lib/liblar1Sens.so");
   lar1::NueAppearanceFitter n;
   // n.setFileSource("/Users/cja33/Desktop/LAr1ND/lar1Repos/lar1/ntuples_2/");
-  n.setVerbose(false);
+  n.setVerbose(true);
   n.setDebug(false);
   n.setSpecialNameText("");
   n.setSpecialNameTextOsc("");
@@ -28,8 +28,8 @@
   n.setUseInfiniteStatistics(false);
   // n.setElectContainedDist(150);
 
-  n.setInflateSystematics(true);
-  n.setSystematicInflationAmount(0.04);
+  n.setInflateSystematics(false);
+  n.setSystematicInflationAmount(0.02);
 
   n.setNpoints(250);
 

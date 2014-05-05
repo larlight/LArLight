@@ -574,13 +574,6 @@ namespace lar1{
           std::cout << "\tBin " << i << ":\t" << nearDetStats[i] << "\n";
         }
     }
-  
-    if (inflateSystematics){
-      for (int i = 0; i < nbinsE*2; ++i)
-      {
-          nearDetStats[i+nbinsE] +=systematicInflationAmount;
-      }
-    }
 
 
   // }
@@ -610,44 +603,46 @@ namespace lar1{
     x3s = new double[npoints+1]; y3s = new double[npoints+1];
     x5s = new double[npoints+1]; y5s = new double[npoints+1];
 
-    systematicErrors.clear();
-    statisticalErrors.clear();
-    systematicErrors.resize(nL);
-    statisticalErrors.resize(nL);
 
-    // populate the vectors that hold the fractional errors
-    // for plotting purposes.
-    // statistical errors doesn't include any signal
-    // systematic error assumes no shape only fit
-    for (int i = 0; i < nL; i++){
-      systematicErrors[i].resize(nbinsE);
-      statisticalErrors[i].resize(nbinsE);
-      for (int bin = 0; bin < nbinsE; bin++ ){
-        if (useNearDetStats){
-          if (i == 0)
-            systematicErrors[i].at(bin) = nearDetSystematicError;
-          else{
-            systematicErrors[i].at(bin) = 1/sqrt(eventsnueVec[0].at(bin));
-            if (inflateSystematics) systematicErrors[i].at(bin) += systematicInflationAmount;
-          }
-        }
-        else{
-          systematicErrors[i].at(bin) = flatSystematicError;
-        }
-        if (!useInfiniteStatistics){
-          statisticalErrors[i].at(bin) =  1/sqrt(eventsnueVec[i].at(bin));
-          if (inflateSystematics) systematicErrors[i].at(bin) += systematicInflationAmount;
-        }
-        else
-          if (i == nL-1)
-            statisticalErrors[i].at(bin) = 0.0;
-          else {
-            statisticalErrors[i].at(bin) =  1/sqrt(eventsnueVec[i].at(bin));
-            if (inflateSystematics) systematicErrors[i].at(bin) += systematicInflationAmount;
-}
 
-      }
-    }
+    // // populate the vectors that hold the fractional errors
+    // // for plotting purposes.
+    // // statistical errors doesn't include any signal
+    // // systematic error assumes no shape only fit
+    // for (int i = 0; i < nL; i++){
+    //   systematicErrors[i].resize(nbinsE);
+    //   statisticalErrors[i].resize(nbinsE);
+    //   for (int bin = 0; bin < nbinsE; bin++ ){
+    //     if (useNearDetStats){
+    //       if (i == 0)
+    //         systematicErrors[i].at(bin) = nearDetSystematicError;
+    //       else{
+    //         systematicErrors[i].at(bin) = 1/sqrt(eventsnueVec[0].at(bin));
+    //         if (inflateSystematics) 
+    //           systematicErrors[i].at(bin) = sqrt(pow(systematicInflationAmount,2)
+    //                                             +pow(systematicErrors[i].at(bin),2));
+    //       }
+    //     }
+    //     else{
+    //       systematicErrors[i].at(bin) = flatSystematicError;
+    //     }
+    //     if (!useInfiniteStatistics){
+    //       statisticalErrors[i].at(bin) =  1/sqrt(eventsnueVec[i].at(bin));
+    //       if (inflateSystematics) 
+    //         systematicErrors[i].at(bin) = sqrt(pow(systematicInflationAmount,2)
+    //                                          + pow(systematicErrors[i].at(bin),2));
+    //     }
+    //     else
+    //       if (i == nL-1)
+    //         statisticalErrors[i].at(bin) = 0.0;
+    //       else {
+    //         statisticalErrors[i].at(bin) =  1/sqrt(eventsnueVec[i].at(bin));
+    //         if (inflateSystematics) 
+    //           systematicErrors[i].at(bin) = sqrt(pow(systematicInflationAmount,2)
+    //                                            + pow(systematicErrors[i].at(bin),2));          }
+
+    //   }
+    // }
 
     fittingSignal.resize(nL);
     fittingBackgr.resize(nL);
@@ -660,6 +655,10 @@ namespace lar1{
       std::cout << "dm^2: " << dm2point << " of " << npoints << std::endl;      
       for (int sin22thpoint = 0; sin22thpoint <= npoints; sin22thpoint++){
         chisq = 0.0; //reset the chisq!
+        systematicErrors.clear();
+        statisticalErrors.clear();
+        systematicErrors.resize(nL);
+        statisticalErrors.resize(nL);
 
         //First, figure out what dm2 and sin22th are for this iteration:
         dm2 = pow(10.,(TMath::Log10(dm2min)+(dm2point*1./npoints)*TMath::Log10(dm2max/dm2min)));
@@ -688,6 +687,7 @@ namespace lar1{
         // But in the shape only analysis, we normalize this to account
         // for high dm2 signal affecting the "null" background
         nullVec = utils.collapseVector(eventsnLnullVec, nbinsE, nL);
+        
         //before collapsing the prediction, need to scale the oscillated signal prediction:
         std::vector<float> eventsFitVecTemp = eventsnLfitVec[dm2point]; //don't want to overwrite...
         for (int i = 0; i < nL; i ++){
@@ -698,33 +698,17 @@ namespace lar1{
             //starts at eventsnLfit
         }
 
+
+
+        predictionVec = utils.collapseVector(eventsFitVecTemp, nbinsE, nL);
+        // Now predictionVec and nullVec hold the right stuff, uncorrected
+        // for high dm2
+        
         // Here's where the shape only stuff comes into play
         double intSignalND = 0.;    double intNooscND = 0.;
         std::vector<double> scalefac;
-
-        predictionVec = utils.collapseVector(eventsFitVecTemp, nbinsE, nL);
-        // Now predictionVec and nullVec hold 
         if(shapeOnlyFit){
 
-          // Do the shape correction before the rate correction
-          shapeCorrection.resize(nL);
-          std::vector<double> total;
-          total.resize(nL);
-          for (int i = 0; i < nL; i++){
-            shapeCorrection[i].resize(nbinsE);
-            for (int bin = 0; bin < nbinsE; bin++){
-              shapeCorrection[i][bin] = nullVec[bin];
-              shapeCorrection[i][bin] *= 1.0/nullVec[2*i*nbinsE + bin];
-              total[i] += shapeCorrection[i][bin];
-            }
-          }
-          // Normalize the shape correction for each bin:
-          for (int i = 0; i < nL; i++){
-            for (int bin = 0; bin < nbinsE; bin++){
-              shapeCorrection[i][bin] /= (total[i]/nbinsE);
-              // std::cout << "Shape correction ("<<i<<","<<bin<<") is "<<shapeCorrection[i][bin]<<"\n";
-            }
-          }
           // Loop over the near det and determine the ratio between 
           // background and background + signal
           for(int i = 0; i < nbinsE; i ++){
@@ -740,12 +724,13 @@ namespace lar1{
             for (int i = 0; i < nbinsE; ++ i)
             {
                 if (debug) std::cout << "\nScaled from: " << nullVec[2*n*nbinsE + i] << std::endl;
-                // nullVec[2*n*nbinsE + i] *= scalefac[i]/shapeCorrection[n][i];
                 nullVec[2*n*nbinsE + i] *= scalefac[i];
                 if (debug) std::cout << "Scaled to: " << nullVec[2*n*nbinsE + i] << std::endl;
             }
           }
         }
+
+
 
 
 
@@ -755,40 +740,77 @@ namespace lar1{
         // That means that the central values need to be read out from nullVec
         // It also means that the nearDetStats need to come from nullVec
         // Therefore, dig those out:
-        if (shapeOnlyFit)
-        {
-            for (int i = 0; i < nbinsE*2; ++i)
-            {
-                nearDetStats[i+nbinsE] = 1/sqrt( nullVec.at(i+nbinsE) );
-            }
+        // if (shapeOnlyFit)
+        // {
+        //   for (int i = 0; i < nbinsE*2; ++i)
+        //   {
+        //       nearDetStats[i+nbinsE] = 1/sqrt( nullVec.at(i+nbinsE) );
+        //   }
+        // }
+        // if (shapeOnlyFit && inflateSystematics){
+        //     for (int i = 0; i < nbinsE*2; ++i)
+        //     {
+        //         nearDetStats[i+nbinsE] = sqrt(pow(systematicInflationAmount,2)
+        //                                     + pow(nearDetStats[i+nbinsE],2));
+        //     }
+        // }        
+
+        // Now make sure the statistical and systematic errors are correct:
+        systematicErrors.clear();
+        statisticalErrors.clear();
+        systematicErrors.resize(nL);
+        statisticalErrors.resize(nL);       
+        for (int b_line = 0; b_line < nL; b_line++){
+          systematicErrors.at(b_line).clear();
+          statisticalErrors.at(b_line).clear();
+          systematicErrors.at(b_line).resize(nbinsE);
+          statisticalErrors.at(b_line).resize(nbinsE);
+          for ( int i = 0; i < nbinsE; i++){
+            if (b_line == 0){
+              statisticalErrors[b_line][i] = 1/sqrt(nullVec.at(i));
+              systematicErrors[b_line][i] = nearDetSystematicError;
+            } 
+            else{
+              if (useNearDetStats){
+                statisticalErrors[b_line][i] = 1/sqrt(nullVec.at(i+b_line*nbinsE*2));
+                systematicErrors[b_line][i] = 1/sqrt(nullVec.at(i));
+              }
+              else{ // no near det stats
+                statisticalErrors[b_line][i] = 1/sqrt(nullVec.at(i+b_line*nbinsE*2));
+                systematicErrors[b_line][i] = flatSystematicError;
+              }
+              if (inflateSystematics){
+                // std::cout << "Testing inflateSystematics, before: " << statisticalErrors[b_line][i];
+                statisticalErrors[b_line][i] = sqrt(pow(statisticalErrors[b_line][i],2)
+                                                  + pow(systematicInflationAmount,2));
+                // std::cout << "After: " << statisticalErrors[b_line][i] << std::endl;
+              }
+
+              if (useInfiniteStatistics && b_line == nL - 1){
+                // zero out the statistical error:
+                statisticalErrors[b_line][i] = 0;
+              }
+
+            } // else on if (b_line == 0)          
+          }
         }
-        if (shapeOnlyFit && inflateSystematics){
-            for (int i = 0; i < nbinsE*2; ++i)
-            {
-                nearDetStats[i+nbinsE] +=systematicInflationAmount;
-            }
-        }        
+
         if (dm2point == dm2FittingPoint && sin22thpoint == sin22thFittingPoint){
+          statisticalErrorsPlotting.resize(nL);
+          systematicErrorsPlotting.resize(nL);
           for (int i = 0; i < nL; i++){
+            statisticalErrorsPlotting.at(i).resize(nbinsE);
+            systematicErrorsPlotting.at(i).resize(nbinsE);
             for (int bin = 0; bin < nbinsE; ++ bin)
             {
               fittingSignal[i].push_back(predictionVec.at(bin + 2*i*nbinsE));
               fittingBackgr[i].push_back(nullVec.at(bin + 2*i*nbinsE));
               double error = 0;
-              if (useNearDetStats){
-                error = pow(nullVec.at(bin + 2*i*nbinsE)*nearDetStats.at(bin),2);
-                if (!useInfiniteStatistics || i != nL-1){
-                  error += sqrt(nullVec.at(bin + 2*i*nbinsE));
-                }
-                else
-                  error += 0.0;
-              }
-              else{
-                error = pow(nullVec.at(bin + 2*i*nbinsE)*flatSystematicError,2);
-                if (!useInfiniteStatistics || i != nL-1)
-                  error += sqrt(nullVec.at(bin + 2*i*nbinsE));
-              }
+              error += pow(nullVec.at(bin + 2*i*nbinsE)*statisticalErrors[i][bin],2);
+              error += pow(nullVec.at(bin + 2*i*nbinsE)*systematicErrors[i][bin],2);
               fittingErrors[i].push_back(sqrt(error));
+              statisticalErrorsPlotting[i][bin] = statisticalErrors[i][bin];
+              systematicErrorsPlotting[i][bin]  = systematicErrors[i][bin];
             }
           }
         }
@@ -799,76 +821,96 @@ namespace lar1{
         
         if (cov_max_name.size() == 0){
           //Only dealing with diagonal entries, just loop over them:
-          for (int ibin = 0; ibin < nbins; ibin++){
-            //start by getting the central value for this entry
-            // getting the central value depends on whether or not shape only
-            // if not shape only, it's easy:
-            double cvi = eventsnLVecTemp[ibin];
-            if (shapeOnlyFit)
-            {
-              if (ibin%(3*nbinsE) < nbinsE) //on a signal bin
-              {
-                int index = ibin - ((int) ibin/(3*nbinsE))*nbinsE;
-                // std::cout << "ibin is: " << ibin << " and accessing nullvec at "
-                // << index;
-                cvi = abs( predictionVec.at(index) - nullVec.at(index) );
-                // std::cout << ". cvi is prediction - nullvec: " << cvi << std::endl;
-                if (cvi > 10e10){
-                    std::cout << "\tprediction is " << predictionVec[ibin] << std::endl;
-                    std::cout << "\tnullVec is " << nullVec.at(ibin - ((int) ibin/(3*nbinsE))*nbinsE) << std::endl;                                
-                }
-                 // Make the cvi the difference between prediction and null
-              }
-              else
-              {
-                // std::cout << "ibin is: " << ibin << " and accessing nullvec at "
-                  // << ibin - nbinsE - ((int) ibin/(3*nbinsE))*nbinsE;
-                cvi = nullVec.at(ibin - nbinsE - ((int) ibin/(3*nbinsE))*nbinsE);
-                // std::cout << ". cvi is nullvec only: " << cvi << std::endl;
-                // else using the null results.
-              }
-            }
-            if (debug) std::cout << "ibin: " << ibin << ", cvi: "<< cvi << std::endl;
-            //looking at the simulated signal for this if:
-            if ( (ibin%(nbinsE*3)) < nbinsE ) cvi *= sin22th; //scale the oscillated signal
+          // for (int ibin = 0; ibin < nbins; ibin++){
+          //   //start by getting the central value for this entry
+          //   // getting the central value depends on whether or not shape only
+          //   // if not shape only, it's easy:
+          //   double cvi = eventsnLVecTemp[ibin];
+          //   if (shapeOnlyFit)
+          //   {
+          //     if (ibin%(3*nbinsE) < nbinsE) //on a signal bin
+          //     {
+          //       int index = ibin - ((int) ibin/(3*nbinsE))*nbinsE;
+          //       // std::cout << "ibin is: " << ibin << " and accessing nullvec at "
+          //       // << index;
+          //       cvi = abs( predictionVec.at(index) - nullVec.at(index) );
+          //       // std::cout << ". cvi is prediction - nullvec: " << cvi << std::endl;
+          //       if (cvi > 10e10){
+          //           std::cout << "\tprediction is " << predictionVec[ibin] << std::endl;
+          //           std::cout << "\tnullVec is " << nullVec.at(ibin - ((int) ibin/(3*nbinsE))*nbinsE) << std::endl;                                
+          //       }
+          //        // Make the cvi the difference between prediction and null
+          //     }
+          //     else
+          //     {
+          //       // std::cout << "ibin is: " << ibin << " and accessing nullvec at "
+          //         // << ibin - nbinsE - ((int) ibin/(3*nbinsE))*nbinsE;
+          //       cvi = nullVec.at(ibin - nbinsE - ((int) ibin/(3*nbinsE))*nbinsE);
+          //       // std::cout << ". cvi is nullvec only: " << cvi << std::endl;
+          //       // else using the null results.
+          //     }
+          //   }
+          //   if (debug) std::cout << "ibin: " << ibin << ", cvi: "<< cvi << std::endl;
+          //   //looking at the simulated signal for this if:
+          //   if ( (ibin%(nbinsE*3)) < nbinsE ) cvi *= sin22th; //scale the oscillated signal
             
-            if (useNearDetStats){ //using near detector stats
-              if (ibin < 3*nbinsE){ //on the near detector
-                entries[ibin][ibin] = cvi + pow(nearDetSystematicError*cvi, 2); 
-                //statistical^2 + systematic^2 errors
-              } // end if on "is near det"
+          //   if (useNearDetStats){ //using near detector stats
+          //     if (ibin < 3*nbinsE){ //on the near detector
+          //       entries[ibin][ibin] = cvi + pow(nearDetSystematicError*cvi, 2); 
+          //       //statistical^2 + systematic^2 errors
+          //     } // end if on "is near det"
               
-              else{ //on far detectors
-                if(!useInfiniteStatistics)
-                  entries[ibin][ibin] = cvi + pow(nearDetStats[ibin % (3*nbinsE)]*cvi, 2);
-                else{
-                  if (ibin > 2*nL*nbinsE)
-                    entries[ibin][ibin] = pow(nearDetStats[ibin % (3*nbinsE)]*cvi, 2);
-                  else
-                    entries[ibin][ibin] = cvi + pow(nearDetStats[ibin % (3*nbinsE)]*cvi, 2);
-                }
+          //     else{ //on far detectors
+          //       if(!useInfiniteStatistics)
+          //         entries[ibin][ibin] = cvi + pow(nearDetStats[ibin % (3*nbinsE)]*cvi, 2);
+          //       else{
+          //         if (ibin > 2*nL*nbinsE)
+          //           entries[ibin][ibin] = pow(nearDetStats[ibin % (3*nbinsE)]*cvi, 2);
+          //         else
+          //           entries[ibin][ibin] = cvi + pow(nearDetStats[ibin % (3*nbinsE)]*cvi, 2);
+          //       }
 
-              } // end else, end section on far dets
-            } //end if on useNearDetStats
+          //     } // end else, end section on far dets
+          //   } //end if on useNearDetStats
             
-            else{ //using flat systematics on everything
-              if(!useInfiniteStatistics)
-                entries[ibin][ibin] = cvi + pow(flatSystematicError*cvi, 2);
-              else{
-                if (ibin > 2*nL*nbinsE)
-                  entries[ibin][ibin] = pow(flatSystematicError*cvi, 2);
-                else
-                  entries[ibin][ibin] = cvi + pow(flatSystematicError*cvi, 2);
-              }
-            } //end else on 5% flat stats
+          //   else{ //using flat systematics on everything
+          //     if(!useInfiniteStatistics)
+          //       entries[ibin][ibin] = cvi + pow(flatSystematicError*cvi, 2);
+          //     else{
+          //       if (ibin > 2*nL*nbinsE)
+          //         entries[ibin][ibin] = pow(flatSystematicError*cvi, 2);
+          //       else
+          //         entries[ibin][ibin] = cvi + pow(flatSystematicError*cvi, 2);
+          //     }
+          //   } //end else on flat stats
           
-            if (isinf(entries[ibin][ibin])) {
-                std::cout << "ibin is " << ibin << std::endl;
-                debug = true;
-                // return -1;
-            }
+          //   if (isinf(entries[ibin][ibin])) {
+          //       std::cout << "ibin is " << ibin << std::endl;
+          //       debug = true;
+          //       // return -1;
+          //   }
 
-          } //end loop over bins, is really loop over diagonal entries
+          // } //end loop over bins, is really loop over diagonal entries
+          for (int b_line = 0; b_line < nL; b_line ++){
+            for (int ibin = 0; ibin < 2*nbinsE; ibin++){ // looping over the C.M.
+              // Really, this just goes down the diagonal since there's no covariance
+              // We don't use fractional errors here but full errors
+              // So, pick the central value (nullVec)
+              int thisBin = 3*nbinsE*b_line + ibin + nbinsE ; // + nbinsE is to skip signal sections
+              if (ibin < nbinsE)
+                entries[thisBin][thisBin] 
+                    = pow(nullVec[2*nbinsE*b_line+ibin]*statisticalErrors[b_line][ibin],2)
+                    + pow(nullVec[2*nbinsE*b_line+ibin]*systematicErrors[b_line][ibin] ,2);
+              else
+                entries[thisBin][thisBin] = nullVec[2*nbinsE*b_line+ibin];
+
+              // std::cout << "On thisBin = " << thisBin << ", added " 
+              //           << entries[thisBin][thisBin] << ", nullVec is "
+              //           << nullVec[2*nbinsE*b_line+ibin]
+              //           << std::endl;
+
+            }
+          }
         } //end if on "cov_max_name.size() == 0"      
         else{ //use the full blown covariance matrix.  Loop over every entry.
           //Can't forget to add in the statistical errors on the diagonal!
@@ -996,7 +1038,8 @@ namespace lar1{
                       if (debug){
                           if (ibin == jbin){
                               std::cout << "ibin: "<< ibin << " Prediction: " << predictioni << " cvi: " << cvi;
-                              std::cout << " M^-1: " << (*cov)(ibin-1,jbin-1) << std::endl;
+                              std::cout << " M^-1: " << (*cov)(ibin-1,jbin-1);
+                              std::cout << " chi2: " << (predictioni-cvi)*(predictionj-cvj)* (*cov)(ibin-1,jbin-1) << std::endl;
                           }
                       }
                       if (sin22thpoint == sin22thFittingPoint && dm2point == dm2FittingPoint){
@@ -1037,7 +1080,7 @@ namespace lar1{
               //     y99[dm2point] = dm2;
               // }
               
-          if (verbose) std::cout << "dm2: " << dm2 << ",\tsin22th: " << sin22th << ",\tchisq: " << chisq << std::endl;    
+          if (debug) std::cout << "dm2: " << dm2 << ",\tsin22th: " << sin22th << ",\tchisq: " << chisq << std::endl;    
           if (debug) std::cout << "\n\n";
           if (debug) std::cout << "---------------------------End dm2: " << dm2 << ",\tsin22th: " << sin22th << std::endl;
           }// end loop over sin22thpoints
@@ -1135,14 +1178,14 @@ namespace lar1{
 
     // Draw the systematic and statistical errors
  
-    std::cout << "systematicErrors  ... " << systematicErrors [nL-1].at(0)  << std::endl;
-    std::cout << "systematicErrors  ... " << systematicErrors [nL-1].at(1)  << std::endl;
-    std::cout << "systematicErrors  ... " << systematicErrors [nL-1].at(2)  << std::endl;
-    std::cout << "systematicErrors  ... " << systematicErrors [nL-1].at(3)  << std::endl;
-    std::cout << "statisticalErrors ... " << statisticalErrors[nL-1].at(0) << std::endl;
-    std::cout << "statisticalErrors ... " << statisticalErrors[nL-1].at(1) << std::endl;
-    std::cout << "statisticalErrors ... " << statisticalErrors[nL-1].at(2) << std::endl;
-    std::cout << "statisticalErrors ... " << statisticalErrors[nL-1].at(3) << std::endl;
+    std::cout << "systematicErrorsPlotting  ... " << systematicErrorsPlotting [nL-1].at(0)  << std::endl;
+    std::cout << "systematicErrorsPlotting  ... " << systematicErrorsPlotting [nL-1].at(1)  << std::endl;
+    std::cout << "systematicErrorsPlotting  ... " << systematicErrorsPlotting [nL-1].at(2)  << std::endl;
+    std::cout << "systematicErrorsPlotting  ... " << systematicErrorsPlotting [nL-1].at(3)  << std::endl;
+    std::cout << "statisticalErrorsPlotting ... " << statisticalErrorsPlotting[nL-1].at(0) << std::endl;
+    std::cout << "statisticalErrorsPlotting ... " << statisticalErrorsPlotting[nL-1].at(1) << std::endl;
+    std::cout << "statisticalErrorsPlotting ... " << statisticalErrorsPlotting[nL-1].at(2) << std::endl;
+    std::cout << "statisticalErrorsPlotting ... " << statisticalErrorsPlotting[nL-1].at(3) << std::endl;
     std::vector<TH1F *> systematicHist;
     std::vector<TH1F *> statisticalHist;
 
@@ -1158,6 +1201,10 @@ namespace lar1{
     std::cout << "fittingBackgr ... " << fittingBackgr[nL-1].at(1) << std::endl;
     std::cout << "fittingBackgr ... " << fittingBackgr[nL-1].at(2) << std::endl;
     std::cout << "fittingBackgr ... " << fittingBackgr[nL-1].at(3) << std::endl;
+    std::cout << "fittingErrors ... " << fittingErrors[nL-1].at(0) << std::endl;
+    std::cout << "fittingErrors ... " << fittingErrors[nL-1].at(1) << std::endl;
+    std::cout << "fittingErrors ... " << fittingErrors[nL-1].at(2) << std::endl;
+    std::cout << "fittingErrors ... " << fittingErrors[nL-1].at(3) << std::endl;
 
     std::vector<TH1F *> fittingSignalHist;
     std::vector<TH1F *> fittingBackgrHist;
@@ -1189,8 +1236,8 @@ namespace lar1{
       std::cout << "1/nL is " << 1.0/nL << std::endl;
       padtemp->Draw();
       padtemp -> cd();
-      systematicHist[i]  = utils.makeHistogram(systematicErrors[i],0.2,3.0);
-      statisticalHist[i] = utils.makeHistogram(statisticalErrors[i],0.2,3.0);
+      systematicHist[i]  = utils.makeHistogram(systematicErrorsPlotting[i],0.2,3.0);
+      statisticalHist[i] = utils.makeHistogram(statisticalErrorsPlotting[i],0.2,3.0);
       systematicHist[i] -> SetTitle(Form("%s Fractional Errors",names[i].c_str()));
       systematicHist[i] -> SetTitleSize(12);
       // systematicHist[i] -> GetYaxis()->SetTitle("");

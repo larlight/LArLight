@@ -84,8 +84,13 @@ namespace lar1{
       void setNpoints(int n)
       {
             npoints = n;
-            dm2FittingPoint = 0.5*npoints;
-            sin22thFittingPoint = 0.25*npoints;
+            // // for LSND BF:
+            // dm2FittingPoint = 0.52*npoints;
+            // sin22thFittingPoint = 0.375*npoints;
+            // for Kopp BF:
+            dm2FittingPoint = 0.41*npoints;
+            sin22thFittingPoint = 0.53*npoints;
+
       }
       void setUseNearDetStats(bool b){useNearDetStats = b;}
       void setShapeOnlyFit(bool b){shapeOnlyFit = b;}
@@ -220,6 +225,8 @@ namespace lar1{
 
       std::vector<std::vector<float> > systematicErrors;
       std::vector<std::vector<float> > statisticalErrors;
+      std::vector<std::vector<float> > systematicErrorsPlotting;
+      std::vector<std::vector<float> > statisticalErrorsPlotting;
 
       // output ntuple with chi2 values and sensitivity contour
       TNtuple * chi2;
