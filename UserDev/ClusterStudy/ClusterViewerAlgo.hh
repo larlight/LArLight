@@ -17,6 +17,7 @@
 
 #include "ViewerException.hh"
 #include "Geometry.hh"
+#include "GeometryUtilities.hh"
 #include <TH2D.h>
 #include <TGraph.h>
 #include <TCanvas.h>
@@ -131,6 +132,10 @@ namespace cluster {
     std::vector<std::vector<TGraph*> > _gClusterEnd;
     /// Cluster polygon points in (wire [cm], time [cm]) ... 1st index = plane, 2nd index = cluster
     std::vector<std::vector<TGraph*> > _gClusterPolygon;
+
+
+    //---- Utility variables for unit conversion ----//
+    double _wire2cm, _time2cm;
   };
   
 }
