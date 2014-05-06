@@ -16,12 +16,10 @@ namespace cluster {
 
     SetUseOpeningAngle(false);
 
-    if(_fout) {
+    angle_dist_histo = 0;
 
-      _fout->cd();
-      angle_dist_histo = new TH1F("angle_dist_histo","Cluster Angle Differences",100,-360,360);
+    angle_dist_histo = new TH1F("angle_dist_histo","Cluster Angle Differences",100,-360,360);
 
-    }
   } //end constructor
 
   bool CMAlgoAngleCompat::Bool(const ClusterParamsAlgNew &cluster1,
