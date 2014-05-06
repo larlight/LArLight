@@ -28,6 +28,7 @@
 #include "CMAlgoTrackSeparate.hh"
 #include "CMAlgoMergeAll.hh"
 #include "CMAlgoStartNearEnd.hh"
+#include "CMAlgoStartTrack.hh"
 //ADD_NEW_HEADER ... do not change this comment line
 
 // Class forward declaration here
@@ -49,6 +50,7 @@ namespace cluster {
   class CMAlgoPolyHitOverlap;
   class CMAlgoStartInCone;
   class CMAlgoStartNearEnd;
+  class CMAlgoStartTrack;
 //ADD_CMALGO_CLASS ... do not change this comment line
 
   class ViewerException;
@@ -69,6 +71,7 @@ namespace larlight {
 
 //ADD_EMPTY_CLASS ... do not change this comment line
 #endif
+
 
 
 
