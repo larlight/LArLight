@@ -143,6 +143,7 @@ namespace larlight {
     double _tot_clus_charge;
     double _frac_clusQ;
     double _dom_MCS_Q;
+    double _mother_energy;
     GEO::View_t _plane;
     bool _after_merging;
 

@@ -201,6 +201,7 @@ namespace larlight {
       ana_tree->Branch("frac_clusQ",&_frac_clusQ,"frac_clusQ/D");
       ana_tree->Branch("dom_MCS_Q",&_dom_MCS_Q,"dom_MCS_Q/D");
       ana_tree->Branch("plane",&_plane,"plane/I");
+      ana_tree->Branch("mother_energy",&_mother_energy,"mother_energy/D");
       ana_tree->Branch("after_merging",&_after_merging,"after_merging/O");
     }
 
@@ -274,7 +275,6 @@ namespace larlight {
       std::cout<<MCShower_indices.at(a)<<", ";
     std::cout<<"}"<<std::endl;
     */
-    
 
     //Here we try to loop over clusters based on the _clusterparams vector, *not* ev_cluster vector,
     //because the merging algorithm returns an altered _clusterparams vector but it does *not*
@@ -465,6 +465,11 @@ namespace larlight {
       }
       hClusQoverMCQ.at(after_merging).at(_plane)->Fill(_clusQ_over_MCQ);
 
+      //take mother energy (ttree var) to be max of MCShower mother energies
+      _mother_energy = 0;
+      for(auto this_mcshow : *ev_mcshower)
+	if(this_mcshow.MotherMomentum().at(3) > _mother_energy)
+	  _mother_energy = this_mcshow.MotherMomentum().at(3);
 
       //Fill ana TTree once per cluster
       if(ana_tree)
@@ -486,17 +491,20 @@ namespace larlight {
       int this_view = ev_cluster->at(clus_idx_vec.at(d).at(0)).View();
       n_clusters_in_plane[this_view]++;
     }
+    //count how many MCShowers are above ~20 MeV.
+    double n_viable_MCShowers = 0;
+    for(auto this_mcshow : *ev_mcshower)
+      if(this_mcshow.MotherMomentum().at(3) > 0.02)
+	n_viable_MCShowers++; 
     //then loop over 3 planes and fill hEff with the right fraction
     for (int iplane = 0; iplane < 3; ++iplane){
       double NMCSoverNClus = 
-	(double)MCShower_indices.size()/(double)n_clusters_in_plane[iplane];
+	n_viable_MCShowers/(double)n_clusters_in_plane[iplane];
       //      std::cout<<Form("Merged yet? %o. In plane %d there were %d MCShowers and %d clusters, which makes the ratio %f\n",
       //		      after_merging,iplane,(int)MCShower_indices.size(),n_clusters_in_plane[iplane],NMCSoverNClus);
-
       hEff.at(after_merging).at(iplane)->Fill(NMCSoverNClus);
     }
     
-
   }//end fillFOMhistos
     
 
