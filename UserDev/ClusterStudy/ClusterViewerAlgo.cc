@@ -13,8 +13,6 @@ namespace cluster {
     _cOneCluster = nullptr;
     _cTwoClusters= nullptr;
 
-    _wire2cm = larutil::GeometryUtilities::GetME()->WireToCm();
-    _time2cm = larutil::GeometryUtilities::GetME()->TimeToCm();
   }
 
   //#############################
@@ -201,8 +199,8 @@ namespace cluster {
       
       _hClusterHits.at(plane).at(index)->Fill(h.first,h.second);
     
-    _gClusterStart.at(plane).at(index)->SetPoint(0,cluster_start.first*_wire2cm,cluster_start.second*_time2cm);
-    _gClusterEnd.at(plane).at(index)->SetPoint(0,cluster_end.first*_wire2cm,cluster_end.second*_time2cm);
+    _gClusterStart.at(plane).at(index)->SetPoint(0,cluster_start.first,cluster_start.second);
+    _gClusterEnd.at(plane).at(index)->SetPoint(0,cluster_end.first,cluster_end.second);
     
     // Set Color
     _hClusterHits.at(plane).at(index)->SetMarkerColor(index+1);
@@ -262,8 +260,8 @@ namespace cluster {
       
       _hClusterHits.at(plane).at(index)->Fill(h.first,h.second);
     
-    _gClusterStart.at(plane).at(index)->SetPoint(0,cluster_start.first*_wire2cm,cluster_start.second*_time2cm);
-    _gClusterEnd.at(plane).at(index)->SetPoint(0,cluster_end.first*_wire2cm,cluster_end.second*_time2cm);
+    _gClusterStart.at(plane).at(index)->SetPoint(0,cluster_start.first,cluster_start.second);
+    _gClusterEnd.at(plane).at(index)->SetPoint(0,cluster_end.first,cluster_end.second);
     
     for(size_t i=0; i<cluster_polygon.size(); ++i)
       
@@ -423,8 +421,6 @@ namespace cluster {
     _cOneCluster->cd();
     
     _hClusterHits.at(plane).at(index)->Draw();
-
-    _gClusterStart.at(plane).at(index)->Print();
 
     if( _gClusterStart.at(plane).at(index)   ) _gClusterStart.at(plane).at(index)->Draw("P");
     if( _gClusterEnd.at(plane).at(index)     ) _gClusterEnd.at(plane).at(index)->Draw("P");
