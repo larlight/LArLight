@@ -1,5 +1,5 @@
-#ifndef PED_ESTIMATOR_CC
-#define PED_ESTIMATOR_CC
+#ifndef PED_ESTIMATOR_CXX
+#define PED_ESTIMATOR_CXX
 
 #include "ped_estimator.hh"
 

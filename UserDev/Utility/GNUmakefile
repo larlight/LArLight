@@ -3,11 +3,11 @@
 #
 
 # specific names for this package
-DICT  = TimeServiceCint
-SHLIB = libTimeService.so
-SOURCES = $(wildcard *.cc)
+DICT  = UtilityCint
+SHLIB = libUtility.so
+SOURCES = $(wildcard *.cxx)
 HEADERS = $(wildcard *.hh)
-OBJECTS = $(SOURCES:.cc=.o)
+OBJECTS = $(SOURCES:.cxx=.o)
 
 # include options for this package
 INCFLAGS = -I.                       #Include itself

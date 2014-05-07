@@ -1,5 +1,5 @@
-#ifndef DBCONN_CC
-#define DBCONN_CC
+#ifndef DBCONN_CXX
+#define DBCONN_CXX
 
 #include "DBConn.hh"
 

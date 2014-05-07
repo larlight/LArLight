@@ -3,17 +3,14 @@
 #
 
 # specific names for this package
-DICT  = FEMPulseRecoCint
-SHLIB = libFEMPulseReco.so
+DICT  = OpticalDetectorDataCint
+SHLIB = libOpticalDetectorData.so
 SOURCES = $(wildcard *.cxx)
 HEADERS = $(wildcard *.hh)
 OBJECTS = $(SOURCES:.cxx=.o)
 
 # include options for this package
-INCFLAGS  = -I.                       #Include itself
-INCFLAGS += -I$(LARLIGHT_CORE_DIR)/Base
-INCFLAGS += -I$(LARLIGHT_CORE_DIR)/DataFormat
-INCFLAGS += -I$(LARLIGHT_CORE_DIR)/Analysis
+INCFLAGS = -I.                       #Include itself
 
 # platform-specific options
 OSNAME          = $(shell uname -s)

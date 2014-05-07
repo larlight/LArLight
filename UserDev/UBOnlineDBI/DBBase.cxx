@@ -1,5 +1,5 @@
-#ifndef DBBASE_CC
-#define DBBASE_CC
+#ifndef DBBASE_CXX
+#define DBBASE_CXX
 
 #include "DBBase.hh"
 

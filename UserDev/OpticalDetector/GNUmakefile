@@ -5,13 +5,12 @@
 # specific names for this package
 DICT  = OpticalDetectorCint
 SHLIB = libOpticalDetector.so
-SOURCES = $(wildcard *.cc)
+SOURCES = $(wildcard *.cxx)
 HEADERS = $(wildcard *.hh)
-OBJECTS = $(SOURCES:.cc=.o)
+OBJECTS = $(SOURCES:.cxx=.o)
 
 # include options for this package
 INCFLAGS  = -I.                       #Include itself
-INCFLAGS += -I$(USER_DEV_DIR)/TimeService
 
 # platform-specific options
 OSNAME          = $(shell uname -s)

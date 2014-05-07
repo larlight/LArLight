@@ -1,5 +1,5 @@
-#ifndef RCWRITER_CC
-#define RCWRITER_CC
+#ifndef RCWRITER_CXX
+#define RCWRITER_CXX
 
 #include "RCWriter.hh"
 

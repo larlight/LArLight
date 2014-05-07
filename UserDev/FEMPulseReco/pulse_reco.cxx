@@ -1,5 +1,5 @@
-#ifndef PULSE_RECO_CC
-#define PULSE_RECO_CC
+#ifndef PULSE_RECO_CXX
+#define PULSE_RECO_CXX
 
 #include "pulse_reco.hh"
 

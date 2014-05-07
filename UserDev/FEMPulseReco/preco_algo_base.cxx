@@ -1,5 +1,5 @@
-#ifndef PRECO_ALGO_BASE_CC
-#define PRECO_ALGO_BASE_CC
+#ifndef PRECO_ALGO_BASE_CXX
+#define PRECO_ALGO_BASE_CXX
 
 #include "preco_algo_base.hh"
 

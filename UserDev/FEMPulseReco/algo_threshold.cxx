@@ -1,5 +1,5 @@
-#ifndef ALGO_THRESHOLD_CC
-#define ALGO_THRESHOLD_CC
+#ifndef ALGO_THRESHOLD_CXX
+#define ALGO_THRESHOLD_CXX
 
 #include "algo_threshold.hh"
 

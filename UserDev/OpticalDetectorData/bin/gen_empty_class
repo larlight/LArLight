@@ -4,19 +4,19 @@ import sys, os
 if len(sys.argv)<2:
    sys.stderr.write('Usage: %s CLASS_NAME\n\n' % sys.argv[0])
    sys.exit(1)
-if not 'ANA_PROC_DIR' in os.environ.keys():
-   sys.stderr.write('$ANA_PROC_DIR not defined!\n\n')
+if not 'USER_DEV_DIR' in os.environ.keys():
+   sys.stderr.write('$USER_DEV_DIR not defined!\n\n')
    sys.exit(1)
 
 name=sys.argv[1]
-working_package='TriggerSim'
-target_dir='%s/TriggerSim' % os.environ['ANA_PROC_DIR']
-source_dir='%s/TriggerSim/bin/tmp' % os.environ['ANA_PROC_DIR']
+working_package='OpticalDetectorData'
+target_dir='%s/OpticalDetectorData' % os.environ['USER_DEV_DIR']
+source_dir='%s/OpticalDetectorData/bin/tmp' % os.environ['USER_DEV_DIR']
 
-in_source='%s/empty.cxx' % source_dir
+in_source='%s/empty.cc' % source_dir
 in_header='%s/empty.hh' % source_dir
 
-src_list = { in_source   : '%s/%s.cxx'         % (target_dir,name),
+src_list = { in_source   : '%s/%s.cc'         % (target_dir,name),
              in_header   : '%s/%s.hh'         % (target_dir,name) }
 
 for src in src_list.keys():
@@ -45,8 +45,8 @@ for line in contents:
    fout.write(line)
 
 # modify TypeDef
-contents=open('%s/TriggerSim-TypeDef.hh' % target_dir, 'r').read().split('\n')
-fout=open('%s/TriggerSim-TypeDef.hh' % target_dir,'w')
+contents=open('%s/OpticalDetectorData-TypeDef.hh' % target_dir, 'r').read().split('\n')
+fout=open('%s/OpticalDetectorData-TypeDef.hh' % target_dir,'w')
 for line in contents:
    line=line + '\n'
    if line.find('ADD_EMPTY_CLASS')>=0:
@@ -66,15 +66,15 @@ print ' OR'
 print '    > cd %s; make;' % target_dir
 print
 print 'If needed, make sure you define linked libraries in rootmap generation script.'
-print 'The script is: %s/lib/make_rootmap.sh' % os.environ['ANA_PROC_DIR']
+print 'The script is: %s/gen_rootmap.sh' % os.environ['LARLIGHT_LIBDIR']
 print 'If you have no idea what this means, just ignore it!'
 print
 print 'To remove your analysis code, you should remove:'
 print '%s/%s.hh' % (target_dir,name)
-print '%s/%s.cxx' % (target_dir,name)
+print '%s/%s.cc' % (target_dir,name)
 print
 print 'Then also remove relevant #include, class definition lines from'
-print '%s/TriggerSim-TypeDef.hh' % target_dir
+print '%s/OpticalDetectorData-TypeDef.hh' % target_dir
 print
 print 'Finally remove #pragma statement for your class from'
 print '%s/LinkDef.h' % target_dir

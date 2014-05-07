@@ -21,8 +21,8 @@
 
 //LArLight
 #include "UBTrigException.h"
-#include "TriggerData.h"
-#include "ElecClock.h"
+#include "RawData/TriggerData.h"
+#include "Utility/ElecClock.h"
 
 namespace trigger
 {

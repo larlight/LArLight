@@ -1,5 +1,5 @@
-#ifndef ALGO_FIXED_WINDOW_CC
-#define ALGO_FIXED_WINDOW_CC
+#ifndef ALGO_FIXED_WINDOW_CXX
+#define ALGO_FIXED_WINDOW_CXX
 
 #include "algo_fixed_window.hh"
 

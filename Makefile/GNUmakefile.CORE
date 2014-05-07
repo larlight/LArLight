@@ -1,7 +1,7 @@
 ###################################################
 
 # default target list
-all: .depend $(DICT).cc lib/$(SHLIB)  $(LARLIGHT_LIBDIR)/$(SHLIB) 
+all: .depend $(DICT).cxx lib/$(SHLIB)  $(LARLIGHT_LIBDIR)/$(SHLIB) 
 
 # define ROOTMAP and add it to the default target list, unless NO_ROOTMAP set
 ifndef NO_ROOTMAP
@@ -17,12 +17,12 @@ endif
 
 
 # root class dictionary
-$(DICT).cc: $(HEADERS) LinkDef.h
+$(DICT).cxx: $(HEADERS) LinkDef.h
 	@echo '<< generating CINT >>'
-	rootcint -f $(DICT).cc -c $(CINTFLAGS) $(INCFLAGS) $(HEADERS) LinkDef.h
+	rootcint -f $(DICT).cxx -c $(CINTFLAGS) $(INCFLAGS) $(HEADERS) LinkDef.h
 
-# default rule for making .o files from .cc files
-%.o: %.cc
+# default rule for making .o files from .cxx files
+%.o: %.cxx
 	@echo '<< compiling' $< '>>'
 	@$(CXX) $(CXXFLAGS) $(INCFLAGS) -c $<
 

@@ -7,27 +7,16 @@
 
 // Header files included here
 
-#include "ChannelData.h"
-#include "ChannelDataGroup.h"
-#include "PMTTrigger.h"
-#include "FIFOChannel.h"
+#include "OpticalWFGenerator.h"
 // Class forward declaration here
-namespace optdata {
-
-  class ChannelData;
-  class ChannelDataGroup;
-  class PMTTrigger;
-  class FIFOChannel;
-}
-
-#include "OpticalWFGen.hh"
 namespace opdet{
 
-  class OpticalWFGen;
+  class OpticalWFGenerator;
 
 }
 
 //ADD_EMPTY_CLASS ... do not change this comment line
 
 #endif
+
 

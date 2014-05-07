@@ -1,5 +1,5 @@
-#ifndef DBAPPBASE_CC
-#define DBAPPBASE_CC
+#ifndef DBAPPBASE_CXX
+#define DBAPPBASE_CXX
 
 #include "DBAppBase.hh"
 

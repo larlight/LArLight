@@ -1,5 +1,5 @@
-#ifndef RCREADER_CC
-#define RCREADER_CC
+#ifndef RCREADER_CXX
+#define RCREADER_CXX
 
 #include "RCReader.hh"
 

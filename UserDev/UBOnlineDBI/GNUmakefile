@@ -5,9 +5,9 @@
 # specific names for this package
 DICT  = UBOnlineDBICint
 SHLIB = libUBOnlineDBI.so
-SOURCES = $(wildcard *.cc)
+SOURCES = $(wildcard *.cxx)
 HEADERS = $(wildcard *.hh)
-OBJECTS = $(SOURCES:.cc=.o)
+OBJECTS = $(SOURCES:.cxx=.o)
 
 # include options for this package
 INCFLAGS = -I.                       #Include itself
