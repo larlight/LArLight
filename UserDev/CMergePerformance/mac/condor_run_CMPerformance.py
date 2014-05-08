@@ -28,7 +28,8 @@ my_proc.set_io_mode(larlight.storage_manager.READ)
 my_proc.set_input_rootdir("scanner")
 
 # Specify output root file name
-my_proc.set_ana_output_file("CMP_ana_out_%s_cut%s.root"%(filename[:-5],cutval))
+#this split bs is to just isolate the filename (cut out path, cut out .root)
+my_proc.set_ana_output_file("CMP_ana_out_%s_cut%s.root"%(filename.split('/')[-1][:-5],cutval))
 
 #attach the CMergePerformance process
 my_CMP = larlight.CMergePerformance()
