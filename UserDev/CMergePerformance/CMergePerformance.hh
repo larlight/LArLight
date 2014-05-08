@@ -138,7 +138,7 @@ namespace larlight {
     std::vector<std::vector<TH1D*> > hPurity;
     std::vector<std::vector<TH1D*> > hEff;
     std::vector<std::vector<TH1D*> > hClusQoverMCQ;
-
+    std::vector<std::vector<TH2D*> > hPi0_photonanglediff_vs_Eff;
     //might as well save stuff in a TTree too
     TTree* ana_tree;
 

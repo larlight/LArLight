@@ -159,7 +159,7 @@ namespace larlight {
 			     100,-0.1,10)
 		    );
     hClusQoverMCQ.push_back(tmp);
-    
+   
     tmp.clear();
     for(int i_view = 0; i_view < 3; i_view++)
       tmp.push_back(
@@ -169,7 +169,27 @@ namespace larlight {
 		    );
     hClusQoverMCQ.push_back(tmp);
     
-    
+    std::vector<TH2D*> tmp2D;
+    tmp2D.clear();
+    for(int i_view = 0; i_view < 3; i_view++)
+      tmp2D.push_back(
+		    new TH2D(Form("hPi0_photonanglediff_vs_Eff_view%d",i_view),
+			     Form("Pi0 Photon 2D Angle Difference vs. Efficiency [before merging], view %d",i_view),
+			     300,-0.1,3.1,
+			     100,0,180)
+		    );
+    hPi0_photonanglediff_vs_Eff.push_back(tmp2D);
+
+    tmp2D.clear();
+    for(int i_view = 0; i_view < 3; i_view++)
+      tmp2D.push_back(
+		    new TH2D(Form("hPi0_photonanglediff_vs_Eff_view%d",i_view),
+			     Form("Pi0 Photon 2D Angle Difference vs. Efficiency [after merging], view %d",i_view),
+			     300,-0.1,3.1,
+			     100,0,180)
+		    );
+    hPi0_photonanglediff_vs_Eff.push_back(tmp2D);
+
   }
   
   void CMergePerformance::PrepareTTree(){
@@ -498,14 +518,32 @@ namespace larlight {
     for(auto this_mcshow : *ev_mcshower)
       if(this_mcshow.MotherMomentum().at(3) > 0.02)
 	n_viable_MCShowers++; 
+
     //then loop over 3 planes and fill hEff with the right fraction
     for (int iplane = 0; iplane < 3; ++iplane){
+
       double NMCSoverNClus = 
 	n_viable_MCShowers/(double)n_clusters_in_plane[iplane];
       //      std::cout<<Form("Merged yet? %o. In plane %d there were %d MCShowers and %d clusters, which makes the ratio %f\n",
       //		      after_merging,iplane,(int)MCShower_indices.size(),n_clusters_in_plane[iplane],NMCSoverNClus);
       hEff.at(after_merging).at(iplane)->Fill(NMCSoverNClus);
-    }
+      
+      //if there are exactly 2 MCShowers in the event, fill some pi0 relevant stuff per plane
+      //this needs debugging
+      double angle2D[2] = {999.,999.};
+      if(n_viable_MCShowers == 2){
+	int blah = 0;
+	for(auto this_mcshow : *ev_mcshower)
+	  if(this_mcshow.MotherMomentum().at(3) > 0.02){
+	    angle2D[blah]=this_mcshow.MotherAngle2D((larlight::GEO::View_t)iplane);
+	    //	    std::cout<<"blah "<<this_mcshow.MotherAngle2D((larlight::GEO::View_t)iplane)<<std::endl;
+	    blah++;
+	  }
+	double angle2Ddiff = std::abs(angle2D[0]-angle2D[1]);
+	hPi0_photonanglediff_vs_Eff.at(after_merging).at(iplane)->Fill(NMCSoverNClus,angle2Ddiff);
+	//	std::cout<<"filling 2d shit with "<<NMCSoverNClus<<", "<<angle2Ddiff<<std::endl;
+      }
+    }//end loop over planes
     
   }//end fillFOMhistos
     
