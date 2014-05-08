@@ -177,7 +177,7 @@ namespace larlight {
     if(!ana_tree) {
       
       ana_tree = new TTree("ana_tree","");
-
+ 
       ana_tree->Branch("clusQfrac_over_totclusQ",&_clusQfrac_over_totclusQ,"clusQfrac_over_totclusQ/D");
       ana_tree->Branch("clusQ_over_MCQ",&_clusQ_over_MCQ,"clusQ_over_MCQ/D");
       ana_tree->Branch("tot_clusQ",&_tot_clus_charge,"tot_clus_charge/D");
@@ -186,6 +186,7 @@ namespace larlight {
       ana_tree->Branch("plane",&_plane,"plane/I");
       ana_tree->Branch("mother_energy",&_mother_energy,"mother_energy/D");
       ana_tree->Branch("nhits",&_nhits,"nhits/I");
+      ana_tree->Branch("opening_angle",&_opening_angle,"opening_angle/D");
       ana_tree->Branch("after_merging",&_after_merging,"after_merging/O");
     }
 
@@ -287,6 +288,7 @@ namespace larlight {
       clus_idx_vec = _mgr.GetBookKeeper().GetResult();
     }
 
+    int cluster_params_idx = 0;
     //debug, viewing idx vec
     /*
     std::cout<<"after_merging is equal to "<<after_merging<<std::endl;
@@ -313,7 +315,7 @@ namespace larlight {
     for(int outer_clus_idx=0; outer_clus_idx<clus_idx_vec.size(); ++outer_clus_idx){
       //total cluster charge
       _tot_clus_charge = 0;
-      _plane = ev_cluster->at(clus_idx_vec. at(outer_clus_idx).at(0)).View();
+      _plane = ev_cluster->at(clus_idx_vec.at(outer_clus_idx).at(0)).View();
 
       //charge from each MCShower object... last element is from unknown MCShower
       //or from MCShowers that were too low energy to pass to McshowerLookback
@@ -413,6 +415,12 @@ namespace larlight {
       // Fill histograms/tree that need once-per-cluster filling
       ///////////////////////////////////////////////
 
+      //calculate _nhits for ttree
+      _nhits = (int)ass_index.size();
+
+      //if _nhits is less than 15, don't fill this clusters' info into histos and ttree
+      if(_nhits<15) continue;
+
       //purity of a cluster: highest charge fraction belonging to an MCShower
       //find the MCShower that most of this cluster belongs to & fill some TTree vars
       //don't count "unknown" showers. looks like lots of clusters are 100% pure from
@@ -429,8 +437,6 @@ namespace larlight {
       }
       hPurity.at(after_merging).at(_plane)->Fill(_clusQfrac_over_totclusQ);
       
-
-
 
       //cluster charge divided by charge of dominant MC shower
       //if dominant_index points to the "unknown" element, set ratio to -1
@@ -457,11 +463,19 @@ namespace larlight {
 	if(this_mcshow.MotherMomentum().at(3) > _mother_energy)
 	  _mother_energy = this_mcshow.MotherMomentum().at(3);
 
-      _nhits = (int)ass_index.size();
-
+      //std::cout<<"after_merging is "<<after_merging<<", outer_clus_idx is "<<outer_clus_idx<<", size of _clusterparms is "<<_clusterparams.size()<<", size of clud_idx_vec is "<<clus_idx_vec.size()<<std::endl;
+      //calculate opening_angle for ttree
+      //get this from the clusterparams
+      _opening_angle = _clusterparams.at(cluster_params_idx).GetParams().opening_angle;
+    
       //Fill ana TTree once per cluster
       if(ana_tree)
 	ana_tree->Fill();
+
+      //make sure to only increment cluster_params_idx (where in the _clusterparams vector this cluster is)
+      //after ditching clusters with <15 hits
+      cluster_params_idx++;
+
     
     }//end loop over clusters
 

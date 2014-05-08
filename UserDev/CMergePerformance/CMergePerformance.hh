@@ -151,6 +151,7 @@ namespace larlight {
     double _dom_MCS_Q;
     double _mother_energy;
     int _nhits;
+    double _opening_angle;
     GEO::View_t _plane;
     bool _after_merging;
 
