@@ -2,7 +2,7 @@ import sys
 
 if len(sys.argv) < 2:
     msg  = '\n'
-    msg += "Usage 1: %s $INPUT_ROOT_FILE\n" % sys.argv[0]
+    msg += "Usage 1: %s $INPUT_ROOT_FILE merge_algo_cut_value\n" % sys.argv[0]
     msg += '\n'
     sys.stderr.write(msg)
     sys.exit(1)
@@ -11,11 +11,15 @@ from ROOT import gSystem
 gSystem.Load("libCMergePerformance")
 from ROOT import larlight, cluster
 
+filename = sys.argv[1]
+cutval = float(sys.argv[2])
+
+
 # Create ana_processor instance
 my_proc = larlight.ana_processor()
 
 # Set input root file
-my_proc.add_input_file(sys.argv[1])
+my_proc.add_input_file(filename)
 
 # Specify IO mode
 my_proc.set_io_mode(larlight.storage_manager.READ)
@@ -24,7 +28,7 @@ my_proc.set_io_mode(larlight.storage_manager.READ)
 my_proc.set_input_rootdir("scanner")
 
 # Specify output root file name
-my_proc.set_ana_output_file("CMP_ana_out.root");
+my_proc.set_ana_output_file("CMP_ana_out_%s_cut%s.root"%(filename[:-5],cutval))
 
 #attach the CMergePerformance process
 my_CMP = larlight.CMergePerformance()
@@ -39,7 +43,7 @@ my_CMP.GetManager().DebugMode(cluster.CMergeManager.kNone)
 
 #Configure the merge algos you want to use here
 short_dist_algo = cluster.CMAlgoShortestDist()
-short_dist_algo.SetSquaredDistanceCut(20000.)
+short_dist_algo.SetSquaredDistanceCut(cutval)
 short_dist_algo.SetVerbose(False)
 my_CMP.GetManager().AddMergeAlgo(short_dist_algo)
 #merge_all_algo = cluster.CMAlgoMergeAll()

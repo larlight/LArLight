@@ -19,14 +19,9 @@ namespace larlight {
   }
   
   bool CMergePerformance::analyze(storage_manager* storage) {
-    //this function is called once per event
-    //    TStopwatch *ts = new TStopwatch();
-    //    std::cout<<"Starting stopwatch at begin of analyze section."<<std::endl;
-    //    ts->Start();
           
     //grab the reconstructed clusters
     larlight::event_cluster* ev_cluster = (larlight::event_cluster*)storage->get_data(larlight::DATA::FuzzyCluster);
-    //larlight::event_cluster* ev_cluster = (larlight::event_cluster*)storage->get_data(larlight::DATA::ShowerAngleCluster);
     if(!ev_cluster) {
       print(larlight::MSG::ERROR,__FUNCTION__,Form("Did not find specified data product, FuzzyCluster!"));
       return false;
@@ -56,44 +51,32 @@ namespace larlight {
 
     //fill some std::maps that are constant through the whole event
     //_shower_idmap is (G4trackid => MCShower index in ev_mcshower)
-    //    std::cout<<"grabbing ev_ stuff just took: "<<std::endl;
-    // ts->Print("u"); ts->Start();
     _shower_idmap.clear();
     _mcslb.FillShowerMap(ev_mcshower,_shower_idmap);
 
-    //    std::cout<<"fillShowerMap just took: "<<std::endl;
-    // ts->Print("u"); ts->Start();
     //_simch_map is (channel => larlight::simch)
     _simch_map.clear();
     _mcslb.FillSimchMap(ev_simch,_simch_map);
 
-    //    std::cout<<"filSimchMap just took: "<<std::endl;
-    // ts->Print("u"); ts->Start();
-    //first start with the raw fuzzyclusters and find their CPAN params
-    FillClusterParamsVector(ev_cluster,ev_hits);
-    
-    //once that is done, _clusterparams is filled, calculate figure
-    //of merit and fill histos with it
-    //    std::cout<<"fill CPAN vector just took: "<<std::endl;
-    // ts->Print("u"); ts->Start();
-    _after_merging = false;
-    FillFOMHistos(_after_merging,ev_mcshower,ev_cluster,ev_hits,_clusterparams);
 
-    //now run merging with whatever algos you want
-    //this overwites _clusterparams with the new (merged) clusters
-    //    std::cout<<"fill FOM histos just took: "<<std::endl;
-    // ts->Print("u"); ts->Start();
+    if(_run_before_merging){
+      //first start with the raw fuzzyclusters and find their CPAN params
+      FillClusterParamsVector(ev_cluster,ev_hits);
+      
+      //once that is done, _clusterparams is filled, calculate figure
+      //of merit and fill histos with it
+      _after_merging = false;
+      FillFOMHistos(_after_merging,ev_mcshower,ev_cluster,ev_hits,_clusterparams);
+    }
+
     if(_run_merging){
+      //now run merging with whatever algos you want
+      //this overwites _clusterparams with the new (merged) clusters
       RunMerging(ev_cluster,ev_hits);
       
       //now fill the other FOM histos
       _after_merging = true;
-      //    std::cout<<"merging just took: "<<std::endl;
-      // ts->Print("u"); ts->Start();
-      FillFOMHistos(_after_merging,ev_mcshower,ev_cluster,ev_hits,_clusterparams);
-    
-    //    std::cout<<"fill FOM histos (2) just took: "<<std::endl;
-    // ts->Print("u"); ts->Start();
+      FillFOMHistos(_after_merging,ev_mcshower,ev_cluster,ev_hits,_clusterparams);    
     }
 
     return true;
@@ -202,6 +185,7 @@ namespace larlight {
       ana_tree->Branch("dom_MCS_Q",&_dom_MCS_Q,"dom_MCS_Q/D");
       ana_tree->Branch("plane",&_plane,"plane/I");
       ana_tree->Branch("mother_energy",&_mother_energy,"mother_energy/D");
+      ana_tree->Branch("nhits",&_nhits,"nhits/I");
       ana_tree->Branch("after_merging",&_after_merging,"after_merging/O");
     }
 
@@ -352,6 +336,7 @@ namespace larlight {
 	ass_index.insert( ass_index.end(), tmp_ass_index.begin(), tmp_ass_index.end() );
       }
 
+
       //debug: view ass_index
       /*
       std::cout<<"for this cluster, ass_index is {";
@@ -367,6 +352,7 @@ namespace larlight {
       for(auto const hit_index: ass_index){
 	//	std::cout<<"hit_index is "<<hit_index<<std::endl;
 	_tot_clus_charge += ev_hits->at(hit_index).Charge();
+
 	//	std::cout<<"adding "<<ev_hits->at(hit_index).Charge()<<" to tot_clus_charge"<<std::endl;
 
 	hit_charge_frac.clear();
@@ -470,6 +456,8 @@ namespace larlight {
       for(auto this_mcshow : *ev_mcshower)
 	if(this_mcshow.MotherMomentum().at(3) > _mother_energy)
 	  _mother_energy = this_mcshow.MotherMomentum().at(3);
+
+      _nhits = (int)ass_index.size();
 
       //Fill ana TTree once per cluster
       if(ana_tree)
