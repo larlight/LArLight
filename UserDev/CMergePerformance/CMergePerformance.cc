@@ -479,9 +479,15 @@ namespace larlight {
 
       //take mother energy (ttree var) to be max of MCShower mother energies
       _mother_energy = 0;
-      for(auto this_mcshow : *ev_mcshower)
-	if(this_mcshow.MotherMomentum().at(3) > _mother_energy)
-	  _mother_energy = this_mcshow.MotherMomentum().at(3);
+      for(auto this_mcshow : *ev_mcshower){
+	double this_mother_energy = 0;
+	for(int i = 0; i < 3; ++i)
+	  this_mother_energy += pow(this_mcshow.MotherMomentum().at(i),2);
+	this_mother_energy = pow(this_mother_energy, 0.5);
+
+	if(this_mother_energy > _mother_energy)
+	  _mother_energy = this_mother_energy;
+      }
 
       //std::cout<<"after_merging is "<<after_merging<<", outer_clus_idx is "<<outer_clus_idx<<", size of _clusterparms is "<<_clusterparams.size()<<", size of clud_idx_vec is "<<clus_idx_vec.size()<<std::endl;
       //calculate opening_angle for ttree
@@ -515,9 +521,14 @@ namespace larlight {
     }
     //count how many MCShowers are above ~20 MeV.
     double n_viable_MCShowers = 0;
-    for(auto this_mcshow : *ev_mcshower)
-      if(this_mcshow.MotherMomentum().at(3) > 0.02)
+    for(auto this_mcshow : *ev_mcshower){
+      double this_mother_energy = 0;
+      for(int i = 0; i < 3; ++i)
+	this_mother_energy += pow(this_mcshow.MotherMomentum().at(i),2);
+      this_mother_energy = pow(this_mother_energy, 0.5);
+      if(this_mother_energy > 0.02)
 	n_viable_MCShowers++; 
+    }
 
     //then loop over 3 planes and fill hEff with the right fraction
     for (int iplane = 0; iplane < 3; ++iplane){
@@ -533,12 +544,18 @@ namespace larlight {
       double angle2D[2] = {999.,999.};
       if(n_viable_MCShowers == 2){
 	int blah = 0;
-	for(auto this_mcshow : *ev_mcshower)
-	  if(this_mcshow.MotherMomentum().at(3) > 0.02){
+	for(auto this_mcshow : *ev_mcshower){
+	  double this_mother_energy = 0;
+	  for(int i = 0; i < 3; ++i)
+	    this_mother_energy += pow(this_mcshow.MotherMomentum().at(i),2);
+	  this_mother_energy = pow(this_mother_energy, 0.5);
+	  
+	  if(this_mother_energy > 0.02){
 	    angle2D[blah]=this_mcshow.MotherAngle2D((larlight::GEO::View_t)iplane);
-	    //	    std::cout<<"blah "<<this_mcshow.MotherAngle2D((larlight::GEO::View_t)iplane)<<std::endl;
-	    blah++;
 	  }
+	  //	    std::cout<<"blah "<<this_mcshow.MotherAngle2D((larlight::GEO::View_t)iplane)<<std::endl;
+	  blah++;
+	}
 	double angle2Ddiff = std::abs(angle2D[0]-angle2D[1]);
 	hPi0_photonanglediff_vs_Eff.at(after_merging).at(iplane)->Fill(NMCSoverNClus,angle2Ddiff);
 	//	std::cout<<"filling 2d shit with "<<NMCSoverNClus<<", "<<angle2Ddiff<<std::endl;
