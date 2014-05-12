@@ -33,6 +33,8 @@ my_ana = larlight.ClusterViewer()
 
 my_proc.add_process(my_ana)
 
+my_ana.SetClusterType(larlight.DATA.FuzzyCluster)
+
 gStyle.SetOptStat(0)
 
 #start on first event always
@@ -57,7 +59,6 @@ while true:
 
             print "        Cluster:",cindex
             my_ana.DrawOneCluster(plane,cindex)
-
             sys.stdin.readline()
     
     print "    Hit enter to go next event..."

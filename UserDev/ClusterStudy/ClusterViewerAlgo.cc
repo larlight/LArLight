@@ -12,6 +12,7 @@ namespace cluster {
     _cAllCluster = nullptr;
     _cOneCluster = nullptr;
     _cTwoClusters= nullptr;
+
   }
 
   //#############################

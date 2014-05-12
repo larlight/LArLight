@@ -15,7 +15,13 @@ namespace larlight {
     for(auto this_mcshow : *my_mcshow){
 
       //if mcshower mother is too low energy, don't put this shower index into the mapping
-      if(this_mcshow.MotherMomentum().at(3) < _cutoff_energy) continue;
+      //MotherMomentum().at(3) looks like it's just nonsense .... sum the components squared
+      double this_mother_energy = 0;
+      for(int i = 0; i < 3; ++i)
+	this_mother_energy += pow(this_mcshow.MotherMomentum().at(i),2);
+      this_mother_energy = pow(this_mother_energy, 0.5);
+
+      if(this_mother_energy < _cutoff_energy) continue;
       
       for(auto this_trackid : (std::vector<UInt_t>)this_mcshow.DaughterTrackID())
 	shower_idmap.insert(std::pair<UInt_t,UInt_t>(this_trackid,mcshower_index));
@@ -72,12 +78,12 @@ namespace larlight {
       
       //(*simch_iter).second is the larlight::simch object
       //maybe i can speed up code here by not making this big vector<ide> object... how?
-      //std::vector<larlight::ide> matchedides = (*simch_iter).second.TrackIDsAndEnergies(this_hit.StartTime(),this_hit.EndTime());
       std::vector<larlight::ide> matchedides((*simch_iter).second.TrackIDsAndEnergies(this_hit.StartTime(),this_hit.EndTime()));
       
       //sometimes you find a reco hit that doesn't correspond to an IDE
       //probably the IDE does not fall within the reco-d hit range (start->end time)
       if(matchedides.size()==0){
+	std::cerr<<"Warning. This reco hit didn't correspond to any IDE object. Returning a null vector."<<std::endl;
 	std::vector<float> bad(0,-1);
 	return bad;
       }
@@ -94,14 +100,15 @@ namespace larlight {
 	auto show_iter=shower_idmap.find(this_trackID);
 	
 	//if you can't find the IDE's trackID in the MCShower mapping
-	//(it was a particle not belonging to a shower, IE excited argon decay photon)
+	//(it was a particle not belonging to a shower, IE excited argon decay photon
+	//or a particle in an MCShower with energy below the cutoff energy)
 	if(show_iter==shower_idmap.end()){
 	  part_ides_charge_unknown_MCShower+=this_ide.numElectrons;
 	}
 	else{
 	  //let's say MCShower_indices is (0,    1,   3) [shower 2 had too little energy to count]
 	  //part_ides should be like      (0.2, 0.6, 0.1, 0.1)
-	  //if it is 20% from shower0, 60% shower1, 10% shower3, and 10% from 2 OR unknown showers
+	  //if it is 20% from shower0, 60% shower1, 10% shower3, and 10% from shower2 OR unknown showers
 	  auto it = std::find(MCShower_indices.begin(),
 			      MCShower_indices.end(),
 			      (*show_iter).second);
@@ -121,13 +128,11 @@ namespace larlight {
       return bad;
     }
     
-    
     //debug
     //  std::cout<<"debug: finished and filled part_ides_charge is (";
     //  for(int j = 0; j < part_ides_charge.size(); ++j)
     //    std::cout<<part_ides_charge.at(j)<<", ";
     //  std::cout<<"), with size "<<part_ides_charge.size()<<std::endl;
-    
     
     //compute the actual fractions function returns
     std::vector<float> fractions;  
