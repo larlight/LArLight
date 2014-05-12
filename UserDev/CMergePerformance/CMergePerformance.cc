@@ -49,8 +49,12 @@ namespace larlight {
       return false;
     }
 
+    _mcslb.SetCutoffEnergy(.02);
+
     //fill some std::maps that are constant through the whole event
     //_shower_idmap is (G4trackid => MCShower index in ev_mcshower)
+    //map does NOT include trackIDs from particles belonging to 
+    //MCShowers with less than cutoff energy
     _shower_idmap.clear();
     _mcslb.FillShowerMap(ev_mcshower,_shower_idmap);
 
@@ -397,8 +401,10 @@ namespace larlight {
 	
 	//sometimes mcslb returns a null vector if the reco hit couldn't be matched with an IDE
 	//in this case, add 100% of this hit's charge to the "unknown" index
-	if(hit_charge_frac.size() == 0)
+	if(hit_charge_frac.size() == 0){
 	  part_clus_charge.back() += (1.)*ev_hits->at(hit_index).Charge();
+	  //	  std::cout<<"warning, mcslb returned a null vector"<<std::endl;
+	}
 	else
 	  for(int i = 0; i < hit_charge_frac.size(); ++i)
 	    part_clus_charge.at(i) += hit_charge_frac.at(i)*ev_hits->at(hit_index).Charge();
@@ -456,8 +462,20 @@ namespace larlight {
 	}
       }
       hPurity.at(after_merging).at(_plane)->Fill(_clusQfrac_over_totclusQ);
-      
+      //      if(_clusQfrac_over_totclusQ == 0){
+	// std::cout<<"uh oh, _clusQfraC_over_totclusQ is ==0"<<std::endl;
+	//	std::cout<<"part_clus_charge vector = { ";
+	//	for(int a = 0; a < part_clus_charge.size(); ++a)
+	//	  std::cout<<part_clus_charge.at(a)<<", ";
+	//	std::cout<< "}"<<std::endl;
+	//	std::cout<<"MCShower_indices = { ";
+	//	for(int a = 0; a < MCShower_indices.size(); ++a)
+	//	  std::cout<<MCShower_indices.at(a)<<", ";
+	//	std::cout<<"}"<<std::endl;
+       
+      //      }
 
+      //"other purity" :
       //cluster charge divided by charge of dominant MC shower
       //if dominant_index points to the "unknown" element, set ratio to -1
 
