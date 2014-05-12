@@ -15,7 +15,13 @@ namespace larlight {
     for(auto this_mcshow : *my_mcshow){
 
       //if mcshower mother is too low energy, don't put this shower index into the mapping
-      if(this_mcshow.MotherMomentum().at(3) < _cutoff_energy) continue;
+      //MotherMomentum().at(3) looks like it's just nonsense .... sum the components squared
+      double this_mother_energy = 0;
+      for(int i = 0; i < 3; ++i)
+	this_mother_energy += pow(this_mcshow.MotherMomentum().at(i),2);
+      this_mother_energy = pow(this_mother_energy, 0.5);
+
+      if(this_mother_energy < _cutoff_energy) continue;
       
       for(auto this_trackid : (std::vector<UInt_t>)this_mcshow.DaughterTrackID())
 	shower_idmap.insert(std::pair<UInt_t,UInt_t>(this_trackid,mcshower_index));
