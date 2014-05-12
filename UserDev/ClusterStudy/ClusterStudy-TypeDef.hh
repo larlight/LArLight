@@ -13,7 +13,7 @@
 #include "CMAlgoShortestDist.hh"
 #include "CMAlgoPolyContain.hh"
 #include "CMAlgoPolyOverlap.hh"
-#include "CMAlgoAngleCompat.hh"
+#include "CMAlgoAngleAlign.hh"
 #include "CMAlgoFake.hh"
 #include "CMAlgoStartInPoly.hh"
 #include "CMAlgoPolyHitOverlap.hh"
@@ -44,7 +44,7 @@ namespace cluster {
   class CMAlgoShortestDist;
   class CMAlgoPolyContain;
   class CMAlgoPolyOverlap;
-  class CMAlgoAngleCompat;
+  class CMAlgoAngleAlign;
   class CMAlgoFake;
   class CMAlgoStartInPoly;
   class CMAlgoPolyHitOverlap;

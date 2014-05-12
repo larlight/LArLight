@@ -27,7 +27,7 @@
 #pragma link C++ class cluster::CMAlgoShortestDist+;
 #pragma link C++ class cluster::CMAlgoPolyContain+;
 #pragma link C++ class cluster::CMAlgoPolyOverlap+;
-#pragma link C++ class cluster::CMAlgoAngleCompat+;
+#pragma link C++ class cluster::CMAlgoAngleAlign+;
 #pragma link C++ class cluster::CMAlgoFake+;
 #pragma link C++ class cluster::CMAlgoStartInPoly+;
 #pragma link C++ class cluster::CMAlgoPolyHitOverlap+;
