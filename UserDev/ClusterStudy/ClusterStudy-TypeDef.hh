@@ -22,6 +22,8 @@
 #include "ViewerException.hh"
 #include "ClusterViewerAlgo.hh"
 #include "ClusterViewer.hh"
+#include "ClusterMerger.hh"
+#include "MCShowerQuality.hh"
 #include "MergeViewer.hh"
 #include "MCShowerClusterViewer.hh"
 #include "CMAlgoArray.hh"
@@ -60,6 +62,7 @@ namespace cluster {
 namespace larlight {
 
   class ClusterMerger;
+  class MCShowerQuality;
 
   class ClusterViewer;
   class MergeViewer;

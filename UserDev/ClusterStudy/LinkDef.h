@@ -39,7 +39,7 @@
 //ADD_CMALGO_CLASS ... do not change this line
 
 #pragma link C++ class larlight::ClusterMerger+;
-
+#pragma link C++ class larlight::MCShowerQuality+;
 
 //ADD_NEW_CLASS ... do not change this line
 #endif
