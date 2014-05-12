@@ -13,7 +13,7 @@
 #include "CMAlgoShortestDist.hh"
 #include "CMAlgoPolyContain.hh"
 #include "CMAlgoPolyOverlap.hh"
-#include "CMAlgoAngleCompat.hh"
+#include "CMAlgoAngleAlign.hh"
 #include "CMAlgoFake.hh"
 #include "CMAlgoStartInPoly.hh"
 #include "CMAlgoPolyHitOverlap.hh"
@@ -30,6 +30,7 @@
 #include "CMAlgoTrackSeparate.hh"
 #include "CMAlgoMergeAll.hh"
 #include "CMAlgoStartNearEnd.hh"
+#include "CMAlgoStartTrack.hh"
 //ADD_NEW_HEADER ... do not change this comment line
 
 // Class forward declaration here
@@ -45,12 +46,13 @@ namespace cluster {
   class CMAlgoShortestDist;
   class CMAlgoPolyContain;
   class CMAlgoPolyOverlap;
-  class CMAlgoAngleCompat;
+  class CMAlgoAngleAlign;
   class CMAlgoFake;
   class CMAlgoStartInPoly;
   class CMAlgoPolyHitOverlap;
   class CMAlgoStartInCone;
   class CMAlgoStartNearEnd;
+  class CMAlgoStartTrack;
 //ADD_CMALGO_CLASS ... do not change this comment line
 
   class ViewerException;
@@ -72,6 +74,7 @@ namespace larlight {
 
 //ADD_EMPTY_CLASS ... do not change this comment line
 #endif
+
 
 
 

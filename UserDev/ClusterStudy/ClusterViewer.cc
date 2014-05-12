@@ -106,8 +106,8 @@ namespace larlight {
       UChar_t plane = nplanes;
 
       std::vector<std::pair<double,double> > cluster_hits;
-      std::pair<double,double> cluster_start  ( cl.StartPos().at(0), cl.StartPos().at(1) );
-      std::pair<double,double> cluster_end    ( cl.EndPos().at(0),   cl.EndPos().at(1)     );
+      std::pair<double,double> cluster_start  ( cl.StartPos().at(0)*wire2cm, cl.StartPos().at(1)*time2cm );
+      std::pair<double,double> cluster_end    ( cl.EndPos().at(0)*wire2cm,   cl.EndPos().at(1)*time2cm     );
       
       for(auto const& index : cl.association(hit_type)) {
 

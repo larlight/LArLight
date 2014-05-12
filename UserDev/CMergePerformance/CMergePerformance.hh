@@ -46,6 +46,7 @@ namespace larlight {
     CMergePerformance() : ana_base() { 
       _name="CMergePerformance"; 
       _fout=0;
+      _run_before_merging=true;
       _run_merging=true;
     }
 
@@ -70,12 +71,17 @@ namespace larlight {
     /// Getter for the CMergeManager so user can configure merge algos etc
     ::cluster::CMergeManager& GetManager() { return _mgr; }
 
+    /// Option to not bother with fillin FOM histos with raw fuzzyclus data
+    /// This is useful if you are repeatedly running over the same file w/
+    /// different merge algos and remaking the same raw plots is redundant
+    void SetRunBeforeMerging(bool flag) { _run_before_merging = flag; }
+    
     /// Option to not bother with cluster merging and just make FOM plots
     /// for raw fuzzycluster data. The after-merge FOM histos
     /// will just be left blank.
     /// This is useful because merging can take the most time to run
     void SetRunMerging(bool flag) { _run_merging = flag; }
-    
+
     protected:
 
     void PrepareHistos();
@@ -108,7 +114,7 @@ namespace larlight {
     //declare a member of CMergeManager class called _mgr
     ::cluster::CMergeManager _mgr;
     
-    bool _run_merging;
+    bool _run_before_merging, _run_merging;
     
 
     //declare mcshowerlookback object only once, not once per event
@@ -132,7 +138,7 @@ namespace larlight {
     std::vector<std::vector<TH1D*> > hPurity;
     std::vector<std::vector<TH1D*> > hEff;
     std::vector<std::vector<TH1D*> > hClusQoverMCQ;
-
+    std::vector<std::vector<TH2D*> > hPi0_photonanglediff_vs_Eff;
     //might as well save stuff in a TTree too
     TTree* ana_tree;
 
@@ -143,6 +149,9 @@ namespace larlight {
     double _tot_clus_charge;
     double _frac_clusQ;
     double _dom_MCS_Q;
+    double _mother_energy;
+    int _nhits;
+    double _opening_angle;
     GEO::View_t _plane;
     bool _after_merging;
 
