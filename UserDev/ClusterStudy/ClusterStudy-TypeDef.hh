@@ -42,6 +42,7 @@ namespace cluster {
   class CMAlgoArray;
 
   class CMergeManager;
+  class CMAlgoAngleCompat;
 
   class CMAlgoShortestDist;
   class CMAlgoPolyContain;
