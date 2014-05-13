@@ -149,6 +149,7 @@ namespace larlight {
     double _clusQfrac_over_totclusQ;
     double _clusQ_over_MCQ;
     double _tot_clus_charge;
+    double _tot_clus_charge_fromKnownMCS;
     double _frac_clusQ;
     double _dom_MCS_Q;
     double _mother_energy;
