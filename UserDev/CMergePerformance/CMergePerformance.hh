@@ -48,6 +48,7 @@ namespace larlight {
       _fout=0;
       _run_before_merging=true;
       _run_merging=true;
+      _MCShower_mother_energy_cutoff = 0.02;
     }
 
     /// Default destructor
@@ -115,6 +116,7 @@ namespace larlight {
     ::cluster::CMergeManager _mgr;
     
     bool _run_before_merging, _run_merging;
+    double _MCShower_mother_energy_cutoff;
     
 
     //declare mcshowerlookback object only once, not once per event
@@ -152,6 +154,7 @@ namespace larlight {
     double _mother_energy;
     int _nhits;
     double _opening_angle;
+    double _clusQfrac_from_unknown;
     GEO::View_t _plane;
     bool _after_merging;
 

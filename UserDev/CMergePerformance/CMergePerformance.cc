@@ -3,6 +3,7 @@
 
 #include "CMergePerformance.hh"
 
+
 namespace larlight {
   
   bool CMergePerformance::initialize() {
@@ -49,7 +50,7 @@ namespace larlight {
       return false;
     }
 
-    _mcslb.SetCutoffEnergy(.02);
+    _mcslb.SetCutoffEnergy(_MCShower_mother_energy_cutoff);
 
     //fill some std::maps that are constant through the whole event
     //_shower_idmap is (G4trackid => MCShower index in ev_mcshower)
@@ -123,7 +124,7 @@ namespace larlight {
     for(int i_view = 0; i_view < 3; i_view++)
       tmp.push_back(
 		    new TH1D(Form("hPurity_before_merging_view%d",i_view),
-			     Form("Clus Purity (Clus Charge Fraction from Dominant MCShower) [before Merge], view %d",i_view),
+			     Form("Clus Purity (ClusQ from Dom. MCShower / ClusQ from all MCShower [incl. unknown]) [before Merge], view %d",i_view),
 			     100,-0.1,1.1)
 		    );
     hPurity.push_back(tmp);
@@ -132,7 +133,7 @@ namespace larlight {
     for(int i_view = 0; i_view < 3; i_view++)
       tmp.push_back(
 		    new TH1D(Form("hPurity_after_merging_view%d",i_view),
-			     Form("Clus Purity (Clus Charge Fraction from Dominant MCShower) [after Merge], view %d",i_view),
+			     Form("Clus Purity (ClusQ from Dom. MCShower / ClusQ from all MCShower [incl. unknown]) [after Merge], view %d",i_view),
 			     100,-0.1,1.1)
 		    );
     hPurity.push_back(tmp);
@@ -173,6 +174,7 @@ namespace larlight {
 		    );
     hClusQoverMCQ.push_back(tmp);
     
+    /*
     std::vector<TH2D*> tmp2D;
     tmp2D.clear();
     for(int i_view = 0; i_view < 3; i_view++)
@@ -193,7 +195,7 @@ namespace larlight {
 			     100,0,180)
 		    );
     hPi0_photonanglediff_vs_Eff.push_back(tmp2D);
-
+    */
   }
   
   void CMergePerformance::PrepareTTree(){
@@ -211,6 +213,7 @@ namespace larlight {
       ana_tree->Branch("mother_energy",&_mother_energy,"mother_energy/D");
       ana_tree->Branch("nhits",&_nhits,"nhits/I");
       ana_tree->Branch("opening_angle",&_opening_angle,"opening_angle/D");
+      ana_tree->Branch("clusQfrac_from_unknown",&_clusQfrac_from_unknown,"clusQfrac_from_unknown/D");
       ana_tree->Branch("after_merging",&_after_merging,"after_merging/O");
     }
 
@@ -403,7 +406,14 @@ namespace larlight {
 	//in this case, add 100% of this hit's charge to the "unknown" index
 	if(hit_charge_frac.size() == 0){
 	  part_clus_charge.back() += (1.)*ev_hits->at(hit_index).Charge();
-	  //	  std::cout<<"warning, mcslb returned a null vector"<<std::endl;
+	  /*
+	  std::cout<<"warning, mcslb returned a null vector"<<std::endl;
+	  std::cout<<"event number is "<<ev_hits->event_id()<<std::endl;
+	  std::cout<<"this hit's startTime, endTime is "<<ev_hits->at(hit_index).StartTime()
+		   <<", "<<ev_hits->at(hit_index).EndTime()<<std::endl;
+	  std::cout<<"this hit's channel is "<<ev_hits->at(hit_index).Channel()<<std::endl;
+	  std::cout<<"this hits' charge is "<<ev_hits->at(hit_index).Charge()<<std::endl;
+	  */
 	}
 	else
 	  for(int i = 0; i < hit_charge_frac.size(); ++i)
@@ -411,16 +421,16 @@ namespace larlight {
 
 
 	//debug
-	/*
-	  std::cout<<"This hit is made up of (";
-	  for(int i=0; i<hit_charge_frac.size()-1; ++i)
-	  std::cout<<hit_charge_frac.at(i)<<", ";
-	  std::cout<<") fractional charge from "<<
-	  hit_charge_frac.size()-1<<" known MCShowers and "<<
-	  (float)hit_charge_frac.back()<<" from unknown ones."<<std::endl;
-	*/
-	  //end debug
 	
+	//  std::cout<<"This hit is made up of (";
+	//	  for(int i=0; i<hit_charge_frac.size()-1; ++i)
+	//	  std::cout<<hit_charge_frac.at(i)<<", ";
+	//	  std::cout<<") fractional charge from "<<
+	//	  hit_charge_frac.size()-1<<" known MCShowers and "<<
+	//	  (float)hit_charge_frac.back()<<" from unknown ones."<<std::endl;
+	
+	  //end debug
+      
       } //end looping over hits in this cluster
       
 
@@ -454,7 +464,11 @@ namespace larlight {
       int dominant_MCshower_index = 0;
       _clusQfrac_over_totclusQ = 0;
       _frac_clusQ = 0;
-      for(int i = 0; i < part_clus_charge.size() - 1; ++i){	
+      //uncomment this if you want the zeros in the purity plot to go away
+      //IE if you want to include clusters totally belonging to "unknown" MCShowers
+      //to be considered 100% pure, not 0% pure
+      //for(int i = 0; i < part_clus_charge.size() - 1; ++i){	
+      for(int i = 0; i < part_clus_charge.size(); ++i){	
 	if( (double)(part_clus_charge.at(i)/_tot_clus_charge) > _clusQfrac_over_totclusQ){
 	  _clusQfrac_over_totclusQ = (double)(part_clus_charge.at(i)/_tot_clus_charge);
 	  _frac_clusQ = part_clus_charge.at(i);
@@ -462,18 +476,22 @@ namespace larlight {
 	}
       }
       hPurity.at(after_merging).at(_plane)->Fill(_clusQfrac_over_totclusQ);
+      
+      _clusQfrac_from_unknown = part_clus_charge.back()/_tot_clus_charge;
+
+
       //      if(_clusQfrac_over_totclusQ == 0){
-	// std::cout<<"uh oh, _clusQfraC_over_totclusQ is ==0"<<std::endl;
+	//	std::cout<<"uh oh, _clusQfraC_over_totclusQ is ==0"<<std::endl;
 	//	std::cout<<"part_clus_charge vector = { ";
 	//	for(int a = 0; a < part_clus_charge.size(); ++a)
 	//	  std::cout<<part_clus_charge.at(a)<<", ";
 	//	std::cout<< "}"<<std::endl;
+	//	std::cout<<"_nhits is "<<_nhits<<std::endl;
 	//	std::cout<<"MCShower_indices = { ";
 	//	for(int a = 0; a < MCShower_indices.size(); ++a)
 	//	  std::cout<<MCShower_indices.at(a)<<", ";
 	//	std::cout<<"}"<<std::endl;
-       
-      //      }
+	//      }
 
       //"other purity" :
       //cluster charge divided by charge of dominant MC shower
@@ -544,7 +562,7 @@ namespace larlight {
       for(int i = 0; i < 3; ++i)
 	this_mother_energy += pow(this_mcshow.MotherMomentum().at(i),2);
       this_mother_energy = pow(this_mother_energy, 0.5);
-      if(this_mother_energy > 0.02)
+      if(this_mother_energy > _MCShower_mother_energy_cutoff)
 	n_viable_MCShowers++; 
     }
 
@@ -553,12 +571,11 @@ namespace larlight {
 
       double NMCSoverNClus = 
 	n_viable_MCShowers/(double)n_clusters_in_plane[iplane];
-      //      std::cout<<Form("Merged yet? %o. In plane %d there were %d MCShowers and %d clusters, which makes the ratio %f\n",
-      //		      after_merging,iplane,(int)MCShower_indices.size(),n_clusters_in_plane[iplane],NMCSoverNClus);
       hEff.at(after_merging).at(iplane)->Fill(NMCSoverNClus);
       
       //if there are exactly 2 MCShowers in the event, fill some pi0 relevant stuff per plane
       //this needs debugging
+      /*
       double angle2D[2] = {999.,999.};
       if(n_viable_MCShowers == 2){
 	int blah = 0;
@@ -568,7 +585,7 @@ namespace larlight {
 	    this_mother_energy += pow(this_mcshow.MotherMomentum().at(i),2);
 	  this_mother_energy = pow(this_mother_energy, 0.5);
 	  
-	  if(this_mother_energy > 0.02){
+	  if(this_mother_energy > _MCShower_mother_energy_cutoff){
 	    angle2D[blah]=this_mcshow.MotherAngle2D((larlight::GEO::View_t)iplane);
 	  }
 	  //	    std::cout<<"blah "<<this_mcshow.MotherAngle2D((larlight::GEO::View_t)iplane)<<std::endl;
@@ -578,6 +595,7 @@ namespace larlight {
 	hPi0_photonanglediff_vs_Eff.at(after_merging).at(iplane)->Fill(NMCSoverNClus,angle2Ddiff);
 	//	std::cout<<"filling 2d shit with "<<NMCSoverNClus<<", "<<angle2Ddiff<<std::endl;
       }
+      */
     }//end loop over planes
     
   }//end fillFOMhistos
