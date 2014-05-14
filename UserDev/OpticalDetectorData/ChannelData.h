@@ -61,7 +61,7 @@ namespace optdata {
     return false;
   }
 #endif
-
+  
 } // namespace optdata
 
 #ifndef __GCCXML__

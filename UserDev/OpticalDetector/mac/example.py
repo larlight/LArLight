@@ -1,13 +1,23 @@
 import sys
 from ROOT import *
+gSystem.Load("libCore")
+gSystem.Load("libOpticalDetector")
 
-try:
+proc=opdet.Tester()
 
-    print "PyROOT recognized your class %s" % str(OpticalDetector)
+mgr = larlight.storage_manager()
+mgr.set_io_mode(larlight.storage_manager.WRITE)
+mgr.set_out_filename("out.root")
+mgr.open()
 
-except NameError:
+proc.initialize()
 
-    print "Failed importing OpticalDetector..."
+for x in xrange(10):
+    print "Event",x
+    proc.analyze(mgr)
+    mgr.next_event()
 
-sys.exit(0)
+proc.finalize()
+mgr.close()
+
 

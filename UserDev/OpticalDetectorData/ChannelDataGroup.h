@@ -20,7 +20,7 @@ namespace optdata {
 
   // Collection of all the channels associated with a certain time frame
   // (e.g., an event, a trigger).
-  class ChannelDataGroup : public std::vector< ChannelData >
+  class ChannelDataGroup : public std::vector< optdata::ChannelData >
   {
   public:
 

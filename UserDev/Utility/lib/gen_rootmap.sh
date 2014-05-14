@@ -15,5 +15,5 @@ rootlibmap() {
 }
 
 ######################################################
-# TimeService
-rootlibmap libTimeService.rootmap libTimeService.so $USER_DEV_DIR/TimeService/LinkDef.h 
+# Utility
+rootlibmap libUtility.rootmap libUtility.so $USER_DEV_DIR/Utility/LinkDef.h 

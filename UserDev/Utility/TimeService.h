@@ -67,7 +67,7 @@ namespace util {
     }
 
     /// Given Geant4 time [ns], returns relative time [ns] w.r.t. electronics time T0 
-    double G4ToElecTime(double g4_time) {return g4_time - fG4RefTime; }
+    double G4ToElecTime(double g4_time) const {return g4_time - fG4RefTime; }
 
     //
     // Getters of ElecClock with input time [ns] w.r.t. clock counting start 
