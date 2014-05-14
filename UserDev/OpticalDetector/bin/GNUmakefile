@@ -1,9 +1,10 @@
 # Include your header file location
 CXXFLAGS += -I$(USER_DEV_DIR)/OpticalDetector
+CXXFLAGS += -I$(USER_DEV_DIR)
 CXXFLAGS += -I. $(shell root-config --cflags) -g
 
 # Include your shared object lib location
-LDFLAGS += -L$(LARLIGHT_LIBDIR) -lOpticalDetector 
+LDFLAGS += -L$(LARLIGHT_LIBDIR) -lOpticalDetector -lUtility -lRawData
 LDFLAGS += $(shell root-config --libs) -lPhysics -lMatrix -g
 
 # platform-specific options
