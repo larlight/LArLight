@@ -1,5 +1,5 @@
 /**
- * \file OpticalDetectorException.h
+ * \file OpticalDetectorSimException.h
  *
  * \ingroup OpticalDetector
  * 
@@ -11,25 +11,25 @@
 /** \addtogroup OpticalDetector
 
     @{*/
-#ifndef OPTICALDETECTOREXCEPTION_H
-#define OPTICALDETECTOREXCEPTION_H
+#ifndef OPTICALDETECTORSIMEXCEPTION_H
+#define OPTICALDETECTORSIMEXCEPTION_H
 
 #include <string>
 #include <exception>
 
 namespace opdet {
   /**
-     \class OpticalDetectorException
+     \class OpticalDetectorSimException
      Simple exception class for OpticalDetector
   */
-  class OpticalDetectorException : public std::exception{
+  class OpticalDetectorSimException : public std::exception{
 
   public:
 
-    OpticalDetectorException(std::string msg="") : std::exception(), _msg(msg)
+    OpticalDetectorSimException(std::string msg="") : std::exception(), _msg(msg)
     {}
 
-    virtual ~OpticalDetectorException() throw(){};
+    virtual ~OpticalDetectorSimException() throw(){};
     virtual const char* what() const throw() 
     {return _msg.c_str(); }
 

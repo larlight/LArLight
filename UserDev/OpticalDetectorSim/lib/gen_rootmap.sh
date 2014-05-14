@@ -15,7 +15,7 @@ rootlibmap() {
 }
 
 ######################################################
-# OpticalDetector
-rootlibmap libOpticalDetector.rootmap libOpticalDetector.so $USER_DEV_DIR/OpticalDetector/LinkDef.h \
+# OpticalDetectorSim
+rootlibmap libOpticalDetectorSim.rootmap libOpticalDetectorSim.so $USER_DEV_DIR/OpticalDetectorSim/LinkDef.h \
     libRawData.so libUtility.so libAnalysis.so libDataFormat.so libBase.so
 #    libRawData.so libOpticalDetectorData.so libUtility.so

@@ -1,7 +1,7 @@
 import sys
 from ROOT import *
 gSystem.Load("libCore")
-gSystem.Load("libOpticalDetector")
+gSystem.Load("libOpticalDetectorSim")
 
 proc=opdet.Tester()
 

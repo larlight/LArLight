@@ -43,7 +43,7 @@ namespace opdet {
   //---------------------------------------------------------------
   {
     if(ch == kINVALID_CHANNEL) return fDefault.at(type);
-    if(ch >= kNChannels) throw OpticalDetectorException("Invalid channel number provided!");
+    if(ch >= kNChannels) throw OpticalDetectorSimException("Invalid channel number provided!");
     return fParams.at(type).at(ch);
   }
 

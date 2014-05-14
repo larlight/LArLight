@@ -10,7 +10,7 @@
 #pragma link off all functions;
 
 #pragma link C++ namespace opdet;
-#pragma link C++ class opdet::OpticalDetectorException+;
+#pragma link C++ class opdet::OpticalDetectorSimException+;
 #pragma link C++ class opdet::UBOpticalADC+;
 #pragma link C++ class std::vector<float>+;
 #pragma link C++ class opdet::WFAlgoDigitizedSPE+;

@@ -2,12 +2,12 @@
 // type-def file for ROOT
 //
 
-#ifndef OPTICALDETECTOR_TYPEDEF_HH
-#define OPTICALDETECTOR_TYPEDEF_HH
+#ifndef OPTICALDETECTORSIM_TYPEDEF_HH
+#define OPTICALDETECTORSIM_TYPEDEF_HH
 
 // Header files included here
 
-#include "OpticalDetectorException.h"
+#include "OpticalDetectorSimException.h"
 #include "RandomServer.h"
 #include "UBOpticalADC.h"
 #include "ChConfig.h"
@@ -18,7 +18,7 @@
 
 // Class forward declaration here
 namespace opdet{
-  class OpticalDetectorException;
+  class OpticalDetectorSimException;
   class RandomServer;
   class UBOpticalADC;
   class ChConfig;

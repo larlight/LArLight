@@ -3,8 +3,8 @@
 #
 
 # specific names for this package
-DICT  = OpticalDetectorCint
-SHLIB = libOpticalDetector.so
+DICT  = OpticalDetectorSimCint
+SHLIB = libOpticalDetectorSim.so
 SOURCES = $(wildcard *.cxx)
 HEADERS = $(wildcard *.hh)
 OBJECTS = $(SOURCES:.cxx=.o)

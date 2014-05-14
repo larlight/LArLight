@@ -21,12 +21,12 @@ namespace opdet {
   {
     if(duration < start_freq.TickPeriod())
 
-      throw OpticalDetectorException(Form("Waveform length (%g ns) smaller than the tick size (%g ns)",
-					  duration,
-					  start_freq.TickPeriod()
-					  )
-				     );
-
+      throw OpticalDetectorSimException(Form("Waveform length (%g ns) smaller than the tick size (%g ns)",
+					     duration,
+					     start_freq.TickPeriod()
+					     )
+					);
+    
     fTimeInfo = start_freq;
     fDuration = duration;
   }
@@ -132,7 +132,7 @@ namespace opdet {
 
     if(high_tmp_wf.size()!=nticks || low_tmp_wf.size()!=nticks)
 
-      throw OpticalDetectorException("Waveform length changed (prohibited)!");
+      throw OpticalDetectorSimException("Waveform length changed (prohibited)!");
 
     //
     // Digitize amplitude

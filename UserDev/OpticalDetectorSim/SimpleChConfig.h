@@ -15,7 +15,7 @@
 #define SIMPLECHCONFIG_H
 
 #include <vector>
-#include "OpticalDetectorException.h"
+#include "OpticalDetectorSimException.h"
 #include "OpticalDetectorConstants.h"
 namespace opdet {
   /**

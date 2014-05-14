@@ -16,7 +16,7 @@
 
 #include <vector>
 #include "Utility/TimeService.h"
-#include "OpticalDetectorException.h"
+#include "OpticalDetectorSimException.h"
 #include "ChConfig.h"
 namespace opdet {
   /**

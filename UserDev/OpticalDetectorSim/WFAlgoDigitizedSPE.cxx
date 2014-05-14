@@ -89,11 +89,11 @@ namespace opdet {
   {
     if(time_info.Time() < 0 || time_info.Ticks() >= wf.size())
       
-      throw OpticalDetectorException(Form("Invalid WF index (%d) for the WF of size %zu",
-					  time_info.Ticks(),
-					  wf.size()
-					  )
-				     );
+      throw OpticalDetectorSimException(Form("Invalid WF index (%d) for the WF of size %zu",
+					     time_info.Ticks(),
+					     wf.size()
+					     )
+					);
 
     fSPE.clear();
     fSPE.reserve(wf.size());
