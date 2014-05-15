@@ -4,8 +4,8 @@
 	Really, it's a sucky class but it makes output fiels smaller by 40x.  So, there's that.
 */
 
-#ifndef LORENTZVECOTRLIGHT_H
-#define LORENTZVECOTRLIGHT_H
+#ifndef LORENTZVECTORLIGHT_H
+#define LORENTZVECTORLIGHT_H
 
 #include "TLorentzVector.h"
 

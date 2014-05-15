@@ -27,7 +27,7 @@ namespace lar1{
     specialNameTextOsc_far = "";
 
     useHighDm=false;
-    useGlobBF=false;
+    useGlobBF=true;
 
     fileNameRoot = fileSource;
     fileNameRoot += "nue_appearance_";
@@ -111,8 +111,8 @@ namespace lar1{
 
     if (energyType == "etrue")  sprintf(label2, "True Energy");
     if (energyType == "eccqe")  sprintf(label2, "CCQE Energy");
-    if (energyType == "ecalo1") sprintf(label2, "Calo Energy (no neutrons)");
-    if (energyType == "ecalo2") sprintf(label2, "Calo Energy (neutrons)");
+    if (energyType == "ecalo1") sprintf(label2, "Calo Energy (neutrons)");
+    if (energyType == "ecalo2") sprintf(label2, "Calo Energy (no neutrons)");
 
     // std::vector<int> baselines;
     // std::vector<double> scales;
@@ -781,8 +781,8 @@ namespace lar1{
               }
               if (inflateSystematics){
                 // std::cout << "Testing inflateSystematics, before: " << statisticalErrors[b_line][i];
-                statisticalErrors[b_line][i] = sqrt(pow(statisticalErrors[b_line][i],2)
-                                                  + pow(systematicInflationAmount,2));
+                systematicErrors[b_line][i] = sqrt(pow(systematicErrors[b_line][i],2)
+                                                 + pow(systematicInflationAmount,2));
                 // std::cout << "After: " << statisticalErrors[b_line][i] << std::endl;
               }
 
@@ -1520,7 +1520,8 @@ namespace lar1{
       NueFromNueCC_chargeKaon -> SetFillColor(31);
       NueFromNueCC_neutKaon -> SetFillColor(32);
       NueFromEScatter     -> SetFillColor(33);
-      NueFromNC_pi0     -> SetFillColor(41);
+      // NueFromNC_pi0     -> SetFillColor(kRed-6);
+      NueFromNC_pi0     -> SetFillColor(45);
       NueFromNC_delta0    -> SetFillStyle(41);
       NueFromNumuCC     -> SetFillColor(40);
       Dirt          -> SetFillColor(15);

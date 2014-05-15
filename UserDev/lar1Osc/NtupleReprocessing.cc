@@ -52,7 +52,7 @@ namespace lar1{
 
     double egammaThreshold = 0.0; // 0.140 // GeV
 
-    bool ccqe_only = true;
+    bool ccqe_only = false;
 
     Double_t prot_thresh = 0.02;
 

@@ -14,8 +14,10 @@
 #include "FluxRWnubar.hh"
 
 // Class forward declaration here
+namespace gan{
+  class LorentzVectorLight;
+}
 class lar1Osc;
-class gan::LorentzVectorLight;
 namespace lar1{  
   class Utils;
   class FluxRW;

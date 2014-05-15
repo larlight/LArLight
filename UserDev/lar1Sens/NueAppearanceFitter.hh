@@ -84,12 +84,12 @@ namespace lar1{
       void setNpoints(int n)
       {
             npoints = n;
-            // // for LSND BF:
-            // dm2FittingPoint = 0.52*npoints;
-            // sin22thFittingPoint = 0.375*npoints;
-            // for Kopp BF:
-            dm2FittingPoint = 0.41*npoints;
-            sin22thFittingPoint = 0.53*npoints;
+            // for LSND BF:
+            dm2FittingPoint = 0.52*npoints;
+            sin22thFittingPoint = 0.375*npoints;
+            // // for Kopp BF:
+            // dm2FittingPoint = 0.41*npoints;
+            // sin22thFittingPoint = 0.53*npoints;
 
       }
       void setUseNearDetStats(bool b){useNearDetStats = b;}

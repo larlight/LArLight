@@ -377,7 +377,7 @@ namespace lar1{
     Double_t Eccqe;
     Double_t ecalo1, ecalo2;
     Double_t ElectContainedDist;
-
+    int nuchan;
 
 
     Int_t nbytes = 0,nb = 0;
@@ -396,6 +396,7 @@ namespace lar1{
     std::cout << "Number of entries at L= " << baseline << ":\t" << nentries1 << std::endl;
     c->SetBranchAddress("energy",&fill_energy);
     c->SetBranchAddress("inno",&inno);
+    c->SetBranchAddress("nuchan", &nuchan);         // NUANCE interaction codes
     c->SetBranchAddress("mode",&mode);
     c->SetBranchAddress("isCC",&isCC);
     c->SetBranchAddress("wgt",&wgt);
@@ -510,6 +511,10 @@ namespace lar1{
       if (energy == "ecalo1") fill_energy = ecalo1;
       if (energy == "ecalo2") fill_energy = ecalo2;
 
+      if (energy == "eccqe" && nuchan != 1){
+        if (inno == 12 || inno == -12)
+          continue;
+      }
       if (ibkg == kNueFromNueCC_muon       || 
           ibkg == kNueFromNueCC_chargeKaon || 
           ibkg == kNueFromNueCC_neutKaon   || 
@@ -644,7 +649,7 @@ namespace lar1{
     Double_t Eccqe;
     Double_t ecalo1, ecalo2;
     Double_t ElectContainedDist;
-
+    int nuchan;
 
     Int_t nbytes = 0,nb = 0;
     Int_t evtcounter;
@@ -672,6 +677,7 @@ namespace lar1{
     c->SetBranchAddress("energy",&fill_energy);
     c->SetBranchAddress("inno",&inno);
     c->SetBranchAddress("mode",&mode);
+    c->SetBranchAddress("nuchan", &nuchan);         // NUANCE interaction codes
     c->SetBranchAddress("isCC",&isCC);
     c->SetBranchAddress("wgt",&wgt);
     c->SetBranchAddress("enugen",&enugen);
@@ -780,6 +786,11 @@ namespace lar1{
       if (energy == "eccqe") fill_energy = Eccqe;
       if (energy == "ecalo1") fill_energy = ecalo1;
       if (energy == "ecalo2") fill_energy = ecalo2;
+
+      if (energy == "eccqe" && nuchan != 1){
+        if (inno == 12 || inno == -12)
+          continue;
+      }
 
       if(ElectContainedDist < showerContainmentDist){
         // std::cout << "Skipping this fosc event in the containment cut.\n";
