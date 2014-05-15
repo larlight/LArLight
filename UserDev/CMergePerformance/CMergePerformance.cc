@@ -289,6 +289,10 @@ namespace larlight {
     std::cout<<"}"<<std::endl;
     */
 
+    //count the number of clusters for the denominator of efficiency plot
+    //but DO NOT INCLUDE clusters that are 100% belonging to "unknown" MCShowers
+    int n_clusters_in_plane[3] = { 0, 0, 0 };
+
     //Here we try to loop over clusters based on the _clusterparams vector, *not* ev_cluster vector,
     //because the merging algorithm returns an altered _clusterparams vector but it does *not*
     //modify the actual ev_cluster vector. 
@@ -462,6 +466,10 @@ namespace larlight {
       // Fill histograms/tree that need once-per-cluster filling
       ///////////////////////////////////////////////
 
+      //if all of the charge in the cluster is from unknown MCShower, skip this cluster   
+      if(_tot_clus_charge_fromKnownMCS == 0) continue;
+      else n_clusters_in_plane[_plane]++;
+
       //calculate _nhits for ttree
       _nhits = (int)ass_index.size();
 
@@ -476,8 +484,6 @@ namespace larlight {
       _clusQfrac_over_totclusQ = 0;
       _frac_clusQ = 0;
 
-      //if all of the charge in the cluster is from unknown MCShower, skip this cluster   
-      if(_tot_clus_charge_fromKnownMCS == 0) continue;
       
       //ignore unknown MCShowers entirely
       for(int i = 0; i < part_clus_charge.size() - 1; ++i){	
@@ -492,18 +498,18 @@ namespace larlight {
       _clusQfrac_from_unknown = part_clus_charge.back()/_tot_clus_charge;
 
       
-      //      if(_clusQfrac_over_totclusQ < 1){
-	//	std::cout<<"_clusQfraC_over_totclusQ is <1"<<std::endl;
-	//	std::cout<<"part_clus_charge vector = { ";
-	//	for(int a = 0; a < part_clus_charge.size(); ++a)
-	//	  std::cout<<part_clus_charge.at(a)<<", ";
-	//	std::cout<< "}"<<std::endl;
-	//	std::cout<<"_nhits is "<<_nhits<<std::endl;
+      if(_clusQfrac_over_totclusQ < 0.50){
+      	std::cout<<"_clusQfraC_over_totclusQ is <0.50"<<std::endl;
+	std::cout<<"part_clus_charge vector = { ";
+      	for(int a = 0; a < part_clus_charge.size(); ++a)
+      	  std::cout<<part_clus_charge.at(a)<<", ";
+      	std::cout<< "}"<<std::endl;
+	std::cout<<"_nhits is "<<_nhits<<std::endl;
 	//	std::cout<<"MCShower_indices = { ";
 	//	for(int a = 0; a < MCShower_indices.size(); ++a)
 	//	  std::cout<<MCShower_indices.at(a)<<", ";
 	//	std::cout<<"}"<<std::endl;
-      //      }
+      }
       
       //"other purity" :
       //cluster charge divided by charge of dominant MC shower
@@ -561,12 +567,7 @@ namespace larlight {
     ///////////
     //efficiency of clustering for the event, per plane
     ///////////
-    //count how many final clusters there are in each plane, using the clus_idx_vec vector
-    int n_clusters_in_plane[3] = { 0, 0, 0 };
-    for (int d = 0; d < (int)clus_idx_vec.size(); ++d){
-      int this_view = ev_cluster->at(clus_idx_vec.at(d).at(0)).View();
-      n_clusters_in_plane[this_view]++;
-    }
+
     //count how many MCShowers are above ~20 MeV.
     double n_viable_MCShowers = 0;
     for(auto this_mcshow : *ev_mcshower){
