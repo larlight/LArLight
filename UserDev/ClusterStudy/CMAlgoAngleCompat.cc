@@ -39,10 +39,9 @@ namespace cluster {
 
     if(angle_dist_histo){
       angle_dist_histo->Fill(angle1-angle2);
-      std::cout<<"filling histo with "<<angle1<<"-"<<angle2<<"="<<angle1-angle2<<std::endl;
     }
     else
-      std::cout<<"\n\n\nSOMETHING WENT HORRIBLY WRONG\n\n\n\n\n\n\n"<<std::endl;
+      std::cout<<"\n\n\nSOMETHING WENT HORRIBLY WRONG IN CMALGOANGLECOMPAT\n\n\n\n\n\n\n"<<std::endl;
 
     bool compatible = false;
     
@@ -73,7 +72,6 @@ namespace cluster {
     
     if(angle_dist_histo) angle_dist_histo->Reset();
 
-    std::cout<<"Prepare function being called within CMAlgoAngleCompat!"<<std::endl;
 
   }
 

@@ -207,6 +207,7 @@ namespace larlight {
       ana_tree->Branch("clusQfrac_over_totclusQ",&_clusQfrac_over_totclusQ,"clusQfrac_over_totclusQ/D");
       ana_tree->Branch("clusQ_over_MCQ",&_clusQ_over_MCQ,"clusQ_over_MCQ/D");
       ana_tree->Branch("tot_clusQ",&_tot_clus_charge,"tot_clus_charge/D");
+      ana_tree->Branch("tot_clusQ_fromKnownMCS",&_tot_clus_charge_fromKnownMCS,"tot_clus_charge_fromKnownMCS/D");
       ana_tree->Branch("frac_clusQ",&_frac_clusQ,"frac_clusQ/D");
       ana_tree->Branch("dom_MCS_Q",&_dom_MCS_Q,"dom_MCS_Q/D");
       ana_tree->Branch("plane",&_plane,"plane/I");
@@ -288,6 +289,10 @@ namespace larlight {
     std::cout<<"}"<<std::endl;
     */
 
+    //count the number of clusters for the denominator of efficiency plot
+    //but DO NOT INCLUDE clusters that are 100% belonging to "unknown" MCShowers
+    int n_clusters_in_plane[3] = { 0, 0, 0 };
+
     //Here we try to loop over clusters based on the _clusterparams vector, *not* ev_cluster vector,
     //because the merging algorithm returns an altered _clusterparams vector but it does *not*
     //modify the actual ev_cluster vector. 
@@ -342,6 +347,7 @@ namespace larlight {
     for(int outer_clus_idx=0; outer_clus_idx<clus_idx_vec.size(); ++outer_clus_idx){
       //total cluster charge
       _tot_clus_charge = 0;
+      _tot_clus_charge_fromKnownMCS = 0;
       _plane = ev_cluster->at(clus_idx_vec.at(outer_clus_idx).at(0)).View();
 
       //charge from each MCShower object... last element is from unknown MCShower
@@ -381,6 +387,7 @@ namespace larlight {
       for(auto const hit_index: ass_index){
 	//	std::cout<<"hit_index is "<<hit_index<<std::endl;
 	_tot_clus_charge += ev_hits->at(hit_index).Charge();
+	  
 
 	//	std::cout<<"adding "<<ev_hits->at(hit_index).Charge()<<" to tot_clus_charge"<<std::endl;
 
@@ -402,24 +409,29 @@ namespace larlight {
 	*/
 
 	
-	//sometimes mcslb returns a null vector if the reco hit couldn't be matched with an IDE
+	//sometimes mcslb returns a null vector if the reco hit couldn't be matched with an IDE at all... this rarely occurs
 	//in this case, add 100% of this hit's charge to the "unknown" index
 	if(hit_charge_frac.size() == 0){
 	  part_clus_charge.back() += (1.)*ev_hits->at(hit_index).Charge();
-	  /*
+	  
 	  std::cout<<"warning, mcslb returned a null vector"<<std::endl;
-	  std::cout<<"event number is "<<ev_hits->event_id()<<std::endl;
+	  /*	  
+		  std::cout<<"event number is "<<ev_hits->event_id()<<std::endl;
 	  std::cout<<"this hit's startTime, endTime is "<<ev_hits->at(hit_index).StartTime()
 		   <<", "<<ev_hits->at(hit_index).EndTime()<<std::endl;
 	  std::cout<<"this hit's channel is "<<ev_hits->at(hit_index).Channel()<<std::endl;
 	  std::cout<<"this hits' charge is "<<ev_hits->at(hit_index).Charge()<<std::endl;
 	  */
 	}
-	else
+	else{
+	  //mcslb has found an IDE, whether it be in an MCShower, or unknown
 	  for(int i = 0; i < hit_charge_frac.size(); ++i)
 	    part_clus_charge.at(i) += hit_charge_frac.at(i)*ev_hits->at(hit_index).Charge();
-
-
+	  //count total charge only from known MCShowers (hence -1)
+	  for(int i = 0; i < hit_charge_frac.size() - 1; ++i)
+	    _tot_clus_charge_fromKnownMCS += hit_charge_frac.at(i)*ev_hits->at(hit_index).Charge();
+	  
+	}
 	//debug
 	
 	//  std::cout<<"This hit is made up of (";
@@ -440,6 +452,9 @@ namespace larlight {
       for(int a = 0; a < part_clus_charge.size(); ++a)
 	std::cout<<part_clus_charge.at(a)<<", ";
       std::cout<< "}"<<std::endl;
+      std::cout<<"total charge is "<<_tot_clus_charge
+	       <<" while totQ from known is "<<_tot_clus_charge_fromKnownMCS
+	       <<std::endl;
       */
 
       //debug: print contents of _shower_idmap map
@@ -450,6 +465,10 @@ namespace larlight {
       ///////////////////////////////////////////////
       // Fill histograms/tree that need once-per-cluster filling
       ///////////////////////////////////////////////
+
+      //if all of the charge in the cluster is from unknown MCShower, skip this cluster   
+      if(_tot_clus_charge_fromKnownMCS == 0) continue;
+      else n_clusters_in_plane[_plane]++;
 
       //calculate _nhits for ttree
       _nhits = (int)ass_index.size();
@@ -464,13 +483,12 @@ namespace larlight {
       int dominant_MCshower_index = 0;
       _clusQfrac_over_totclusQ = 0;
       _frac_clusQ = 0;
-      //uncomment this if you want the zeros in the purity plot to go away
-      //IE if you want to include clusters totally belonging to "unknown" MCShowers
-      //to be considered 100% pure, not 0% pure
-      //for(int i = 0; i < part_clus_charge.size() - 1; ++i){	
-      for(int i = 0; i < part_clus_charge.size(); ++i){	
-	if( (double)(part_clus_charge.at(i)/_tot_clus_charge) > _clusQfrac_over_totclusQ){
-	  _clusQfrac_over_totclusQ = (double)(part_clus_charge.at(i)/_tot_clus_charge);
+
+      
+      //ignore unknown MCShowers entirely
+      for(int i = 0; i < part_clus_charge.size() - 1; ++i){	
+	if( (double)(part_clus_charge.at(i)/_tot_clus_charge_fromKnownMCS) > _clusQfrac_over_totclusQ){
+	  _clusQfrac_over_totclusQ = (double)(part_clus_charge.at(i)/_tot_clus_charge_fromKnownMCS);
 	  _frac_clusQ = part_clus_charge.at(i);
 	  dominant_MCshower_index = i;
 	}
@@ -479,20 +497,20 @@ namespace larlight {
       
       _clusQfrac_from_unknown = part_clus_charge.back()/_tot_clus_charge;
 
-
-      //      if(_clusQfrac_over_totclusQ == 0){
-	//	std::cout<<"uh oh, _clusQfraC_over_totclusQ is ==0"<<std::endl;
-	//	std::cout<<"part_clus_charge vector = { ";
-	//	for(int a = 0; a < part_clus_charge.size(); ++a)
-	//	  std::cout<<part_clus_charge.at(a)<<", ";
-	//	std::cout<< "}"<<std::endl;
-	//	std::cout<<"_nhits is "<<_nhits<<std::endl;
+      
+      if(_clusQfrac_over_totclusQ < 0.50){
+      	std::cout<<"_clusQfraC_over_totclusQ is <0.50"<<std::endl;
+	std::cout<<"part_clus_charge vector = { ";
+      	for(int a = 0; a < part_clus_charge.size(); ++a)
+      	  std::cout<<part_clus_charge.at(a)<<", ";
+      	std::cout<< "}"<<std::endl;
+	std::cout<<"_nhits is "<<_nhits<<std::endl;
 	//	std::cout<<"MCShower_indices = { ";
 	//	for(int a = 0; a < MCShower_indices.size(); ++a)
 	//	  std::cout<<MCShower_indices.at(a)<<", ";
 	//	std::cout<<"}"<<std::endl;
-	//      }
-
+      }
+      
       //"other purity" :
       //cluster charge divided by charge of dominant MC shower
       //if dominant_index points to the "unknown" element, set ratio to -1
@@ -549,12 +567,7 @@ namespace larlight {
     ///////////
     //efficiency of clustering for the event, per plane
     ///////////
-    //count how many final clusters there are in each plane, using the clus_idx_vec vector
-    int n_clusters_in_plane[3] = { 0, 0, 0 };
-    for (int d = 0; d < (int)clus_idx_vec.size(); ++d){
-      int this_view = ev_cluster->at(clus_idx_vec.at(d).at(0)).View();
-      n_clusters_in_plane[this_view]++;
-    }
+
     //count how many MCShowers are above ~20 MeV.
     double n_viable_MCShowers = 0;
     for(auto this_mcshow : *ev_mcshower){

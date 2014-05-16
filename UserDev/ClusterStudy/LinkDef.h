@@ -23,7 +23,7 @@
 #pragma link C++ class cluster::CBookKeeper+;
 #pragma link C++ class std::vector<unsigned short>+;
 #pragma link C++ class std::vector<std::vector<unsigned short> >+;
-
+#pragma link C++ class cluster::CMAlgoAngleCompat+;
 #pragma link C++ class cluster::CMAlgoShortestDist+;
 #pragma link C++ class cluster::CMAlgoPolyContain+;
 #pragma link C++ class cluster::CMAlgoPolyOverlap+;
