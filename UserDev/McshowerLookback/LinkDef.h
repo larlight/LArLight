@@ -9,6 +9,6 @@
 #pragma link off all classes;
 #pragma link off all functions;
 
-#pragma link C++ class McshowerLookback+;
+#pragma link C++ class larlight::McshowerLookback+;
 //ADD_NEW_CLASS ... do not change this line
 #endif

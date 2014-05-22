@@ -16,12 +16,10 @@ namespace cluster {
 
     SetUseOpeningAngle(false);
 
-    if(_fout) {
+    angle_dist_histo = 0;
 
-      _fout->cd();
-      angle_dist_histo = new TH1F("angle_dist_histo","Cluster Angle Differences",100,-360,360);
+    angle_dist_histo = new TH1F("angle_dist_histo","Cluster Angle Differences",100,-360,360);
 
-    }
   } //end constructor
 
   bool CMAlgoAngleCompat::Bool(const ClusterParamsAlgNew &cluster1,
@@ -41,19 +39,16 @@ namespace cluster {
 
     if(angle_dist_histo){
       angle_dist_histo->Fill(angle1-angle2);
-      std::cout<<"filling histo with "<<angle1<<"-"<<angle2<<"="<<angle1-angle2<<std::endl;
     }
     else
-      std::cout<<"\n\n\nSOMETHING WENT HORRIBLY WRONG\n\n\n\n\n\n\n"<<std::endl;
+      std::cout<<"\n\n\nSOMETHING WENT HORRIBLY WRONG IN CMALGOANGLECOMPAT\n\n\n\n\n\n\n"<<std::endl;
 
     bool compatible = false;
     
-    double my_cut_value;
+    double my_cut_value = _max_allowed_2D_angle_diff;
     //if using opening angle, have angle cutoff be the smaller of the two opening angles
     if(_use_opening_angle) 
       my_cut_value = std::min(cluster1.GetParams().opening_angle, cluster2.GetParams().opening_angle);
-    
-    else my_cut_value = _max_allowed_2D_angle_diff;
     
     //if you don't care if clusters have been reconstructed backwards
     if(_allow_180_ambig)
@@ -73,11 +68,10 @@ namespace cluster {
     
   } // end Merge function 
   
-  void CMAlgoAngleCompat::Prepare(const std::vector<cluster::ClusterParamsAlgNew> &clusters){
+  void CMAlgoAngleCompat::IterationBegin(const std::vector<cluster::ClusterParamsAlgNew> &clusters){
     
     if(angle_dist_histo) angle_dist_histo->Reset();
 
-    std::cout<<"Prepare function being called within CMAlgoAngleCompat!"<<std::endl;
 
   }
 

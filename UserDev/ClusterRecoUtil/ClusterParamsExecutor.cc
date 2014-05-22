@@ -148,7 +148,7 @@ namespace cluster {
 	double charge_in_bin, bin_low, bin_high;
 	
 	while( (charge_filled)/(h->Charge()) < 0.97
-	       && counter < hCurrentHit->GetNbinsY() ){
+	       && counter < (unsigned int)(hCurrentHit->GetNbinsY()) ){
 
 	  //if you're dealing with the one peak bin
 	  if(!counter){

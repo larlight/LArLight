@@ -38,6 +38,8 @@ namespace larlight {
     
     bool process(storage_manager* out_storage, UInt_t id=DATA::INVALID_UINT);
 
+    virtual bool check_event_quality(){return true;}
+
     virtual bool finalize();
 
     void SetPlotFile(TFile* fout) { _fout = fout; _analyze=true;}

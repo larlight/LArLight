@@ -7,7 +7,7 @@ namespace larlight {
   
   bool BryceToy::initialize() {
     
-    h = new TH2D("h11","Percent charge from dominant MCShower; IDE numElectrons; Fraction",100,0,4e7,102,-0.01,1.01);
+    h = new TH2D("h11","Percent charge from dominant MCShower; Charge; Fraction",100,0,3e6,102,-0.01,1.01);
 
     return true;
   }
@@ -21,7 +21,7 @@ namespace larlight {
     auto my_mcshow = (event_mcshower*)(storage->get_data(DATA::MCShower));
     num_mcshow = my_mcshow->size();
 
-    std::map<unsigned long, unsigned short > shower_idmap;
+    std::map<UInt_t, UInt_t> shower_idmap;
     b.FillShowerMap(my_mcshow, shower_idmap);    
 
     if(my_mcshow->size()>1){
@@ -41,7 +41,7 @@ namespace larlight {
     //std::cout<<"------------------------------"<<std::endl;
     
     //Get all simchannels for this event, and make map of simchannel versus channel
-    std::map<unsigned short,larlight::simch> simch_map;    
+    std::map<UShort_t,larlight::simch> simch_map;    
     auto my_simch = (event_simch*)(storage->get_data(DATA::SimChannel));
     if(!my_simch) std::cerr<<"I found no simchannels!"<<std::endl;
     b.FillSimchMap(my_simch, simch_map);
@@ -63,19 +63,64 @@ namespace larlight {
     DATA::DATA_TYPE hit_type = my_clusters->get_hit_type();
     auto my_hits = (event_hit*)(storage->get_data(hit_type));        
     if(!my_clusters || !my_hits) std::cerr<<"I found an empty cluster!"<<std::endl;
+
+    //make a vector of MCShower indices
+    std::vector<UInt_t> MCShower_indices;
+    for(UInt_t i=0; i < my_mcshow->size(); ++i)
+      MCShower_indices.push_back(i);
+    
+
+
+
     //Loop through clusters
     for(auto this_cluster : *my_clusters) {      
+
       double tot_clus_charge = 0;
-      double part_clus_charge[(const int)(num_mcshow+1)];
-      for(int i=0;i<num_mcshow+1;i++)
-    	part_clus_charge[i]=0;
+      //the +1 is because sometimes charge comes from non MCShower stuff
+      //so the last element will be charge from unknown origin
+      double part_clus_charge[(const int)MCShower_indices.size()+1];
+      for(int i=0;i<MCShower_indices.size()+1;i++)
+	part_clus_charge[i]=0;
+
       //Get hits and loop over them
       auto hit_index_vector = this_cluster.association(hit_type);	
       for(auto hit_index : hit_index_vector){
     	auto this_hit = (larlight::hit)(my_hits->at(hit_index));
 	
-	b.MatchHitsAll(this_hit,simch_map, shower_idmap,num_mcshow);
-	//std::vector<float> hit_charge_breakdown = b.MatchHitsAll(this_hit, simch_map, shower_idmap,num_mcshow);
+	tot_clus_charge += this_hit.Charge(); //need to check units on this
+
+	std::vector<float> hit_fraction_breakdown = 
+	  b.MatchHitsAll(this_hit,
+			 simch_map,
+			 shower_idmap,
+			 MCShower_indices);
+	
+	//DK: hit_fraction_breakdown is a vector of charge fractions
+	//from the different MCShowers the hit belongs to.
+	// For example, if the list of MCShowers indicies was (0, 1, 2)
+	// and the hit's charge is 20% in MCShower 0, 70% in MCShower1, 
+	// 0% in MCShower2, and 10% in an unknown MCShower, 
+	// the returned vector is (0.2, 0.8, 0.0, 0.10)
+	// (the unknown MCShower is always the last entry in the return vector)
+
+	if(hit_fraction_breakdown.size() == 0){
+	  std::cerr<<"Something horrible has happened in McshowerLookback. "
+		   <<"hit_fraction_breakdown.size() is zero\n"
+		   <<"This means McshowerLookback returned a bad vector. skipping this hit."
+		   <<std::endl;
+	  break;
+	}
+
+	for(int i=0;i<MCShower_indices.size()+1;i++){
+	  //multiply fraction (returned by MatchHitsAll) by actual charge
+	  //	  std::cout<<"hi"<<std::endl;
+	  part_clus_charge[i] += 
+	    (hit_fraction_breakdown.at(i) * this_hit.Charge());
+	  //	  std::cout<<"hi2"<<std::endl;
+	}
+
+
+
 	//std::cout<<hit_charge_breakdown.at(0)/hit_charge_breakdown.at(num_mcshow+1)<<std::endl;
 	
     	/////////////
@@ -122,16 +167,20 @@ namespace larlight {
     	//  //std::cout<<tot_ides_charge<<")"<<std::endl;	  
     	//}
       }
+      
+      //this might just be un-doing what is done in MatchHitsAll
       std::cout<<"(";
+      //the +1 here is for "unknown showers"
       for(int i=0;i<num_mcshow+1;i++){
-    	part_clus_charge[i]/=tot_clus_charge;
-    	std::cout<<part_clus_charge[i]<<" ";
+	part_clus_charge[i]/=tot_clus_charge;
+	std::cout<<part_clus_charge[i]<<" ";
       }
       std::cout<<tot_clus_charge<<")"<<std::endl;	      
       double biggest=0;
-      for(int i=1;i<num_mcshow+1;i++){
-    	if(part_clus_charge[i]>biggest) biggest=part_clus_charge[i];
+      for(int i=0;i<num_mcshow;i++){
+	if(part_clus_charge[i]>biggest) biggest=part_clus_charge[i];
       }
+      
       h->Fill(tot_clus_charge,biggest);
     }
     std::cout<<"-------------------------------"<<std::endl;

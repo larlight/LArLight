@@ -146,13 +146,14 @@ namespace larlight {
 
     UInt_t last_word_class = get_word_class(last_word);
     if(last_word_class != FEM::CHANNEL_LAST_WORD &&
-       last_word_class != FEM::FEM_FIRST_WORD) {
+       last_word_class != FEM::FEM_FIRST_WORD &&
+       !( last_word == 0x8000 && ((*_event_data->rbegin()).size())%2)) {
 
       Message::send(MSG::ERROR,__FUNCTION__,
 		    Form("Unexpected word: %x (previous = %x)",word,last_word));
       
       status = false;
-
+      
     }
 
     _nwords++;

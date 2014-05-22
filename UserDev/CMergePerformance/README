@@ -1,0 +1,8 @@
+The purpose of this package is to quantify how well cluster merging algorithms do.
+
+It will:
+   1) Read in fuzzycluster and MCShower objects
+   2) Match the clusters with their respective MCShowers
+   3) Perform whatever cluster merging algorithms the user wants
+   4) Create figure-of-merit plots to show merging performance
+

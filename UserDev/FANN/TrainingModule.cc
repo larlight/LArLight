@@ -45,7 +45,7 @@ namespace cluster{
     unsigned int * layers;
     layers = new unsigned int[fNumHiddenLayers + 2];
     layers[0] = fFeatureVectorLength;
-    for (unsigned int i = 1; i <= fNumHiddenLayers; i++)
+    for (int i = 1; i <= fNumHiddenLayers; i++)
       layers[i] = fHiddenLayerLength[i-1];
     layers[fNumHiddenLayers+1] = fOutputVectorLength;
     ann.create_shortcut_array(fNumHiddenLayers+2, layers); 

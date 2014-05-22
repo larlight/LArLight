@@ -366,7 +366,7 @@ namespace larutil {
     unsigned int wireNumber = (unsigned int) NearestWireNumber;
 
     if(NearestWireNumber < 0 ||
-       NearestWireNumber >= this->Nwires(PlaneNo)) {
+       NearestWireNumber >= (int)(this->Nwires(PlaneNo)) ){
 
       if(NearestWireNumber < 0) wireNumber = 0;
       else wireNumber = this->Nwires(PlaneNo) - 1;

@@ -14,6 +14,7 @@ namespace larlight {
     _ana_filename = "";
     _ref_data = DATA::Trigger;
     _out_storage = 0;
+    _debug_mode = false;
     // Create output data stream
     _out_storage = new storage_manager();
     _out_storage->set_io_mode(_out_storage->WRITE);    
@@ -118,7 +119,15 @@ namespace larlight {
     UInt_t event_id = 0;
     TStopwatch clock;
     clock.Start();
-    while( status && !eof && _evb_algo_v[_algo_index[_ref_data]]->process(_out_storage) ) {
+    while( (_debug_mode || status) && !eof) {
+      
+      try{
+	status = _evb_algo_v[_algo_index[_ref_data]]->process(_out_storage);
+      }catch(evb_exception &e) {
+	  std::cerr<<e.what()<<std::endl;
+	status=false;
+      }
+      eof = (eof || _evb_algo_v.at(_algo_index.at(_ref_data))->eof());
 
       event_id = _out_storage->get_data(_ref_data)->event_id();
 
@@ -126,8 +135,10 @@ namespace larlight {
 
 	const DATA::DATA_TYPE type = algo->data_type();
 
+	// Skip if main stream
 	if(type == _ref_data) continue;
 
+	// Prepare
 	_out_storage->get_data(type)->set_event_id(event_id);
 
 	if(type == DATA::PMTFIFO)
@@ -137,12 +148,34 @@ namespace larlight {
 	else if(type == DATA::TPCFIFO)
 
 	  ((event_tpcfifo*)(_out_storage->get_data(type)))->set_event_number(DATA::INVALID_UINT);
-	  
-	status = status && algo->process(_out_storage,event_id);
+
+	// Process
+	try{
+
+	  if(_debug_mode)
+	    status = algo->process(_out_storage,event_id) && status;
+	  else
+	    status = status && algo->process(_out_storage,event_id);
+	    
+	}catch(evb_exception &e){
+	  std::cerr<<e.what()<<std::endl;
+	  status=false;
+	}
+	
+	// Check
+	try{
+	  if(_debug_mode)
+	    status = algo->check_event_quality() && status;
+	  else
+	    status = status && algo->check_event_quality();
+	}catch(evb_exception &e){
+	  std::cerr<<e.what()<<std::endl;
+	  status=false;
+	}
 
 	eof = (eof || algo->eof());
       }
-      
+
       if(status) {
 
 	_out_storage->next_event();
@@ -156,13 +189,16 @@ namespace larlight {
 
 	ctr++;
 	
-	if(ctr%10==0) 
+	if(ctr%100==0) 
 	  print(MSG::NORMAL,__FUNCTION__,
 		Form("  Done %d events @ %g [s]",ctr,clock.RealTime()));
 
       }else{
 
-	for(auto const algo : _evb_algo_v)
+	print(MSG::ERROR,__FUNCTION__,
+	      Form("skip storing count %d as status return from algorithm is false...",ctr));
+
+	for(auto const &algo : _evb_algo_v)
 	  
 	  _out_storage->get_data(algo->data_type())->clear_data();
 

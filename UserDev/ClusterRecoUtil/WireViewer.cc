@@ -71,7 +71,7 @@ namespace cluster{
 
       if(!fFilterBaseline) {
 	
-	for(int i = 0; i < wire.Signal().size(); i++)
+	for(size_t i = 0; i < wire.Signal().size(); i++)
 
 	  hWireView->Fill(mygeo->ChannelToWire(wire.Channel()),i,wire.Signal().at(i));
 	//	std::cout<<Form("Filled bin (%d, %d) with %f",mygeo->ChannelToWire(wire.Channel()),i,wire.Signal().at(i))<< std::endl;

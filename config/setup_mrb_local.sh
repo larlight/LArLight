@@ -28,11 +28,13 @@ export TMP_PWD=$PWD
 cd $MY_LARSOFT
 source $MY_LARSOFT_SETUP/setup
 cd build
-source mrb s
+#source mrb s
+mrbsetenv
 
 # Set up local installation
 cd $MY_LARSOFT
-source mrb slp
+#source mrb slp
+mrbslp
     
 cd $TMP_PWD
 unset TMP_PWD

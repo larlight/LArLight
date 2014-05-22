@@ -12,6 +12,7 @@ namespace larlight {
   {
   //#########################################
 
+    _algo_fem_last_word = FEM::CHANNEL_LAST_WORD;
     reset();
 
   }
@@ -309,14 +310,14 @@ namespace larlight {
 
       }
 
-      _event_data->set_module_address         ( _header_info.module_address    );
-      _event_data->set_module_id              ( _header_info.module_id         );
-      _event_data->set_event_number           ( _header_info.event_number          );
-      _event_data->set_event_frame_number     ( _header_info.event_frame_number    );
+      _event_data->set_module_address         ( _header_info.module_address         );
+      _event_data->set_module_id              ( _header_info.module_id              );
+      _event_data->set_event_number           ( _header_info.event_number-1         );
+      _event_data->set_event_frame_number     ( _header_info.event_frame_number     );
       _event_data->set_fem_trig_frame_number  ( _header_info.fem_trig_frame_number  );
       _event_data->set_fem_trig_sample_number ( _header_info.fem_trig_sample_number );
-      _event_data->set_nwords                 ( _header_info.nwords            );
-      _event_data->set_checksum               ( _header_info.checksum          );
+      _event_data->set_nwords                 ( _header_info.nwords                 );
+      _event_data->set_checksum               ( _header_info.checksum               );
 
       status = _storage->next_event();
 

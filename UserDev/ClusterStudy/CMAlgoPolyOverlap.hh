@@ -41,8 +41,17 @@ namespace cluster {
     virtual bool Bool(const ClusterParamsAlgNew &cluster1,
 		      const ClusterParamsAlgNew &cluster2);
 
+    void SetDebug(bool debug) { _debug = debug; }
+
+    void SetVerbose(bool verbose) { _verbose = verbose; }
+
     /// Method to re-configure the instance
     void reconfigure();
+
+  private:
+    
+    bool _verbose;
+    bool _debug;
 
   };
 }

@@ -91,9 +91,9 @@ namespace larlight {
 
     else if(_current_event_number > id)
       
-      print(MSG::WARNING,__FUNCTION__,
-	    Form("data stream for \"%s\" did not find input event with event number %d!", 
-		 DATA::DATA_TREE_NAME[_type].c_str(),id));
+      throw evb_exception(Form("data stream for \"%s\" did not find input event with event number %d!", 
+			       DATA::DATA_TREE_NAME[_type].c_str(),id)
+			  );
 
     // while find_next is false, process 
     while(status && !find_next(id) && !_eof)

@@ -14,7 +14,7 @@ namespace cluster {
 
   //--------------------------------------------------------
   bool CMAlgoMergeAll::Bool(const ClusterParamsAlgNew &cluster1,
-			const ClusterParamsAlgNew &cluster2)
+			    const ClusterParamsAlgNew &cluster2)
   //--------------------------------------------------------
   {
     return true;
