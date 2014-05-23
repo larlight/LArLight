@@ -24,25 +24,25 @@ namespace cluster {
   bool CMAlgoPolyOverlap::Bool(const ClusterParamsAlgNew &cluster1,
 			       const ClusterParamsAlgNew &cluster2)
   {
-    //if either has < 4 hits do not merge!
-    if ( (cluster1.GetParams().PolyObject.Size() < 3) or
-	 (cluster2.GetParams().PolyObject.Size() < 3) ){
-      if (_debug) { std::cout << "either cluster is too small!" << std::endl; }
+
+    //if either has < 3 sides do not merge!
+    if ( (cluster1.GetParams().PolyObject.Size() < 2) or
+	 (cluster2.GetParams().PolyObject.Size() < 2) ){
       return false;
     }
-    if (_verbose) {
+    if (_debug and cluster1.GetParams().N_Hits > 10 and cluster2.GetParams().N_Hits > 10) {
       std::cout << "Cluster 1:" << std::endl;
       std::cout << "\tN_Hits: " << cluster1.GetParams().N_Hits << std::endl;
       std::cout << "\tN Sides:" << cluster1.GetParams().PolyObject.Size() << std::endl;
       for (unsigned int n=0; n < cluster1.GetParams().PolyObject.Size(); n++)
 	std::cout << "\t\t\t(" << cluster1.GetParams().PolyObject.Point(n).first << ", "
-		  << cluster1.GetParams().PolyObject.Point(n).second << " )" << std::endl;
+		  << cluster1.GetParams().PolyObject.Point(n).second << ")" << std::endl;
       std::cout << "Cluster 2:" << std::endl;
       std::cout << "\tN_Hits: " << cluster2.GetParams().N_Hits << std::endl;
       std::cout << "\tN Sides:" << cluster2.GetParams().PolyObject.Size() << std::endl;
       for (unsigned int n=0; n < cluster2.GetParams().PolyObject.Size(); n++)
 	std::cout << "\t\t\t(" << cluster2.GetParams().PolyObject.Point(n).first << ", "
-		  << cluster2.GetParams().PolyObject.Point(n).second << " )" << std::endl;
+		  << cluster2.GetParams().PolyObject.Point(n).second << ")" << std::endl;
     }
 
     //if the two polygons overlap even partially
@@ -51,7 +51,6 @@ namespace cluster {
       if (_verbose) { std::cout << "Overlap...merging!" << std::endl; }
       return true;
     }
-    if (_debug) { std::cout << "No overlap..." << std::endl; }
     return false;
 
   }

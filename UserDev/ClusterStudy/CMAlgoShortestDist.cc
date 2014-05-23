@@ -10,6 +10,8 @@ namespace cluster {
 
     //this just sets default values    
     SetVerbose(true);
+    SetDebug(false);
+    SetMinHits(0);
     
     //1e9 is huge; everything will be merged
     SetSquaredDistanceCut(1e9);
@@ -27,6 +29,12 @@ namespace cluster {
 				const ClusterParamsAlgNew &cluster2)
   {
     
+    //if number of hits not large enough skip
+    if ( (_minHits > 0) and ((cluster1.GetParams().N_Hits < _minHits) or (cluster2.GetParams().N_Hits < _minHits)) ) {
+      if (_debug) { std::cout << "Num of Hits below threshold..." << std::endl; }
+      return false;
+    }
+
     double w_start1 = cluster1.GetParams().start_point.w * _wire_2_cm;
     double t_start1 = cluster1.GetParams().start_point.t * _time_2_cm;
     double w_end1   = cluster1.GetParams().end_point.w   * _wire_2_cm;
@@ -36,6 +44,13 @@ namespace cluster {
     double t_start2 = cluster2.GetParams().start_point.t * _time_2_cm;
     double w_end2   = cluster2.GetParams().end_point.w   * _wire_2_cm;
     double t_end2   = cluster2.GetParams().end_point.t   * _time_2_cm;
+
+    if (_debug){
+      std::cout << "Start point Cluster 1: (" << w_start1 << ", " << t_start1 << ")"  << std::endl;
+      std::cout << "End point Cluster 2: (" << w_end1 << ", " << t_end1 << ")"  << std::endl;
+      std::cout << "Start point Cluster 1: (" << w_start2 << ", " << t_start2 << ")"  << std::endl;
+      std::cout << "End point Cluster 2: (" << w_end2 << ", " << t_end2 << ")"  << std::endl;
+    }
     
     //First, pretend the first cluster is a 2D line segment, from its start point to end point
     //Find the shortest distance between start point of the second cluster to this line segment.

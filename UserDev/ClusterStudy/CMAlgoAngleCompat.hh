@@ -54,6 +54,9 @@ namespace cluster {
     /// Method to set angle cut value to be based on opening angle
     void SetUseOpeningAngle(bool on) { _use_opening_angle = on; }
 
+    /// Set Minimum Number of Hits to consider Cluster
+    void SetMinHits(int n) { _minHits = n; }
+
     TH1F* GetAngleDistHisto() const{ return angle_dist_histo; };
 
   protected:
@@ -72,6 +75,7 @@ namespace cluster {
     /// angle instead of whatever you set with SetAngleCut
     bool _use_opening_angle;
 
+    int _minHits;        /// Min Number of hits for cluster to be considered
 
     /// Histogram used for debugging/cut value settings
     TH1F *angle_dist_histo;
