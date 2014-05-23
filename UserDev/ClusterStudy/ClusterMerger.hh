@@ -52,7 +52,11 @@ namespace larlight {
 
     ::cluster::CMergeManager& GetManager() { return _mgr; }
 
-    protected:
+    void SaveOutputCluster(bool doit=true) { _write_output = doit; }
+    
+  protected:
+
+    bool _write_output;
 
     ::cluster::CMergeManager _mgr;
 

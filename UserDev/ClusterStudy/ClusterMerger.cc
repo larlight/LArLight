@@ -57,10 +57,45 @@ namespace larlight {
       }
 
     }
-    std::cout<<Form("Processing event %d...",ev_cluster->event_id())<<std::endl;
+
     _mgr.SetClusters(local_clusters);
 
     _mgr.Process();
+
+    if(!_write_output) return true;
+
+    // Proceed to write an output data product
+    std::vector<std::vector<unsigned short> > merged_indexes;
+    _mgr.GetBookKeeper().PassResult(merged_indexes);
+
+    event_cluster* out_cluster_v =  (event_cluster*)(storage->get_data(DATA::Cluster));
+    out_cluster_v->clear();
+    out_cluster_v->reserve(merged_indexes.size());
+    out_cluster_v->set_event_id(ev_cluster->event_id());
+    out_cluster_v->set_run(ev_cluster->run());
+    out_cluster_v->set_subrun(ev_cluster->subrun());
+
+    for(auto const& indexes : merged_indexes) {
+
+      std::vector<unsigned short> merged_association;
+
+      for(auto const& cluster_index : indexes) {
+
+	merged_association.reserve(merged_association.size() + 
+				   ev_cluster->at(cluster_index).association(hit_type).size());
+
+	for(auto const& hit_index : ev_cluster->at(cluster_index).association(hit_type)) 
+
+	  merged_association.push_back(hit_index);
+	
+      }
+
+      cluster out_cluster;
+      out_cluster.set_id(out_cluster_v->size());
+      out_cluster.add_association(hit_type,merged_association);
+      out_cluster_v->push_back(out_cluster);
+    }
+    
   
     return true;
   }
