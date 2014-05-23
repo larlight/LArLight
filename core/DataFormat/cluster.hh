@@ -62,10 +62,10 @@ namespace larlight{
       data_base::clear_data();
       fTotalCharge = -1;
       fdTdW = fdQdW = fSigmadTdW = fSigmadQdW = -1;
-      fStartPos.clear();
-      fEndPos.clear();
-      fSigmaStartPos.clear();
-      fSigmaEndPos.clear();
+      fStartPos.resize(2,0);
+      fEndPos.resize(2,0);
+      fSigmaStartPos.resize(2,0);
+      fSigmaEndPos.resize(2,0);
       fID = -1;
       fView = GEO::kUnknown;
     }
