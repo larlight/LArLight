@@ -247,7 +247,7 @@ namespace cluster {
 	if(plane1 != plane2) continue;
 
 	// Skip if this combination is not meant to be compared
-	if(!(merge_flag.at((*citer2).second))) continue;
+	if(!(merge_flag.at((*citer2).second)) && !(merge_flag.at((*citer1).second)) ) continue;
 
 	// Skip if this combination is not allowed to merge
 	if(!(book_keeper.MergeAllowed((*citer1).second,(*citer2).second))) continue;
