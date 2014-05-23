@@ -45,6 +45,9 @@ namespace cluster {
     /// Method to set verbose mode
     void SetVerbose(bool on) { _verbose = on; }
 
+    /// Method to set debug mode
+    void SetDebug(bool on) { _debug = on; }
+
     /// Method to set whether you allow angles to match with +/- 180 deg difference
     void SetAllow180Ambig(bool on) { _allow_180_ambig = on; }
 
@@ -62,6 +65,8 @@ namespace cluster {
   protected:
 
     bool _verbose;    /// bool to suppress lots of output if you want
+
+    bool _debug;    /// bool to suppress lots of output if you want
 
     ///bool to allow "backwards" clusters (swapped start/end points)
     ///to still match in angle, even though they are 180 degrees apart

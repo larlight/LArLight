@@ -10,6 +10,8 @@ namespace cluster {
     //this just sets default values
     SetVerbose(true);
 
+    SetDebug(true);
+
     SetAngleCut(30.); // in degrees
 
     SetMinHits(0);
@@ -37,6 +39,22 @@ namespace cluster {
     //already in cm/cm units, degrees? need to check that
     double angle1 = cluster1.GetParams().angle_2d;// * _time_2_cm / _wire_2_cm;
     double angle2 = cluster2.GetParams().angle_2d;// * _time_2_cm / _wire_2_cm;
+
+    double w_start1 = cluster1.GetParams().start_point.w;// * _wire_2_cm;
+    double t_start1 = cluster1.GetParams().start_point.t;// * _time_2_cm;
+    double w_start2 = cluster2.GetParams().start_point.w;// * _wire_2_cm;
+    double t_start2 = cluster2.GetParams().start_point.t;// * _time_2_cm;
+
+    if (_debug){
+
+      std::cout << "Cluster 1:" << std::endl;
+      std::cout << "\tAngle: " << angle1 << std::endl;
+      std::cout << "\tStart: ( " << w_start1 << ", " << t_start1 << " )" << std::endl;
+      std::cout << "Cluster 2:" << std::endl;
+      std::cout << "\tAngle: " << angle2 << std::endl;
+      std::cout << "\tStart: ( " << w_start2 << ", " << t_start2 << " )" << std::endl;
+
+    }
   
     //for some reason angles are frequently -999.99.
     //if either angle is this, clearly the cluster 2d angle is not well defined
