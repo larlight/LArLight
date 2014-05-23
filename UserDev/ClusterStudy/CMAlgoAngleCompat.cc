@@ -11,6 +11,8 @@ namespace cluster {
     SetVerbose(true);
 
     SetAngleCut(30.); // in degrees
+
+    SetMinHits(0);
     
     SetAllow180Ambig(false);
 
@@ -26,6 +28,11 @@ namespace cluster {
 			       const ClusterParamsAlgNew &cluster2)
   {
     
+    //if number of hits not large enough skip
+    if ( (_minHits > 0) and ((cluster1.GetParams().N_Hits < _minHits) or (cluster2.GetParams().N_Hits < _minHits)) ) {
+      return false;
+    }
+
     //pretty sure we don't need conversion factors here. 
     //already in cm/cm units, degrees? need to check that
     double angle1 = cluster1.GetParams().angle_2d;// * _time_2_cm / _wire_2_cm;

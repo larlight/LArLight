@@ -54,14 +54,22 @@ namespace cluster {
     /// Set Debug for messages
     void SetDebug(bool debug){ _debug = debug; }
 
+    /// Set Angle Compatibility betweeen the clusters
+    void SetAngleCompat(double deg){ _angleCompat = deg; }
+
+    /// Set Length Reach: How for out the cone extends as percent of cluster length
+    void SetLengthReach(double frac){ _lengthReach = frac; }
+
   protected:
 
     double _wire_2_cm, _time_2_cm; /// Conversion factors ogtten from GeometryUtilities
 
-    int _NhitsMin;
-    double _lenMin;
+    int _NhitsMin;     /// Larger cluster which determines cone must have this many hits
+    double _lenMin;    /// Larger cluster which determines cone must be at least this long
     bool _verbose;
     bool _debug;
+    double _angleCompat; /// Two clusters must have direction within this value of each other
+    double _lengthReach; ///How four out - as percent of cluster length - cone will extend from start point
     
   };
 
