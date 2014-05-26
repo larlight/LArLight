@@ -28,6 +28,7 @@
 #include "MCShowerClusterViewer.hh"
 #include "CMAlgoArray.hh"
 #include "CMAlgoTrackSeparate.hh"
+#include "CMAlgoAngleSeparate.hh"
 #include "CMAlgoMergeAll.hh"
 #include "CMAlgoStartNearEnd.hh"
 #include "CMAlgoStartTrack.hh"
@@ -59,6 +60,7 @@ namespace cluster {
   class ViewerException;
   class ClusterViewerAlgo;
   class ClusterTrackSeparate;
+  class ClusterAngleSeparate;
   class ClusterMergeAll;
 }
 
