@@ -28,7 +28,7 @@ namespace larlight {
   public:
 
     /// Default constructor
-    ClusterMerger(){ _name="ClusterMerger"; _fout=0; _cluster_type = DATA::FuzzyCluster;}
+    ClusterMerger(){ _name="ClusterMerger"; _fout=0; _cluster_type = DATA::FuzzyCluster; _write_output=false;}
 
     /// Default destructor
     virtual ~ClusterMerger(){}
