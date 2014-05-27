@@ -96,10 +96,14 @@ namespace larlight {
 	  hPurity.at(before_after).at(nview)->Write();
 	  hEff.at(before_after).at(nview)->Write();
 	  hClusQoverMCQ.at(before_after).at(nview)->Write();
+	  hEffPerMCShower.at(before_after).at(nview)->Write();
+	  hPurityPerMCShower.at(before_after).at(nview)->Write();
 
 	  delete hPurity.at(before_after).at(nview);
 	  delete hEff.at(before_after).at(nview);
 	  delete hClusQoverMCQ.at(before_after).at(nview);
+	  delete hPurityPerMCShower.at(before_after).at(nview);
+	  delete hEffPerMCShower.at(before_after).at(nview);
 	}
       }
 
@@ -137,7 +141,25 @@ namespace larlight {
 			     100,-0.1,1.1)
 		    );
     hPurity.push_back(tmp);
+
+    tmp.clear();
+    for(int i_view = 0; i_view < 3; i_view++)
+      tmp.push_back(
+		    new TH1D(Form("hPurityPerMCShower_before_merging_view%d",i_view),
+			     Form("For *best* Cluster: Q in Clus from MCShower / Q of Cluster  [before merge], view %d",i_view),
+			     100,-0.1,3.1)
+		    );
+    hPurityPerMCShower.push_back(tmp);
     
+    tmp.clear();
+    for(int i_view = 0; i_view < 3; i_view++)
+      tmp.push_back(
+		    new TH1D(Form("hPurityPerMCShower_after_merging_view%d",i_view),
+			     Form("For *best* Cluster: Q in Clus from MCShower / Q of Cluster [after Merge], view %d",i_view),
+			     100,-0.1,3.1)
+		    );
+    hPurityPerMCShower.push_back(tmp);
+
     tmp.clear();
     for(int i_view = 0; i_view < 3; i_view++)
       tmp.push_back(
@@ -155,7 +177,25 @@ namespace larlight {
 			     300,-0.1,3.1)
 		    );
     hEff.push_back(tmp);
+
+    tmp.clear();
+    for(int i_view = 0; i_view < 3; i_view++)
+      tmp.push_back(
+		    new TH1D(Form("hEffPerMCShower_before_merging_view%d",i_view),
+			     Form("Largest Frac of Shower Q in single Cluster, before, view %d",i_view), 
+			     300,-0.1,3.1)
+		    );
+    hEffPerMCShower.push_back(tmp);
     
+    tmp.clear();
+    for(int i_view = 0; i_view < 3; i_view++)
+      tmp.push_back(
+		    new TH1D(Form("hEffPerMCShower_after_merging_view%d",i_view),
+			     Form("Largest Frac of Shower Q in single Cluster, before, view %d",i_view), 
+			     300,-0.1,3.1)
+		    );
+    hEffPerMCShower.push_back(tmp);
+
     tmp.clear();
     for(int i_view = 0; i_view < 3; i_view++)
       tmp.push_back(
@@ -334,6 +374,14 @@ namespace larlight {
     std::cout<<" } "<<std::endl;
     */
 
+    //Hold max fraction of each MCShower's charge in a single cluster
+    std::vector< std::vector<double> >  MCShower_best_clus(3, std::vector<double>(MCShower_indices.size()+1,0) );
+    //Try and Keep track of Each MCShower's charge across the clusters
+    std::vector< std::vector<double> >  MCShower_Qs(3, std::vector<double>(MCShower_indices.size()+1,0) );
+    //Keep track of total Q of the cluster that has largest fract of MCShower Q
+    std::vector< std::vector<double> > BestClus_Qs(3, std::vector<double>(MCShower_indices.size()+1,0) );
+
+
     ///////////////////////////////////////////////
     //Loop over reconstructed clusters
     ///////////////////////////////////////////////
@@ -493,6 +541,17 @@ namespace larlight {
 	  dominant_MCshower_index = i;
 	}
       }
+
+      for (int i=0; i < part_clus_charge.size() - 1; i++){
+	//std::cout << "Cluster's Charge from MC Shower " << i << " : " << part_clus_charge.at(i) << std::endl;
+	MCShower_Qs.at(_plane).at(i) += part_clus_charge.at(i);
+	if ( part_clus_charge.at(i) > MCShower_best_clus.at(_plane).at(i) ) {
+	  MCShower_best_clus.at(_plane).at(i) = part_clus_charge.at(i);
+	  BestClus_Qs.at(_plane).at(i) = (double)(part_clus_charge.at(i)/_tot_clus_charge_fromKnownMCS);
+	  }
+      }
+
+
       hPurity.at(after_merging).at(_plane)->Fill(_clusQfrac_over_totclusQ);
       
       _clusQfrac_from_unknown = part_clus_charge.back()/_tot_clus_charge;
@@ -564,6 +623,24 @@ namespace larlight {
     // Fill histograms/tree that need once-per-event filling
     ///////////////////////////////////////////////
     
+
+    ///////////
+    // Per MCShower Efficiency & Purity
+    ///////////
+    for (int iplane = 0; iplane < 3; ++iplane){
+      for (int i=0; i<MCShower_indices.size(); i++){
+	//std::cout << "Charge of MCShower in Cluster - max: " << MCShower_best_clus_pl0.at(i) << std::endl;
+	//std::cout << "Charge of MCShower Total: " <<MCShower_Qs_pl0.at(i) << std::endl;
+	MCShower_best_clus.at(iplane).at(i) /= MCShower_Qs.at(iplane).at(i);
+      //std::cout << "Fraction of MCShower's Q in that Cluster: " << MCShower_best_clus_pl0.at(i) << std::endl;
+      //BestClus_Qs_pl0.at(i) /= MCShower_Qs_pl0.at(i);
+	hEffPerMCShower.at(after_merging).at(iplane)->Fill(MCShower_best_clus.at(iplane).at(i));
+      //std::cout << "Fraction of Cluster's Q made up by the Q of that MCShower " << BestClus_Qs_pl0.at(i) << std::endl;      
+	hPurityPerMCShower.at(after_merging).at(iplane)->Fill(BestClus_Qs.at(iplane).at(i));
+      }
+    }
+
+
     ///////////
     //efficiency of clustering for the event, per plane
     ///////////
