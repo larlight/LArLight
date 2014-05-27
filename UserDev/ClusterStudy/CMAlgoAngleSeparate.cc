@@ -12,9 +12,9 @@ namespace cluster {
 
     SetDebug(false);
     SetVerbose(false);
-    SetMaxAngleSep(30.);
+    SetMaxAngleSep(20.);
     SetMinLength(15.);
-    SetMinHits(10);
+    SetMinHits(20);
 
   }
 
@@ -65,7 +65,7 @@ namespace cluster {
     if ( (t_start2-t_start1) == 0 )
       angle = 0.;
     else {
-      double slope = (w_start2-w_start1)/(t_start2-t_start1);
+      double slope = (t_start2-t_start1)/(w_start2-w_start1);
       angle = atan(slope)*180./3.14;
     }
 
@@ -74,7 +74,8 @@ namespace cluster {
       std::cout << "Angle S1--S2: " << angle << std::endl;
       std::cout << "Angle1--S2: " << separation << std::endl;
     }
-    if ( ((separation < _MaxAngle) or ( (separation < 180+_MaxAngle) and (separation > 180-_MaxAngle) ))
+    if ( ( ( (separation > _MaxAngle) and (separation < 180-_MaxAngle) ) or
+	   ( (separation > 180+_MaxAngle) and (separation< 360-_MaxAngle) ) )
 	 and (hits2 > _minHits)
 	 and (len1 > _MinLen)      ){
       if (_verbose) { std::cout << "Separate! cluster 1 BIG" << std::endl << std::endl; }
@@ -89,7 +90,8 @@ namespace cluster {
       std::cout << "Angle S2--S1: " << angle << std::endl;
       std::cout << "Angle2--S1: " << separation << std::endl;
     }
-    if ( ((separation < _MaxAngle) or ( (separation < 180+_MaxAngle) and (separation > 180-_MaxAngle) ))
+    if ( ( ( (separation > _MaxAngle) and (separation < 180-_MaxAngle) ) or
+	   ( (separation > 180+_MaxAngle) and (separation< 360-_MaxAngle) ) )
 	 and (hits1 > _minHits)
 	 and (len2 > _MinLen)    ){
       if (_verbose) { std::cout << "Separate! cluster 2 BIG" << std::endl << std::endl; }
