@@ -35,6 +35,7 @@
 #pragma link C++ class cluster::CMAlgoArray+;
 #pragma link C++ class cluster::CMAlgoTrackSeparate+;
 #pragma link C++ class cluster::CMAlgoAngleSeparate+;
+#pragma link C++ class cluster::CMAlgoOutOfConeSeparate+;
 #pragma link C++ class cluster::CMAlgoMergeAll+;
 #pragma link C++ class cluster::CMAlgoStartNearEnd+;
 #pragma link C++ class cluster::CMAlgoStartTrack+;

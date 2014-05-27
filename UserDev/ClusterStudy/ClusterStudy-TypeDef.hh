@@ -29,6 +29,7 @@
 #include "CMAlgoArray.hh"
 #include "CMAlgoTrackSeparate.hh"
 #include "CMAlgoAngleSeparate.hh"
+#include "CMAlgoOutOfConeSeparate.hh"
 #include "CMAlgoMergeAll.hh"
 #include "CMAlgoStartNearEnd.hh"
 #include "CMAlgoStartTrack.hh"
@@ -61,6 +62,7 @@ namespace cluster {
   class ClusterViewerAlgo;
   class ClusterTrackSeparate;
   class ClusterAngleSeparate;
+  class ClusterOutOfConeSeparate;
   class ClusterMergeAll;
 }
 
