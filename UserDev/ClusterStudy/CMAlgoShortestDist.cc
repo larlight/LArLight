@@ -15,7 +15,10 @@ namespace cluster {
     
     //1e9 is huge; everything will be merged
     SetSquaredDistanceCut(1e9);
-    std::cout << "wire2cm: " << _wire_2_cm << " time2cm: " << _time_2_cm << std::endl;
+
+    if(_verbose or _debug)
+      std::cout << "wire2cm: " << _wire_2_cm << " time2cm: " << _time_2_cm << std::endl;
+
     _wire_2_cm = larutil::GeometryUtilities::GetME()->WireToCm();
     _time_2_cm = larutil::GeometryUtilities::GetME()->TimeToCm();
 
