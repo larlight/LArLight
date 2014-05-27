@@ -55,7 +55,10 @@ namespace larlight{
     void DrawAllClusters() {_algo.DrawAllClusters();}
 
     /// Function to draw a secondary canvas (where individual cluster is shown)
-    void DrawOneCluster(UChar_t plane, size_t index) {_algo.DrawOneCluster(plane,index);}
+    void DrawOneCluster(UChar_t plane, size_t index) {
+      _algo.DrawOneCluster(plane,index);
+      if(_print_on_DrawOneCluster) PrintClusterInfo(plane,index);
+    }
 
     /// Function to draw a tertiary canvas w/ two clusters on it
     void DrawTwoClusters(UChar_t plane, size_t index1, size_t index2) {_algo.DrawTwoClusters(plane,index1,index2);}
@@ -63,12 +66,19 @@ namespace larlight{
     /// Function to disable drawing of polygon if you want
     void SetDrawPolygon(bool flag) { _draw_polygon = flag; }
 
+    /// Function to print cluster params to screen if user wants to 
+    void PrintClusterInfo(UChar_t plane, size_t index);
+
+    /// Function to set whether user wants to print cluster info
+    void SetPrintClusterInfo(bool flag) { _print_on_DrawOneCluster = flag; }
+
   protected:
 
     ::cluster::ClusterViewerAlgo _algo;
 
     bool _draw_polygon;
 
+    bool _print_on_DrawOneCluster;
   };
   
 }

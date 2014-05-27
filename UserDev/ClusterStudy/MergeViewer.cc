@@ -15,6 +15,7 @@ namespace larlight {
     
     // Default values for stuff
     SetDrawPolygon(false);
+    SetPrintClusterInfo(false);
 
   }
   
@@ -134,13 +135,33 @@ namespace larlight {
     
     return true;
   };
-  
+
   bool MergeViewer::finalize() {
 
     return ClusterMerger::finalize();
 
   }
 
+  void MergeViewer::PrintClusterInfo(UChar_t plane, size_t index){
+
+    int index_offset = 0;
+    //get the clusters (after merging)
+    for (auto const &cl : ClusterMerger::GetManager().GetClusters()) {
+      if (cl.Plane() == plane) break;
+      else index_offset++;
+    }
+    
+    index = index + index_offset;
+    auto cl = ClusterMerger::GetManager().GetClusters().at(index);
+    std::cout<<"**********PRINTING CLUSTER INFO**********"<<std::endl;
+    std::cout<<"Angle 2D = "<<cl.GetParams().angle_2d<<std::endl;
+    std::cout<<"Opening Angle = "<<cl.GetParams().opening_angle<<std::endl;
+    std::cout<<"Sum charge = "<<cl.GetParams().sum_charge<<std::endl;
+    std::cout<<"Length = "<<cl.GetParams().length<<std::endl;
+    std::cout<<"Width = "<<cl.GetParams().width<<std::endl;
+    std::cout<<"N_Hits = "<<cl.GetParams().N_Hits<<std::endl;
+  }
+  
 }
 #endif
 
