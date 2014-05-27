@@ -150,8 +150,15 @@ namespace cluster {
       
       _hClusterHits.at(plane).at(index)->Fill(h.first,h.second);
     
-    // Set Color
-    _hClusterHits.at(plane).at(index)->SetMarkerColor(index+1);
+    // Set Color (skipping white and close-to-white)
+    if(index+1 != 10 && index+1 != 19 ){
+      _hClusterHits.at(plane).at(index)->SetMarkerColor(index+1);
+    }
+    else if (index+1 == 10)
+      _hClusterHits.at(plane).at(index)->SetMarkerColor(92);
+    else if (index+1 == 19)
+      _hClusterHits.at(plane).at(index)->SetMarkerColor(99);
+
     _hClusterHits.at(plane).at(index)->SetMarkerStyle(kFullStar);
 
   }
