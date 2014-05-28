@@ -43,12 +43,15 @@ my_CMP.SetRunBeforeMerging(False)
 my_CMP.SetRunMerging(True)
 my_CMP.GetManager().MergeTillConverge(False)
 my_CMP.GetManager().DebugMode(cluster.CMergeManager.kNone)
+my_CMP.SetClusterType(larlight.DATA.FuzzyCluster)
+my_CMP.SetDebug(False)
 
 
+########################################
+# attach merge algos here
+########################################
 
-#algos that require AND condition have to be added in array
-algo_array = cluster.CMAlgoArray()
-
+## PROHIBIT ALGOS ##
 tracksep_prohibit = cluster.CMAlgoTrackSeparate()
 tracksep_prohibit.SetMinNumHits(30)
 tracksep_prohibit.SetMinAngleDiff(0.1)
@@ -59,20 +62,38 @@ tracksep_prohibit.SetDebug(False)
 tracksep_prohibit.SetVerbose(False)
 my_CMP.GetManager().AddSeparateAlgo(tracksep_prohibit)
 
+outofcone_prohibit = cluster.CMAlgoOutOfConeSeparate()
+outofcone_prohibit.SetDebug(False)
+outofcone_prohibit.SetVerbose(False)
+my_CMP.GetManager().AddSeparateAlgo(outofcone_prohibit)
+
+
+#merge algos that require AND condition have to be added in array
+#----------------------------------------------------------
+algo_array = cluster.CMAlgoArray()
+
 angalg = cluster.CMAlgoAngleCompat()
 angalg.SetVerbose(False)
+angalg.SetDebug(False)
 angalg.SetAllow180Ambig(False)
-angalg.SetAngleCut(angle_cutval)
-#my_CMP.GetManager().AddMergeAlgo(angalg)
+angalg.SetUseOpeningAngle(False)
+angalg.SetAngleCut(3.)
+#False here means use "OR" condition
 algo_array.AddAlgo(angalg,False)
+
 
 algo = cluster.CMAlgoShortestDist()
 algo.SetVerbose(False)
-algo.SetSquaredDistanceCut(dist_cutval)
-#my_CMP.GetManager().AddMergeAlgo(algo)
+algo.SetDebug(False)
+algo.SetMinHits(0)
+algo.SetSquaredDistanceCut(5.)
+
 algo_array.AddAlgo(algo,False)
 
 my_CMP.GetManager().AddMergeAlgo(algo_array)
+#----------------------------------------------------------
+
+
 
 print
 print  "Finished configuring ana_processor. Start event loop!"

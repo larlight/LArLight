@@ -117,7 +117,6 @@ namespace cluster {
       return true;
     }
 
-    std::cout << std::endl;
     return false;
   }
 

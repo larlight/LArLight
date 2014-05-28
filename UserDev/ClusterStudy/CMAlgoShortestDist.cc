@@ -9,7 +9,7 @@ namespace cluster {
   CMAlgoShortestDist::CMAlgoShortestDist() {
 
     //this just sets default values    
-    SetVerbose(true);
+    SetVerbose(false);
     SetDebug(false);
     SetMinHits(0);
     
