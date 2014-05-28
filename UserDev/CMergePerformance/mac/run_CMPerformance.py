@@ -34,23 +34,63 @@ my_proc.add_process(my_CMP)
 my_CMP.SetRunBeforeMerging(True)
 #can toggle off running merging to just make FOM plots for raw fuzzycluster data, runs faster
 my_CMP.SetRunMerging(True)
-my_CMP.GetManager().MergeTillConverge(True)
+my_CMP.GetManager().MergeTillConverge(False)
 my_CMP.GetManager().DebugMode(cluster.CMergeManager.kNone)
+my_CMP.SetClusterType(larlight.DATA.FuzzyCluster)
+my_CMP.SetDebug(False)
 
-#Configure the merge algos you want to use here
-short_dist_algo = cluster.CMAlgoShortestDist()
-short_dist_algo.SetSquaredDistanceCut(20000.)
-short_dist_algo.SetVerbose(False)
-my_CMP.GetManager().AddMergeAlgo(short_dist_algo)
-#merge_all_algo = cluster.CMAlgoMergeAll()
-#my_CMP.GetManager().AddMergeAlgo(merge_all_algo)
+########################################
+# attach merge algos here
+########################################
+
+## PROHIBIT ALGOS ##
+tracksep_prohibit = cluster.CMAlgoTrackSeparate()
+tracksep_prohibit.SetMinNumHits(30)
+tracksep_prohibit.SetMinAngleDiff(0.1)
+tracksep_prohibit.SetMaxOpeningAngle(30)
+tracksep_prohibit.SetMinLength(10.)
+tracksep_prohibit.SetMaxWidth(25.)
+tracksep_prohibit.SetDebug(False)
+tracksep_prohibit.SetVerbose(False)
+my_CMP.GetManager().AddSeparateAlgo(tracksep_prohibit)
+
+outofcone_prohibit = cluster.CMAlgoOutOfConeSeparate()
+outofcone_prohibit.SetDebug(False)
+outofcone_prohibit.SetVerbose(False)
+my_CMP.GetManager().AddSeparateAlgo(outofcone_prohibit)
+
+
+#merge algos that require AND condition have to be added in array
+#----------------------------------------------------------
+algo_array = cluster.CMAlgoArray()
+
+angalg = cluster.CMAlgoAngleCompat()
+angalg.SetVerbose(False)
+angalg.SetDebug(False)
+angalg.SetAllow180Ambig(False)
+angalg.SetUseOpeningAngle(False)
+angalg.SetAngleCut(3.)
+#False here means use "OR" condition
+algo_array.AddAlgo(angalg,False)
+
+
+algo = cluster.CMAlgoShortestDist()
+algo.SetVerbose(False)
+algo.SetDebug(False)
+algo.SetMinHits(0)
+algo.SetSquaredDistanceCut(5.)
+
+algo_array.AddAlgo(algo,False)
+
+my_CMP.GetManager().AddMergeAlgo(algo_array)
+#----------------------------------------------------------
 
 print
 print  "Finished configuring ana_processor. Start event loop!"
 print
 
 # Let's run it.
-my_proc.run(1,30);
+my_proc.run();
 
 # done!
 print

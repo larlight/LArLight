@@ -7,7 +7,9 @@
 namespace larlight {
   
   bool CMergePerformance::initialize() {
-    
+
+    SetDebug(false);
+
     ana_tree=0;
     PrepareTTree();
     
@@ -322,12 +324,12 @@ namespace larlight {
       MCShower_indices.push_back(i);
 
     //debug: view MCShower_indices
-    /*
-    std::cout<<"MCShower_indices = { ";
-    for(int a = 0; a < MCShower_indices.size(); ++a)
-      std::cout<<MCShower_indices.at(a)<<", ";
-    std::cout<<"}"<<std::endl;
-    */
+    if(_debug){
+      std::cout<<"MCShower_indices = { ";
+      for(int a = 0; a < MCShower_indices.size(); ++a)
+	std::cout<<MCShower_indices.at(a)<<", ";
+      std::cout<<"}"<<std::endl;
+    }
 
     //count the number of clusters for the denominator of efficiency plot
     //but DO NOT INCLUDE clusters that are 100% belonging to "unknown" MCShowers
@@ -362,17 +364,18 @@ namespace larlight {
 
     int cluster_params_idx = 0;
     //debug, viewing idx vec
-    /*
-    std::cout<<"after_merging is equal to "<<after_merging<<std::endl;
-    std::cout<<"clus_idx_vec = { ";
-    for(int a = 0; a < clus_idx_vec.size(); a++){
-      std::cout<< "{ ";
-      for(int b = 0; b < clus_idx_vec.at(a).size(); b++)
-	std::cout<< clus_idx_vec.at(a).at(b) << ", ";
-      std::cout<<" }, ";
+    if(_debug){
+      std::cout<<"after_merging is equal to "<<after_merging<<std::endl;
+      std::cout<<"clus_idx_vec = { ";
+      for(int a = 0; a < clus_idx_vec.size(); a++){
+	std::cout<< "{ ";
+	for(int b = 0; b < clus_idx_vec.at(a).size(); b++)
+	  std::cout<< clus_idx_vec.at(a).at(b) << ", ";
+	std::cout<<" }, ";
+      }
+      std::cout<<" } "<<std::endl;
     }
-    std::cout<<" } "<<std::endl;
-    */
+    
 
     //Hold max fraction of each MCShower's charge in a single cluster
     std::vector< std::vector<double> >  MCShower_best_clus(3, std::vector<double>(MCShower_indices.size()+1,0) );
@@ -385,13 +388,13 @@ namespace larlight {
     ///////////////////////////////////////////////
     //Loop over reconstructed clusters
     ///////////////////////////////////////////////
+    if(_debug){
+      std::cout<<"after_merging? = "<<after_merging
+	       <<". This event has "<<clus_idx_vec.size()
+	       <<" clusters and "<<MCShower_indices.size()
+	       <<" viable MCShowers"<<std::endl;
+    }
 
-    //    std::cout<<"after_merging? = "<<after_merging
-    //	     <<". This event has "<<clus_idx_vec.size()
-    //	     <<" clusters and "<<MCShower_indices.size()
-    //	     <<" viable MCShowers"<<std::endl;
-
-    //    for(auto const i_cluster: *ev_cluster) {
     for(int outer_clus_idx=0; outer_clus_idx<clus_idx_vec.size(); ++outer_clus_idx){
       //total cluster charge
       _tot_clus_charge = 0;
@@ -421,26 +424,26 @@ namespace larlight {
 
 
       //debug: view ass_index
-      /*
-      std::cout<<"for this cluster, ass_index is {";
-      for(int a = 0; a < ass_index.size(); a++)
-	std::cout<<ass_index.at(a)<<",";
-      std::cout<< "}"<<std::endl;
-      */
+      if(_debug){
+	std::cout<<"for this cluster, ass_index is {";
+	for(int a = 0; a < ass_index.size(); a++)
+	  std::cout<<ass_index.at(a)<<",";
+	std::cout<< "}"<<std::endl;
+      }
 
       ///////////////////////////////////////////////
       //Loop over hits in this cluster 
       ///////////////////////////////////////////////
-      //      std::cout<<"looping over ass_index. n_hits is "<<ass_index.size()<<std::endl;
+      if(_debug)
+	std::cout<<"looping over ass_index. n_hits is "<<ass_index.size()<<std::endl;
       for(auto const hit_index: ass_index){
-	//	std::cout<<"hit_index is "<<hit_index<<std::endl;
+	if(_debug)
+	  std::cout<<"hit_index is "<<hit_index<<std::endl;
+	
 	_tot_clus_charge += ev_hits->at(hit_index).Charge();
 	  
-
-	//	std::cout<<"adding "<<ev_hits->at(hit_index).Charge()<<" to tot_clus_charge"<<std::endl;
-
 	hit_charge_frac.clear();
-	
+		
 	hit_charge_frac = 
 	  _mcslb.MatchHitsAll(ev_hits->at(hit_index),
 			      _simch_map,
@@ -449,12 +452,12 @@ namespace larlight {
 
 
 	//debug
-	/*
-	std::cout<<"Debug: just got back hit_charge_frac as (";
-	for(int j = 0; j < hit_charge_frac.size(); ++j)
-	  std::cout<<hit_charge_frac.at(j)<<", ";
-	std::cout<<")."<<std::endl;
-	*/
+	if(_debug){
+	  std::cout<<"Debug: just got back hit_charge_frac as (";
+	  for(int j = 0; j < hit_charge_frac.size(); ++j)
+	    std::cout<<hit_charge_frac.at(j)<<", ";
+	  std::cout<<")."<<std::endl;
+	}
 
 	
 	//sometimes mcslb returns a null vector if the reco hit couldn't be matched with an IDE at all... this rarely occurs
@@ -462,14 +465,14 @@ namespace larlight {
 	if(hit_charge_frac.size() == 0){
 	  part_clus_charge.back() += (1.)*ev_hits->at(hit_index).Charge();
 	  
-	  std::cout<<"warning, mcslb returned a null vector"<<std::endl;
-	  /*	  
-		  std::cout<<"event number is "<<ev_hits->event_id()<<std::endl;
-	  std::cout<<"this hit's startTime, endTime is "<<ev_hits->at(hit_index).StartTime()
-		   <<", "<<ev_hits->at(hit_index).EndTime()<<std::endl;
-	  std::cout<<"this hit's channel is "<<ev_hits->at(hit_index).Channel()<<std::endl;
-	  std::cout<<"this hits' charge is "<<ev_hits->at(hit_index).Charge()<<std::endl;
-	  */
+	  if(_debug){
+	    std::cout<<"warning, mcslb returned a null vector"<<std::endl;
+	    std::cout<<"event number is "<<ev_hits->event_id()<<std::endl;
+	    std::cout<<"this hit's startTime, endTime is "<<ev_hits->at(hit_index).StartTime()
+		     <<", "<<ev_hits->at(hit_index).EndTime()<<std::endl;
+	    std::cout<<"this hit's channel is "<<ev_hits->at(hit_index).Channel()<<std::endl;
+	    std::cout<<"this hits' charge is "<<ev_hits->at(hit_index).Charge()<<std::endl;
+	  }
 	}
 	else{
 	  //mcslb has found an IDE, whether it be in an MCShower, or unknown
@@ -480,35 +483,34 @@ namespace larlight {
 	    _tot_clus_charge_fromKnownMCS += hit_charge_frac.at(i)*ev_hits->at(hit_index).Charge();
 	  
 	}
-	//debug
-	
-	//  std::cout<<"This hit is made up of (";
-	//	  for(int i=0; i<hit_charge_frac.size()-1; ++i)
-	//	  std::cout<<hit_charge_frac.at(i)<<", ";
-	//	  std::cout<<") fractional charge from "<<
-	//	  hit_charge_frac.size()-1<<" known MCShowers and "<<
-	//	  (float)hit_charge_frac.back()<<" from unknown ones."<<std::endl;
-	
-	  //end debug
+
+	if(_debug){
+	  std::cout<<"This hit is made up of (";
+	  for(int i=0; i<hit_charge_frac.size()-1; ++i)
+	    std::cout<<hit_charge_frac.at(i)<<", ";
+	  std::cout<<") fractional charge from "<<
+	    hit_charge_frac.size()-1<<" known MCShowers and "<<
+	    (float)hit_charge_frac.back()<<" from unknown ones."<<std::endl;
+	}
+	 
       
       } //end looping over hits in this cluster
       
 
       //debug: view part_clus_charge vector
-      /*
-      std::cout<<"part_clus_charge vector = { ";
-      for(int a = 0; a < part_clus_charge.size(); ++a)
-	std::cout<<part_clus_charge.at(a)<<", ";
-      std::cout<< "}"<<std::endl;
-      std::cout<<"total charge is "<<_tot_clus_charge
-	       <<" while totQ from known is "<<_tot_clus_charge_fromKnownMCS
-	       <<std::endl;
-      */
-
-      //debug: print contents of _shower_idmap map
-      //    for(std::map<UInt_t,UInt_t>::iterator it=_shower_idmap.begin(); it!=_shower_idmap.end(); ++it)
-      //      std::cout<<"viewing whoer_idmap: "<<it->first << " => "<<it->second <<std::endl;
-      
+      if(_debug){
+	std::cout<<"part_clus_charge vector = { ";
+	for(int a = 0; a < part_clus_charge.size(); ++a)
+	  std::cout<<part_clus_charge.at(a)<<", ";
+	std::cout<< "}"<<std::endl;
+	std::cout<<"total charge is "<<_tot_clus_charge
+		 <<" while totQ from known is "<<_tot_clus_charge_fromKnownMCS
+		 <<std::endl;
+	
+	//debug: print contents of _shower_idmap map
+	for(std::map<UInt_t,UInt_t>::iterator it=_shower_idmap.begin(); it!=_shower_idmap.end(); ++it)
+	  std::cout<<"viewing whoer_idmap: "<<it->first << " => "<<it->second <<std::endl;
+      }
     
       ///////////////////////////////////////////////
       // Fill histograms/tree that need once-per-cluster filling
@@ -555,21 +557,21 @@ namespace larlight {
       hPurity.at(after_merging).at(_plane)->Fill(_clusQfrac_over_totclusQ);
       
       _clusQfrac_from_unknown = part_clus_charge.back()/_tot_clus_charge;
-
       
-      if(_clusQfrac_over_totclusQ < 0.50){
-      	std::cout<<"_clusQfraC_over_totclusQ is <0.50"<<std::endl;
-	std::cout<<"part_clus_charge vector = { ";
-      	for(int a = 0; a < part_clus_charge.size(); ++a)
-      	  std::cout<<part_clus_charge.at(a)<<", ";
-      	std::cout<< "}"<<std::endl;
-	std::cout<<"_nhits is "<<_nhits<<std::endl;
-	//	std::cout<<"MCShower_indices = { ";
-	//	for(int a = 0; a < MCShower_indices.size(); ++a)
-	//	  std::cout<<MCShower_indices.at(a)<<", ";
-	//	std::cout<<"}"<<std::endl;
+      if(_debug){
+	if(_clusQfrac_over_totclusQ < 0.50){
+	  std::cout<<"_clusQfraC_over_totclusQ is <0.50"<<std::endl;
+	  std::cout<<"part_clus_charge vector = { ";
+	  for(int a = 0; a < part_clus_charge.size(); ++a)
+	    std::cout<<part_clus_charge.at(a)<<", ";
+	  std::cout<< "}"<<std::endl;
+	  std::cout<<"_nhits is "<<_nhits<<std::endl;
+	  std::cout<<"MCShower_indices = { ";
+	  for(int a = 0; a < MCShower_indices.size(); ++a)
+	    std::cout<<MCShower_indices.at(a)<<", ";
+	  std::cout<<"}"<<std::endl;
+	}
       }
-      
       //"other purity" :
       //cluster charge divided by charge of dominant MC shower
       //if dominant_index points to the "unknown" element, set ratio to -1

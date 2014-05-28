@@ -88,6 +88,9 @@ namespace larlight {
     /// will just be left blank.
     /// This is useful because merging can take the most time to run
     void SetRunMerging(bool flag) { _run_merging = flag; }
+    
+    void SetDebug(bool flag) { _debug = flag; }
+
 
     protected:
 
@@ -107,6 +110,7 @@ namespace larlight {
 
     void RunMerging(event_cluster* ev_cluster,
 		    event_hit* ev_hits);
+
 
     ///vector of CPAN objects (before, and overwritten after merging)
     std::vector< ::cluster::ClusterParamsAlgNew> _clusterparams;
@@ -169,6 +173,9 @@ namespace larlight {
     GEO::View_t _plane;
     bool _after_merging;
 
+
+
+    bool _debug;
 
   };
 }
