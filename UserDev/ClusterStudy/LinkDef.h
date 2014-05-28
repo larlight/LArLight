@@ -37,6 +37,7 @@
 #pragma link C++ class cluster::CMAlgoAngleSeparate+;
 #pragma link C++ class cluster::CMAlgoOutOfConeSeparate+;
 #pragma link C++ class cluster::CMAlgoMergeAll+;
+#pragma link C++ class cluster::CMAlgoCenterOfMass+;
 #pragma link C++ class cluster::CMAlgoStartNearEnd+;
 #pragma link C++ class cluster::CMAlgoStartTrack+;
 //ADD_CMALGO_CLASS ... do not change this line

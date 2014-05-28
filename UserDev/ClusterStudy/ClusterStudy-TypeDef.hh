@@ -31,6 +31,7 @@
 #include "CMAlgoAngleSeparate.hh"
 #include "CMAlgoOutOfConeSeparate.hh"
 #include "CMAlgoMergeAll.hh"
+#include "CMAlgoCenterOfMass.hh"
 #include "CMAlgoStartNearEnd.hh"
 #include "CMAlgoStartTrack.hh"
 //ADD_NEW_HEADER ... do not change this comment line
@@ -64,6 +65,7 @@ namespace cluster {
   class ClusterAngleSeparate;
   class ClusterOutOfConeSeparate;
   class ClusterMergeAll;
+  class ClusterCenterOfMass;
 }
 
 namespace larlight {
