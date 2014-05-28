@@ -49,6 +49,7 @@ namespace larlight {
       _run_before_merging=true;
       _run_merging=true;
       _MCShower_mother_energy_cutoff = 0.02;
+      _cluster_type = DATA::FuzzyCluster;
     }
 
     /// Default destructor
@@ -68,6 +69,11 @@ namespace larlight {
         Finalize method to be called after all events processed.
     */
     virtual bool finalize();
+
+    /** Set Cluster Type to be read in: ClusterMerger makes Cluster
+	instead of FuzzyCluster
+    */
+    void SetClusterType(DATA::DATA_TYPE type) {_cluster_type = type;}
 
     /// Getter for the CMergeManager so user can configure merge algos etc
     ::cluster::CMergeManager& GetManager() { return _mgr; }
@@ -117,7 +123,9 @@ namespace larlight {
     
     bool _run_before_merging, _run_merging;
     double _MCShower_mother_energy_cutoff;
-    
+
+    //Cluster type to be read in
+    DATA::DATA_TYPE _cluster_type;
 
     //declare mcshowerlookback object only once, not once per event
     larlight::McshowerLookback _mcslb;

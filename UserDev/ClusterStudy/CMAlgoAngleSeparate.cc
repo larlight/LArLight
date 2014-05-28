@@ -98,7 +98,7 @@ namespace cluster {
       return true;
     }
 
-    std::cout << std::endl;
+    if (_debug) { std::cout << std::endl; }
     return false;
   }
 

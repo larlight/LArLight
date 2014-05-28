@@ -15,14 +15,14 @@ namespace larlight {
     
     w2cm = larutil::GeometryUtilities::GetME()->WireToCm();
     t2cm = larutil::GeometryUtilities::GetME()->TimeToCm();
-    
+
     return true;
   }
   
   bool CMergePerformance::analyze(storage_manager* storage) {
           
     //grab the reconstructed clusters
-    larlight::event_cluster* ev_cluster = (larlight::event_cluster*)storage->get_data(larlight::DATA::FuzzyCluster);
+    larlight::event_cluster* ev_cluster = (larlight::event_cluster*)storage->get_data(_cluster_type);
     if(!ev_cluster) {
       print(larlight::MSG::ERROR,__FUNCTION__,Form("Did not find specified data product, FuzzyCluster!"));
       return false;
