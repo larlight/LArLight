@@ -61,12 +61,21 @@ namespace cluster {
     /// Function to se Min hits for big clusters
     void SetMinHitsBigClus(int n) { _minHits = n; }
 
+    /// Function to set Max Distance for COM to be from start-end
+    void SetMaxDistance(double d) { _MaxDist = d; }
+
+    double ShortestDistanceSquared(double point_x, double point_y, 
+				   double start_x, double start_y,
+				   double end_x,   double end_y  ) const;
+    
+    
   protected:
 
     bool _debug;
     bool _verbose;
     int _minHits;
     int _maxHits;
+    double _MaxDist;
 
   };
 }
