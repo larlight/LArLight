@@ -75,12 +75,16 @@ namespace larlight {
     out_cluster_v->set_event_id(ev_cluster->event_id());
     out_cluster_v->set_run(ev_cluster->run());
     out_cluster_v->set_subrun(ev_cluster->subrun());
+    //tmp_index to know what plane to use
+    int tmp_index;
 
     for(auto const& indexes : merged_indexes) {
 
       std::vector<unsigned short> merged_association;
 
       for(auto const& cluster_index : indexes) {
+
+	tmp_index = cluster_index;
 
 	merged_association.reserve(merged_association.size() + 
 				   ev_cluster->at(cluster_index).association(hit_type).size());
@@ -93,6 +97,7 @@ namespace larlight {
 
       cluster out_cluster;
       out_cluster.set_id(out_cluster_v->size());
+      out_cluster.set_view(ev_cluster->at(tmp_index).View());
       out_cluster.add_association(hit_type,merged_association);
       out_cluster_v->push_back(out_cluster);
     }
