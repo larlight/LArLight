@@ -34,6 +34,7 @@
 #include "CMAlgoCenterOfMass.hh"
 #include "CMAlgoStartNearEnd.hh"
 #include "CMAlgoStartTrack.hh"
+#include "CMAlgoProhibitAllTracks.hh"
 //ADD_NEW_HEADER ... do not change this comment line
 
 // Class forward declaration here
@@ -57,6 +58,7 @@ namespace cluster {
   class CMAlgoStartInCone;
   class CMAlgoStartNearEnd;
   class CMAlgoStartTrack;
+  class CMAlgoProhibitAllTracks;
 //ADD_CMALGO_CLASS ... do not change this comment line
 
   class ViewerException;
@@ -81,6 +83,8 @@ namespace larlight {
 
 //ADD_EMPTY_CLASS ... do not change this comment line
 #endif
+
+
 
 
 

@@ -160,6 +160,7 @@ namespace larlight {
     std::cout<<"Length = "<<cl.GetParams().length<<std::endl;
     std::cout<<"Width = "<<cl.GetParams().width<<std::endl;
     std::cout<<"N_Hits = "<<cl.GetParams().N_Hits<<std::endl;
+    std::cout<<"eigenvalue_principal = "<<cl.GetParams().eigenvalue_principal<<std::endl;
   }
   
 }

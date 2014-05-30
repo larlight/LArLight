@@ -8,8 +8,8 @@ namespace cluster {
   CMAlgoPolyOverlap::CMAlgoPolyOverlap()
   {
     // Nothing to be done in the base class
-    SetDebug(true);
-    SetVerbose(true);
+    SetDebug(false);
+    SetVerbose(false);
     SetMinNumHits(0);
 
     this->reconfigure();
