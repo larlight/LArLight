@@ -26,21 +26,89 @@ larlight.storage_manager.get().set_data_to_read(larlight.DATA.Shower,False)
 larlight.storage_manager.get().set_data_to_read(larlight.DATA.Calorimetry,False)
 larlight.storage_manager.get().set_data_to_read(larlight.DATA.UserInfo,False)
 
-#is there a way to disable ana_proc from creating an output file at all?
 my_proc.set_ana_output_file("")
 
 raw_viewer   = larlight.ClusterViewer()
 merge_viewer = larlight.MergeViewer()
-mc_viewer    = larlight.MCShowerClusterViewer()
 
-# attach merge algo
-merge_viewer.GetManager().AddMergeAlgo(cluster.CMAlgoFake())
+
+merge_viewer.SetPrintClusterInfo(True)
+
+########################################
+# attach merge algos here
+########################################
+prohib_array = cluster.CMAlgoArray()
+
+tracksep_prohibit = cluster.CMAlgoTrackSeparate()
+tracksep_prohibit.SetMinNumHits(30)
+tracksep_prohibit.SetMinAngleDiff(0.1)
+tracksep_prohibit.SetMaxOpeningAngle(30)
+tracksep_prohibit.SetMinLength(10.)
+tracksep_prohibit.SetMaxWidth(25.)
+tracksep_prohibit.SetDebug(False)
+tracksep_prohibit.SetVerbose(False)
+#merge_viewer.GetManager().AddSeparateAlgo(tracksep_prohibit)
+prohib_array.AddAlgo(tracksep_prohibit,False)
+
+outofcone_prohibit = cluster.CMAlgoOutOfConeSeparate()
+outofcone_prohibit.SetDebug(False)
+outofcone_prohibit.SetVerbose(False)
+#merge_viewer.GetManager().AddSeparateAlgo(outofcone_prohibit)
+prohib_array.AddAlgo(outofcone_prohibit,False)
+
+alltrack_prohibit = cluster.CMAlgoProhibitAllTracks()
+alltrack_prohibit.SetMinEP(.999000)
+#merge_viewer.GetManager().AddSeparateAlgo(alltrack_prohibit)
+prohib_array.AddAlgo(alltrack_prohibit,False)
+
+merge_viewer.GetManager().AddSeparateAlgo(prohib_array)
+
+#temprary merge all to test prohibit algos
+#ma_algo = cluster.CMAlgoMergeAll()
+#merge_viewer.GetManager().AddMergeAlgo(ma_algo)
+#temporary merge nothing
+#tmpalgo = cluster.CMAlgoShortestDist()
+#tmpalgo.SetMinHits(999999)
+#merge_viewer.GetManager().AddMergeAlgo(tmpalgo)
+
+#algos that require AND condition have to be added in array
+#----------------------------------------------------------
+algo_array = cluster.CMAlgoArray()
+
+angalg = cluster.CMAlgoAngleCompat()
+angalg.SetVerbose(False)
+angalg.SetDebug(False)
+angalg.SetAllow180Ambig(False)
+angalg.SetUseOpeningAngle(False)
+angalg.SetAngleCut(3.)
+
+#False here means use "OR" condition
+algo_array.AddAlgo(angalg,False)
+
+algo = cluster.CMAlgoShortestDist()
+algo.SetVerbose(False)
+algo.SetDebug(False)
+algo.SetMinHits(10)
+algo.SetSquaredDistanceCut(5.)
+
+algo_array.AddAlgo(algo,False)
+
+merge_viewer.GetManager().AddMergeAlgo(algo_array)
+#----------------------------------------------------------
+
+merge_viewer.GetManager().MergeTillConverge(False)
+
+########################################
+# done attaching merge algos
+########################################
+
 
 my_proc.add_process(raw_viewer)
 
 my_proc.add_process(merge_viewer)
 
-my_proc.add_process(mc_viewer)
+raw_viewer.SetClusterType(larlight.DATA.FuzzyCluster)
+merge_viewer.SetClusterType(larlight.DATA.FuzzyCluster)
 
 gStyle.SetOptStat(0)
 
@@ -60,7 +128,17 @@ while true:
 
     merge_viewer.DrawAllClusters();
 
-    mc_viewer.DrawAllClusters();
+
+#    for plane in xrange(larutil.Geometry.GetME().Nplanes()):
+#
+#        print "    Plane:", plane
+#        
+#        for cindex in xrange(merge_viewer.ClusterCount(plane)):
+#
+#            print "        Cluster:",cindex
+#            merge_viewer.DrawOneCluster(plane,cindex)
+#            sys.stdin.readline()
+#    
 
     print "    Hit enter to go next event..."
     sys.stdin.readline()
