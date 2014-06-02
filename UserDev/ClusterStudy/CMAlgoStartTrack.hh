@@ -72,7 +72,24 @@ namespace cluster {
     
     /// Function to reset the algorithm instance ... maybe implemented via child class
     virtual void Reset();
+
+    bool IsStartTrack(const ClusterParamsAlgNew &cluster);
+
+    bool IsOverlappingBlob(const ClusterParamsAlgNew &cluster);
+
+    void SetMinWidth(double value) { _min_width = value; }
+
+    void SetMinOpeningAngle(double value) { _min_opening_angle = value; }
+
+    void SetMinEP(double value) { _min_EP = value; }
+
+    void SetMinHits(int value) { _min_hits = value; }
+
+  protected:
     
+    int _min_hits;
+    double _min_width, _min_opening_angle, _min_EP;
+
   };
 }
 #endif
