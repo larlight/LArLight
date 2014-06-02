@@ -37,20 +37,59 @@ merge_viewer.SetPrintClusterInfo(True)
 ########################################
 # attach merge algos here
 ########################################
+prohib_array = cluster.CMAlgoArray()
 
-myalg = cluster.CMAlgoShortestDist()
-#merge nothing:
-myalg.SetMinHits(999999)
-#merge everything:
-#myalg.SetMinHits(0)
-#myalg.SetSquaredDistanceCut(9999999)
-merge_viewer.GetManager().AddMergeAlgo(myalg)
+tracksep_prohibit = cluster.CMAlgoTrackSeparate()
+tracksep_prohibit.SetMinNumHits(30)
+tracksep_prohibit.SetMinAngleDiff(0.1)
+tracksep_prohibit.SetMaxOpeningAngle(30)
+tracksep_prohibit.SetMinLength(10.)
+tracksep_prohibit.SetMaxWidth(25.)
+tracksep_prohibit.SetDebug(False)
+tracksep_prohibit.SetVerbose(False)
+prohib_array.AddAlgo(tracksep_prohibit,False)
+
+outofcone_prohibit = cluster.CMAlgoOutOfConeSeparate()
+outofcone_prohibit.SetDebug(False)
+outofcone_prohibit.SetVerbose(False)
+prohib_array.AddAlgo(outofcone_prohibit,False)
+
+merge_viewer.GetManager().AddSeparateAlgo(prohib_array)
+
+#algos that require AND condition have to be added in array
+#----------------------------------------------------------
+algo_array = cluster.CMAlgoArray()
+
+angalg = cluster.CMAlgoAngleCompat()
+angalg.SetVerbose(False)
+angalg.SetDebug(False)
+angalg.SetAllow180Ambig(False)
+angalg.SetUseOpeningAngle(False)
+angalg.SetAngleCut(3.)
+
+#False here means use "OR" condition
+algo_array.AddAlgo(angalg,False)
+
+algo = cluster.CMAlgoShortestDist()
+algo.SetVerbose(False)
+algo.SetDebug(False)
+algo.SetMinHits(10)
+algo.SetSquaredDistanceCut(5.)
+
+algo_array.AddAlgo(algo,False)
+
+trackblob = cluster.CMAlgoStartTrack()
+
+algo_array.AddAlgo(trackblob,False)
+
+merge_viewer.GetManager().AddMergeAlgo(algo_array)
+#----------------------------------------------------------
+
+merge_viewer.GetManager().MergeTillConverge(True)
 
 ########################################
 # done attaching merge algos
 ########################################
-
-merge_viewer.GetManager().MergeTillConverge(True)
 
 
 my_proc.add_process(raw_viewer)
