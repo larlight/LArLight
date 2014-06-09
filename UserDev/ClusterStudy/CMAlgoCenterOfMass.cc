@@ -15,6 +15,10 @@ namespace cluster {
     SetMaxHitsSmallClus(10);
     SetMinHitsBigClus(40);
     SetMaxDistance(20.);
+    SetLengthReach(3.0);
+    UseCOMInPoly(true);
+    UseCOMInCone(true);
+    UseCOMNearClus(true);
 
   }
 
@@ -47,6 +51,7 @@ namespace cluster {
     double start_t;
     double end_w;
     double end_t;
+    Polygon2D poly;
 
     //Get Hit vector for small cluster
     std::vector<larutil::PxHit> hitss;
@@ -60,6 +65,7 @@ namespace cluster {
       start_t = cluster2.GetParams().start_point.t;
       end_w = cluster2.GetParams().end_point.w;
       end_t = cluster2.GetParams().end_point.t;
+      poly  = cluster2.GetParams().PolyObject;
     }      
     if ( small == 2 ){
       hitss = cluster2.GetHitVector();
@@ -71,6 +77,16 @@ namespace cluster {
       start_t = cluster1.GetParams().start_point.t;
       end_w = cluster1.GetParams().end_point.w;
       end_t = cluster1.GetParams().end_point.t;
+      poly  = cluster1.GetParams().PolyObject;
+    }
+
+    if (_debug){
+      std::cout << "Big Cluster:" << std::endl;
+      std::cout << "\tOpening Angle: " << opening_angle << std::endl;
+      std::cout << "\tLength: " << length << std::endl;
+      std::cout << "\tStart Point: (" << start_w << ", " << end_w << ")" << std::endl;
+      std::cout << "\tDirection Angle: " << direc_angle << std::endl;
+      std::cout << std::endl;
     }
 
     for (auto& hit: hitss){
@@ -96,44 +112,25 @@ namespace cluster {
     double COM_w_rot = (COM_w_s - start_w)*cos(direc_angle*3.14/180.) + (COM_t_s - start_t)*sin(direc_angle*3.14/180.);
     double COM_t_rot = - (COM_w_s - start_w)*sin(direc_angle*3.14/180.) + (COM_t_s - start_t)*cos(direc_angle*3.14/180.);
 
-    //check if COM is in polygon:
-    if ( small == 1 ){
-      //look for polygon overlap
-      if ( cluster2.GetParams().PolyObject.PointInside( COM_s ) ){
-	if (_verbose) { std::cout << "Polygon Overlap -> Merge!" << std::endl << std::endl;}
-	return true;
-      }
-      //look for COM in cone
-      if ( (COM_w_rot < length) and ( COM_w_rot > 0 ) and
-	   ( abs(COM_t_rot) < abs(COM_w_rot*sin(opening_angle*3.14/180.)) ) ){
-	if (_verbose) { std::cout << "COM in Cone -> Merge! " << std::endl; }
-	return true;
-      }
-      //look for COM close to start-end of other cluster
-      if ( ShortestDistanceSquared( COM_w_s, COM_t_s, start_w, start_t, end_w, end_t ) < _MaxDist ) {
-	if (_verbose) { std::cout << "COM close to start-end -> Merge!" << std::endl; }
-	return true;
-      }
+    //look for polygon overlap
+    if ( ( poly.PointInside(COM_s) ) and  _COMinPolyAlg ){
+      if (_verbose) { std::cout << "Polygon Overlap -> Merge!" << std::endl << std::endl;}
+      return true;
     }
-    if ( small == 2 ){
-      // COM in Polygon
-      if ( cluster1.GetParams().PolyObject.PointInside( COM_s ) ){
-	if (_verbose) { std::cout << "Polygon Overlap -> Merge!" << std::endl << std::endl;}
-	return true;
-      }
-      //COM in cone
-      if ( (COM_w_rot < length) and ( COM_w_rot > 0 ) and
-	   ( abs(COM_t_rot) < abs(COM_w_rot*sin(opening_angle*3.14/180.)) ) ){
-	if (_verbose) { std::cout << "COM in Cone -> Merge! " << std::endl; }
-	return true;
-      }
-      //look for COM close to start-end of other cluster
-      if ( ShortestDistanceSquared( COM_w_s, COM_t_s, start_w, start_t, end_w, end_t ) < _MaxDist ) {
-	if (_verbose) { std::cout << "COM close to start-end -> Merge!" << std::endl; }
-	return true;
-      }
+    //look for COM in cone
+    if ( _COMinConeAlg and
+	 (COM_w_rot < length*_lengthReach ) and ( COM_w_rot > 0 ) and
+	 ( abs(COM_t_rot) < abs(COM_w_rot*sin(opening_angle*3.14/180.)) ) ){
+      if (_verbose) { std::cout << "COM in Cone -> Merge! " << std::endl; }
+      return true;
     }
-   
+    //look for COM close to start-end of other cluster
+    if ( _COMNearClus and
+	 ShortestDistanceSquared( COM_w_s, COM_t_s, start_w, start_t, end_w, end_t ) < _MaxDist ) {
+      if (_verbose) { std::cout << "COM close to start-end -> Merge!" << std::endl; }
+      return true;
+    }
+
     return false;
   }
 
