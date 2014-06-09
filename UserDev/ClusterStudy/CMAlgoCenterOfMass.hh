@@ -64,6 +64,18 @@ namespace cluster {
     /// Function to set Max Distance for COM to be from start-end
     void SetMaxDistance(double d) { _MaxDist = d; }
 
+    /// Use COM in Poly algo to decide merging
+    void UseCOMInPoly(bool on) { _COMinPolyAlg = on; }
+
+    /// Use COM in Poly algo to decide merging
+    void UseCOMInCone(bool on) { _COMinConeAlg = on; }
+
+    /// Use COM in Poly algo to decide merging
+    void UseCOMNearClus(bool on) { _COMNearClus = on; }
+
+    /// Set Length Reach: How for out the cone extends as percent of cluster length
+    void SetLengthReach(double frac){ _lengthReach = frac; }
+
     double ShortestDistanceSquared(double point_x, double point_y, 
 				   double start_x, double start_y,
 				   double end_x,   double end_y  ) const;
@@ -76,7 +88,10 @@ namespace cluster {
     int _minHits;
     int _maxHits;
     double _MaxDist;
-
+    double _lengthReach; ///How four out - as percent of cluster length - cone will extend from start point
+    bool _COMinPolyAlg;
+    bool _COMinConeAlg;
+    bool _COMNearClus;
   };
 }
 
