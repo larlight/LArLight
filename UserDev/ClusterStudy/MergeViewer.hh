@@ -72,6 +72,9 @@ namespace larlight{
     /// Function to set whether user wants to print cluster info
     void SetPrintClusterInfo(bool flag) { _print_on_DrawOneCluster = flag; }
 
+    /// Set minimum number of hits to draw a cluster (Default is 0)
+    void SetMinHitsToDraw(size_t minhits) { _min_hits_to_draw = minhits; }
+    
   protected:
 
     ::cluster::ClusterViewerAlgo _algo;
@@ -79,6 +82,8 @@ namespace larlight{
     bool _draw_polygon;
 
     bool _print_on_DrawOneCluster;
+    
+    size_t _min_hits_to_draw;
   };
   
 }

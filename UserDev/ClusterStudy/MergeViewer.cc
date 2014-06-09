@@ -16,7 +16,8 @@ namespace larlight {
     // Default values for stuff
     SetDrawPolygon(false);
     SetPrintClusterInfo(false);
-
+    SetMinHitsToDraw(0);
+    
   }
   
   //################################################################
@@ -118,19 +119,20 @@ namespace larlight {
 	cluster_polygon.at(cluster_polygon.size()-1).first = cluster_polygon.at(0).first;
 	cluster_polygon.at(cluster_polygon.size()-1).second = cluster_polygon.at(0).second;
       } //kaleko added this bracket around if statement. did i fix it, or break it?
-      
-      if(_draw_polygon)
-	_algo.AddCluster(plane,
-			 cluster_hits,
-			 cluster_start,
-			 cluster_end,
-			 cluster_polygon);
-      else
-	_algo.AddCluster(plane,
-			 cluster_hits,
-			 cluster_start,
-			 cluster_end);
-      
+    
+      if(cluster_hits.size() > _min_hits_to_draw){
+	if(_draw_polygon)
+	  _algo.AddCluster(plane,
+			   cluster_hits,
+			   cluster_start,
+			   cluster_end,
+			   cluster_polygon);
+	else
+	  _algo.AddCluster(plane,
+			   cluster_hits,
+			   cluster_start,
+			   cluster_end);
+      }
     }
     
     return true;
