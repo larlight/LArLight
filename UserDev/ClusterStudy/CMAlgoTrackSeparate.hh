@@ -55,6 +55,10 @@ namespace cluster {
 
     void SetMaxWidth(float maxwidth) { _MaxWidth = maxwidth; }
 
+    void SetUseEP(bool flag) { _use_EP = flag; }
+
+    void SetEPCutoff(float epcut) { _ep_cut = epcut; }
+
     /// Function to reset the algorithm instance ... maybe implemented via child class
     virtual void Reset(){}
 
@@ -65,6 +69,8 @@ namespace cluster {
 
     bool _verbose;
     bool _debug;
+    bool _use_EP;
+    float _ep_cut;
     int _MinNumHits;
     float _MinAngleDiff;
     float _MaxOpeningAngle;
