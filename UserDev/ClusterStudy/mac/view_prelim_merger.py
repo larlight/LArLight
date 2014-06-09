@@ -85,7 +85,7 @@ algo_array.AddAlgo(trackblob,False)
 merge_viewer.GetManager().AddMergeAlgo(algo_array)
 #----------------------------------------------------------
 
-merge_viewer.GetManager().MergeTillConverge(True)
+merge_viewer.GetManager().MergeTillConverge(False)
 
 ########################################
 # done attaching merge algos
