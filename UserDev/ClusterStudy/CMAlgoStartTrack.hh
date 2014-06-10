@@ -85,10 +85,13 @@ namespace cluster {
 
     void SetMinHits(int value) { _min_hits = value; }
 
+    void SetDebug(bool flag) { _debug = flag; }
+
   protected:
     
     int _min_hits;
     double _min_width, _min_opening_angle, _min_EP;
+    bool _debug;
 
   };
 }

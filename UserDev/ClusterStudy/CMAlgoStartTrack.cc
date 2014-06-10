@@ -14,6 +14,7 @@ namespace cluster {
     SetMinWidth(1.00000);
     SetMinOpeningAngle(0.15000);
     SetMinEP(0.99000);
+    SetDebug(false);
 
   }
 
@@ -69,6 +70,31 @@ namespace cluster {
       FirstTrackSecondBlob = true;
     if(IsStartTrack(cluster2) && IsOverlappingBlob(cluster1))
       SecondTrackFirstBlob = true;
+
+    if(_debug){
+      if(FirstTrackSecondBlob){
+	std::cout<<"*********************************************"<<std::endl;
+	std::cout<<"First track second blob! First has params:"<<std::endl;
+	std::cout<<"Angle 2D = "<<cluster1.GetParams().angle_2d<<std::endl;
+	std::cout<<"Opening Angle = "<<cluster1.GetParams().opening_angle<<std::endl;
+	std::cout<<"Sum charge = "<<cluster1.GetParams().sum_charge<<std::endl;
+	std::cout<<"Length = "<<cluster1.GetParams().length<<std::endl;
+	std::cout<<"Width = "<<cluster1.GetParams().width<<std::endl;
+	std::cout<<"N_Hits = "<<cluster1.GetParams().N_Hits<<std::endl;
+	std::cout<<"eigenvalue_principal = "<<cluster1.GetParams().eigenvalue_principal<<std::endl;
+	std::cout<<"Second has params:"<<std::endl;
+	std::cout<<"Angle 2D = "<<cluster2.GetParams().angle_2d<<std::endl;
+	std::cout<<"Opening Angle = "<<cluster2.GetParams().opening_angle<<std::endl;
+	std::cout<<"Sum charge = "<<cluster2.GetParams().sum_charge<<std::endl;
+	std::cout<<"Length = "<<cluster2.GetParams().length<<std::endl;
+	std::cout<<"Width = "<<cluster2.GetParams().width<<std::endl;
+	std::cout<<"N_Hits = "<<cluster2.GetParams().N_Hits<<std::endl;
+	std::cout<<"eigenvalue_principal = "<<cluster2.GetParams().eigenvalue_principal<<std::endl;
+
+      }
+		 
+
+    }
 
     //if cluster1 looks like a track and cluster2 looks like a blob
     if (FirstTrackSecondBlob)
