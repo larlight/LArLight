@@ -32,9 +32,9 @@ namespace cluster {
     int hitssmall = 0;
 
     //determine if clusters ok and if so which is big and which is small
-    if ( (cluster1.GetParams().N_Hits > _minHits) and (cluster2.GetParams().N_Hits < _maxHits) )
+    if ( (cluster1.GetHitVector().size() > _minHits) and (cluster2.GetHitVector().size() < _maxHits) )
       small = 2;
-    else if ( (cluster2.GetParams().N_Hits > _minHits) and (cluster1.GetParams().N_Hits < _maxHits) )
+    else if ( (cluster2.GetHitVector().size() > _minHits) and (cluster1.GetHitVector().size() < _maxHits) )
       small = 1;
     else
       return false;
