@@ -37,7 +37,7 @@ namespace cluster {
     double len2 = cluster2.GetParams().length;
     
     int hits1 = cluster1.GetParams().N_Hits;
-    int hits2 = cluster1.GetParams().N_Hits;
+    int hits2 = cluster2.GetParams().N_Hits;
 
     double startseparation = (w_start2-w_start1)*(w_start2-w_start1) + (t_start2-t_start1)*(t_start2-t_start1);
     //convert sepration to be instead of just angle -> angle/distance^n (n=1 for now)
