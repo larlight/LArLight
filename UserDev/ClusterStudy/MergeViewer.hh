@@ -75,6 +75,9 @@ namespace larlight{
     /// Set minimum number of hits to draw a cluster (Default is 0)
     void SetMinHitsToDraw(size_t minhits) { _min_hits_to_draw = minhits; }
     
+    /// Option to not draw track-like clusters, for debugging
+    void SetDrawTracks(bool flag) { _draw_tracks = flag; }
+
   protected:
 
     ::cluster::ClusterViewerAlgo _algo;
@@ -84,6 +87,8 @@ namespace larlight{
     bool _print_on_DrawOneCluster;
     
     size_t _min_hits_to_draw;
+
+    bool _draw_tracks;
   };
   
 }
