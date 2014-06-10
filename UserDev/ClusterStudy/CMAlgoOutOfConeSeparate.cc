@@ -102,7 +102,7 @@ namespace cluster {
     angle = (int)(angle) % 360;
 
     separation = abs(angle-angle2);
-    separation *= (400./startseparation); //distance^2 of 400 cm^2 taken as "standard"
+    //separation *= (400./startseparation); //distance^2 of 400 cm^2 taken as "standard"
     if (_debug){
       std::cout << "Angle S2--S1: " << angle << std::endl;
       std::cout << "Angle2--S1: " << separation << std::endl;
