@@ -40,7 +40,7 @@ namespace lar1{
 
     void add_plot_label(char* label, double x, double y,
                         double size = 0.05, int color = 1,
-                        int font = 62, int align = 22 );
+                        int font = 72, int align = 22 );
     
     //fields will contain the elements of the string s, split by the delimiter "delim"
     void split(std::vector<std::string> &fields, std::string s, char delim = ' ') ;

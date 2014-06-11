@@ -16,22 +16,23 @@
   n.setUse100mLong(false);
   n.setUse470m(true);
   n.setUse700m(false);
-  n.setUseT600(false);
+  n.setUseT600(true);
   n.setUbooneScale(1.0);
-  n.setLAr1NDScale(1.0/3.0);
+  n.setLAr1NDScale(1.0);
+  // n.setLAr1NDScale(1.5/3.0);
   n.setLAr1FDScale(1.0);
   n.setEnergyType("ecalo2");
   n.setUseNearDetStats(true);
   n.setShapeOnlyFit(true);
   n.setNearDetSystematicError(0.2);
-  n.setForceRemake(true);
+  n.setForceRemake(false);
   n.setUseInfiniteStatistics(false);
   // n.setElectContainedDist(150);
 
-  n.setInflateSystematics(true);
+  n.setInflateSystematics(false);
   n.setSystematicInflationAmount(0.04);
 
-  n.setNpoints(10);
+  n.setNpoints(250);
 
   n.Prepare();
   n.ReadData();

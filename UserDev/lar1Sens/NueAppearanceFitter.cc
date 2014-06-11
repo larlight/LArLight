@@ -1147,11 +1147,11 @@ namespace lar1{
 
     std::cout<<"Drawing LSND intervals...\n\n";
 
-    TCanvas* c3 = new TCanvas("c3","Sensitivity",900,800);
+    TCanvas* c3 = new TCanvas("c3","Sensitivity",700,700);
     // c3->Divide(1,2);
-    TPad * pad1 = new TPad("pad1","pad1",0,0.25,2.0/3.0,1);
-    TPad * pad2 = new TPad("pad2","pad2",0,0,2.0/3.0,0.25);
-    TPad * pad3 = new TPad("pad3","pad3",2.0/3.0,0,1,1);
+    TPad * pad1 = new TPad("pad1","pad1",0,0.25,0.75,1);
+    TPad * pad2 = new TPad("pad2","pad2",0,0,0.75,0.25);
+    TPad * pad3 = new TPad("pad3","pad3",0.75,0,1,1);
 
     pad1 -> Draw();
     pad2 -> Draw();
@@ -1516,16 +1516,16 @@ namespace lar1{
       SignalNu -> Add(SignalNubar);
 
 
-      NueFromNueCC_muon   -> SetFillColor(30);
-      NueFromNueCC_chargeKaon -> SetFillColor(31);
-      NueFromNueCC_neutKaon -> SetFillColor(32);
-      NueFromEScatter     -> SetFillColor(33);
+      NueFromNueCC_muon       -> SetFillColor(kGreen+3);
+      NueFromNueCC_chargeKaon -> SetFillColor(kGreen+2);
+      NueFromNueCC_neutKaon   -> SetFillColor(kGreen-6);
+      NueFromEScatter         -> SetFillColor(kOrange-8);
       // NueFromNC_pi0     -> SetFillColor(kRed-6);
-      NueFromNC_pi0     -> SetFillColor(45);
-      NueFromNC_delta0    -> SetFillStyle(41);
-      NueFromNumuCC     -> SetFillColor(40);
-      Dirt          -> SetFillColor(15);
-      Other         -> SetFillColor(8);
+      NueFromNC_pi0           -> SetFillColor(kOrange-8);
+      NueFromNC_delta0        -> SetFillStyle(kBlack);
+      NueFromNumuCC           -> SetFillColor(kBlue-9);
+      Dirt                    -> SetFillColor(15);
+      Other                   -> SetFillColor(8);
 
       std::vector< float > totalEvents, signalEvents;
       totalEvents.resize(nbins);
@@ -1570,13 +1570,17 @@ namespace lar1{
       stack -> Add(NueFromNueCC_muon);
       stack -> Add(NueFromNueCC_chargeKaon);
       stack -> Add(NueFromNueCC_neutKaon);
-      //stack -> Add(NueFromEScatter);
+      // stack -> Add(NueFromEScatter);
       stack -> Add(NueFromNC_pi0);
       // stack -> Add(NueFromNC_delta0);
       stack -> Add(NueFromNumuCC);
       // stack -> Add(Dirt);
       // stack -> Add(Other);
       // stack ->Add(MBPhotExcess);
+
+      SignalNu -> SetLineStyle(0);
+      SignalNu -> SetLineColor(1);
+      SignalNu -> SetLineWidth(2);
 
       double integral = 0;
       integral += NueFromNueCC_muon->Integral();
@@ -1592,10 +1596,11 @@ namespace lar1{
 
       //set up the legend
       leg = new TLegend(0.75,0.5,.95,0.9);
+      leg -> SetTextFont(72);
       leg->AddEntry(NueFromNueCC_muon, "#mu #rightarrow #nu_{e}");
       leg->AddEntry(NueFromNueCC_chargeKaon, "k^{+} #rightarrow #nu_{e}");
       leg->AddEntry(NueFromNueCC_neutKaon, "k^{0} #rightarrow #nu_{e}");
-      //leg->AddEntry(NueFromEScatter, "#nu - e^{-}");
+      // leg->AddEntry(NueFromEScatter, "#nu - e^{-}");
       leg->AddEntry(NueFromNC_pi0, "NC #pi^{0}");
       // leg->AddEntry(NueFromNC_delta0, "#Delta #rightarrow N#gamma");
       leg->AddEntry(NueFromNumuCC, "#nu_{#mu} CC");
@@ -1604,7 +1609,10 @@ namespace lar1{
       leg->AddEntry(SignalNu,"Signal");
 
       leg -> SetTextSize(0.04);
-
+      leg -> SetFillStyle(0);
+      leg -> SetFillColor(0);
+      leg -> SetBorderSize(0);
+      // leg3->SetTextSize(0.03);
 
 
       // Get the value to be the maximum of the plot:
@@ -1626,7 +1634,8 @@ namespace lar1{
 
 
 
-      TH1F *chr = stackedCanvas[j]->DrawFrame(emin-0.01,-0.01*(SignalNu->GetMaximum()),emax,1.0*max);
+      TH1F *chr = stackedCanvas[j]->DrawFrame(emin-0.01,
+                                  -0.01*(SignalNu->GetMaximum()),emax,1.0*max);
       
       //chr->GetYaxis()->SetLabelOffset(999);
       chr->GetYaxis()->SetTitle("Events");
@@ -1666,7 +1675,7 @@ namespace lar1{
       chr->GetXaxis()->SetTitleSize(0.07);
       chr->GetXaxis()->SetLimits(emin-0.01,emax);
       chr->Draw();
-      SignalNu -> SetLineStyle(2);
+      
 
       plotUtils.add_plot_label( name , 0.5, 0.85, 0.05, 1 );
       if (useHighDm) 

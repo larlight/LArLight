@@ -90,6 +90,9 @@ namespace lar1{
             // // for Kopp BF:
             // dm2FittingPoint = 0.41*npoints;
             // sin22thFittingPoint = 0.53*npoints;
+            // for high dm2 point:
+            // dm2FittingPoint = 0.9*npoints;
+            // sin22thFittingPoint = 0.375*npoints;
 
       }
       void setUseNearDetStats(bool b){useNearDetStats = b;}
