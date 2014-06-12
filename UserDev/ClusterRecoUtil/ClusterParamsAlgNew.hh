@@ -182,7 +182,7 @@ namespace cluster {
 
     void DisableFANN(){enableFANN = false;}
 
-    unsigned int GetNHits(){return fHitVector.size();}
+    unsigned int GetNHits() const {return fHitVector.size();}
     const std::vector<larutil::PxHit>& GetHitVector() const {return fHitVector;}
     int Plane() const {return fPlane;}
     

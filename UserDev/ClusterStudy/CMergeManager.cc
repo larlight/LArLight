@@ -218,7 +218,7 @@ namespace cluster {
 	prioritized_index.insert(std::pair<double,size_t>(in_clusters.at(i).GetParams().sum_charge,i));
 	break;
       case ::cluster::CMergeManager::kNHits:
-	prioritized_index.insert(std::pair<double,size_t>((double)(in_clusters.at(i).GetParams().N_Hits),i));
+	prioritized_index.insert(std::pair<double,size_t>((double)(in_clusters.at(i).GetNHits()),i));
 	break;
       }
     }
@@ -338,7 +338,7 @@ namespace cluster {
 	prioritized_index.insert(std::pair<double,size_t>(in_clusters.at(i).GetParams().sum_charge,i));
 	break;
       case ::cluster::CMergeManager::kNHits:
-	prioritized_index.insert(std::pair<double,size_t>((double)(in_clusters.at(i).GetParams().N_Hits),i));
+	prioritized_index.insert(std::pair<double,size_t>((double)(in_clusters.at(i).GetNHits()),i));
 	break;
       }
     }
