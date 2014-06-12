@@ -35,7 +35,7 @@ namespace larlight {
 
     size_t ptr_index = (size_t)(type);
     
-    if(_ptr_data_array[ptr_index]) {
+    if(_in_ch[ptr_index]) {
 
       _in_ch[ptr_index]->GetEntry(_index);
 
