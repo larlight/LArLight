@@ -15,7 +15,7 @@ namespace larlight {
     _out_fname="";
     _name_tdirectory="";
     _status=INIT;
-    _check_alignment=true;
+    _check_alignment=false;
 
     reset();
     _mode=mode;
@@ -24,6 +24,36 @@ namespace larlight {
   
   event_base* storage_manager::get_data(DATA::DATA_TYPE type){
     
+    // Read entry _index-1
+    if(!_index) {
+
+      Message::send(MSG::ERROR,__FUNCTION__,
+		    Form("Call next_event() before calling %s", __FUNCTION__));
+
+      return 0;
+    }
+
+    size_t ptr_index = (size_t)(type);
+    
+    if(_ptr_data_array[ptr_index]) {
+
+      _in_ch[ptr_index]->GetEntry(_index);
+
+      if( _check_alignment && 
+	  _ptr_data_array[ptr_index]->event_id() != _ptr_data_array[(size_t)(DATA::Event)]->event_id() ) {
+	
+	    print(MSG::ERROR,__FUNCTION__,
+		  Form("Detected event-alignment mismatch! (%d != %d)",
+		       _ptr_data_array[ptr_index]->event_id(),
+		       _ptr_data_array[(size_t)(DATA::Event)]->event_id() )
+		  );
+	    
+	    return 0;
+
+      }
+    
+    }
+
     // If data class object does not exist, and if it's either WRITE or BOTH mode, create it.
     if(!_ptr_data_array[type] && _mode != READ){
       
@@ -329,6 +359,9 @@ namespace larlight {
     if(_ptr_data_array[type]) return;
     
     switch(type){
+    case DATA::Event:
+      _ptr_data_array[type]=(event_base*)(new event_base(type));
+      break;
     case DATA::SimChannel:
       _ptr_data_array[type]=(event_base*)(new event_simch(type));
       break;
@@ -414,7 +447,6 @@ namespace larlight {
       print(MSG::ERROR,__FUNCTION__,Form("MCTrajectory is stored within MCParticle! Retrieve MCParticle instead."));
       break;
     case DATA::Seed:
-    case DATA::Event:
     case DATA::DATA_TYPE_MAX:
       print(MSG::ERROR,__FUNCTION__,Form("Data identifier not supported: %d",(int)type));
       break;
@@ -572,31 +604,23 @@ namespace larlight {
   bool storage_manager::read_event(){
     
     if(_index>=_nevents)
+
       return false;
 
-    UInt_t event_id = DATA::INVALID_UINT;
+    if( _check_alignment ) {
 
-    for(size_t i=0; i<DATA::DATA_TYPE_MAX; ++i) { 
+      if( !_read_data_array[(size_t)(DATA::Event)] ) {
+
+	print(MSG::ERROR,__FUNCTION__,
+	      "DATA::Event data tree necessary for alignment check!");
+	
+	return false;
+	
+      }
       
-      if(_in_ch[i]) {
+      _in_ch[(size_t)(DATA::Event)]->GetEntry(_index);
 
-	_in_ch[i]->GetEntry(_index);
-
-	if(_mode != WRITE && _read_data_array[i] &&  _check_alignment) {
-
-	  if(event_id == DATA::INVALID_UINT) event_id = _ptr_data_array[i]->event_id();
-
-	  else if(event_id != _ptr_data_array[i]->event_id()) {
-
-	    print(MSG::ERROR,__FUNCTION__,
-		  Form("Detected event-alignment mismatch! (%d != %d)",event_id,_ptr_data_array[i]->event_id()));
-
-	    return false;
-
-	  }
-	} // end check event alignment
-      } // end read-in data @ _index
-    } // end looping over data types
+    }
     
     _index++;
     _nevents_read++;

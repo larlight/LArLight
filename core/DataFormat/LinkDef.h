@@ -70,6 +70,7 @@
 
 #pragma link C++ class larlight::ide+;
 #pragma link C++ class larlight::simch+;
+#pragma link C++ class std::vector<larlight::ide>+;
 #pragma link C++ class std::map<UShort_t,larlight::simch>+;
 #pragma link C++ class std::vector<larlight::simch>+;
 #pragma link C++ class larlight::event_simch+;
