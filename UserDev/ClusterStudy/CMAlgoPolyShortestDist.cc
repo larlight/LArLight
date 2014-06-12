@@ -54,8 +54,8 @@ namespace cluster {
 			       const ClusterParamsAlgNew &cluster2)
   //----------------------------------------------------------------
   {
-    if( (cluster1.GetParams().N_Hits < _min_hits) ||
-	(cluster2.GetParams().N_Hits < _min_hits) )
+    if( (cluster1.GetHitVector().size() < _min_hits) ||
+	(cluster2.GetHitVector().size() < _min_hits) )
       return false;
 
     //if either has < 3 sides do not merge!

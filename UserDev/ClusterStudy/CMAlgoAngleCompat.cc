@@ -31,7 +31,7 @@ namespace cluster {
   {
     
     //if number of hits not large enough skip
-    if ( (_minHits > 0) and ((cluster1.GetParams().N_Hits < _minHits) or (cluster2.GetParams().N_Hits < _minHits)) ) {
+    if ( (_minHits > 0) and ((cluster1.GetHitVector().size() < _minHits) or (cluster2.GetHitVector().size() < _minHits)) ) {
       return false;
     }
 
