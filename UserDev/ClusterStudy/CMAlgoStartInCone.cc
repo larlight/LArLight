@@ -35,8 +35,8 @@ namespace cluster {
   {
 
     //apply filter on hit number and length immediately
-    if ( ( (cluster1.GetParams().length < _lenMin) and (cluster1.GetParams().N_Hits < _NhitsMin) )
-	 and ( (cluster2.GetParams().length < _lenMin) and (cluster2.GetParams().N_Hits < _NhitsMin) ) )
+    if ( ( (cluster1.GetParams().length < _lenMin) and (cluster1.GetHitVector().size() < _NhitsMin) )
+	 and ( (cluster2.GetParams().length < _lenMin) and (cluster2.GetHitVector().size() < _NhitsMin) ) )
       return false;
 
     //A cluster has an associated cone defined as the cone originating
@@ -101,14 +101,14 @@ namespace cluster {
     if ( (w_start1_rot < len2*_lengthReach ) and (w_start1_rot > 0) and
 	 ( abs(t_start1_rot) < (abs(w_start1_rot*sin(opening2*3.14/180.))) ) and
 	 (len2 > _lenMin) and 
-	 (cluster2.GetParams().N_Hits > _NhitsMin) ){
+	 (cluster2.GetHitVector().size() > _NhitsMin) ){
       if (_verbose) { std::cout << "Start point of Cluster 1 in cone of Cluster 2!" << std::endl; }
       return true;
     }
     if ( (w_start2_rot < len1*_lengthReach ) and (w_start2_rot > 0) and
 	 ( abs(t_start2_rot) < (abs(w_start2_rot*sin(opening1*3.14/180.))) ) and
 	 (len1 > _lenMin) and 
-	 (cluster1.GetParams().N_Hits > _NhitsMin) ){
+	 (cluster1.GetHitVector().size() > _NhitsMin) ){
       if (_verbose) { std::cout << "Start point of Cluster 2 in cone of Cluster 1!" << std::endl; }
       return true;
     }

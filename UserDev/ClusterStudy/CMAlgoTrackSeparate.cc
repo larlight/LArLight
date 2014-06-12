@@ -54,8 +54,8 @@ namespace cluster {
       //2) opening angle for both < _MAxOpeningAngle
       //3) diff. in direction of both < _MinAngleDiff
       
-      int N_Hits1 = cluster1.GetParams().N_Hits;
-      int N_Hits2 = cluster2.GetParams().N_Hits;
+      int N_Hits1 = cluster1.GetHitVector().size();
+      int N_Hits2 = cluster2.GetHitVector().size();
       larutil::PxPoint start_point1 = cluster1.GetParams().start_point;
       larutil::PxPoint start_point2 = cluster2.GetParams().start_point;
       double angle_2d1 = cluster1.GetParams().angle_2d;

@@ -59,8 +59,8 @@ namespace cluster {
   //----------------------------------------------------------------
   {
     
-    if(cluster1.GetParams().N_Hits < _min_hits ||
-       cluster2.GetParams().N_Hits < _min_hits )
+    if(cluster1.GetHitVector().size() < _min_hits ||
+       cluster2.GetHitVector().size() < _min_hits )
       return false;
     
     bool FirstTrackSecondBlob = false;
@@ -80,7 +80,7 @@ namespace cluster {
 	std::cout<<"Sum charge = "<<cluster1.GetParams().sum_charge<<std::endl;
 	std::cout<<"Length = "<<cluster1.GetParams().length<<std::endl;
 	std::cout<<"Width = "<<cluster1.GetParams().width<<std::endl;
-	std::cout<<"N_Hits = "<<cluster1.GetParams().N_Hits<<std::endl;
+	std::cout<<"N_Hits = "<<cluster1.GetHitVector().size()<<std::endl;
 	std::cout<<"eigenvalue_principal = "<<cluster1.GetParams().eigenvalue_principal<<std::endl;
 	std::cout<<"Second has params:"<<std::endl;
 	std::cout<<"Angle 2D = "<<cluster2.GetParams().angle_2d<<std::endl;
@@ -88,7 +88,7 @@ namespace cluster {
 	std::cout<<"Sum charge = "<<cluster2.GetParams().sum_charge<<std::endl;
 	std::cout<<"Length = "<<cluster2.GetParams().length<<std::endl;
 	std::cout<<"Width = "<<cluster2.GetParams().width<<std::endl;
-	std::cout<<"N_Hits = "<<cluster2.GetParams().N_Hits<<std::endl;
+	std::cout<<"N_Hits = "<<cluster2.GetHitVector().size()<<std::endl;
 	std::cout<<"eigenvalue_principal = "<<cluster2.GetParams().eigenvalue_principal<<std::endl;
 
       }

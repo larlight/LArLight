@@ -35,8 +35,8 @@ namespace cluster {
     double len1 = cluster1.GetParams().length;
     double len2 = cluster2.GetParams().length;
     
-    int hits1 = cluster1.GetParams().N_Hits;
-    int hits2 = cluster1.GetParams().N_Hits;
+    int hits1 = cluster1.GetHitVector().size();
+    int hits2 = cluster1.GetHitVector().size();
 
     //if either cluster has less than _minHits don't even try...
     if ( (hits1 < _minHits) or (hits2 < _minHits)
