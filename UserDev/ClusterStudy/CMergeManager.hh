@@ -84,6 +84,9 @@ namespace cluster {
     /// A simple method to add a cluster
     void SetClusters(const std::vector<std::vector<larutil::PxHit> > &clusters);
 
+    /// A setter for minimum # of hits ... passed onto ClusterParamsAlg
+    void SetMinNHits(size_t n) { _min_nhits = n; }
+
     /// A method to execute merging algorithms
     void Process();
 
@@ -136,6 +139,9 @@ namespace cluster {
 
     /// Output analysis plot TFile
     TFile* _fout;
+
+    /// Minimum # of hits ... passed onto ClusterParamsAlg
+    size_t _min_nhits;
 
   };
 }

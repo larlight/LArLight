@@ -8,6 +8,7 @@ namespace cluster {
   CMergeManager::CMergeManager(CMergePriority_t priority)
   {
     _fout = 0;
+    _min_nhits = 0;
     _debug_mode = kNone;
     _merge_till_converge = false;
     _priority = priority;
@@ -36,7 +37,7 @@ namespace cluster {
     _in_clusters.reserve(clusters.size());
 
     ClusterParamsAlgNew tmp_alg;
-    tmp_alg.SetMinNHits(0);
+    tmp_alg.SetMinNHits(_min_nhits);
     tmp_alg.SetVerbose(false);
 
     for(auto const &c : clusters) {
