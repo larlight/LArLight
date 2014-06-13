@@ -37,9 +37,6 @@ namespace cluster {
     virtual bool Bool(const ClusterParamsAlgNew &cluster1,
 		      const ClusterParamsAlgNew &cluster2);
 
-    /// Method to set verbose mode
-    void SetVerbose(bool on) { _verbose = on; }
-
     /// Method to set debug mode
     void SetDebug(bool on) { _debug = on; }
 
@@ -48,10 +45,11 @@ namespace cluster {
 
     /// Method to set cut value in degrees for angle compatibility test
     void SetAngleCut(double angle) { _MaxAngleSep = angle; }
+
     void SetMinNHits(int n) { _MinNHits = n; }
+
   protected:
 
-    bool _verbose;    /// bool to suppress lots of output if you want
     bool _debug;
     int _MinNHits;    /// minimum number of hits for cluster to be considered
 

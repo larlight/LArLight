@@ -1,5 +1,5 @@
-#ifndef CMALGOANGLESEPARATE_CC
-#define CMALGOANGLESEPARATE_CC
+#ifndef CMALGOANGLESEPARATE_CXX
+#define CMALGOANGLESEPARATE_CXX
 
 #include "CMAlgoAngleSeparate.hh"
 
@@ -11,7 +11,6 @@ namespace cluster {
   {
 
     SetDebug(false);
-    SetVerbose(false);
     SetMaxAngleSep(20.);
     SetMinLength(15.);
     SetMinHits(20);

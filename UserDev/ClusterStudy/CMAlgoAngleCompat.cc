@@ -1,5 +1,5 @@
-#ifndef CMALGOANGLECOMPAT_CC
-#define CMALGOANGLECOMPAT_CC
+#ifndef CMALGOANGLECOMPAT_CXX
+#define CMALGOANGLECOMPAT_CXX
 
 #include "CMAlgoAngleCompat.hh"
 
@@ -8,7 +8,6 @@ namespace cluster {
   CMAlgoAngleCompat::CMAlgoAngleCompat() : CBoolAlgoBase() {
 
     //this just sets default values
-    SetVerbose(true);
 
     SetDebug(true);
 

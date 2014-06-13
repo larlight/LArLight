@@ -1,5 +1,5 @@
-#ifndef CMALGOARRAY_CC
-#define CMALGOARRAY_CC
+#ifndef CMALGOARRAY_CXX
+#define CMALGOARRAY_CXX
 
 #include "CMAlgoArray.hh"
 

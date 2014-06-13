@@ -1,5 +1,5 @@
-#ifndef CMALGOSTARTTRACK_CC
-#define CMALGOSTARTTRACK_CC
+#ifndef CMALGOSTARTTRACK_CXX
+#define CMALGOSTARTTRACK_CXX
 
 #include "CMAlgoStartTrack.hh"
 

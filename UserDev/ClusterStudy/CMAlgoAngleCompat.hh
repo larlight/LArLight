@@ -42,9 +42,6 @@ namespace cluster {
     /// should rewrite it to not take an input argument...
     virtual void IterationBegin(const std::vector<cluster::ClusterParamsAlgNew> &clusters);
 
-    /// Method to set verbose mode
-    void SetVerbose(bool on) { _verbose = on; }
-
     /// Method to set debug mode
     void SetDebug(bool on) { _debug = on; }
 
@@ -63,8 +60,6 @@ namespace cluster {
     TH1F* GetAngleDistHisto() const{ return angle_dist_histo; };
 
   protected:
-
-    bool _verbose;    /// bool to suppress lots of output if you want
 
     bool _debug;    /// bool to suppress lots of output if you want
 

@@ -20,13 +20,6 @@ namespace cluster {
     return true;
   }
 
-  //-----------------------
-  void CMAlgoMergeAll::Report()
-  //-----------------------
-  {
-
-  }
-
 }
 
 #endif

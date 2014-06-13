@@ -1,11 +1,11 @@
-#ifndef CMALGOPOLYCONTAIN_CC
-#define CMALGOPOLYCONTAIN_CC
+#ifndef CMALGOPOLYCONTAIN_CXX
+#define CMALGOPOLYCONTAIN_CXX
 
 #include "CMAlgoPolyContain.hh"
 
 namespace cluster {
 
-  CMAlgoPolyContain::CMAlgoPolyContain()
+  CMAlgoPolyContain::CMAlgoPolyContain() : CBoolAlgoBase()
   {
     // Nothing to be done in the base class
     this->reconfigure();

@@ -41,9 +41,6 @@ namespace cluster {
     virtual bool Bool(const ClusterParamsAlgNew &cluster1,
 		      const ClusterParamsAlgNew &cluster2);
 
-    /// Set Verbose Mode on or off
-    void SetVerbose(bool on) { _verbose = on; }
-
     /// Set Debug Mode on or off
     void SetDebug(bool on) { _debug = on; }
 
@@ -65,7 +62,6 @@ namespace cluster {
   protected:
 
     bool _debug;
-    bool _verbose;
     float _MaxAngle;
     float _MinLen;
     int _minHits;

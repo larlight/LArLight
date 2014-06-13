@@ -1,5 +1,5 @@
-#ifndef CMALGOOUTOFCONESEPARATE_CC
-#define CMALGOOUTOFCONESEPARATE_CC
+#ifndef CMALGOOUTOFCONESEPARATE_CXX
+#define CMALGOOUTOFCONESEPARATE_CXX
 
 #include "CMAlgoOutOfConeSeparate.hh"
 
@@ -11,7 +11,6 @@ namespace cluster {
   {
 
     SetDebug(false);
-    SetVerbose(false);
     SetMaxAngleSep(20.);
     SetMinLength(15.);
     SetMinHits(20);
@@ -118,14 +117,6 @@ namespace cluster {
     }
 
     return false;
-  }
-
-
-  //-----------------------
-  void CMAlgoOutOfConeSeparate::Report()
-  //-----------------------
-  {
-
   }
 
 }

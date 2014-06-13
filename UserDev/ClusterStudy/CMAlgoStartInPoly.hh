@@ -41,8 +41,6 @@ namespace cluster {
     /// Method to set cut value on minimum number of hits considered
     void SetMinHitsCut(int n) { _MinHits = n; }
 
-    void SetVerbose(bool verbosity) { _verbose = verbosity; }
-
     void SetDebug(bool debug) { _debug = debug; }
 
     /// Merging Algorithm is Here
@@ -56,7 +54,6 @@ namespace cluster {
 
     double _wire_2_cm, _time_2_cm; /// Conversion factors ogtten from GeometryUtilities
     int _MinHits; /// Minimum number of hits for cluster whose start point is being considered. We want it to be a good start point...
-    bool _verbose;
     bool _debug;
   };
 }

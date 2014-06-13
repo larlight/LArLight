@@ -38,9 +38,6 @@ namespace cluster {
        merged or not.
     */
 
-    /// Function to set verbosity
-    void SetVerbose(bool verbosity) { _verbose=verbosity; }
-
     void SetMaxStartEndSeparation(double d) { _separation=d; }
 
     void SetMaxAngle(double a) { _maxopeningangle=a; }
@@ -58,7 +55,6 @@ namespace cluster {
 
   protected:
 
-    bool _verbose;
     double _maxopeningangle;
     double _separation;
     int _MinHits;

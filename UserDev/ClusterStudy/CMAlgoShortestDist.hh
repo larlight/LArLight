@@ -43,9 +43,6 @@ namespace cluster {
     /// Method to set cut value in cm^2 for distance compatibility test
     void SetSquaredDistanceCut(double d) { _max_2D_dist2 = d; }
 
-    /// Method to set verbose mode
-    void SetVerbose(bool on) { _verbose = on; }
-
     /// Method to set debug mode
     void SetDebug(bool on) { _debug = on; }
 
@@ -64,8 +61,6 @@ namespace cluster {
 
   protected:
     
-    bool _verbose;         /// bool to suppress lots of output if you want
-
     bool _debug;         /// bool to suppress lots of output if you want
 
     int _minHits;        /// Min Number of hits for cluster to be considered

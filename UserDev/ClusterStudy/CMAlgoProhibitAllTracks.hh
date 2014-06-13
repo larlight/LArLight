@@ -74,12 +74,10 @@ namespace cluster {
 
     void SetMinEP(double value) { _min_EP = value; }
 
-    void SetVerbose(bool flag) { _verbose = flag; }
   protected:
 
     double _min_EP;
 
-    bool _verbose;
   };
 
 

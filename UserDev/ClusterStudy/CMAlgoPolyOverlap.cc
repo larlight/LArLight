@@ -1,15 +1,14 @@
-#ifndef CMALGOPOLYOVERLAP_CC
-#define CMALGOPOLYOVERLAP_CC
+#ifndef CMALGOPOLYOVERLAP_CXX
+#define CMALGOPOLYOVERLAP_CXX
 
 #include "CMAlgoPolyOverlap.hh"
 
 namespace cluster {
 
-  CMAlgoPolyOverlap::CMAlgoPolyOverlap()
+  CMAlgoPolyOverlap::CMAlgoPolyOverlap() : CBoolAlgoBase()
   {
     // Nothing to be done in the base class
     SetDebug(false);
-    SetVerbose(false);
     SetMinNumHits(0);
 
     this->reconfigure();

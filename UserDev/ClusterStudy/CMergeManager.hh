@@ -47,8 +47,6 @@ namespace cluster {
     enum CMergeMSGLevel_t {
       /// Extremely verbose (cout per individual algorithm execution)
       kPerMerging,
-      /// Very verbose (cout per set of algorithms execution)
-      kPerAlgoSet,
       /// Somewhat verbose (cout per merging iteration)
       kPerIteration,
       /// Bit verbose (cout per event)

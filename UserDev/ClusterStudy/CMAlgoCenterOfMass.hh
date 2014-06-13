@@ -46,11 +46,8 @@ namespace cluster {
     /// Function to reset the algorithm instance ... maybe implemented via child class
     virtual void Reset(){}
 
-    /// Function to report what's going on per merging
+    /// Function to report what's going on per merging iteration
     virtual void Report();
-
-    /// Function to set Verbosity of output
-    void SetVerbose(bool on) { _verbose = on; }
 
     /// Function to set Debug mode of output
     void SetDebug(bool on) { _debug = on; }
@@ -84,7 +81,6 @@ namespace cluster {
   protected:
 
     bool _debug;
-    bool _verbose;
     int _minHits;
     int _maxHits;
     double _MaxDist;

@@ -1,5 +1,5 @@
-#ifndef CMALGOSTARTINPOLY_CC
-#define CMALGOSTARTINPOLY_CC
+#ifndef CMALGOSTARTINPOLY_CXX
+#define CMALGOSTARTINPOLY_CXX
 
 #include "CMAlgoStartInPoly.hh"
 
@@ -13,7 +13,6 @@ namespace cluster {
     _wire_2_cm = larutil::GeometryUtilities::GetME()->WireToCm();
     _time_2_cm = larutil::GeometryUtilities::GetME()->TimeToCm();
 
-    SetVerbose(true);
     SetDebug(true);
     SetMinHitsCut(40);
 

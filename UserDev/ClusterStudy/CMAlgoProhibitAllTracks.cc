@@ -1,5 +1,5 @@
-#ifndef CMALGOPROHIBITALLTRACKS_CC
-#define CMALGOPROHIBITALLTRACKS_CC
+#ifndef CMALGOPROHIBITALLTRACKS_CXX
+#define CMALGOPROHIBITALLTRACKS_CXX
 
 #include "CMAlgoProhibitAllTracks.hh"
 
@@ -10,7 +10,6 @@ namespace cluster {
   //-------------------------------------------------------
   {
     SetMinEP(.990000);
-    SetVerbose(false);
   }
 
   //-----------------------------

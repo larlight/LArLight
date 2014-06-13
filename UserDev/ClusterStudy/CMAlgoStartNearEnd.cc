@@ -1,5 +1,5 @@
-#ifndef CMALGOSTARTNEAREND_CC
-#define CMALGOSTARTNEAREND_CC
+#ifndef CMALGOSTARTNEAREND_CXX
+#define CMALGOSTARTNEAREND_CXX
 
 #include "CMAlgoStartNearEnd.hh"
 
@@ -9,7 +9,6 @@ namespace cluster {
   CMAlgoStartNearEnd::CMAlgoStartNearEnd() : CBoolAlgoBase()
   //----------------------------------------
   {
-    SetVerbose(true);
     SetMaxStartEndSeparation(10); //cm^2
     SetMinHits(40); //cm^2
     SetMaxAngle(20*(3.14/180)); //rad: max angle of end-point cluster

@@ -43,8 +43,6 @@ namespace cluster {
 
     void SetDebug(bool debug) { _debug = debug; }
 
-    void SetVerbose(bool verbose) { _verbose = verbose; }
-
     //both clusters must have > this # of hits to be considered for merging
     void SetMinNumHits(int nhits) { _min_hits = nhits; }
 
@@ -53,7 +51,6 @@ namespace cluster {
 
   private:
     
-    bool _verbose;
     bool _debug;
     int _min_hits;
   };

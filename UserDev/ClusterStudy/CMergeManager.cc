@@ -21,6 +21,8 @@ namespace cluster {
     _in_clusters.clear();
     _out_clusters.clear();
     _book_keeper.Reset();
+    if(_merge_algo)    _merge_algo->Reset();
+    if(_separate_algo) _separate_algo->Reset();
   }
 
   void CMergeManager::SetClusters(const std::vector<std::vector<larutil::PxHit> > &clusters)
@@ -59,11 +61,18 @@ namespace cluster {
   {
     if(!_merge_algo) throw RecoUtilException("No algorithm to run!");
 
+
     _merge_algo->SetAnaFile(_fout);
-    if(_separate_algo) _merge_algo->SetAnaFile(_fout);
-    
     _merge_algo->EventBegin(_in_clusters);
-    if(_separate_algo) _separate_algo->EventBegin(_in_clusters);
+    if(_debug_mode <= kPerMerging)
+      _merge_algo->SetVerbose(true);
+    
+    if(_separate_algo) {
+      _separate_algo->SetAnaFile(_fout);
+      _separate_algo->EventBegin(_in_clusters);
+      if(_debug_mode <= kPerMerging)
+	_separate_algo->SetVerbose(true);
+    }
     
     size_t ctr=0;
     bool keep_going=true;
@@ -96,12 +105,20 @@ namespace cluster {
 	  merge_switch.at(i) = false;
 
       // Run separation algorithm
-      if(_separate_algo)
+      if(_separate_algo) {
 
 	RunSeparate(tmp_merged_clusters, bk);
 
+	if(_debug_mode <= kPerIteration)
+
+	  _separate_algo->Report();
+      }
+
       // Run merging algorithm
       RunMerge(tmp_merged_clusters, merge_switch, bk);
+      if(_debug_mode <= kPerIteration)
+	
+	_merge_algo->Report();
 
       // Save output
       bk.PassResult(tmp_merged_indexes);
@@ -253,7 +270,7 @@ namespace cluster {
 	// Skip if this combination is not allowed to merge
 	if(!(book_keeper.MergeAllowed((*citer1).second,(*citer2).second))) continue;
 
-	if(_debug_mode <= kPerAlgoSet){
+	if(_debug_mode <= kPerMerging){
 	  
 	  std::cout
 	    << Form("    \033[93mInspecting a pair (%zu, %zu) for merging... \033[00m",(*citer1).second, (*citer2).second)
@@ -262,7 +279,7 @@ namespace cluster {
 	
 	bool merge = _merge_algo->Bool(in_clusters.at((*citer1).second),in_clusters.at((*citer2).second));
 
-	if(_debug_mode <= kPerAlgoSet) {
+	if(_debug_mode <= kPerMerging) {
 	  
 	  if(merge) 
 	    std::cout << "    \033[93mfound to be merged!\033[00m " 
@@ -365,7 +382,7 @@ namespace cluster {
 	// Skip if this combination is not meant to be compared
 	//if(!(separate_flag.at(cindex2))) continue;
 	
-	if(_debug_mode <= kPerAlgoSet){
+	if(_debug_mode <= kPerMerging){
 	  
 	  std::cout
 	    << Form("    \033[93mInspecting a pair (%zu, %zu) for separation... \033[00m",cindex1,cindex2)
@@ -374,7 +391,7 @@ namespace cluster {
 	
 	bool separate = _separate_algo->Bool(in_clusters.at(cindex1),in_clusters.at(cindex2));
 	
-	if(_debug_mode <= kPerAlgoSet) {
+	if(_debug_mode <= kPerMerging) {
 	  
 	  if(separate) 
 	    std::cout << "    \033[93mfound to be separated!\033[00m " 
