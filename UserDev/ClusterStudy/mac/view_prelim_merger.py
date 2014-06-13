@@ -108,7 +108,7 @@ while true:
 
     merge_viewer.DrawAllClusters();
 
-    print "    Hit enter to go next event..."
+    print "Just displayed Event %d.  Hit enter to go next event..." % user_input_evt_no
     sys.stdin.readline()
 
 
