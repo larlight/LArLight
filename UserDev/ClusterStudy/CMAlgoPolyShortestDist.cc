@@ -11,6 +11,7 @@ namespace cluster {
   {
     SetMinDistSquared(1.);
     SetMinNumHits(0);
+    SetMaxNumHits(99999);
     SetDebug(false);
   }
 
@@ -56,6 +57,10 @@ namespace cluster {
   {
     if( (cluster1.GetHitVector().size() < _min_hits) ||
 	(cluster2.GetHitVector().size() < _min_hits) )
+      return false;
+
+    if( (cluster1.GetHitVector().size() > _max_hits) ||
+	(cluster2.GetHitVector().size() > _max_hits) )
       return false;
 
     //if either has < 3 sides do not merge!

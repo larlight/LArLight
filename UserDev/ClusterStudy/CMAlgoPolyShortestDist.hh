@@ -74,13 +74,15 @@ namespace cluster {
     //both clusters must have > this # of hits to be considered for merging
     void SetMinNumHits(int nhits) { _min_hits = nhits; }
 
+    void SetMaxNumHits(int nhits) { _max_hits = nhits; }
+
     void SetMinDistSquared(double dist) { _dist_sqrd_cut = dist; }
 
     void SetDebug(bool flag) { _debug = flag; }
 
   private:
 
-    int _min_hits;
+    int _min_hits, _max_hits;
 
     double _dist_sqrd_cut;
 
