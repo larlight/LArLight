@@ -23,7 +23,7 @@ int main(int argc, char** argv) {
 
   auto mc_viewer    = new larlight::MCShowerClusterViewer();
 
-  merge_viewer->GetManager().AddAlgo(new cluster::CMAlgoFake());
+  merge_viewer->GetManager().AddMergeAlgo(new cluster::CMAlgoFake());
 
   ana_proc.add_process(raw_viewer);
 
@@ -35,26 +35,20 @@ int main(int argc, char** argv) {
 
   size_t ctr=0;
 
-  try {
-    while(1) {
-      
-      ana_proc.process_event(ctr);
-      
-      raw_viewer->DrawAllClusters();
-      
-      merge_viewer->DrawAllClusters();
-      
-      mc_viewer->DrawAllClusters();
-      
-      //std::string input;
-      //std::cin>>input;
-      
-      ctr++;
-    }
-  }catch(larutil::LArUtilException e) {
-
-    std::cout<<e.msg()<<std::endl;
-
+  while(1) {
+    
+    ana_proc.process_event(ctr);
+    
+    raw_viewer->DrawAllClusters();
+    
+    merge_viewer->DrawAllClusters();
+    
+    mc_viewer->DrawAllClusters();
+    
+    //std::string input;
+    //std::cin>>input;
+    
+    ctr++;
   }
 
   return 1;

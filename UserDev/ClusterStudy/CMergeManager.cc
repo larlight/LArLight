@@ -34,6 +34,7 @@ namespace cluster {
     _in_clusters.reserve(clusters.size());
 
     ClusterParamsAlgNew tmp_alg;
+    tmp_alg.SetMinNHits(0);
     tmp_alg.SetVerbose(false);
 
     for(auto const &c : clusters) {
