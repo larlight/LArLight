@@ -36,6 +36,9 @@
 #include "CMAlgoStartTrack.hh"
 #include "CMAlgoProhibitAllTracks.hh"
 #include "CMAlgoPolyShortestDist.hh"
+#include "CMAlgoAngleIncompat.hh"
+#include "CMAlgoMergeTinyWithBig.hh"
+#include "CMAlgoProhibitBigClusters.hh"
 //ADD_NEW_HEADER ... do not change this comment line
 
 // Class forward declaration here
@@ -61,6 +64,9 @@ namespace cluster {
   class CMAlgoStartTrack;
   class CMAlgoProhibitAllTracks;
   class CMAlgoPolyShortestDist;
+  class CMAlgoAngleIncompat;
+  class CMAlgoMergeTinyWithBig;
+  class CMAlgoProhibitBigClusters;
 //ADD_CMALGO_CLASS ... do not change this comment line
 
   class ViewerException;
@@ -85,6 +91,9 @@ namespace larlight {
 
 //ADD_EMPTY_CLASS ... do not change this comment line
 #endif
+
+
+
 
 
 

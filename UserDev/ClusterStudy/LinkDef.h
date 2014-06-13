@@ -42,6 +42,9 @@
 #pragma link C++ class cluster::CMAlgoStartTrack+;
 #pragma link C++ class cluster::CMAlgoProhibitAllTracks+;
 #pragma link C++ class cluster::CMAlgoPolyShortestDist+;
+#pragma link C++ class cluster::CMAlgoAngleIncompat+;
+#pragma link C++ class cluster::CMAlgoMergeTinyWithBig+;
+#pragma link C++ class cluster::CMAlgoProhibitBigClusters+;
 //ADD_CMALGO_CLASS ... do not change this line
 
 #pragma link C++ class larlight::ClusterMerger+;
@@ -49,6 +52,9 @@
 
 //ADD_NEW_CLASS ... do not change this line
 #endif
+
+
+
 
 
 
