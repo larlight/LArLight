@@ -43,9 +43,6 @@ namespace cluster {
     /// Function to reset the algorithm instance ... maybe implemented via child class
     virtual void Reset(){}
 
-    /// Function to report what's going on per merging
-    virtual void Report();
-
   protected:
 
   };

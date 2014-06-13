@@ -1,5 +1,5 @@
-#ifndef CMALGOANGLEALIGN_CC
-#define CMALGOANGLEALIGN_CC
+#ifndef CMALGOANGLEALIGN_CXX
+#define CMALGOANGLEALIGN_CXX
 
 #include "CMAlgoAngleAlign.hh"
 
@@ -8,7 +8,6 @@ namespace cluster {
   CMAlgoAngleAlign::CMAlgoAngleAlign() : CBoolAlgoBase() {
 
     //this just sets default values
-    SetVerbose(true);
     SetDebug(true);
     SetAngleCut(10.); // in degrees
     SetAllow180Ambig(false);
@@ -18,13 +17,13 @@ namespace cluster {
   } //end constructor
 
   bool CMAlgoAngleAlign::Bool(const ClusterParamsAlgNew &cluster1,
-			       const ClusterParamsAlgNew &cluster2)
+			      const ClusterParamsAlgNew &cluster2)
   {
     
     double angle1 = cluster1.GetParams().angle_2d;
     double angle2 = cluster2.GetParams().angle_2d;
-    int hits1     = cluster1.GetHitVector().size();
-    int hits2     = cluster2.GetHitVector().size();
+    size_t hits1     = cluster1.GetHitVector().size();
+    size_t hits2     = cluster2.GetHitVector().size();
 
     //if don't make hit cut return aflse
     if ( (hits1 < _MinNHits) or (hits2 < _MinNHits) )

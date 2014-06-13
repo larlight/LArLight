@@ -1,5 +1,5 @@
-#ifndef CMALGOANGLECOMPAT_CC
-#define CMALGOANGLECOMPAT_CC
+#ifndef CMALGOANGLECOMPAT_CXX
+#define CMALGOANGLECOMPAT_CXX
 
 #include "CMAlgoAngleCompat.hh"
 
@@ -8,7 +8,6 @@ namespace cluster {
   CMAlgoAngleCompat::CMAlgoAngleCompat() : CBoolAlgoBase() {
 
     //this just sets default values
-    SetVerbose(true);
 
     SetDebug(true);
 
@@ -31,7 +30,7 @@ namespace cluster {
   {
     
     //if number of hits not large enough skip
-    if ( (_minHits > 0) and ((cluster1.GetHitVector().size() < _minHits) or (cluster2.GetHitVector().size() < _minHits)) ) {
+    if ( _minHits and ((cluster1.GetHitVector().size() < _minHits) or (cluster2.GetHitVector().size() < _minHits)) ) {
       return false;
     }
 
@@ -77,11 +76,11 @@ namespace cluster {
     
     //if you don't care if clusters have been reconstructed backwards
     if(_allow_180_ambig)
-      compatible = ( abs(angle1-angle2)     < _max_allowed_2D_angle_diff ||
-		     abs(angle1-angle2-180) < _max_allowed_2D_angle_diff ||
-		     abs(angle1-angle2+180) < _max_allowed_2D_angle_diff   );
+      compatible = ( abs(angle1-angle2)     < my_cut_value ||
+		     abs(angle1-angle2-180) < my_cut_value ||
+		     abs(angle1-angle2+180) < my_cut_value   );
     else
-      compatible = ( abs(angle1-angle2)     < _max_allowed_2D_angle_diff );
+      compatible = ( abs(angle1-angle2)     < my_cut_value );
     
   
     if(_verbose) {
@@ -93,12 +92,6 @@ namespace cluster {
     
   } // end Merge function 
   
-  void CMAlgoAngleCompat::IterationBegin(const std::vector<cluster::ClusterParamsAlgNew> &clusters){
-    
-    //    if(angle_dist_histo) angle_dist_histo->Reset();
-
-
-  }
 
 }//end namespace cluster
 #endif

@@ -1,5 +1,5 @@
-#ifndef CMALGOOUTOFCONESEPARATE_CC
-#define CMALGOOUTOFCONESEPARATE_CC
+#ifndef CMALGOOUTOFCONESEPARATE_CXX
+#define CMALGOOUTOFCONESEPARATE_CXX
 
 #include "CMAlgoOutOfConeSeparate.hh"
 
@@ -11,7 +11,6 @@ namespace cluster {
   {
 
     SetDebug(false);
-    SetVerbose(false);
     SetMaxAngleSep(20.);
     SetMinLength(15.);
     SetMinHits(20);
@@ -36,8 +35,8 @@ namespace cluster {
     double len1 = cluster1.GetParams().length;
     double len2 = cluster2.GetParams().length;
     
-    int hits1 = cluster1.GetHitVector().size();
-    int hits2 = cluster2.GetHitVector().size();
+    size_t hits1 = cluster1.GetHitVector().size();
+    size_t hits2 = cluster2.GetHitVector().size();
 
     double startseparation = (w_start2-w_start1)*(w_start2-w_start1) + (t_start2-t_start1)*(t_start2-t_start1);
     //convert sepration to be instead of just angle -> angle/distance^n (n=1 for now)
@@ -118,14 +117,6 @@ namespace cluster {
     }
 
     return false;
-  }
-
-
-  //-----------------------
-  void CMAlgoOutOfConeSeparate::Report()
-  //-----------------------
-  {
-
   }
 
 }

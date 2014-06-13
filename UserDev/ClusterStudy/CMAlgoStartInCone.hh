@@ -43,7 +43,7 @@ namespace cluster {
     void reconfigure();
 
     /// Set Minimum number of hits for cone-cluster
-    void SetMinHits(int n){ _NhitsMin = n; }
+    void SetMinHits(size_t n){ _NhitsMin = n; }
 
     /// Set Minimum number of hits for cone-cluster
     void SetMinLen(double l){ _lenMin = l; }
@@ -64,7 +64,7 @@ namespace cluster {
 
     double _wire_2_cm, _time_2_cm; /// Conversion factors ogtten from GeometryUtilities
 
-    int _NhitsMin;     /// Larger cluster which determines cone must have this many hits
+    size_t _NhitsMin;     /// Larger cluster which determines cone must have this many hits
     double _lenMin;    /// Larger cluster which determines cone must be at least this long
     bool _verbose;
     bool _debug;

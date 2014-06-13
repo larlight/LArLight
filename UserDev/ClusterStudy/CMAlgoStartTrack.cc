@@ -1,5 +1,5 @@
-#ifndef CMALGOSTARTTRACK_CC
-#define CMALGOSTARTTRACK_CC
+#ifndef CMALGOSTARTTRACK_CXX
+#define CMALGOSTARTTRACK_CXX
 
 #include "CMAlgoStartTrack.hh"
 
@@ -26,32 +26,32 @@ namespace cluster {
   }
 
   //------------------------------------------------------------------------------------------
-  void CMAlgoStartTrack::EventBegin(const std::vector<cluster::ClusterParamsAlgNew> &clusters)
+  //void CMAlgoStartTrack::EventBegin(const std::vector<cluster::ClusterParamsAlgNew> &clusters)
   //------------------------------------------------------------------------------------------
-  {
-
-  }
+  //{
+  //
+  //}
 
   //-------------------------------
-  void CMAlgoStartTrack::EventEnd()
+  //void CMAlgoStartTrack::EventEnd()
   //-------------------------------
-  {
-
-  }
+  //{
+  //
+  //}
 
   //-----------------------------------------------------------------------------------------------
-  void CMAlgoStartTrack::IterationBegin(const std::vector<cluster::ClusterParamsAlgNew> &clusters)
+  //void CMAlgoStartTrack::IterationBegin(const std::vector<cluster::ClusterParamsAlgNew> &clusters)
   //-----------------------------------------------------------------------------------------------
-  {
-
-  }
+  //{
+  //
+  //}
 
   //------------------------------------
-  void CMAlgoStartTrack::IterationEnd()
+  //void CMAlgoStartTrack::IterationEnd()
   //------------------------------------
-  {
-
-  }
+  //{
+  //
+  //}
   
   //----------------------------------------------------------------
   bool CMAlgoStartTrack::Bool(const ClusterParamsAlgNew &cluster1,

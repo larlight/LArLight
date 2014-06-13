@@ -1,5 +1,5 @@
-#ifndef CMALGOPROHIBITALLTRACKS_CC
-#define CMALGOPROHIBITALLTRACKS_CC
+#ifndef CMALGOPROHIBITALLTRACKS_CXX
+#define CMALGOPROHIBITALLTRACKS_CXX
 
 #include "CMAlgoProhibitAllTracks.hh"
 
@@ -10,7 +10,6 @@ namespace cluster {
   //-------------------------------------------------------
   {
     SetMinEP(.990000);
-    SetVerbose(false);
   }
 
   //-----------------------------
@@ -21,32 +20,32 @@ namespace cluster {
   }
 
   //------------------------------------------------------------------------------------------
-  void CMAlgoProhibitAllTracks::EventBegin(const std::vector<cluster::ClusterParamsAlgNew> &clusters)
+  //void CMAlgoProhibitAllTracks::EventBegin(const std::vector<cluster::ClusterParamsAlgNew> &clusters)
   //------------------------------------------------------------------------------------------
-  {
-
-  }
+  //{
+  //
+  //}
 
   //-------------------------------
-  void CMAlgoProhibitAllTracks::EventEnd()
+  //void CMAlgoProhibitAllTracks::EventEnd()
   //-------------------------------
-  {
-
-  }
+  //{
+  //
+  //}
 
   //-----------------------------------------------------------------------------------------------
-  void CMAlgoProhibitAllTracks::IterationBegin(const std::vector<cluster::ClusterParamsAlgNew> &clusters)
+  //void CMAlgoProhibitAllTracks::IterationBegin(const std::vector<cluster::ClusterParamsAlgNew> &clusters)
   //-----------------------------------------------------------------------------------------------
-  {
-
-  }
+  //{
+  //
+  //}
 
   //------------------------------------
-  void CMAlgoProhibitAllTracks::IterationEnd()
+  //void CMAlgoProhibitAllTracks::IterationEnd()
   //------------------------------------
-  {
-
-  }
+  //{
+  //
+  //}
   
   //----------------------------------------------------------------
   bool CMAlgoProhibitAllTracks::Bool(const ClusterParamsAlgNew &cluster1,

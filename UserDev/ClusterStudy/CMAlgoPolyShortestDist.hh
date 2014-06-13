@@ -35,25 +35,25 @@ namespace cluster {
 
     /**
        Optional function: called at the beginning of 1st iteration. This is called per event.
-     */
+    */
     virtual void EventBegin(const std::vector<cluster::ClusterParamsAlgNew> &clusters);
 
     /**
        Optional function: called at the end of event ... after the last merging iteration is over.
      */
-    virtual void EventEnd();
+    //virtual void EventEnd();
  
     /**
        Optional function: called at the beggining of each iteration over all pairs of clusters. 
        This provides all clusters' information in case the algorithm need them. Note this
        is called per iteration which may be more than once per event.
      */
-    virtual void IterationBegin(const std::vector<cluster::ClusterParamsAlgNew> &clusters);
+    //virtual void IterationBegin(const std::vector<cluster::ClusterParamsAlgNew> &clusters);
 
     /**
        Optional function: called at the end of each iteration over all pairs of clusters.
      */
-    virtual void IterationEnd();
+    //virtual void IterationEnd();
 
     /**
        Core function: given the CPAN input, return whether a cluster should be
@@ -72,7 +72,7 @@ namespace cluster {
     virtual void Reset();
 
     //both clusters must have > this # of hits to be considered for merging
-    void SetMinNumHits(int nhits) { _min_hits = nhits; }
+    void SetMinNumHits(size_t nhits) { _min_hits = nhits; }
 
     void SetMaxNumHits(int nhits) { _max_hits = nhits; }
 
@@ -82,7 +82,8 @@ namespace cluster {
 
   private:
 
-    int _min_hits, _max_hits;
+
+    size_t _min_hits, _max_hits;
 
     double _dist_sqrd_cut;
 

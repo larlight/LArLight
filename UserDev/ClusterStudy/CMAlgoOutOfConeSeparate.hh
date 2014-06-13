@@ -41,9 +41,6 @@ namespace cluster {
     virtual bool Bool(const ClusterParamsAlgNew &cluster1,
 		      const ClusterParamsAlgNew &cluster2);
 
-    /// Set Verbose Mode on or off
-    void SetVerbose(bool on) { _verbose = on; }
-
     /// Set Debug Mode on or off
     void SetDebug(bool on) { _debug = on; }
 
@@ -60,23 +57,22 @@ namespace cluster {
     void SetMinLength(float len) { _MinLen = len; }
 
     /// SetMinimum number of hits for small cluster
-    void SetMinHits(int n) { _minHits = n; }
+    void SetMinHits(size_t n) { _minHits = n; }
 
     /// Function to reset the algorithm instance ... maybe implemented via child class
     virtual void Reset(){}
 
     /// Function to report what's going on per merging
-    virtual void Report();
+    virtual void Report(){}
 
   protected:
 
     bool _debug;
-    bool _verbose;
     float _MaxAngle;
     float _MaxAngleFar;
     float _MinLen;
     float _FallOff;
-    int _minHits;
+    size_t _minHits;
 
   };
 }

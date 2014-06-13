@@ -77,6 +77,10 @@ namespace cluster {
        CMergeManager is run with verbosity level kPerMerging. Maybe useful for debugging.
     */
     virtual void Report();
+
+    /// Function to set verbosity
+    virtual void SetVerbose(bool doit=true)
+    { for(auto &algo : _algo_array) algo->SetVerbose(doit); }
     
     /// Function to reset the algorithm instance ... maybe implemented via child class
     virtual void Reset();

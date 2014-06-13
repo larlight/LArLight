@@ -1,5 +1,5 @@
-#ifndef CMALGOSTARTINCONE_CC
-#define CMALGOSTARTINCONE_CC
+#ifndef CMALGOSTARTINCONE_CXX
+#define CMALGOSTARTINCONE_CXX
 
 #include "CMAlgoStartInCone.hh"
 
@@ -15,7 +15,6 @@ namespace cluster {
 
     SetMinHits(40);
     SetMinLen(10);
-    SetVerbose(true);
     SetDebug(false);
     SetAngleCompat(90.);
     SetLengthReach(1.0);

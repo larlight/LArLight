@@ -1,5 +1,5 @@
-#ifndef CMALGOSHORTESTDIST_CC
-#define CMALGOSHORTESTDIST_CC
+#ifndef CMALGOSHORTESTDIST_CXX
+#define CMALGOSHORTESTDIST_CXX
 
 #include "CMAlgoShortestDist.hh"
 
@@ -9,7 +9,6 @@ namespace cluster {
   CMAlgoShortestDist::CMAlgoShortestDist() {
 
     //this just sets default values    
-    SetVerbose(false);
     SetDebug(false);
     SetMinHits(0);
     
@@ -122,18 +121,17 @@ namespace cluster {
     double length_squared = pow((end_x - start_x), 2) + pow((end_y - start_y), 2);
     
     // Treat the case start & end point overlaps
-    if(length_squared < _min_distance_unit) {
-      if(_verbose){
-	std::cout << std::endl;
-	std::cout << Form(" Provided very short line segment: (%g,%g) => (%g,%g)",
-			  start_x,start_y,end_x,end_y) << std::endl;
-	std::cout << " Likely this means one of two clusters have start & end point identical." << std::endl;
-	std::cout << " Check the cluster output!" << std::endl;
-	std::cout << std::endl;
-	std::cout << Form(" At this time, the algorithm uses a point (%g,%g)",start_x,start_y) << std::endl;
-	std::cout << " to represent this cluster's location." << std::endl;
-	std::cout << std::endl;
-      }
+    if( (_verbose or _debug) and length_squared < _min_distance_unit) {
+
+      std::cout << std::endl;
+      std::cout << Form(" Provided very short line segment: (%g,%g) => (%g,%g)",
+			start_x,start_y,end_x,end_y) << std::endl;
+      std::cout << " Likely this means one of two clusters have start & end point identical." << std::endl;
+      std::cout << " Check the cluster output!" << std::endl;
+      std::cout << std::endl;
+      std::cout << Form(" At this time, the algorithm uses a point (%g,%g)",start_x,start_y) << std::endl;
+      std::cout << " to represent this cluster's location." << std::endl;
+      std::cout << std::endl;
       
       return (pow((point_x - start_x),2) + pow((point_y - start_y),2));
     }

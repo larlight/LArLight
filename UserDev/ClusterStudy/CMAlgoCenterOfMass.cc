@@ -1,5 +1,5 @@
-#ifndef CMALGOCENTEROFMASS_CC
-#define CMALGOCENTEROFMASS_CC
+#ifndef CMALGOCENTEROFMASS_CXX
+#define CMALGOCENTEROFMASS_CXX
 
 #include "CMAlgoCenterOfMass.hh"
 
@@ -10,7 +10,6 @@ namespace cluster {
   //----------------------------------------
   {
 
-    SetVerbose(false);
     SetDebug(false);
     SetMaxHitsSmallClus(10);
     SetMinHitsBigClus(40);

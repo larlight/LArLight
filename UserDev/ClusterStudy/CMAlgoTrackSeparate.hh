@@ -43,7 +43,7 @@ namespace cluster {
 
     void SetDebug(bool on) { _debug = on; }
 
-    void SetMinNumHits(int n) { _MinNumHits = n; }
+    void SetMinNumHits(size_t n) { _MinNumHits = n; }
 
     void SetMinAngleDiff(float anglesep) { _MinAngleDiff = anglesep; }
     
@@ -71,7 +71,7 @@ namespace cluster {
     bool _debug;
     bool _use_EP;
     float _ep_cut;
-    int _MinNumHits;
+    size_t _MinNumHits;
     float _MinAngleDiff;
     float _MaxOpeningAngle;
     float _MinLength;
