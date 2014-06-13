@@ -12,6 +12,7 @@ namespace cluster{
 
   ClusterParamsAlgNew::ClusterParamsAlgNew()
   {
+    fMinNHits = 10;
     fGSer=nullptr;
     enableFANN = false;
     verbose=true;
@@ -20,6 +21,7 @@ namespace cluster{
 
   ClusterParamsAlgNew::ClusterParamsAlgNew(const std::vector<const larlight::hit*> &inhitlist)
   {
+    fMinNHits = 10;
     fGSer=nullptr;
     enableFANN = false;
     verbose=true;
@@ -28,6 +30,7 @@ namespace cluster{
 
   ClusterParamsAlgNew::ClusterParamsAlgNew(const std::vector<larutil::PxHit> &inhitlist)
   {
+    fMinNHits = 10;
     fGSer=nullptr;
     enableFANN = false;
     verbose=true;
@@ -53,7 +56,7 @@ namespace cluster{
     fPlane=fHitVector[0].plane;
     
       
-    if (fHitVector.size()<10)
+    if (fHitVector.size() < fMinNHits)
     {
       if(verbose) std::cout << " the hitlist is too small. Continuing to run may result in crash!!! " <<std::endl;
       return -1;
