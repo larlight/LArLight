@@ -63,7 +63,7 @@ namespace cluster {
     virtual void Reset(){}
 
     /// Function to report what's going on per merging
-    virtual void Report();
+    virtual void Report(){}
 
   protected:
 
