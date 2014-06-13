@@ -18,7 +18,7 @@ namespace larlight {
     SetPrintClusterInfo(false);
     SetMinHitsToDraw(0);
     SetDrawTracks(true);
-
+    SetDrawOnlyTracks(false);
   }
   
   //################################################################
@@ -126,35 +126,41 @@ namespace larlight {
       if(cluster_hits.size() > _min_hits_to_draw){
 
 	bool is_track = cl.GetParams().eigenvalue_principal > 0.99000;
-
-	//if it's not a track, draw it regarldess of _draw_tracks flag
-	if(!is_track){	  
-	  if(_draw_polygon)
-	    _algo.AddCluster(plane,
-			     cluster_hits,
-			     cluster_start,
-			     cluster_end,
-			     cluster_polygon);
-	  else
-	    _algo.AddCluster(plane,
-			     cluster_hits,
-			     cluster_start,
-			     cluster_end);
-	}//end if it is not a track
 	
-	else{//if it is a track, only draw it if _draw_tracks is true
-	  if(_draw_tracks){
-	    if(_draw_polygon)
+	//if it's not a track, draw it only if !_draw_only_tracks
+	if(!is_track){
+	  if(!_draw_only_tracks){
+	    if(_draw_polygon){
 	      _algo.AddCluster(plane,
 			       cluster_hits,
 			       cluster_start,
 			       cluster_end,
 			       cluster_polygon);
-	    else
+	    }
+	    else{
 	      _algo.AddCluster(plane,
 			       cluster_hits,
 			       cluster_start,
 			       cluster_end);
+	    }
+	  }
+	}//end if it is not a track
+	
+	else{//if it is a track, draw it if _draw_tracks is true
+	  if(_draw_tracks){
+	    if(_draw_polygon){
+	      _algo.AddCluster(plane,
+			       cluster_hits,
+			       cluster_start,
+			       cluster_end,
+			       cluster_polygon);
+	    }
+	    else{
+	      _algo.AddCluster(plane,
+			       cluster_hits,
+			       cluster_start,
+			       cluster_end);
+	    }
 	  }//end if(_draw_tracks)
 	}//end if it is a track
       }//end only drawing clusters with more than min hits
