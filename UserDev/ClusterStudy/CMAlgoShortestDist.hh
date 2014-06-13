@@ -47,7 +47,7 @@ namespace cluster {
     void SetDebug(bool on) { _debug = on; }
 
     /// Set Minimum Number of Hits to consider Cluster
-    void SetMinHits(int n) { _minHits = n; }
+    void SetMinHits(size_t n) { _minHits = n; }
    
     /**
        Function to compute a distance between a 2D point (point_x, point_y) to a 2D finite line segment
@@ -63,7 +63,7 @@ namespace cluster {
     
     bool _debug;         /// bool to suppress lots of output if you want
 
-    int _minHits;        /// Min Number of hits for cluster to be considered
+    size_t _minHits;        /// Min Number of hits for cluster to be considered
   
     double _wire_2_cm, _time_2_cm; /// Conversion factors ogtten from GeometryUtilities
 

@@ -39,7 +39,7 @@ namespace cluster {
     */
 
     /// Method to set cut value on minimum number of hits considered
-    void SetMinHitsCut(int n) { _MinHits = n; }
+    void SetMinHitsCut(size_t n) { _MinHits = n; }
 
     void SetDebug(bool debug) { _debug = debug; }
 
@@ -53,7 +53,7 @@ namespace cluster {
   protected:
 
     double _wire_2_cm, _time_2_cm; /// Conversion factors ogtten from GeometryUtilities
-    int _MinHits; /// Minimum number of hits for cluster whose start point is being considered. We want it to be a good start point...
+    size_t _MinHits; /// Minimum number of hits for cluster whose start point is being considered. We want it to be a good start point...
     bool _debug;
   };
 }

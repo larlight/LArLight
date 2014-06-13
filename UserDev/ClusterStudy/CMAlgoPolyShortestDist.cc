@@ -25,29 +25,30 @@ namespace cluster {
   void CMAlgoPolyShortestDist::EventBegin(const std::vector<cluster::ClusterParamsAlgNew> &clusters)
   //------------------------------------------------------------------------------------------
   {
-    tmp_min_dist = 99999;
+    if(clusters.size())
+      tmp_min_dist = 99999;
   }
 
   //-------------------------------
-  void CMAlgoPolyShortestDist::EventEnd()
+  //void CMAlgoPolyShortestDist::EventEnd()
   //-------------------------------
-  {
-
-  }
+  //{
+  //
+  //}
 
   //-----------------------------------------------------------------------------------------------
-  void CMAlgoPolyShortestDist::IterationBegin(const std::vector<cluster::ClusterParamsAlgNew> &clusters)
+  //void CMAlgoPolyShortestDist::IterationBegin(const std::vector<cluster::ClusterParamsAlgNew> &clusters)
   //-----------------------------------------------------------------------------------------------
-  {
-
-  }
+  //{
+  //
+  //}
 
   //------------------------------------
-  void CMAlgoPolyShortestDist::IterationEnd()
+  //void CMAlgoPolyShortestDist::IterationEnd()
   //------------------------------------
-  {
-
-  }
+  //{
+  //
+  //}
   
   //----------------------------------------------------------------
   bool CMAlgoPolyShortestDist::Bool(const ClusterParamsAlgNew &cluster1,

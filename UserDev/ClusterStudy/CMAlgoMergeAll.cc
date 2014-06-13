@@ -17,9 +17,10 @@ namespace cluster {
 			    const ClusterParamsAlgNew &cluster2)
   //--------------------------------------------------------
   {
-    return true;
+    if(cluster1.GetNHits() && cluster2.GetNHits()) return true;
+    else return false;
   }
-
+  
 }
 
 #endif

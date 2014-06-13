@@ -37,11 +37,6 @@ namespace cluster {
     virtual bool Bool(const ClusterParamsAlgNew &cluster1,
 		      const ClusterParamsAlgNew &cluster2);
 
-    /// Overloaded function called at beginning of iterating over all pairs of clusters
-    /// Currently using just to initialize some debugging histograms
-    /// should rewrite it to not take an input argument...
-    virtual void IterationBegin(const std::vector<cluster::ClusterParamsAlgNew> &clusters);
-
     /// Method to set debug mode
     void SetDebug(bool on) { _debug = on; }
 
@@ -55,7 +50,7 @@ namespace cluster {
     void SetUseOpeningAngle(bool on) { _use_opening_angle = on; }
 
     /// Set Minimum Number of Hits to consider Cluster
-    void SetMinHits(int n) { _minHits = n; }
+    void SetMinHits(size_t n) { _minHits = n; }
 
     //    TH1F* GetAngleDistHisto() const{ return angle_dist_histo; };
 
@@ -75,7 +70,7 @@ namespace cluster {
     /// angle instead of whatever you set with SetAngleCut
     bool _use_opening_angle;
 
-    int _minHits;        /// Min Number of hits for cluster to be considered
+    size_t _minHits;        /// Min Number of hits for cluster to be considered
 
     /// Histogram used for debugging/cut value settings
     TH1F *angle_dist_histo;

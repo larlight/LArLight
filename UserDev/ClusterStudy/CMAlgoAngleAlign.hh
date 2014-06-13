@@ -46,13 +46,13 @@ namespace cluster {
     /// Method to set cut value in degrees for angle compatibility test
     void SetAngleCut(double angle) { _MaxAngleSep = angle; }
 
-    void SetMinNHits(int n) { _MinNHits = n; }
+    void SetMinNHits(size_t n) { _MinNHits = n; }
 
   protected:
 
     bool _debug;
-    int _MinNHits;    /// minimum number of hits for cluster to be considered
-
+    size_t _MinNHits;    /// minimum number of hits for cluster to be considered
+    
     ///bool to allow "backwards" clusters (swapped start/end points)
     ///to still match in angle, even though they are 180 degrees apart
     ///only valid for _use_opening_angle==false

@@ -1,5 +1,5 @@
-#ifndef CMALGO_CLASS_NAME_CC
-#define CMALGO_CLASS_NAME_CC
+#ifndef CMALGO_CLASS_NAME_CXX
+#define CMALGO_CLASS_NAME_CXX
 
 #include "CMAlgo_Class_Name.hh"
 
@@ -19,40 +19,13 @@ namespace cluster {
 
   }
 
-  //------------------------------------------------------------------------------------------
-  void CMAlgo_Class_Name::EventBegin(const std::vector<cluster::ClusterParamsAlgNew> &clusters)
-  //------------------------------------------------------------------------------------------
-  {
-
-  }
-
-  //-------------------------------
-  void CMAlgo_Class_Name::EventEnd()
-  //-------------------------------
-  {
-
-  }
-
-  //-----------------------------------------------------------------------------------------------
-  void CMAlgo_Class_Name::IterationBegin(const std::vector<cluster::ClusterParamsAlgNew> &clusters)
-  //-----------------------------------------------------------------------------------------------
-  {
-
-  }
-
-  //------------------------------------
-  void CMAlgo_Class_Name::IterationEnd()
-  //------------------------------------
-  {
-
-  }
-  
   //----------------------------------------------------------------
   bool CMAlgo_Class_Name::Bool(const ClusterParamsAlgNew &cluster1,
 			       const ClusterParamsAlgNew &cluster2)
   //----------------------------------------------------------------
   {
-    return false;
+    if(cluster1.GetNHits() && cluster2.GetNHits()) return false;
+    else return false;
   }
 
   //------------------------------

@@ -53,10 +53,10 @@ namespace cluster {
     void SetDebug(bool on) { _debug = on; }
 
     /// Function to set Max hits for small clsuters
-    void SetMaxHitsSmallClus(int n) { _maxHits = n; }
+    void SetMaxHitsSmallClus(size_t n) { _maxHits = n; }
 
     /// Function to se Min hits for big clusters
-    void SetMinHitsBigClus(int n) { _minHits = n; }
+    void SetMinHitsBigClus(size_t n) { _minHits = n; }
 
     /// Function to set Max Distance for COM to be from start-end
     void SetMaxDistance(double d) { _MaxDist = d; }
@@ -81,8 +81,8 @@ namespace cluster {
   protected:
 
     bool _debug;
-    int _minHits;
-    int _maxHits;
+    size_t _minHits;
+    size_t _maxHits;
     double _MaxDist;
     double _lengthReach; ///How four out - as percent of cluster length - cone will extend from start point
     bool _COMinPolyAlg;

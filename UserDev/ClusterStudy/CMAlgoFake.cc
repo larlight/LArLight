@@ -19,10 +19,13 @@ namespace cluster {
 			const ClusterParamsAlgNew &cluster2)
   //--------------------------------------------------------
   {
-    _ctr++;
-    if( (_ctr%64) == 0)
-      _flip = (!_flip);
-    return _flip;
+    if(cluster1.GetNHits() && cluster2.GetNHits()) {
+      _ctr++;
+      if( (_ctr%64) == 0)
+	_flip = (!_flip);
+      return _flip;
+    }
+    else return false;
   }
 
 }

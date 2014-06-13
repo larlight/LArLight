@@ -38,24 +38,24 @@ namespace cluster {
     /**
        Optional function: called at the beginning of 1st iteration. This is called per event.
      */
-    virtual void EventBegin(const std::vector<cluster::ClusterParamsAlgNew> &clusters);
+    //virtual void EventBegin(const std::vector<cluster::ClusterParamsAlgNew> &clusters);
 
     /**
        Optional function: called at the end of event ... after the last merging iteration is over.
      */
-    virtual void EventEnd();
+    //virtual void EventEnd();
  
     /**
        Optional function: called at the beggining of each iteration over all pairs of clusters. 
        This provides all clusters' information in case the algorithm need them. Note this
        is called per iteration which may be more than once per event.
      */
-    virtual void IterationBegin(const std::vector<cluster::ClusterParamsAlgNew> &clusters);
+    //virtual void IterationBegin(const std::vector<cluster::ClusterParamsAlgNew> &clusters);
 
     /**
        Optional function: called at the end of each iteration over all pairs of clusters.
      */
-    virtual void IterationEnd();
+    //virtual void IterationEnd();
 
     /**
        Core function: given the CPAN input, return whether a cluster should be
@@ -83,13 +83,13 @@ namespace cluster {
 
     void SetMinEP(double value) { _min_EP = value; }
 
-    void SetMinHits(int value) { _min_hits = value; }
+    void SetMinHits(size_t value) { _min_hits = value; }
 
     void SetDebug(bool flag) { _debug = flag; }
 
   protected:
     
-    int _min_hits;
+    size_t _min_hits;
     double _min_width, _min_opening_angle, _min_EP;
     bool _debug;
 

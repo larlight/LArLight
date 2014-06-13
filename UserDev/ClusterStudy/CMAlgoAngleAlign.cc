@@ -22,8 +22,8 @@ namespace cluster {
     
     double angle1 = cluster1.GetParams().angle_2d;
     double angle2 = cluster2.GetParams().angle_2d;
-    int hits1     = cluster1.GetHitVector().size();
-    int hits2     = cluster2.GetHitVector().size();
+    size_t hits1     = cluster1.GetHitVector().size();
+    size_t hits2     = cluster2.GetHitVector().size();
 
     //if don't make hit cut return aflse
     if ( (hits1 < _MinNHits) or (hits2 < _MinNHits) )

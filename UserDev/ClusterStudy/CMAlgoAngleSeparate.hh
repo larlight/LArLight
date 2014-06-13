@@ -51,7 +51,7 @@ namespace cluster {
     void SetMinLength(float len) { _MinLen = len; }
 
     /// SetMinimum number of hits for small cluster
-    void SetMinHits(int n) { _minHits = n; }
+    void SetMinHits(size_t n) { _minHits = n; }
 
     /// Function to reset the algorithm instance ... maybe implemented via child class
     virtual void Reset(){}
@@ -64,7 +64,7 @@ namespace cluster {
     bool _debug;
     float _MaxAngle;
     float _MinLen;
-    int _minHits;
+    size_t _minHits;
 
   };
 }

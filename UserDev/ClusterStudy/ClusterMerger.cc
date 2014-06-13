@@ -76,7 +76,7 @@ namespace larlight {
     out_cluster_v->set_run(ev_cluster->run());
     out_cluster_v->set_subrun(ev_cluster->subrun());
     //tmp_index to know what plane to use
-    int tmp_index;
+    unsigned short tmp_index = 0;
 
     for(auto const& indexes : merged_indexes) {
 

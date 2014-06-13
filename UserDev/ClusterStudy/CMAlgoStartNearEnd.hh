@@ -42,7 +42,7 @@ namespace cluster {
 
     void SetMaxAngle(double a) { _maxopeningangle=a; }
 
-    void SetMinHits(int n) { _MinHits=n; }
+    void SetMinHits(size_t n) { _MinHits=n; }
 
     virtual bool Bool(const ClusterParamsAlgNew &cluster1,
 		      const ClusterParamsAlgNew &cluster2);
@@ -57,7 +57,7 @@ namespace cluster {
 
     double _maxopeningangle;
     double _separation;
-    int _MinHits;
+    size_t _MinHits;
 
   };
 }
