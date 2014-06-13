@@ -19,9 +19,9 @@ namespace cluster {
 
     SetUseOpeningAngle(false);
 
-    angle_dist_histo = 0;
+    //    angle_dist_histo = 0;
 
-    angle_dist_histo = new TH1F("angle_dist_histo","Cluster Angle Differences",100,-360,360);
+    //    angle_dist_histo = new TH1F("angle_dist_histo","Cluster Angle Differences",100,-360,360);
 
   } //end constructor
 
@@ -61,11 +61,11 @@ namespace cluster {
     if(angle1 < -998 || angle2 < -998)
       return false;
 
-    if(angle_dist_histo){
-      angle_dist_histo->Fill(angle1-angle2);
-    }
-    else
-      std::cout<<"\n\n\nSOMETHING WENT HORRIBLY WRONG IN CMALGOANGLECOMPAT\n\n\n\n\n\n\n"<<std::endl;
+    //    if(angle_dist_histo){
+    //      angle_dist_histo->Fill(angle1-angle2);
+    //    }
+    //    else
+    //      std::cout<<"\n\n\nSOMETHING WENT HORRIBLY WRONG IN CMALGOANGLECOMPAT\n\n\n\n\n\n\n"<<std::endl;
 
     bool compatible = false;
     
@@ -94,7 +94,7 @@ namespace cluster {
   
   void CMAlgoAngleCompat::IterationBegin(const std::vector<cluster::ClusterParamsAlgNew> &clusters){
     
-    if(angle_dist_histo) angle_dist_histo->Reset();
+    //    if(angle_dist_histo) angle_dist_histo->Reset();
 
 
   }

@@ -57,7 +57,7 @@ namespace cluster {
     /// Set Minimum Number of Hits to consider Cluster
     void SetMinHits(int n) { _minHits = n; }
 
-    TH1F* GetAngleDistHisto() const{ return angle_dist_histo; };
+    //    TH1F* GetAngleDistHisto() const{ return angle_dist_histo; };
 
   protected:
 

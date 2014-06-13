@@ -78,6 +78,9 @@ namespace larlight{
     /// Option to not draw track-like clusters, for debugging
     void SetDrawTracks(bool flag) { _draw_tracks = flag; }
 
+    /// Option to only draw track-like clusters, for debugging
+    void SetDrawOnlyTracks(bool flag) { _draw_only_tracks = flag; }
+
   protected:
 
     ::cluster::ClusterViewerAlgo _algo;
@@ -89,6 +92,8 @@ namespace larlight{
     size_t _min_hits_to_draw;
 
     bool _draw_tracks;
+
+    bool _draw_only_tracks;
   };
   
 }
