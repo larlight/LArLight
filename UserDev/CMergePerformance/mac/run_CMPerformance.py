@@ -9,7 +9,7 @@ if len(sys.argv) < 2:
 
 from ROOT import gSystem
 gSystem.Load("libCMergePerformance")
-from ROOT import larlight, cluster
+from ROOT import larlight, cluster, cmtool
 
 # Create ana_processor instance
 my_proc = larlight.ana_processor()
@@ -44,7 +44,7 @@ my_CMP.SetDebug(False)
 ########################################
 
 ## PROHIBIT ALGOS ##
-tracksep_prohibit = cluster.CMAlgoTrackSeparate()
+tracksep_prohibit = cmtool.CBAlgoTrackSeparate()
 tracksep_prohibit.SetMinNumHits(30)
 tracksep_prohibit.SetMinAngleDiff(0.1)
 tracksep_prohibit.SetMaxOpeningAngle(30)
@@ -54,7 +54,7 @@ tracksep_prohibit.SetDebug(False)
 tracksep_prohibit.SetVerbose(False)
 my_CMP.GetManager().AddSeparateAlgo(tracksep_prohibit)
 
-outofcone_prohibit = cluster.CMAlgoOutOfConeSeparate()
+outofcone_prohibit = cmtool.CBAlgoOutOfConeSeparate()
 outofcone_prohibit.SetDebug(False)
 outofcone_prohibit.SetVerbose(False)
 my_CMP.GetManager().AddSeparateAlgo(outofcone_prohibit)
@@ -62,9 +62,9 @@ my_CMP.GetManager().AddSeparateAlgo(outofcone_prohibit)
 
 #merge algos that require AND condition have to be added in array
 #----------------------------------------------------------
-algo_array = cluster.CMAlgoArray()
+algo_array = cmtool.CBAlgoArray()
 
-angalg = cluster.CMAlgoAngleCompat()
+angalg = cmtool.CBAlgoAngleCompat()
 angalg.SetVerbose(False)
 angalg.SetDebug(False)
 angalg.SetAllow180Ambig(False)
@@ -74,7 +74,7 @@ angalg.SetAngleCut(3.)
 algo_array.AddAlgo(angalg,False)
 
 
-algo = cluster.CMAlgoShortestDist()
+algo = cmtool.CBAlgoShortestDist()
 algo.SetVerbose(False)
 algo.SetDebug(False)
 algo.SetMinHits(0)
