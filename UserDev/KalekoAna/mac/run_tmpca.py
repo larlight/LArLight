@@ -38,7 +38,7 @@ if len(sys.argv) > 2:
 my_proc.set_ana_output_file("out.root");
 
 # Attach a template process
-my_ana= kaleko.QuickClusterAna()
+my_ana= kaleko.tmpClusterAna()
 my_proc.add_process(my_ana)
 
 print
