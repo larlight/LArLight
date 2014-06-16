@@ -91,7 +91,7 @@ namespace larlight {
       hits_xy.at(plane).push_back(std::pair<double,double>(x,y));
       hits_charge.at(plane).push_back(h.Charge());
     }
-    
+
     // Inform the algorithm about the range
     for(size_t i=0; i<nplanes; ++i)
       _algo.SetRange(i,xrange.at(i),yrange.at(i));
@@ -125,7 +125,7 @@ namespace larlight {
 		       cluster_start,
 		       cluster_end);
     }
-    
+
     return true;
   };
   
