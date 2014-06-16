@@ -38,19 +38,25 @@ namespace ubpsql {
        takes list of strings that it then converts to hstore values. Needs to know the total number of channels 
      */
     bool CreateConfigType(const std::string config_type,
-			  const unsigned int nchannels,
 			  const std::vector<std::string> &stringkeylist);
 
+    /*
+    bool ExistConfigType(const std::string config_type);
+
+    bool ExistConfigType(const std::string config_type,
+			 const std::vector<std::string> &stringkeylist);
+    */
     /// Create a new run number in the database
     bool InsertNewRun(unsigned int config_id);
 
     /// Create a new sub run number in the database
     bool InsertNewSubRun(unsigned int config_id, unsigned int run);
 
-    bool InsertSubConfigValuesPerCrate(const std::string  config_type,
-				       const unsigned int config_id,
-				       const unsigned int crate,
-				       const std::map<std::string,std::string> &hstore_values);
+    bool InsertSubConfigValues(const std::string  config_type,
+			       const unsigned int config_id,
+			       const unsigned int crate,
+			       const unsigned int channel,
+			       const std::map<std::string,std::string> &hstore_values);
       
   };
 }

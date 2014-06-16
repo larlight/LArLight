@@ -6,20 +6,27 @@
 namespace ubpsql {
 
   bool RCWriter::CreateConfigType(const std::string config_type,
-				  const unsigned int nchannels,
 				  const std::vector<std::string> &stringkeylist)
   {
     if(!Connect()) return false;
 
     // Form a command string
-    std::string cmd(Form("SELECT CreateConfigurationType('%s',",config_type.c_str()));
+    std::string cmd(Form("SELECT CreateConfigurationType('%s','",config_type.c_str()));
 
-    // Append hstore parameters
-    cmd+=(Form("' \"nchannels\"=>\"%d\"",nchannels));
+    /*
     for(size_t index=0; index<stringkeylist.size(); ++index)
 
       cmd += Form(", \"f%zu\"=>\"%s\"",index,stringkeylist.at(index).c_str());
+    */
 
+    for(auto const& name : stringkeylist) {
+
+      if(name == (*stringkeylist.begin()))
+	cmd += Form(" \"%s\"=>\"\"",name.c_str());
+      else
+	cmd += Form(", \"%s\"=>\"\"",name.c_str());
+
+    }
     cmd += " ');";
     
     PGresult* res = _conn->Execute(cmd);
@@ -27,7 +34,6 @@ namespace ubpsql {
     PQclear(res);
     return true;
   }
-
 
   bool RCWriter::InsertNewRun(unsigned int config_id)
   {
@@ -49,16 +55,19 @@ namespace ubpsql {
     return true;
   }
 
-  bool RCWriter::InsertSubConfigValuesPerCrate(const std::string  config_type,
-					       const unsigned int config_id,
-					       const unsigned int crate,
-					       const std::map<std::string,std::string> &hstore_values)
+  bool RCWriter::InsertSubConfigValues(const std::string  config_type,
+				       const unsigned int config_id,
+				       const unsigned int crate,
+				       const unsigned int channel,
+				       const std::map<std::string,std::string> &hstore_values)
   {
     if(!Connect()) return false;
-    std::string cmd(Form("SELECT InsertConfigurationSet('%s', %d, %d, 0, ",
+    std::string cmd(Form("SELECT InsertConfigurationSet('%s', %d, %d, %d, ",
 			 config_type.c_str(),
 			 config_id,
-			 crate));
+			 crate,
+			 channel)
+		    );
     cmd += "'";
 
     size_t ctr = hstore_values.size() - 1;

@@ -1,0 +1,72 @@
+LOG:  database system was shut down at 2014-04-21 18:25:41 CDT
+LOG:  database system is ready to accept connections
+LOG:  autovacuum launcher started
+LOG:  received fast shutdown request
+LOG:  aborting any active transactions
+LOG:  autovacuum launcher shutting down
+LOG:  shutting down
+LOG:  database system is shut down
+LOG:  database system was shut down at 2014-06-11 10:35:39 CDT
+LOG:  database system is ready to accept connections
+LOG:  autovacuum launcher started
+ERROR:  ++++++++++ Configuration pmtconfig is not defined yet! +++++++++++
+STATEMENT:  SELECT InsertConfigurationSet('pmtconfig', 0, 0, 0, ' "calib_delay"=>"0x0", "deadtime"=>"0x0", "frame_size"=>"25600", "mask0"=>"0x0", "mask1"=>"0x0", "mask2"=>"0x0", "mask3"=>"0x0", "mask4"=>"0x0", "mask5"=>"0x0", "mask6"=>"0x0", "mask7"=>"0x0", "mask8"=>"0x0", "module_address"=>"1", "prescale0"=>"0x0", "prescale1"=>"0x0", "prescale2"=>"0x0", "prescale3"=>"0x0", "prescale4"=>"0x0", "prescale5"=>"0x0", "prescale6"=>"0x0", "prescale7"=>"0x0", "prescale8"=>"0x0", "pulse_delay1"=>"0x0", "pulse_delay2"=>"0x0", "pulse_width1"=>"0x0", "pulse_width2"=>"0x0" ');
+ERROR:  ++++++++++ Configuration ktest1 is not defined yet! +++++++++++
+STATEMENT:  SELECT InsertConfigurationSet('ktest1', 1, 0, 0, ' "par0"=>"var0", "par1"=>"var1" ');
+ERROR:  ++++++++++ Configuration ktest1 is not defined yet! +++++++++++
+STATEMENT:  SELECT InsertConfigurationSet('ktest1', 1, 0, 0, ' "par0"=>"var0", "par1"=>"var1" ');
+ERROR:  ++++++++++ Provided HSTORE columns are lacking necessary pieces! +++++++++++
+STATEMENT:  SELECT InsertConfigurationSet('ktest1', 1, 0, 0, ' "par0"=>"var0", "par1"=>"var1" ');
+ERROR:  ++++++++++ Configuration Type ktest1 Already Exists +++++++++++
+STATEMENT:  SELECT CreateConfigurationType('ktest1',' "nchannels"=>"1", "f0"=>"", "f1"=>"", "f2"=>"par0", "f3"=>"par1" ');
+ERROR:  ++++++++++ Configuration Type ktest1 Already Exists +++++++++++
+STATEMENT:  SELECT CreateConfigurationType('ktest1',' "nchannels"=>"1", "f0"=>"", "f1"=>"", "f2"=>"par0", "f3"=>"par1" ');
+ERROR:  ++++++++++ Configuration Type ktest1 Already Exists +++++++++++
+STATEMENT:  SELECT CreateConfigurationType('ktest1',' "nchannels"=>"1", "f0"=>"par0", "f1"=>"par1" ');
+ERROR:  ++++++++++ Provided HSTORE columns are lacking necessary pieces! +++++++++++
+STATEMENT:  SELECT InsertConfigurationSet('ktest1', 1, 0, 0, ' "par0"=>"var0", "par1"=>"var1" ');
+FATAL:  database "kazuhiro" does not exist
+ERROR:  ++++++++++ Configuration Type ktest1 Already Exists +++++++++++
+STATEMENT:  SELECT CreateConfigurationType('ktest1',' "nchannels"=>"1", "f0"=>"par0", "f1"=>"par1" ');
+ERROR:  ++++++++++ Provided HSTORE columns are lacking necessary pieces! +++++++++++
+STATEMENT:  SELECT InsertConfigurationSet('ktest1', 1, 0, 0, ' "par0"=>"var0", "par1"=>"var1" ');
+ERROR:  ++++++++++ Provided HSTORE columns are lacking necessary pieces! +++++++++++
+STATEMENT:  SELECT InsertConfigurationSet('ktest3', 1, 0, 0, ' "par0"=>"var0", "par1"=>"var1" ');
+ERROR:  ++++++++++ Configuration nr 1 Already Exists for Crate 0 and Channel 0 ++++++++++
+STATEMENT:  SELECT InsertConfigurationSet('ktest3', 1, 0, 0, ' "nchannels"=>"10", "par0"=>"var0", "par1"=>"var1" ');
+ERROR:  ++++++++++ Configuration nr 1 Already Exists for Crate 0 and Channel 0 ++++++++++
+STATEMENT:  SELECT InsertConfigurationSet('ktest3', 1, 0, 0, ' "nchannels"=>"10", "par0"=>"var0", "par1"=>"var1" ');
+ERROR:  ++++++++++ Provided HSTORE columns are lacking necessary pieces! +++++++++++
+STATEMENT:  SELECT InsertConfigurationSet('ktest3', 2, 0, 0, ' "par0"=>"var0", "par1"=>"var1" ');
+ERROR:  +++++++++++++ Config with name MainTest1 already exists in MainConfigTable! +++++++++++++
+STATEMENT:  SELECT InsertMainConfiguration('Test1=>0,Test2=>0,Test3=>0'::hstore,'MainTest1');
+ERROR:  +++++++++++++ This Configuration exists MainConfigTable, with ID: 0! +++++++++++++
+STATEMENT:  SELECT InsertMainConfiguration('Test1=>0,Test2=>0,Test3=>0'::hstore,'MainTest2');
+ERROR:  syntax error at or near "," at character 41
+STATEMENT:  SELECT CreateConfigurationType('ktest3',, "par0"=>"", "par1"=>"", "nchannels"=>"" ');
+ERROR:  zero-length delimited identifier at or near """" at character 50
+STATEMENT:  SELECT CreateConfigurationType('ktest3', "par0"=>"" "par1"=>"" "nchannels"=>"" ');
+ERROR:  zero-length delimited identifier at or near """" at character 50
+STATEMENT:  SELECT CreateConfigurationType('ktest3', "par0"=>"", "par1"=>"", "nchannels"=>"" ');
+ERROR:  ++++++++++ Configuration Type ktest3 Already Exists +++++++++++
+STATEMENT:  SELECT CreateConfigurationType('ktest3',' "par0"=>"", "par1"=>"", "nchannels"=>"" ');
+ERROR:  ++++++++++ Configuration nr 2 Already Exists for Crate 0 and Channel 0 ++++++++++
+STATEMENT:  SELECT InsertConfigurationSet('ktest3', 2, 0, 0, ' "nchannels"=>"10", "par0"=>"var0", "par1"=>"var1" ');
+ERROR:  +++++++++++++ Config with name MainTest1 already exists in MainConfigTable! +++++++++++++
+STATEMENT:  SELECT InsertMainConfiguration('Test1=>0,Test2=>0,Test3=>0'::hstore,'MainTest1');
+ERROR:  +++++++++++++ This Configuration exists MainConfigTable, with ID: 0! +++++++++++++
+STATEMENT:  SELECT InsertMainConfiguration('Test1=>0,Test2=>0,Test3=>0'::hstore,'MainTest2');
+ERROR:  +++++++++++++ Config with name MainTest1 already exists in MainConfigTable! +++++++++++++
+STATEMENT:  SELECT InsertMainConfiguration('Test1=>0,Test2=>0,Test3=>0'::hstore,'MainTest1');
+ERROR:  +++++++++++++ This Configuration exists MainConfigTable, with ID: 0! +++++++++++++
+STATEMENT:  SELECT InsertMainConfiguration('Test1=>0,Test2=>0,Test3=>0'::hstore,'MainTest2');
+ERROR:  ++++++++++ Configuration Type pmt_fem_mod Already Exists +++++++++++
+STATEMENT:  SELECT CreateConfigurationType('pmt_fem_mod',' "nchannels"=>"", "top_ch_enable"=>"", "middle_ch_enable"=>"", "bottom_ch_enable"=>"", "cosmic_trig_mult"=>"", "cosmic_trig_thres"=>"", "beam_trig_mult"=>"", "beam_trig_thres"=>"", "numi_window_size"=>"", "numi_window_delay"=>"", "numi_gate_size"=>"", "numi_gate_delay"=>"", "bnb_window_size"=>"", "bnb_window_delay"=>"", "bnb_gate_size"=>"", "bnb_gate_delay"=>"", "ch_config_id_00"=>"", "ch_config_id_01"=>"", "ch_config_id_02"=>"", "ch_config_id_03"=>"", "ch_config_id_04"=>"", "ch_config_id_05"=>"", "ch_config_id_06"=>"", "ch_config_id_07"=>"", "ch_config_id_08"=>"", "ch_config_id_09"=>"", "ch_config_id_10"=>"", "ch_config_id_11"=>"", "ch_config_id_12"=>"", "ch_config_id_13"=>"", "ch_config_id_14"=>"", "ch_config_id_15"=>"", "ch_config_id_16"=>"", "ch_config_id_17"=>"", "ch_config_id_18"=>"", "ch_config_id_19"=>"", "ch_config_id_20"=>"", "ch_config_id_21"=>"", "ch_config_id_22"=>"", "ch_config_id_23"=>"", "ch_config_id_24"=>"", "ch_config_id_25"=>"", "ch_config_id_26"=>"", "ch_config_id_27"=>"", "ch_config_id_28"=>"", "ch_config_id_29"=>"", "ch_config_id_30"=>"", "ch_config_id_31"=>"", "ch_config_id_32"=>"", "ch_config_id_33"=>"", "ch_config_id_34"=>"", "ch_config_id_35"=>"", "ch_config_id_36"=>"", "ch_config_id_37"=>"", "ch_config_id_38"=>"", "ch_config_id_39"=>"", "ch_config_id_40"=>"", "ch_config_id_41"=>"", "ch_config_id_42"=>"", "ch_config_id_43"=>"", "ch_config_id_44"=>"", "ch_config_id_45"=>"", "ch_config_id_46"=>"", "ch_config_id_47"=>"" ');
+ERROR:  ++++++++++ Configuration pmt_ is not defined yet! +++++++++++
+STATEMENT:  SELECT InsertConfigurationSet('pmt_', 2, 0, 0, ' "beam_trig_mult"=>"2", "beam_trig_thres"=>"200", "bnb_gate_delay"=>"256", "bnb_gate_size"=>"103", "bnb_window_delay"=>"20", "bnb_window_size"=>"1600", "bottom_ch_enable"=>"0xffff", "ch_config_id_00"=>"0", "ch_config_id_01"=>"0", "ch_config_id_02"=>"0", "ch_config_id_03"=>"0", "ch_config_id_04"=>"0", "ch_config_id_05"=>"0", "ch_config_id_06"=>"0", "ch_config_id_07"=>"0", "ch_config_id_08"=>"0", "ch_config_id_09"=>"0", "ch_config_id_10"=>"0", "ch_config_id_11"=>"0", "ch_config_id_12"=>"0", "ch_config_id_13"=>"0", "ch_config_id_14"=>"0", "ch_config_id_15"=>"0", "ch_config_id_16"=>"0", "ch_config_id_17"=>"0", "ch_config_id_18"=>"0", "ch_config_id_19"=>"0", "ch_config_id_20"=>"0", "ch_config_id_21"=>"0", "ch_config_id_22"=>"0", "ch_config_id_23"=>"0", "ch_config_id_24"=>"0", "ch_config_id_25"=>"0", "ch_config_id_26"=>"0", "ch_config_id_27"=>"0", "ch_config_id_28"=>"0", "ch_config_id_29"=>"0", "ch_config_id_30"=>"0", "ch_config_id_31"=>"0", "ch_config_id_32"=>"0", "ch_config_id_33"=>"0", "ch_config_id_34"=>"0", "ch_config_id_35"=>"0", "ch_config_id_36"=>"0", "ch_config_id_37"=>"0", "ch_config_id_38"=>"0", "ch_config_id_39"=>"0", "ch_config_id_40"=>"0", "ch_config_id_41"=>"0", "ch_config_id_42"=>"0", "ch_config_id_43"=>"0", "ch_config_id_44"=>"0", "ch_config_id_45"=>"0", "ch_config_id_46"=>"0", "ch_config_id_47"=>"0", "cosmic_trig_mult"=>"2", "cosmic_trig_thres"=>"200", "middle_ch_enable"=>"0xffff", "nchannels"=>"2", "numi_gate_delay"=>"640", "numi_gate_size"=>"640", "numi_window_delay"=>"20", "numi_window_size"=>"1500", "top_ch_enable"=>"0xffff" ');
+ERROR:  ++++++++++ Configuration nr 2 Already Exists for Crate 0 and Channel 0 ++++++++++
+STATEMENT:  SELECT InsertConfigurationSet('pmt_fem_mod', 2, 0, 0, ' "beam_trig_mult"=>"2", "beam_trig_thres"=>"200", "bnb_gate_delay"=>"256", "bnb_gate_size"=>"103", "bnb_window_delay"=>"20", "bnb_window_size"=>"1600", "bottom_ch_enable"=>"0xffff", "ch_config_id_00"=>"0", "ch_config_id_01"=>"0", "ch_config_id_02"=>"0", "ch_config_id_03"=>"0", "ch_config_id_04"=>"0", "ch_config_id_05"=>"0", "ch_config_id_06"=>"0", "ch_config_id_07"=>"0", "ch_config_id_08"=>"0", "ch_config_id_09"=>"0", "ch_config_id_10"=>"0", "ch_config_id_11"=>"0", "ch_config_id_12"=>"0", "ch_config_id_13"=>"0", "ch_config_id_14"=>"0", "ch_config_id_15"=>"0", "ch_config_id_16"=>"0", "ch_config_id_17"=>"0", "ch_config_id_18"=>"0", "ch_config_id_19"=>"0", "ch_config_id_20"=>"0", "ch_config_id_21"=>"0", "ch_config_id_22"=>"0", "ch_config_id_23"=>"0", "ch_config_id_24"=>"0", "ch_config_id_25"=>"0", "ch_config_id_26"=>"0", "ch_config_id_27"=>"0", "ch_config_id_28"=>"0", "ch_config_id_29"=>"0", "ch_config_id_30"=>"0", "ch_config_id_31"=>"0", "ch_config_id_32"=>"0", "ch_config_id_33"=>"0", "ch_config_id_34"=>"0", "ch_config_id_35"=>"0", "ch_config_id_36"=>"0", "ch_config_id_37"=>"0", "ch_config_id_38"=>"0", "ch_config_id_39"=>"0", "ch_config_id_40"=>"0", "ch_config_id_41"=>"0", "ch_config_id_42"=>"0", "ch_config_id_43"=>"0", "ch_config_id_44"=>"0", "ch_config_id_45"=>"0", "ch_config_id_46"=>"0", "ch_config_id_47"=>"0", "cosmic_trig_mult"=>"2", "cosmic_trig_thres"=>"200", "middle_ch_enable"=>"0xffff", "nchannels"=>"2", "numi_gate_delay"=>"640", "numi_gate_size"=>"640", "numi_window_delay"=>"20", "numi_window_size"=>"1500", "top_ch_enable"=>"0xffff" ');
+ERROR:  ++++++++++ Configuration nr 2 Already Exists for Crate 0 and Channel 0 ++++++++++
+STATEMENT:  SELECT InsertConfigurationSet('pmt_fem_mod', 2, 0, 0, ' "beam_trig_mult"=>"2", "beam_trig_thres"=>"200", "bnb_gate_delay"=>"256", "bnb_gate_size"=>"103", "bnb_window_delay"=>"20", "bnb_window_size"=>"1600", "bottom_ch_enable"=>"0xffff", "ch_config_id_00"=>"0", "ch_config_id_01"=>"0", "ch_config_id_02"=>"0", "ch_config_id_03"=>"0", "ch_config_id_04"=>"0", "ch_config_id_05"=>"0", "ch_config_id_06"=>"0", "ch_config_id_07"=>"0", "ch_config_id_08"=>"0", "ch_config_id_09"=>"0", "ch_config_id_10"=>"0", "ch_config_id_11"=>"0", "ch_config_id_12"=>"0", "ch_config_id_13"=>"0", "ch_config_id_14"=>"0", "ch_config_id_15"=>"0", "ch_config_id_16"=>"0", "ch_config_id_17"=>"0", "ch_config_id_18"=>"0", "ch_config_id_19"=>"0", "ch_config_id_20"=>"0", "ch_config_id_21"=>"0", "ch_config_id_22"=>"0", "ch_config_id_23"=>"0", "ch_config_id_24"=>"0", "ch_config_id_25"=>"0", "ch_config_id_26"=>"0", "ch_config_id_27"=>"0", "ch_config_id_28"=>"0", "ch_config_id_29"=>"0", "ch_config_id_30"=>"0", "ch_config_id_31"=>"0", "ch_config_id_32"=>"0", "ch_config_id_33"=>"0", "ch_config_id_34"=>"0", "ch_config_id_35"=>"0", "ch_config_id_36"=>"0", "ch_config_id_37"=>"0", "ch_config_id_38"=>"0", "ch_config_id_39"=>"0", "ch_config_id_40"=>"0", "ch_config_id_41"=>"0", "ch_config_id_42"=>"0", "ch_config_id_43"=>"0", "ch_config_id_44"=>"0", "ch_config_id_45"=>"0", "ch_config_id_46"=>"0", "ch_config_id_47"=>"0", "cosmic_trig_mult"=>"2", "cosmic_trig_thres"=>"200", "middle_ch_enable"=>"0xffff", "nchannels"=>"2", "numi_gate_delay"=>"640", "numi_gate_size"=>"640", "numi_window_delay"=>"20", "numi_window_size"=>"1500", "top_ch_enable"=>"0xffff" ');
+ERROR:  ++++++++++ Configuration nr 2 Already Exists for Crate 0 and Channel 0 ++++++++++
+STATEMENT:  SELECT InsertConfigurationSet('pmt_fem_mod', 2, 0, 0, ' "beam_trig_mult"=>"2", "beam_trig_thres"=>"200", "bnb_gate_delay"=>"256", "bnb_gate_size"=>"103", "bnb_window_delay"=>"20", "bnb_window_size"=>"1600", "bottom_ch_enable"=>"0xffff", "ch_config_id_00"=>"0", "ch_config_id_01"=>"0", "ch_config_id_02"=>"0", "ch_config_id_03"=>"0", "ch_config_id_04"=>"0", "ch_config_id_05"=>"0", "ch_config_id_06"=>"0", "ch_config_id_07"=>"0", "ch_config_id_08"=>"0", "ch_config_id_09"=>"0", "ch_config_id_10"=>"0", "ch_config_id_11"=>"0", "ch_config_id_12"=>"0", "ch_config_id_13"=>"0", "ch_config_id_14"=>"0", "ch_config_id_15"=>"0", "ch_config_id_16"=>"0", "ch_config_id_17"=>"0", "ch_config_id_18"=>"0", "ch_config_id_19"=>"0", "ch_config_id_20"=>"0", "ch_config_id_21"=>"0", "ch_config_id_22"=>"0", "ch_config_id_23"=>"0", "ch_config_id_24"=>"0", "ch_config_id_25"=>"0", "ch_config_id_26"=>"0", "ch_config_id_27"=>"0", "ch_config_id_28"=>"0", "ch_config_id_29"=>"0", "ch_config_id_30"=>"0", "ch_config_id_31"=>"0", "ch_config_id_32"=>"0", "ch_config_id_33"=>"0", "ch_config_id_34"=>"0", "ch_config_id_35"=>"0", "ch_config_id_36"=>"0", "ch_config_id_37"=>"0", "ch_config_id_38"=>"0", "ch_config_id_39"=>"0", "ch_config_id_40"=>"0", "ch_config_id_41"=>"0", "ch_config_id_42"=>"0", "ch_config_id_43"=>"0", "ch_config_id_44"=>"0", "ch_config_id_45"=>"0", "ch_config_id_46"=>"0", "ch_config_id_47"=>"0", "cosmic_trig_mult"=>"2", "cosmic_trig_thres"=>"200", "middle_ch_enable"=>"0xffff", "nchannels"=>"2", "numi_gate_delay"=>"640", "numi_gate_size"=>"640", "numi_window_delay"=>"20", "numi_window_size"=>"1500", "top_ch_enable"=>"0xffff" ');

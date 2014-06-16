@@ -43,7 +43,13 @@ namespace ubpsql {
 
     /// Getter for a list of config ID for each sub-config types to a given RunConfigID
     std::map<int,int> GetSubConfigIDList(int run_config_id);
-    
+
+    /// 
+    //bool RCWriter::ExistConfigType(const std::string config_type);
+
+    /// 
+    //bool RCWriter::ExistConfigType(const std::string config_type,
+    //				   const std::vector<std::string> &stringkeylist);
 
   };
 }

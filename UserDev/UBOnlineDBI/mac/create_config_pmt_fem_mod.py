@@ -1,0 +1,38 @@
+from ROOT import gSystem, std
+gSystem.Load("libUBOnlineDBI")
+from ROOT import ubpsql as db
+
+# First set CUSTOM_USER config string for UBDAQ_WRITER
+writer_dbi = db.DBConn.GetME(db.kUBDAQ_WRITER)
+custom_dbi = db.DBConn.GetME(db.kCUSTOM_USER)
+writer_dbi.Configure(custom_dbi.GetConnectionInfo())
+
+# Set to debug mode
+#writer_dbi.SetVerbosity(db.MSG.kDEBUG)
+
+# Get a writer instance
+writer_api = db.RCWriter()
+
+# Create hstore_column to be recorded
+hstore_column = std.vector(std.string)()
+hstore_column.push_back('nchannels')
+hstore_column.push_back('top_ch_enable')
+hstore_column.push_back('middle_ch_enable')
+hstore_column.push_back('bottom_ch_enable')
+hstore_column.push_back('cosmic_trig_mult')
+hstore_column.push_back('cosmic_trig_thres')
+hstore_column.push_back('beam_trig_mult')
+hstore_column.push_back('beam_trig_thres')
+hstore_column.push_back('numi_window_size')
+hstore_column.push_back('numi_window_delay')
+hstore_column.push_back('numi_gate_size')
+hstore_column.push_back('numi_gate_delay')
+hstore_column.push_back('bnb_window_size')
+hstore_column.push_back('bnb_window_delay')
+hstore_column.push_back('bnb_gate_size')
+hstore_column.push_back('bnb_gate_delay')
+for x in xrange(48):
+    hstore_column.push_back('ch_config_id_%02d' % x)
+
+writer_api.CreateConfigType("pmt_fem_mod",hstore_column)
+
