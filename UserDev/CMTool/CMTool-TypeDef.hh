@@ -80,9 +80,9 @@ namespace cmtool {
   class CBAlgoOutOfConeSeparate;
   class CBAlgoTrackSeparate;
   class CBAlgoAngleSeparate;
-//ADD_CMALGO_CLASS ... do not change this comment line
+//ADD_CBALGO_CLASS ... do not change this comment line
 
-//ADD_MATCH_CLASS ... do not change this comment line
+//ADD_CFALGO_CLASS ... do not change this comment line
 
 }
 
@@ -102,10 +102,6 @@ namespace larlight {
 //ADD_ANA_CLASS ... do not change this comment line
 }
 
-namespace cmtool {
-
-
-}
 
 //ADD_EMPTY_CLASS ... do not change this comment line
 #endif

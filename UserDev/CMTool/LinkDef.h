@@ -53,7 +53,9 @@
 #pragma link C++ class cmtool::CBAlgoAngleIncompat+;
 #pragma link C++ class cmtool::CBAlgoMergeTinyWithBig+;
 #pragma link C++ class cmtool::CBAlgoProhibitBigClusters+;
-//ADD_CMALGO_CLASS ... do not change this line
+//ADD_CBALGO_CLASS ... do not change this line
+
+//ADD_CFALGO_CLASS ... do not change this line
 
 #pragma link C++ class larlight::ClusterMerger+;
 #pragma link C++ class larlight::MCShowerQuality+;

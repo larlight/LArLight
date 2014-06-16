@@ -40,7 +40,7 @@ contents=open('%s/LinkDef.h' % target_dir, 'r').read().split('\n')
 fout=open('%s/LinkDef.h' % target_dir,'w')
 for line in contents:
    line=line + '\n'
-   if line.find('ADD_CMALGO_CLASS')>=0:
+   if line.find('ADD_CBALGO_CLASS')>=0:
       line='#pragma link C++ class cluster::%s+;\n%s' % (name,line)
    fout.write(line)
 
@@ -49,7 +49,7 @@ contents=open('%s/CMTool-TypeDef.hh' % target_dir, 'r').read().split('\n')
 fout=open('%s/CMTool-TypeDef.hh' % target_dir,'w')
 for line in contents:
    line=line + '\n'
-   if line.find('ADD_CMALGO_CLASS')>=0:
+   if line.find('ADD_CBALGO_CLASS')>=0:
       line='  class %s;\n%s' % (name,line)
    if line.find('ADD_NEW_HEADER')>=0:
       line='#include \"%s.hh\"\n%s' % (name,line)

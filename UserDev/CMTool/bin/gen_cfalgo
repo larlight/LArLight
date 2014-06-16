@@ -8,7 +8,7 @@ if not 'USER_DEV_DIR' in os.environ.keys():
    sys.stderr.write('$USER_DEV_DIR not defined!\n\n')
    sys.exit(1)
 
-name='CBAlgo' + sys.argv[1]
+name='CFAlgo' + sys.argv[1]
 working_package='CMTool'
 target_dir='%s/CMTool' % os.environ['USER_DEV_DIR']
 source_dir='%s/CMTool/bin/tmp' % os.environ['USER_DEV_DIR']
@@ -26,9 +26,9 @@ for src in src_list.keys():
       
 for src in src_list.keys():
    contents=open(src,'r').read()
-   contents=contents.replace('CBALGO_CLASS_NAME',name.upper())
-   contents=contents.replace('cbalgo_class_name',name.lower())
-   contents=contents.replace('CBAlgo_Class_Name',name)
+   contents=contents.replace('CFALGO_CLASS_NAME',name.upper())
+   contents=contents.replace('cfalgo_class_name',name.lower())
+   contents=contents.replace('CFAlgo_Class_Name',name)
    contents=contents.replace('USER',os.environ['USER'])
    contents=contents.replace('Working_Package',working_package)
    fout=open(src_list[src],'w')
@@ -40,7 +40,7 @@ contents=open('%s/LinkDef.h' % target_dir, 'r').read().split('\n')
 fout=open('%s/LinkDef.h' % target_dir,'w')
 for line in contents:
    line=line + '\n'
-   if line.find('ADD_CMALGO_CLASS')>=0:
+   if line.find('ADD_CFALGO_CLASS')>=0:
       line='#pragma link C++ class cluster::%s+;\n%s' % (name,line)
    fout.write(line)
 
@@ -49,7 +49,7 @@ contents=open('%s/CMTool-TypeDef.hh' % target_dir, 'r').read().split('\n')
 fout=open('%s/CMTool-TypeDef.hh' % target_dir,'w')
 for line in contents:
    line=line + '\n'
-   if line.find('ADD_CMALGO_CLASS')>=0:
+   if line.find('ADD_CFALGO_CLASS')>=0:
       line='  class %s;\n%s' % (name,line)
    if line.find('ADD_NEW_HEADER')>=0:
       line='#include \"%s.hh\"\n%s' % (name,line)

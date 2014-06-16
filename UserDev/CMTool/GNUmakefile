@@ -1,10 +1,10 @@
 #
-# This is an example GNUmakefile for ClusterStudy package
+# This is an example GNUmakefile for CMTool package
 #
 
 # specific names for this package
-DICT  = ClusterStudyCint
-SHLIB = libClusterStudy.so
+DICT  = CMToolCint
+SHLIB = libCMTool.so
 SOURCES = $(wildcard *.cc)
 HEADERS = $(wildcard *.hh)
 OBJECTS = $(SOURCES:.cc=.o)
