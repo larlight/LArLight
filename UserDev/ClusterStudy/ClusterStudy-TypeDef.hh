@@ -8,8 +8,12 @@
 // Header files included here
 
 #include "CBookKeeper.hh"
+#include "MatchBookKeeper.hh"
 #include "CBoolAlgoBase.hh"
+#include "CFloatAlgoBase.hh"
 #include "CMergeManager.hh"
+#include "CMAlgoArray.hh"
+
 #include "CMAlgoShortestDist.hh"
 #include "CMAlgoPolyContain.hh"
 #include "CMAlgoPolyOverlap.hh"
@@ -18,15 +22,6 @@
 #include "CMAlgoStartInPoly.hh"
 #include "CMAlgoPolyHitOverlap.hh"
 #include "CMAlgoStartInCone.hh"
-
-#include "ViewerException.hh"
-#include "ClusterViewerAlgo.hh"
-#include "ClusterViewer.hh"
-#include "ClusterMerger.hh"
-#include "MCShowerQuality.hh"
-#include "MergeViewer.hh"
-#include "MCShowerClusterViewer.hh"
-#include "CMAlgoArray.hh"
 #include "CMAlgoTrackSeparate.hh"
 #include "CMAlgoAngleSeparate.hh"
 #include "CMAlgoOutOfConeSeparate.hh"
@@ -40,6 +35,14 @@
 #include "CMAlgoMergeTinyWithBig.hh"
 #include "CMAlgoProhibitBigClusters.hh"
 //ADD_NEW_HEADER ... do not change this comment line
+
+#include "ViewerException.hh"
+#include "ClusterViewerAlgo.hh"
+#include "ClusterViewer.hh"
+#include "ClusterMerger.hh"
+#include "MCShowerQuality.hh"
+#include "MergeViewer.hh"
+#include "MCShowerClusterViewer.hh"
 
 // Class forward declaration here
 namespace cluster {
@@ -89,8 +92,16 @@ namespace larlight {
 //ADD_ANA_CLASS ... do not change this comment line
 }
 
+namespace cmatch {
+  class CFloatAlgoBase;
+  class MatchBookKeeper;
+//ADD_MATCH_CLASS ... do not change this comment line
+}
+
 //ADD_EMPTY_CLASS ... do not change this comment line
 #endif
+
+
 
 
 

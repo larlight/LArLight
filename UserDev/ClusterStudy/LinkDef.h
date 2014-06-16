@@ -9,6 +9,9 @@
 #pragma link off all classes;
 #pragma link off all functions;
 
+#pragma link C++ class std::vector<unsigned int>+;
+#pragma link C++ class std::vector<std::vector<unsigned int> >+;
+
 #pragma link C++ class cluster::ClusterViewerAlgo+;
 #pragma link C++ class cluster::ViewerException+;
 #pragma link C++ class larlight::ClusterViewer+;
@@ -19,10 +22,12 @@
 
 #pragma link C++ class cluster::CBoolAlgoBase+;
 #pragma link C++ class cluster::CMAlgoArray+;
-
 #pragma link C++ class cluster::CBookKeeper+;
+#pragma link C++ class cmatch::MatchBookKeeper+;
+#pragma link C++ class cmatch::CFloatAlgoBase+;
 #pragma link C++ class std::vector<unsigned short>+;
 #pragma link C++ class std::vector<std::vector<unsigned short> >+;
+
 #pragma link C++ class cluster::CMAlgoAngleCompat+;
 #pragma link C++ class cluster::CMAlgoShortestDist+;
 #pragma link C++ class cluster::CMAlgoPolyContain+;
@@ -49,9 +54,10 @@
 
 #pragma link C++ class larlight::ClusterMerger+;
 #pragma link C++ class larlight::MCShowerQuality+;
-
 //ADD_NEW_CLASS ... do not change this line
 #endif
+
+
 
 
 
