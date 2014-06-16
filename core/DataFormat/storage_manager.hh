@@ -172,6 +172,9 @@ namespace larlight {
     
     /// number of events read/written
     UInt_t _nevents, _nevents_read, _nevents_written;
+
+    /// Current event ID (used for alignment check)
+    Int_t _current_event_id;
     
     /// status control stamp
     STATUS _status;
