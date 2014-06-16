@@ -64,6 +64,9 @@ namespace lar1{
     else if (iDet == 4) detect_dist = 70000.0; // 4 is IC using FD monte carlo
     else if (iDet == 6) detect_dist = 60000.0; // 4 is IC @ 600m using FD monte carlo
     else if (iDet == 7) detect_dist = 80000.0; // 4 is IC @ 600m using FD monte carlo
+    else if (iDet == 8) detect_dist = 15000.0; // alternative near detector locations
+    else if (iDet == 9) detect_dist = 17500.0; // alternative near detector locations
+    else if (iDet == 10) detect_dist = 20000.0; //alternative near detector locations
 
     //---------------------------------------------
 
@@ -505,6 +508,18 @@ namespace lar1{
     Double_t NnumuElec_LE = 0;
 
 
+    // Some plots for detector comparisons
+    // The "beam spot" plots: event vertex in the fiducial volume (no cuts)
+    TH2D * beamSpot = new TH2D("BeamSpot","Event vertex Distribution",500,-150,600,500,-250,250);
+    // parent pion kinematics
+    TH2D * parentKinematics = new TH2D("parentKinematics", "Neutrino Parent p_{T} vs. p_{z};p_{z};p_{T}",
+                                     100,0,10,100,0,3);
+    // Flux Through Both Detectors
+    TH2D * SharedFlux = new TH2D("SharedFlux","Amount of flux that passes through uB",500,-150,600,500,-250,250);
+    TH2D * nearDetOnlyFlux = new TH2D("nearDetOnlyFlux","Amount of flux that passes through ND only",500,-150,600,500,-250,250);
+    TH2D * FluxRatio = new TH2D("FluxRatio","Ratio of events in ND only to Total Events",500,-150,600,500,-250,250);
+
+
     // vertex energy in NC pizero single photon events
     TH1D *NCpizeroVtxKE = new TH1D("NCpizeroVtxKE","NCpizeroVtxKE;Vtx Kinetic Energy (GeV)",50,0,500);
     TH1D *NCpizeroConvD = new TH1D("NCpizeroConvD","NCpizeroConvD;Photon Conversion Distance (cm)",100,0,100);
@@ -604,6 +619,62 @@ namespace lar1{
 
       if( !isActive ) continue;
 
+
+      beamSpot -> Fill(Vx,Vy,fluxweight);
+      parentKinematics -> Fill(ParPz,sqrt(ParPy*ParPy + ParPx*ParPx),fluxweight);
+
+      // Now find out if this neutrino would have hit microboone
+      // (but only if this is a near detector)
+      // The function that does this is a ray tracing alg in utils
+      /*
+      if (iDet == 0 || iDet == 8 || iDet == 9 || iDet == 10){
+
+        // Important: Putting everything in beam coordinates!
+
+        // Need 5 vectors: the start position, the start direction
+        // The corners of the parallelogram upstream to hit, in
+        // the same coordinates.
+        // The start point is the neutrino vertex, so just move to beam coords:
+        TVector3 startPoint(Vx - 130, Vy + 40, Vz);
+        // Find the start direction:  Make a vector of the neutrino path
+        // from parent to vertex and then normalize.
+        TVector3 startDir(ParVx - (Vx-130), ParVy - (Vy+40), detect_dist + ParVz - Vz);
+        startDir*= 1.0/startDir.Mag();
+        // The 3 corners are the bottom left, bottom right, and top left
+        // corners of uboone, and then shifted forward in z by 470m - detector_dist
+        // to account for the distance between detectors
+        // TVector3 corner1(0.0 + 8  , -116.5 - 42, 47000-detect_dist);
+        TVector3 corner1(256.0 - 128, -116.5, 47000-detect_dist - Vz - 20000);
+        TVector3 corner2(0.0   - 128, -116.5, 47000-detect_dist - Vz - 20000);
+        TVector3 corner3(256.0 - 128,  116.5, 47000-detect_dist - Vz - 20000);
+
+        // Now find out if the neutrino (which has interacted in ND)
+        // would have passed through uB
+        bool hitsuB = utils.IntersectsPlane(startPoint,startDir,corner1,corner2,corner3);
+
+
+        if (verbose || jentry % 50000 == 0){
+          std::cout << "Neutrino vertex and direction: ("
+                    << vtx.X() << ", " << vtx.Y() << ", " << vtx.Z() << "), ("
+                    << startDir.X() << ", " << startDir.Y() << ", " << startDir.Z() << ") " << std::endl;
+          std::cout << "  MicroBooNE corners: " << "("
+                    << corner1.X() << ", " << corner1.Y() << ", " << corner1.Z() << "), ("
+                    << corner2.X() << ", " << corner2.Y() << ", " << corner2.Z() << "), ("
+                    << corner3.X() << ", " << corner3.Y() << ", " << corner3.Z() << ")" << std::endl;
+
+        }
+        
+
+        if (hitsuB){
+          std::cout << "Found a neutrino that hits uB!"<< std::endl;
+          SharedFlux -> Fill(Vx,Vy,fluxweight);
+        }
+        else
+          nearDetOnlyFlux -> Fill(Vx,Vy,fluxweight);
+      }
+      */
+
+      // Now figure out which direction the neutrino was going in
 
       Double_t photon_energy = utils.TotalPhotonEnergy( iDet, p1PhotonConversionPos, p1PhotonConversionMom, 
                     p2PhotonConversionPos, p2PhotonConversionMom );
@@ -1344,6 +1415,9 @@ namespace lar1{
     nueBackgroundsLepE->Write();
     nueBackgroundsCCQE->Write();
     nueBackgroundsCalo->Write();
+
+    FluxRatio = (TH2D*) nearDetOnlyFlux->Clone();
+    FluxRatio -> Divide(beamSpot);
 
     f->Write();
     

@@ -246,6 +246,26 @@ namespace lar1{
     }
     if (!useNearDetStats) shapeOnlyFit = false;
 
+    chi2FileName = fileNameRoot+mode;
+    if(shapeOnlyFit){
+        if (useNearDetStats){
+            chi2FileName = chi2FileName+"_nearDetStats_shapeOnly_chi2.root";
+        }
+        else{
+            chi2FileName = chi2FileName+"_flatStats_shapeOnly_chi2.root";
+        }
+    }
+    else{
+        if (useNearDetStats){
+            chi2FileName = chi2FileName+"_nearDetStats_chi2.root";
+        }
+        else{
+            chi2FileName = chi2FileName+"_flatStats_chi2.root";
+        }
+    }
+
+
+
     //The following section is purely informational, to let the user see what's happening...
 
     for (int i = 0; i < 10; i++) std::cout << "\n";
@@ -1112,23 +1132,6 @@ namespace lar1{
     sens3s->SetLineColor(9); sens3s->SetLineWidth(2);
     sens5s->SetLineColor(9); sens5s->SetLineStyle(2); sens5s->SetLineWidth(1);
     
-    TString chi2FileName = fileNameRoot+mode;
-    if(shapeOnlyFit){
-        if (useNearDetStats){
-            chi2FileName = chi2FileName+"_nearDetStats_shapeOnly_chi2.root";
-        }
-        else{
-            chi2FileName = chi2FileName+"_flatStats_shapeOnly_chi2.root";
-        }
-    }
-    else{
-        if (useNearDetStats){
-            chi2FileName = chi2FileName+"_nearDetStats_chi2.root";
-        }
-        else{
-            chi2FileName = chi2FileName+"_flatStats_chi2.root";
-        }
-    }
 
     std::cout << "Writing chi2 to " << chi2FileName << std::endl;
 
@@ -1715,6 +1718,127 @@ namespace lar1{
    
     return 0;
 
+  }
+
+  int NueAppearanceFitter::MakeAltSensPlot(){
+
+    // contains the points at which chi2 is calc'd
+    std::vector<float>  dm2Vec;
+    std::vector<float>  sin22thVec;
+
+    for (int i = 0; i <= npoints; i ++)
+    {
+      double dm2 = pow(10.,(TMath::Log10(dm2min)+(i*1./npoints)*TMath::Log10(dm2max/dm2min)));
+      double sin22th = pow(10.,(TMath::Log10(sin22thmin)+(i*1./npoints)*TMath::Log10(sin22thmax/sin22thmin)));
+      dm2Vec.push_back(dm2);
+      sin22thVec.push_back(sin22th);
+    }
+
+      // set up the variables to be read in by the ntuple:
+    Float_t dm2_temp;
+    Float_t sin22th_temp;
+    Float_t chi2_temp;
+
+    // TString chi2FileName;
+
+    TFile f(chi2FileName, "READ");
+
+    TNtuple * thisNtuple;
+    f.GetObject("chi2", thisNtuple);
+
+    thisNtuple->SetBranchAddress("chisq", &chi2_temp);
+    thisNtuple->SetBranchAddress("dm2", &dm2_temp);
+    thisNtuple->SetBranchAddress("sin22th", &sin22th_temp);
+
+    // build a vector for this ntuple, then push it back to the main set
+    std::vector< std::vector< float> > thisChi2(npoints+1, std::vector<float>(npoints + 1, 0.0));
+    int i_entry = 0;
+    int i_dm2 = 0;
+    int i_sin22th = 0;
+    while (i_entry < thisNtuple->GetEntries())
+    {
+      thisNtuple->GetEntry(i_entry);
+      thisChi2[i_dm2][i_sin22th] = chi2_temp;
+      i_sin22th ++;
+      if (i_sin22th % (npoints+1) == 0){
+        i_sin22th = 0;
+        i_dm2 ++;
+      }
+      i_entry ++;
+    }
+    std::cout << "Finished reading chi2 from: " << std::endl;
+    std::cout << "  " << chi2FileName << std::endl;
+  
+    std::vector<float> lsnd_bottom_edge = plotUtils.Bin_LSND_Data(npoints, dm2Vec, sin22thVec);
+
+    // Now make a plot of chi2 along that line lsnd_bins
+    float chi2_at_bottom_edge[npoints+1];
+    float dm2_points[npoints+1];
+
+    for (int i = 0; i <= npoints; i++)
+    {
+      dm2_points[i] = dm2Vec.at(i);
+      chi2_at_bottom_edge[i] = sqrt(thisChi2[i][lsnd_bottom_edge.at(i)]);
+    }
+    TGraph * lsnd_bottom_edge_graph = new TGraph(npoints+1, dm2_points, chi2_at_bottom_edge);
+
+    lsnd_bottom_edge_graph -> GetHistogram()->SetMinimum(0.0);
+    // lsnd_bottom_edge_graph -> GetHistogram()->SetMaximum(20);
+
+    TCanvas * canv2 = new TCanvas("c2","Sensitivity along bottom of LSND region",1000,500);
+    if (mode == "nu")
+      lsnd_bottom_edge_graph -> SetTitle("Sensitivity to 3+1 #nu signal along the LSND edge.");
+    else 
+      lsnd_bottom_edge_graph -> SetTitle("Sensitivity to 3+1 #bar{#nu} signal along the LSND edge.");
+    lsnd_bottom_edge_graph -> GetXaxis() -> SetTitle("#Delta m^{2} (eV^{2})");
+    lsnd_bottom_edge_graph -> GetYaxis() -> SetTitle("Sensitivity (#sigma)");
+    lsnd_bottom_edge_graph -> GetXaxis() -> SetTitleSize(.06);
+    lsnd_bottom_edge_graph -> GetYaxis() -> SetTitleSize(.06);
+    lsnd_bottom_edge_graph -> GetXaxis() -> CenterTitle();
+    lsnd_bottom_edge_graph -> GetYaxis() -> CenterTitle();
+
+
+    lsnd_bottom_edge_graph -> GetXaxis() -> SetTitleOffset(0.85);
+    lsnd_bottom_edge_graph -> GetYaxis() -> SetTitleOffset(0.35);
+
+    // Drawing attributes:
+    lsnd_bottom_edge_graph -> SetLineWidth(2);
+    lsnd_bottom_edge_graph -> SetLineColor(4);
+    canv2 -> SetGrid();
+    canv2 -> SetLogx();
+
+      // sprintf(label,"Detector Mass (ton): %.0f", farDetMassVec[mass_i]);
+    lsnd_bottom_edge_graph -> Draw("AC");
+
+    // Make a plot to validate the LSND edge finding?
+    if (false){
+
+      // First, make an empty LSND plot:
+      TH2D * hist = plotUtils.getEmptySensPlot();
+      TCanvas * c = new TCanvas("canv","canv",800,800);
+      c->SetLogy();
+      c->SetLogx();
+      hist->Draw();
+      plotUtils.lsnd_plot(c);
+      c->Update();
+
+      float xpoints[npoints+1];
+      float ypoints[npoints+1];
+      for (int i = 0; i <= npoints; i++)
+      {
+        xpoints[i] = sin22thVec[lsnd_bottom_edge[i]];
+        ypoints[i] = dm2Vec[i];
+      }
+
+    
+      TGraph * line = new TGraph(npoints+1, xpoints, ypoints);
+      line -> SetLineColor(4);
+      line -> SetLineWidth(2);
+      line -> Draw("same C");
+    }
+
+
+    return 0;
   }
 
 }

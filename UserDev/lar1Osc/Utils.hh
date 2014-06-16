@@ -77,6 +77,8 @@ namespace lar1{
     const static Int_t kNubar 	   = 2;
     const static Int_t kNubar_Fosc = 3; 
 
+
+    // Enumerate the detectors
     const static Int_t kND = 0;
     const static Int_t kUB = 1;
     const static Int_t kFD = 2; 
@@ -85,6 +87,11 @@ namespace lar1{
     const static Int_t kND_long = 5;
     const static Int_t kIC_600 = 6;
     const static Int_t kIC_800 = 7;
+    const static Int_t kND150 = 8;
+    const static Int_t kND175 = 9;
+    const static Int_t kND200 = 10;
+
+    
 
     double fidCut_x, fidCut_y, fidCut_zUp, fidCut_zDown;
     double nd_xmin, nd_xmax, nd_ymin, nd_ymax, nd_zmin, nd_zmax;

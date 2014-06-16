@@ -57,6 +57,7 @@ namespace lar1{
       int Loop();
       int MakePlots();
       int MakeEventRatePlots();
+      int MakeAltSensPlot();
 
 
       // Functions to switch the general configuration variables on and off:
@@ -203,6 +204,8 @@ namespace lar1{
       double systematicInflationAmount;
       bool inflateSystematics;
       
+      TString chi2FileName;
+
       //except for oscVev, its name[b_line][energy_bin]
       std::vector< std::vector <float> >    eventsnumuVec;
       std::vector< std::vector <float> >     eventsnueVec;

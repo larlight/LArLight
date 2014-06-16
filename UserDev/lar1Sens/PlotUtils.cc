@@ -46,7 +46,6 @@ namespace lar1{
       //printf("%s\n",filename);
       strcat(filename, file_list[ifile]);
       //printf("%s\n",filename);
-      std::cout << std::endl;
       ifstream datafile;
       datafile.open(filename, std::ios_base::in);
       //check if the file is open: 
@@ -487,5 +486,168 @@ namespace lar1{
         return val;
     }
   }
+
+std::vector<float> PlotUtils::Bin_LSND_Data( int npoints,
+                    std::vector<float> dm2points,
+                    std::vector<float> sin22thpoints){
+
+  // Get at the underlying array from the vectors, to set up the bins:
+  float * xbins = & sin22thpoints[0];
+  float * ybins = & dm2points[0];
+
+  // for (auto & x : sin22thpoints) std::cout << "x: " << x << std::endl;
+  std::string path = GetEnv("MAKE_TOP_DIR");
+  path.append("/UserDev/lar1Sens/");
+  std::string data_dir= path;
+  data_dir.append("lsnd_data/");
+
+  TH2D * LSND_Data = new TH2D("data","data", npoints,xbins, npoints, ybins);
+
+  const Int_t NDATAFILES = 11;
+  const char * file_list[NDATAFILES] = {"llreg_608_1.vec",
+               "llreg_608_2.vec",
+               "llreg_608_3.vec",
+               "llreg_607_1.vec",
+               "llreg_607_2.vec",
+               "llreg_607_3.vec",
+               "llreg_607_4.vec",
+               "llreg_607_5.vec",
+               "llreg_607_6.vec",
+               "llreg_607_7.vec",
+               "llreg_607_8.vec"};
+
+  Int_t    nlines;
+  Double_t dummy, dummy_old;
+  Double_t x(0), y(0);
+  for (Int_t ifile = 0; ifile<NDATAFILES; ifile++) {
+    nlines = 0;
+    char  filename[100];
+    strcpy(filename, data_dir.c_str());
+    //printf("%s\n",filename);
+    strcat(filename, file_list[ifile]);
+    //printf("%s\n",filename);
+    ifstream datafile;
+    datafile.open(filename, std::ios_base::in);
+    //check if the file is open: 
+    if (!datafile.is_open() ) {std::cerr << "lsnd_plot.C: file not opened" <<std::endl;}
+    //else {std::cout << "Successfully opened " << filename << std::endl;}
+    while (!datafile.eof()) {
+      datafile >> dummy; 
+      datafile >> dummy; 
+      datafile >> x; 
+      datafile >> y;
+      LSND_Data -> Fill(x,y);
+      nlines++;
+      if (dummy == dummy_old) nlines--; //if last row was empty
+      dummy_old = dummy;
+    }
+    datafile.close();
+  }
+
+  // TStyle * style = new TStyle(*gStyle);
+
+  // gStyle->SetOptStat(0000);
+  // gStyle->SetOptFit(0000);
+  // gStyle->SetPadBorderMode(0);
+  // gStyle->SetPadBottomMargin(0.15);
+  // gStyle->SetPadLeftMargin(0.15);
+  // gStyle->SetPadRightMargin(0.05);
+  // gStyle->SetFrameBorderMode(0);
+  // gStyle->SetCanvasBorderMode(0);
+  // gStyle->SetPalette(0);
+  // gStyle->SetCanvasColor(0);
+  // gStyle->SetPadColor(0);
+
+
+  // TCanvas * d = new TCanvas("LSND Region", "LSND Region", 700, 700);
+  // d->SetLogx();
+  // d->SetLogy();  
+
+  // TH2D* hr1=new TH2D("hr1","hr1",500,0.0001,1.0,500,0.01,100.0);
+  // hr1->Reset();
+  // hr1->SetFillColor(0);
+  // hr1->SetTitle(";sin^{2}2#theta_{#mue};#Deltam^{2} (eV^{2})");
+  // hr1->GetXaxis()->SetTitleOffset(1.1);
+  // hr1->GetYaxis()->SetTitleOffset(1.2);
+  // hr1->GetXaxis()->SetTitleSize(0.05);
+  // hr1->GetYaxis()->SetTitleSize(0.05);
+  // hr1->SetStats(kFALSE);
+  // hr1->Draw();
+  // lsnd_plot(d);
+  // // gROOT->ProcessLine(".x ./lsnd_plot.c+(d)");
+  // // LSND_Data ->Draw("LF");
+
+  // TLegend* leg3=new TLegend(0.2,0.2,0.4,0.35);
+  // leg3->SetFillStyle(0);
+  // leg3->SetFillColor(0);
+  // leg3->SetBorderSize(0);
+  // leg3->SetTextSize(0.03);
+  // TGraph *gdummy1 = new TGraph();
+  // gdummy1->SetFillColor(29);
+  // TGraph *gdummy2 = new TGraph();
+  // gdummy2->SetFillColor(38);
+  // TMarker *gdummy3 = new TMarker();
+  // gdummy3 -> SetMarkerStyle(3);
+  // gdummy3 -> SetMarkerColor(1);
+  // TGraph *gdummy0 = new TGraph();
+  // gdummy0 -> SetFillColor(4);
+  // gdummy0 -> SetFillStyle(3004);
+  // leg3->AddEntry(gdummy2,"LSND 90% CL","F");
+  // leg3->AddEntry(gdummy1,"LSND 99% CL","F");
+  // leg3->AddEntry(gdummy3,"LSND Best Fit","P*");
+  // leg3->AddEntry(gdummy0,"Global Fit 90% CL (J. Kopp et al. arXiv:1303.3011)");   
+  // leg3->Draw("same");
+
+  // gStyle -> cd();
+
+  std::vector<float> sin22thresult(npoints+1, 0.0);
+  std::cout << "Result size: " << sin22thresult.size() << std::endl;
+  // Now loop over the hist in y points and find the first point where the bins are filled:
+  for (int i_dm2 = 1; i_dm2 <= npoints+1; i_dm2++)
+  {
+    for (int i_sin22th = npoints+1; i_sin22th > 0; i_sin22th--)
+    {
+      if (LSND_Data -> GetBinContent(i_sin22th,i_dm2) > 0) sin22thresult.at(i_dm2-1) = i_sin22th;
+    }
+    if (sin22thresult.at(i_dm2 -1) == 0) {
+      if (i_dm2 != 1 ) sin22thresult.at(i_dm2 - 1) = sin22thresult.at(i_dm2-2);
+      else sin22thresult.at(i_dm2 -1) = npoints;
+    }
+  }
+
+  // Refine the line to extrapolate between the points that have no fit
+  // refine(sin22thresult);
+
+
+
+  // Need to validate that this works:
+  // float xpoints[npoints+1];
+  // float ypoints[npoints+1];
+  
+  // Pass it to a function to interpolate between constant sections.
+  // refine(sin22thresult);
+
+  // for (int i = 0; i <= npoints; i++)
+  // {
+  //   xpoints[i] = sin22thpoints[sin22thresult[i]];
+  //   ypoints[i] = dm2points[i];
+  // }
+
+
+
+  // for (int i = 0; i <= npoints; i++)
+  //   std::cout << "Line along dm2 = " << ypoints[i] << ",\tsin22th = " << xpoints[i] << std::endl;
+
+
+
+  // TGraph * line = new TGraph(npoints+1, xpoints, ypoints);
+  // line -> SetLineColor(4);
+  // line -> SetLineWidth(2);
+  // line -> Draw("same C");
+
+  // Returns the index of what points to use in sin22th space
+  return sin22thresult;
+
+}
 
 }

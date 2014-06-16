@@ -19,7 +19,7 @@
   n.setUseT600(true);
   n.setUbooneScale(1.0);
   n.setLAr1NDScale(1.0);
-  // n.setLAr1NDScale(1.5/3.0);
+  // n.setLAr1NDScale(1.0/3.0);
   n.setLAr1FDScale(1.0);
   n.setEnergyType("ecalo2");
   n.setUseNearDetStats(true);
@@ -36,9 +36,10 @@
 
   n.Prepare();
   n.ReadData();
-  // n.Loop();
-  // n.MakePlots();
+  n.Loop();
+  n.MakePlots();
   n.MakeEventRatePlots();
+  n.MakeAltSensPlot();
 
 
 }

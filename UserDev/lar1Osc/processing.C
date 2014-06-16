@@ -2,8 +2,8 @@
 {
   gSystem->Load("liblar1Osc.so");
   TString directory = "~/Desktop/LAr1ND/lar1Repos/lar1/ntuples_2/";
-  lar1::NtupleReprocessing ntuple_100m_long_nu(directory + "combined_ntuple_100m_long_nu.root");      
-  lar1::NtupleReprocessing ntuple_100m_long_nu_fosc(directory + "combined_ntuple_100m_long_nu_fosc.root"); 
+  // lar1::NtupleReprocessing ntuple_100m_long_nu(directory + "combined_ntuple_100m_long_nu.root");      
+  // lar1::NtupleReprocessing ntuple_100m_long_nu_fosc(directory + "combined_ntuple_100m_long_nu_fosc.root"); 
   lar1::NtupleReprocessing ntuple_100m_nu(directory + "combined_ntuple_100m_nu.root");           
   lar1::NtupleReprocessing ntuple_100m_nu_fosc(directory + "combined_ntuple_100m_nu_fosc.root");      
   // lar1::NtupleReprocessing ntuple_100m_nubar(directory + "combined_ntuple_100m_nubar.root");        

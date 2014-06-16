@@ -25,6 +25,8 @@ namespace lar1{
     fidCut_zUp = 17;
     fidCut_zDown = 17;
 
+    // For reference, the monte carlo for ND spans 7m in x and is centered at 130cm
+    // These coordinates try to represent the actual beam center.
     // Bathtub option:
     // iDet = 0
     nd_xmin = -80.0;
@@ -171,6 +173,8 @@ namespace lar1{
     Double_t POT_Sim = 1;
     Double_t POTnorm = 1;
 
+
+    // Nue POT has to be divided by 1.385
     if (iflux == kNu)
     {
       POTnorm = PotNormNu;
@@ -194,6 +198,15 @@ namespace lar1{
       }
       else if (iDet == kND_long){
         POT_Sim = 1.8832e20;
+      }
+      else if (iDet == kND150){
+        POT_Sim = 2.5797e+20;
+      }
+      else if (iDet == kND175){
+        POT_Sim = 3.0536e+20;
+      }
+      else if (iDet == kND200){
+        POT_Sim = 4.3528e+20;
       }
       else{
         POT_Sim = 1;
@@ -241,6 +254,15 @@ namespace lar1{
       }
       else if (iDet == kND_long){
         POT_Sim = 1.9022e20;
+      }
+      else if (iDet == kND150){
+        POT_Sim = 2.4087e+20;
+      }
+      else if (iDet == kND175){
+        POT_Sim = 3.5404e+20;
+      }
+      else if (iDet == kND200){
+        POT_Sim = 1.3459e+21;
       }
       else{ //unknown detector
         POT_Sim = 1;
@@ -528,7 +550,7 @@ namespace lar1{
   			    Double_t &ymin, Double_t &ymax, Double_t &zmin, Double_t &zmax ){
     
     // LAr1-ND
-    if( idet == kND ){
+    if( idet == kND || idet == kND150 || idet == kND175 || idet == kND200 ){
       xmin = nd_xmin;
       xmax = nd_xmax;
       ymin = nd_ymin;
