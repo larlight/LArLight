@@ -17,7 +17,7 @@
 #include <iostream>
 #include "ClusterParamsAlgNew.hh"
 
-namespace cluster {
+namespace cmtool {
 
   /**
      \class CBoolAlgoBase
@@ -69,8 +69,8 @@ namespace cluster {
        merged or not.
     */
 
-    virtual bool Bool(const ClusterParamsAlgNew &cluster1,
-		      const ClusterParamsAlgNew &cluster2)
+    virtual bool Bool(const ::cluster::ClusterParamsAlgNew &cluster1,
+		      const ::cluster::ClusterParamsAlgNew &cluster2)
     { if(cluster1.Plane() != cluster2.Plane()) return false;
       else return true;
     }

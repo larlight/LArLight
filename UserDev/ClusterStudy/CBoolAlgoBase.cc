@@ -1,5 +1,5 @@
-#ifndef CBOOLALGOBASE_CC
-#define CBOOLALGOBASE_CC
+#ifndef CBOOLALGOBASE_CXX
+#define CBOOLALGOBASE_CXX
 
 #include "CBoolAlgoBase.hh"
 

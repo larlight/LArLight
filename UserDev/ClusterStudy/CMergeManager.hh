@@ -17,15 +17,15 @@
 #include <iostream>
 
 #include "ClusterParamsAlgNew.hh"
-#include "CBookKeeper.hh"
+#include "CMergeBookKeeper.hh"
 #include "CBoolAlgoBase.hh"
 
-namespace cluster {
+namespace cmtool {
 
   /**
      \class CMergeManager
      A class that instantiates merging algorithm(s) and run.
-     The book-keeping of merged cluster sets are done by CBookKeeper.
+     The book-keeping of merged cluster sets are done by CMergeBookKeeper.
   */
   class CMergeManager{
 
@@ -94,7 +94,7 @@ namespace cluster {
     const std::vector<cluster::ClusterParamsAlgNew>& GetClusters() const { return _out_clusters; }
 
     /// A method to obtain book keeper
-    const CBookKeeper& GetBookKeeper() const { return _book_keeper; }
+    const CMergeBookKeeper& GetBookKeeper() const { return _book_keeper; }
 
     /// A setter for an analysis output file
     void SetAnaFile(TFile* fout) { _fout = fout; }
@@ -102,14 +102,14 @@ namespace cluster {
   protected:
 
     void RunMerge(const std::vector<cluster::ClusterParamsAlgNew > &in_clusters,
-		  CBookKeeper &book_keeper) const;
+		  CMergeBookKeeper &book_keeper) const;
 
     void RunMerge(const std::vector<cluster::ClusterParamsAlgNew > &in_clusters,
 		  const std::vector<bool> &merge_flag,
-		  CBookKeeper &book_keeper) const;
+		  CMergeBookKeeper &book_keeper) const;
 
     void RunSeparate(const std::vector<cluster::ClusterParamsAlgNew > &in_clusters,
-		     CBookKeeper &book_keeper) const;
+		     CMergeBookKeeper &book_keeper) const;
 
   protected:
 
@@ -126,13 +126,13 @@ namespace cluster {
     std::vector<cluster::ClusterParamsAlgNew> _out_clusters;
 
     /// Book keeper instance
-    CBookKeeper _book_keeper;
+    CMergeBookKeeper _book_keeper;
 
     /// Merging algorithm
-    ::cluster::CBoolAlgoBase* _merge_algo;
+    ::cmtool::CBoolAlgoBase* _merge_algo;
 
     /// Separation algorithm
-    ::cluster::CBoolAlgoBase* _separate_algo;
+    ::cmtool::CBoolAlgoBase* _separate_algo;
     
     /// Merging priority type
     CMergePriority_t _priority;

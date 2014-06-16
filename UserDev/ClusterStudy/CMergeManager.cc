@@ -3,7 +3,7 @@
 
 #include "CMergeManager.hh"
 
-namespace cluster {
+namespace cmtool {
 
   CMergeManager::CMergeManager(CMergePriority_t priority)
   {
@@ -36,7 +36,7 @@ namespace cluster {
 
     _in_clusters.reserve(clusters.size());
 
-    ClusterParamsAlgNew tmp_alg;
+    ::cluster::ClusterParamsAlgNew tmp_alg;
     tmp_alg.SetMinNHits(_min_nhits);
     tmp_alg.SetVerbose(false);
 
@@ -60,7 +60,7 @@ namespace cluster {
   
   void CMergeManager::Process()
   {
-    if(!_merge_algo) throw RecoUtilException("No algorithm to run!");
+    if(!_merge_algo) throw CMTException("No algorithm to run!");
 
 
     _merge_algo->SetAnaFile(_fout);
@@ -77,13 +77,13 @@ namespace cluster {
     
     size_t ctr=0;
     bool keep_going=true;
-    std::vector<CBookKeeper> book_keepers;
+    std::vector<CMergeBookKeeper> book_keepers;
     std::vector<std::vector<unsigned short> > tmp_merged_indexes;
     std::vector<cluster::ClusterParamsAlgNew> tmp_merged_clusters;
     while(keep_going){
       
       // Configure input for RunMerge
-      CBookKeeper bk;
+      CMergeBookKeeper bk;
 
       if(!ctr) tmp_merged_clusters = _in_clusters;
       else tmp_merged_clusters = _out_clusters;
@@ -145,7 +145,7 @@ namespace cluster {
 	    for(auto const& hit : tmp_merged_clusters.at(index).GetHitVector())
 	      tmp_hits.push_back(hit);
 	  }
-	  _out_clusters.push_back(ClusterParamsAlgNew());
+	  _out_clusters.push_back(::cluster::ClusterParamsAlgNew());
 	  (*_out_clusters.rbegin()).SetVerbose(false);
 	  (*_out_clusters.rbegin()).DisableFANN();
 
@@ -195,7 +195,7 @@ namespace cluster {
   }
 
   void CMergeManager::RunMerge(const std::vector<cluster::ClusterParamsAlgNew> &in_clusters,
-			       CBookKeeper &book_keeper) const
+			       CMergeBookKeeper &book_keeper) const
   {
     RunMerge(in_clusters,
 	     std::vector<bool>(in_clusters.size(),true),
@@ -204,10 +204,10 @@ namespace cluster {
 
   void CMergeManager::RunMerge(const std::vector<cluster::ClusterParamsAlgNew> &in_clusters,
 			       const std::vector<bool> &merge_flag,
-			       CBookKeeper &book_keeper) const
+			       CMergeBookKeeper &book_keeper) const
   {
     if(merge_flag.size() != in_clusters.size())
-      throw RecoUtilException(Form("in_clusters (%zu) and merge_flag (%zu) vectors must be of same length!",
+      throw CMTException(Form("in_clusters (%zu) and merge_flag (%zu) vectors must be of same length!",
 				   in_clusters.size(),
 				   merge_flag.size()
 				   )
@@ -227,16 +227,16 @@ namespace cluster {
       if(in_clusters.at(i).GetHitVector().size()<1) continue;
 
       switch(_priority) {
-      case ::cluster::CMergeManager::kIndex:
+      case ::cmtool::CMergeManager::kIndex:
 	prioritized_index.insert(std::pair<double,size_t>(((double)(in_clusters.size()) - (double)i),i));
 	break;
-      case ::cluster::CMergeManager::kPolyArea:
+      case ::cmtool::CMergeManager::kPolyArea:
 	prioritized_index.insert(std::pair<double,size_t>(in_clusters.at(i).GetParams().PolyObject.Area(),i));
 	break;
-      case ::cluster::CMergeManager::kChargeSum:
+      case ::cmtool::CMergeManager::kChargeSum:
 	prioritized_index.insert(std::pair<double,size_t>(in_clusters.at(i).GetParams().sum_charge,i));
 	break;
-      case ::cluster::CMergeManager::kNHits:
+      case ::cmtool::CMergeManager::kNHits:
 	prioritized_index.insert(std::pair<double,size_t>((double)(in_clusters.at(i).GetNHits()),i));
 	break;
       }
@@ -322,11 +322,11 @@ namespace cluster {
   }
 
   void CMergeManager::RunSeparate(const std::vector<cluster::ClusterParamsAlgNew> &in_clusters,
-				  CBookKeeper &book_keeper) const
+				  CMergeBookKeeper &book_keeper) const
   {
     /*
     if(separate_flag.size() != in_clusters.size())
-      throw RecoUtilException(Form("in_clusters (%zu) and separate_flag (%zu) vectors must be of same length!",
+      throw CMTException(Form("in_clusters (%zu) and separate_flag (%zu) vectors must be of same length!",
 				   in_clusters.size(),
 				   separate_flag.size()
 				   )
@@ -347,16 +347,16 @@ namespace cluster {
       if(in_clusters.at(i).GetHitVector().size()<1) continue;
 
       switch(_priority) {
-      case ::cluster::CMergeManager::kIndex:
+      case ::cmtool::CMergeManager::kIndex:
 	prioritized_index.insert(std::pair<double,size_t>(((double)(in_clusters.size()) - (double)i),i));
 	break;
-      case ::cluster::CMergeManager::kPolyArea:
+      case ::cmtool::CMergeManager::kPolyArea:
 	prioritized_index.insert(std::pair<double,size_t>(in_clusters.at(i).GetParams().PolyObject.Area(),i));
 	break;
-      case ::cluster::CMergeManager::kChargeSum:
+      case ::cmtool::CMergeManager::kChargeSum:
 	prioritized_index.insert(std::pair<double,size_t>(in_clusters.at(i).GetParams().sum_charge,i));
 	break;
-      case ::cluster::CMergeManager::kNHits:
+      case ::cmtool::CMergeManager::kNHits:
 	prioritized_index.insert(std::pair<double,size_t>((double)(in_clusters.at(i).GetNHits()),i));
 	break;
       }

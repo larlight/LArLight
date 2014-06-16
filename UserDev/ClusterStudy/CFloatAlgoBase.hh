@@ -17,7 +17,7 @@
 #include <iostream>
 #include "ClusterParamsAlgNew.hh"
 
-namespace cmatch {
+namespace cmtool {
 
   /**
      \class CFloatAlgoBase

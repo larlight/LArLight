@@ -50,7 +50,7 @@ namespace larlight {
 
     void SetClusterType(DATA::DATA_TYPE type) {_cluster_type = type;}
 
-    ::cluster::CMergeManager& GetManager() { return _mgr; }
+    ::cmtool::CMergeManager& GetManager() { return _mgr; }
 
     void SaveOutputCluster(bool doit=true) { _write_output = doit; }
     
@@ -58,7 +58,7 @@ namespace larlight {
 
     bool _write_output;
 
-    ::cluster::CMergeManager _mgr;
+    ::cmtool::CMergeManager _mgr;
 
     DATA::DATA_TYPE _cluster_type;
 

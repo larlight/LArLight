@@ -18,38 +18,39 @@
 #pragma link C++ class larlight::MergeViewer+;
 #pragma link C++ class larlight::MCShowerClusterViewer+;
 
-#pragma link C++ class cluster::CMergeManager+;
+#pragma link C++ class cmtool::CMTException+;
+#pragma link C++ class cmtool::CMergeBookKeeper+;
+#pragma link C++ class cmtool::CMatchBookKeeper+;
+#pragma link C++ class cmtool::CBoolAlgoBase+;
+#pragma link C++ class cmtool::CFloatAlgoBase+;
+#pragma link C++ class cmtool::CMergeManager+;
 
-#pragma link C++ class cluster::CBoolAlgoBase+;
-#pragma link C++ class cluster::CMAlgoArray+;
-#pragma link C++ class cluster::CBookKeeper+;
-#pragma link C++ class cmatch::MatchBookKeeper+;
-#pragma link C++ class cmatch::CFloatAlgoBase+;
+#pragma link C++ class cmtool::CBAlgoArray+;
 #pragma link C++ class std::vector<unsigned short>+;
 #pragma link C++ class std::vector<std::vector<unsigned short> >+;
 
-#pragma link C++ class cluster::CMAlgoAngleCompat+;
-#pragma link C++ class cluster::CMAlgoShortestDist+;
-#pragma link C++ class cluster::CMAlgoPolyContain+;
-#pragma link C++ class cluster::CMAlgoPolyOverlap+;
-#pragma link C++ class cluster::CMAlgoAngleAlign+;
-#pragma link C++ class cluster::CMAlgoFake+;
-#pragma link C++ class cluster::CMAlgoStartInPoly+;
-#pragma link C++ class cluster::CMAlgoPolyHitOverlap+;
-#pragma link C++ class cluster::CMAlgoStartInCone+;
-#pragma link C++ class cluster::CMAlgoArray+;
-#pragma link C++ class cluster::CMAlgoTrackSeparate+;
-#pragma link C++ class cluster::CMAlgoAngleSeparate+;
-#pragma link C++ class cluster::CMAlgoOutOfConeSeparate+;
-#pragma link C++ class cluster::CMAlgoMergeAll+;
-#pragma link C++ class cluster::CMAlgoCenterOfMass+;
-#pragma link C++ class cluster::CMAlgoStartNearEnd+;
-#pragma link C++ class cluster::CMAlgoStartTrack+;
-#pragma link C++ class cluster::CMAlgoProhibitAllTracks+;
-#pragma link C++ class cluster::CMAlgoPolyShortestDist+;
-#pragma link C++ class cluster::CMAlgoAngleIncompat+;
-#pragma link C++ class cluster::CMAlgoMergeTinyWithBig+;
-#pragma link C++ class cluster::CMAlgoProhibitBigClusters+;
+#pragma link C++ class cmtool::CBAlgoAngleCompat+;
+#pragma link C++ class cmtool::CBAlgoShortestDist+;
+#pragma link C++ class cmtool::CBAlgoPolyContain+;
+#pragma link C++ class cmtool::CBAlgoPolyOverlap+;
+#pragma link C++ class cmtool::CBAlgoAngleAlign+;
+#pragma link C++ class cmtool::CBAlgoFake+;
+#pragma link C++ class cmtool::CBAlgoStartInPoly+;
+#pragma link C++ class cmtool::CBAlgoPolyHitOverlap+;
+#pragma link C++ class cmtool::CBAlgoStartInCone+;
+#pragma link C++ class cmtool::CBAlgoArray+;
+#pragma link C++ class cmtool::CBAlgoTrackSeparate+;
+#pragma link C++ class cmtool::CBAlgoAngleSeparate+;
+#pragma link C++ class cmtool::CBAlgoOutOfConeSeparate+;
+#pragma link C++ class cmtool::CBAlgoMergeAll+;
+#pragma link C++ class cmtool::CBAlgoCenterOfMass+;
+#pragma link C++ class cmtool::CBAlgoStartNearEnd+;
+#pragma link C++ class cmtool::CBAlgoStartTrack+;
+#pragma link C++ class cmtool::CBAlgoProhibitAllTracks+;
+#pragma link C++ class cmtool::CBAlgoPolyShortestDist+;
+#pragma link C++ class cmtool::CBAlgoAngleIncompat+;
+#pragma link C++ class cmtool::CBAlgoMergeTinyWithBig+;
+#pragma link C++ class cmtool::CBAlgoProhibitBigClusters+;
 //ADD_CMALGO_CLASS ... do not change this line
 
 #pragma link C++ class larlight::ClusterMerger+;
