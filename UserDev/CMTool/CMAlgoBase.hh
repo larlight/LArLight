@@ -1,9 +1,9 @@
 /**
- * \file CFloatAlgoBase.hh
+ * \file CMAlgoBase.hh
  *
  * \ingroup ClusterRecoUtil
  * 
- * \brief Class def header for a class CAlgoBase, CFloatAlgoBase and CSeparateAlgoBase
+ * \brief Class def header for a class CAlgoBase, CMAlgoBase and CSeparateAlgoBase
  *
  * @author kazuhiro
  */
@@ -11,8 +11,8 @@
 /** \addtogroup ClusterRecoUtil
 
     @{*/
-#ifndef CFLOATALGOBASE_HH
-#define CFLOATALGOBASE_HH
+#ifndef CMALGOBASE_HH
+#define CMALGOBASE_HH
 
 #include <iostream>
 #include "ClusterParamsAlgNew.hh"
@@ -20,22 +20,22 @@
 namespace cmtool {
 
   /**
-     \class CFloatAlgoBase
+     \class CMAlgoBase
      An abstract base class for merging/mathcing algorithm. Having this base class helps
      to have a better overall design of various merging for iterative approach.
      The algorithms are run through CMergeManager.
   */
-  class CFloatAlgoBase {
+  class CMAlgoBase {
     
   public:
     
     /// Default constructor
-    CFloatAlgoBase(){ _fout = 0; _verbose = false; }
+    CMAlgoBase(){ _fout = 0; _verbose = false; }
     
     /// Default destructor
-    virtual ~CFloatAlgoBase(){}
+    virtual ~CMAlgoBase(){}
 
-    /// Function to reset the algorithm instance called within CMergeManager::Reset() ... maybe implemented via child class
+    /// Function to reset the algorithm instance called within CMergeManager/CMatchManager's Reset() ... maybe implemented via child class
     virtual void Reset(){}
 
     /**
@@ -65,19 +65,8 @@ namespace cmtool {
     {return; }
 
     /**
-       Core function: given the CPAN input, return whether a cluster should be
-       merged or not.
-    */
-
-    virtual float Float(std::vector<const cluster::ClusterParamsAlgNew*> &clusters)
-    { 
-      if(clusters.size()) return 1;
-      else return -1;
-    }
-
-    /**
        Optional function: called after Bool() function is called for all possible cluster
-       pairs by by CMergeManager IFF CMergeManager is run with verbosity level kPerIteration. 
+       pairs by CMergeManager/CMatchManager IFF run with verbosity level kPerIteration. 
        Maybe useful for debugging.       
      */
     virtual void Report()
@@ -94,7 +83,7 @@ namespace cmtool {
     /// TFile pointer to an output file
     TFile* _fout;
 
-    /// Boolean to choose verbose mode. Turned on if CMergeManager's verbosity level is >= kPerMerging
+    /// Boolean to choose verbose mode. Turned on if CMergeManager/CMatchManager's verbosity level is >= kPerMerging
     bool _verbose;
   };
 

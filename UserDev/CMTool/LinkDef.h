@@ -21,8 +21,10 @@
 #pragma link C++ class cmtool::CMTException+;
 #pragma link C++ class cmtool::CMergeBookKeeper+;
 #pragma link C++ class cmtool::CMatchBookKeeper+;
+#pragma link C++ class cmtool::CMAlgoBase+;
 #pragma link C++ class cmtool::CBoolAlgoBase+;
 #pragma link C++ class cmtool::CFloatAlgoBase+;
+#pragma link C++ class cmtool::CPriorityAlgoBase+;
 #pragma link C++ class cmtool::CMergeManager+;
 
 #pragma link C++ class cmtool::CBAlgoArray+;

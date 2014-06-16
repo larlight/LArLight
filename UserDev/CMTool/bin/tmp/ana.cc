@@ -1,5 +1,5 @@
-#ifndef ANA_CLASS_NAME_CC
-#define ANA_CLASS_NAME_CC
+#ifndef ANA_CLASS_NAME_CXX
+#define ANA_CLASS_NAME_CXX
 
 #include "Ana_Class_Name.hh"
 

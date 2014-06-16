@@ -5,7 +5,7 @@
  * 
  * \brief Class def header for a class Ana_Class_Name
  *
- * @author andrzej
+ * @author USER_NAME
  */
 
 /** \addtogroup Working_Package

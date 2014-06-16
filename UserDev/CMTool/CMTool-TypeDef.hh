@@ -2,16 +2,18 @@
 // type-def file for ROOT
 //
 
-#ifndef CLUSTERSTUDY_TYPEDEF_HH
-#define CLUSTERSTUDY_TYPEDEF_HH
+#ifndef CMTOOL_TYPEDEF_HH
+#define CMTOOL_TYPEDEF_HH
 
 // Header files included here
 
 #include "CMTException.hh"
 #include "CMergeBookKeeper.hh"
 #include "CMatchBookKeeper.hh"
+#include "CMAlgoBase.hh"
 #include "CBoolAlgoBase.hh"
 #include "CFloatAlgoBase.hh"
+#include "CPriorityAlgoBase.hh"
 #include "CMergeManager.hh"
 #include "CBAlgoArray.hh"
 
@@ -49,11 +51,14 @@
 namespace cmtool {
 
   class CMTException;
+  class CMAlgoBase;
   class CBoolAlgoBase;
-  class CBAlgoArray;
+  class CFloatAlgoBase;
   class CMergeBookKeeper;
+  class CMatchBookKeeper;
   class CMergeManager;
 
+  class CBAlgoArray;
   class CBAlgoAngleCompat;
   class CBAlgoShortestDist;
   class CBAlgoPolyContain;
@@ -70,15 +75,20 @@ namespace cmtool {
   class CBAlgoAngleIncompat;
   class CBAlgoMergeTinyWithBig;
   class CBAlgoProhibitBigClusters;
+  class CBAlgoCenterOfMass;
+  class CBAlgoMergeAll;
+  class CBAlgoOutOfConeSeparate;
+  class CBAlgoTrackSeparate;
+  class CBAlgoAngleSeparate;
 //ADD_CMALGO_CLASS ... do not change this comment line
 
+//ADD_MATCH_CLASS ... do not change this comment line
+
+}
+
+namespace cluster {
   class ViewerException;
   class ClusterViewerAlgo;
-  class ClusterTrackSeparate;
-  class ClusterAngleSeparate;
-  class ClusterOutOfConeSeparate;
-  class ClusterMergeAll;
-  class ClusterCenterOfMass;
 }
 
 namespace larlight {
@@ -93,9 +103,8 @@ namespace larlight {
 }
 
 namespace cmtool {
-  class CFloatAlgoBase;
-  class CMatchBookKeeper;
-//ADD_MATCH_CLASS ... do not change this comment line
+
+
 }
 
 //ADD_EMPTY_CLASS ... do not change this comment line

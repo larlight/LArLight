@@ -1,9 +1,9 @@
 /**
- * \file CMAlgo_Class_Name.hh
+ * \file CBAlgo_Class_Name.hh
  *
  * \ingroup Working_Package
  * 
- * \brief Class def header for a class CMAlgo_Class_Name
+ * \brief Class def header for a class CBAlgo_Class_Name
  *
  * @author USER_NAME
  */
@@ -11,27 +11,27 @@
 /** \addtogroup Working_Package
 
     @{*/
-#ifndef CMALGO_CLASS_NAME_HH
-#define CMALGO_CLASS_NAME_HH
+#ifndef CBALGO_CLASS_NAME_HH
+#define CBALGO_CLASS_NAME_HH
 
 #include <iostream>
 #include "CBoolAlgoBase.hh"
 
-namespace cluster {
+namespace cmtool {
   /**
-     \class CMAlgo_Class_Name
+     \class CBAlgo_Class_Name
      User implementation for CBoolAlgoBase class
      doxygen documentation!
   */
-  class CMAlgo_Class_Name : public CBoolAlgoBase {
+  class CBAlgo_Class_Name : public CBoolAlgoBase {
     
   public:
     
     /// Default constructor
-    CMAlgo_Class_Name();
+    CBAlgo_Class_Name();
     
     /// Default destructor
-    virtual ~CMAlgo_Class_Name(){};
+    virtual ~CBAlgo_Class_Name(){};
 
     //
     // Author should be aware of 3 functions at least: Bool, Report, and Reset.
@@ -43,8 +43,8 @@ namespace cluster {
        Core function: given the CPAN input, return whether a cluster should be
        merged or not.
     */
-    virtual bool Bool(const ClusterParamsAlgNew &cluster1,
-		      const ClusterParamsAlgNew &cluster2);
+    virtual bool Bool(const ::cluster::ClusterParamsAlgNew &cluster1,
+		      const ::cluster::ClusterParamsAlgNew &cluster2);
 
     /**
        Optional function: called after each Merge() function call by CMergeManager IFF
