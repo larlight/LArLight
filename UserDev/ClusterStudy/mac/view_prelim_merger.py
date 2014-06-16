@@ -44,30 +44,30 @@ merge_viewer.SetDrawOnlyTracks(False)
 ########################################
 
 ## PROHIBIT ALGOS ##
-prohib_array = cluster.CMAlgoArray()
+prohib_array = cmtool.CBAlgoArray()
 
-tracksep_prohibit = cluster.CMAlgoTrackSeparate()
+tracksep_prohibit = cmtool.CBAlgoTrackSeparate()
 tracksep_prohibit.SetUseEP(True)
 prohib_array.AddAlgo(tracksep_prohibit,False)
 
-outofcone_prohibit = cluster.CMAlgoOutOfConeSeparate()
+outofcone_prohibit = cmtool.CBAlgoOutOfConeSeparate()
 outofcone_prohibit.SetMaxAngleSep(20.)
 prohib_array.AddAlgo(outofcone_prohibit,False)
 
 merge_viewer.GetManager().AddSeparateAlgo(prohib_array)
 
 ## MERGE ALGOS ##
-merge_array = cluster.CMAlgoArray()
+merge_array = cmtool.CBAlgoArray()
 
-shortdist_alg = cluster.CMAlgoShortestDist()
+shortdist_alg = cmtool.CBAlgoShortestDist()
 shortdist_alg.SetMinHits(10)
 shortdist_alg.SetSquaredDistanceCut(5.)
 merge_array.AddAlgo(shortdist_alg,False)
 
-trackblob = cluster.CMAlgoStartTrack()
+trackblob = cmtool.CBAlgoStartTrack()
 merge_array.AddAlgo(trackblob,False)
 
-pcontain = cluster.CMAlgoPolyContain()
+pcontain = cmtool.CBAlgoPolyContain()
 merge_array.AddAlgo(pcontain,False)
 
 merge_viewer.GetManager().AddMergeAlgo(merge_array)

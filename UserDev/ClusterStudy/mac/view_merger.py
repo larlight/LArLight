@@ -38,7 +38,7 @@ merge_viewer.SetPrintClusterInfo(True)
 # attach merge algos here
 ########################################
 
-myalg = cluster.CMAlgoShortestDist()
+myalg = cmtool.CBAlgoShortestDist()
 #merge nothing:
 myalg.SetMinHits(999999)
 #merge everything:

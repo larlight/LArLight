@@ -19,13 +19,13 @@ proc = fmwk.ClusterMerger()
 
 proc.SaveOutputCluster(True)
 
-proc.GetManager().AddMergeAlgo(cluster.CMAlgoFake())
+proc.GetManager().AddMergeAlgo(cmtool.CBAlgoFake())
 
-proc.GetManager().AddSeparateAlgo(cluster.CMAlgoFake())
+proc.GetManager().AddSeparateAlgo(cmtool.CBAlgoFake())
 
-#proc.GetManager().DebugMode(cluster.CMergeManager.kPerIteration)
-#proc.GetManager().DebugMode(cluster.CMergeManager.kPerAlgoSet)
-#proc.GetManager().DebugMode(cluster.CMergeManager.kPerMerging)
+#proc.GetManager().DebugMode(cmtool.CMergeManager.kPerIteration)
+#proc.GetManager().DebugMode(cmtool.CMergeManager.kPerAlgoSet)
+#proc.GetManager().DebugMode(cmtool.CMergeManager.kPerMerging)
 
 #mgr.set_verbosity(fmwk.MSG.DEBUG)
 

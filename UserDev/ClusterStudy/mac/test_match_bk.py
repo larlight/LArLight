@@ -1,9 +1,9 @@
 import sys
 from ROOT import *
 gSystem.Load("libClusterStudy")
-from ROOT import cmatch
+from ROOT import cmtool
 
-bk=cmatch.MatchBookKeeper()
+bk=cmtool.MatchBookKeeper()
 
 
 myset = std.vector("unsigned int")()
