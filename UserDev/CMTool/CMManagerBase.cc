@@ -11,11 +11,13 @@ namespace cmtool {
     _debug_mode = kNone;
     _priority_algo = nullptr;
     _min_nhits = 0;
+    _merge_till_converge = false;
     Reset();
   }
 
   void CMManagerBase::Reset()
   {
+    _planes.clear();
     _in_clusters.clear();
     if(_priority_algo) _priority_algo->Reset();
   }
@@ -52,9 +54,38 @@ namespace cmtool {
     _in_clusters = clusters;
   }
 
+  void CMManagerBase::Process()
+  {
+    
+    EventBegin();
+
+    bool keep_going = true;
+
+    while(keep_going) {
+
+      IterationBegin();
+
+      keep_going = IterationProcess();
+
+      IterationEnd();
+
+      if(!_merge_till_converge)
+
+	break;
+    }
+
+    if(!keep_going && _debug_mode >= kPerIteration)
+      
+      std::cout << "\033[93m  Iterative approach = OFF ... exiting from iteration loop. \033[00m" << std::endl;
+
+    EventEnd();
+
+  }
+
   void CMManagerBase::ComputePriority(const std::vector<cluster::ClusterParamsAlgNew> &clusters) {
 
     _priority.clear();
+    _planes.clear();
 
     if(!clusters.size()) return;
 
@@ -74,9 +105,15 @@ namespace cmtool {
 
       }
 	
-      if(priority>0) 
+      if(priority>0) {
 	
 	_priority.insert(std::make_pair(priority,c_index));
+
+	if( _planes.find(clusters.at(c_index).Plane()) == _planes.end() )
+
+	  _planes.insert(clusters.at(c_index).Plane());
+
+      }
       
     }
     
