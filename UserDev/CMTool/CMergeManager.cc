@@ -5,13 +5,9 @@
 
 namespace cmtool {
 
-  CMergeManager::CMergeManager(CMergePriority_t priority)
+  CMergeManager::CMergeManager() : CMManagerBase()
   {
-    _fout = 0;
-    _min_nhits = 0;
-    _debug_mode = kNone;
     _merge_till_converge = false;
-    _priority = priority;
     _merge_algo = nullptr;
     _separate_algo = nullptr;
     Reset();
@@ -19,49 +15,17 @@ namespace cmtool {
 
   void CMergeManager::Reset()
   {
-    _in_clusters.clear();
+    CMManagerBase::Reset();
     _out_clusters.clear();
     _book_keeper.Reset();
     if(_merge_algo)    _merge_algo->Reset();
     if(_separate_algo) _separate_algo->Reset();
   }
 
-  void CMergeManager::SetClusters(const std::vector<std::vector<larutil::PxHit> > &clusters)
-  {
-
-    // Clear & fill cluster info
-
-    _in_clusters.clear();
-    _out_clusters.clear();
-
-    _in_clusters.reserve(clusters.size());
-
-    ::cluster::ClusterParamsAlgNew tmp_alg;
-    tmp_alg.SetMinNHits(_min_nhits);
-    tmp_alg.SetVerbose(false);
-
-    for(auto const &c : clusters) {
-      
-      _in_clusters.push_back(tmp_alg);
-      (*_in_clusters.rbegin()).Initialize();
-
-      if((*_in_clusters.rbegin()).SetHits(c) < 1) continue;
-      (*_in_clusters.rbegin()).DisableFANN();
-      (*_in_clusters.rbegin()).FillParams(true,true,true,true,true,false);
-      (*_in_clusters.rbegin()).FillPolygon();
-
-    }    
-
-    // Clear book keeper
-    
-    _book_keeper.Reset(clusters.size());
-
-  }
-  
   void CMergeManager::Process()
   {
-    if(!_merge_algo) throw CMTException("No algorithm to run!");
 
+    if(!_merge_algo) throw CMTException("No algorithm to run!");
 
     _merge_algo->SetAnaFile(_fout);
     _merge_algo->EventBegin(_in_clusters);
@@ -74,9 +38,17 @@ namespace cmtool {
       if(_debug_mode <= kPerMerging)
 	_separate_algo->SetVerbose(true);
     }
+
+    if(_priority_algo) {
+      _priority_algo->SetAnaFile(_fout);
+      _priority_algo->EventBegin(_in_clusters);
+      if(_debug_mode <= kPerMerging)
+	_priority_algo->SetVerbose(true);
+    }
     
     size_t ctr=0;
     bool keep_going=true;
+    _book_keeper.Reset(_in_clusters.size());
     std::vector<CMergeBookKeeper> book_keepers;
     std::vector<std::vector<unsigned short> > tmp_merged_indexes;
     std::vector<cluster::ClusterParamsAlgNew> tmp_merged_clusters;
@@ -104,6 +76,8 @@ namespace cmtool {
 	if(tmp_merged_indexes.at(i).size()==1)
 	  
 	  merge_switch.at(i) = false;
+
+      ComputePriority(tmp_merged_clusters);
 
       // Run separation algorithm
       if(_separate_algo) {
@@ -220,28 +194,6 @@ namespace cmtool {
 
     }
 
-    // Figure out ordering of clusters to process
-    std::multimap<double,size_t> prioritized_index;
-    for(size_t i=0; i<in_clusters.size(); ++i) {
-
-      if(in_clusters.at(i).GetHitVector().size()<1) continue;
-
-      switch(_priority) {
-      case ::cmtool::CMergeManager::kIndex:
-	prioritized_index.insert(std::pair<double,size_t>(((double)(in_clusters.size()) - (double)i),i));
-	break;
-      case ::cmtool::CMergeManager::kPolyArea:
-	prioritized_index.insert(std::pair<double,size_t>(in_clusters.at(i).GetParams().PolyObject.Area(),i));
-	break;
-      case ::cmtool::CMergeManager::kChargeSum:
-	prioritized_index.insert(std::pair<double,size_t>(in_clusters.at(i).GetParams().sum_charge,i));
-	break;
-      case ::cmtool::CMergeManager::kNHits:
-	prioritized_index.insert(std::pair<double,size_t>((double)(in_clusters.at(i).GetNHits()),i));
-	break;
-      }
-    }
-
     //
     // Merging
     //
@@ -249,8 +201,8 @@ namespace cmtool {
     _merge_algo->IterationBegin(in_clusters);
     
     // Run over clusters and execute merging algorithms
-    for(auto citer1 = prioritized_index.rbegin();
-	citer1 != prioritized_index.rend();
+    for(auto citer1 = _priority.rbegin();
+	citer1 != _priority.rend();
 	++citer1) {
       
       auto citer2 = citer1;
@@ -259,7 +211,7 @@ namespace cmtool {
 
       while(1) {
 	citer2++;
-	if(citer2 == prioritized_index.rend()) break;
+	if(citer2 == _priority.rend()) break;
 
 	// Skip if not on the same plane
 	UChar_t plane2 = in_clusters.at((*citer2).second).Plane();
@@ -338,28 +290,6 @@ namespace cmtool {
 	<< Form("  Calling %s with %zu clusters...",__FUNCTION__,in_clusters.size())
 	<<std::endl;
 
-    }
-
-    // Figure out ordering of clusters to process
-    std::multimap<double,size_t> prioritized_index;
-    for(size_t i=0; i<in_clusters.size(); ++i) {
-
-      if(in_clusters.at(i).GetHitVector().size()<1) continue;
-
-      switch(_priority) {
-      case ::cmtool::CMergeManager::kIndex:
-	prioritized_index.insert(std::pair<double,size_t>(((double)(in_clusters.size()) - (double)i),i));
-	break;
-      case ::cmtool::CMergeManager::kPolyArea:
-	prioritized_index.insert(std::pair<double,size_t>(in_clusters.at(i).GetParams().PolyObject.Area(),i));
-	break;
-      case ::cmtool::CMergeManager::kChargeSum:
-	prioritized_index.insert(std::pair<double,size_t>(in_clusters.at(i).GetParams().sum_charge,i));
-	break;
-      case ::cmtool::CMergeManager::kNHits:
-	prioritized_index.insert(std::pair<double,size_t>((double)(in_clusters.at(i).GetNHits()),i));
-	break;
-      }
     }
 
     //

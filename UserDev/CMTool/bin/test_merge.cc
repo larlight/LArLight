@@ -1,5 +1,5 @@
 #include "Analysis-TypeDef.hh"
-#include "ClusterStudy-TypeDef.hh"
+#include "CMTool-TypeDef.hh"
 #include "TSystem.h"
 
 int main(int argc, char** argv) {
@@ -22,9 +22,9 @@ int main(int argc, char** argv) {
 
   //proc->GetManager().AddSeparateAlgo(new cluster::CMAlgoFake());
 
-  proc->GetManager().AddMergeAlgo(new cluster::CMAlgoMergeAll);
+  proc->GetManager().AddMergeAlgo(new cmtool::CBAlgoMergeAll);
 
-  //proc->GetManager().DebugMode(cluster::CMergeManager::kPerIteration);
+  proc->GetManager().DebugMode(cmtool::CMergeManager::kPerIteration);
   //proc.GetManager().DebugMode(cluster.CMergeManager.kPerAlgoSet);
   //proc.GetManager().DebugMode(cluster.CMergeManager.kPerMerging);
 

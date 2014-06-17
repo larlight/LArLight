@@ -16,6 +16,7 @@
 
 #include <iostream>
 
+#include "CMManagerBase.hh"
 #include "ClusterParamsAlgNew.hh"
 #include "CMergeBookKeeper.hh"
 #include "CBoolAlgoBase.hh"
@@ -27,53 +28,21 @@ namespace cmtool {
      A class that instantiates merging algorithm(s) and run.
      The book-keeping of merged cluster sets are done by CMergeBookKeeper.
   */
-  class CMergeManager{
+  class CMergeManager : public CMManagerBase {
 
-  public:
-
-    /// Enum to specify the priority for running a merging.
-    enum CMergePriority_t {
-      /// Merge clusters along the vector index (from low to high)
-      kIndex,
-      /// Merge clusters with large areas first 
-      kPolyArea,
-      /// Merge clusters with high charge first
-      kChargeSum,
-      /// Merge clusters with many hits first
-      kNHits
-    };
-
-    /// Enum to specify message output level
-    enum CMergeMSGLevel_t {
-      /// Extremely verbose (cout per individual algorithm execution)
-      kPerMerging,
-      /// Somewhat verbose (cout per merging iteration)
-      kPerIteration,
-      /// Bit verbose (cout per event)
-      kPerEvent,
-      /// Normal
-      kNone
-    };
-    
   public:
     
     /// Default constructor
-    CMergeManager(CMergePriority_t priority = kNHits);
+    CMergeManager();
     
     /// Default destructor
     virtual ~CMergeManager(){};
 
-    /// Method to enable debug mode (lots of couts)
-    void DebugMode(CMergeMSGLevel_t level) {_debug_mode=level;}
-
     /// Switch to continue merging till converges
     void MergeTillConverge(bool doit=true) {_merge_till_converge = doit;}
 
-    /// Choose ordering for clusters to be merged
-    void SetMergePriority(CMergePriority_t level) { _priority=level; }
-
     /// Method to reset itself
-    void Reset();
+    virtual void Reset();
 
     /// A simple method to add an algorithm for merging
     void AddMergeAlgo(CBoolAlgoBase* algo) {_merge_algo = algo;}
@@ -81,23 +50,14 @@ namespace cmtool {
     /// A simple method to add an algorithm for separation
     void AddSeparateAlgo(CBoolAlgoBase* algo) {_separate_algo = algo;}
 
-    /// A simple method to add a cluster
-    void SetClusters(const std::vector<std::vector<larutil::PxHit> > &clusters);
-
-    /// A setter for minimum # of hits ... passed onto ClusterParamsAlg
-    void SetMinNHits(size_t n) { _min_nhits = n; }
-
     /// A method to execute merging algorithms
-    void Process();
+    virtual void Process();
 
     /// A method to obtain output clusters
     const std::vector<cluster::ClusterParamsAlgNew>& GetClusters() const { return _out_clusters; }
 
     /// A method to obtain book keeper
     const CMergeBookKeeper& GetBookKeeper() const { return _book_keeper; }
-
-    /// A setter for an analysis output file
-    void SetAnaFile(TFile* fout) { _fout = fout; }
 
   protected:
 
@@ -116,12 +76,6 @@ namespace cmtool {
     /// Iterative approach for merging
     bool _merge_till_converge;
 
-    /// Debug mode switch
-    CMergeMSGLevel_t _debug_mode;
-
-    /// Input clusters
-    std::vector<cluster::ClusterParamsAlgNew> _in_clusters;
-
     /// Output clusters
     std::vector<cluster::ClusterParamsAlgNew> _out_clusters;
 
@@ -133,15 +87,6 @@ namespace cmtool {
 
     /// Separation algorithm
     ::cmtool::CBoolAlgoBase* _separate_algo;
-    
-    /// Merging priority type
-    CMergePriority_t _priority;
-
-    /// Output analysis plot TFile
-    TFile* _fout;
-
-    /// Minimum # of hits ... passed onto ClusterParamsAlg
-    size_t _min_nhits;
 
   };
 }

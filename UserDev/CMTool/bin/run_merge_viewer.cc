@@ -2,7 +2,7 @@
 #include "LArUtil-TypeDef.hh"
 #include "Analysis-TypeDef.hh"
 #include "ClusterRecoUtil-TypeDef.hh"
-#include "ClusterStudy-TypeDef.hh"
+#include "CMTool-TypeDef.hh"
 #include <iostream>
 
 int main(int argc, char** argv) {
@@ -23,7 +23,7 @@ int main(int argc, char** argv) {
 
   auto mc_viewer    = new larlight::MCShowerClusterViewer();
 
-  merge_viewer->GetManager().AddMergeAlgo(new cluster::CMAlgoFake());
+  merge_viewer->GetManager().AddMergeAlgo(new cmtool::CBAlgoFake());
 
   ana_proc.add_process(raw_viewer);
 

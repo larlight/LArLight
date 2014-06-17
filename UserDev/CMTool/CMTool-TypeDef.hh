@@ -14,6 +14,7 @@
 #include "CBoolAlgoBase.hh"
 #include "CFloatAlgoBase.hh"
 #include "CPriorityAlgoBase.hh"
+#include "CMManagerBase.hh"
 #include "CMergeManager.hh"
 #include "CBAlgoArray.hh"
 
@@ -56,6 +57,7 @@ namespace cmtool {
   class CFloatAlgoBase;
   class CMergeBookKeeper;
   class CMatchBookKeeper;
+  class CMManagerBase;
   class CMergeManager;
 
   class CBAlgoArray;

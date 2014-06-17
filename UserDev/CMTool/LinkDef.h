@@ -25,6 +25,7 @@
 #pragma link C++ class cmtool::CBoolAlgoBase+;
 #pragma link C++ class cmtool::CFloatAlgoBase+;
 #pragma link C++ class cmtool::CPriorityAlgoBase+;
+#pragma link C++ class cmtool::CMManagerBase;
 #pragma link C++ class cmtool::CMergeManager+;
 
 #pragma link C++ class cmtool::CBAlgoArray+;

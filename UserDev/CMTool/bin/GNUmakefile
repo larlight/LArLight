@@ -13,11 +13,11 @@ CXXFLAGS += -I$(LARLIGHT_CORE_DIR)/LArUtil
 CXXFLAGS += -I$(USER_DEV_DIR)/FANN
 CXXFLAGS += -I$(USER_DEV_DIR)/FANN/include
 CXXFLAGS += -I$(USER_DEV_DIR)/ClusterRecoUtil
-CXXFLAGS += -I$(USER_DEV_DIR)/ClusterStudy
+CXXFLAGS += -I$(USER_DEV_DIR)/CMTool
 CXXFLAGS += -I. $(shell root-config --cflags) -g
 
 # Include your shared object lib location
-LDFLAGS += -L$(LARLIGHT_LIBDIR) -lClusterStudy -lClusterRecoUtil -lFANN -lAnalysis -lDataFormat -lLArUtil -lBase -lHist -lGpad 
+LDFLAGS += -L$(LARLIGHT_LIBDIR) -lCMTool -lClusterRecoUtil -lFANN -lAnalysis -lDataFormat -lLArUtil -lBase -lHist -lGpad 
 
 # Add your program below with a space after the previous one.
 # This makefile compiles all binaries specified below.
