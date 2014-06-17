@@ -7,7 +7,7 @@ namespace cmtool {
 
   CMergeManager::CMergeManager() : CMManagerBase()
   {
-    _merge_till_converge = false;
+    _iter_ctr=0;
     _merge_algo = nullptr;
     _separate_algo = nullptr;
     Reset();
@@ -16,156 +16,208 @@ namespace cmtool {
   void CMergeManager::Reset()
   {
     CMManagerBase::Reset();
+    _tmp_merged_clusters.clear();
+    _tmp_merged_indexes.clear();
     _out_clusters.clear();
     _book_keeper.Reset();
+    _book_keeper_v.clear();
     if(_merge_algo)    _merge_algo->Reset();
     if(_separate_algo) _separate_algo->Reset();
+    _iter_ctr = 0;
   }
 
-  void CMergeManager::Process()
+  /// FMWK function called @ beginning of Process()
+  void CMergeManager::EventBegin()
   {
-
+    // Initialization per event
     if(!_merge_algo) throw CMTException("No algorithm to run!");
 
+    // Merging algorithm
     _merge_algo->SetAnaFile(_fout);
     _merge_algo->EventBegin(_in_clusters);
-    if(_debug_mode <= kPerMerging)
-      _merge_algo->SetVerbose(true);
-    
+
+    // Separation algorithm
     if(_separate_algo) {
       _separate_algo->SetAnaFile(_fout);
       _separate_algo->EventBegin(_in_clusters);
-      if(_debug_mode <= kPerMerging)
-	_separate_algo->SetVerbose(true);
     }
 
+    // Priority ordering algorithm
     if(_priority_algo) {
       _priority_algo->SetAnaFile(_fout);
       _priority_algo->EventBegin(_in_clusters);
-      if(_debug_mode <= kPerMerging)
-	_priority_algo->SetVerbose(true);
+    }
+
+    // Verbosity setting
+    if(_debug_mode <= kPerMerging) {
+      _merge_algo->SetVerbose(true);
+      if(_separate_algo) _separate_algo->SetVerbose(true);
+      if(_priority_algo) _priority_algo->SetVerbose(true);
     }
     
-    size_t ctr=0;
-    bool keep_going=true;
+    // Book keeper reinitialization
     _book_keeper.Reset(_in_clusters.size());
-    std::vector<CMergeBookKeeper> book_keepers;
-    std::vector<std::vector<unsigned short> > tmp_merged_indexes;
-    std::vector<cluster::ClusterParamsAlgNew> tmp_merged_clusters;
-    while(keep_going){
+
+    // Clear temporary variables
+    _iter_ctr = 0;
+    _tmp_merged_clusters.clear();
+    _tmp_merged_indexes.clear();
+    _book_keeper_v.clear();
+
+  }
+  
+  /// FMWK function called @ beginning of iterative loop inside Process()
+  void CMergeManager::IterationBegin()
+  {
+
+    if(_debug_mode <= kPerIteration) {
       
-      // Configure input for RunMerge
-      CMergeBookKeeper bk;
+      size_t nclusters = _tmp_merged_clusters.size();
 
-      if(!ctr) tmp_merged_clusters = _in_clusters;
-      else tmp_merged_clusters = _out_clusters;
-      _out_clusters.clear();
+      if(!_iter_ctr) nclusters = _in_clusters.size();
+      
+      std::cout 
+	<< std::endl
+	<< Form("  Merging iteration %zu: processing %zu clusters...",_iter_ctr,nclusters)
+	<< std::endl;
 
-      if(_debug_mode <= kPerIteration)
-	
-	std::cout 
-	  << std::endl
-	  << Form("  Merging iteration %zu: processing %zu clusters...",ctr,tmp_merged_clusters.size()) 
-	  << std::endl;
-
-      bk.Reset(tmp_merged_clusters.size());
-
-      std::vector<bool> merge_switch(tmp_merged_clusters.size(),true);
-      for(size_t i=0; i<tmp_merged_indexes.size(); ++i)
-	
-	if(tmp_merged_indexes.at(i).size()==1)
-	  
-	  merge_switch.at(i) = false;
-
-      ComputePriority(tmp_merged_clusters);
-
-      // Run separation algorithm
-      if(_separate_algo) {
-
-	RunSeparate(tmp_merged_clusters, bk);
-
-	if(_debug_mode <= kPerIteration)
-
-	  _separate_algo->Report();
-      }
-
-      // Run merging algorithm
-      RunMerge(tmp_merged_clusters, merge_switch, bk);
-      if(_debug_mode <= kPerIteration)
-	
-	_merge_algo->Report();
-
-      // Save output
-      bk.PassResult(tmp_merged_indexes);
-
-      if(bk.size() == tmp_merged_indexes.size())
-	_out_clusters = tmp_merged_clusters;
-      else {
-	_out_clusters.reserve(tmp_merged_indexes.size());
-	for(auto const& indexes_v : tmp_merged_indexes) {
-	  
-	  if(indexes_v.size()==1) {
-	    _out_clusters.push_back(tmp_merged_clusters.at(indexes_v.at(0)));
-	    continue;
-	  }
-	      
-	  size_t tmp_hit_counts=0;
-	  for(auto const& index : indexes_v) 
-	    tmp_hit_counts += tmp_merged_clusters.at(index).GetHitVector().size();
-	  std::vector<larutil::PxHit> tmp_hits;
-	  tmp_hits.reserve(tmp_hit_counts);
-	  
-	  for(auto const& index : indexes_v) {
-	    for(auto const& hit : tmp_merged_clusters.at(index).GetHitVector())
-	      tmp_hits.push_back(hit);
-	  }
-	  _out_clusters.push_back(::cluster::ClusterParamsAlgNew());
-	  (*_out_clusters.rbegin()).SetVerbose(false);
-	  (*_out_clusters.rbegin()).DisableFANN();
-
-	  if((*_out_clusters.rbegin()).SetHits(tmp_hits) < 1) continue;
-	  (*_out_clusters.rbegin()).FillParams(true,true,true,true,true,false);
-	  (*_out_clusters.rbegin()).FillPolygon();
-	}
-	book_keepers.push_back(bk);
-      }
-
-      if(_debug_mode <= kPerIteration) {
-
-	std::cout
-	  << Form("  Input / Output cluster length: %zu/%zu",tmp_merged_clusters.size(),_out_clusters.size())
-	  << std::endl;
-
-	if(tmp_merged_clusters.size() == _out_clusters.size())
-
-	  std::cout << "  Did not find any newly merged clusters..." <<std::endl;
-	
-	if(_out_clusters.size()==1)
-	  
-	  std::cout << "  Output cluster length is 1 (= no more merging needed)" << std::endl;
-
-	if(!_merge_till_converge) 
-
-	  std::cout << "  Non-iterative option: terminating..." << std::endl;
-
-      }
-
-      // Break if necessary
-      if(!_merge_till_converge || tmp_merged_clusters.size() == _out_clusters.size() || _out_clusters.size()==1)
-
-	break;
-
-      ctr++;
     }
-    
+
+  }
+  
+  /// FMWK function called @ end of iterative loop inside Process()
+  void CMergeManager::IterationEnd()
+  {
+
+    _merge_algo->IterationEnd();
+    if(_separate_algo) _separate_algo->IterationEnd();
+    if(_priority_algo) _priority_algo->IterationEnd();
+
+    if(_debug_mode <= kPerIteration) {
+
+      if(_priority_algo) _priority_algo->Report();
+
+      if(_separate_algo) _separate_algo->Report();
+      
+      _merge_algo->Report();
+      
+      std::cout
+	<< Form("  Input / Output cluster length: %zu/%zu",_tmp_merged_clusters.size(),_out_clusters.size())
+	<< std::endl;
+      
+      if(_tmp_merged_clusters.size() == _out_clusters.size())
+	
+	std::cout << "  Did not find any newly merged clusters..." <<std::endl;
+      
+      if(_out_clusters.size()==1)
+	
+	std::cout << "  Output cluster length is 1 (= no more merging needed)" << std::endl;
+      
+      if(!_merge_till_converge) 
+	
+	std::cout << "  Non-iterative option: terminating..." << std::endl;
+      
+    }
+
+    _iter_ctr++;
+  }
+
+  /// FMWK function called @ end of Process()
+  void CMergeManager::EventEnd()
+  {
     // Gather the full book keeping result
-    for(auto const& bk : book_keepers)
+    for(auto const& bk : _book_keeper_v)
 
       _book_keeper.Combine(bk);
 
+    // Call EventEnd for algorithms
     _merge_algo->EventEnd();
     if(_separate_algo) _separate_algo->EventEnd();
+    if(_priority_algo) _priority_algo->EventEnd();
+
+    _book_keeper_v.clear();
+    _tmp_merged_clusters.clear();
+    _tmp_merged_indexes.clear();
+  }
+
+  bool CMergeManager::IterationProcess()
+  {
+
+    // Configure input for RunMerge
+    CMergeBookKeeper bk;
     
+    if(!_iter_ctr) _tmp_merged_clusters = _in_clusters;
+    else _tmp_merged_clusters = _out_clusters;
+    _out_clusters.clear();
+
+    bk.Reset(_tmp_merged_clusters.size());
+
+    std::vector<bool> merge_switch(_tmp_merged_clusters.size(),true);
+
+    for(size_t i=0; i<_tmp_merged_indexes.size(); ++i)
+      
+	if(_tmp_merged_indexes.at(i).size()==1)
+	  
+	  merge_switch.at(i) = false;
+
+    ComputePriority(_tmp_merged_clusters);
+    
+    // Run separation algorithm
+    if(_separate_algo)
+      
+      RunSeparate(_tmp_merged_clusters, bk);
+
+    // Run merging algorithm
+    RunMerge(_tmp_merged_clusters, merge_switch, bk);
+    if(_debug_mode <= kPerIteration)
+      
+      _merge_algo->Report();
+    
+    // Save output
+    bk.PassResult(_tmp_merged_indexes);
+    
+    if(bk.size() == _tmp_merged_indexes.size())
+      _out_clusters = _tmp_merged_clusters;
+    else {
+      _out_clusters.reserve(_tmp_merged_indexes.size());
+      for(auto const& indexes_v : _tmp_merged_indexes) {
+	
+	if(indexes_v.size()==1) {
+	  _out_clusters.push_back(_tmp_merged_clusters.at(indexes_v.at(0)));
+	  continue;
+	}
+	
+	size_t tmp_hit_counts=0;
+	for(auto const& index : indexes_v) 
+	  tmp_hit_counts += _tmp_merged_clusters.at(index).GetHitVector().size();
+	std::vector<larutil::PxHit> tmp_hits;
+	tmp_hits.reserve(tmp_hit_counts);
+	
+	for(auto const& index : indexes_v) {
+	  for(auto const& hit : _tmp_merged_clusters.at(index).GetHitVector())
+	    tmp_hits.push_back(hit);
+	}
+	_out_clusters.push_back(::cluster::ClusterParamsAlgNew());
+	(*_out_clusters.rbegin()).SetVerbose(false);
+	(*_out_clusters.rbegin()).DisableFANN();
+	
+	if((*_out_clusters.rbegin()).SetHits(tmp_hits) < 1) continue;
+	(*_out_clusters.rbegin()).FillParams(true,true,true,true,true,false);
+	(*_out_clusters.rbegin()).FillPolygon();
+      }
+      _book_keeper_v.push_back(bk);
+    }
+
+    // Break if no more merging occurred
+    if(_tmp_merged_clusters.size() == _out_clusters.size())
+      
+      return false;
+
+    if(_out_clusters.size() == _planes.size())
+
+      return false;
+
+    return true;
   }
 
   void CMergeManager::RunMerge(const std::vector<cluster::ClusterParamsAlgNew> &in_clusters,
