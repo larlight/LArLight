@@ -15,7 +15,7 @@ namespace larlight {
     _out_fname="";
     _name_tdirectory="";
     _status=INIT;
-    _check_alignment=false;
+    _check_alignment=true;
 
     reset();
     _mode=mode;
@@ -39,21 +39,26 @@ namespace larlight {
 
       _in_ch[ptr_index]->GetEntry(_index);
 
-      if( _check_alignment && 
-	  _ptr_data_array[ptr_index]->event_id() != _ptr_data_array[(size_t)(DATA::Event)]->event_id() ) {
+      if( _check_alignment ) {
+
+	if(_current_event_id<0) 
+
+	  _current_event_id = _ptr_data_array[ptr_index]->event_id();
+
+	else if(_ptr_data_array[ptr_index]->event_id() != _current_event_id) {
 	
-	    print(MSG::ERROR,__FUNCTION__,
-		  Form("Detected event-alignment mismatch! (%d != %d)",
-		       _ptr_data_array[ptr_index]->event_id(),
-		       _ptr_data_array[(size_t)(DATA::Event)]->event_id() )
-		  );
-	    
-	    return 0;
-
+	  print(MSG::ERROR,__FUNCTION__,
+		Form("Detected event-alignment mismatch! (%d != %d)",
+		     _ptr_data_array[ptr_index]->event_id(),
+		     _ptr_data_array[(size_t)(DATA::Event)]->event_id() )
+		);
+	  
+	  return 0;
+	  
+	}
       }
-    
     }
-
+    
     // If data class object does not exist, and if it's either WRITE or BOTH mode, create it.
     if(!_ptr_data_array[type] && _mode != READ){
       
@@ -109,6 +114,7 @@ namespace larlight {
       break;
     }
     
+    _current_event_id = -1;
     _index=0;
     _nevents=0;
     _nevents_written=0;
@@ -609,16 +615,15 @@ namespace larlight {
 
     if( _check_alignment ) {
 
-      if( !_read_data_array[(size_t)(DATA::Event)] ) {
+      // if DATA::Event is present, use that as absolute check
+      if( _in_ch[(size_t)(DATA::Event)] ) {
 
-	print(MSG::ERROR,__FUNCTION__,
-	      "DATA::Event data tree necessary for alignment check!");
-	
-	return false;
-	
-      }
-      
-      _in_ch[(size_t)(DATA::Event)]->GetEntry(_index);
+	_in_ch[(size_t)(DATA::Event)]->GetEntry(_index);	
+
+	_current_event_id = _ptr_data_array[DATA::Event]->event_id();
+      }else
+
+	_current_event_id = -1;
 
     }
     
