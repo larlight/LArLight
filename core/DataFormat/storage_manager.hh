@@ -80,7 +80,13 @@ namespace larlight {
     void add_in_filename(std::string name) {_in_fnames.push_back(name);}
     
     /// Setter for input file's TDirectory name
-    void set_in_rootdir(std::string name){_name_tdirectory=name;}
+    void set_in_rootdir(std::string name){ _name_in_tdirectory=name;}
+
+    /// Setter for output file's TDirectory name
+    void set_out_rootdir(std::string name) { _name_out_tdirectory=name;}
+
+    /// Setter for both (in/out) file's TDirectory name
+    void set_rootdir(std::string name) { _name_in_tdirectory=name; _name_out_tdirectory=name; }
     
     /// Setter for output filename
     void set_out_filename(std::string name) {_out_fname=name;}
@@ -197,7 +203,8 @@ namespace larlight {
     /// I/O filename
     std::string _out_fname;
     std::vector<std::string> _in_fnames;
-    std::string _name_tdirectory;
+    std::string _name_in_tdirectory;
+    std::string _name_out_tdirectory;
     
     /// TTree name
     const std::string _treename;
