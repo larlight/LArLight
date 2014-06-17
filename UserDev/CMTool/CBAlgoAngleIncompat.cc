@@ -53,11 +53,11 @@ namespace cmtool {
     
     //if you don't care if clusters have been reconstructed backwards
     if(_allow_180_ambig)
-      compatible = ( abs(angle1-angle2) < _max_allowed_2D_angle_diff ||
-		     abs(angle1-angle2-180) < _max_allowed_2D_angle_diff ||
-		     abs(angle1-angle2+180) < _max_allowed_2D_angle_diff   );
+      compatible = ( abs(angle1-angle2) < my_cut_value ||
+		     abs(angle1-angle2-180) < my_cut_value ||
+		     abs(angle1-angle2+180) < my_cut_value   );
     else
-      compatible = ( abs(angle1-angle2)     < _max_allowed_2D_angle_diff );
+      compatible = ( abs(angle1-angle2)     < my_cut_value );
     
 
     if(_debug){
