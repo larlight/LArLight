@@ -3,7 +3,7 @@ import ROOT, sys, os
 from ROOT import *
 
 # Now import ana_processor & your class. For this example, ana_base.
-gSystem.Load("libClusterStudy")
+gSystem.Load("libCMTool")
 from ROOT import *
 if len(sys.argv) != 2:
     print
