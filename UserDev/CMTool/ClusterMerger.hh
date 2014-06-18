@@ -62,7 +62,7 @@ namespace larlight {
 
     DATA::DATA_TYPE _cluster_type;
 
-    CRUHelper _cru_helper;
+    ::cluster::CRUHelper _cru_helper;
 
   };
 }

@@ -29,7 +29,7 @@
 #pragma link C++ class cluster::WireViewer+;
 #pragma link C++ class cluster::ShowerReco2DAlgo+;
 
-#pragma link C++ class larlight::CRUHelper+;
+#pragma link C++ class cluster::CRUHelper+;
 //ADD_NEW_CLASS ... do not change this line
 #endif
 

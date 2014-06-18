@@ -21,12 +21,7 @@ namespace cluster{
   class SimChannelViewer;
   class WireViewer;
   class ShowerReco2DAlgo;
-}
-
-namespace larlight {
-
   class CRUHelper;
-
 }
 
 class Polygon2D;
