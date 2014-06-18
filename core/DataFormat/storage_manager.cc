@@ -13,9 +13,10 @@ namespace larlight {
     //_event_wf=0;
     _fout=0;
     _out_fname="";
-    _name_tdirectory="";
+    _name_in_tdirectory="";
+    _name_out_tdirectory="";
     _status=INIT;
-    _check_alignment=false;
+    _check_alignment=true;
 
     reset();
     _mode=mode;
@@ -35,25 +36,31 @@ namespace larlight {
 
     size_t ptr_index = (size_t)(type);
     
-    if(_in_ch[ptr_index]) {
+    // If in READ mode, here is where we read in data product
+    if(_in_ch[ptr_index] && _mode == READ) {
 
       _in_ch[ptr_index]->GetEntry(_index);
 
-      if( _check_alignment && 
-	  _ptr_data_array[ptr_index]->event_id() != _ptr_data_array[(size_t)(DATA::Event)]->event_id() ) {
+      if( _check_alignment ) {
+
+	if(_current_event_id<0) 
+
+	  _current_event_id = _ptr_data_array[ptr_index]->event_id();
+
+	else if(_ptr_data_array[ptr_index]->event_id() != _current_event_id) {
 	
-	    print(MSG::ERROR,__FUNCTION__,
-		  Form("Detected event-alignment mismatch! (%d != %d)",
-		       _ptr_data_array[ptr_index]->event_id(),
-		       _ptr_data_array[(size_t)(DATA::Event)]->event_id() )
-		  );
-	    
-	    return 0;
-
+	  print(MSG::ERROR,__FUNCTION__,
+		Form("Detected event-alignment mismatch! (%d != %d)",
+		     _ptr_data_array[ptr_index]->event_id(),
+		     _ptr_data_array[(size_t)(DATA::Event)]->event_id() )
+		);
+	  
+	  return 0;
+	  
+	}
       }
-    
     }
-
+    
     // If data class object does not exist, and if it's either WRITE or BOTH mode, create it.
     if(!_ptr_data_array[type] && _mode != READ){
       
@@ -61,7 +68,7 @@ namespace larlight {
 
       if(_ptr_data_array[(size_t)type]) {
 	
-	_fout->cd();
+	_fout->cd(_name_out_tdirectory.c_str());
 	
 	_out_ch[(size_t)type]=new TTree(Form("%s_tree",DATA::DATA_TREE_NAME[type].c_str()),
 					Form("%s Tree",DATA::DATA_TREE_NAME[type].c_str()));
@@ -109,6 +116,7 @@ namespace larlight {
       break;
     }
     
+    _current_event_id = -1;
     _index=0;
     _nevents=0;
     _nevents_written=0;
@@ -212,7 +220,12 @@ namespace larlight {
 	sprintf(_buf,"Open attempt failed for a file: %s", _out_fname.c_str());
 	Message::send(MSG::ERROR,__FUNCTION__,_buf);
 	status=false;
-      }
+      }else if(!_name_out_tdirectory.empty()) {
+	
+	_fout->mkdir(_name_out_tdirectory.c_str());
+	_fout->cd(_name_out_tdirectory.c_str());
+
+      }	
       break;
       
     case UNDEFINED:
@@ -255,8 +268,8 @@ namespace larlight {
 	
 	std::string tree_name(Form("%s_tree",DATA::DATA_TREE_NAME[(DATA::DATA_TYPE)i].c_str()));
 	
-	if(_name_tdirectory.size()>0)
-	  _in_ch[i]=new TChain(Form("%s/%s",_name_tdirectory.c_str(),tree_name.c_str()),
+	if(_name_in_tdirectory.size()>0)
+	  _in_ch[i]=new TChain(Form("%s/%s",_name_in_tdirectory.c_str(),tree_name.c_str()),
 			       Form("%s Tree",DATA::DATA_TREE_NAME[(DATA::DATA_TYPE)i].c_str()));
 	else
 	  _in_ch[i]=new TChain(tree_name.c_str(),
@@ -293,10 +306,20 @@ namespace larlight {
       
       if(_mode!=READ && _write_data_array[i] ) {
 	
-	_fout->cd();
+	_fout->cd(_name_out_tdirectory.c_str());
 	
+	/*
+	if(_name_out_tdirectory.empty())
+	  _out_ch[i]=new TTree(Form("%s_tree",DATA::DATA_TREE_NAME[(DATA::DATA_TYPE)i].c_str()),
+			       Form("%s Tree",DATA::DATA_TREE_NAME[(DATA::DATA_TYPE)i].c_str()));
+	else
+	  _out_ch[i]=new TTree(Form("%s/%s_tree",_name_out_tdirectory.c_str(),DATA::DATA_TREE_NAME[(DATA::DATA_TYPE)i].c_str()),
+			       Form("%s Tree",DATA::DATA_TREE_NAME[(DATA::DATA_TYPE)i].c_str()));
+	*/
+
 	_out_ch[i]=new TTree(Form("%s_tree",DATA::DATA_TREE_NAME[(DATA::DATA_TYPE)i].c_str()),
 			     Form("%s Tree",DATA::DATA_TREE_NAME[(DATA::DATA_TYPE)i].c_str()));
+
 	_out_ch[i]->SetMaxTreeSize    (1024*1024*1024);
 	_out_ch[i]->SetMaxVirtualSize (1024*1024*1024);
 	
@@ -505,7 +528,7 @@ namespace larlight {
 	    Message::send(MSG::INFO,__FUNCTION__,Form("Writing TTree: %s",_out_ch[i]->GetName()));
 	  
 	  _fout = _out_ch[i]->GetCurrentFile();
-	  _fout->cd();
+	  _fout->cd(_name_out_tdirectory.c_str());
 	  _out_ch[i]->Write();
 	  
 	  Message::send(MSG::NORMAL,__FUNCTION__,
@@ -607,21 +630,47 @@ namespace larlight {
 
       return false;
 
-    if( _check_alignment ) {
+    _current_event_id = -1;
 
-      if( !_read_data_array[(size_t)(DATA::Event)] ) {
+    // If this is BOTH mode, then read all relevant data products & check alignment here
+    if( _mode == BOTH ) {
 
-	print(MSG::ERROR,__FUNCTION__,
-	      "DATA::Event data tree necessary for alignment check!");
-	
-	return false;
-	
-      }
+      for(size_t i=0; i<DATA::DATA_TYPE_MAX; ++i) { 
       
-      _in_ch[(size_t)(DATA::Event)]->GetEntry(_index);
+	if(_in_ch[i]) {
+
+	  _in_ch[i]->GetEntry(_index);
+
+	  if(_read_data_array[i] &&  _check_alignment) {
+
+	    if(_current_event_id == DATA::INVALID_UINT) 
+
+	      _current_event_id = _ptr_data_array[i]->event_id();
+
+	    else if(_current_event_id != _ptr_data_array[i]->event_id()) {
+
+	      print(MSG::ERROR,__FUNCTION__,
+		    Form("Detected event-alignment mismatch! (%d != %d)",
+			 _current_event_id,
+			 _ptr_data_array[i]->event_id()));
+	      
+	      return false;
+	      
+	    }
+	  } // end check event alignment
+	} // end read-in data @ _index
+      } 
+    }else if(_mode == READ) {
+      
+      // if DATA::Event is present, use that as absolute check
+      if( _in_ch[(size_t)(DATA::Event)] ) {
+	
+	_in_ch[(size_t)(DATA::Event)]->GetEntry(_index);	
+	
+	_current_event_id = _ptr_data_array[DATA::Event]->event_id();
+      }
 
     }
-    
     _index++;
     _nevents_read++;
     return true;

@@ -19,7 +19,7 @@ my_proc.set_verbosity(fmwk.MSG.NORMAL)
 my_proc.add_input_file(sys.argv[1])
 
 # Have it find the scanner directory
-fmwk.storage_manager.get().set_in_rootdir("scanner")
+#fmwk.storage_manager.get().set_in_rootdir("scanner")
 fmwk.storage_manager.get().set_data_to_read(fmwk.DATA.MCTruth,False)
 fmwk.storage_manager.get().set_data_to_read(fmwk.DATA.Calorimetry,False)
 fmwk.storage_manager.get().set_data_to_read(fmwk.DATA.Shower,False)

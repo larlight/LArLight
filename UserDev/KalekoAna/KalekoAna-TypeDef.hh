@@ -10,6 +10,7 @@
 #include "KalekoUtilFunc.hh"
 #include "QuickClusterAna.hh"
 #include "MCShowerStudy.hh"
+#include "tmpClusterAna.hh"
 //ADD_NEW_HEADER
 
 // Class forward declaration here
@@ -17,6 +18,7 @@ namespace kaleko {
   class KalekoTrackAna;
   class UtilFunctions;
   class QuickClusterAna;
+  class tmpClusterAna;
   //ADD_ANA_CLASS
 }
 
@@ -26,6 +28,7 @@ namespace larlight {
 
 //ADD_EMPTY_CLASS
 #endif
+
 
 
 

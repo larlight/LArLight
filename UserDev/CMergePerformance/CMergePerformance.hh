@@ -20,9 +20,6 @@
 #include "CMergeManager.hh"
 #include "McshowerLookback.hh"
 
-#include "CMAlgoShortestDist.hh"
-
-
 #include <TStopwatch.h>
 
 namespace larlight {
@@ -76,7 +73,7 @@ namespace larlight {
     void SetClusterType(DATA::DATA_TYPE type) {_cluster_type = type;}
 
     /// Getter for the CMergeManager so user can configure merge algos etc
-    ::cluster::CMergeManager& GetManager() { return _mgr; }
+    ::cmtool::CMergeManager& GetManager() { return _mgr; }
 
     /// Option to not bother with fillin FOM histos with raw fuzzyclus data
     /// This is useful if you are repeatedly running over the same file w/
@@ -123,7 +120,7 @@ namespace larlight {
     std::vector<std::vector<unsigned short> > clus_idx_vec;
 
     //declare a member of CMergeManager class called _mgr
-    ::cluster::CMergeManager _mgr;
+    ::cmtool::CMergeManager _mgr;
     
     bool _run_before_merging, _run_merging;
     double _MCShower_mother_energy_cutoff;

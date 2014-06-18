@@ -23,13 +23,18 @@ namespace cluster{
   class ShowerReco2DAlgo;
 }
 
-class ClusterParamsExecutor;
-class Polygon2D;
+namespace larlight {
 
+  class CRUHelper;
+
+}
+
+class Polygon2D;
 
 //ADD_EMPTY_CLASS ... do not change this comment line
 
 #endif
+
 
 
 
