@@ -1,14 +1,14 @@
 /**
  * \file MCShowerQuality.hh
  *
- * \ingroup ClusterStudy
+ * \ingroup CMTool
  * 
  * \brief Class def header for a class MCShowerQuality
  *
  * @author kazuhiro
  */
 
-/** \addtogroup ClusterStudy
+/** \addtogroup CMTool
 
     @{*/
 

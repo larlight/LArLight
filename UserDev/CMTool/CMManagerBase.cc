@@ -57,6 +57,10 @@ namespace cmtool {
   void CMManagerBase::Process()
   {
     
+    if(!(_in_clusters.size()))
+
+      return;
+    
     EventBegin();
 
     bool keep_going = true;

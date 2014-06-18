@@ -13,8 +13,8 @@ working_package='CMTool'
 target_dir='%s/CMTool' % os.environ['USER_DEV_DIR']
 source_dir='%s/CMTool/bin/tmp' % os.environ['USER_DEV_DIR']
 
-in_source='%s/cmalgo.cc' % source_dir
-in_header='%s/cmalgo.hh' % source_dir
+in_source='%s/cbalgo.cc' % source_dir
+in_header='%s/cbalgo.hh' % source_dir
 
 src_list = { in_source   : '%s/%s.cc'         % (target_dir,name),
              in_header   : '%s/%s.hh'         % (target_dir,name) }
@@ -41,7 +41,7 @@ fout=open('%s/LinkDef.h' % target_dir,'w')
 for line in contents:
    line=line + '\n'
    if line.find('ADD_CBALGO_CLASS')>=0:
-      line='#pragma link C++ class cluster::%s+;\n%s' % (name,line)
+      line='#pragma link C++ class cmtool::%s+;\n%s' % (name,line)
    fout.write(line)
 
 # modify TypeDef

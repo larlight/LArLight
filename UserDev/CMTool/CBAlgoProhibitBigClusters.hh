@@ -1,14 +1,14 @@
 /**
  * \file CBAlgoProhibitBigClusters.hh
  *
- * \ingroup ClusterStudy
+ * \ingroup CMTool
  * 
  * \brief Class def header for a class CBAlgoProhibitBigClusters
  *
  * @author davidkaleko_NAME
  */
 
-/** \addtogroup ClusterStudy
+/** \addtogroup CMTool
 
     @{*/
 #ifndef CBALGOPROHIBITBIGCLUSTERS_HH

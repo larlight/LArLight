@@ -1,14 +1,14 @@
 /**
  * \file CBAlgoProhibitAllTracks.hh
  *
- * \ingroup ClusterStudy
+ * \ingroup CMTool
  * 
  * \brief Class def header for a class CBAlgoProhibitAllTracks
  *
  * @author davidkaleko_NAME
  */
 
-/** \addtogroup ClusterStudy
+/** \addtogroup CMTool
 
     @{*/
 #ifndef CBALGOPROHIBITALLTRACKS_HH

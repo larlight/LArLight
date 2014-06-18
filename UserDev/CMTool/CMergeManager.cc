@@ -1,5 +1,5 @@
-#ifndef CMERGEMANAGER_CC
-#define CMERGEMANAGER_CC
+#ifndef CMERGEMANAGER_CXX
+#define CMERGEMANAGER_CXX
 
 #include "CMergeManager.hh"
 
@@ -70,6 +70,20 @@ namespace cmtool {
   void CMergeManager::IterationBegin()
   {
 
+    if(!_iter_ctr) {
+
+      _merge_algo->IterationBegin(_in_clusters);
+      if(_separate_algo) _separate_algo->IterationBegin(_in_clusters);
+      if(_priority_algo) _priority_algo->IterationBegin(_in_clusters);
+
+    }else{
+
+      _merge_algo->IterationBegin(_in_clusters);
+      if(_separate_algo) _separate_algo->IterationBegin(_out_clusters);
+      if(_priority_algo) _priority_algo->IterationBegin(_out_clusters);
+
+    }
+
     if(_debug_mode <= kPerIteration) {
       
       size_t nclusters = _tmp_merged_clusters.size();
@@ -95,12 +109,10 @@ namespace cmtool {
 
     if(_debug_mode <= kPerIteration) {
 
+      _merge_algo->Report();
+      if(_separate_algo) _separate_algo->Report();
       if(_priority_algo) _priority_algo->Report();
 
-      if(_separate_algo) _separate_algo->Report();
-      
-      _merge_algo->Report();
-      
       std::cout
 	<< Form("  Input / Output cluster length: %zu/%zu",_tmp_merged_clusters.size(),_out_clusters.size())
 	<< std::endl;
@@ -249,8 +261,6 @@ namespace cmtool {
     //
     // Merging
     //
-    // Call prepare function for merging
-    _merge_algo->IterationBegin(in_clusters);
     
     // Run over clusters and execute merging algorithms
     for(auto citer1 = _priority.rbegin();
@@ -306,8 +316,6 @@ namespace cmtool {
 
     } // end looping over clusters
 
-    _merge_algo->IterationEnd();
-    
     if(_debug_mode <= kPerIteration && book_keeper.GetResult().size() != in_clusters.size()) {
       
       std::cout << "  Found following clusters to be merged..." << std::endl;
@@ -347,9 +355,6 @@ namespace cmtool {
     //
     // Separation
     //
-
-    // Call prepare functions for separation
-    _separate_algo->IterationBegin(in_clusters);
     
     // Run over clusters and execute merging algorithms
     for(size_t cindex1 = 0; cindex1 < in_clusters.size(); ++cindex1) {
@@ -396,7 +401,6 @@ namespace cmtool {
       
     } // end looping over clusters
 
-    _separate_algo->IterationEnd();
   }
 
 }

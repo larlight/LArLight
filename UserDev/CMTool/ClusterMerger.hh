@@ -1,14 +1,14 @@
 /**
  * \file ClusterMerger.hh
  *
- * \ingroup TestEff
+ * \ingroup CMTool
  * 
  * \brief Class def header for a class ClusterMerger
  *
  * @author kazuhiro
  */
 
-/** \addtogroup TestEff
+/** \addtogroup CMTool
 
     @{*/
 

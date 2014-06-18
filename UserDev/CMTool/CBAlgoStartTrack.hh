@@ -1,7 +1,7 @@
 /**
  * \file CBAlgoStartTrack.hh
  *
- * \ingroup ClusterStudy
+ * \ingroup CMTool
  * 
  * \brief This merge algo is looking for short tracks from the 
  *        start of a shower that are overlapping a blob that is
@@ -10,7 +10,7 @@
  * @author davidkaleko
  */
 
-/** \addtogroup ClusterStudy
+/** \addtogroup CMTool
 
     @{*/
 #ifndef CBALGOSTARTTRACK_HH

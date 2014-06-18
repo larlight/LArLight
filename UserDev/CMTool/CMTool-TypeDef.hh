@@ -16,8 +16,9 @@
 #include "CPriorityAlgoBase.hh"
 #include "CMManagerBase.hh"
 #include "CMergeManager.hh"
-#include "CBAlgoArray.hh"
+#include "CMatchManager.hh"
 
+#include "CBAlgoArray.hh"
 #include "CBAlgoShortestDist.hh"
 #include "CBAlgoPolyContain.hh"
 #include "CBAlgoPolyOverlap.hh"
@@ -60,6 +61,7 @@ namespace cmtool {
   class CMManagerBase;
   class CMergeManager;
 
+//ADD_CPALGO_CLASS ... do not change this comment line
   class CBAlgoArray;
   class CBAlgoAngleCompat;
   class CBAlgoShortestDist;
@@ -83,7 +85,6 @@ namespace cmtool {
   class CBAlgoTrackSeparate;
   class CBAlgoAngleSeparate;
 //ADD_CBALGO_CLASS ... do not change this comment line
-
 //ADD_CFALGO_CLASS ... do not change this comment line
 
 }
@@ -107,6 +108,10 @@ namespace larlight {
 
 //ADD_EMPTY_CLASS ... do not change this comment line
 #endif
+
+
+
+
 
 
 

@@ -1,14 +1,14 @@
 /**
  * \file MergeViewer.hh
  *
- * \ingroup ClusterStudy
+ * \ingroup CMTool
  * 
  * \brief Class def header for a class MergeViewer
  *
  * @author kazuhiro/kaleko
  */
 
-/** \addtogroup ClusterStudy
+/** \addtogroup CMTool
 
     @{*/
 

@@ -1,14 +1,14 @@
 /**
  * \file CBAlgoAngleIncompat.hh
  *
- * \ingroup ClusterStudy
+ * \ingroup CMTool
  * 
  * \brief Class def header for a class CBAlgoAngleIncompat
  *
  * @author davidkaleko_NAME
  */
 
-/** \addtogroup ClusterStudy
+/** \addtogroup CMTool
 
     @{*/
 #ifndef CBALGOANGLEINCOMPAT_HH

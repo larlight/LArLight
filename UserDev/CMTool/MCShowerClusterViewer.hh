@@ -1,14 +1,14 @@
 /**
  * \file MCShowerClusterViewer.hh
  *
- * \ingroup ClusterStudy
+ * \ingroup CMTool
  * 
  * \brief Class def header for a class MCShowerClusterViewer
  *
  * @author kazuhiro/kaleko
  */
 
-/** \addtogroup ClusterStudy
+/** \addtogroup CMTool
 
     @{*/
 

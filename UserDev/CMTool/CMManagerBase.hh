@@ -1,14 +1,14 @@
 /**
  * \file CMManagerBase.hh
  *
- * \ingroup ClusterRecoUtil
+ * \ingroup CMTool
  * 
  * \brief Class def header for a class CMManagerBase
  *
  * @author kazuhiro
  */
 
-/** \addtogroup ClusterRecoUtil
+/** \addtogroup CMTool
 
     @{*/
 #ifndef CMMANAGERBASE_HH

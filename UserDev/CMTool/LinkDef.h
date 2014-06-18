@@ -11,6 +11,8 @@
 
 #pragma link C++ class std::vector<unsigned int>+;
 #pragma link C++ class std::vector<std::vector<unsigned int> >+;
+#pragma link C++ class std::vector<unsigned short>+;
+#pragma link C++ class std::vector<std::vector<unsigned short> >+;
 
 #pragma link C++ class cluster::ClusterViewerAlgo+;
 #pragma link C++ class cluster::ViewerException+;
@@ -27,11 +29,10 @@
 #pragma link C++ class cmtool::CPriorityAlgoBase+;
 #pragma link C++ class cmtool::CMManagerBase;
 #pragma link C++ class cmtool::CMergeManager+;
+#pragma link C++ class cmtool::CMatchManager+;
 
+//ADD_CPALGO_CLASS ... do not change this line
 #pragma link C++ class cmtool::CBAlgoArray+;
-#pragma link C++ class std::vector<unsigned short>+;
-#pragma link C++ class std::vector<std::vector<unsigned short> >+;
-
 #pragma link C++ class cmtool::CBAlgoAngleCompat+;
 #pragma link C++ class cmtool::CBAlgoShortestDist+;
 #pragma link C++ class cmtool::CBAlgoPolyContain+;
@@ -55,13 +56,17 @@
 #pragma link C++ class cmtool::CBAlgoMergeTinyWithBig+;
 #pragma link C++ class cmtool::CBAlgoProhibitBigClusters+;
 //ADD_CBALGO_CLASS ... do not change this line
-
 //ADD_CFALGO_CLASS ... do not change this line
+
 
 #pragma link C++ class larlight::ClusterMerger+;
 #pragma link C++ class larlight::MCShowerQuality+;
 //ADD_NEW_CLASS ... do not change this line
 #endif
+
+
+
+
 
 
 

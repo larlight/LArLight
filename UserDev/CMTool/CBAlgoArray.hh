@@ -1,14 +1,14 @@
 /**
  * \file CBAlgoArray.hh
  *
- * \ingroup ClusterStudy
+ * \ingroup CMTool
  * 
  * \brief Class def header for a class CBAlgoArray
  *
- * @author kazuhiro_NAME
+ * @author kazuhiro
  */
 
-/** \addtogroup ClusterStudy
+/** \addtogroup CMTool
 
     @{*/
 #ifndef CBALGOARRAY_HH

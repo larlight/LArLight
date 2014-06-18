@@ -6,7 +6,7 @@
 namespace cmtool {
 
   //-------------------------------------------------------
-  CFAlgo_Class_Name::CFAlgo_Class_Name() : CBoolAlgoBase()
+  CFAlgo_Class_Name::CFAlgo_Class_Name() : CFloatAlgoBase()
   //-------------------------------------------------------
   {
 
@@ -19,11 +19,11 @@ namespace cmtool {
 
   }
 
-  //---------------------------------------------------------------------------------
-  bool CFAlgo_Class_Name::Float(std::vector<cluster::ClusterParamsAlgNew*> &clusters)
-  //---------------------------------------------------------------------------------
+  //----------------------------------------------------------------------------------------------
+  float CFAlgo_Class_Name::Float(const std::vector<const cluster::ClusterParamsAlgNew*> &clusters)
+  //----------------------------------------------------------------------------------------------
   {
-    if(cluster1.GetNHits() && cluster2.GetNHits()) return 1.;
+    if(clusters.size()) return 1.;
     else return -1.;
   }
 

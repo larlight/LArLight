@@ -1,14 +1,14 @@
 /**
  * \file ClusterViewerAlgo.hh
  *
- * \ingroup ClusterStudy
+ * \ingroup CMTool
  * 
  * \brief Class def header for a class ClusterViewerAlgo
  *
  * @author kazuhiro/kaleko
  */
 
-/** \addtogroup ClusterStudy
+/** \addtogroup CMTool
 
     @{*/
 

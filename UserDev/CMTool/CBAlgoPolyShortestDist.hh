@@ -1,14 +1,14 @@
 /**
  * \file CBAlgoPolyShortestDist.hh
  *
- * \ingroup ClusterStudy
+ * \ingroup CMTool
  * 
  * \brief Class def header for a class CBAlgoPolyShortestDist
  *
  * @author davidkaleko_NAME
  */
 
-/** \addtogroup ClusterStudy
+/** \addtogroup CMTool
 
     @{*/
 #ifndef CBALGOPOLYSHORTESTDIST_HH

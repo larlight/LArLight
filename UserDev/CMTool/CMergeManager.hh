@@ -1,14 +1,14 @@
 /**
  * \file CMergeManager.hh
  *
- * \ingroup ClusterRecoUtil
+ * \ingroup CMTool
  * 
  * \brief Class def header for a class CMergeManager
  *
  * @author kazuhiro
  */
 
-/** \addtogroup ClusterRecoUtil
+/** \addtogroup CMTool
 
     @{*/
 #ifndef CMERGEMANAGER_HH
@@ -17,7 +17,6 @@
 #include <iostream>
 
 #include "CMManagerBase.hh"
-#include "ClusterParamsAlgNew.hh"
 #include "CMergeBookKeeper.hh"
 #include "CBoolAlgoBase.hh"
 

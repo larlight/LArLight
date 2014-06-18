@@ -14,7 +14,6 @@
 #ifndef CFALGO_CLASS_NAME_HH
 #define CFALGO_CLASS_NAME_HH
 
-#include <iostream>
 #include "CFloatAlgoBase.hh"
 
 namespace cmtool {
@@ -34,28 +33,25 @@ namespace cmtool {
     virtual ~CFAlgo_Class_Name(){};
 
     //
-    // Author should be aware of 3 functions at least: Bool, Report, and Reset.
-    // More possibly-useful functions can be later part but commented out.
-    // All of these functions are virtual and defined in the base class.
-    //
+    // Author should be aware of 3 functions at least: Float, Report, 
+    // and Reset. More possibly-useful functions can be found in the later 
+    // part but commented out. All of these functions are virtual and defined
+    // in the base class.
 
     /**
-       Core function: given the CPAN input, return whether a cluster should be
-       merged or not.
+       Core function: given a set of CPANs, return a float which indicates 
+       the compatibility the cluster combination.
     */
-    bool Float(std::vector<cluster::ClusterParamsAlgNew*> &clusters)
-
+    virtual float Float(const std::vector<const cluster::ClusterParamsAlgNew*> &clusters);
 
     /**
-       Optional function: called after each Merge() function call by CMergeManager IFF
-       CMergeManager is run with verbosity level kPerMerging. Maybe useful for debugging.
+       Optional function: called after each iterative approach if a manager class is
+       run with verbosity level <= kPerIteration. Maybe useful for debugging.
     */
     virtual void Report();
     
-    /// Function to reset the algorithm instance ... maybe implemented via child class
+    /// Function to reset the algorithm instance, called together with manager's Reset()
     virtual void Reset();
-    
-
 
     /**
        Optional function: called at the beginning of 1st iteration. This is called per event.
@@ -68,14 +64,14 @@ namespace cmtool {
     //virtual void EventEnd();
  
     /**
-       Optional function: called at the beggining of each iteration over all pairs of clusters. 
+       Optional function: called at the beggining of each iterative loop.
        This provides all clusters' information in case the algorithm need them. Note this
        is called per iteration which may be more than once per event.
      */
     //virtual void IterationBegin(const std::vector<cluster::ClusterParamsAlgNew> &clusters);
 
     /**
-       Optional function: called at the end of each iteration over all pairs of clusters.
+       Optional function: called at the end of each iterative loop.
      */
     //virtual void IterationEnd();
 
