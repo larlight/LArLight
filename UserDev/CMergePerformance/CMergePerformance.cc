@@ -3,7 +3,6 @@
 
 #include "CMergePerformance.hh"
 
-
 namespace larlight {
   
   bool CMergePerformance::initialize() {

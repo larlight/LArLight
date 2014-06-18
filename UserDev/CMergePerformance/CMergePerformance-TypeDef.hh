@@ -7,14 +7,14 @@
 
 // Header files included here
 #include "CMergePerformance.hh"
-#include "Calorimetry.hh"
+#include "ShowerCalo.hh"
 //ADD_NEW_HEADER ... do not change this comment line
 
 // Class forward declaration here
 namespace larlight {
 
+  class ShowerCalo;
   class CMergePerformance;
-  class Calorimetry;
 
 //ADD_ANA_CLASS ... do not change this comment line
 

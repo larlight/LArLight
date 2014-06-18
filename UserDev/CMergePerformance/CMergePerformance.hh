@@ -35,7 +35,7 @@ namespace larlight {
      3) run cluster merging with whatever algos/parameters
      4) make those same FOM plots to compare to the original
    */
-  class CMergePerformance : public ana_base{
+  class CMergePerformance : public ana_base {
   
   public:
 
@@ -50,7 +50,7 @@ namespace larlight {
     }
 
     /// Default destructor
-    virtual ~CMergePerformance(){};
+    virtual ~CMergePerformance(){}
 
     /** IMPLEMENT in CMergePerformance.cc!
         Initialization method to be called before the analysis event loop.
