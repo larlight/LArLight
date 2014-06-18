@@ -69,9 +69,6 @@ namespace cmtool {
     virtual bool Bool(const ::cluster::ClusterParamsAlgNew &cluster1,
 		      const ::cluster::ClusterParamsAlgNew &cluster2);
 
-    
-
-    
     /**
        Optional function: called after each Merge() function call by CMergeManager IFF
        CMergeManager is run with verbosity level kPerMerging. Maybe useful for debugging.

@@ -18,6 +18,9 @@
 #include "CMergeManager.hh"
 #include "CMatchManager.hh"
 
+#include "CPAlgoArray.hh"
+//ADD_CPALGO_HEADER
+
 #include "CBAlgoArray.hh"
 #include "CBAlgoShortestDist.hh"
 #include "CBAlgoPolyContain.hh"
@@ -39,6 +42,12 @@
 #include "CBAlgoAngleIncompat.hh"
 #include "CBAlgoMergeTinyWithBig.hh"
 #include "CBAlgoProhibitBigClusters.hh"
+//ADD_CBALGO_HEADER
+
+#include "CFAlgoArray.hh"
+#include "CFAlgoQRatio.hh"
+//ADD_CFALGO_HEADER
+
 //ADD_NEW_HEADER ... do not change this comment line
 
 #include "ViewerException.hh"
@@ -61,7 +70,9 @@ namespace cmtool {
   class CMManagerBase;
   class CMergeManager;
 
+  class CPAlgoArray;
 //ADD_CPALGO_CLASS ... do not change this comment line
+
   class CBAlgoArray;
   class CBAlgoAngleCompat;
   class CBAlgoShortestDist;
@@ -85,6 +96,9 @@ namespace cmtool {
   class CBAlgoTrackSeparate;
   class CBAlgoAngleSeparate;
 //ADD_CBALGO_CLASS ... do not change this comment line
+
+  class CFAlgoArray;
+  class CFAlgoQRatio;
 //ADD_CFALGO_CLASS ... do not change this comment line
 
 }
@@ -108,6 +122,8 @@ namespace larlight {
 
 //ADD_EMPTY_CLASS ... do not change this comment line
 #endif
+
+
 
 
 

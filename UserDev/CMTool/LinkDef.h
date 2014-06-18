@@ -31,7 +31,9 @@
 #pragma link C++ class cmtool::CMergeManager+;
 #pragma link C++ class cmtool::CMatchManager+;
 
+#pragma link C++ class cmtool::CPAlgoArray+;
 //ADD_CPALGO_CLASS ... do not change this line
+
 #pragma link C++ class cmtool::CBAlgoArray+;
 #pragma link C++ class cmtool::CBAlgoAngleCompat+;
 #pragma link C++ class cmtool::CBAlgoShortestDist+;
@@ -56,6 +58,9 @@
 #pragma link C++ class cmtool::CBAlgoMergeTinyWithBig+;
 #pragma link C++ class cmtool::CBAlgoProhibitBigClusters+;
 //ADD_CBALGO_CLASS ... do not change this line
+
+#pragma link C++ class cmtool::CFAlgoArray+;
+#pragma link C++ class cmtool::CFAlgoQRatio+;
 //ADD_CFALGO_CLASS ... do not change this line
 
 
@@ -63,6 +68,8 @@
 #pragma link C++ class larlight::MCShowerQuality+;
 //ADD_NEW_CLASS ... do not change this line
 #endif
+
+
 
 
 

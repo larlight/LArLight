@@ -88,7 +88,9 @@ namespace cmtool {
 
       float score = _match_algo->Float(ptr_v);
 
-      _book_keeper.Match(tmp_index_v,score);
+      if(score>0)
+	
+	_book_keeper.Match(tmp_index_v,score);
 
       for(size_t i=0; i<ctr.size(); ++i) {
 

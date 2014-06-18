@@ -51,7 +51,7 @@ for line in contents:
    line=line + '\n'
    if line.find('ADD_CFALGO_CLASS')>=0:
       line='  class %s;\n%s' % (name,line)
-   if line.find('ADD_NEW_HEADER')>=0:
+   if line.find('ADD_CFALGO_HEADER')>=0:
       line='#include \"%s.hh\"\n%s' % (name,line)
    fout.write(line)
 
