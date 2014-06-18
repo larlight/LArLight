@@ -10,6 +10,7 @@
 #pragma link off all functions;
 
 #pragma link C++ class larlight::CMergePerformance+;
+#pragma link C++ class larlight::Calorimetry+;
 //ADD_NEW_CLASS ... do not change this line
 
 #endif
