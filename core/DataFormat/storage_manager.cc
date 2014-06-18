@@ -26,7 +26,7 @@ namespace larlight {
   event_base* storage_manager::get_data(DATA::DATA_TYPE type){
     
     // Read entry _index-1
-    if(!_index) {
+    if(!_index && _mode != WRITE) {
 
       Message::send(MSG::ERROR,__FUNCTION__,
 		    Form("Call next_event() before calling %s", __FUNCTION__));
@@ -39,7 +39,7 @@ namespace larlight {
     // If in READ mode, here is where we read in data product
     if(_in_ch[ptr_index] && _mode == READ) {
 
-      _in_ch[ptr_index]->GetEntry(_index);
+      _in_ch[ptr_index]->GetEntry(_index-1);
 
       if( _check_alignment ) {
 
@@ -665,8 +665,8 @@ namespace larlight {
       // if DATA::Event is present, use that as absolute check
       if( _in_ch[(size_t)(DATA::Event)] ) {
 	
-	_in_ch[(size_t)(DATA::Event)]->GetEntry(_index);	
-	
+	_in_ch[(size_t)(DATA::Event)]->GetEntry(_index);
+
 	_current_event_id = _ptr_data_array[DATA::Event]->event_id();
       }
 
