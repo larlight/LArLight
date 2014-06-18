@@ -1,0 +1,26 @@
+#ifndef CPALGOPOLYAREA_CXX
+#define CPALGOPOLYAREA_CXX
+
+#include "CPAlgoPolyArea.hh"
+
+namespace cmtool {
+
+  //----------------------------------------------------------
+  CPAlgoPolyArea::CPAlgoPolyArea() : CPriorityAlgoBase()
+  //----------------------------------------------------------
+  {
+    _area_cut = 0;
+  }
+
+  //------------------------------------------------------------------------------
+  float CPAlgoPolyArea::Priority(const ::cluster::ClusterParamsAlgNew &cluster)
+  //------------------------------------------------------------------------------
+  {
+
+    auto area = cluster.GetParams().PolyObject.Area();
+
+    return ( area < _area_cut ? -1 : area);
+  }
+  
+}
+#endif

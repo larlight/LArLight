@@ -23,41 +23,13 @@ namespace larlight {
   
   bool ClusterMerger::analyze(storage_manager* storage) {
 
-    const event_cluster* ev_cluster = (event_cluster*)(storage->get_data(_cluster_type));
+    std::vector<std::vector<larutil::PxHit> > local_clusters;
 
-    if(!ev_cluster) 
-      throw ::cluster::RecoUtilException(Form("Data type %s not found!",
-					      DATA::DATA_TREE_NAME[_cluster_type].c_str())
-					 );
+    _cru_helper.GeneratePxHit(storage,_cluster_type,local_clusters);
 
-    DATA::DATA_TYPE hit_type = ev_cluster->get_hit_type();
-    
-    const event_hit* ev_hit = (event_hit*)(storage->get_data(hit_type));
-    if(!ev_hit)
-      throw ::cluster::RecoUtilException(Form("Data type %s not found!",
-					      DATA::DATA_TREE_NAME[hit_type].c_str())
-					 );
+    std::cout<<local_clusters.size()<<std::endl;
 
-    std::vector<std::vector<larutil::PxHit> > local_clusters(ev_cluster->size(),
-							     std::vector<larutil::PxHit>()
-							     );
-
-    for(size_t i=0; i<ev_cluster->size(); ++i) {
-
-      std::vector<unsigned short> hit_indexes(ev_cluster->at(i).association(hit_type));
-
-      local_clusters.at(i).reserve(hit_indexes.size());
-
-      for(auto index : hit_indexes) {
-	larutil::PxHit h;
-	h.w = ev_hit->at(index).Wire() * larutil::GeometryUtilities::GetME()->WireToCm();
-	h.t = ev_hit->at(index).PeakTime() * larutil::GeometryUtilities::GetME()->TimeToCm();
-	h.plane = larutil::Geometry::GetME()->ChannelToPlane(ev_hit->at(index).Channel());
-	h.charge = ev_hit->at(index).Charge();
-	local_clusters.at(i).push_back(h);
-      }
-
-    }
+    _mgr.Reset();
 
     _mgr.SetClusters(local_clusters);
 
@@ -66,10 +38,15 @@ namespace larlight {
     if(!_write_output) return true;
 
     // Proceed to write an output data product
+    
+    auto ev_cluster = (const event_cluster*)(storage->get_data(_cluster_type));
+
+    const DATA::DATA_TYPE hit_type = ev_cluster->get_hit_type();
+
     std::vector<std::vector<unsigned short> > merged_indexes;
     _mgr.GetBookKeeper().PassResult(merged_indexes);
-
-    event_cluster* out_cluster_v =  (event_cluster*)(storage->get_data(DATA::Cluster));
+    
+    auto out_cluster_v =  (event_cluster*)(storage->get_data(DATA::Cluster));
     out_cluster_v->clear();
     out_cluster_v->reserve(merged_indexes.size());
     out_cluster_v->set_event_id(ev_cluster->event_id());

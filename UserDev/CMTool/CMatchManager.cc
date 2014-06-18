@@ -52,6 +52,8 @@ namespace cmtool {
     //
     ComputePriority(_in_clusters);
 
+    if(!_planes.size()) return false;
+
     if(_planes.size() != ((*_planes.rbegin())+1))
  
       throw CMTException("Some planes do not contain any cluster!");

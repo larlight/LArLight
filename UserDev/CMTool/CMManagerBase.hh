@@ -57,7 +57,7 @@ namespace cmtool {
     void Reset();
 
     /// Setter to add an algorithm for priority determination
-    void AddPriorityAlgo(CPriorityAlgoBase* algo);
+    void AddPriorityAlgo(CPriorityAlgoBase* algo) { _priority_algo = algo; }
 
     /// Switch to continue merging till converges
     void MergeTillConverge(bool doit=true) {_merge_till_converge = doit;}

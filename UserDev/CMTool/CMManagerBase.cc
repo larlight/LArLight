@@ -25,6 +25,9 @@ namespace cmtool {
   void CMManagerBase::SetClusters(const std::vector<std::vector<larutil::PxHit> > &clusters)
   {
 
+    // Reset
+    this->Reset();
+
     // Clear & fill cluster info
 
     _in_clusters.clear();

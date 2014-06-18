@@ -32,6 +32,9 @@
 #pragma link C++ class cmtool::CMatchManager+;
 
 #pragma link C++ class cmtool::CPAlgoArray+;
+#pragma link C++ class cmtool::CPAlgoNHits+;
+#pragma link C++ class cmtool::CPAlgoQSum+;
+#pragma link C++ class cmtool::CPAlgoPolyArea+;
 //ADD_CPALGO_CLASS ... do not change this line
 
 #pragma link C++ class cmtool::CBAlgoArray+;
@@ -65,9 +68,13 @@
 
 
 #pragma link C++ class larlight::ClusterMerger+;
+#pragma link C++ class larlight::ClusterMatcher+;
 #pragma link C++ class larlight::MCShowerQuality+;
 //ADD_NEW_CLASS ... do not change this line
 #endif
+
+
+
 
 
 

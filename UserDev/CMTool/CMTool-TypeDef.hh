@@ -19,6 +19,9 @@
 #include "CMatchManager.hh"
 
 #include "CPAlgoArray.hh"
+#include "CPAlgoNHits.hh"
+#include "CPAlgoQSum.hh"
+#include "CPAlgoPolyArea.hh"
 //ADD_CPALGO_HEADER
 
 #include "CBAlgoArray.hh"
@@ -54,6 +57,7 @@
 #include "ClusterViewerAlgo.hh"
 #include "ClusterViewer.hh"
 #include "ClusterMerger.hh"
+#include "ClusterMatcher.hh"
 #include "MCShowerQuality.hh"
 #include "MergeViewer.hh"
 #include "MCShowerClusterViewer.hh"
@@ -71,6 +75,9 @@ namespace cmtool {
   class CMergeManager;
 
   class CPAlgoArray;
+  class CPAlgoNHits;
+  class CPAlgoQSum;
+  class CPAlgoPolyArea;
 //ADD_CPALGO_CLASS ... do not change this comment line
 
   class CBAlgoArray;
@@ -111,6 +118,7 @@ namespace cluster {
 namespace larlight {
 
   class ClusterMerger;
+  class ClusterMatcher;
   class MCShowerQuality;
 
   class ClusterViewer;
@@ -122,6 +130,9 @@ namespace larlight {
 
 //ADD_EMPTY_CLASS ... do not change this comment line
 #endif
+
+
+
 
 
 
