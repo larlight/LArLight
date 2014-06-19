@@ -7,7 +7,7 @@ namespace larlight {
   ///////////////////////////////////////////////////
   //Make map of trackIDs for each shower           //
   ///////////////////////////////////////////////////
-  void McshowerLookback::FillShowerMap(larlight::event_mcshower* my_mcshow, 
+  void McshowerLookback::FillShowerMap(const larlight::event_mcshower* my_mcshow, 
 				       std::map<UInt_t,UInt_t> &shower_idmap)
   {
     UInt_t mcshower_index = 0;
@@ -51,7 +51,7 @@ namespace larlight {
   ///////////////////////////////////////////////////
   //Make map of simchannel objects for each channel//
   ///////////////////////////////////////////////////
-  void McshowerLookback::FillSimchMap(larlight::event_simch* my_simch, 
+  void McshowerLookback::FillSimchMap(const larlight::event_simch* my_simch, 
 				      std::map<UShort_t, larlight::simch> &simch_map){
     
     for(auto this_simch : *my_simch)

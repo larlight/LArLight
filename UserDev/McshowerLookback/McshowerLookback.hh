@@ -35,7 +35,7 @@ namespace larlight {
     
     /// Takes in event_mcshowers and fills a map of 
     /// (G4trackid of daughter particle => MCShower index in ev_mcshower)
-    void FillShowerMap(larlight::event_mcshower* my_mcshow, 
+    void FillShowerMap(const larlight::event_mcshower* my_mcshow, 
 		       std::map<UInt_t,UInt_t> &shower_idmap);
 
     /// Utilitiy function: convert std::map(track ID, shower ID) to std::vector(unique shower ID)
@@ -43,7 +43,7 @@ namespace larlight {
 
     /// Takes in event_simchannels and fills a map of
     /// (channel => larlight::simch)
-    void FillSimchMap(larlight::event_simch* my_simch, 
+    void FillSimchMap(const larlight::event_simch* my_simch, 
 		      std::map<UShort_t, larlight::simch> &simch_map);
     
     /// Takes in a single hit, two maps, and a list of MCShower indices and returns 
