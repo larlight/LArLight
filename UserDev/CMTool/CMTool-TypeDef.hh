@@ -51,6 +51,7 @@
 #include "CFAlgoQRatio.hh"
 //ADD_CFALGO_HEADER
 
+#include "MatchViewer.hh"
 //ADD_NEW_HEADER ... do not change this comment line
 
 #include "ViewerException.hh"
@@ -124,12 +125,14 @@ namespace larlight {
   class ClusterViewer;
   class MergeViewer;
   class MCShowerClusterCiewer;
+  class MatchViewer;
 //ADD_ANA_CLASS ... do not change this comment line
 }
 
 
 //ADD_EMPTY_CLASS ... do not change this comment line
 #endif
+
 
 
 

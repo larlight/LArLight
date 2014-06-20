@@ -68,6 +68,10 @@ namespace cmtool {
     /// A simple method to add a cluster
     void SetClusters(const std::vector<cluster::ClusterParamsAlgNew> &clusters);
 
+    /// A getter for input clusters
+    const std::vector<cluster::ClusterParamsAlgNew>&  GetInputClusters() const 
+    { return _in_clusters; }
+
     /// A setter for minimum # of hits ... passed onto ClusterParamsAlg
     void SetMinNHits(unsigned int n) { _min_nhits = n; }
 

@@ -17,16 +17,16 @@ mgr.set_ana_output_file("")
 
 proc = fmwk.ClusterMatcher()
 
-priority_algo = cmtool.CPAlgoPolyArea()
+#priority_algo = cmtool.CPAlgoPolyArea()
 #priority_algo.SetMinArea(1e9)
 
-proc.GetManager().AddPriorityAlgo(priority_algo)
+#proc.GetManager().AddPriorityAlgo(priority_algo)
 
 proc.GetManager().AddMatchAlgo(cmtool.CFAlgoQRatio())
 
-#proc.GetManager().DebugMode(cmtool.CMergeManager.kPerIteration)
-#proc.GetManager().DebugMode(cmtool.CMergeManager.kPerAlgoSet)
-proc.GetManager().DebugMode(cmtool.CMergeManager.kPerMerging)
+#proc.GetManager().DebugMode(cmtool.CMatchManager.kPerIteration)
+#proc.GetManager().DebugMode(cmtool.CMatchManager.kPerAlgoSet)
+proc.GetManager().DebugMode(cmtool.CMatchManager.kPerMerging)
 
 mgr.add_process(proc)
 
@@ -35,9 +35,12 @@ print "Start..."
 while mgr.process_event():
 
     print 
+
     bk=proc.GetManager().GetBookKeeper()
 
     res = bk.GetResult()
+
+    print "Found %d matched pairs ... listing each pair below..." % res.size()
 
     for x in xrange(res.size()):
 
@@ -45,7 +48,8 @@ while mgr.process_event():
 
             print res.at(x).at(y),
         print
-    print "Holding..."
+
+    print "Waiting user hitting an enter..."
     sys.stdin.readline()
 
 

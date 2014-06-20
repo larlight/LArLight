@@ -70,8 +70,10 @@
 #pragma link C++ class larlight::ClusterMerger+;
 #pragma link C++ class larlight::ClusterMatcher+;
 #pragma link C++ class larlight::MCShowerQuality+;
+#pragma link C++ class larlight::MatchViewer+;
 //ADD_NEW_CLASS ... do not change this line
 #endif
+
 
 
 
