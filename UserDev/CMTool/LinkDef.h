@@ -64,6 +64,7 @@
 
 #pragma link C++ class cmtool::CFAlgoArray+;
 #pragma link C++ class cmtool::CFAlgoQRatio+;
+#pragma link C++ class cmtool::CFAlgoTimeOverlap+;
 //ADD_CFALGO_CLASS ... do not change this line
 
 
