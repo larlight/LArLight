@@ -252,7 +252,6 @@ namespace cluster {
     larutil::PxPoint fRoughEndPoint;
     bool enableFANN;
 
-
     public:
 
     cluster::cluster_params fParams;
