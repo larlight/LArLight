@@ -17,6 +17,7 @@
 #include <iostream>
 #include "shower.hh"
 #include "CMatchManager.hh"
+#include "CalorimetryAlg.hh"
 
 namespace shower {
   
@@ -42,6 +43,8 @@ namespace shower {
     ::larlight::shower Reconstruct(const std::vector< ::cluster::ClusterParamsAlgNew>& );
     
   protected:
+
+    ::calo::CalorimetryAlg fCaloAlg;
 
   };
 }
