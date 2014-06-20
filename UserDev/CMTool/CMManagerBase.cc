@@ -81,7 +81,7 @@ namespace cmtool {
 	break;
     }
 
-    if(!keep_going && _debug_mode >= kPerIteration)
+    if(!keep_going && _debug_mode <= kPerIteration)
       
       std::cout << "\033[93m  Iterative approach = OFF ... exiting from iteration loop. \033[00m" << std::endl;
 
