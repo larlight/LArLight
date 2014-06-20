@@ -20,7 +20,6 @@ namespace cluster{
   class RecoUtilException;
   class SimChannelViewer;
   class WireViewer;
-  class ShowerReco2DAlgo;
   class CRUHelper;
 }
 
