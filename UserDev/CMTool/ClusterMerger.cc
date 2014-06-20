@@ -27,8 +27,6 @@ namespace larlight {
 
     _cru_helper.GeneratePxHit(storage,_cluster_type,local_clusters);
 
-    std::cout<<local_clusters.size()<<std::endl;
-
     _mgr.Reset();
 
     _mgr.SetClusters(local_clusters);

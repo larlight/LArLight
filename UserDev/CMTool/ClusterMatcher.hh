@@ -28,7 +28,7 @@ namespace larlight {
   public:
 
     /// Default constructor
-    ClusterMatcher(){ _name="ClusterMatcher"; _fout=0; _cluster_type = DATA::FuzzyCluster; _write_output=false;}
+    ClusterMatcher(){ _name="ClusterMatcher"; _fout=0; _cluster_type = DATA::FuzzyCluster; }
 
     /// Default destructor
     virtual ~ClusterMatcher(){}

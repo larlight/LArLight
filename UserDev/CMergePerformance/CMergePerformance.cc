@@ -14,9 +14,6 @@ namespace larlight {
     
     PrepareHistos();
     
-    w2cm = larutil::GeometryUtilities::GetME()->WireToCm();
-    t2cm = larutil::GeometryUtilities::GetME()->TimeToCm();
-
     return true;
   }
   
@@ -64,25 +61,31 @@ namespace larlight {
     _simch_map.clear();
     _mcslb.FillSimchMap(ev_simch,_simch_map);
 
+    std::vector<std::vector<larutil::PxHit> > local_clusters;
+
+    _cru_helper.GeneratePxHit(storage,_cluster_type,local_clusters);
+
+    _mgr.SetClusters(local_clusters);
+
+    local_clusters.clear();
 
     if(_run_before_merging){
-      //first start with the raw fuzzyclusters and find their CPAN params
-      FillClusterParamsVector(ev_cluster,ev_hits);
       
       //once that is done, _clusterparams is filled, calculate figure
       //of merit and fill histos with it
       _after_merging = false;
-      FillFOMHistos(_after_merging,ev_mcshower,ev_cluster,ev_hits,_clusterparams);
+      FillFOMHistos(_after_merging,ev_mcshower,ev_cluster,ev_hits);
     }
-
+    
     if(_run_merging){
+
       //now run merging with whatever algos you want
       //this overwites _clusterparams with the new (merged) clusters
-      RunMerging(ev_cluster,ev_hits);
+      _mgr.Process();
       
       //now fill the other FOM histos
       _after_merging = true;
-      FillFOMHistos(_after_merging,ev_mcshower,ev_cluster,ev_hits,_clusterparams);    
+      FillFOMHistos(_after_merging,ev_mcshower,ev_cluster,ev_hits);
     }
 
     return true;
@@ -261,61 +264,11 @@ namespace larlight {
 
   }
 
-  void CMergePerformance::FillClusterParamsVector(event_cluster* ev_cluster,
-						  event_hit* ev_hits){
-
-    // Now we make ClusterParamsAlgNew instance per cluster
-    _clusterparams.clear();
-
-    //loop over the reconstructed clusters
-    const larlight::DATA::DATA_TYPE hit_type = ev_cluster->get_hit_type();
-
-    for(auto const i_cluster: *ev_cluster){
-      
-      const std::vector<unsigned short> ass_index(i_cluster.association(hit_type));
-      if(ass_index.size()<15) continue;
-
-      const UChar_t plane = larutil::Geometry::GetME()->ChannelToPlane(ev_hits->at((*ass_index.begin())).Channel());
-
-      // Compute cluster parameters (ClusterParamsAlgNew) and store (_clusterparams)
-      std::vector<larutil::PxHit> tmp_hits;
-      tmp_hits.reserve(ass_index.size());
-
-      for(auto const index : ass_index) {	
-	larutil::PxHit h;
-	h.w = ev_hits->at(index).Wire() * w2cm;
-	h.t = ev_hits->at(index).PeakTime() * t2cm;
-	h.plane = plane;
-	h.charge = ev_hits->at(index).Charge();
-	tmp_hits.push_back(h);
-      }
-      
-
-      _clusterparams.push_back(::cluster::ClusterParamsAlgNew());
-	
-      try {
-	(*_clusterparams.rbegin()).SetVerbose(false);
-	(*_clusterparams.rbegin()).setNeuralNetPath(myNeuralNetPath);
-	(*_clusterparams.rbegin()).SetHits(tmp_hits);
-	(*_clusterparams.rbegin()).FillPolygon();
-	(*_clusterparams.rbegin()).FillParams();
-      }catch( ::cluster::RecoUtilException) {
-	
-	print(larlight::MSG::ERROR,__FUNCTION__,Form("Cluster %d too bad to run ClusterParamsAlgNew!",i_cluster.ID()));
-      }
-      
-    } //end loop over ev_cluster
-        
-
-    return;
-  }//end FillClusterParamsVector
-  
   void CMergePerformance::FillFOMHistos(bool after_merging,
-					event_mcshower* ev_mcshower,
-					event_cluster* ev_cluster,
-					event_hit* ev_hits,
-					const std::vector< ::cluster::ClusterParamsAlgNew> &_clusterparams){
-
+					const event_mcshower* ev_mcshower,
+					const event_cluster* ev_cluster,
+					const event_hit* ev_hits)
+  {
     //make a vector of MCShower indices 
     //McshowerLookback has a default 20MeV cut on these energies, don't have to do it here
     std::vector<UInt_t> MCShower_indices;
@@ -606,8 +559,11 @@ namespace larlight {
       //std::cout<<"after_merging is "<<after_merging<<", outer_clus_idx is "<<outer_clus_idx<<", size of _clusterparms is "<<_clusterparams.size()<<", size of clud_idx_vec is "<<clus_idx_vec.size()<<std::endl;
       //calculate opening_angle for ttree
       //get this from the clusterparams
-      _opening_angle = _clusterparams.at(cluster_params_idx).GetParams().opening_angle;
-    
+
+      if(after_merging)
+	_opening_angle = _mgr.GetClusters().at(cluster_params_idx).GetParams().opening_angle;
+      else
+	_opening_angle = _mgr.GetInputClusters().at(cluster_params_idx).GetParams().opening_angle;	
       //Fill ana TTree once per cluster
       if(ana_tree)
 	ana_tree->Fill();
@@ -690,46 +646,6 @@ namespace larlight {
     }//end loop over planes
     
   }//end fillFOMhistos
-    
-
-  void CMergePerformance::RunMerging(event_cluster* ev_cluster,
-				     event_hit* ev_hits)
-  {
-
-    std::vector<std::vector<larutil::PxHit> > local_clusters(ev_cluster->size(),
-							     std::vector<larutil::PxHit>()
-							     );
-
-    for(size_t i=0; i<ev_cluster->size(); ++i) {
-      
-      std::vector<unsigned short> hit_indexes(ev_cluster->at(i).association(hit_type));
-      
-      local_clusters.at(i).reserve(hit_indexes.size());
-      
-      for(auto index : hit_indexes) {
-	larutil::PxHit h;
-	h.w = ev_hits->at(index).Wire() * w2cm;
-	h.t = ev_hits->at(index).PeakTime() * t2cm;
-	h.plane = larutil::Geometry::GetME()->ChannelToPlane(ev_hits->at(index).Channel());
-	h.charge = ev_hits->at(index).Charge();
-	local_clusters.at(i).push_back(h);
-      }
-
-    }
-
-    //do the actual merging with those algos
-    //user needs to add algos etc w/ python, via GetManager() function
-    _mgr.SetClusters(local_clusters);
-    _mgr.Process();
-
-    //clear the clusterparams vector (which was CPAN params from before merging)
-    _clusterparams.clear();
-
-    //overwite the clusterparams vector w/ the merged CPAN params
-    _clusterparams=_mgr.GetClusters();
-    
-  }//end RunMerging
-
 
 }
 #endif
