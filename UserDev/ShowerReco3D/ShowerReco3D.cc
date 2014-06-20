@@ -79,6 +79,9 @@ namespace larlight {
       // Add association
       result.add_association(fClusterType,ass_index);
 
+      // Set ID
+      result.set_id(shower_v->size());
+
       // Store
       shower_v->push_back(result);
 
