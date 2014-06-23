@@ -1,12 +1,12 @@
-#ifndef DAVIDANA_CC
-#define DAVIDANA_CC
+#ifndef SAVEWF_CC
+#define SAVEWF_CC
 
-#include "DavidAna.hh"
+#include "SaveWF.hh"
 #include "math.h"
 
 namespace larlight {
 
-  bool DavidAna::initialize() {
+  bool SaveWF::initialize() {
 
 
     noise = new TH1D("noise", "Noise RMS; ADC-baseline; freq." , 10, -5, 5);
@@ -19,7 +19,7 @@ namespace larlight {
     return true;
   }
   
-  bool DavidAna::analyze(storage_manager* storage) {
+  bool SaveWF::analyze(storage_manager* storage) {
   
     //Count events (since variable seems set to 0)
     event_num += 1;
@@ -93,7 +93,7 @@ namespace larlight {
   }//End Analyze Loop
   
   
-  bool DavidAna::finalize() {
+  bool SaveWF::finalize() {
     
     noise->Write();
     rms->Write();

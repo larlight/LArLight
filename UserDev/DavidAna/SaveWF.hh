@@ -1,9 +1,9 @@
 /**
- * \file DavidAna.hh
+ * \file SaveWF.hh
  *
  * \ingroup Analysis
  * 
- * \brief Class def header for a class DavidAna
+ * \brief Class def header for a class SaveWF
  *
  * @author davidc1
  */
@@ -12,8 +12,8 @@
 
     @{*/
 
-#ifndef DAVIDANA_HH
-#define DAVIDANA_HH
+#ifndef SAVEWF_HH
+#define SAVEWF_HH
 
 #include "ana_base.hh"
 #include "Geometry.hh"
@@ -29,30 +29,30 @@
 
 namespace larlight {
   /**
-     \class DavidAna
+     \class SaveWF
      User custom analysis class made by davidc1
    */
-  class DavidAna : public ana_base{
+  class SaveWF : public ana_base{
   
   public:
 
     /// Default constructor
-    DavidAna(){ _name="DavidAna"; _fout=0;};
+    SaveWF(){ _name="SaveWF"; _fout=0;};
 
     /// Default destructor
-    virtual ~DavidAna(){};
+    virtual ~SaveWF(){};
 
-    /** IMPLEMENT in DavidAna.cc!
+    /** IMPLEMENT in SaveWF.cc!
         Initialization method to be called before the analysis event loop.
     */ 
     virtual bool initialize();
 
-    /** IMPLEMENT in DavidAna.cc! 
+    /** IMPLEMENT in SaveWF.cc! 
         Analyze a data event-by-event  
     */
     virtual bool analyze(storage_manager* storage);
 
-    /** IMPLEMENT in DavidAna.cc! 
+    /** IMPLEMENT in SaveWF.cc! 
         Finalize method to be called after all events processed.
     */
     virtual bool finalize();
