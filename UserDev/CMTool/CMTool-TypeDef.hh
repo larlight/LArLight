@@ -50,6 +50,7 @@
 #include "CFAlgoArray.hh"
 #include "CFAlgoQRatio.hh"
 #include "CFAlgoTimeOverlap.hh"
+#include "CFAlgoStartPointMatch.hh"
 //ADD_CFALGO_HEADER
 
 #include "MatchViewer.hh"
@@ -109,6 +110,7 @@ namespace cmtool {
   class CFAlgoArray;
   class CFAlgoQRatio;
   class CFAlgoTimeOverlap;
+  class CFAlgoStartPointMatch;
 //ADD_CFALGO_CLASS ... do not change this comment line
 
 }
@@ -134,6 +136,7 @@ namespace larlight {
 
 //ADD_EMPTY_CLASS ... do not change this comment line
 #endif
+
 
 
 

@@ -65,6 +65,7 @@
 #pragma link C++ class cmtool::CFAlgoArray+;
 #pragma link C++ class cmtool::CFAlgoQRatio+;
 #pragma link C++ class cmtool::CFAlgoTimeOverlap+;
+#pragma link C++ class cmtool::CFAlgoStartPointMatch+;
 //ADD_CFALGO_CLASS ... do not change this line
 
 
@@ -74,6 +75,7 @@
 #pragma link C++ class larlight::MatchViewer+;
 //ADD_NEW_CLASS ... do not change this line
 #endif
+
 
 
 
