@@ -10,7 +10,7 @@ namespace larlight {
 
 
     noise = new TH1D("noise", "Noise RMS; ADC-baseline; freq." , 10, -5, 5);
-    rms   = new TH1D("rms",   "RMS; ADC-baseline" ,              10,  0,10);
+
     _baseline      =     0;
     event_num      =     0;
     _PedInduction  =  2048;
@@ -23,7 +23,7 @@ namespace larlight {
   
     //Count events (since variable seems set to 0)
     event_num += 1;
-    if (event_num%10==0){
+    if ( event_num%100 == 0 ){
 
     const event_tpcfifo *event_wf = (event_tpcfifo*)(storage->get_data(DATA::TPCFIFO));
     //waveform counter
@@ -44,23 +44,21 @@ namespace larlight {
 
       bool interesting = false;
       UInt_t chan = tpc_data->channel_number();
-      //determine collection plane
-      //(for now by looking at value of first adc)
+      //determine  plane type
       if ( larutil::Geometry::GetME()->SignalType(chan) == larlight::GEO::kInduction)
 	_baseline = _PedInduction;
       else if ( larutil::Geometry::GetME()->SignalType(chan) == larlight::GEO::kCollection )
 	_baseline = _PedCollection;
       else 
 	_baseline = 1000;
-      //      std::cout << "Baseline: " << _baseline << std::endl;
-      //count how many waveforms from same channel
+
       if ( i > 0 ){
 	if ( chan == (&event_wf->at(i-1))->channel_number() ) {multiplicity += 1; }
 	else { multiplicity = 0; }
       }
 
       //Here allow for selection of 1 channel
-      if ( chan%1==0 ){
+      if ( chan == 137 ){
 	
 	//create temporary histogram
 	
@@ -77,8 +75,6 @@ namespace larlight {
 	  }
 	  else {
 	    noise->Fill(adcs-_baseline);
-	    double rmsbin = sqrt((adcs-_baseline)*(adcs-_baseline));
-	    rms->Fill(rmsbin);
 	  }
 	  ADChist->SetBinContent(adc_index+1,adcs);
 	}

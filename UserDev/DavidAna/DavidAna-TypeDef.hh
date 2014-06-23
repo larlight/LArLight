@@ -6,7 +6,7 @@
 #define DAVIDANA_TYPEDEF_HH
 
 // Header files included here
-#include "DavidAna.hh"
+#include "SaveWF.hh"
 #include "EvtDisplay.hh"
 #include "HitViewer.hh"
 #include "WFCompress.hh"
@@ -20,7 +20,7 @@
 // Class forward declaration here
 namespace larlight {
 
-  class DavidAna;
+  class SaveWF;
   class EvtDisplay;
   class HitViewer;
   class WFCompress;
@@ -34,6 +34,7 @@ namespace larlight {
 
 }
 #endif
+
 
 
 
