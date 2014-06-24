@@ -1,9 +1,9 @@
 /**
- * \file CFAlgoTimeOverlap.hh
+ * \file CFAlgoZOverlap.hh
  *
  * \ingroup CMTool
  * 
- * \brief Class def header for a class CFAlgoTimeOverlap
+ * \brief Class def header for a class CFAlgoZOverlap
  *
  * @author ah673_NAME
  */
@@ -11,26 +11,26 @@
 /** \addtogroup CMTool
 
     @{*/
-#ifndef CFALGOTIMEOVERLAP_HH
-#define CFALGOTIMEOVERLAP_HH
+#ifndef CFALGOZOVERLAP_HH
+#define CFALGOZOVERLAP_HH
 
 #include "CFloatAlgoBase.hh"
 
 namespace cmtool {
   /**
-     \class CFAlgoTimeOverlap
+     \class CFAlgoZOverlap
      User implementation for CFloatAlgoBase class
      doxygen documentation!
   */
-  class CFAlgoTimeOverlap : public CFloatAlgoBase {
+  class CFAlgoZOverlap : public CFloatAlgoBase {
     
   public:
     
     /// Default constructor
-    CFAlgoTimeOverlap();
+    CFAlgoZOverlap();
     
     /// Default destructor
-    virtual ~CFAlgoTimeOverlap(){};
+    virtual ~CFAlgoZOverlap(){};
 
     //
     // Author should be aware of 3 functions at least: Float, Report, 
@@ -76,7 +76,7 @@ namespace cmtool {
     //virtual void IterationEnd();
 
 	protected:
-		float _time_ratio_cut ;
+		float _wire_ratio_cut;
 
   };
 }
