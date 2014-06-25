@@ -77,6 +77,8 @@ namespace cmtool {
 
 	protected:
 		float _time_ratio_cut ;
+		float _start_time_cut ;
+		float _N_Hits_cut	  ;
 
   };
 }
