@@ -23,8 +23,8 @@ namespace cmtool {
   void CMatchManager::EventBegin()
   {
     if(_debug_mode <= kPerMerging) {
-      _match_algo->SetVerbose(true);
-      _priority_algo->SetVerbose(true);
+      if(_match_algo)    _match_algo->SetVerbose(true);
+      if(_priority_algo) _priority_algo->SetVerbose(true);
     }
 
     _match_algo->IterationBegin(_in_clusters);
@@ -121,8 +121,8 @@ namespace cmtool {
     }
 
     if(_debug_mode <= kPerIteration) {
-      _match_algo->Report();
-      _priority_algo->Report();
+      if(_match_algo) _match_algo->Report();
+      if(_priority_algo) _priority_algo->Report();
     }
     
     return false;
