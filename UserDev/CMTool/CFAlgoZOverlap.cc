@@ -26,11 +26,21 @@ namespace cmtool {
 	if(clusters.size()) return 1.;
     else return -1.;
 
-	double wire_distance 	= 0;
-	double ratio 		= 1;
-//	double length_max	= 0;	
-	double max_wire_distance= -1;
+	double wire_distance 		= 0;
+	double ratio 				= 1;
+	double max_wire_distance	= -1;
+
+   /*	float start_wire1          = clusters.at(0)->GetParams().start_point.w ;
+   	float end_wire1            = clusters.at(0)->GetParams().end_point.w ;
+   	float start_wire2          = clusters.at(1)->GetParams().start_point.w ;
+   	float end_wire2            = clusters.at(1)->GetParams().end_point.w ;
+   	float start_wire3          = clusters.at(2)->GetParams().start_point.w ;
+   	float end_wire3            = clusters.at(2)->GetParams().end_point.w ;
 	
+	float distance1 	   	   = end_wire1 - start_wire1 ;
+	float distance2			   = end_wire2 - start_wire2 ;
+	float distance3			   = end_wire3 - start_wire3 ; 
+*/
 	for(auto const& c : clusters){
 	
 		wire_distance = c->GetParams().end_point.w - c->GetParams().start_point.w ;
@@ -38,22 +48,15 @@ namespace cmtool {
 		if(max_wire_distance < wire_distance)
 			max_wire_distance = wire_distance;
 	
-//		if(length_max < c->GetParams().length)
-//    		length_max = c->GetParams().length;
 		}
 
  	for(auto const& c : clusters){
 	
 			wire_distance = c->GetParams().end_point.w - c->GetParams().start_point.w ;
-
-//			ratio *= c->GetParams().length / length_max ;
  			ratio *= wire_distance / max_wire_distance ; 
 			
 		}	
-    
-	
 
-	//return(ratio > _wire_ratio_cut ? ratio : -1	)
 	return(ratio) ;
 
   }

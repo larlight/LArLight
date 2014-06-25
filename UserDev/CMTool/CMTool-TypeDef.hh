@@ -51,6 +51,7 @@
 #include "CFAlgoQRatio.hh"
 #include "CFAlgoTimeOverlap.hh"
 #include "CFAlgoZOverlap.hh"
+#include "CFAlgoStartPointMatch.hh"
 //ADD_CFALGO_HEADER
 
 #include "MatchViewer.hh"
@@ -111,6 +112,7 @@ namespace cmtool {
   class CFAlgoQRatio;
   class CFAlgoTimeOverlap;
   class CFAlgoZOverlap;
+  class CFAlgoStartPointMatch;
 //ADD_CFALGO_CLASS ... do not change this comment line
 
 }

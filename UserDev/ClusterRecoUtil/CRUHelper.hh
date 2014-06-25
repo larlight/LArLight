@@ -22,7 +22,7 @@ namespace cluster {
 
   /**
      \class CRUHelper
-     This class bridges the framework and ClusterRecoUtil package be being an interface
+     This class bridges the framework and ClusterRecoUtil package by being an interface
      to the framework's data products. Its mere purpose is to generate ClusterParamsAlg
      instances from hit lists (fmwk data products).
   */

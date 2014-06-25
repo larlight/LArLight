@@ -16,8 +16,8 @@
 #define CMERGEPERFORMANCE_HH
 
 #include "ana_base.hh"
-#include "ClusterParamsAlgNew.hh"
 #include "CMergeManager.hh"
+#include "CRUHelper.hh"
 #include "McshowerLookback.hh"
 
 #include <TStopwatch.h>
@@ -95,18 +95,10 @@ namespace larlight {
     
     void PrepareTTree();
 
-    void FillClusterParamsVector(event_cluster* ev_cluster,
-				 event_hit* ev_hits);
-
     void FillFOMHistos(bool before_merging,
-		       event_mcshower* ev_mcshower,
-		       event_cluster* ev_cluster,
-		       event_hit* ev_hits,
-		       const std::vector< ::cluster::ClusterParamsAlgNew> &_clusterparams);
-
-
-    void RunMerging(event_cluster* ev_cluster,
-		    event_hit* ev_hits);
+		       const event_mcshower* ev_mcshower,
+		       const event_cluster* ev_cluster,
+		       const event_hit* ev_hits);
 
 
     ///vector of CPAN objects (before, and overwritten after merging)
@@ -121,6 +113,9 @@ namespace larlight {
 
     //declare a member of CMergeManager class called _mgr
     ::cmtool::CMergeManager _mgr;
+
+    /// CRU helper
+    ::cluster::CRUHelper _cru_helper;
     
     bool _run_before_merging, _run_merging;
     double _MCShower_mother_energy_cutoff;
@@ -134,8 +129,6 @@ namespace larlight {
     //some maps that mcshowerlookback fills once per event
     std::map<UInt_t,UInt_t> _shower_idmap;
     std::map<UShort_t,larlight::simch> _simch_map;
-
-    Double_t w2cm, t2cm;
     
     //neural net path needed
     std::string myNeuralNetPath;
@@ -169,8 +162,6 @@ namespace larlight {
     double _clusQfrac_from_unknown;
     GEO::View_t _plane;
     bool _after_merging;
-
-
 
     bool _debug;
 

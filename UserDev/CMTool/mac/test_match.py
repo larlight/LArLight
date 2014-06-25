@@ -22,7 +22,7 @@ proc = fmwk.ClusterMatcher()
 
 #proc.GetManager().AddPriorityAlgo(priority_algo)
 
-proc.GetManager().AddMatchAlgo(cmtool.CFAlgoQRatio())
+proc.GetManager().AddMatchAlgo(cmtool.CFAlgoTimeOverlap())
 
 #proc.GetManager().DebugMode(cmtool.CMatchManager.kPerIteration)
 #proc.GetManager().DebugMode(cmtool.CMatchManager.kPerAlgoSet)

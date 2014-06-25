@@ -1259,7 +1259,7 @@ namespace cluster{
     double hit_counter_forward  = 0;
     double hit_counter_backward = 0;
     
-    if (endStartDiff_y == 0 && endStartDiff_x == 0) {
+    if (verbose && endStartDiff_y == 0 && endStartDiff_x == 0) {
       std::cerr << "Error:  end point and start point are the same!\n";
       return;
     }

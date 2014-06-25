@@ -9,7 +9,8 @@ namespace cmtool {
   CFAlgoTimeOverlap::CFAlgoTimeOverlap() : CFloatAlgoBase()
   //-------------------------------------------------------
   {
-		//_time_ratio_cut = something;
+		_time_ratio_cut = 0.7 ;   //TEMPORARY
+
   }
 
   //-----------------------------
@@ -24,38 +25,49 @@ namespace cmtool {
   //----------------------------------------------------------------------------------------------
    {
 	
-   if(clusters.size()) return 1.;
-    else return -1.;
-
-	double time_difference		 = 0;
-	double max_time_difference	 = -1;
 	double ratio				 = 1;
+	double time_difference		 = 0;
+	double max_time_difference	 = 0;
+
 
 	for(auto const& c : clusters){
+		time_difference  = c->GetParams().start_point.t - c->GetParams().end_point.t ; 
 
-			time_difference = c->GetParams().end_point.t - c->GetParams().start_point.t;
-//			std::cout<<"Testing..." <<c->GetParams().start_point.plane ;
-		
-			if(max_time_difference < time_difference)
-				max_time_difference = time_difference ;
-
-		}
-
-	for(auto const& c : clusters){
-			time_difference = c->GetParams().end_point.t - c->GetParams().start_point.t;
-//			ratio *= time_difference/ max_time_difference ;
-
-	    	//electron takes 1.875 us/plane
-			if(time_difference >=0 && time_difference <= 3.75)
-				ratio *= time_difference/ max_time_difference ;
-			else ratio = 0 ;
+		if(time_difference < 0) 
+			time_difference *= -1; 
+	
+		if(max_time_difference < time_difference)
+			max_time_difference = time_difference ;
 		}
 
 
-	if(_verbose)
-		std::cout<<"Time overlap? "<<std::endl;
- 	
-return(ratio) ;
+	 for(auto const& c: clusters){
+		time_difference  = c->GetParams().start_point.t - c->GetParams().end_point.t ; 
+	
+		if(time_difference<0)
+			time_difference *= -1;
+	
+		ratio *= time_difference/max_time_difference ;
+
+		if(ratio !=1 && ratio >0.5){	
+		std::cout<<"\nStart point: "<<c->GetParams().start_point.t<<std::endl;
+		std::cout<<"End Point: "<<c->GetParams().end_point.t  <<std::endl;
+		std::cout<<"Max Time diff: "<<max_time_difference<<std::endl;
+		std::cout<<"Time diff: "<<time_difference<<std::endl;
+		std::cout<<"ratio for each cluster: "<<ratio<<std::endl;
+		}
+	}
+		std::cout<<"Ratio is : "<<ratio<<std::endl; 	
+
+ 
+	if(_verbose){
+	//	std::cout<<"Time overlap? "<<std::endl;
+//		std::cout<<"Max Time diff: "<<max_time_difference<<std::endl;
+//		std::cout<<"Time diff: "<<time_difference<<std::endl;
+		std::cout<<"Ratio is : "<<ratio<<std::endl; 	
+	  }
+
+	return (ratio > _time_ratio_cut ? ratio : -1 ); 
 
 }
 
@@ -64,7 +76,6 @@ return(ratio) ;
   void CFAlgoTimeOverlap::Report()
   //------------------------------
   {
-
   }
     
 }

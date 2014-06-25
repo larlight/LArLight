@@ -8,14 +8,14 @@ namespace larutil{
     public:
       double w; // wire distance in cm
       double t; // time distance in cm (drift distance)
-      unsigned int plane; // plane 0, 1, 2
+      unsigned char plane; // plane 0, 1, 2
       
       PxPoint(){
 	Clear();
 	//	std::cout<< "This is the default point ctor." << std::endl;
       }
       
-      PxPoint(unsigned int pp,double ww,double tt){
+      PxPoint(unsigned char pp,double ww,double tt){
 	plane=pp;
 	w=ww;
 	t=tt;
@@ -35,8 +35,9 @@ namespace larutil{
     
   public:
     
-    double charge; //charge
-    
+    double charge; ///< area charge
+    double peak;   ///< peak amplitude
+
     PxHit(){
       Clear();
     }
@@ -46,6 +47,7 @@ namespace larutil{
     {
       PxPoint::Clear();
       charge = 0;
+      peak   = 0;
     }
 
   };
@@ -62,9 +64,9 @@ namespace larutil{
     double t0; ///<defined to be the vertex t-position
     double w1; ///<defined to be the ending w-position (of line or seed depending)
     double t1; ///<defined to be the ending t-position (of line or seed depending)
-    unsigned int plane;
+    unsigned char plane;
     
-    PxLine(unsigned int pp,double ww0,double tt0, double ww1, double tt1){
+    PxLine(unsigned char pp,double ww0,double tt0, double ww1, double tt1){
       Clear();
       plane=pp;
       w0=ww0;
