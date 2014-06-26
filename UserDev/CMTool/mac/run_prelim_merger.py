@@ -9,7 +9,7 @@ mgr = fmwk.ana_processor()
 mgr.add_input_file(sys.argv[1])
 
 mgr.set_input_rootdir("scanner")
-
+mgr.set_output_rootdir("scanner")
 #arg2 should be output file name
 mgr.set_output_file(sys.argv[2])
 
