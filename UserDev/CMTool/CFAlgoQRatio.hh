@@ -59,7 +59,7 @@ namespace cmtool {
   protected:
     
     float _qratio_cut;
-
+	float _N_Hits_cut;
   };
 }
 #endif
