@@ -36,8 +36,10 @@ namespace cmtool {
 	  if(c->GetParams().N_Hits >_N_Hits_cut){
 
     		if(c->GetParams().sum_charge < 0) {
-			//	if(_verbose) 
-					  std::cout << "\033[00m Found a cluster with negative charge!\033[00m ... aborting " << __FUNCTION__ <<std::endl;
+				if(_verbose) 
+					  std::cout 
+					<< "\033[00m Found a cluster with negative charge!\033[00m ... aborting " 
+					<< __FUNCTION__ <<std::endl;
 				  	  return -1;
     	 		 }
 
@@ -52,30 +54,18 @@ namespace cmtool {
     for(auto const& c : clusters){
 		if(c->GetParams().N_Hits>_N_Hits_cut){
 	        ratio *= c->GetParams().sum_charge / q_max;
-
-	/*		if(c->GetParams().N_Hits>_N_Hits_cut&& ratio > _qratio_cut){
-			std::cout<<"\nRatio is: "<<ratio<<std::endl;
-			std::cout<<"Sum charge per cluster: "<<c->GetParams().sum_charge<<std::endl;
-			std::cout<<"q_max: "<<q_max <<std::endl;	 
-			std::cout<<"N hits: "<<c->GetParams().N_Hits<<std::endl;
-     	    std::cout << "Computed ratio: " << ratio<<std::endl; 
-			}*/
-		
-		std::cout<<"Hits: "<<c->GetParams().N_Hits<<std::endl;
-
-		}
-		//Modify the ratio of those cluster with < _N_Hits_cut
+	
+			if(_verbose){
+				std::cout<<"Sum Charge: "<<c->GetParams().sum_charge ;
+				std::cout<<"Q max : "<<q_max<<std::endl ;
+				std::cout<<"Ratio is: "<<ratio<<std::endl;	
+			  }
+		 }	
+		//Modify the ratio of those cluster with < _N_Hits_cut to remove them from matching process
 		else
 			ratio*=0.1; 
-
 	}
 	
-std::cout<<"********END OF CLUSTER PERMUTATION*********"<<std::endl;
-if(ratio>_qratio_cut )
-	std::cout<<"FOUND A pair wooooooooooooooooooooooooooooooooooooooooooooooooo: "<<ratio<<std::endl;
-
-
-_verbose = kFALSE ;	
    		  if(_verbose) {
       	  	if( ratio > _qratio_cut ) std::cout << " ... pass!" << std::endl;
      	  	else std::cout << " ... below cut value: " << _qratio_cut << std::endl;
