@@ -558,51 +558,51 @@ int multiple_detector_fit()
 			eventsnL[point] 	= makeHistogram(eventsnLVec[point]		, 0	, nbins);
 			eventsnLfit[point]	= makeHistogram(eventsnLfitVec[point]	, 0	, nbins);
 			if (point == 0){
-				eventsnLcvVec 	= appendVectors(eventsnuefoscVec[0]	, eventsnueVec[0], eventsnumuVec[0]);
-				eventsnLnullVec = appendVectors(blankVector			, eventsnueVec[0], eventsnumuVec[0]);
-				eventsnLcv 		= makeHistogram(eventsnLcvVec		, 0	, nbins);
-				eventsnLnull 	= makeHistogram(eventsnLnullVec		, 0	, nbins);
+			  eventsnLcvVec 	= appendVectors(eventsnuefoscVec[0]	, eventsnueVec[0], eventsnumuVec[0]);
+			  eventsnLnullVec = appendVectors(blankVector			, eventsnueVec[0], eventsnumuVec[0]);
+			  eventsnLcv 		= makeHistogram(eventsnLcvVec		, 0	, nbins);
+			  eventsnLnull 	= makeHistogram(eventsnLnullVec		, 0	, nbins);
 			}
 		}
 		else if (nL == 2) { //two baselines
-			//append the vectors:
-			eventsnLVec[point] = appendVectors(	appendVectors(eventsnueoscVec[0][point], eventsnueVec[0], eventsnumuVec[0]),
-												appendVectors(eventsnueoscVec[1][point], eventsnueVec[1], eventsnumuVec[1]));
-			eventsnLfitVec[point] = eventsnLVec[point];
-			//make them into histograms, just for display:
-			eventsnL[point] 	= makeHistogram(eventsnLVec[point]		, 0	, nbins);
-			eventsnLfit[point]	= makeHistogram(eventsnLfitVec[point]	, 0	, nbins);
-			if (point == 0){
-				eventsnLcvVec 	= appendVectors(appendVectors(eventsnuefoscVec[0]	, eventsnueVec[0], eventsnumuVec[0]),
-												appendVectors(eventsnuefoscVec[1]	, eventsnueVec[1], eventsnumuVec[1]));
-				eventsnLnullVec = appendVectors(appendVectors(blankVector			, eventsnueVec[0], eventsnumuVec[0]),
-												appendVectors(blankVector			, eventsnueVec[1], eventsnumuVec[1]));
-				eventsnLcv 		= makeHistogram(eventsnLcvVec		, 0	, nbins);
-				eventsnLnull 	= makeHistogram(eventsnLnullVec		, 0	, nbins);
-			}
+		  //append the vectors:
+		  eventsnLVec[point] = appendVectors(	appendVectors(eventsnueoscVec[0][point], eventsnueVec[0], eventsnumuVec[0]),
+							appendVectors(eventsnueoscVec[1][point], eventsnueVec[1], eventsnumuVec[1]));
+		  eventsnLfitVec[point] = eventsnLVec[point];
+		  //make them into histograms, just for display:
+		  eventsnL[point] 	= makeHistogram(eventsnLVec[point]		, 0	, nbins);
+		  eventsnLfit[point]	= makeHistogram(eventsnLfitVec[point]	, 0	, nbins);
+		  if (point == 0){
+		    eventsnLcvVec 	= appendVectors(appendVectors(eventsnuefoscVec[0]	, eventsnueVec[0], eventsnumuVec[0]),
+							appendVectors(eventsnuefoscVec[1]	, eventsnueVec[1], eventsnumuVec[1]));
+		    eventsnLnullVec = appendVectors(appendVectors(blankVector			, eventsnueVec[0], eventsnumuVec[0]),
+						    appendVectors(blankVector			, eventsnueVec[1], eventsnumuVec[1]));
+		    eventsnLcv 		= makeHistogram(eventsnLcvVec		, 0	, nbins);
+		    eventsnLnull 	= makeHistogram(eventsnLnullVec		, 0	, nbins);
+		  }
 		}
 		else if (nL == 3) { //three baselines
-			//append the vectors:
-			eventsnLVec[point] = appendVectors(	appendVectors(eventsnueoscVec[0][point], eventsnueVec[0], eventsnumuVec[0]),
-												appendVectors(eventsnueoscVec[1][point], eventsnueVec[1], eventsnumuVec[1]),
-												appendVectors(eventsnueoscVec[2][point], eventsnueVec[2], eventsnumuVec[2]));
-			eventsnLfitVec[point] = eventsnLVec[point];
-			//make them into histograms, just for display:
-			eventsnL[point] 	= makeHistogram(eventsnLVec[point]		, 0	, nbins);
-			eventsnLfit[point]	= makeHistogram(eventsnLfitVec[point]	, 0	, nbins);
-			if (point == 0){
-				eventsnLcvVec 	= appendVectors(appendVectors(eventsnuefoscVec[0]	, eventsnueVec[0], eventsnumuVec[0]),
+		  //append the vectors:
+		  eventsnLVec[point] = appendVectors(	appendVectors(eventsnueoscVec[0][point], eventsnueVec[0], eventsnumuVec[0]),
+							appendVectors(eventsnueoscVec[1][point], eventsnueVec[1], eventsnumuVec[1]),
+							appendVectors(eventsnueoscVec[2][point], eventsnueVec[2], eventsnumuVec[2]));
+		  eventsnLfitVec[point] = eventsnLVec[point];
+		  //make them into histograms, just for display:
+		  eventsnL[point] 	= makeHistogram(eventsnLVec[point]		, 0	, nbins);
+		  eventsnLfit[point]	= makeHistogram(eventsnLfitVec[point]	, 0	, nbins);
+		  if (point == 0){
+		    eventsnLcvVec 	= appendVectors(appendVectors(eventsnuefoscVec[0]	, eventsnueVec[0], eventsnumuVec[0]),
 												appendVectors(eventsnuefoscVec[1]	, eventsnueVec[1], eventsnumuVec[1]),
-												appendVectors(eventsnuefoscVec[2]	, eventsnueVec[2], eventsnumuVec[2]));
-				eventsnLnullVec = appendVectors(appendVectors(blankVector			, eventsnueVec[0], eventsnumuVec[0]),
-												appendVectors(blankVector			, eventsnueVec[1], eventsnumuVec[1]),
-												appendVectors(blankVector			, eventsnueVec[2], eventsnumuVec[2]));
+							appendVectors(eventsnuefoscVec[2]	, eventsnueVec[2], eventsnumuVec[2]));
+		    eventsnLnullVec = appendVectors(appendVectors(blankVector			, eventsnueVec[0], eventsnumuVec[0]),
+						    appendVectors(blankVector			, eventsnueVec[1], eventsnumuVec[1]),
+						    appendVectors(blankVector			, eventsnueVec[2], eventsnumuVec[2]));
 				eventsnLcv 		= makeHistogram(eventsnLcvVec		, 0	, nbins);
 				eventsnLnull 	= makeHistogram(eventsnLnullVec		, 0	, nbins);
-			}	
+		  }	
 		}
 		else { //4+ baselines.  No way!
-			std::cout << "This macro doesn't handle more than 3 baselines." << std::endl;
+		  std::cout << "This macro doesn't handle more than 3 baselines." << std::endl;
 		}
 	}
 	

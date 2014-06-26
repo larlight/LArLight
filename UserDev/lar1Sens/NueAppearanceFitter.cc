@@ -1,5 +1,4 @@
 
-
 #include "NueAppearanceFitter.hh"
 
 namespace lar1{
@@ -8,7 +7,7 @@ namespace lar1{
     //---------------Start of section you can alter to change the baselines:
 
     //Self explanatory, this is where the ntuples you want to use are located:
-    fileSource="/Users/cja33/Desktop/LAr1ND/lar1Repos/lar1/MC2_proposal_ntuples/";
+    //  fileSource="/Users/cja33/Desktop/LAr1ND/lar1Repos/lar1/MC2_proposal_ntuples/";
     //Note: parts of this routine will write to that same folder, 
     //make sure its writable!
 
@@ -74,8 +73,11 @@ namespace lar1{
     useNearDetStats = true;           // Only matters if the covariance matrix vector is empty.
     shapeOnlyFit = false;              // Only matters with near detd stats = true
     nearDetSystematicError = 0.20;  // Only matters if userNearDetStats = true
-    // std::vector<std::string>  cov_max_name;
-    //cov_max_name.push_back(mode+"_covariance_matrix/output_fraccovmx_xsec.out");
+    std::vector<std::string>  cov_max_name;
+    //    if(useNearDetStats == false){    
+    cov_max_name.push_back("matrices/s_no_osc_matrix.out");
+
+      //}
   }
 
   int NueAppearanceFitter::Prepare(){
@@ -306,6 +308,7 @@ namespace lar1{
             return 1;
         }
         returnVal = readerNumu[i].processData();
+	if (useT600){continue;}
         if (returnVal) {  //only returns 0 on successful completion
             std::cout << "Error: failed to read the ntuple at " << L << " with error " << returnVal;
             std::cout << std::endl;
@@ -561,10 +564,17 @@ namespace lar1{
     //This is going to come from a txt file, from Georgia
     // fracentries = std::vector<float>( nbins, std::vector<float> ( nbins, 0.0 ) );
     fracentries.resize(nbins);
+    //    for(int i = 0; i < nbins; i++){
+    //  fracentries[i].resize(nbins);  
+    // }
     for (auto & row : fracentries) row.resize(nbins);
     //initialized to zero
-  
-    if (cov_max_name.size()) utils.buildCovarianceMatrix(fracentries, cov_max_name, nbins);
+    //Try it here I guess
+    
+    cov_max_name.push_back("matrices/s_no_osc_matrix.out");
+
+    if (cov_max_name.size() != 0) utils.buildCovarianceMatrix(fracentries, cov_max_name, nbins);
+
     //if there is nothing in the covariance matrix vector, going to use near detector
     //statistics as the systematics downstream.  This involves going and finding
     //the near detector statistics in each case, and then populating the covariance matrix
@@ -577,7 +587,7 @@ namespace lar1{
 
     // For shape only fits, the near det stats get recalculated each time chi2 gets
     // calculate.  But we do them once out here too, for the shape+rate fit.
-    if (!cov_max_name.size()){
+    if (cov_max_name.size() == 0){
       //by design, the nearest detector to the source is the first in the vector
       //of baselines.
       nearDetStats.resize(nbinsE*3);
@@ -593,7 +603,7 @@ namespace lar1{
         for (unsigned int i = 0; i < nearDetStats.size(); i++){
           std::cout << "\tBin " << i << ":\t" << nearDetStats[i] << "\n";
         }
-    }
+      }
 
 
   // }
@@ -750,10 +760,6 @@ namespace lar1{
           }
         }
 
-
-
-
-
         // At this point, prediction vec is the 2*nbinsE*nL long vector that holds
         // the null+signal
         // nullVec is the (corrected, if necessary) background
@@ -780,6 +786,7 @@ namespace lar1{
         statisticalErrors.clear();
         systematicErrors.resize(nL);
         statisticalErrors.resize(nL);       
+
         for (int b_line = 0; b_line < nL; b_line++){
           systematicErrors.at(b_line).clear();
           statisticalErrors.at(b_line).clear();
@@ -932,13 +939,17 @@ namespace lar1{
             }
           }
         } //end if on "cov_max_name.size() == 0"      
+
+
+	// Joseph Joseph Joseph Joseph Joseph Joseph
+
         else{ //use the full blown covariance matrix.  Loop over every entry.
           //Can't forget to add in the statistical errors on the diagonal!
           for (int ibin = 0; ibin < nbins; ibin++){
             for (int jbin = 0; jbin < nbins; jbin ++){
               double cvi = eventsnLVecTemp[ibin];
               double cvj = eventsnLVecTemp[jbin];
-              if ( (ibin%(nbinsE*3)) <nbinsE ) cvi *= sin22th; //scale the oscillated signal
+	      if ( (ibin%(nbinsE*3)) <nbinsE ) cvi *= sin22th; //scale the oscillated signal
               if ( (jbin%(nbinsE*3)) <nbinsE ) cvj *= sin22th; //scale the oscillated signal
 
               //Now scale the entries:
@@ -1065,8 +1076,8 @@ namespace lar1{
                       if (sin22thpoint == sin22thFittingPoint && dm2point == dm2FittingPoint){
                         if (ibin == jbin){
                           std::cout << "On bin " << ibin << ", adding chi2 = " << (predictioni-cvi)*(predictionj-cvj)* (*cov)(ibin-1,jbin-1) << std::endl;
-                          std::cout << "  nearDetStats error on this bin is "<< nearDetStats[ibin%(2*nbinsE)] << std::endl;
-                          std::cout << "  ibin: "<< ibin << " Prediction: " << predictioni << " cvi: " << cvi;
+			  //            std::cout << "  nearDetStats error on this bin is "<< nearDetStats[ibin%(2*nbinsE)] << std::endl;
+			  std::cout << "  ibin: "<< ibin << " Prediction: " << predictioni << " cvi: " << cvi;
                           std::cout << "  M^-1: " << (*cov)(ibin-1,jbin-1) << std::endl;
                         }
                       }
@@ -1426,7 +1437,7 @@ namespace lar1{
     leg3->AddEntry(gdummy1,"LSND 99% CL","F");
     leg3->AddEntry(gdummy3,"LSND Best Fit","P*");
     leg3->AddEntry(gdummy4,"Global Best Fit","P*");
-    leg3->AddEntry(gdummy0,"Global Fit 90% CL (J. Kopp et al. arXiv:1303.3011)");   
+    leg3->AddEntry(gdummy0,"Global Fit 90% CL (arXiv:1303.3011)");   
     leg3->Draw();
     
     TImage *img = TImage::Create();

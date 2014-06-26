@@ -263,23 +263,26 @@ namespace lar1
     {
         const char * name = (*it).c_str();
         double readInArray[nbins][nbins];
-        std::cout << "\nReading in covariance matric from " << name << std::endl;
+        std::cout << "\nReading in covariance matrix from " << name << std::endl;
         if (fileExists(name) ){
             ifstream indata(name);
+	    std::string line;
+	    std::getline(indata, line);
+	    std::stringstream ss(line);
             for (int i = 0; i < nbins; i ++ ){
-                std::string line;
-                std::getline(indata, line);
-                std::stringstream ss(line);
+	      //                std::string line;
+	      //                std::getline(indata, line);
+	      //                std::stringstream ss(line);
                 for (int j = 0; j < nbins; j ++ ){
                     ss >> readInArray[i][j];
                 }    
             }
             //Quick check on corner entries:
-            //std::cout << "Covariance Matrix " << name << "is read, check entries...?" << std::endl;
-            //std::cout << "Top left: " << readInArray[0][0] << std::endl;
-            //std::cout << "Bottom left: " << readInArray[0][nbins-1] << std::endl;
-            //std::cout << "Top right: " << readInArray[nbins-1][0] << std::endl;
-            //std::cout << "Bottom right: " << readInArray[nbins-1][nbins-1] << std::endl;    
+            std::cout << "Covariance Matrix " << name << "is read, check entries...?" << std::endl;
+            std::cout << "Top left: " << readInArray[0][0] << std::endl;
+            std::cout << "Bottom left: " << readInArray[0][nbins-1] << std::endl;
+            std::cout << "Top right: " << readInArray[nbins-1][0] << std::endl;
+            std::cout << "Bottom right: " << readInArray[nbins-1][nbins-1] << std::endl;    
         }
         else{
             std::cout << "Error while building covariance matrix: can't find file: \n" ;
