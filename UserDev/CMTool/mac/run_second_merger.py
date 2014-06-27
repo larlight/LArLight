@@ -28,6 +28,13 @@ proc.SaveOutputCluster(True)
 ########################################
 
 ########################################
+# Remove tracks with priority algo!
+########################################
+proc.GetManager().AddPriorityAlgo(cmtool.CPAlgoIgnoreTracks())
+
+
+
+########################################
 # PROHIBIT ALGORITHMS
 ########################################
 prohib_array = cmtool.CBAlgoArray()
@@ -52,7 +59,7 @@ angle_prohibit.SetUseOpeningAngle(False)
 #this prohibits clusters w/ angles different than 10 degrees
 angle_prohibit.SetAngleCut(10.)
 angle_prohibit.SetMinLength(20.)
-angle_prohibit.SetDebug(True)
+angle_prohibit.SetDebug(False)
 prohib_array.AddAlgo(angle_prohibit,False)
 
 proc.GetManager().AddSeparateAlgo(prohib_array)
@@ -94,9 +101,6 @@ proc.GetManager().AddMergeAlgo(algo_array)
 # CMergeManager options
 ########################################
 proc.GetManager().MergeTillConverge(True)
-#need to modify this. this no longer works. make a merge priority algo that uses only nhits?
-#i think default is number of hits so maybe this is OK for now
-#proc.GetManager().SetMergePriority(cmtool.CMergeManager.kNHits)
 
 
 mgr.add_process(proc)
