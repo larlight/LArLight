@@ -77,7 +77,7 @@ namespace cmtool {
 
 	protected:
 		float _wire_ratio_cut;
-
+		float _N_Hits_cut ;
   };
 }
 #endif
