@@ -194,6 +194,8 @@ namespace larlight {
     std::cout<<"Width = "<<cl.GetParams().width<<std::endl;
     std::cout<<"N_Hits = "<<cl.GetParams().N_Hits<<std::endl;
     std::cout<<"eigenvalue_principal = "<<cl.GetParams().eigenvalue_principal<<std::endl;
+    std::cout<<"modified hit density = "<<cl.GetParams().modified_hit_density<<std::endl;
+    std::cout<<"multi hit wires = "<<cl.GetParams().multi_hit_wires<<std::endl;
   }
   
 }
