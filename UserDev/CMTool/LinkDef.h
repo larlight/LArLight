@@ -35,6 +35,7 @@
 #pragma link C++ class cmtool::CPAlgoNHits+;
 #pragma link C++ class cmtool::CPAlgoQSum+;
 #pragma link C++ class cmtool::CPAlgoPolyArea+;
+#pragma link C++ class cmtool::CPAlgoIgnoreTracks+;
 //ADD_CPALGO_CLASS ... do not change this line
 
 #pragma link C++ class cmtool::CBAlgoArray+;
@@ -76,6 +77,7 @@
 #pragma link C++ class larlight::MatchViewer+;
 //ADD_NEW_CLASS ... do not change this line
 #endif
+
 
 
 

@@ -22,6 +22,7 @@
 #include "CPAlgoNHits.hh"
 #include "CPAlgoQSum.hh"
 #include "CPAlgoPolyArea.hh"
+#include "CPAlgoIgnoreTracks.hh"
 //ADD_CPALGO_HEADER
 
 #include "CBAlgoArray.hh"
@@ -82,6 +83,7 @@ namespace cmtool {
   class CPAlgoNHits;
   class CPAlgoQSum;
   class CPAlgoPolyArea;
+  class CPAlgoIgnoreTracks;
 //ADD_CPALGO_CLASS ... do not change this comment line
 
   class CBAlgoArray;
@@ -138,6 +140,7 @@ namespace larlight {
 
 //ADD_EMPTY_CLASS ... do not change this comment line
 #endif
+
 
 
 
