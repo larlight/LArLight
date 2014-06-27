@@ -52,9 +52,9 @@ namespace cmtool {
 
     bool isTrack = false;
     if(cluster.GetNHits() > _min_hits &&
-       cluster.GetParams().modified_hit_density > _min_mod_hit_dens &&
-       cluster.GetParams().multi_hit_wires > _min_multihit_wires &&
-       fPrincipal > _min_principal)
+       cluster.GetParams().modified_hit_density < _min_mod_hit_dens &&
+       cluster.GetParams().multi_hit_wires < _min_multihit_wires &&
+       fPrincipal < _min_principal)
       isTrack = true;
 
     return isTrack;
