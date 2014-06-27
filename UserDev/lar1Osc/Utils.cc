@@ -29,16 +29,16 @@ namespace lar1{
     // These coordinates try to represent the actual beam center.
     // Bathtub option:
     // iDet = 0
-    nd_xmin = -80.0;
-    nd_xmax =  320.0;
+    nd_xmin = -200.0;
+    nd_xmax =  200.0;
     nd_ymin = -242.0;
     nd_ymax =  158.0;
     nd_zmin =  0.0;
     nd_zmax =  365.0;
 
     // iDet = ?
-    nd_long_xmin = -80.0;
-    nd_long_xmax =  320.0;
+    nd_long_xmin = -200.0;
+    nd_long_xmax =  200.0;
     nd_long_ymin = -242.0;
     nd_long_ymax =  158.0;
     nd_long_zmin =  0.0;
@@ -47,8 +47,8 @@ namespace lar1{
     // Other option, shorter
 
     // iDet = 1
-    ub_xmin =  0.0;
-    ub_xmax =  256.0;
+    ub_xmin =  -128.0;
+    ub_xmax =  128.0;
     ub_ymin = -116.5;
     ub_ymax =  116.5;
     ub_zmin =  0.0;
@@ -180,7 +180,8 @@ namespace lar1{
       POTnorm = PotNormNu;
       if (iDet == kND){//Near Det
         //POTnorm /= 3.0;
-        POT_Sim = 1.74e20;
+        POT_Sim = 2.9E19;
+        // POT_Sim = 1.74e20;
         // POT_Sim = 1.899e20;
       }
       else if (iDet == kUB){ //uboone
@@ -200,13 +201,13 @@ namespace lar1{
         POT_Sim = 1.8832e20;
       }
       else if (iDet == kND150){
-        POT_Sim = 2.5797e+20;
+        POT_Sim = 5.599e9;
       }
       else if (iDet == kND175){
-        POT_Sim = 3.0536e+20;
+        POT_Sim = -9.471e+19;
       }
       else if (iDet == kND200){
-        POT_Sim = 4.3528e+20;
+        POT_Sim = 9.471e19;
       }
       else{
         POT_Sim = 1;
