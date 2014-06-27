@@ -201,7 +201,7 @@ namespace lar1{
         POT_Sim = 1.8832e20;
       }
       else if (iDet == kND150){
-        POT_Sim = 5.599e9;
+        POT_Sim = 5.599e19;
       }
       else if (iDet == kND175){
         POT_Sim = -9.471e+19;
