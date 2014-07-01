@@ -206,8 +206,9 @@ namespace larlight {
 	//probably the IDE does not fall within the reco-d hit range (start->end time)
 	if(matchedides.size()==0){
 	  std::cerr<<"Warning. This reco hit didn't correspond to any IDE object. Returning a null vector."<<std::endl;
-	  std::vector<float> bad(0,-1);
-	  return bad;
+	  //std::vector<float> bad(0,-1);
+	  //return bad;
+	  continue;
 	}
 	
 	////////////////////////////////////////////////////////////////
@@ -245,8 +246,9 @@ namespace larlight {
     }//end looping over hits
 
     if(tot_ides_charge<=0) {
-      std::cerr<<"something is bad. tot_ides_charge is "<<tot_ides_charge<<"... less than one?!"<<std::endl;
-      std::vector<float> bad(0,-1);
+      std::cerr<<"something is bad. tot_ides_charge is "<<tot_ides_charge<<" ?!"<<std::endl;
+      std::vector<float> bad(part_ides_charge.size()+1,0);
+      (*bad.rbegin()) = -1;
       return bad;
     }
     
