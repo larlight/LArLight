@@ -35,7 +35,7 @@ namespace cmtool {
     CMergeManager();
     
     /// Default destructor
-    virtual ~CMergeManager(){};
+    virtual ~CMergeManager(){}
 
     /// Method to reset itself
     virtual void Reset();

@@ -62,8 +62,6 @@ namespace cmtool {
 		   double Bx, double By, double Bz,
 		   double Cx, double Cy, double Cz);
 
-    void SetDebug( bool on ) { _debug = on; }
-
     void UseTime( bool on ) { _time = on; }
     
     void SetMaxArea( double area ) { _MaxArea = area; }
@@ -94,7 +92,6 @@ namespace cmtool {
 
     double _w2cm, _t2cm;
     double _MaxArea;
-    bool _debug;
     bool _time;  /// Use Time to compute intersection and trinagle area
 
   };

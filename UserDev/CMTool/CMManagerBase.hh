@@ -48,7 +48,7 @@ namespace cmtool {
     CMManagerBase();
     
     /// Default destructor
-    virtual ~CMManagerBase(){};
+    virtual ~CMManagerBase(){}
 
     /// Method to enable debug mode (lots of couts)
     void DebugMode(CMMSGLevel_t level) {_debug_mode=level;}

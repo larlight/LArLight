@@ -35,7 +35,7 @@ namespace cmtool {
     CMatchManager();
     
     /// Default destructor
-    virtual ~CMatchManager(){};
+    virtual ~CMatchManager(){}
 
     /// Method to reset itself
     virtual void Reset();

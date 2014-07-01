@@ -12,7 +12,6 @@ namespace cmtool {
 
     _w2cm = larutil::GeometryUtilities::GetME()->WireToCm();
     _t2cm = larutil::GeometryUtilities::GetME()->TimeToCm();
-    SetDebug(true);
     UseTime(true);
     SetMaxArea(100.);
     
@@ -68,7 +67,7 @@ namespace cmtool {
 						   Pl2, Pl3,
 						   yS23, zS23);
 
-    if ( _debug ){
+    if ( _verbose ){
       std::cout << "Wire Start Numbers: " << std::endl;
       std::cout << "\t" << startWire1 << std::endl;
       std::cout << "\t" << startWire2 << std::endl;
@@ -76,7 +75,7 @@ namespace cmtool {
       std::cout << std::endl;
     }
 
-    if ( _debug ){
+    if ( _verbose ){
       std::cout << "Intersection Pl1-Pl3: ( " << yS13 << ", " << zS13 << " )" << std::endl;  
       std::cout << "Intersection Pl1-Pl2: ( " << yS12 << ", " << zS12 << " )" << std::endl;  
       std::cout << "Intersection Pl2-Pl3: ( " << yS23 << ", " << zS23 << " )" << std::endl;  
@@ -93,7 +92,7 @@ namespace cmtool {
 		     (yS12-yS23)/2. , (zS13-zS23)/2. , startTime2 );
     }
     
-    if ( _debug ) { std::cout << "Area of intersections triangle is: " << area << std::endl; }
+    if ( _verbose ) { std::cout << "Area of intersections triangle is: " << area << std::endl; }
 
     if ( area > _MaxArea )
       return -1;

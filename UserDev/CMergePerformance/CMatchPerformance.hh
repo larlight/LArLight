@@ -33,8 +33,9 @@ namespace larlight {
     CMatchPerformance(){ 
       _name="CMatchPerformance";
       _fout=0; 
-      hMatchChargeEff_MC=0; 
-      hMatchNumEff_MC=0;
+      hMatchQEff=0;
+      hMatchNumEff=0;
+      hMatchQEffEvent=0;
       _cluster_type = DATA::Cluster;
     };
 
@@ -70,9 +71,11 @@ namespace larlight {
 
     McshowerLookback fBTAlgo;
 
-    TH1D* hMatchChargeEff_MC;
+    TH1D* hMatchQEff;
 
-    TH1D* hMatchNumEff_MC;
+    TH1D* hMatchQEffEvent;
+
+    TH1D* hMatchNumEff;
 
     std::vector<UChar_t> _view_to_plane;
   };

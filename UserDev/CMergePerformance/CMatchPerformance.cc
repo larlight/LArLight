@@ -21,13 +21,17 @@ namespace larlight {
 
     }
 
-    hMatchChargeEff_MC = new TH1D("hMatchChargeEff",
-				  "MC Matched Pair Efficiency; Efficiency; Num. MCShower;",
-				  100,0,1);
+    hMatchQEff = new TH1D("hMatchChargeEff",
+			  "MC Matched Pair Efficiency; Efficiency; Num. MCShower;",
+			  101,-0.005,1.005);
 
-    hMatchNumEff_MC = new TH1D("hMatchNumEff",
-			       "Number of MCShower / Reco-Matched Pair; Efficiency; Events;",
-			       100,0,1);
+    hMatchQEffEvent = new TH1D("hMatchChargeEffEvent",
+			       "MC Matched Pair Efficiency; Efficiency; Num. MCShower;",
+			       101,-0.005,1.005);
+
+    hMatchNumEff = new TH1D("hMatchNumEff",
+			    "Number of MCShower / Reco-Matched Pair; Efficiency; Events;",
+			    101,-0.005,1.005);
 
     return true;
 
@@ -53,7 +57,13 @@ namespace larlight {
 
     fMgr.SetClusters(clusters);
 
-    fMgr.Process();
+    try{
+
+      fMgr.Process();
+    }catch( ::cmtool::CMTException &e){
+      e.what();
+      return false;
+    }
 
     // Done matching clusters. Get result
     auto bk = fMgr.GetBookKeeper();
@@ -64,8 +74,6 @@ namespace larlight {
     //std::vector<std::vector<float> > reco_match_charge_v;
     //reco_match_charge_v.resize(reco_match_v.size(),std::vector<float>(geo->Nplanes(),0));
 
-
-    
     //
     // Prepare back-tracking using McshowerLookback
     //
@@ -131,8 +139,9 @@ namespace larlight {
 
     // Loop over clusters & get charge fraction per MCShower
     std::vector<std::vector<float> > qfrac_v;
+    std::vector<double> cluster_charge;
     qfrac_v.reserve(ev_cluster->size());
-    
+    cluster_charge.reserve(ev_cluster->size());
     for(auto const& c : *ev_cluster) {
 
       // Create hit list
@@ -140,69 +149,84 @@ namespace larlight {
       const std::vector<unsigned short> &hit_indices = c.association(hit_type);
       hits.reserve(hit_indices.size());
 
-      for(auto const& index : hit_indices)
+      cluster_charge.push_back(0);
+      for(auto const& index : hit_indices) {
 
 	hits.push_back(&(ev_hit->at(index)));
+	(*cluster_charge.rbegin()) += ev_hit->at(index).Charge();
+	
+      }
 
       qfrac_v.push_back(fBTAlgo.MatchHitsAll(hits, simch_map, shower_idmap));
+
     }
 
-    // Find the most representative reco-ed cluster per MCShower per plane
+    //
+    // Find the best matched pair (and its charge) per MCShower
+    //
+
     std::vector<UInt_t> mcshower_id;    // index number of MCShowers (in event_mcshower) that are taken into account 
     fBTAlgo.UniqueShowerID(shower_idmap,mcshower_id);
 
-    std::vector<std::vector<size_t> > mc_match_v(mcshower_id.size(),
-						 std::vector<size_t>(geo->Nplanes(),0)
-						 );
-    std::vector<std::vector<float> > mc_match_charge_v(mcshower_id.size(),
-						       std::vector<float>(geo->Nplanes(),0)
-						       );
-    std::vector<std::vector<float> > mc_sum_charge_v(mcshower_id.size(),
-						     std::vector<float>(geo->Nplanes(),0)
-						     );
+    std::vector<std::vector<double> > bmatch_q  (mcshower_id.size(),std::vector<double>(geo->Nplanes(),0));
+    std::vector<std::vector<size_t> > bmatch_id (mcshower_id.size(),std::vector<size_t>(geo->Nplanes(),0));
 
-    for(size_t cluster_index=0; cluster_index < ev_cluster->size(); ++cluster_index) {
-      
-      const larlight::cluster &c = ev_cluster->at(cluster_index);
-      
-      UChar_t plane = _view_to_plane.at(c.View());
+    for(size_t shower_index=0; shower_index < mcshower_id.size(); ++shower_index) {
 
-      Double_t cluster_q = c.Charge();
-      
-      for(size_t mcshower_index=0; mcshower_index < mcshower_id.size(); ++mcshower_index) {
-	
-	float mcshower_q = cluster_q * qfrac_v.at(cluster_index).at(mcshower_index);
+      for(size_t cluster_index=0; cluster_index < ev_cluster->size(); ++cluster_index) {
 
-	if(mc_match_charge_v.at(mcshower_index).at(plane) < mcshower_q) {
+	if((*(qfrac_v.at(cluster_index).rbegin())) < 0) continue;
 
-	  mc_match_v.at(mcshower_index).at(plane) = cluster_index;
+	auto plane = _view_to_plane.at(ev_cluster->at(cluster_index).View());
 
-	  mc_match_charge_v.at(mcshower_index).at(plane) = mcshower_q;
+	double q = qfrac_v.at(cluster_index).at(shower_index) * cluster_charge.at(cluster_index);
+
+	if( bmatch_q.at(shower_index).at(plane) < q ) {
+
+	  bmatch_q.at(shower_index).at(plane)  = q;
+	  bmatch_id.at(shower_index).at(plane) = cluster_index;
 
 	}
 	
-	mc_sum_charge_v.at(mcshower_index).at(plane) += mcshower_q;
+      }
+    }
+
+    //
+    // Evaluate efficiency
+    //
+    double max_eff=0;
+    for(auto const& match : reco_match_v) {
+
+      // Compute efficiency per MCShower
+      std::vector<double> match_eff(mcshower_id.size(),1);
+
+      for(auto const& cluster_index : match) {
+
+	for(size_t shower_index=0; shower_index < mcshower_id.size(); ++shower_index) {
+
+	  unsigned char plane = _view_to_plane.at(ev_cluster->at(cluster_index).View());
+
+	  double q = cluster_charge.at(cluster_index)* qfrac_v.at(cluster_index).at(shower_index);
+
+	  match_eff.at(shower_index) *= q / bmatch_q.at(shower_index).at(plane);
+	}
+
       }
 
-    }
-    
-    //
-    // Fill MCTruth matching efficiency plot 
-    //
+      // Find the best qratio
+      double qratio_max = -1;
+      for(auto const& eff : match_eff)
 
-    for(size_t mcshower_index=0; mcshower_index < mcshower_id.size(); ++mcshower_index) {
+	if(qratio_max < eff) qratio_max = eff;
 
-      float eff = 1;
+      if(max_eff < qratio_max) max_eff = qratio_max;
 
-      for(size_t plane=0; plane<geo->Nplanes(); ++plane)
-
-	eff *= mc_match_charge_v.at(mcshower_index).at(plane) / mc_sum_charge_v.at(mcshower_index).at(plane);
-
-      hMatchChargeEff_MC->Fill(eff);
-      
+      hMatchQEff->Fill(qratio_max);
     }
 
-    hMatchNumEff_MC->Fill( (float)(mcshower_id.size()) / (float)(reco_match_v.size()) );
+    hMatchQEffEvent->Fill(max_eff);
+
+    hMatchNumEff->Fill( (float)(mcshower_id.size()) / (float)(reco_match_v.size()) );
 
     return true;
   }
@@ -213,9 +237,11 @@ namespace larlight {
 
       _fout->cd();
       
-      hMatchChargeEff_MC->Write();
+      hMatchQEff->Write();
 
-      hMatchNumEff_MC->Write();
+      hMatchNumEff->Write();
+
+      hMatchQEffEvent->Write();
 
     }
 
