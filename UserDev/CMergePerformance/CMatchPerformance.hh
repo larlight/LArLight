@@ -71,10 +71,13 @@ namespace larlight {
 
     McshowerLookback fBTAlgo;
 
+    /// Charge-based efficiency histogram: entry per matched pair
     TH1D* hMatchQEff;
 
+    /// Charge-based efficiency histogram: entry per event
     TH1D* hMatchQEffEvent;
 
+    /// # MCShower / # matched cluster pairs (kinda efficiency)
     TH1D* hMatchNumEff;
 
     std::vector<UChar_t> _view_to_plane;
