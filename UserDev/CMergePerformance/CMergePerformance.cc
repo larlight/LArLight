@@ -90,9 +90,9 @@ namespace larlight {
 
     return true;
   }
-
+  
   bool CMergePerformance::finalize() {
-
+    
     if(_fout) { 
       _fout->cd(); 
       for(int before_after = 0; before_after < 2; ++before_after){
@@ -102,15 +102,17 @@ namespace larlight {
 	  hClusQoverMCQ.at(before_after).at(nview)->Write();
 	  hEffPerMCShower.at(before_after).at(nview)->Write();
 	  hPurityPerMCShower.at(before_after).at(nview)->Write();
-
+	  hQFracInBigClusters.at(before_after).at(nview)->Write();
+	  
 	  delete hPurity.at(before_after).at(nview);
 	  delete hEff.at(before_after).at(nview);
 	  delete hClusQoverMCQ.at(before_after).at(nview);
 	  delete hPurityPerMCShower.at(before_after).at(nview);
 	  delete hEffPerMCShower.at(before_after).at(nview);
+	  delete hQFracInBigClusters.at(before_after).at(nview);
 	}
       }
-
+      
       if(ana_tree){
 	ana_tree->Write();
 	delete ana_tree;
@@ -145,7 +147,7 @@ namespace larlight {
 			     100,-0.1,1.1)
 		    );
     hPurity.push_back(tmp);
-
+    
     tmp.clear();
     for(int i_view = 0; i_view < 3; i_view++)
       tmp.push_back(
@@ -163,7 +165,7 @@ namespace larlight {
 			     100,-0.1,3.1)
 		    );
     hPurityPerMCShower.push_back(tmp);
-
+    
     tmp.clear();
     for(int i_view = 0; i_view < 3; i_view++)
       tmp.push_back(
@@ -218,27 +220,47 @@ namespace larlight {
 		    );
     hClusQoverMCQ.push_back(tmp);
     
+    
+    tmp.clear();
+    for(int i_view = 0; i_view < 3; i_view++)
+      tmp.push_back(
+		    new TH1D(Form("hQFracInBigClusters_beforemerging_view%d",i_view),
+			     Form("Fraction of Total Q in Clusters with >10 Hits [before merging];Q Fraction per Event;Number of Events"),
+			     102,-0.01,1.01)
+		    );
+    hQFracInBigClusters.push_back(tmp);
+    
+    
+    tmp.clear();
+    for(int i_view = 0; i_view < 3; i_view++)
+      tmp.push_back(
+		    new TH1D(Form("hQFracInBigClusters_aftermerging_view%d",i_view),
+			     Form("Fraction of Total Q in Clusters with >10 Hits [after merging];Q Fraction per Event;Number of Events"),
+			     102,-0.01,1.01)
+		    );
+    hQFracInBigClusters.push_back(tmp);
+    
     /*
-    std::vector<TH2D*> tmp2D;
-    tmp2D.clear();
-    for(int i_view = 0; i_view < 3; i_view++)
+      std::vector<TH2D*> tmp2D;
+      tmp2D.clear();
+      for(int i_view = 0; i_view < 3; i_view++)
       tmp2D.push_back(
-		    new TH2D(Form("hPi0_photonanglediff_vs_Eff_view%d",i_view),
-			     Form("Pi0 Photon 2D Angle Difference vs. Efficiency [before merging], view %d",i_view),
-			     300,-0.1,3.1,
-			     100,0,180)
-		    );
-    hPi0_photonanglediff_vs_Eff.push_back(tmp2D);
-
-    tmp2D.clear();
-    for(int i_view = 0; i_view < 3; i_view++)
+      new TH2D(Form("hPi0_photonanglediff_vs_Eff_view%d",i_view),
+      Form("Pi0 Photon 2D Angle Difference vs. Efficiency [before merging], view %d",i_view),
+      300,-0.1,3.1,
+      100,0,180)
+      );
+      hPi0_photonanglediff_vs_Eff.push_back(tmp2D);
+      
+      tmp2D.clear();
+      for(int i_view = 0; i_view < 3; i_view++)
       tmp2D.push_back(
-		    new TH2D(Form("hPi0_photonanglediff_vs_Eff_view%d",i_view),
-			     Form("Pi0 Photon 2D Angle Difference vs. Efficiency [after merging], view %d",i_view),
-			     300,-0.1,3.1,
-			     100,0,180)
-		    );
-    hPi0_photonanglediff_vs_Eff.push_back(tmp2D);
+      new TH2D(Form("hPi0_photonanglediff_vs_Eff_view%d",i_view),
+      Form("Pi0 Photon 2D Angle Difference vs. Efficiency [after merging], view %d",i_view),
+      300,-0.1,3.1,
+      100,0,180)
+      );
+      hPi0_photonanglediff_vs_Eff.push_back(tmp2D);
     */
   }
   
@@ -247,7 +269,7 @@ namespace larlight {
     if(!ana_tree) {
       
       ana_tree = new TTree("ana_tree","");
- 
+      
       ana_tree->Branch("clusQfrac_over_totclusQ",&_clusQfrac_over_totclusQ,"clusQfrac_over_totclusQ/D");
       ana_tree->Branch("clusQ_over_MCQ",&_clusQ_over_MCQ,"clusQ_over_MCQ/D");
       ana_tree->Branch("tot_clusQ",&_tot_clus_charge,"tot_clus_charge/D");
@@ -274,7 +296,7 @@ namespace larlight {
     std::vector<UInt_t> MCShower_indices;
     for(UInt_t i=0; i < ev_mcshower->size(); ++i)
       MCShower_indices.push_back(i);
-
+    
     //debug: view MCShower_indices
     if(_debug){
       std::cout<<"MCShower_indices = { ";
@@ -282,11 +304,16 @@ namespace larlight {
 	std::cout<<MCShower_indices.at(a)<<", ";
       std::cout<<"}"<<std::endl;
     }
-
+    
+    //stuff for calculating event charge fraction in clusters with > 10 hits
+    double total_event_charge[3] = { 0., 0., 0. };
+    double charge_in_small_clusters[3] = { 0., 0., 0. };
+    
+    
     //count the number of clusters for the denominator of efficiency plot
     //but DO NOT INCLUDE clusters that are 100% belonging to "unknown" MCShowers
     int n_clusters_in_plane[3] = { 0, 0, 0 };
-
+    
     //Here we try to loop over clusters based on the _clusterparams vector, *not* ev_cluster vector,
     //because the merging algorithm returns an altered _clusterparams vector but it does *not*
     //modify the actual ev_cluster vector. 
@@ -296,12 +323,12 @@ namespace larlight {
     // { {1, 2}, {3}, {4, 5, 6, 7}, ...} showing which ev_cluster elements should be combined
     //That way, when we can easily combine the hits in different clusters to loop over,
     //as if the clusters were really merged
-
+    
     //solution: get the bookkeeper instance and use the GetResult() function
     //this returns a vector of vector whose length = # of output clusters
     //(index number matches with the std::vector<CPAN> you get from CMergeManager::GetClusters()
     //the internal vector is the input clusters indices that were merged
-
+    
     
     clus_idx_vec.clear();
     if(!after_merging){
@@ -313,7 +340,7 @@ namespace larlight {
     else{
       clus_idx_vec = _mgr.GetBookKeeper().GetResult();
     }
-
+    
     int cluster_params_idx = 0;
     //debug, viewing idx vec
     if(_debug){
@@ -328,15 +355,15 @@ namespace larlight {
       std::cout<<" } "<<std::endl;
     }
     
-
+    
     //Hold max fraction of each MCShower's charge in a single cluster
     std::vector< std::vector<double> >  MCShower_best_clus(3, std::vector<double>(MCShower_indices.size()+1,0) );
     //Try and Keep track of Each MCShower's charge across the clusters
     std::vector< std::vector<double> >  MCShower_Qs(3, std::vector<double>(MCShower_indices.size()+1,0) );
     //Keep track of total Q of the cluster that has largest fract of MCShower Q
     std::vector< std::vector<double> > BestClus_Qs(3, std::vector<double>(MCShower_indices.size()+1,0) );
-
-
+    
+    
     ///////////////////////////////////////////////
     //Loop over reconstructed clusters
     ///////////////////////////////////////////////
@@ -346,20 +373,20 @@ namespace larlight {
 	       <<" clusters and "<<MCShower_indices.size()
 	       <<" viable MCShowers"<<std::endl;
     }
-
+    
     for(int outer_clus_idx=0; outer_clus_idx<clus_idx_vec.size(); ++outer_clus_idx){
       //total cluster charge
       _tot_clus_charge = 0;
       _tot_clus_charge_fromKnownMCS = 0;
       _plane = ev_cluster->at(clus_idx_vec.at(outer_clus_idx).at(0)).View();
-
+      
       //charge from each MCShower object... last element is from unknown MCShower
       //or from MCShowers that were too low energy to pass to McshowerLookback
       std::vector<double> part_clus_charge(MCShower_indices.size()+1,0);
-
+      
       //container to hold the fractional hit charge returned by McshowerLookback
       std::vector<float> hit_charge_frac;
-
+      
       //Get the hits from each cluster and loop over them
       //if after merging, this may be hits from multiple clusters
       //combine the assiciations from all merged clusters into one vector of hit indices to loop over
@@ -373,8 +400,8 @@ namespace larlight {
 	// and concatenate it to ass_index
 	ass_index.insert( ass_index.end(), tmp_ass_index.begin(), tmp_ass_index.end() );
       }
-
-
+      
+      
       //debug: view ass_index
       if(_debug){
 	std::cout<<"for this cluster, ass_index is {";
@@ -382,7 +409,7 @@ namespace larlight {
 	  std::cout<<ass_index.at(a)<<",";
 	std::cout<< "}"<<std::endl;
       }
-
+      
       ///////////////////////////////////////////////
       //Loop over hits in this cluster 
       ///////////////////////////////////////////////
@@ -393,16 +420,16 @@ namespace larlight {
 	  std::cout<<"hit_index is "<<hit_index<<std::endl;
 	
 	_tot_clus_charge += ev_hits->at(hit_index).Charge();
-	  
+	
 	hit_charge_frac.clear();
-		
+	
 	hit_charge_frac = 
 	  _mcslb.MatchHitsAll(ev_hits->at(hit_index),
 			      _simch_map,
 			      _shower_idmap,
 			      MCShower_indices);
-
-
+	
+	
 	//debug
 	if(_debug){
 	  std::cout<<"Debug: just got back hit_charge_frac as (";
@@ -410,7 +437,7 @@ namespace larlight {
 	    std::cout<<hit_charge_frac.at(j)<<", ";
 	  std::cout<<")."<<std::endl;
 	}
-
+	
 	
 	//sometimes mcslb returns a null vector if the reco hit couldn't be matched with an IDE at all... this rarely occurs
 	//in this case, add 100% of this hit's charge to the "unknown" index
@@ -435,7 +462,7 @@ namespace larlight {
 	    _tot_clus_charge_fromKnownMCS += hit_charge_frac.at(i)*ev_hits->at(hit_index).Charge();
 	  
 	}
-
+	
 	if(_debug){
 	  std::cout<<"This hit is made up of (";
 	  for(int i=0; i<hit_charge_frac.size()-1; ++i)
@@ -444,11 +471,11 @@ namespace larlight {
 	    hit_charge_frac.size()-1<<" known MCShowers and "<<
 	    (float)hit_charge_frac.back()<<" from unknown ones."<<std::endl;
 	}
-	 
-      
+	
+	
       } //end looping over hits in this cluster
       
-
+      
       //debug: view part_clus_charge vector
       if(_debug){
 	std::cout<<"part_clus_charge vector = { ";
@@ -463,21 +490,25 @@ namespace larlight {
 	for(std::map<UInt_t,UInt_t>::iterator it=_shower_idmap.begin(); it!=_shower_idmap.end(); ++it)
 	  std::cout<<"viewing whoer_idmap: "<<it->first << " => "<<it->second <<std::endl;
       }
-    
+      
       ///////////////////////////////////////////////
       // Fill histograms/tree that need once-per-cluster filling
       ///////////////////////////////////////////////
-
+      
       //if all of the charge in the cluster is from unknown MCShower, skip this cluster   
       if(_tot_clus_charge_fromKnownMCS == 0) continue;
       else n_clusters_in_plane[_plane]++;
-
+      
       //calculate _nhits for ttree
       _nhits = (int)ass_index.size();
-
+      
+      //stuff for calculating event charge fraction in clusters with >10 hits
+      total_event_charge[_plane] += _tot_clus_charge;
+      if(_nhits<10) charge_in_small_clusters[_plane] += _tot_clus_charge;
+      
       //if _nhits is less than 15, don't fill this clusters' info into histos and ttree
       if(_nhits<15) continue;
-
+      
       //purity of a cluster: highest charge fraction belonging to an MCShower
       //find the MCShower that most of this cluster belongs to & fill some TTree vars
       //don't count "unknown" showers. looks like lots of clusters are 100% pure from
@@ -485,7 +516,7 @@ namespace larlight {
       int dominant_MCshower_index = 0;
       _clusQfrac_over_totclusQ = 0;
       _frac_clusQ = 0;
-
+      
       
       //ignore unknown MCShowers entirely
       for(int i = 0; i < part_clus_charge.size() - 1; ++i){	
@@ -495,17 +526,17 @@ namespace larlight {
 	  dominant_MCshower_index = i;
 	}
       }
-
+      
       for (int i=0; i < part_clus_charge.size() - 1; i++){
 	//std::cout << "Cluster's Charge from MC Shower " << i << " : " << part_clus_charge.at(i) << std::endl;
 	MCShower_Qs.at(_plane).at(i) += part_clus_charge.at(i);
 	if ( part_clus_charge.at(i) > MCShower_best_clus.at(_plane).at(i) ) {
 	  MCShower_best_clus.at(_plane).at(i) = part_clus_charge.at(i);
 	  BestClus_Qs.at(_plane).at(i) = (double)(part_clus_charge.at(i)/_tot_clus_charge_fromKnownMCS);
-	  }
+	}
       }
-
-
+      
+      
       hPurity.at(after_merging).at(_plane)->Fill(_clusQfrac_over_totclusQ);
       
       _clusQfrac_from_unknown = part_clus_charge.back()/_tot_clus_charge;
@@ -527,7 +558,7 @@ namespace larlight {
       //"other purity" :
       //cluster charge divided by charge of dominant MC shower
       //if dominant_index points to the "unknown" element, set ratio to -1
-
+      
       if(dominant_MCshower_index == ev_mcshower->size()){
 	
 	_dom_MCS_Q = -1;
@@ -537,13 +568,13 @@ namespace larlight {
       else{
 	//total charge of the dominant MC Shower for this cluster
 	_dom_MCS_Q = ev_mcshower->at(dominant_MCshower_index).Charge(_plane);
-
+	
 	_clusQ_over_MCQ = 
 	  _tot_clus_charge / _dom_MCS_Q;
-
+	
       }
       hClusQoverMCQ.at(after_merging).at(_plane)->Fill(_clusQ_over_MCQ);
-
+      
       //take mother energy (ttree var) to be max of MCShower mother energies
       _mother_energy = 0;
       for(auto this_mcshow : *ev_mcshower){
@@ -551,15 +582,15 @@ namespace larlight {
 	for(int i = 0; i < 3; ++i)
 	  this_mother_energy += pow(this_mcshow.MotherMomentum().at(i),2);
 	this_mother_energy = pow(this_mother_energy, 0.5);
-
+	
 	if(this_mother_energy > _mother_energy)
 	  _mother_energy = this_mother_energy;
       }
-
+      
       //std::cout<<"after_merging is "<<after_merging<<", outer_clus_idx is "<<outer_clus_idx<<", size of _clusterparms is "<<_clusterparams.size()<<", size of clud_idx_vec is "<<clus_idx_vec.size()<<std::endl;
       //calculate opening_angle for ttree
       //get this from the clusterparams
-
+      
       if(after_merging)
 	_opening_angle = _mgr.GetClusters().at(cluster_params_idx).GetParams().opening_angle;
       else
@@ -567,20 +598,24 @@ namespace larlight {
       //Fill ana TTree once per cluster
       if(ana_tree)
 	ana_tree->Fill();
-
+      
       //make sure to only increment cluster_params_idx (where in the _clusterparams vector this cluster is)
       //after ditching clusters with <15 hits
       cluster_params_idx++;
-
-    
+      
+      
     }//end loop over clusters
-
-
+    
+    
     ///////////////////////////////////////////////
     // Fill histograms/tree that need once-per-event filling
     ///////////////////////////////////////////////
     
-
+    //stuff for calculating event charge fraction in clusters with > 10 hits
+    for (int iplane = 0; iplane < 3; ++iplane)
+      hQFracInBigClusters.at(after_merging).at(iplane)->Fill((total_event_charge[iplane]-charge_in_small_clusters[iplane])/total_event_charge[iplane]);
+    
+    
     ///////////
     // Per MCShower Efficiency & Purity
     ///////////
@@ -643,6 +678,10 @@ namespace larlight {
 	//	std::cout<<"filling 2d shit with "<<NMCSoverNClus<<", "<<angle2Ddiff<<std::endl;
       }
       */
+
+      //fraction of total charge in plane in big clusters
+      
+      
     }//end loop over planes
     
   }//end fillFOMhistos
