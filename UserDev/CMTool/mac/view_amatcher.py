@@ -34,7 +34,12 @@ match_viewer.SetPrintClusterInfo(True)
 # attach match algos here
 ########################################
 
-myalg = cmtool.CFAlgoZOverlap()
+
+priority_algo = cmtool.CPAlgoNHits()
+priority_algo.SetMinHits(50)
+match_viewer.GetManager().AddPriorityAlgo(priority_algo)
+
+myalg = cmtool.CFAlgoQRatio()
 match_viewer.GetManager().AddMatchAlgo(myalg)
 
 ########################################
@@ -52,6 +57,14 @@ raw_viewer.SetClusterType(larlight.DATA.Cluster)
 match_viewer.SetClusterType(larlight.DATA.Cluster)
 
 gStyle.SetOptStat(0)
+
+####
+# want to mark begin points
+####
+#algo = cluster.ClusterParamsExecutor()
+#result = algo.GetParams()
+
+
 
 #start on first event always
 user_input_evt_no = -1;

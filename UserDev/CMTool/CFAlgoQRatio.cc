@@ -10,7 +10,6 @@ namespace cmtool {
   //-------------------------------------------------------
   {
     _qratio_cut = 0.1 ;// Preliminary cuts
-	_N_Hits_cut = 20 ;
 	
   }
 
@@ -33,7 +32,6 @@ namespace cmtool {
 	for(auto const& c : clusters) {
 
 	  //Ignore all clusters with less than 40 hits 
-	  if(c->GetParams().N_Hits >_N_Hits_cut){
 
     		if(c->GetParams().sum_charge < 0) {
 				if(_verbose) 
@@ -46,13 +44,11 @@ namespace cmtool {
 
 	 		if(q_max < c->GetParams().sum_charge)
 				q_max = c->GetParams().sum_charge;
-        }
 
 	 }
 
     // Compute ratio
     for(auto const& c : clusters){
-		if(c->GetParams().N_Hits>_N_Hits_cut){
 	        ratio *= c->GetParams().sum_charge / q_max;
 	
 			if(_verbose){
@@ -60,10 +56,6 @@ namespace cmtool {
 				std::cout<<"Q max : "<<q_max<<std::endl ;
 				std::cout<<"Ratio is: "<<ratio<<std::endl;	
 			  }
-		 }	
-		//Modify the ratio of those cluster with < _N_Hits_cut to remove them from matching process
-		else
-			ratio*=0.1; 
 	}
 	
    		  if(_verbose) {

@@ -9,9 +9,9 @@ namespace cmtool {
   CFAlgoTimeOverlap::CFAlgoTimeOverlap() : CFloatAlgoBase()
   //-------------------------------------------------------
   {
-		_time_ratio_cut = 0.3 ;  //Cuts thus far unoptimized
-		_N_Hits_cut		= 30 ; 
-		_start_time_cut = 10 ;
+		_time_ratio_cut 		= 0.1 ;  //Cuts thus far unoptimized
+		_time_difference_cut	= 20 ; 
+		_start_time_cut 		= 20 ;
 
   }
 
@@ -40,7 +40,6 @@ namespace cmtool {
 	for(auto const& c : clusters){
 
 		//Calculate time ratio for events with > 20 hits
-		if(c->GetParams().N_Hits > _N_Hits_cut){
 			time_difference  = c->GetParams().start_point.t - c->GetParams().end_point.t ; 
 	
 			if(time_difference < 0) 
@@ -48,13 +47,13 @@ namespace cmtool {
 	
 			if(max_time_difference < time_difference)
 				max_time_difference = time_difference ;
-		 }
 	}
 
 
 	 for(auto const& c: clusters){
-		if(c->GetParams().N_Hits > _N_Hits_cut){
-			
+		if(c->Plane()==0)
+			ratio=1; 
+	
      		//Make start_t always smaller
 			if(c->GetParams().start_point.t > c->GetParams().end_point.t){
 					start_t = c->GetParams().end_point.t   ;
@@ -69,36 +68,37 @@ namespace cmtool {
 				prev_start_t = start_t ;
 
 			time_difference  = end_t - start_t ; 
+	//		if( max_time_difference <= _time_difference_cut )
+	//			ratio *= 1 ;
+	//		else
 			ratio *= time_difference/max_time_difference ;
 	
 			//If current cluster's start time is not within some range of the previous cluster's start time,
 			//modify ratio to disallow matching
 			if( start_t < (prev_start_t - _start_time_cut) || start_t > (prev_start_t + _start_time_cut))
-					ratio*= 0.01;
+					ratio*= 0.5;
+
+
 
 			prev_start_t = start_t ;
 
 	   		
-			/*if( ratio!= 1 && ratio > _time_ratio_cut ){	
+			if( ratio > _time_ratio_cut ){	
+				std::cout<<"\nPLANE: "<<c->Plane() ;
 				std::cout<<"\nStart point: "<<start_t<<std::endl;
 				std::cout<<"End Point: "<<end_t  <<std::endl;
 				std::cout<<"Previous start time: "<<prev_start_t<<std::endl;
+				std::cout<<"Max time diff: "<<max_time_difference<<std::endl;
 				std::cout<<"ratio for each cluster: "<<ratio<<std::endl;
-				} */
-
-			}
-
-		//If cluster has < N hits, modify ratio to disallow matching 
-		else
-			ratio *= 0.01 ;
+				
+				} 
 
 		}
 
-//		if(ratio > _time_ratio_cut) std::cout<<"MATCH FOUND WOOOOOOOOOOOOOOOOOOOO. Ratio is  : "<<ratio<<std::endl; 	
+	std::cout<<"*****************End of a cluster! "<<std::endl;
+	if(ratio> _time_ratio_cut)
+		std::cout<<"**************************FOUND A MATCH . ratio is: "<<ratio<<"\n\n\n"<<std::endl;
  
-	if(_verbose){
-	  }
-
 	return (ratio > _time_ratio_cut ? ratio : -1 ); 
 
 }
