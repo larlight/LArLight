@@ -36,6 +36,7 @@ namespace cmtool {
 	double start_t				 = 0;
 	double end_t				 = 0;
 	double prev_start_t 		 = 0;
+	_verbose 					 = false; 
 
 	for(auto const& c : clusters){
 
@@ -83,7 +84,7 @@ namespace cmtool {
 			prev_start_t = start_t ;
 
 	   		
-			if( ratio > _time_ratio_cut ){	
+			if( _verbose && ratio > _time_ratio_cut ){	
 				std::cout<<"\nPLANE: "<<c->Plane() ;
 				std::cout<<"\nStart point: "<<start_t<<std::endl;
 				std::cout<<"End Point: "<<end_t  <<std::endl;
@@ -95,8 +96,8 @@ namespace cmtool {
 
 		}
 
-	std::cout<<"*****************End of a cluster! "<<std::endl;
-	if(ratio> _time_ratio_cut)
+//	std::cout<<"*****************End of a cluster! "<<std::endl;
+	if(_verbose && ratio> _time_ratio_cut)
 		std::cout<<"**************************FOUND A MATCH . ratio is: "<<ratio<<"\n\n\n"<<std::endl;
  
 	return (ratio > _time_ratio_cut ? ratio : -1 ); 
