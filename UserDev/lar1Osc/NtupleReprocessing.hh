@@ -170,7 +170,7 @@ namespace lar1{
     virtual Int_t    GetEntry(Long64_t entry);
     virtual Long64_t LoadTree(Long64_t entry);
     virtual void     Init(TTree *tree);
-    virtual void     Loop(std::string, Int_t iDet = 1, Long64_t max_entry = -1, bool verbose = false, double scale = 1);
+    virtual void     Loop(std::string signal, int iDet = 1, int iLoc = 4, Long64_t max_entry = -1, bool verbose = false, double scale = 1);
     virtual Bool_t   Notify();
     virtual void     Show(Long64_t entry = -1);
     virtual TString  InFile();

@@ -79,12 +79,12 @@ namespace lar1{
     // I think this is about the closest I can come:
     // Length 15m, make a square in x and y at lengths 4.76 meters.
     // iDet = 5
-    ic_xmin =  -288.0;
-    ic_xmax =  288.0;
-    ic_ymin =  -238.0;
-    ic_ymax =  238.0;
+    ic_xmin =  -350.0;
+    ic_xmax =  350.0;
+    ic_ymin =  -158.0;
+    ic_ymax =  158.0;
     ic_zmin =  0.0;
-    ic_zmax =  1500.0;
+    ic_zmax =  1795.0;
 
     // MiniBooNE shaped info:
     // iDet = 4
@@ -116,6 +116,7 @@ namespace lar1{
   }
 
   Double_t Utils::GetPOTNormNuMI(Int_t iflux, Int_t iDet){
+/*
     Double_t POT_Sim = 1;
     Double_t POTnorm = 1;
     if (iflux == kNu_Fosc)
@@ -159,143 +160,145 @@ namespace lar1{
 
     if (POTnorm > 1e-5) return POTnorm;
     else return 1.0;
+    */
+   return 1;
   }
 
-  Double_t Utils::GetPOTNorm(Int_t iflux, Int_t iDet){
+  Double_t Utils::GetPOTNorm( Int_t iflux, Int_t iLoc){
 
     // Simple function, really, but put into utils to abstract it out of reprocessing.
     // 
     // ideally, this should involve a database lookup.  But I'm going to hardcode it.
     // Putting in values of 1 right now but that'll update with the final POT Numbers:
     // 
-    
 
     Double_t POT_Sim = 1;
     Double_t POTnorm = 1;
 
+    if (iflux == kNu || iflux == kNu_Fosc)
+      POTnorm = 6.6e20;
+    if (iflux == kNubar || iflux == kNubar_Fosc)
+      POTnorm = 10e20;
 
-    // Nue POT has to be divided by 1.385
-    if (iflux == kNu)
+    switch (iLoc)
     {
-      POTnorm = PotNormNu;
-      if (iDet == kND){//Near Det
-        //POTnorm /= 3.0;
-        POT_Sim = 2.9E19;
-        // POT_Sim = 1.74e20;
-        // POT_Sim = 1.899e20;
-      }
-      else if (iDet == kUB){ //uboone
-        // POT_Sim = 1.64e21;
-        POT_Sim = 2.8173e21;
-      }
-      else if (iDet == kFD || iDet == kIC || iDet == kIC_600 || iDet == kIC_800){ //LAr1-FD
-        POT_Sim = 3.63e20;
-        if (iDet == kIC_600) POT_Sim /= (700.0/600.0)*(700.0/600.0);
-        if (iDet == kIC_800) POT_Sim /= (700.0/800.0)*(700.0/800.0);
-      }
-      else if (iDet == kMB){ //MiniBooNE Shape
-        POT_Sim = 3.63e20; // using FD file
-        POT_Sim /= (700.0/540.0)*(700.0/540.0); // Scale to MB location
-      }
-      else if (iDet == kND_long){
-        POT_Sim = 1.8832e20;
-      }
-      else if (iDet == kND150){
-        POT_Sim = 5.599e19;
-      }
-      else if (iDet == kND175){
-        POT_Sim = -9.471e+19;
-      }
-      else if (iDet == kND200){
-        POT_Sim = 9.471e19;
-      }
-      else{
-        POT_Sim = 1;
-      }
-    }
-    else if (iflux == kNubar)
-    {
-      POTnorm = PotNormNubar;
-      if (iDet == kND){//Near Det
-        POT_Sim = 8.87e20;
-      }
-      else if (iDet == kUB){ //uboone
-        POT_Sim = 3.70E+22;
-      }
-      else if (iDet == kFD || iDet == kIC || iDet == kIC_600 || iDet == kIC_800){ //LAr1-FD
-        POT_Sim = 1.30e21;
-        if (iDet == kIC_600) POT_Sim /= (700.0/600.0)*(700.0/600.0);
-        if (iDet == kIC_800) POT_Sim /= (700.0/800.0)*(700.0/800.0);
-      }
-      else if (iDet == kMB){ //MiniBooNE Shape
-        POT_Sim = 1.30e21; // using FD file
-        POT_Sim /= (700.0/540.0)*(700.0/540.0); // Scale to MB location
-      }
-      else{ //unknown detector
-        POT_Sim = 1;
-      }
-    }
-    else if (iflux == kNu_Fosc)
-    {
-      POTnorm = PotNormNu;
-      if (iDet == kND){//Near Det
-        POT_Sim = 1.79e20;
-      }
-      else if (iDet == kUB){ //uboone
-        POT_Sim = 5.37e21;
-      }
-      else if (iDet == kFD || iDet == kIC || iDet == kIC_600 || iDet == kIC_800){ //LAr1-FD
-        POT_Sim = 5.32e20;
-        if (iDet == kIC_600) POT_Sim /= (700.0/600.0)*(700.0/600.0);
-        if (iDet == kIC_800) POT_Sim /= (700.0/800.0)*(700.0/800.0);
-      }
-      else if (iDet == kMB){ //MiniBooNE Shape
-        POT_Sim = 5.32e20; // using FD file
-        POT_Sim /= (700.0/540.0)*(700.0/540.0); // Scale to MB location
-      }
-      else if (iDet == kND_long){
-        POT_Sim = 1.9022e20;
-      }
-      else if (iDet == kND150){
-        POT_Sim = 2.4087e+20;
-      }
-      else if (iDet == kND175){
-        POT_Sim = 3.5404e+20;
-      }
-      else if (iDet == kND200){
-        POT_Sim = 1.3459e+21;
-      }
-      else{ //unknown detector
-        POT_Sim = 1;
-      }
-    }
-    else if (iflux == kNubar_Fosc)
-    {
-      POTnorm = PotNormNubar;
-      if (iDet == kND){//Near Det
-        POT_Sim = 7.42e20;
-      }
-      else if (iDet == kUB){ //uboone
-        POT_Sim = 3.58e22;
-      }
-      else if (iDet == kFD || iDet == kIC || iDet == kIC_600 || iDet == kIC_800){ //LAr1-FD
-        POT_Sim = 1.35e21;
-        if (iDet == kIC_600) POT_Sim /= (700.0/600.0)*(700.0/600.0);
-        if (iDet == kIC_800) POT_Sim /= (700.0/800.0)*(700.0/800.0);
-      }
-      else if (iDet == kMB){ //MiniBooNE Shape
-        POT_Sim = 1.35e21; // using FD file
-        POT_Sim /= (700.0/540.0)*(700.0/540.0); // Scale to MB location
-      }
-      else{ //unknown detector
-        POT_Sim = 1;
-      }
-    }
-    else
-    {
-      POT_Sim = -1; //unknown baseline
+      case k100m:
+        switch (iflux)
+        {
+          case kNu:
+            POT_Sim = 7.879E+19;
+            break;
+          case kNu_Fosc:
+            POT_Sim = 7.637E+19;
+            break;
+          case kNubar:
+          case kNubar_Fosc:
+          default:
+            POT_Sim = -1;
+            break;
+
+        }
+        break;
+      case k150m:
+        switch (iflux)
+        {
+          case kNu:
+            POT_Sim = 1.536E+20;
+            break;
+          case kNu_Fosc:
+            POT_Sim = 1.475E+20;
+            break;
+          case kNubar:
+          case kNubar_Fosc:
+          default:
+          POT_Sim = -1;
+            break;
+        }
+        break;
+      case k175m:
+        switch (iflux)
+        {
+          case kNu:
+          case kNu_Fosc:
+          case kNubar:
+          case kNubar_Fosc:
+          default:
+            POT_Sim = -1;
+            break;
+        }
+        break;
+      case k200m:
+        switch (iflux)
+        {
+          case kNu:
+            POT_Sim = 2.591E+20;
+            break;
+          case kNu_Fosc:
+            POT_Sim = 2.494E+20;
+            break;
+          case kNubar:
+          case kNubar_Fosc:
+          default:
+            POT_Sim = -1;
+            break;
+        }
+        break;
+      case k470m:
+        switch (iflux)
+        {
+          case kNu:
+            POT_Sim = 6.053E+21;
+            break;
+          case kNu_Fosc:
+            POT_Sim = 2.592E+21;
+            break;
+          case kNubar:
+          case kNubar_Fosc:
+          default:
+            POT_Sim = -1;
+            break;
+        }
+        break;
+      case k600m_onaxis:
+        switch (iflux)
+        {
+          case kNu:
+            POT_Sim = 5.434E+20;
+            break;
+          case kNu_Fosc:
+            POT_Sim = 6.507E+20;
+            // POT_Sim = 2.766e20;
+            break;
+          case kNubar:
+          case kNubar_Fosc:
+          default:
+            POT_Sim = -1;
+            break;
+        }
+        break;
+      case k600m_offaxis:
+        switch (iflux)
+        {
+          case kNu:
+            POT_Sim = 2.386E+20;
+            break;
+          case kNu_Fosc:
+            POT_Sim = 6.476E+20;
+            break;
+          case kNubar:
+          case kNubar_Fosc:
+          default:
+            POT_Sim = -1;
+            break;
+        }
+        break;
+      default:
+        std::cout << "No detector location selected, or invalid selection.  Error.\n";
+        return -999;
     }
 
+
+ 
     POTnorm /= POT_Sim;
 
     if (POTnorm > 1e-5) return POTnorm;
@@ -377,9 +380,9 @@ namespace lar1{
 
   }
 
-  //=========================================================================================
+  //=================================================================================
   // Polar angle Phi - angle in the x-y plane, x-axis = 0
-  //=========================================================================================
+  //=================================================================================
   Double_t Utils::GetPhi( TVector3 mom, TVector3 ref ){
 
     mom.RotateUz(ref.Unit());
@@ -393,10 +396,11 @@ namespace lar1{
 
   }
 
-  //=========================================================================================
+  //=================================================================================
   // CCQE neutrino energy
-  //=========================================================================================
-  Double_t Utils::NuEnergyCCQE( Double_t l_energy, Double_t l_p, Double_t l_theta, Double_t mass, Int_t mode, bool verbose ){
+  //=================================================================================
+  Double_t Utils::NuEnergyCCQE( Double_t l_energy, Double_t l_p, Double_t l_theta,
+                                Double_t mass, Int_t mode, bool verbose ){
     
     Double_t M_n = 939.565;    // MeV/c2
     Double_t M_p = 938.272;    // MeV/c2
@@ -433,11 +437,12 @@ namespace lar1{
   }
 
 
-  //=========================================================================================
+  //=================================================================================
   // Calorimetric energy reconstruction
-  //=========================================================================================
-  Double_t Utils::NuEnergyCalo(  std::vector<Int_t> *pdg, std::vector<Double_t> *energy,
-  			       Bool_t include_neutrons, Bool_t include_pizeros, Double_t prot_thresh, bool verbose ){
+  //=================================================================================
+  Double_t Utils::NuEnergyCalo(std::vector<Int_t> *pdg, std::vector<Double_t> *energy,
+                               Bool_t include_neutrons, Bool_t include_pizeros,
+                               Double_t prot_thresh, bool verbose ){
 
     if ( verbose ) std::cout << "Determining calorimetric energy" << std::endl;
 
@@ -470,9 +475,9 @@ namespace lar1{
   }
 
 
-  //=========================================================================================
+  //=================================================================================
   // Get the visible energy near the interaction vertex
-  //=========================================================================================
+  //=================================================================================
   Double_t Utils::VertexEnergy( std::vector<Int_t> *pdg, std::vector<Double_t> *energy, 
                                 Double_t prot_thresh, Double_t pion_thresh, bool verbose  ){
 
@@ -544,14 +549,16 @@ namespace lar1{
   }
 
 
-  //=========================================================================================
+  //==========================================================================
   // Check if point is in some fiducial volume definition
-  //==========================================================================================
-  void Utils::GetDetBoundary( Int_t idet, Double_t &xmin, Double_t &xmax, 
-  			    Double_t &ymin, Double_t &ymax, Double_t &zmin, Double_t &zmax ){
+  //==========================================================================
+  void Utils::GetDetBoundary(Int_t idet, 
+                             Double_t &xmin, Double_t &xmax, 
+  			                     Double_t &ymin, Double_t &ymax,
+                             Double_t &zmin, Double_t &zmax ){
     
     // LAr1-ND
-    if( idet == kND || idet == kND150 || idet == kND175 || idet == kND200 ){
+    if( idet == kND){
       xmin = nd_xmin;
       xmax = nd_xmax;
       ymin = nd_ymin;
@@ -569,14 +576,14 @@ namespace lar1{
       zmax = ub_zmax;
     }
     // LAr1-FD
-    else if( idet == kFD ){
-      xmin = fd_xmin;
-      xmax = fd_xmax;
-      ymin = fd_ymin;
-      ymax = fd_ymax;
-      zmin = fd_zmin;
-      zmax = fd_zmax;
-    }
+    // else if( idet == kFD ){
+    //   xmin = fd_xmin;
+    //   xmax = fd_xmax;
+    //   ymin = fd_ymin;
+    //   ymax = fd_ymax;
+    //   zmin = fd_zmin;
+    //   zmax = fd_zmax;
+    // }
     else if (idet == kMB){
       xmin = kMB_radius;
       xmax = 0;
@@ -585,7 +592,7 @@ namespace lar1{
       zmin = 0;
       zmax = 0;
     }
-    else if (idet == kIC || idet == kIC_600 || kIC_800){
+    else if (idet == kIC){
       xmin = ic_xmin;
       xmax = ic_xmax;
       ymin = ic_ymin;

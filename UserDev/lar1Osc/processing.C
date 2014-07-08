@@ -2,36 +2,48 @@
 {
   gSystem->Load("liblar1Osc.so");
 
-  TString directory = "/Users/jzennamo/Desktop/LArLite/Files/";
-  //lar1::NtupleReprocessing ntuple_100m_long_nu(directory + "combined_ntuple_100m_long_nu.root");      
-  //lar1::NtupleReprocessing ntuple_100m_long_nu_fosc(directory + "combined_ntuple_100m_long_nu_fosc.root"); 
+  TString directory = "/uboone/data/lar1/ComboNtuples_MC3_PAC/";
 
-  //lar1::NtupleReprocessing ntuple_100m_nu(directory + "combined_ntuple_100m_nu.root");           
-  //lar1::NtupleReprocessing ntuple_100m_nu_fosc(directory + "combined_ntuple_100m_nu_fosc.root");      
- 
-  // lar1::NtupleReprocessing ntuple_470m_nu(directory + "combined_ntuple_470m_nu.root");           
-  //lar1::NtupleReprocessing ntuple_470m_nu_fosc(directory + "combined_ntuple_470m_nu_fosc.root");
- 
-  lar1::NtupleReprocessing ntuple_700m_nu(directory + "combined_ntuple_700m_nu.root");
-  lar1::NtupleReprocessing ntuple_700m_nu_fosc(directory + "combined_ntuple_700m_nu_fosc.root");
+  //LAr1-ND @ 100 meters
+  lar1::NtupleReprocessing ntuple_100m_nu              (directory + "combined_ntuple_100m_nu.root");           
+  lar1::NtupleReprocessing ntuple_100m_nu_fosc         (directory + "combined_ntuple_100m_nu_fosc.root");      
+  ntuple_100m_nu.Loop("nue",0,0);
+  ntuple_100m_nu.Loop("numu",0,0);
+  ntuple_100m_nu_fosc.Loop("fosc",0,0);
 
-  // For each ntuple, do the nue, numu, fosc processing loops.
-  // Grouping them by iDet:
+  //LAr1-ND @ 150 meters
+  lar1::NtupleReprocessing ntuple_150m_nu              (directory + "combined_ntuple_150m_nu.root");           
+  lar1::NtupleReprocessing ntuple_150m_nu_fosc         (directory + "combined_ntuple_150m_nu_fosc.root");      
+  ntuple_150m_nu.Loop("nue",0,1);
+  ntuple_150m_nu.Loop("numu",0,1);
+  ntuple_150m_nu_fosc.Loop("fosc",0,1);
 
-  //@ 100 meters
-  //  ntuple_100m_nu.Loop("nue",0);
-  // ntuple_100m_nu.Loop("numu",0);
-  //ntuple_100m_nu_fosc.Loop("fosc",0);
+  //LAr1-ND @ 200 meters
+  lar1::NtupleReprocessing ntuple_200m_nu              (directory + "combined_ntuple_200m_nu.root");           
+  lar1::NtupleReprocessing ntuple_200m_nu_fosc         (directory + "combined_ntuple_200m_nu_fosc.root");      
+  ntuple_200m_nu.Loop("nue",0,3);
+  ntuple_200m_nu.Loop("numu",0,3);
+  ntuple_200m_nu_fosc.Loop("fosc",0,3);
 
-  //@ MicroBooNE
-  //  ntuple_470m_nu.Loop("nue",1);
-  //  ntuple_470m_nu.Loop("numu",1);
-  //  ntuple_470m_nu_fosc.Loop("fosc",1);
+  // MicroBooNE @ 470m
+  lar1::NtupleReprocessing ntuple_470m_nu              (directory + "combined_ntuple_470m_nu.root");           
+  lar1::NtupleReprocessing ntuple_470m_nu_fosc         (directory + "combined_ntuple_470m_nu_fosc.root");
+  ntuple_470m_nu.Loop("nue",1,4);
+  ntuple_470m_nu.Loop("numu",1,4);
+  ntuple_470m_nu_fosc.Loop("fosc",1,4);
 
   //T600 @ 600m on axis
-  ntuple_700m_nu.Loop("nue",6);
-  ntuple_700m_nu.Loop("numu",6);
-  ntuple_700m_nu_fosc.Loop("fosc",6);
+  lar1::NtupleReprocessing ntuple_600m_onaxis_nu       (directory + "combined_ntuple_600m_onaxis_nu.root");           
+  lar1::NtupleReprocessing ntuple_600m_onaxis_nu_fosc  (directory + "combined_ntuple_600m_onaxis_nu_fosc.root");      
+  ntuple_600m_onaxis_nu.Loop("nue",2,5,10000);
+  ntuple_600m_onaxis_nu.Loop("numu",2,5,10000);
+  ntuple_600m_onaxis_nu_fosc.Loop("fosc",2,5,10000);
 
+  //T600 @ 600m off axis
+  lar1::NtupleReprocessing ntuple_600m_offaxis_nu      (directory + "combined_ntuple_600m_offaxis_nu.root");           
+  lar1::NtupleReprocessing ntuple_600m_offaxis_nu_fosc (directory + "combined_ntuple_600m_offaxis_nu_fosc.root");      
+  ntuple_600m_offaxis_nu.Loop("nue",2,6,10000);
+  ntuple_600m_offaxis_nu.Loop("numu",2,6,10000);
+  ntuple_600m_offaxis_nu_fosc.Loop("fosc",2,6,10000);
 
 }

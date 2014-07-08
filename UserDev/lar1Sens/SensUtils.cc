@@ -75,9 +75,9 @@ namespace lar1
     Int_t nbins = 3*nbinsE*nL;
     
     Float_t entriescollapsed1[nbins-nbinsE][nbins-nbinsE];
-      Float_t entriescollapsed2[nbins-2*nbinsE][nbins-2*nbinsE];
-      Float_t entriescollapsed3[nbins-nL*nbinsE][nbins-nL*nbinsE];
-      Float_t *entriescollapsed = new float[(nbins-nL*nbinsE)*(nbins-nL*nbinsE)];
+    Float_t entriescollapsed2[nbins-2*nbinsE][nbins-2*nbinsE];
+    Float_t entriescollapsed3[nbins-nL*nbinsE][nbins-nL*nbinsE];
+    Float_t *entriescollapsed = new float[(nbins-nL*nbinsE)*(nbins-nL*nbinsE)];
     
     for (int ibin=0; ibin<(nbins-nbinsE); ibin++)
     {

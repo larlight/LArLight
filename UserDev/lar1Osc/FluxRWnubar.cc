@@ -118,7 +118,7 @@ namespace lar1{
     std::cout <<"Returning weight=1"<<std::endl;
     } else {
 
-    Int_t bin=Int_t(energy/fBinSize)+1;
+    Int_t bin=Int_t(energy/fBinSize);
     Double_t num   = fMB[ntype-1][ptype-1][bin];
     Double_t denom = fGS[ntype-1][ptype-1][bin];
 

@@ -120,7 +120,7 @@ namespace lar1{
     leg3->AddEntry(gdummy1,"LSND 99% CL","F");
     leg3->AddEntry(gdummy3,"LSND Best Fit","P*");
     leg3->AddEntry(gdummy4,"Global Best Fit","P*");
-    leg3->AddEntry(gdummy0,"Global Fit 90% CL (J. Kopp et al. arXiv:1303.3011)");
+    leg3->AddEntry(gdummy0,"Global Fit 90% CL (arXiv:1303.3011)");
 
     return leg3;
 

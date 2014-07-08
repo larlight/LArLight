@@ -13,9 +13,14 @@ class TH1D;
 
 namespace lar1{
 
+  enum beamMode {kNu, kNu_Fosc, kNubar, kNubar_Fosc };
+  enum detectorGeom {kND, kUB, kIC, kND_long, kMB};
+  enum detectorLoc  {k100m, k150m, k175m, k200m, k470m, k600m_onaxis, k600m_offaxis};
+
+
   class Utils {
     
-   public:
+  public:
     
     Utils();
     ~Utils();
@@ -47,7 +52,8 @@ namespace lar1{
     Double_t GetActiveMass( Int_t idet );
     void     GetDetBoundary( Int_t idet, Double_t &xmin, Double_t &xmax, 
   			     Double_t &ymin, Double_t &ymax, Double_t &zmin, Double_t &zmax ); 
-    Double_t GetPOTNorm( Int_t iflux, Int_t iDet );
+    
+    Double_t GetPOTNorm( Int_t iflux, Int_t iLoc );
     Double_t GetPOTNormNuMI( Int_t iflux, Int_t iDet );
 
     double   GetContainedLength(TVector3 startPoint, TVector3 startDir, int idet);
@@ -72,24 +78,24 @@ namespace lar1{
     double PotNormNubar;
     double PotNormNu;
 
-    const static Int_t kNu         = 0;
-    const static Int_t kNu_Fosc    = 1;
-    const static Int_t kNubar 	   = 2;
-    const static Int_t kNubar_Fosc = 3; 
+    // const static Int_t kNu         = 0;
+    // const static Int_t kNu_Fosc    = 1;
+    // const static Int_t kNubar 	   = 2;
+    // const static Int_t kNubar_Fosc = 3; 
 
 
     // Enumerate the detectors
-    const static Int_t kND = 0;
-    const static Int_t kUB = 1;
-    const static Int_t kFD = 2; 
-    const static Int_t kMB = 3;
-    const static Int_t kIC = 4;
-    const static Int_t kND_long = 5;
-    const static Int_t kIC_600 = 6;
-    const static Int_t kIC_800 = 7;
-    const static Int_t kND150 = 8;
-    const static Int_t kND175 = 9;
-    const static Int_t kND200 = 10;
+    // const static Int_t kND = 0;
+    // const static Int_t kUB = 1;
+    // const static Int_t kFD = 2; 
+    // const static Int_t kMB = 3;
+    // const static Int_t kIC = 4;
+    // const static Int_t kND_long = 5;
+    // const static Int_t kIC_600 = 6;
+    // const static Int_t kIC_800 = 7;
+    // const static Int_t kND150 = 8;
+    // const static Int_t kND175 = 9;
+    // const static Int_t kND200 = 10;
 
     
 

@@ -14,6 +14,7 @@
 #include <fstream>
 #include <sstream>
 #include "TLatex.h"
+#include <algorithm>
 
 namespace lar1{
   class SensUtils
