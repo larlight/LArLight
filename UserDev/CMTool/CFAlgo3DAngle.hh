@@ -54,6 +54,11 @@ namespace cmtool {
 		Set max and min phi and theta for ratio calculations
 	*/
 	virtual void SetMaxMin(const double phi_1, const double phi_2,double &max_1,double &max_2);
+	
+	/**
+		Order the hits per plane to make cuts convenient
+	*/
+	virtual void SortHits(const double hits_0, const double hits_1, const double hits_2, double &most, double &middle, double &least) ;
 
     /**
        Optional function: called after each iterative approach if a manager class is
