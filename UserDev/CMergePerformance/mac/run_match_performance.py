@@ -11,9 +11,16 @@ ana_module = fmwk.CMatchPerformance()
 priority_algo = cmtool.CPAlgoNHits()
 priority_algo.SetMinHits(20)
 
+algo_array = cmtool.CFAlgoArray()
+algo_array.SetMode(cmtool.CFAlgoArray.kSimpleAddition)
+algo_array.AddAlgo(cmtool.CFAlgoTimeOverlap())
+#algo_array.AddAlgo(cmtool.CFAlgoStartPointMatch())
+#algo_array.AddAlgo(cmtool.CFAlgo3DAngle())
+#algo_array.AddAlgo(cmtool.CFAlgoZOverlap())
+
 match_algo = cmtool.CFAlgoStartPointMatch()
 
-ana_module.GetManager().AddMatchAlgo(match_algo)
+ana_module.GetManager().AddMatchAlgo(algo_array)
 ana_module.GetManager().AddPriorityAlgo(priority_algo)
 
 processor.add_process(ana_module)
