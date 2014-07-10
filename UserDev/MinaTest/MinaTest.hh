@@ -15,13 +15,14 @@
 #define MINATEST_HH
 
 #include <iostream>
-
+#include <TObject.h>
+#include <vector>
 /**
    \class MinaTest
    User defined class MinaTest ... these comments are used to generate
    doxygen documentation!
  */
-class MinaTest{
+class MinaTest : public TObject{
 
 public:
 
@@ -30,19 +31,20 @@ public:
 
   /// Default destructor
   virtual ~MinaTest(){};
+
   struct Photon{
 
     int Event;
     int Run;
     int PDG;
     int TrackID;
-    std::array<double> StartXYZT[4];
-    std::array<double> EndXYZT[4];
+    std::vector<double> StartXYZT;
+    std::vector<double> EndXYZT;
     double Energy;
     int MotherTID;
     int MotherPDG;
-
-    Photon(){};
+ 
+   Photon(){};
   };
 
   struct Particle{
@@ -54,8 +56,8 @@ public:
 
   };
 
-  std::vector<Photon> Gamma_;
-  std::vector<Particle> All_;
+  std::vector<double> Gamma_;
+  std::vector<double> All_;
 
   ClassDef(MinaTest,1);
 
