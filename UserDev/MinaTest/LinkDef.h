@@ -11,6 +11,7 @@
 
 #pragma link C++ class MinaTest+;
 #pragma link C++ class ToyData+;
+#pragma link C++ class std::vector<ToyData>+;
 #pragma link C++ class ToyEvent+;
 //ADD_NEW_CLASS ... do not change this line
 #endif
