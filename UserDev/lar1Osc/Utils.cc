@@ -283,7 +283,7 @@ namespace lar1{
             POT_Sim = 2.386E+20;
             break;
           case kNu_Fosc:
-            POT_Sim = 6.476E+20;
+            POT_Sim = 7.357E+20;
             break;
           case kNubar:
           case kNubar_Fosc:

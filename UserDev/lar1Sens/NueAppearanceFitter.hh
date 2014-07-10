@@ -58,6 +58,7 @@ namespace lar1{
       int MakeRatioPlots(int sin22thpoint = -1, int dm2point = -1);
       int Loop();
       int MakePlots();
+      int MakeSimplePlot();
       int MakeEventRatePlots();
       int MakeAltSensPlot();
 
@@ -199,6 +200,7 @@ namespace lar1{
       std::vector<std::string> baselines;
       std::vector<double> scales;
       std::vector<std::string> names;
+      std::vector<std::string> baselinesFancy;
       std::vector<double> volume;
       std::vector<NtupleReader> readerNue;
       std::vector<NtupleReader> readerNumu;
@@ -228,8 +230,10 @@ namespace lar1{
 
       //except for oscVev, its name[b_line][energy_bin]
       std::vector< std::vector <float> >    eventsnumuVec;
-      std::vector< std::vector <float> >     eventsnueVec;
-      std::vector<std::vector< std::vector <float> > >    eventsnueoscVec;
+      std::vector< std::vector <float> >    eventsnueVec;
+      std::vector<std::vector< std::vector <float> > >    
+                                            eventsnueoscVec;
+
       //scheme is: eventsnueoscVec[b_line][point][energybin]
       std::vector< std::vector <float> >    eventsnuefoscVec;
       std::vector< std::vector <float> >    eventsSignalBestFitNuVec;
@@ -296,14 +300,10 @@ namespace lar1{
       TMatrix fractionalErrorMatrix;
       TMatrix correlationMatrix;
 
-/*
-
-holdiing off on this for a bit....
-      // vectors for holding the multiweight stuff.... 
-      // All of these are the fully combined vectors,
-      // as in: 100m fosc, 100m nue, 100m numu, 600m fosc, 600m nue, 600m numu
-      // that would make this vector nbinsE*3*nL long
-*/
+      TMatrix Shape_covarianceMatrix;
+      TMatrix fractional_Shape_covarianceMatrix;
+      TMatrix Mixed_covarianceMatrix;
+      TMatrix Norm_covarianceMatrix;
 
 
 

@@ -15,7 +15,7 @@ namespace lar1{
     //coming soon...
 
 
-    //verbose causes print outs of information that is good for checking
+    //verbose causes print outs of information that is good fsior checking
     verbose = false;  
     //debug prints out info to make sure root is behaving...
     debug   = false;  
@@ -98,16 +98,16 @@ namespace lar1{
     // char  label1[200], label2[200];
 
     if (mode == "nu"){
-        if (energyType == "etrue")  sprintf(label1, "#nu mode, CC events");
-        if (energyType == "eccqe")  sprintf(label1, "#nu mode, CCQE events");
-        if (energyType == "ecalo1") sprintf(label1, "#nu mode, CC events");
-        if (energyType == "ecalo2") sprintf(label1, "#nu mode, CC events");
+        if (energyType == "etrue")  sprintf(label1, "#nu mode, CC Events");
+        if (energyType == "eccqe")  sprintf(label1, "#nu mode, CCQE Events");
+        if (energyType == "ecalo1") sprintf(label1, "#nu mode, CC Events");
+        if (energyType == "ecalo2") sprintf(label1, "#nu mode, CC Events");
     }
     else if (mode == "nubar"){
-        if (energyType == "etrue")  sprintf(label1, "#bar{#nu} mode, CC events");
-        if (energyType == "eccqe")  sprintf(label1, "#bar{#nu} mode, CCQE events");
-        if (energyType == "ecalo1") sprintf(label1, "#bar{#nu} mode, CC events");
-        if (energyType == "ecalo2") sprintf(label1, "#bar{#nu} mode, CC events");
+        if (energyType == "etrue")  sprintf(label1, "#bar{#nu} mode, CC Events");
+        if (energyType == "eccqe")  sprintf(label1, "#bar{#nu} mode, CCQE Events");
+        if (energyType == "ecalo1") sprintf(label1, "#bar{#nu} mode, CC Events");
+        if (energyType == "ecalo2") sprintf(label1, "#bar{#nu} mode, CC Events");
     }
     else {
       std::cerr << "NO mode selected!!!\n";
@@ -116,8 +116,8 @@ namespace lar1{
 
     if (energyType == "etrue")  sprintf(label2, "True Energy");
     if (energyType == "eccqe")  sprintf(label2, "CCQE Energy");
-    if (energyType == "ecalo1") sprintf(label2, "Calo Energy (neutrons)");
-    if (energyType == "ecalo2") sprintf(label2, "Calo Energy (no neutrons)");
+    if (energyType == "ecalo1") sprintf(label2, "Reconstructed Energy");
+    if (energyType == "ecalo2") sprintf(label2, "Reconstructed Energy");
 
     fileNameRoot = fileSource;
     fileNameRoot += "nue_appearance_";
@@ -141,6 +141,13 @@ namespace lar1{
     if (use470m) baselines.push_back("470m");
     if (useT600_onaxis) baselines.push_back("600m_onaxis");
     if (useT600_offaxis) baselines.push_back("600m_offaxis");
+    if (use100m) baselinesFancy.push_back("100m");
+    if (use100mLong) baselinesFancy.push_back("100m");
+    if (use150m) baselinesFancy.push_back("150m");
+    if (use200m) baselinesFancy.push_back("200m");
+    if (use470m) baselinesFancy.push_back("470m");
+    if (useT600_onaxis) baselinesFancy.push_back("600m, on axis");
+    if (useT600_offaxis) baselinesFancy.push_back("600m, off axis");
     // if (useT600){
     //   if (specialNameText_far == "600") baselines.push_back("600");
     //   else if (specialNameText_far == "800") baselines.push_back("800");
@@ -157,7 +164,8 @@ namespace lar1{
     if (use100mLong) names.push_back("2*LAr1-ND");
     if (use470m) names.push_back("MicroBooNE");
     if (use700m) names.push_back("LAr1-FD");
-    if (useT600_onaxis || useT600_offaxis) names.push_back("ICARUS");
+    if (useT600_onaxis) names.push_back("T600");
+    if (useT600_offaxis) names.push_back("T600");
     //fiducial volume FROM MC, also just for fun: (scale to get target volume)
     if (use100m || use150m || use200m) volume.push_back(40);
     if (use470m) volume.push_back(61.4);
@@ -342,7 +350,9 @@ namespace lar1{
         shapeOnlyFit = false;
         //flatSystematicError = nearDetSystematicError; 
     }
-    if (!useNearDetStats) shapeOnlyFit = false;
+    // if (!useNearDetStats && !useCovarianceMatrix) shapeOnlyFit = false;
+
+    // if (shapeOnlyFit)
 
     chi2FileName = fileNameRoot+mode;
     if(shapeOnlyFit){
@@ -739,7 +749,6 @@ namespace lar1{
     
     // cov_max_name.push_back("matrices/s_no_osc_matrix.out");
 
-    // if (cov_max_name.size() != 0) utils.buildCovarianceMatrix(fracentries, cov_max_name, nbins);
 
     //if there is nothing in the covariance matrix vector, going to use near detector
     //statistics as the systematics downstream.  This involves going and finding
@@ -798,6 +807,19 @@ namespace lar1{
     correlationMatrix.ResizeTo(nL*3*nbinsE,nL*3*nbinsE);
     covarianceMatrix.Clear();
     covarianceMatrix.ResizeTo(nL*3*nbinsE,nL*3*nbinsE);
+
+    Shape_covarianceMatrix.Clear();
+    Shape_covarianceMatrix.ResizeTo(nL*3*nbinsE,nL*3*nbinsE);
+    fractional_Shape_covarianceMatrix.Clear();
+    fractional_Shape_covarianceMatrix.ResizeTo(nL*3*nbinsE,nL*3*nbinsE);
+    Mixed_covarianceMatrix.Clear();
+    Mixed_covarianceMatrix.ResizeTo(nL*3*nbinsE,nL*3*nbinsE);
+    Norm_covarianceMatrix.Clear();
+    Norm_covarianceMatrix.ResizeTo(nL*3*nbinsE,nL*3*nbinsE);
+
+
+    double n_total =0.0;
+
 
     float sin22th = 1;
     if (sin22thpoint != -1)
@@ -892,8 +914,13 @@ namespace lar1{
       }
 
 
+
       for (int ibin = 0; ibin < nL*nbinsE*3; ++ibin)
       {
+        // This is for computing the total number of events and is used in
+        // factoring the covariance matrix into shape, mixed, and norm parts
+        n_total += events_nominal_COPY[ibin] + sin22th*signal_nominal_COPY[ibin];
+
         for (int jbin = 0; jbin < nL*nbinsE*3; ++jbin)
         {
           if (debug && ibin == 53 && jbin == 20){
@@ -922,10 +949,19 @@ namespace lar1{
     }
 
     // std::cout << "Printing out fractional covariance matrix:"<<std::endl;
+    // This loop takes the error matrix and computes subsequent matrices from it:
+    // correlation matrix
+    // fractional error matrix
+    // 
+    // 
+
+    double covMatSum = 0.0;
+
     for (int ibin = 0; ibin < nL*nbinsE*3; ++ibin)
     {
       for (int jbin = 0; jbin < nL*nbinsE*3; ++jbin)
       {
+        covMatSum += covarianceMatrix[ibin][jbin];
         float norm = 1;
         if (covarianceMatrix[ibin][jbin] != 0)
         {
@@ -953,6 +989,45 @@ namespace lar1{
       }
 
     }
+
+    // Compute the following:
+    // shape only matrix
+    // fractional shape only matrix
+    // mixed matrix
+    // normalization matrix
+    // 
+    // Need to compute a few sums first:
+    for (int ibin = 0; ibin < nbinsE*nL*3; ++ibin)
+    {
+      for (int jbin = 0; jbin < nbinsE*nL*3; ++jbin)
+      {
+        Shape_covarianceMatrix[ibin][jbin] = covarianceMatrix[ibin][ibin];
+        double temp = events_nominal_COPY[ibin] + sin22th*signal_nominal_COPY[ibin];
+        temp *= events_nominal_COPY[jbin] + sin22th*signal_nominal_COPY[jbin];
+        temp /= n_total*n_total;
+        temp *= covMatSum;
+        Shape_covarianceMatrix[ibin][jbin] -= temp;
+        temp = events_nominal_COPY[ibin] + sin22th*signal_nominal_COPY[ibin];
+        temp *= events_nominal_COPY[jbin] + sin22th*signal_nominal_COPY[jbin];
+        if (temp != 0)
+          fractional_Shape_covarianceMatrix[ibin][jbin] = Shape_covarianceMatrix[ibin][jbin]/temp;
+        else
+          fractional_Shape_covarianceMatrix[ibin][jbin] = 0.0;
+      }
+    }
+
+    // for (int bin = 0; bin < nbinsE*3*nL; ++bin)
+    // {
+    //   std::cout << fractional_Shape_covarianceMatrix[bin][bin] << "\t"
+    //   std::cout << fractional_Shape_covarianceMatrix[bin][bin] << "\t"
+    //   std::cout << Shape_covarianceMatrix[bin][bin] << "\t"
+    //   std::cout << fractional_Shape_covarianceMatrix[bin][bin] << "\t"
+    // }
+
+// Shape_covarianceMatrix
+// fractional_Shape_covarianceMatrix
+// Mixed_covarianceMatrix
+// Norm_covarianceMatrix
 
     std::cout << "Making plots of the covariance matrix...." << std::endl;
     // TCanvas * covCanv = new TCanvas("covCanv","Covariance Matrix",700,700);
@@ -1130,21 +1205,7 @@ namespace lar1{
 
 
 
-    // Check on the nominal event rates?
-    if (debug){
-      for (int b_line = 0; b_line < nL; ++b_line)
-      { 
-        std::cout << "------nominal-------------" << std::endl;
-        std::cout << "sig\tnue\nnumu" << std::endl;
-        for (int bin = 0; bin < nbinsE; ++bin)
-        {
-          std::cout << signal_nominal_COPY[b_line][bin] << "\t";
-          std::cout << events_nue_nominal_COPY[b_line][bin] << "\t";
-          std::cout << events_nue_nominal_COPY[b_line][bin] << "\n";
-        }
-        std::cout << std::endl;
-      }
-    }
+
 
     // The ratio is the far detector divided by the near detector, always.
     for (int b_line = 1; b_line < nL; ++b_line)
@@ -1262,8 +1323,25 @@ namespace lar1{
                                                             *(temp_numu_Ratio[b_line][bin] - nominal_numu_Ratio[b_line][bin]);     
         }
       }
-// std::cout<< "Got here 4,"<<N_weight << std::endl;
+    }
 
+    if (debug){
+      std::cout << "Printing the nominal and last used event rates and ratios." << std::endl;
+      for (int b_line = 0; b_line < nL; ++b_line)
+      { 
+        std::cout << "------nominal-------------" << std::endl;
+        std::cout << "sig\tnue\tnumu\tsig\tnue\tnumu" << std::endl;
+        for (int bin = 0; bin < nbinsE; ++bin)
+        {
+          std::cout << signal_nominal_COPY[b_line][bin] << "\t";
+          std::cout << events_nue_nominal_COPY[b_line][bin] << "\t";
+          std::cout << events_numu_nominal_COPY[b_line][bin] << "\t";
+          std::cout << temp_signal_MW_COPY[b_line][bin] << "\t";
+          std::cout << temp_events_nue_MW_COPY[b_line][bin] << "\t";
+          std::cout << temp_events_numu_MW_COPY[b_line][bin] << "\n";
+        }
+        std::cout << std::endl;
+      }
     }
 
     //Now go and plot the ratios
@@ -1323,7 +1401,7 @@ namespace lar1{
       sprintf(temp,"#nu_{e} error of %s to %s",baselines[0].c_str(),baselines[i+1].c_str());
       nue_errorPlots[i] -> SetTitle(temp);
       nue_errorPlots[i] -> SetMinimum(0);
-      nue_errorPlots[i] -> SetMaximum(15);
+      nue_errorPlots[i] -> SetMaximum(20);
       nue_errorPlots[i] -> GetXaxis() -> SetTitle("Reconstructed Energy (GeV)");
       nue_errorPlots[i] -> GetYaxis() -> SetTitle("Percent Error [\%]");
 
@@ -1341,7 +1419,7 @@ namespace lar1{
       sprintf(temp,"#nu_{e} Statistical Error of %s to %s",baselines[0].c_str(),baselines[i+1].c_str());
       nue_stat_errorPlots[i] -> SetTitle(temp);
       nue_stat_errorPlots[i] -> SetMinimum(0);
-      nue_stat_errorPlots[i] -> SetMaximum(15);
+      nue_stat_errorPlots[i] -> SetMaximum(20);
       nue_stat_errorPlots[i] -> GetXaxis() -> SetTitle("Reconstructed Energy (GeV)");
       nue_stat_errorPlots[i] -> GetYaxis() -> SetTitle("Percent Error [\%]");
 
@@ -1359,7 +1437,7 @@ namespace lar1{
       sprintf(temp,"#nu_{e} MC Statistical Error of %s to %s",baselines[0].c_str(),baselines[i+1].c_str());
       nue_MCstat_errorPlots[i] -> SetTitle(temp);
       nue_MCstat_errorPlots[i] -> SetMinimum(0);
-      nue_MCstat_errorPlots[i] -> SetMaximum(15);
+      nue_MCstat_errorPlots[i] -> SetMaximum(20);
       nue_MCstat_errorPlots[i] -> SetLineColor(11);
       nue_MCstat_errorPlots[i] -> GetXaxis() -> SetTitle("Reconstructed Energy (GeV)");
       nue_MCstat_errorPlots[i] -> GetYaxis() -> SetTitle("Percent Error [\%]");
@@ -1570,7 +1648,6 @@ namespace lar1{
         double intSignalND = 0.;    double intNooscND = 0.;
         std::vector<double> scalefac;
         if(shapeOnlyFit){
-
           // Loop over the near det and determine the ratio between 
           // background and background + signal
           for(int i = 0; i < nbinsE; i ++){
@@ -1587,6 +1664,7 @@ namespace lar1{
             {
                 if (debug) std::cout << "\nScaled from: " << nullVec[2*n*nbinsE + i] << std::endl;
                 nullVec[2*n*nbinsE + i] *= scalefac[i];
+                eventsFitVecTemp[nbinsE + n*nbinsE*3 + i] *= scalefac[i];
                 if (debug) std::cout << "Scaled to: " << nullVec[2*n*nbinsE + i] << std::endl;
             }
           }
@@ -1725,7 +1803,10 @@ namespace lar1{
               // if ( (jbin%(nbinsE*3)) <nbinsE ) cvj *= sin22th; //scale the oscillated signal
 
               //Now scale the entries:
-              entries[ibin][jbin] = fractionalErrorMatrix[ibin][jbin]*cvi*cvj;
+              if (shapeOnlyFit)
+                entries[ibin][jbin] = fractional_Shape_covarianceMatrix[ibin][jbin]*cvi*cvj;
+              else
+                entries[ibin][jbin] = fractionalErrorMatrix[ibin][jbin]*cvi*cvj;
               //add statistical errors on the diagonal:
               if (ibin == jbin){
                 entries[ibin][jbin] += cvi; //cvi should equal cvj here
@@ -1791,107 +1872,67 @@ namespace lar1{
           }
         }
 
+        //This is the actual chi2 calculation
+        //Energy spectrum fit
+        //loop over collapsed bins
+        for (int ibin=1; ibin<=nbins-nL*nbinsE; ibin++)
+        {
+            //loop over collapsed bins
+            for (int jbin=1; jbin<=nbins-nL*nbinsE; jbin++)
+            {
 
+                float cvi = nullVec[ibin-1];
+                float cvj = nullVec[jbin-1];
 
-
-              // Make some plots:
-              if (shapeOnlyFit && dm2point == (int) npoints*0.9 )
-              {
-                  // if (sin22thpoint == (int) npoints/2)
-                  // {
-                  //     std::cout << "Using dm2: " << dm2 << std::endl;
-                  //     std::cout << "Using sin22th: " << sin22th << std::endl;
-                  //     // std::cout << "Scalefac: " << scalefac << std::endl;
-                  //     std::vector<float> tempVec = utils.collapseVector(eventsnLnullVec, nbinsE, nL);
-                  //     // TH1F * unscaled = makeHistogram(tempVec, 0, nbinsE);
-                  //     // TH1F * background = makeHistogram(nullVec, 0, nbinsE);
-                  //     // TH1F * sig = makeHistogram(predictionVec, 0, nbinsE);
-                  //     unscaled -> SetLineColor(1);
-                  //     background -> SetLineColor(2);
-                  //     sig -> SetLineColor(4);
-
-                  //     TLegend * scaleLegend = new TLegend(0.65,0.55,0.82,0.75);
-                  //     scaleLegend->SetFillStyle(0);
-                  //     scaleLegend->SetFillColor(0);
-                  //     scaleLegend->SetBorderSize(0);
-                  //     scaleLegend->SetTextSize(0.025);
-                  
-                  //     // scaleLegend -> AddEntry(unscaled, "Unscaled events");
-                  //     // scaleLegend -> AddEntry(background, "background events");
-                  //     // scaleLegend -> AddEntry(sig, "scaled events");
-
-                  //     // TCanvas * c65 = new TCanvas("c65","Stupid",800,400);
-                  //     // c65 -> cd();
-                  //     // unscaled ->Draw();
-                  //     // background ->Draw("same");
-                  //     // sig -> Draw("same");
-                  //     // scaleLegend -> Draw();
-                  // }
-              }
-
-
-
-              //This is the actual chi2 calculation
-              //Energy spectrum fit
-              //loop over collapsed bins
-              for (int ibin=1; ibin<=nbins-nL*nbinsE; ibin++)
-              {
-                  //loop over collapsed bins
-                  for (int jbin=1; jbin<=nbins-nL*nbinsE; jbin++)
-                  {
-
-                      float cvi = nullVec[ibin-1];
-                      float cvj = nullVec[jbin-1];
-
-                      // The prediction doesn't change
-                      float predictioni = predictionVec[ibin-1];
-                      float predictionj = predictionVec[jbin-1];
-                      
-                      if (debug){
-                          if (ibin == jbin){
-                              std::cout << "ibin: "<< ibin << " Prediction: " << predictioni << " cvi: " << cvi;
-                              std::cout << " M^-1: " << (*cov)(ibin-1,jbin-1);
-                              std::cout << " chi2: " << (predictioni-cvi)*(predictionj-cvj)* (*cov)(ibin-1,jbin-1) << std::endl;
-                          }
-                      }
-                      if (sin22thpoint == sin22thFittingPoint && dm2point == dm2FittingPoint){
-                        if (ibin == jbin){
-                          std::cout << "On bin " << ibin << ", adding chi2 = " << (predictioni-cvi)*(predictionj-cvj)* (*cov)(ibin-1,jbin-1) << std::endl;
-                          std::cout << "  nearDetStats error on this bin is "<< nearDetStats[ibin%(2*nbinsE)] << std::endl;
-                          std::cout << "  ibin: "<< ibin << " Prediction: " << predictioni << " cvi: " << cvi;
-                          std::cout << "  M^-1: " << (*cov)(ibin-1,jbin-1) << std::endl;
-                        }
-                      }
-                      chisq += (predictioni-cvi)*(predictionj-cvj)* (*cov)(ibin-1,jbin-1);
-
+                // The prediction doesn't change
+                float predictioni = predictionVec[ibin-1];
+                float predictionj = predictionVec[jbin-1];
+                
+                if (debug){
+                    if (ibin == jbin){
+                        std::cout << "ibin: "<< ibin << " Prediction: " << predictioni << " cvi: " << cvi;
+                        std::cout << " M^-1: " << (*cov)(ibin-1,jbin-1);
+                        std::cout << " chi2: " << (predictioni-cvi)*(predictionj-cvj)* (*cov)(ibin-1,jbin-1) << std::endl;
+                    }
+                }
+                if (sin22thpoint == sin22thFittingPoint && dm2point == dm2FittingPoint){
+                  if (ibin == jbin){
+                    std::cout << "On bin " << ibin << ", adding chi2 = " << (predictioni-cvi)*(predictionj-cvj)* (*cov)(ibin-1,jbin-1) << std::endl;
+                    std::cout << "  nearDetStats error on this bin is "<< nearDetStats[ibin%(2*nbinsE)] << std::endl;
+                    std::cout << "  ibin: "<< ibin << " Prediction: " << predictioni << " cvi: " << cvi;
+                    std::cout << "  M^-1: " << (*cov)(ibin-1,jbin-1) << std::endl;
                   }
-              }
-              
-              // return 0;
-              //write model in file
-              chi2->Fill(chisq,dm2,sin22th);
+                }
+                chisq += (predictioni-cvi)*(predictionj-cvj)* (*cov)(ibin-1,jbin-1);
 
-              if (chisq<=deltachisq5s)
-              {
-                  x5s[dm2point] = sin22th;
-                  y5s[dm2point] = dm2;
-              }
-              if (chisq<=deltachisq3s)
-              {
-                  x3s[dm2point] = sin22th;
-                  y3s[dm2point] = dm2;
-              }
-              if (chisq<=deltachisq90)
-              {
-                  x90[dm2point] = sin22th;
-                  y90[dm2point] = dm2;
-              }
-              // if (chisq<=deltachisq99)
-              // {
-              //     x99[dm2point] = sin22th;
-              //     y99[dm2point] = dm2;
-              // }
-              
+            }
+        }
+        
+        // return 0;
+        //write model in file
+        chi2->Fill(chisq,dm2,sin22th);
+
+        if (chisq<=deltachisq5s)
+        {
+            x5s[dm2point] = sin22th;
+            y5s[dm2point] = dm2;
+        }
+        if (chisq<=deltachisq3s)
+        {
+            x3s[dm2point] = sin22th;
+            y3s[dm2point] = dm2;
+        }
+        if (chisq<=deltachisq90)
+        {
+            x90[dm2point] = sin22th;
+            y90[dm2point] = dm2;
+        }
+        // if (chisq<=deltachisq99)
+        // {
+        //     x99[dm2point] = sin22th;
+        //     y99[dm2point] = dm2;
+        // }
+        
           if (debug) std::cout << "dm2: " << dm2 << ",\tsin22th: " << sin22th << ",\tchisq: " << chisq << std::endl;    
           if (debug) std::cout << "\n\n";
           if (debug) std::cout << "---------------------------End dm2: " << dm2 << ",\tsin22th: " << sin22th << std::endl;
@@ -2128,7 +2169,7 @@ namespace lar1{
 
     //======================================================
 
-    TLegend* legt=new TLegend(0.68,0.55,0.86,0.72);
+    TLegend* legt=new TLegend(0.68,0.50,0.86,0.62);
     legt->SetFillStyle(0);
     legt->SetFillColor(0);
     legt->SetBorderSize(0);
@@ -2151,18 +2192,18 @@ namespace lar1{
     for (int j=0; j<nL; j++) {
         if (baselines[j] == "100m" || baselines[j] == "150m" || baselines[j] == "200m"){
             if (use100m || use150m || use200m)
-                sprintf(name[j], "LAr1-ND (%s)", baselines[j].c_str());
+                sprintf(name[j], "LAr1-ND (%s)", baselinesFancy[j].c_str());
             else if (use100mLong)
-                sprintf(name[j], "2*LAr1-ND (%s)", baselines[j].c_str());
+                sprintf(name[j], "2*LAr1-ND (%s)", baselinesFancy[j].c_str());
         }
         else if (baselines[j] == "470m"){
-            sprintf(name[j], "MicroBooNE (%s)", baselines[j].c_str());
+            sprintf(name[j], "MicroBooNE (%s)", baselinesFancy[j].c_str());
         }
         else if (baselines[j] == "700m"){
-            if (use700m) sprintf(name[j], "LAr1-FD (%s)", baselines[j].c_str());
+            if (use700m) sprintf(name[j], "LAr1-FD (%s)", baselinesFancy[j].c_str());
         }
         else if (baselines[j] == "600m_onaxis" || baselines[j] == "600m_offaxis"){
-            sprintf(name[j], "T600 (%s)", baselines[j].c_str());
+            sprintf(name[j], "T600 (%s)", baselinesFancy[j].c_str());
         }
         // else if (baselines[j] == 800){
         //     sprintf(name[j], "T600 (%sm)", baselines[j].c_str());
@@ -2256,7 +2297,7 @@ namespace lar1{
       }
     }
 
-    TCanvas * tempCanv = new TCanvas("tempCanv","temp canvas",800,800);
+    TCanvas * tempCanv = new TCanvas("tempCanv","temp canvas",650,650);
     TPad * padTemp = new TPad("padTemp","padTemp",0,0,1,1);
     padTemp->Draw();
 
@@ -2278,14 +2319,125 @@ namespace lar1{
         std::cout << "Name is " << name[i] << std::endl;
         plotUtils.add_plot_label(name[i],  0.77, 0.87-i*0.04, 0.026, 1, 62);
     }  
-    plotUtils.add_plot_label(label2, 0.77, 0.76, 0.023, 1, 62);
-    plotUtils.add_plot_label(label1, 0.77, 0.73, 0.023, 1, 62);
+    plotUtils.add_plot_label((char*)"PRELIMINARY",0.77,0.79,0.023,2,62);
+    plotUtils.add_plot_label(label1, 0.77, 0.76, 0.023, 1, 62);
+    plotUtils.add_plot_label(label2, 0.77, 0.73, 0.023, 1, 62);
+    plotUtils.add_plot_label((char*)"80\% #nu_{e} efficiency", 0.77, 0.70, 0.023, 1, 62);
+    plotUtils.add_plot_label((char*)"Statistical and flux uncert. only", 0.77, 0.67, 0.023, 1, 62);
+
 
 
     std::cout<<"\nEnd of routine.\n";
 
     return 0;
   }
+
+  int NueAppearanceFitter::MakeSimplePlot(){
+
+    gStyle->SetOptStat(0000);
+    gStyle->SetOptFit(0000);
+    gStyle->SetPadBorderMode(0);
+    gStyle->SetPadBottomMargin(0.15);
+    gStyle->SetPadLeftMargin(0.15);
+    gStyle->SetPadRightMargin(0.05);
+    gStyle->SetFrameBorderMode(0);
+    gStyle->SetCanvasBorderMode(0);
+    gStyle->SetPalette(0);
+    gStyle->SetCanvasColor(0);
+    gStyle->SetPadColor(0);
+    
+    TGraph *sens90 = new TGraph(npoints+1,x90,y90); 
+    TGraph *sens3s = new TGraph(npoints+1,x3s,y3s); 
+    TGraph *sens5s = new TGraph(npoints+1,x5s,y5s);
+
+    //Plot Results:
+    sens90->SetLineColor(1); sens90->SetLineWidth(2);
+    sens3s->SetLineColor(9); sens3s->SetLineWidth(2);
+    sens5s->SetLineColor(9); sens5s->SetLineStyle(2); sens5s->SetLineWidth(1);   
+
+
+
+    TH2D* hr1=new TH2D("hr1","hr1",500,sin22thmin,sin22thmax,500,dm2min,dm2max);
+    hr1->Reset();
+    hr1->SetFillColor(0);
+    hr1->SetTitle(";sin^{2}2#theta_{#mue};#Deltam^{2}_{41} (eV^{2})");
+    hr1->GetXaxis()->SetTitleOffset(1.1);
+    hr1->GetYaxis()->SetTitleOffset(1.2);
+    hr1->GetXaxis()->SetTitleSize(0.05);
+    hr1->GetYaxis()->SetTitleSize(0.05);
+    hr1->GetXaxis()->CenterTitle();
+    hr1->GetYaxis()->CenterTitle();
+    hr1->SetStats(kFALSE);
+    // hr1->Draw();
+
+
+    TLegend* legt=new TLegend(0.8,0.45,0.93,0.57);
+    legt->SetFillStyle(0);
+    legt->SetFillColor(0);
+    legt->SetBorderSize(0);
+    legt->SetTextSize(0.025);
+
+    char name[3][200];
+
+    for (int j=0; j<nL; j++) {
+        if (baselines[j] == "100m" || baselines[j] == "150m" || baselines[j] == "200m"){
+            if (use100m || use150m || use200m)
+                sprintf(name[j], "LAr1-ND (%s)", baselinesFancy[j].c_str());
+            else if (use100mLong)
+                sprintf(name[j], "2*LAr1-ND (%s)", baselinesFancy[j].c_str());
+        }
+        else if (baselines[j] == "470m"){
+            sprintf(name[j], "MicroBooNE (%s)", baselinesFancy[j].c_str());
+        }
+        else if (baselines[j] == "700m"){
+            if (use700m) sprintf(name[j], "LAr1-FD (%s)", baselinesFancy[j].c_str());
+        }
+        else if (baselines[j] == "600m_onaxis" || baselines[j] == "600m_offaxis"){
+            sprintf(name[j], "T600 (%s)", baselinesFancy[j].c_str());
+        }
+        // else if (baselines[j] == 800){
+        //     sprintf(name[j], "T600 (%sm)", baselines[j].c_str());
+        // }
+    }
+
+
+
+    TLegend * leg3 = plotUtils.getLSNDLegend();
+    // leg3->Draw();
+
+    TCanvas * tempCanv = new TCanvas("tempCanv","temp canvas",650,650);
+    TPad * padTemp = new TPad("padTemp","padTemp",0,0,1,1);
+    padTemp->Draw();
+
+    padTemp->cd();
+
+    padTemp->SetLogx();
+    padTemp->SetLogy();
+    hr1->Draw();
+    plotUtils.lsnd_plot(padTemp);
+    sens90->Draw("l same");
+    legt->AddEntry(sens90,"90\% CL","l");
+    sens3s->Draw("l same");
+    legt->AddEntry(sens3s,"3#sigma CL","l");
+    sens5s->Draw("l same");
+    legt->AddEntry(sens5s,"5#sigma CL","l");
+    legt->Draw();
+    leg3->Draw();
+    // TLegend * FinalLegend()
+    for (int i = 0; i < nL;i++){
+        std::cout << "Name is " << name[nL-i-1] << std::endl;
+        plotUtils.add_plot_label(name[nL-i-1],  0.93, 0.78+i*0.04, 0.025, 1, 62,32);
+    }  
+    plotUtils.add_plot_label((char*)"PRELIMINARY",0.93,0.72,0.025,kRed-3,62,32);
+    plotUtils.add_plot_label(label1, 0.93, 0.69, 0.025, 1, 62,32);
+    plotUtils.add_plot_label(label2, 0.93, 0.66, 0.025, 1, 62,32);
+    plotUtils.add_plot_label((char*)"80\% #nu_{e} Efficiency", 0.93, 0.63, 0.025, 1, 62,32);
+    plotUtils.add_plot_label((char*)"Statistical and Flux Uncert. Only", 0.93, 0.60, 0.025, 1, 62,32);
+
+
+   return 0;
+  }
+
 
   int NueAppearanceFitter::MakeEventRatePlots(){
 
@@ -2430,8 +2582,8 @@ namespace lar1{
       leg = new TLegend(0.75,0.5,.95,0.9);
       leg -> SetTextFont(72);
       leg->AddEntry(NueFromNueCC_muon, "#mu #rightarrow #nu_{e}");
-      leg->AddEntry(NueFromNueCC_chargeKaon, "k^{+} #rightarrow #nu_{e}");
-      leg->AddEntry(NueFromNueCC_neutKaon, "k^{0} #rightarrow #nu_{e}");
+      leg->AddEntry(NueFromNueCC_chargeKaon, "K^{+} #rightarrow #nu_{e}");
+      leg->AddEntry(NueFromNueCC_neutKaon, "K^{0} #rightarrow #nu_{e}");
       // leg->AddEntry(NueFromEScatter, "#nu - e^{-}");
       leg->AddEntry(NueFromNC_pi0, "NC #pi^{0}");
       // leg->AddEntry(NueFromNC_delta0, "#Delta #rightarrow N#gamma");
@@ -2470,31 +2622,33 @@ namespace lar1{
                                   -0.01*(SignalNu->GetMaximum()),emax,1.0*max);
       
       //chr->GetYaxis()->SetLabelOffset(999);
-      chr->GetYaxis()->SetTitle("Events");
-      chr->GetYaxis()->SetTitleSize(0.06);
-      chr->GetYaxis()->SetTitleOffset(.7);
+
       char name[200];
       if (baselines[j] == "100m" || baselines[j] == "150m" || baselines[j] == "200m"){
-        if (use100mLong) sprintf(name, "2*LAr1-ND (%s)", baselines[j].c_str());
-        else sprintf(name, "LAr1-ND (%s)", baselines[j].c_str());
+        if (use100mLong) sprintf(name, "2*LAr1-ND (%s)", baselinesFancy[j].c_str());
+        else sprintf(name, "LAr1-ND (%s)", baselinesFancy[j].c_str());
       }
       else if (baselines[j] == "470m"){
-        sprintf(name, "MicroBooNE (%s)", baselines[j].c_str());
+        sprintf(name, "MicroBooNE (%s)", baselinesFancy[j].c_str());
       }
       else if (baselines[j] == "700m"){
-        if (use700m) sprintf(name, "LAr1-FD (%s)", baselines[j].c_str());
-        if (useT600_onaxis) sprintf(name, "T600 (%s)", baselines[j].c_str());
+        if (use700m) sprintf(name, "LAr1-FD (%s)", baselinesFancy[j].c_str());
+        if (useT600_onaxis) sprintf(name, "T600 (%s)", baselinesFancy[j].c_str());
       }
       else if (baselines[j] == "600m_onaxis"){
-        sprintf(name, "T600 (%s)", baselines[j].c_str());
+        sprintf(name, "T600 (%s)", baselinesFancy[j].c_str());
       }
       else if (baselines[j] == "600m_offaxis"){
-        sprintf(name, "T600 (%s)", baselines[j].c_str());
+        sprintf(name, "T600 (%s)", baselinesFancy[j].c_str());
       }
       // else if (baselines[j] == "800m"){
       //   sprintf(name, "T600 (%sm)", baselines[j].c_str());
       // }
       
+      chr->GetYaxis()->SetTitle("Events / 280 MeV");
+      chr->GetYaxis()->SetTitleSize(0.06);
+      chr->GetYaxis()->SetTitleOffset(0.9);
+      chr->GetYaxis()->CenterTitle();
       chr->GetXaxis()->CenterTitle();
       chr->GetXaxis()->SetLabelSize(0.05);
       TString forComparison = fileSource;
@@ -2506,18 +2660,21 @@ namespace lar1{
       TString EnergyLabel = label2;
       EnergyLabel += " (GeV)";
       chr->GetXaxis()->SetTitle(EnergyLabel);
-      chr->GetXaxis()->SetTitleOffset(1);
+      chr->GetXaxis()->SetTitleOffset(0.95);
       chr->GetXaxis()->SetTitleSize(0.07);
       chr->GetXaxis()->SetLimits(emin-0.01,emax);
       chr->Draw();
       
 
-      plotUtils.add_plot_label( name , 0.5, 0.85, 0.05, 1 );
+      plotUtils.add_plot_label( name , 0.2, 0.87, 0.05, 1,62,12);
       if (useHighDm) 
-        plotUtils.add_plot_label( (char*)"signal: (#Deltam^{2} = 50 eV^{2}, sin^{2}2#theta_{#mue} = 0.003)", 0.5, 0.775, 0.04, 1);
+        plotUtils.add_plot_label( (char*)"Signal: (#Deltam^{2} = 50 eV^{2}, sin^{2}2#theta_{#mue} = 0.003)", 0.2, 0.81, 0.04, 1,62,12);
       else if (useGlobBF)
-        plotUtils.add_plot_label( (char*)"signal: (#Deltam^{2} = 0.43 eV^{2}, sin^{2}2#theta_{#mue} = 0.013)", 0.5, 0.775, 0.04, 1);
-      else  plotUtils.add_plot_label( (char*)"signal: (#Deltam^{2} = 1.2 eV^{2}, sin^{2}2#theta_{#mue} = 0.003)", 0.5, 0.775, 0.04, 1);
+        plotUtils.add_plot_label( (char*)"Signal: (#Deltam^{2} = 0.43 eV^{2}, sin^{2}2#theta_{#mue} = 0.013)", 0.2, 0.81, 0.04, 1,62,12);
+      else  plotUtils.add_plot_label( (char*)"Signal: (#Deltam^{2} = 1.2 eV^{2}, sin^{2}2#theta_{#mue} = 0.003)", 0.2, 0.81, 0.04, 1,62,12);
+
+      plotUtils.add_plot_label((char*)"Statistical Uncertainty Only",0.2,0.76, 0.04,1,62,12);
+      plotUtils.add_plot_label((char*)"PRELIMINARY",0.2,0.71, 0.04, kRed-3,62,12);
 
       stack -> Draw("E0 hist same");
       SignalNu -> Draw("E0 hist same");

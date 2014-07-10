@@ -245,7 +245,7 @@ std::vector<std::vector<std::vector<float> > > NtupleReader::GetMultiWeightDataO
 
     if (bins.size() == 0 || bins.size() == 1){
       std::cout << "NtupleReader: Error: not enough bins." <<std::endl;
-      return 6;
+      exit(6);
     }
 
     buildFileNameSource();
@@ -256,7 +256,7 @@ std::vector<std::vector<std::vector<float> > > NtupleReader::GetMultiWeightDataO
       std::cout << "NtupleReader: Error: No input file found.  Searched for: " <<std::endl;
       std::cout << "\t" << fileNameSource <<std::endl;
       std::cout << "\tIn: " << filePath << std::endl;
-      return 2;
+      exit(2);
     }
     SourceFound = fileExists(filePath+fileNameSourceOsc);
 
@@ -264,7 +264,7 @@ std::vector<std::vector<std::vector<float> > > NtupleReader::GetMultiWeightDataO
       std::cout << "NtupleReader: Error: No input file found.  Searched for: " <<std::endl;
       std::cout << "\t" << fileNameSourceOsc <<std::endl;
       std::cout << "\tIn: " << filePath << std::endl;
-      return 2;
+      exit(2);
     }
 
     //If the code gets to this point, there is an input!
