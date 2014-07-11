@@ -12,7 +12,7 @@ include $(MAKE_TOP_DIR)/Makefile/Makefile.${OSNAME}
 
 # Add your program below with a space after the previous one.
 # This makefile compiles all binaries specified below.
-PROGRAMS = example
+PROGRAMS = mina_better_ana
 
 all:		$(PROGRAMS)
 
