@@ -17,22 +17,26 @@
 #include <iostream>
 #include <TObject.h>
 #include <vector>
-#include "MinaTestConstants.hh"
+#include <climits>
+#include <limits>
 
 /**
    \class MinaTest
    User defined class MinaTest ... these comments are used to generate
    doxygen documentation!
  */
-class photon : public TObject{
+class MinaTest : public TObject{
 
 public:
 
+  /// A constant to indicate invalid integer value in the storage
+  static const int kINVALID_INT = std::numeric_limits<int>::max();
+
   /// Default constructor
-  photon(){ clear();};
+  MinaTest(){ clear();};
 
   /// Default destructor
-  virtual ~photon(){};
+  virtual ~MinaTest(){};
 
 
   //int Event;
@@ -69,7 +73,7 @@ protected:
   int MotherTID;
   //int MotherPDG;
 
-  ClassDef(photon,1);
+  ClassDef(MinaTest,1);
 
 };
 
@@ -77,6 +81,9 @@ class Particle : public TObject{
 
 public:
 
+  /// A constant to indicate invalid integer value in the storage
+  static const int kINVALID_INT = std::numeric_limits<int>::max();
+ 
   //Constructor
   Particle() { clear(); }
 
@@ -95,7 +102,7 @@ public:
 //  };
 
   //The Photon must already be set as a photon in the analysis.
-  void SetParticle(int const TID, int const pdg, photon Pho_) {
+  void SetParticle(int const TID, int const pdg, MinaTest Pho_) {
     TrackID = TID;
     PDG = pdg;
     Photon_ = Pho_;
@@ -112,7 +119,7 @@ public:
 
 protected:
 
-  photon Photon_;
+  MinaTest Photon_;
   int TrackID;
   int PDG;
 
@@ -120,29 +127,29 @@ protected:
   
 };
 
-class MinaTest : public std::vector<Particle> {
+class Event : public std::vector<Particle> {
 
 public:
   
   //Constructor
-  MinaTest() : std::vector<Particle>() { clear(); };
+  Event() : std::vector<Particle>() { clear(); };
 
   //Destructor
-  virtual ~MinaTest(){};
+  virtual ~Event(){};
   
   //Setter for event 
-  void SetEvent(int EventID, int run) {Event = EventID; Run = run;}
-  int GetEvent() const {return Event;}
+  void SetEvent(int EventID, int run) {Evt = EventID; Run = run;}
+  int GetEvent() const {return Evt;}
   int GetRun() const {return Run;}
 
-  void clear() { Event = 0; Run = 0; std::vector<Particle>::clear(); }
+  void clear() { Evt = 0; Run = 0; std::vector<Particle>::clear(); }
 
 protected:
   
-  int Event;
+  int Evt;
   int Run;
   
-  ClassDef(MinaTest,1);
+  ClassDef(Event,1);
 
 };
 

@@ -16,11 +16,8 @@
 
 #include "TObject.h"
 #include <iostream>
-#include <climits>
-#include <limits>
-
-/// A constant to indicate invalid integer value in the storage
-static const int kINVALID_INT = std::numeric_limits<int>::max();
+#include <vector>
+#include "MinaTestConstants.hh"
 
 /**
    \class ToyData
