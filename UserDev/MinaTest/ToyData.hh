@@ -19,6 +19,9 @@
 #include <climits>
 #include <limits>
 
+/// A constant to indicate invalid integer value in the storage
+static const int kINVALID_INT = std::numeric_limits<int>::max();
+
 /**
    \class ToyData
    This is an example data product, ToyData.
@@ -27,9 +30,6 @@
 class ToyData : public TObject {
 
 public:
-
-  /// A constant to indicate invalid integer value in the storage
-  static const int kINVALID_INT = std::numeric_limits<int>::max();
 
   /// Default constructor
   ToyData() { clear(); }

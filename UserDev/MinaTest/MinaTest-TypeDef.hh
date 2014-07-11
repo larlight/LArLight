@@ -13,7 +13,9 @@
 class MinaTest;
 class ToyData;
 class ToyEvent;
+  class ToyAna;
 //ADD_EMPTY_CLASS ... do not change this comment line
 
 #endif
+
 

@@ -13,6 +13,8 @@
 #pragma link C++ class ToyData+;
 #pragma link C++ class std::vector<ToyData>+;
 #pragma link C++ class ToyEvent+;
+#pragma link C++ class ToyAna+;
 //ADD_NEW_CLASS ... do not change this line
 #endif
+
 
