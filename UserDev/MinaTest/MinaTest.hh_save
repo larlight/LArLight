@@ -1,0 +1,159 @@
+/**
+ * \file MinaTest.hh
+ *
+ * \ingroup MinaTest
+ * 
+ * \brief Class def header for a class MinaTest
+ *
+ * @author mina
+ */
+
+/** \addtogroup MinaTest
+
+    @{*/
+#ifndef MINATEST_HH
+#define MINATEST_HH
+
+#include <iostream>
+#include <TObject.h>
+#include <vector>
+#include <climits>
+#include <limits>
+
+/**
+   \class MinaTest
+   User defined class MinaTest ... these comments are used to generate
+   doxygen documentation!
+ */
+class MinaTest : public TObject{
+
+public:
+
+  /// A constant to indicate invalid integer value in the storage
+  static const int kINVALID_INT = std::numeric_limits<int>::max();
+
+  /// Default constructor
+  MinaTest(){ clear();};
+
+  /// Default destructor
+  virtual ~MinaTest(){};
+
+
+  //int Event;
+  //int Run;
+  //int PDG;
+  //int TrackID;
+
+  void clear() { 
+    MotherTID = kINVALID_INT;
+    Energy = 0.;
+    StartXYZT.clear();
+    EndXYZT.clear();
+  };
+
+  void SetPhoton(double const E, std::vector<double> const sXYZT, std::vector<double> const eXYZT, int const MTID) {
+    Energy = E;
+    MotherTID = MTID;
+    //MotherPDG = MPDG;
+    StartXYZT = sXYZT;
+    EndXYZT = eXYZT;
+  };
+
+  int GetEnergy() const { return Energy; }
+  int GetMotherTID() const { return MotherTID; }
+  //void GetMotherPDG() const { return MotherPDG; }
+  std::vector<double> GetStartXYZT() const { return StartXYZT; }
+  std::vector<double> GetEndXYZT() const { return EndXYZT; }
+
+protected:
+
+  std::vector<double> StartXYZT;
+  std::vector<double> EndXYZT;
+  double Energy;
+  int MotherTID;
+  //int MotherPDG;
+
+  ClassDef(MinaTest,1);
+
+};
+
+class Particle : public TObject{
+
+public:
+
+  /// A constant to indicate invalid integer value in the storage
+  static const int kINVALID_INT = std::numeric_limits<int>::max();
+ 
+  //Constructor
+  Particle() { clear(); }
+
+  //Destructor
+  virtual ~Particle(){}
+
+  void clear() {
+    TrackID = PDG = kINVALID_INT;
+    Photon_.clear();
+  };
+
+//  void SetParticle(int const TID, int const pdg) {
+//    TrackID = TID;
+//    PDG = pdg;
+//    Photon_.clear();
+//  };
+
+  //The Photon must already be set as a photon in the analysis.
+  void SetParticle(int const TID, int const pdg, MinaTest Pho_) {
+    TrackID = TID;
+    PDG = pdg;
+    Photon_ = Pho_;
+  };
+    
+
+  int fTrackId() const {return TrackID;}
+  int fPDG() const {return PDG;}
+  double fEnergy() const {return Photon_.GetEnergy(); }
+  int fMotherTID() const {return Photon_.GetMotherTID(); }
+  //int fMotherPDG() const {return Photon_.GetMotherPDG(); }
+  std::vector<double> fStartXYZT() const {return Photon_.GetStartXYZT(); }
+  std::vector<double> fEndXYZT() const {return Photon_.GetEndXYZT(); }
+
+protected:
+
+  MinaTest Photon_;
+  int TrackID;
+  int PDG;
+
+  ClassDef(Particle, 1);
+  
+};
+
+class Event : public std::vector<Particle> {
+
+public:
+  
+  //Constructor
+  Event() : std::vector<Particle>() { clear(); };
+
+  //Destructor
+  virtual ~Event(){};
+  
+  //Setter for event 
+  void SetEvent(int EventID, int run) {Evt = EventID; Run = run;}
+  int GetEvent() const {return Evt;}
+  int GetRun() const {return Run;}
+
+  void clear() { Evt = 0; Run = 0; std::vector<Particle>::clear(); }
+
+protected:
+  
+  int Evt;
+  int Run;
+  
+  ClassDef(Event,1);
+
+};
+
+
+#endif
+/** @} */ // end of doxygen group 
+
