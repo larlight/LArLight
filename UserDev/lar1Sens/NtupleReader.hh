@@ -27,8 +27,15 @@ Either way, you can access the data with the GetData() and GetDataOsc() methods.
 
  */
 namespace lar1{
+
+  // enum MWSource {kUnisim, kPiMinus, kPiPlus, kKaon0, kKMinus, kKPlus, kTotal};
+
+
   class NtupleReader
   {
+
+
+
   public:
     NtupleReader();
     NtupleReader( std::string signal,
@@ -70,7 +77,9 @@ namespace lar1{
     void setSpecialNameText(std::string s);
     void setSpecialNameTextOsc(std::string s);
     void setContainedShowers(double d = 150);
-    void useMultiWeights(bool b = true, bool b_signal = false);
+    void useMultiWeights(bool b = true, bool b_signal = false, int multiWeightSource = 6);
+
+    void setAbsolute_MWSource(bool b){absolute_MWSource = b;}
 
     int LoopNue();
     int LoopNumu();
@@ -93,8 +102,13 @@ namespace lar1{
     std::string energy;
     int npoints;
 
+    int multiWeightSource;
+    bool absolute_MWSource;
+
     bool usingMultiWeights;
     bool usingSignalMultiWeights;
+
+
 
     std::string specialNameText;
     std::string specialNameTextOsc;

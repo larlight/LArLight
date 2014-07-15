@@ -27,7 +27,7 @@ namespace lar1{
 
     useHighDm=false;
     useGlobBF=true;
-
+    absolute_MWSource=false; 
 
     flatSystematicError = 0.20;  // Only used if nearDetStats = false.
 
@@ -123,8 +123,8 @@ namespace lar1{
     fileNameRoot += "nue_appearance_";
     fileNameRoot += energyType;
     fileNameRoot += "_";
-    if(useCovarianceMatrix)
-      fileNameRoot+="covMat_";
+    // if(useCovarianceMatrix)
+    //   fileNameRoot+="covMat_";
 
     // std::vector<int> baselines;
     // std::vector<double> scales;
@@ -172,14 +172,14 @@ namespace lar1{
     if (use700m) volume.push_back(1000);
     if (useT600_onaxis || useT600_offaxis) volume.push_back(476);
     if (use100mLong) volume.push_back(80);
-    if (use100m) fileNameRoot += "ND_100m";
-    if (use150m) fileNameRoot += "ND_150m";
-    if (use200m) fileNameRoot += "ND_200m";
-    if (use100mLong) fileNameRoot += "2ND_";
-    if (use470m) fileNameRoot += "uB_";
-    if (use700m) fileNameRoot += "FD_";
-    if (useT600_onaxis ) fileNameRoot += "T600_onaxis";
-    if (useT600_offaxis) fileNameRoot += "T600_offaxis";
+    if (use100m) detNamesString += "ND_100m_";
+    if (use150m) detNamesString += "ND_150m_";
+    if (use200m) detNamesString += "ND_200m_";
+    if (use100mLong) detNamesString += "2ND_";
+    if (use470m) detNamesString += "uB_";
+    if (use700m) detNamesString += "FD_";
+    if (useT600_onaxis ) detNamesString += "T600_onaxis";
+    if (useT600_offaxis) detNamesString += "T600_offaxis";
     if (ElectContainedDist != -999) {
         char tempstring[100];
         sprintf(tempstring,"cont%g_",ElectContainedDist);
@@ -190,7 +190,7 @@ namespace lar1{
          (use100m && use200m) ||
          (use150m && use200m) ){
       std::cout << "Error, can only pick one near detector location!" << std::endl;
-      return -1;
+      exit(-1);
     }
 
     if (use100m){
@@ -199,8 +199,10 @@ namespace lar1{
       a.setSpecialNameText(specialNameText);
       a.setSpecialNameTextOsc(specialNameTextOsc);
       if (useCovarianceMatrix){
-        a.useMultiWeights(useCovarianceMatrix,useSignalCovarianceMatrix);
+        a.useMultiWeights(useCovarianceMatrix,useSignalCovarianceMatrix,multiWeightSource);
         a.setNWeights(nWeights);
+        if (absolute_MWSource)
+          a.setAbsolute_MWSource(absolute_MWSource);
       }
       readerNue.push_back(a);
       a.setSignal("numu");
@@ -214,8 +216,10 @@ namespace lar1{
       a.setSpecialNameText(specialNameText);
       a.setSpecialNameTextOsc(specialNameTextOsc);
       if (useCovarianceMatrix){
-        a.useMultiWeights(useCovarianceMatrix,useSignalCovarianceMatrix);
+        a.useMultiWeights(useCovarianceMatrix,useSignalCovarianceMatrix,multiWeightSource);
         a.setNWeights(nWeights);
+        if (absolute_MWSource)
+          a.setAbsolute_MWSource(absolute_MWSource);
       }
       readerNue.push_back(a);
       a.setSignal("numu");
@@ -229,8 +233,10 @@ namespace lar1{
       a.setSpecialNameText(specialNameText);
       a.setSpecialNameTextOsc(specialNameTextOsc);
       if (useCovarianceMatrix){
-        a.useMultiWeights(useCovarianceMatrix,useSignalCovarianceMatrix);
+        a.useMultiWeights(useCovarianceMatrix,useSignalCovarianceMatrix,multiWeightSource);
         a.setNWeights(nWeights);
+        if (absolute_MWSource)
+          a.setAbsolute_MWSource(absolute_MWSource);
       }
       readerNue.push_back(a);
       a.setSignal("numu");
@@ -244,8 +250,10 @@ namespace lar1{
       a.setSpecialNameText("long");
       a.setSpecialNameTextOsc("long");
       if (useCovarianceMatrix){
-        a.useMultiWeights(useCovarianceMatrix,useSignalCovarianceMatrix);
+        a.useMultiWeights(useCovarianceMatrix,useSignalCovarianceMatrix,multiWeightSource);
         a.setNWeights(nWeights);
+        if (absolute_MWSource)
+          a.setAbsolute_MWSource(absolute_MWSource);
       }
       readerNue.push_back(a);
       a.setSignal("numu");
@@ -260,8 +268,10 @@ namespace lar1{
       // a.setSpecialNameText(specialNameText);
       a.setSpecialNameTextOsc(specialNameTextOsc);
       if (useCovarianceMatrix){
-        a.useMultiWeights(useCovarianceMatrix,useSignalCovarianceMatrix);
+        a.useMultiWeights(useCovarianceMatrix,useSignalCovarianceMatrix,multiWeightSource);
         a.setNWeights(nWeights);
+        if (absolute_MWSource)
+          a.setAbsolute_MWSource(absolute_MWSource);
       }
       readerNue.push_back(a);
       a.setSignal("numu");
@@ -288,8 +298,10 @@ namespace lar1{
       a.setSpecialNameText(specialNameText);
       a.setSpecialNameTextOsc(specialNameTextOsc);
       if (useCovarianceMatrix){
-        a.useMultiWeights(useCovarianceMatrix,useSignalCovarianceMatrix);
+        a.useMultiWeights(useCovarianceMatrix,useSignalCovarianceMatrix,multiWeightSource);
         a.setNWeights(nWeights);
+        if (absolute_MWSource)
+          a.setAbsolute_MWSource(absolute_MWSource);
       }
       readerNue.push_back(a);
       a.setSignal("numu");
@@ -304,8 +316,10 @@ namespace lar1{
       a.setSpecialNameText(specialNameText);
       a.setSpecialNameTextOsc(specialNameTextOsc);
       if (useCovarianceMatrix){
-        a.useMultiWeights(useCovarianceMatrix,useSignalCovarianceMatrix);
+        a.useMultiWeights(useCovarianceMatrix,useSignalCovarianceMatrix,multiWeightSource);
         a.setNWeights(nWeights);
+        if (absolute_MWSource)
+          a.setAbsolute_MWSource(absolute_MWSource);
       }
       readerNue.push_back(a);
       a.setSignal("numu");
@@ -357,18 +371,24 @@ namespace lar1{
     chi2FileName = fileNameRoot+mode;
     if(shapeOnlyFit){
         if (useNearDetStats){
-            chi2FileName = chi2FileName+"_nearDetStats_shapeOnly_chi2.root";
+            chi2FileName = chi2FileName+detNamesString+"_nearDetStats_shapeOnly_chi2.root";
+        }
+        else if (useCovarianceMatrix) {
+            chi2FileName = chi2FileName+detNamesString+"_covMat_shapeOnly_chi2.root";
         }
         else{
-            chi2FileName = chi2FileName+"_flatStats_shapeOnly_chi2.root";
+            chi2FileName = chi2FileName+detNamesString+"_flatStats_shapeOnly_chi2.root";
         }
     }
     else{
         if (useNearDetStats){
-            chi2FileName = chi2FileName+"_nearDetStats_chi2.root";
+            chi2FileName = chi2FileName+detNamesString+"_nearDetStats_chi2.root";
         }
-        else{
-            chi2FileName = chi2FileName+"_flatStats_chi2.root";
+        else if (useCovarianceMatrix){
+            chi2FileName = chi2FileName+detNamesString+"_covMat_chi2.root";
+        }
+        else {
+          chi2FileName = chi2FileName+detNamesString+"_flatStats_chi2.root";
         }
     }
 
@@ -762,7 +782,7 @@ namespace lar1{
 
     // For shape only fits, the near det stats get recalculated each time chi2 gets
     // calculate.  But we do them once out here too, for the shape+rate fit.
-    if (cov_max_name.size() == 0){
+    if (!useCovarianceMatrix){
       //by design, the nearest detector to the source is the first in the vector
       //of baselines.
       nearDetStats.resize(nbinsE*3);
@@ -784,7 +804,7 @@ namespace lar1{
   // }
 
 
-    std::cout << std::endl;
+    // std::cout << std::endl;
     //now either the covariance matrix is set, or the frac entries is filled.
     //nearDetStats is only nonezero size if the cov_max_name is empty
     
@@ -896,6 +916,8 @@ namespace lar1{
     // for each iteration
     std::vector<float> temp_events_MW_COPY;
     std::vector<float> temp_signal_MW_COPY;
+    std::vector<float> saved_events_MW_COPY;
+    std::vector<float> saved_signal_MW_COPY;
 
     std::cout << "Computing the covariance matrix...." << std::endl;
     for (int N_weight = 0; N_weight < nWeights; ++N_weight)
@@ -912,8 +934,10 @@ namespace lar1{
           }
         }
       }
-
-
+      if (N_weight == 500){
+        saved_signal_MW_COPY = temp_signal_MW_COPY;
+        saved_events_MW_COPY = temp_events_MW_COPY;
+      }
 
       for (int ibin = 0; ibin < nL*nbinsE*3; ++ibin)
       {
@@ -934,19 +958,23 @@ namespace lar1{
           part1 -= temp_events_MW_COPY[ibin] + sin22th*temp_signal_MW_COPY[ibin];
           float part2 = events_nominal_COPY[jbin] + sin22th*signal_nominal_COPY[jbin];
           part2 -= temp_events_MW_COPY[jbin] + sin22th*temp_signal_MW_COPY[jbin];
+          if (ibin == 25 && jbin == 25) {
+            std::cout << "ibin, jbin: ("<<ibin<<","<<jbin<<"), weight: " << N_weight <<std::endl;
+            std::cout << "\tpart1: " << part1 << "\t" << "part2: " << part2 << "\n";
+          }
           covarianceMatrix[ibin][jbin] += (1.0/nWeights)*(part1*part2);
         }
       }
     }
 
 
-    if (debug){
+    // if (debug){
       std::cout << "Printing out the nominal and last used weight vectors:\n";
       for (int ibin = 0; ibin< nL*nbinsE*3; ++ibin){
-        std::cout << events_nominal_COPY[ibin] << "+" << signal_nominal_COPY[ibin] << "\t\t";
-        std::cout << temp_events_MW_COPY[ibin] << "+" << temp_signal_MW_COPY[ibin] << "\n";
+        std::cout << events_nominal_COPY[ibin]  << "+" << signal_nominal_COPY[ibin]  << "\t\t";
+        std::cout << saved_events_MW_COPY[ibin] << "+" << saved_signal_MW_COPY[ibin] << "\n";
       }
-    }
+    // }
 
     // std::cout << "Printing out fractional covariance matrix:"<<std::endl;
     // This loop takes the error matrix and computes subsequent matrices from it:
@@ -967,8 +995,11 @@ namespace lar1{
         {
           norm = events_nominal_COPY[ibin] + sin22th*signal_nominal_COPY[ibin];
           norm *= (events_nominal_COPY[jbin] + sin22th*signal_nominal_COPY[jbin]);
+          if (norm != 0)
+            fractionalErrorMatrix[ibin][jbin] = covarianceMatrix[ibin][jbin]/(norm);
+          else 
+            fractionalErrorMatrix[ibin][jbin] = 0.0;
 
-          fractionalErrorMatrix[ibin][jbin] = covarianceMatrix[ibin][jbin]/(norm);
           if (covarianceMatrix[ibin][ibin] != 0 &&
               covarianceMatrix[jbin][jbin] != 0 )
           {
@@ -985,7 +1016,7 @@ namespace lar1{
           correlationMatrixHist -> SetBinContent(ibin+1,jbin+1,correlationMatrix[ibin][jbin]);
         }
         // std::cout << "Matrix["<<ibin<<"]["<<jbin<<"] = " 
-                  // << covarianceMatrix[ibin][jbin]/norm << std::endl;
+                  // << covarianceMatrix[ibin][jbin] << std::endl;
       }
 
     }
@@ -1029,7 +1060,7 @@ namespace lar1{
 // Mixed_covarianceMatrix
 // Norm_covarianceMatrix
 
-    std::cout << "Making plots of the covariance matrix...." << std::endl;
+    // std::cout << "Making plots of the covariance matrix...." << std::endl;
     // TCanvas * covCanv = new TCanvas("covCanv","Covariance Matrix",700,700);
     // TCanvas * fracCanv = new TCanvas("fracCanv","Fractional Matrix",700,700);
 
@@ -1070,7 +1101,12 @@ namespace lar1{
     // 
     // 
     if (savePlots){
-      TFile * fileOut = new TFile("matrixForDave.root","RECREATE");
+      // Need to get the name of the matrix right:
+      int systematicInt = multiWeightSource;
+      TString matrixFileName = fileNameRoot + "matrixFile_";
+      if (absolute_MWSource) matrixFileName += "abs_";
+      matrixFileName += std::to_string(systematicInt) + "_" + detNamesString + ".root";
+      TFile * fileOut = new TFile(matrixFileName,"RECREATE");
       covarianceMatrixHist -> Write();
       fractionalMatrixHist -> Write();
       correlationMatrixHist -> Write();
@@ -1155,6 +1191,19 @@ namespace lar1{
   }
 
   int NueAppearanceFitter::MakeRatioPlots(int sin22thpoint, int dm2point){
+
+    gStyle->SetOptStat(0000);
+    gStyle->SetOptFit(0000);
+    gStyle->SetPadBorderMode(0);
+    gStyle->SetPadBottomMargin(0.15);
+    gStyle->SetPadLeftMargin(0.15);
+    gStyle->SetPadRightMargin(0.05);
+    gStyle->SetFrameBorderMode(0);
+    gStyle->SetCanvasBorderMode(0);
+    gStyle->SetPalette(0);
+    gStyle->SetCanvasColor(0);
+    gStyle->SetPadColor(0);
+
 
     if (nL < 2) {
       std::cout << "Can't make a ratio plot with only 1 detector!" << std::endl;
@@ -1381,11 +1430,22 @@ namespace lar1{
       sprintf(temp,"nue_ratioplot_%i",i);
       nue_ratioPlots[i] = new TH1F(temp,"Ratio Plot",nbinsE,emin,emax);
       sprintf(temp,"#nu_{e} Ratio of %s to %s",baselines[0].c_str(),baselines[i+1].c_str());
-      nue_ratioPlots[i] -> SetTitle(temp);
+      nue_ratioPlots[i] -> SetTitle("");
       nue_ratioPlots[i] -> SetMinimum(0);
-      nue_ratioPlots[i] -> SetMaximum(1);
-      nue_ratioPlots[i] -> GetXaxis() -> SetTitle("Reconstructed Energy (GeV)");
-      nue_ratioPlots[i] -> GetYaxis() -> SetTitle("Event Ratio");
+      nue_ratioPlots[i] -> SetMaximum(0.5);
+      // nue_ratioPlots[i] -> GetXaxis() -> CenterTitle();
+      nue_ratioPlots[i] -> GetXaxis() -> SetNdivisions(506);
+      nue_ratioPlots[i] -> GetXaxis() -> SetLabelSize(0.05);
+      nue_ratioPlots[i] -> GetYaxis() -> SetNdivisions(506);
+      nue_ratioPlots[i] -> GetYaxis() -> SetLabelSize(0.05);
+      nue_ratioPlots[i] -> GetXaxis() -> SetTitle("Reconstructed Neutrino Energy (GeV)");
+      nue_ratioPlots[i] -> GetXaxis() -> CenterTitle();
+      // nue_ratioPlots[i] -> GetYaxis() -> CenterTitle();
+      nue_ratioPlots[i] -> GetXaxis() -> SetTitleSize(.05);
+      nue_ratioPlots[i] -> GetYaxis() -> SetTitle("T600 (600m, on axis) / LAr1-ND (100m)");
+      nue_ratioPlots[i] -> GetYaxis() -> SetTitleSize(.045);
+      nue_ratioPlots[i] -> GetYaxis() -> SetTitleOffset(1.6);
+
 
       sprintf(temp,"numu_ratioplot_%i",i);
       numu_ratioPlots[i] = new TH1F(temp,"Ratio Plot",nbinsE,emin,emax);
@@ -1399,58 +1459,68 @@ namespace lar1{
       sprintf(temp,"nue_errorplot_%i",i);
       nue_errorPlots[i] = new TH1F(temp,"Error Plot",nbinsE,emin,emax);
       sprintf(temp,"#nu_{e} error of %s to %s",baselines[0].c_str(),baselines[i+1].c_str());
-      nue_errorPlots[i] -> SetTitle(temp);
+      nue_errorPlots[i] -> SetTitle("");
       nue_errorPlots[i] -> SetMinimum(0);
-      nue_errorPlots[i] -> SetMaximum(20);
-      nue_errorPlots[i] -> GetXaxis() -> SetTitle("Reconstructed Energy (GeV)");
-      nue_errorPlots[i] -> GetYaxis() -> SetTitle("Percent Error [\%]");
+      nue_errorPlots[i] -> SetMaximum(25);
+      nue_errorPlots[i] -> GetXaxis() -> SetNdivisions(506);
+      nue_errorPlots[i] -> GetXaxis() -> SetLabelSize(0.05);
+      nue_errorPlots[i] -> GetYaxis() -> SetNdivisions(506);
+      nue_errorPlots[i] -> GetYaxis() -> SetLabelSize(0.05);
+      nue_errorPlots[i] -> GetXaxis() -> CenterTitle();
+      nue_errorPlots[i] -> GetXaxis() -> SetTitleSize(.05);
+      nue_errorPlots[i] -> GetXaxis() -> SetTitle("Reconstructed Neutrino Energy (GeV)");
+      nue_errorPlots[i] -> GetYaxis() -> SetTitle("Percent Uncert. [\%]");
+      nue_errorPlots[i] -> GetYaxis() -> SetTitleSize(.05);
+      nue_errorPlots[i] -> GetYaxis() -> SetTitleOffset(1.2);
+      nue_errorPlots[i] -> SetLineWidth(2);
 
       sprintf(temp,"numu_errorplot_%i",i);
-      numu_errorPlots[i] = new TH1F(temp,"Error Plot",nbinsE,emin,emax);
-      sprintf(temp,"#nu_{#mu} error of %s to %s",baselines[0].c_str(),baselines[i+1].c_str());
+      numu_errorPlots[i] = new TH1F(temp,"Uncert. Plot",nbinsE,emin,emax);
+      sprintf(temp,"#nu_{#mu} Uncert. of %s to %s",baselines[0].c_str(),baselines[i+1].c_str());
       numu_errorPlots[i] -> SetTitle(temp);
       numu_errorPlots[i] -> SetMinimum(0);
       numu_errorPlots[i] -> SetMaximum(10);
       numu_errorPlots[i] -> GetXaxis() -> SetTitle("Reconstructed Energy (GeV)");
-      numu_errorPlots[i] -> GetYaxis() -> SetTitle("Percent Error [\%]");
+      numu_errorPlots[i] -> GetYaxis() -> SetTitle("Percent Uncert. [\%]");
 
       sprintf(temp,"nue_stat_errorplot_%i",i);
-      nue_stat_errorPlots[i] = new TH1F(temp,"Statistical Error Plot",nbinsE,emin,emax);
-      sprintf(temp,"#nu_{e} Statistical Error of %s to %s",baselines[0].c_str(),baselines[i+1].c_str());
+      nue_stat_errorPlots[i] = new TH1F(temp,"Statistical Uncert. Plot",nbinsE,emin,emax);
+      sprintf(temp,"#nu_{e} Statistical Uncert. of %s to %s",baselines[0].c_str(),baselines[i+1].c_str());
       nue_stat_errorPlots[i] -> SetTitle(temp);
       nue_stat_errorPlots[i] -> SetMinimum(0);
-      nue_stat_errorPlots[i] -> SetMaximum(20);
+      nue_stat_errorPlots[i] -> SetMaximum(25);
       nue_stat_errorPlots[i] -> GetXaxis() -> SetTitle("Reconstructed Energy (GeV)");
-      nue_stat_errorPlots[i] -> GetYaxis() -> SetTitle("Percent Error [\%]");
+      nue_stat_errorPlots[i] -> GetYaxis() -> SetTitle("Percent Uncert. [\%]");
+      nue_stat_errorPlots[i] -> SetLineWidth(2);
 
       sprintf(temp,"numu_stat_errorplot_%i",i);
-      numu_stat_errorPlots[i] = new TH1F(temp,"Statistical Error Plot",nbinsE,emin,emax);
-      sprintf(temp,"#nu_{#mu} Statistical Error of %s to %s",baselines[0].c_str(),baselines[i+1].c_str());
+      numu_stat_errorPlots[i] = new TH1F(temp,"Statistical Uncert. Plot",nbinsE,emin,emax);
+      sprintf(temp,"#nu_{#mu} Statistical Uncert. of %s to %s",baselines[0].c_str(),baselines[i+1].c_str());
       numu_stat_errorPlots[i] -> SetTitle(temp);
       numu_stat_errorPlots[i] -> SetMinimum(0);
       numu_stat_errorPlots[i] -> SetMaximum(10);
       numu_stat_errorPlots[i] -> GetXaxis() -> SetTitle("Reconstructed Energy (GeV)");
-      numu_stat_errorPlots[i] -> GetYaxis() -> SetTitle("Percent Error [\%]");
+      numu_stat_errorPlots[i] -> GetYaxis() -> SetTitle("Percent Uncert. [\%]");
 
       sprintf(temp,"nue_MCstat_errorplot_%i",i);
-      nue_MCstat_errorPlots[i] = new TH1F(temp,"MC Statistical Error Plot",nbinsE,emin,emax);
-      sprintf(temp,"#nu_{e} MC Statistical Error of %s to %s",baselines[0].c_str(),baselines[i+1].c_str());
+      nue_MCstat_errorPlots[i] = new TH1F(temp,"MC Statistical Uncert. Plot",nbinsE,emin,emax);
+      sprintf(temp,"#nu_{e} MC Statistical Uncert. of %s to %s",baselines[0].c_str(),baselines[i+1].c_str());
       nue_MCstat_errorPlots[i] -> SetTitle(temp);
       nue_MCstat_errorPlots[i] -> SetMinimum(0);
-      nue_MCstat_errorPlots[i] -> SetMaximum(20);
+      nue_MCstat_errorPlots[i] -> SetMaximum(25);
       nue_MCstat_errorPlots[i] -> SetLineColor(11);
       nue_MCstat_errorPlots[i] -> GetXaxis() -> SetTitle("Reconstructed Energy (GeV)");
-      nue_MCstat_errorPlots[i] -> GetYaxis() -> SetTitle("Percent Error [\%]");
+      nue_MCstat_errorPlots[i] -> GetYaxis() -> SetTitle("Percent Uncert. [\%]");
 
       sprintf(temp,"numu_MCstat_errorplot_%i",i);
-      numu_MCstat_errorPlots[i] = new TH1F(temp,"MC Statistical Error Plot",nbinsE,emin,emax);
-      sprintf(temp,"#nu_{#mu} MC Statistical Error of %s to %s",baselines[0].c_str(),baselines[i+1].c_str());
+      numu_MCstat_errorPlots[i] = new TH1F(temp,"MC Statistical Uncert. Plot",nbinsE,emin,emax);
+      sprintf(temp,"#nu_{#mu} MC Statistical Uncert. of %s to %s",baselines[0].c_str(),baselines[i+1].c_str());
       numu_MCstat_errorPlots[i] -> SetTitle(temp);
       numu_MCstat_errorPlots[i] -> SetMinimum(0);
       numu_MCstat_errorPlots[i] -> SetMaximum(10);
       numu_MCstat_errorPlots[i] -> SetLineColor(11);
       numu_MCstat_errorPlots[i] -> GetXaxis() -> SetTitle("Reconstructed Energy (GeV)");
-      numu_MCstat_errorPlots[i] -> GetYaxis() -> SetTitle("Percent Error [\%]");
+      numu_MCstat_errorPlots[i] -> GetYaxis() -> SetTitle("Percent Uncert. [\%]");
 
       for (int bin = 0; bin < nbinsE; ++bin)
       {
@@ -1474,11 +1544,12 @@ namespace lar1{
     }
 
     gStyle->SetOptStat(0);
-    leg_ratio -> AddEntry(nue_ratioPlots[0],"Nominal event rate ratio","l");
+    leg_ratio -> AddEntry(nue_ratioPlots[0],"Nominal #nu_{e} event ratio","l");
     // leg_ratio -> AddEntry();
-    leg_error -> AddEntry(nue_stat_errorPlots[0],"Data Statistical Error","l");
-    leg_error -> AddEntry(numu_MCstat_errorPlots[0],"MC Statistical Error","l");
+    leg_error -> AddEntry(nue_stat_errorPlots[0],"Data Statistical Uncert.","l");
+    leg_error -> AddEntry(numu_MCstat_errorPlots[0],"MC Statistical Uncert.","l");
     leg_error -> AddEntry(nue_errorPlots[0],"RMS for Ratio");
+    leg_error -> SetTextSize(0.035);
     // TH1F *chr = stackedCanvas[j]->DrawFrame(emin-0.01,-0.01*(SignalNu->GetMaximum()),emax,1.0*max);
 
     TCanvas * canv_nue = new TCanvas("ratioplots_nue","ratioplots_nue",800,500*(nL-1));
@@ -1898,7 +1969,7 @@ namespace lar1{
                 if (sin22thpoint == sin22thFittingPoint && dm2point == dm2FittingPoint){
                   if (ibin == jbin){
                     std::cout << "On bin " << ibin << ", adding chi2 = " << (predictioni-cvi)*(predictionj-cvj)* (*cov)(ibin-1,jbin-1) << std::endl;
-                    std::cout << "  nearDetStats error on this bin is "<< nearDetStats[ibin%(2*nbinsE)] << std::endl;
+                    if (useNearDetStats) std::cout << "  nearDetStats error on this bin is "<< nearDetStats[ibin%(2*nbinsE)] << std::endl;
                     std::cout << "  ibin: "<< ibin << " Prediction: " << predictioni << " cvi: " << cvi;
                     std::cout << "  M^-1: " << (*cov)(ibin-1,jbin-1) << std::endl;
                   }
@@ -2272,27 +2343,35 @@ namespace lar1{
     
     TImage *img = TImage::Create();
     img -> FromPad(c3);
-    if (specialNameText_far != "") fileNameRoot = fileNameRoot + specialNameText_far + "_";
-    if (specialNameTextOsc_far != "") fileNameRoot = fileNameRoot + specialNameTextOsc_far + "_";
+    // if (specialNameText_far != "") fileNameRoot = fileNameRoot + specialNameText_far + "_";
+    // if (specialNameTextOsc_far != "") fileNameRoot = fileNameRoot + specialNameTextOsc_far + "_";
     if (savePlots){
       if(shapeOnlyFit){
           if (useNearDetStats){
-              c3 -> Print(fileNameRoot+mode+"_nearDetStats_shapeOnly.pdf", "pdf");
-              c3 -> Print(fileNameRoot+mode+"_nearDetStats_shapeOnly.png", "png");
+              c3 -> Print(fileNameRoot+mode+"_nearDetStats_shapeOnly_megaPlot.pdf", "pdf");
+              c3 -> Print(fileNameRoot+mode+"_nearDetStats_shapeOnly_megaPlot.eps", "eps");
+          }
+          else if (useCovarianceMatrix) {
+              c3 -> Print(fileNameRoot+mode+"_covMat_shapeOnly_megaPlot.pdf", "pdf");
+              c3 -> Print(fileNameRoot+mode+"_covMat_shapeOnly_megaPlot.eps", "eps");
           }
           else{
-              c3 -> Print(fileNameRoot+mode+"_flatStats_shapeOnly.pdf", "pdf");
-              c3 -> Print(fileNameRoot+mode+"_flatStats_shapeOnly.png", "png");
+              c3 -> Print(fileNameRoot+mode+"_flatStats_shapeOnly_megaPlot.pdf", "pdf");
+              c3 -> Print(fileNameRoot+mode+"_flatStats_shapeOnly_megaPlot.eps", "eps");
           }
       }
       else{
         if (useNearDetStats){
-              c3 -> Print(fileNameRoot+mode+"_nearDetStats.pdf", "pdf");
-              c3 -> Print(fileNameRoot+mode+"_nearDetStats.png", "png");
+              c3 -> Print(fileNameRoot+mode+"_nearDetStats_megaPlot.pdf", "pdf");
+              c3 -> Print(fileNameRoot+mode+"_nearDetStats_megaPlot.eps", "eps");
           }
-          else{
-              c3 -> Print(fileNameRoot+mode+"_flatStats.pdf", "pdf");
-              c3 -> Print(fileNameRoot+mode+"_flatStats.png", "png");
+          else if (useCovarianceMatrix){
+              c3 -> Print(fileNameRoot+mode+"_covMat_megaPlot.pdf", "pdf");
+              c3 -> Print(fileNameRoot+mode+"_covMat_megaPlot.eps", "eps");
+          }
+          else {
+              c3 -> Print(fileNameRoot+mode+"_flatStats_megaPlot.pdf", "pdf");
+              c3 -> Print(fileNameRoot+mode+"_flatStats_megaPlot.eps", "eps");
           }
       }
     }
@@ -2433,6 +2512,38 @@ namespace lar1{
     plotUtils.add_plot_label(label2, 0.93, 0.66, 0.025, 1, 62,32);
     plotUtils.add_plot_label((char*)"80\% #nu_{e} Efficiency", 0.93, 0.63, 0.025, 1, 62,32);
     plotUtils.add_plot_label((char*)"Statistical and Flux Uncert. Only", 0.93, 0.60, 0.025, 1, 62,32);
+
+
+    if (savePlots){
+      if(shapeOnlyFit){
+          if (useNearDetStats){
+              tempCanv -> Print(fileNameRoot+mode+"_nearDetStats_shapeOnly_megaPlot.pdf", "pdf");
+              tempCanv -> Print(fileNameRoot+mode+"_nearDetStats_shapeOnly_megaPlot.eps", "eps");
+          }
+          else if (useCovarianceMatrix) {
+              tempCanv -> Print(fileNameRoot+mode+"_covMat_shapeOnly_megaPlot.pdf", "pdf");
+              tempCanv -> Print(fileNameRoot+mode+"_covMat_shapeOnly_megaPlot.eps", "eps");
+          }
+          else{
+              tempCanv -> Print(fileNameRoot+mode+"_flatStats_shapeOnly_megaPlot.pdf", "pdf");
+              tempCanv -> Print(fileNameRoot+mode+"_flatStats_shapeOnly_megaPlot.eps", "eps");
+          }
+      }
+      else{
+        if (useNearDetStats){
+              tempCanv -> Print(fileNameRoot+mode+"_nearDetStats_megaPlot.pdf", "pdf");
+              tempCanv -> Print(fileNameRoot+mode+"_nearDetStats_megaPlot.eps", "eps");
+          }
+          else if (useCovarianceMatrix){
+              tempCanv -> Print(fileNameRoot+mode+"_covMat_megaPlot.pdf", "pdf");
+              tempCanv -> Print(fileNameRoot+mode+"_covMat_megaPlot.eps", "eps");
+          }
+          else {
+              tempCanv -> Print(fileNameRoot+mode+"_flatStats_megaPlot.pdf", "pdf");
+              tempCanv -> Print(fileNameRoot+mode+"_flatStats_megaPlot.eps", "eps");
+          }
+      }
+    }
 
 
    return 0;
@@ -2598,7 +2709,19 @@ namespace lar1{
       leg -> SetBorderSize(0);
       // leg3->SetTextSize(0.03);
 
+//Start here
 
+    // TFile * f = new TFile("microBooNE_Event_Rates.root","RECREATE");
+    // NueFromNueCC_muon -> Write();
+    // NueFromNueCC_chargeKaon -> Write();
+    // NueFromNueCC_neutKaon -> Write();
+    // NueFromNC_pi0 -> Write();
+    // NueFromNumuCC -> Write();
+    // stack -> Write();
+    // // stackedCanvas -> Write();
+    // f->Close();
+//end here
+//
       // Get the value to be the maximum of the plot:
       double max = (stack -> GetMaximum());
 
@@ -2697,14 +2820,21 @@ namespace lar1{
     {
       char fileName[200];
       if (useHighDm) 
-        sprintf(fileName, "%s%s_%s_%s_highdm2.pdf", fileNameRoot.Data(), baselines[i].c_str(), mode.c_str(),energyType.c_str());
+        sprintf(fileName, "%s%s_%s_highdm2.pdf", fileNameRoot.Data(), baselines[i].c_str(), mode.c_str());
       else if (useGlobBF) 
-        sprintf(fileName, "%s%s_%s_%s_globBF.pdf", fileNameRoot.Data(), baselines[i].c_str(), mode.c_str(),energyType.c_str());
-      else sprintf(fileName, "%s%s_%s_%s.pdf", fileNameRoot.Data(), baselines[i].c_str(), mode.c_str(),energyType.c_str());
+        sprintf(fileName, "%s%s_%s_globBF.pdf", fileNameRoot.Data(), baselines[i].c_str(), mode.c_str());
+      else sprintf(fileName, "%s%s_%s.pdf", fileNameRoot.Data(), baselines[i].c_str(), mode.c_str());
       if (savePlots) stackedCanvas[i] -> Print(fileName, "pdf");
+      if (useHighDm) 
+        sprintf(fileName, "%s%s_%s_highdm2.eps", fileNameRoot.Data(), baselines[i].c_str(), mode.c_str());
+      else if (useGlobBF) 
+        sprintf(fileName, "%s%s_%s_globBF.eps", fileNameRoot.Data(), baselines[i].c_str(), mode.c_str());
+      else sprintf(fileName, "%s%s_%s.eps", fileNameRoot.Data(), baselines[i].c_str(), mode.c_str());
+      if (savePlots) stackedCanvas[i] -> Print(fileName, "eps");
       // stackedCanvas[i] -> Print(fileName, "eps");
     }
    
+
     return 0;
 
   }

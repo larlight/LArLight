@@ -1243,6 +1243,7 @@ namespace lar1{
                   electron_cand_angle, 0.511, iflux )/1000.0;
             enucalo1 = utils.NuEnergyCalo( geniePDG, genieE, true, true );
             enucalo2 = utils.NuEnergyCalo( geniePDG, genieE, false, false, prot_thresh ) + photon_energy;
+            Elep = electron_cand_energy;
             
             CcqeVsTrueE->Fill( energy, enuccqe, wgt );
             Calo1VsTrueE->Fill( energy, enucalo1, wgt );

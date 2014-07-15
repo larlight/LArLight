@@ -19,6 +19,7 @@ namespace lar1{
     specialNameText = "";
 
     usingMultiWeights = false;
+    absolute_MWSource = false;
     usingSignalMultiWeights = false;
     nWeights = 1000;
 
@@ -64,6 +65,7 @@ namespace lar1{
     specialNameText = "";
 
     usingMultiWeights = false;
+    absolute_MWSource = false;
     usingSignalMultiWeights = false;
     nWeights = 1000;
 
@@ -80,10 +82,11 @@ namespace lar1{
     setBins(defaultBins);
 
   }
-  void lar1::NtupleReader::useMultiWeights(bool b, bool signal_b)
+  void lar1::NtupleReader::useMultiWeights(bool b, bool signal_b, int this_multiWeightSource)
   {
     usingMultiWeights = b;
     usingSignalMultiWeights = signal_b;
+    multiWeightSource = this_multiWeightSource;
     multiWeightData.resize(nWeights);
     multiWeightDataOsc.resize(nWeights);
     for (int i = 0; i < nWeights; ++i)
@@ -210,21 +213,25 @@ std::vector<std::vector<std::vector<float> > > NtupleReader::GetMultiWeightDataO
     sprintf(tempstring, "%g_", emax);
     fileNameHists += tempstring;
     if (usingMultiWeights){
-      sprintf(tempstring, "%d_", nWeights);
+      sprintf(tempstring, "%dw_%d", nWeights,multiWeightSource);
       fileNameHists += tempstring;
+      if (absolute_MWSource)
+        fileNameHists += "_abs_";
     }
     fileNameHists += energy;
     fileNameHists += "_hists.root";
+
+
     fileNameHistsOsc += "_";
     sprintf(tempstring, "%g", emin);
     fileNameHistsOsc += tempstring;
     fileNameHistsOsc += "_";
     sprintf(tempstring, "%g", emax);
     fileNameHistsOsc += tempstring;
-    sprintf(tempstring, "_%d_", npoints);
+    sprintf(tempstring, "_%dp_", npoints);
     fileNameHistsOsc += tempstring;
     if (usingSignalMultiWeights){
-      sprintf(tempstring, "%d_", nWeights);
+      sprintf(tempstring, "%dw_%d", nWeights,multiWeightSource);
       fileNameHistsOsc += tempstring;
     }
     fileNameHistsOsc += energy;
@@ -612,11 +619,24 @@ std::vector<std::vector<std::vector<float> > > NtupleReader::GetMultiWeightDataO
       if (energy == "eccqe") fill_energy = Eccqe;
       if (energy == "ecalo1") fill_energy = ecalo1;
       if (energy == "ecalo2") fill_energy = ecalo2;
+      if (energy == "elep") fill_energy = Elep;
 
-      if (energy == "eccqe" && nuchan != 1){
-        if (inno == 12 || inno == -12)
-          continue;
-      }
+      // if ( (ibkg == kNueFromNueCC_muon       || 
+      //       ibkg == kNueFromNueCC_chargeKaon || 
+      //       ibkg == kNueFromNueCC_neutKaon)
+      //     && nuchan != 1)
+      // {
+      //   if (inno == 12 || inno == -12)
+      //     continue;
+      // }
+      // if ( (ibkg == kNueFromNueCC_muon       || 
+      //       ibkg == kNueFromNueCC_chargeKaon || 
+      //       ibkg == kNueFromNueCC_neutKaon)
+      //     && nuchan != 1)
+      // {
+      //   if (inno == 12 || inno == -12)
+      //     continue;
+      // }
       if (ibkg == kNueFromNueCC_muon       || 
           ibkg == kNueFromNueCC_chargeKaon || 
           ibkg == kNueFromNueCC_neutKaon   || 
@@ -631,7 +651,7 @@ std::vector<std::vector<std::vector<float> > > NtupleReader::GetMultiWeightDataO
       
       //use all the events because the weight, eff is already calculated
       weight=wgt; 
-      edistrnue->Fill(fill_energy,weight);
+      // if (!absolute_MWSource) edistrnue->Fill(fill_energy,weight);
       if (inno == 12 || inno == -12) eventsNueMC->Fill(fill_energy);
 
 
@@ -640,11 +660,22 @@ std::vector<std::vector<std::vector<float> > > NtupleReader::GetMultiWeightDataO
       if (usingMultiWeights){
         for (int i = 0; i < nWeights; ++i)
         {
-          double mult_wgt = (*MultiWeight)[6][i];
-          // std::cout << "mult_wgt[6]["<<i<<"] is " << mult_wgt << std::endl;
-          edistrnueMultiWeight[i]->Fill(fill_energy,wgt*mult_wgt);
+          double mult_wgt = (*MultiWeight)[multiWeightSource][i];
+          if (absolute_MWSource){
+            if (mult_wgt != 1.0){
+              edistrnueMultiWeight[i]->Fill(fill_energy,wgt*mult_wgt);           
+              if (i == 1)
+                edistrnue->Fill(fill_energy,weight);
+            }
+          }
+          else{
+            if (i == 0) edistrnue->Fill(fill_energy,weight);
+            edistrnueMultiWeight[i]->Fill(fill_energy,wgt*mult_wgt);  
+          }
         }
       }
+      else edistrnue->Fill(fill_energy,weight);
+
 
       if (ibkg == kNueFromNueCC_muon      ) nue_kNueFromNueCC_muon       -> Fill(fill_energy, weight);
       if (ibkg == kNueFromNueCC_chargeKaon) nue_kNueFromNueCC_chargeKaon -> Fill(fill_energy, weight);
@@ -1033,7 +1064,7 @@ std::vector<std::vector<std::vector<float> > > NtupleReader::GetMultiWeightDataO
         if (usingSignalMultiWeights){
           for (int N_weight = 0; N_weight < nWeights; ++N_weight)
           {
-            double mutl_wgt = (*MultiWeight)[6][N_weight];
+            double mutl_wgt = (*MultiWeight)[multiWeightSource][N_weight];
             edistrnueoscMultiWeight[N_weight][i]->Fill(fill_energy,weight*mutl_wgt);
           }
         }
@@ -1359,18 +1390,38 @@ std::vector<std::vector<std::vector<float> > > NtupleReader::GetMultiWeightDataO
 
       //use all the events because the weight, eff is already calculated
       weight=wgt; 
-      edistrnumu    -> Fill(fill_energy,weight);
       muLeptonEnergy  -> Fill(Elep, weight);
       eventsNumuMC -> Fill(fill_energy);
+
       // Now do the multiweight part
+      // if (usingMultiWeights){
+      //   for (int N_weight = 0; N_weight < nWeights; ++N_weight)
+      //   {
+      //     // double mutl_wgt = (*MultiWeight)[multiWeightSource][N_weight];
+      //     double mutl_wgt = (*MultiWeight)[6][N_weight];
+      //     edistnumuMultiWeight[N_weight]->Fill(fill_energy,weight*mutl_wgt);
+      //   }
+      // }
       if (usingMultiWeights){
-        for (int N_weight = 0; N_weight < nWeights; ++N_weight)
+        for (int i = 0; i < nWeights; ++i)
         {
-          double mutl_wgt = (*MultiWeight)[6][N_weight];
-          edistnumuMultiWeight[N_weight]->Fill(fill_energy,weight*mutl_wgt);
+          double mult_wgt = (*MultiWeight)[multiWeightSource][i];
+          if (absolute_MWSource){
+            if (mult_wgt != 1.0){
+              edistnumuMultiWeight[i]->Fill(fill_energy,wgt*mult_wgt);           
+              if (i == 0)
+                edistrnumu->Fill(fill_energy,weight);
+            }
+          }
+          else{
+            if (i == 0) edistrnumu->Fill(fill_energy,weight);
+            edistnumuMultiWeight[i]->Fill(fill_energy,wgt*mult_wgt);  
+          }
         }
       }
-      
+      else edistrnumu -> Fill(fill_energy,weight);
+
+
     }//end loop over events
 
     if (evtcounter!=nentries1){ printf("Events loop error! Exiting...\n"); return 4; }

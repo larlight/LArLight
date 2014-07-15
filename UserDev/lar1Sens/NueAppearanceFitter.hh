@@ -109,6 +109,7 @@ namespace lar1{
       void setUseCovarianceMatrix(bool b){useCovarianceMatrix = b;}
       void setUseSignalCovarianceMatrix(bool b){useSignalCovarianceMatrix = b;}
 
+      void setMultiWeightSource(int source){multiWeightSource = source;}
 
       void setShapeOnlyFit(bool b){shapeOnlyFit = b;}
       void setNearDetSystematicError(double d){nearDetSystematicError = d;}
@@ -120,6 +121,9 @@ namespace lar1{
       void setSystematicInflationAmount(double d){systematicInflationAmount =d;}
       void setInflateSystematics(bool b){inflateSystematics = b;}
 
+      void setAbsolute_MWSource(bool b){absolute_MWSource = b;}
+
+
     private:
 
       SensUtils utils;
@@ -128,6 +132,8 @@ namespace lar1{
       // All of the variables below are settable.
       //Self explanatory, this is where the ntuples you want to use are located:
       std::string fileSource;
+      TString fileNameRoot;
+      TString detNamesString;
       //Note: parts of this routine will write to that same folder, make sure its writable!
 
       //Set up the bins for the vector:
@@ -144,7 +150,9 @@ namespace lar1{
       bool useHighDm;
       bool useGlobBF;
 
-      TString fileNameRoot;
+      int multiWeightSource;
+      bool absolute_MWSource;
+
       double flatSystematicError;  // Only used if nearDetStats = false.
 
       std::string mode;  //beam mode to run in
