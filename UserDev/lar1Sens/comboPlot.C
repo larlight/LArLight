@@ -47,12 +47,21 @@
   TString path = "/uboone/app/users/cadams/reprocessing/LArLight/UserDev/lar1Sens/";
 
   std::vector<std::string> files;
-  files.push_back("files/nue_appearance_ecalo2_nuND_100m_T600_onaxis_covMat_shapeOnly_chi2.root");
-  files.push_back("files/nue_appearance_ecalo2_nuND_150m_T600_onaxis_covMat_shapeOnly_chi2.root");
-  files.push_back("files/nue_appearance_ecalo2_nuND_200m_T600_onaxis_covMat_shapeOnly_chi2.root");
+  // files.push_back("files/nue_appearance_ecalo2_nuND_100m_T600_onaxis_covMat_shapeOnly_chi2.root");
+  // files.push_back("files/nue_appearance_ecalo2_nuND_150m_T600_onaxis_covMat_shapeOnly_chi2.root");
+  // files.push_back("files/nue_appearance_ecalo2_nuND_200m_T600_onaxis_covMat_shapeOnly_chi2.root");
   // files.push_back("files/nue_appearance_ecalo2_covMat_ND_100mT600_offaxisnu_flatStats_shapeOnly_chi2.root");
   // files.push_back("files/nue_appearance_ecalo2_covMat_ND_150mT600_offaxisnu_flatStats_shapeOnly_chi2.root");
   // files.push_back("files/nue_appearance_ecalo2_covMat_ND_200mT600_offaxisnu_flatStats_shapeOnly_chi2.root");
+
+  // files.push_back("equalStats_chi2/nue_appearance_ecalo2_nuND_100m_T600_onaxis_flatStats_shapeOnly_chi2.root");
+  // files.push_back("equalStats_chi2/nue_appearance_ecalo2_nuND_150m_T600_onaxis_flatStats_shapeOnly_chi2.root");
+  // files.push_back("equalStats_chi2/nue_appearance_ecalo2_nuND_200m_T600_onaxis_flatStats_shapeOnly_chi2.root");
+
+  files.push_back("equalStats_scaleNDonly_chi2/nue_appearance_ecalo2_nuND_100m_T600_onaxis_flatStats_shapeOnly_chi2.root");
+  files.push_back("equalStats_scaleNDonly_chi2/nue_appearance_ecalo2_nuND_150m_T600_onaxis_flatStats_shapeOnly_chi2.root");
+  files.push_back("equalStats_scaleNDonly_chi2/nue_appearance_ecalo2_nuND_200m_T600_onaxis_flatStats_shapeOnly_chi2.root");
+
 
   // files.push_back("files/nue_appearance_ecalo2_nuND_100m_T600_onaxis_flatStats_shapeOnly_chi2.root");
   // files.push_back("files/nue_appearance_ecalo2_nuND_150m_T600_onaxis_flatStats_shapeOnly_chi2.root");
@@ -135,7 +144,7 @@
     TString this_File = path;
     this_File += files[i];
     TFile f(this_File);
-    TGraph * sens90 = (TGraph*) f.Get("Graph;3");
+    TGraph * sens90 = (TGraph*) f.Get("Graph;1");
     graphsForRatio.push_back(sens90);
     sens90 -> SetLineColor(colors[i]);
     sens90 -> SetLineStyle(1);
@@ -178,9 +187,9 @@
       graph_150->GetPoint(i,x_150,y_150);
       graph_200->GetPoint(i,x_200,y_200);
 
-      graph_100_R->SetPoint(i, (y_100), (x_100/x_100));
-      graph_150_R->SetPoint(i, (y_150), (x_100/x_150));
-      graph_200_R->SetPoint(i, (y_200), (x_100/x_200));
+      graph_100_R->SetPoint(i, (y_100), (x_100-x_100)/x_100 );
+      graph_150_R->SetPoint(i, (y_150), (x_100-x_150)/x_100 );
+      graph_200_R->SetPoint(i, (y_200), (x_100-x_200)/x_100 );
       
   }
 
@@ -190,7 +199,7 @@
   c3->SetBorderMode(0);
   c3->SetBorderSize(2);
   c3->SetLogx();
-  c3->SetLogy();
+  // c3->SetLogy();
   c3->SetLeftMargin(0.15);
   c3->SetRightMargin(0.05);
   c3->SetTopMargin(0.05);
@@ -198,7 +207,7 @@
   c3->SetFrameBorderMode(0);
   c3->SetFrameBorderMode(0);
 
-    TH2D *hr1__1 = new TH2D("hr1__1","",500,0.05,100,500,0.1,10);
+    TH2D *hr1__1 = new TH2D("hr1__1","",500,0.01,100,500,-5.0,5);
     hr1__1->SetDirectory(0);
     hr1__1->SetStats(0);
     
@@ -211,6 +220,7 @@
     hr1__1->GetYaxis()->SetTitleSize(0.05);
     hr1__1->GetYaxis()->SetTitleFont(62);
     hr1__1->GetYaxis()->SetTitleOffset(1.2);
+
 
     hr1__1->GetXaxis()->SetTitle("#Deltam_{41}^{2} [eV^{2}]");
     hr1__1->GetXaxis()->CenterTitle(true);

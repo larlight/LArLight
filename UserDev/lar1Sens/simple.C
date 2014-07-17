@@ -5,7 +5,7 @@
   lar1::NueAppearanceFitter n;
   n.setFileSource("/uboone/app/users/cadams/reprocessing/LArLight/UserDev/lar1Sens/files/");
   n.setVerbose(true);
-  n.setDebug(false);
+  n.setDebug(true);
   n.setSpecialNameText("");
   n.setSpecialNameTextOsc("");
   n.setSpecialNameText_far("");
@@ -21,9 +21,7 @@
   n.setUseT600_onaxis(true);
   n.setUseT600_offaxis(false);
   n.setUbooneScale(1.0);
-  n.setLAr1NDScale(1.0/(1.65*1.65));
-  // n.setLAr1NDScale(4.2/(1.65*1.65));
-  // n.setLAr1NDScale(2.3/(1.65*1.65));
+  n.setLAr1NDScale(10/(1.65*1.65));
   // n.setLAr1NDScale(1.0/3.0);
   n.setLAr1FDScale(1.0);
   n.setEnergyType("ecalo2");
@@ -43,26 +41,26 @@
   int kUnisim(0), kPiMinus(1), kPiPlus(2), kKaon0(3), kKMinus(4), kKPlus(5), kTotal(6);
   // n.setMultiWeightSource(kUnisim);
   // n.setMultiWeightSource(kPiMinus);
-  n.setMultiWeightSource(kPiPlus);
+  // n.setMultiWeightSource(kPiPlus);
   // n.setMultiWeightSource(kKaon0);
   // n.setMultiWeightSource(kKMinus);
   // n.setMultiWeightSource(kKPlus);
-  // n.setMultiWeightSource(kTotal);
+  n.setMultiWeightSource(kTotal);
 
-  n.setAbsolute_MWSource(true);
+  n.setAbsolute_MWSource(false);
 
-  n.setNpoints(500);
+  n.setNpoints(10);
   n.setNWeights(1000);
 
   n.setSavePlots(true);
 
   n.Prepare();
   n.ReadData();
-  n.BuildCovarianceMatrix();
+  // n.BuildCovarianceMatrix();
   // n.MakeRatioPlots();
-  // n.Loop();
+  n.Loop();
   // n.MakePlots();
-  // n.MakeSimplePlot();
+  n.MakeSimplePlot();
   // n.MakeEventRatePlots();
   // n.MakeAltSensPlot();
 

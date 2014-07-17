@@ -1180,11 +1180,127 @@ namespace lar1{
         numuEventRates[b_line] -> Write();
 
       }
+/*
+      std::vector<TH1F *> nue_fractionalUncertantiesHists;
+      std::vector<TH1F *> numu_fractionalUncertantiesHists;
+      nue_fractionalUncertantiesHists.resize(nL);
+      numu_fractionalUncertantiesHists.resize(nL);
 
 
+      // TCanvas * canvUncerts = new TCanvas("stupid_canv","canvas",400,400*nL);
+      // canvUncerts->Divide(1,2);
 
+
+      for (int b_line = 0; b_line < nL; b_line ++){
+        char tempstring[100];
+
+        sprintf(tempstring,"nue_fracUncert_%s",names[b_line].c_str());
+        nue_fractionalUncertantiesHists[b_line] = new TH1F(tempstring,baselinesFancy[b_line].c_str(),nbinsE,emin,emax);
+        sprintf(tempstring,"numu_fracUncert_%s",names[b_line].c_str());
+        numu_fractionalUncertantiesHists[b_line] = new TH1F(tempstring,baselinesFancy[b_line].c_str(),nbinsE,emin,emax);
+        for (int bin = 0; bin < nbinsE; ++bin)
+        {
+          double error = sqrt((*collapsed_fracMat)[b_line*2*nbinsE + bin][b_line*2*nbinsE + bin]);
+          nue_fractionalUncertantiesHists[b_line] -> SetBinContent(bin+1,error);
+          error = sqrt((*collapsed_fracMat)[b_line*2*nbinsE + nbinsE + bin][b_line*2*nbinsE + nbinsE + bin]);
+          numu_fractionalUncertantiesHists[b_line] -> SetBinContent(bin+1,error);
+        }
+
+        // canvUncerts -> cd(1);
+        nue_fractionalUncertantiesHists[b_line]->SetTitle("#nu_{e} Fractional Uncertainty [%]");
+        nue_fractionalUncertantiesHists[b_line]->GetXaxis()->SetTitle("Neutrino Energy [GeV]");
+        nue_fractionalUncertantiesHists[b_line]->GetYaxis()->SetTitleFont(62);
+        nue_fractionalUncertantiesHists[b_line]->GetXaxis()->SetTitleFont(62);
+        nue_fractionalUncertantiesHists[b_line]->GetYaxis()->SetLabelFont(62);
+        nue_fractionalUncertantiesHists[b_line]->GetXaxis()->SetLabelFont(62);
+        nue_fractionalUncertantiesHists[b_line]->GetYaxis()->CenterTitle();
+        nue_fractionalUncertantiesHists[b_line]->GetYaxis()->SetTitleSize(0.06);
+        nue_fractionalUncertantiesHists[b_line]->GetXaxis()->SetTitleSize(0.6);
+        nue_fractionalUncertantiesHists[b_line]->GetXaxis()->SetLabelSize(0.06);
+        nue_fractionalUncertantiesHists[b_line]->GetYaxis()->SetLabelSize(0.06);
+        nue_fractionalUncertantiesHists[b_line]->GetYaxis()->SetTitleOffset(0.8);
+        nue_fractionalUncertantiesHists[b_line]->GetXaxis()->SetTitleOffset(1.5);
+        nue_fractionalUncertantiesHists[b_line]->SetLineWidth(4);
+        if (b_line == 0){
+          nue_fractionalUncertantiesHists[b_line]->SetLineColor(kBlack);
+          // nue_fractionalUncertantiesHists[b_line]->Draw("h");
+        }
+        else{
+          nue_fractionalUncertantiesHists[b_line]->SetLineColor(kBlue-3);
+          // nue_fractionalUncertantiesHists[b_line]->Draw("h same");
+        }
+
+
+        // canvUncerts -> cd(2);
+        numu_fractionalUncertantiesHists[b_line]->SetTitle("#nu_{#mu} Fractional Uncertainty [%]");
+        numu_fractionalUncertantiesHists[b_line]->GetXaxis()->SetTitle("Neutrino Energy [GeV]");
+        numu_fractionalUncertantiesHists[b_line]->GetYaxis()->SetTitleFont(62);
+        numu_fractionalUncertantiesHists[b_line]->GetXaxis()->SetTitleFont(62);
+        numu_fractionalUncertantiesHists[b_line]->GetYaxis()->SetLabelFont(62);
+        numu_fractionalUncertantiesHists[b_line]->GetXaxis()->SetLabelFont(62);
+        numu_fractionalUncertantiesHists[b_line]->GetYaxis()->CenterTitle();
+        numu_fractionalUncertantiesHists[b_line]->GetYaxis()->SetTitleSize(0.06);
+        numu_fractionalUncertantiesHists[b_line]->GetXaxis()->SetTitleSize(0.6);
+        numu_fractionalUncertantiesHists[b_line]->GetXaxis()->SetLabelSize(0.06);
+        numu_fractionalUncertantiesHists[b_line]->GetYaxis()->SetLabelSize(0.06);
+        numu_fractionalUncertantiesHists[b_line]->GetYaxis()->SetTitleOffset(0.8);
+        numu_fractionalUncertantiesHists[b_line]->GetXaxis()->SetTitleOffset(1.5);
+        numu_fractionalUncertantiesHists[b_line]->SetLineWidth(4);
+        if (b_line == 0){
+          numu_fractionalUncertantiesHists[b_line]->SetLineColor(kBlack);
+          // numu_fractionalUncertantiesHists[b_line]->Draw("h");
+        }
+        else{
+          numu_fractionalUncertantiesHists[b_line]->SetLineColor(kBlue-3);
+          // numu_fractionalUncertantiesHists[b_line]->Draw("h same");
+        }
+        /*
+            ND_err->GetYaxis()->SetTitle("Fractional Uncertainty [%]");
+    ND_err->GetXaxis()->SetTitle("Neutrino Energy [GeV]");
+    ND_err->GetYaxis()->SetTitleFont(62);
+    ND_err->GetXaxis()->SetTitleFont(62);
+    ND_err->GetYaxis()->SetLabelFont(62);
+    ND_err->GetXaxis()->SetLabelFont(62);
+    ND_err->GetYaxis()->CenterTitle();
+    ND_err->GetYaxis()->SetTitleSize(0.06);
+    ND_err->GetXaxis()->SetTitleSize(0.6);
+    ND_err->GetXaxis()->SetLabelSize(0.06);
+    ND_err->GetYaxis()->SetLabelSize(0.06);
+    ND_err->GetYaxis()->SetTitleOffset(0.8);
+    ND_err->GetXaxis()->SetTitleOffset(1.5);
+    ND_err->SetStats(0);
+    ND_err->SetMinimum(1.1);
+    ND_err->SetMaximum(100);
+    ND_err->GetYaxis()->SetNdivisions(509);
+    ND_err->GetXaxis()->SetNdivisions(509);
+    
+    ND_err->SetLineWidth(4);
+    ND_err->SetLineColor(kBlue-3);
+    ND_err->Draw("h");
+    FD_err->SetLineWidth(3);
+    FD_err->SetLineStyle(2);
+    FD_err->SetLineColor(kRed-3);
+    FD_err->Draw("h same");
+    
+    TLegend* leg3=new TLegend(0.2,0.7,0.4,0.8);
+    leg3->SetFillStyle(0);
+    leg3->SetFillColor(0);
+    leg3->SetBorderSize(0);
+    leg3->SetTextFont(62);
+    leg3->SetTextSize(0.03);
+    leg3->AddEntry(ND_err,"LAr1-ND (200m)","L");
+    leg3->AddEntry(FD_err,"T600 (600m, on axis)","L");
+    leg3->Draw();
+
+        nue_fractionalUncertantiesHists[b_line] -> Write();
+        numu_fractionalUncertantiesHists[b_line] -> Write();
+
+      }
+*/
       fileOut -> Close();
     }
+
+    // Plot the diagonal errors for this particular fractional Uncert. MatrixL
 
     return 0;
 
@@ -1614,7 +1730,8 @@ namespace lar1{
     x3s = new double[npoints+1]; y3s = new double[npoints+1];
     x5s = new double[npoints+1]; y5s = new double[npoints+1];
 
-
+    if (useCovarianceMatrix)
+      BuildCovarianceMatrix();
 
     // // populate the vectors that hold the fractional errors
     // // for plotting purposes.
@@ -1662,8 +1779,10 @@ namespace lar1{
 
     //This loop is actually doing the chisq calculation
     //It loops over npoints twice.  First over dm2, and second over sin22th
+    // for (int dm2point = 450; dm2point <= npoints; dm2point ++){
     for (int dm2point = 0; dm2point <= npoints; dm2point ++){
       std::cout << "dm^2: " << dm2point << " of " << npoints << std::endl;      
+      // for (int sin22thpoint = 250; sin22thpoint <= npoints; sin22thpoint++){
       for (int sin22thpoint = 0; sin22thpoint <= npoints; sin22thpoint++){
         chisq = 0.0; //reset the chisq!
         systematicErrors.clear();
@@ -1675,6 +1794,8 @@ namespace lar1{
         dm2 = pow(10.,(TMath::Log10(dm2min)+(dm2point*1./npoints)*TMath::Log10(dm2max/dm2min)));
         sin22th = pow(10.,(TMath::Log10(sin22thmin)+(sin22thpoint*1./npoints)*TMath::Log10(sin22thmax/sin22thmin)));
         if (debug) std::cout << "---------------------------Begin dm2: " << dm2 << ",\tsin22th: " << sin22th << std::endl;
+
+////Avoiding edits before here.
 
         //Now build the covariance matrix for this point on (dm2, sin22th)
         //The current matrix is just the fractional systematics.
@@ -1715,6 +1836,11 @@ namespace lar1{
         // Now predictionVec and nullVec hold the right stuff, uncorrected
         // for high dm2
         
+        // for (auto bin : eventsFitVecTemp)
+        //   std::cout << bin << " ";
+        // std::cout <<"\n";
+
+
         // Here's where the shape only stuff comes into play
         double intSignalND = 0.;    double intNooscND = 0.;
         std::vector<double> scalefac;
@@ -1740,6 +1866,12 @@ namespace lar1{
             }
           }
         }
+
+        // for (auto bin : eventsFitVecTemp)
+        //   std::cout << bin << " ";
+        // std::cout <<"\n";
+
+        // exit(-1);
 
         // At this point, prediction vec is the 2*nbinsE*nL long vector that holds
         // the null+signal
@@ -1776,12 +1908,27 @@ namespace lar1{
           for ( int i = 0; i < nbinsE; i++){
             if (b_line == 0){
               statisticalErrors[b_line][i] = 1/sqrt(nullVec.at(i));
-              systematicErrors[b_line][i] = nearDetSystematicError;
+              if (useCovarianceMatrix){
+                if (shapeOnlyFit){
+                  systematicErrors[b_line][i] = sqrt(fractional_Shape_covarianceMatrix[nbinsE+i][nbinsE+i]);
+                }
+                else
+                  systematicErrors[b_line][i] = sqrt(fractionalErrorMatrix[nbinsE+i][nbinsE+i]);
+              }
+              else
+                systematicErrors[b_line][i] = nearDetSystematicError;
             } 
             else{
               if (useNearDetStats){
                 statisticalErrors[b_line][i] = 1/sqrt(nullVec.at(i+b_line*nbinsE*2));
                 systematicErrors[b_line][i] = 1/sqrt(nullVec.at(i));
+              }
+              else if (useCovarianceMatrix){
+                statisticalErrors[b_line][i] = 1/sqrt(nullVec.at(i+b_line*nbinsE*2));
+                if (shapeOnlyFit)
+                  systematicErrors[b_line][i] = sqrt(fractional_Shape_covarianceMatrix[b_line*nL*3+nbinsE+i][b_line*nL*3+nbinsE+i]);
+                else
+                  systematicErrors[b_line][i] = sqrt(fractionalErrorMatrix[b_line*nL*3+nbinsE+i][b_line*nL*3+nbinsE+i]);
               }
               else{ // no near det stats
                 statisticalErrors[b_line][i] = 1/sqrt(nullVec.at(i+b_line*nbinsE*2));
@@ -1862,8 +2009,8 @@ namespace lar1{
           // if (dm2point == 0 && sin22thpoint == 0) BuildCovarianceMatrix();
           if (useSignalCovarianceMatrix)
             BuildCovarianceMatrix(sin22thpoint, dm2point);
-          else if (sin22thpoint == 0 && dm2point == 0)
-            BuildCovarianceMatrix();
+          // else if (sin22thpoint == 0 && dm2point == 0)
+           
 
           //Can't forget to add in the statistical errors on the diagonal!
           for (int ibin = 0; ibin < nbins; ibin++){
@@ -1886,11 +2033,15 @@ namespace lar1{
           } //end loop on ibin
         
         } //end section that is using full covariance matrix
-        
+
+/////No edits past here
+
         //At this point, the covariance matrix is built in full in "entries"
         //We need to collapse everything, though.
         
+
         //for debugging, can print out covariance matrix:
+        //
         if (debug){
           for (unsigned int i = 0; i < entries.size(); i ++){
             std::cout << i << "\t";
@@ -1904,6 +2055,7 @@ namespace lar1{
         Float_t * entriescollapsed = (utils.CollapseMatrix(entries,nbinsE, nL));
         //collapsed!
         //if debug is on, print out the collapsed matrix:
+
         if (debug){
           //the matrix should be nbins- nL*nbinsE on each side.  Print:
           std::cout << "\nPrinting collapsed covariance matrix:\n";
@@ -1916,6 +2068,7 @@ namespace lar1{
             std::cout << std::endl;
           }
         }
+
         
 
 
