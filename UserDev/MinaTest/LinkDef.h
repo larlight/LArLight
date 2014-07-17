@@ -17,6 +17,9 @@
 #pragma link C++ class MinaTestEvent+;
 #pragma link C++ class MinaTestPhoton+;
 #pragma link C++ class MinaTestParticle+;
+#pragma link C++ class DarkPhotonAnaC+;
+#pragma link C++ class LineDist+;
 //ADD_NEW_CLASS ... do not change this line
 #endif
+
 

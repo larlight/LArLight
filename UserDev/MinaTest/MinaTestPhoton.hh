@@ -47,14 +47,16 @@ public:
     Energy = 0.;
     StartXYZT.clear();
     EndXYZT.clear();
+    TrackLength = 0.;
   };
 
-  void SetPhoton(double const E, std::vector<double> const sXYZT, std::vector<double> const eXYZT, int const MTID) {
+  void SetPhoton(double const E, std::vector<double> const sXYZT, std::vector<double> const eXYZT, int const MTID, double const track_length) {
     Energy = E;
     MotherTID = MTID;
     //MotherPDG = MPDG;
     StartXYZT = sXYZT;
     EndXYZT = eXYZT;
+    TrackLength = track_length;
   };
 
   int GetEnergy() const { return Energy; }
@@ -62,6 +64,7 @@ public:
   //void GetMotherPDG() const { return MotherPDG; }
   std::vector<double> GetStartXYZT() const { return StartXYZT; }
   std::vector<double> GetEndXYZT() const { return EndXYZT; }
+  double GetTrackLength() const {return TrackLength; }
 
 protected:
 
@@ -69,6 +72,7 @@ protected:
   std::vector<double> EndXYZT;
   double Energy;
   int MotherTID;
+  double TrackLength;
   //int MotherPDG;
 
   ClassDef(MinaTestPhoton,1);

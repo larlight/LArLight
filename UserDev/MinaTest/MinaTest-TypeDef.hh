@@ -18,6 +18,9 @@ class ToyAna;
 class MinaTestEvent; //Added by Mina
 class MinaTestPhoton;
 class MinaTestParticle;
+class DarkPhotonAnaC;
+  class LineDist;
 //ADD_EMPTY_CLASS ... do not change this comment line
 
 #endif
+
