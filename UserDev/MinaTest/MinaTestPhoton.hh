@@ -75,7 +75,7 @@ protected:
   double TrackLength;
   //int MotherPDG;
 
-  ClassDef(MinaTestPhoton,1);
+  ClassDef(MinaTestPhoton,2);
 
 };
 
