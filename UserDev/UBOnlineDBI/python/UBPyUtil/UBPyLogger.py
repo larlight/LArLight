@@ -2,16 +2,22 @@ import logging, logging.handlers, sys
 
 class _MSG_FORMAT(logging.Formatter):
 
-    _fmt_DEBUG   = logging.Formatter("                [%(levelname)s] %(module)s (L: %(lineno)-3d) >> <<%(funcName)s>> %(message)s")
-    _fmt_INFO    = logging.Formatter("          [%(levelname)s] %(module)s (L: %(lineno)-3d) >> {%(funcName)s} %(message)s")
-    _fmt_WARNING = logging.Formatter("[%(levelname)s] %(module)s (L: %(lineno)-3d) >> {%(funcName)s} %(message)s")
+    _fmt_DEBUG    = logging.Formatter("\033[94m[ %(levelname)-8s]\033[00m %(module)s (L: %(lineno)-3d) >> {%(funcName)s} %(message)s")
+    _fmt_INFO     = logging.Formatter("\033[92m[ %(levelname)-8s]\033[00m %(module)s (L: %(lineno)-3d) >> {%(funcName)s} %(message)s")
+    _fmt_WARNING  = logging.Formatter("\033[95m[ %(levelname)-8s]\033[00m %(module)s (L: %(lineno)-3d) >> {%(funcName)s} %(message)s")
+    _fmt_ERROR    = logging.Formatter("\033[93m[ %(levelname)-8s]\033[00m %(module)s (L: %(lineno)-3d) >> {%(funcName)s} %(message)s")
+    _fmt_CRITICAL = logging.Formatter("\033[91m[ %(levelname)-8s]\033[00m %(module)s (L: %(lineno)-3d) >> {%(funcName)s} %(message)s")
     def format(self,record):
         if record.levelno <= 10:
             return self._fmt_DEBUG.format(record)
         elif record.levelno <= 20:
             return self._fmt_INFO.format(record)
-        else:
+        elif record.levelno <= 30:
             return self._fmt_WARNING.format(record)
+        elif record.levelno <= 40:
+            return self._fmt_ERROR.format(record)
+        else:
+            return self._fmt_CRITICAL.format(record)
 
 class UBPyLogger:
 

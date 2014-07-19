@@ -1,17 +1,17 @@
-#ifndef RCWRITER_CXX
-#define RCWRITER_CXX
+#ifndef CONFIGWRITER_CXX
+#define CONFIGWRITER_CXX
 
-#include "RCWriter.hh"
+#include "ConfigWriter.hh"
 
 namespace ubpsql {
 
-  bool RCWriter::CreateConfigType(const std::string config_type,
-				  const std::vector<std::string> &stringkeylist)
+  bool ConfigWriter::CreateConfigType(const std::string config_name,
+				      const std::vector<std::string> &stringkeylist)
   {
     if(!Connect()) return false;
 
     // Form a command string
-    std::string cmd(Form("SELECT CreateConfigurationType('%s','",config_type.c_str()));
+    std::string cmd(Form("SELECT CreateConfigurationType('%s','",config_name.c_str()));
 
     /*
     for(size_t index=0; index<stringkeylist.size(); ++index)
@@ -35,7 +35,7 @@ namespace ubpsql {
     return true;
   }
 
-  bool RCWriter::InsertNewRun(unsigned int config_id)
+  bool ConfigWriter::InsertNewRun(unsigned int config_id)
   {
     if(!Connect()) return false;
     PGresult* res = _conn->Execute(Form("SELECT InsertNewRun(%d);",config_id));
@@ -45,7 +45,7 @@ namespace ubpsql {
     return true;
   }
 
-  bool RCWriter::InsertNewSubRun(unsigned int config_id, unsigned int run)
+  bool ConfigWriter::InsertNewSubRun(unsigned int config_id, unsigned int run)
   {
     if(!Connect()) return false;
     PGresult* res = _conn->Execute(Form("SELECT InsertNewSubRun(%d,%d);",config_id,run));
@@ -55,24 +55,20 @@ namespace ubpsql {
     return true;
   }
 
-  bool RCWriter::InsertSubConfigValues(const std::string  config_type,
-				       const unsigned int config_id,
-				       const unsigned int crate,
-				       const unsigned int channel,
-				       const std::map<std::string,std::string> &hstore_values)
+  bool ConfigWriter::InsertSubConfigValues(const ConfigData &data)
   {
     if(!Connect()) return false;
     std::string cmd(Form("SELECT InsertConfigurationSet('%s', %d, %d, %d, ",
-			 config_type.c_str(),
-			 config_id,
-			 crate,
-			 channel)
+			 data.Name().c_str(),
+			 data.ID(),
+			 data.Crate(),
+			 data.Channel())
 		    );
     cmd += "'";
 
-    size_t ctr = hstore_values.size() - 1;
-    for(auto hstore_iter = hstore_values.begin();
-	hstore_iter != hstore_values.end();
+    size_t ctr = data.size() - 1;
+    for(auto hstore_iter = data.begin();
+	hstore_iter != data.end();
 	++hstore_iter) {
 
       if( ctr )

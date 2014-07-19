@@ -10,8 +10,8 @@
 #include "DBBase.hh"
 #include "DBException.hh"
 #include "DBConn.hh"
-#include "RCReader.hh"
-#include "RCWriter.hh"
+#include "ConfigReader.hh"
+#include "ConfigWriter.hh"
 
 // Class forward declaration here
 namespace ubpsql{
@@ -27,14 +27,16 @@ namespace ubpsql{
 
   // Application classes
   class DBAppBase;       // Base class for application classes
-  class RCReader;        // RunControl database read interface
-  class RCWriter;        // RunControl database write interface
+  class ConfigReader;    // Run configuration database read interface
+  class ConfigWriter;    // Run configuration database write interface
 
+  class ConfigData;
   //ADD_EMPTY_CLASS ... do not change this comment line
 
 }
 
 #endif
+
 
 
 

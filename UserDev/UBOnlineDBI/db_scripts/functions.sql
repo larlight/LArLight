@@ -22,9 +22,45 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
-
-
 ------------------------------------------------------------------------------
+
+DROP FUNCTION IF EXISTS ExistSubConfig(SCfgName TEXT);
+CREATE OR REPLACE FUNCTION ExistSubConfig(SCfgName TEXT) RETURNS INT AS $$
+   SELECT 1 FROM ConfigLookUp WHERE SubConfigName = SCfgName LIMIT 1
+$$ LANGUAGE SQL;
+
+DROP FUNCTION IF EXISTS ListSubConfigParameters(SCfgName TEXT);
+CREATE OR REPLACE FUNCTION ListSubConfigParameters(SCfgName TEXT) RETURNS SETOF TEXT AS $$
+   SELECT skeys(setupcolumns) FROM configlookup WHERE subconfigname = SCfgName
+$$ LANGUAGE SQL;
+
+DROP FUNCTION IF EXISTS ListSubConfigNameAndID(CfgID INT);
+DROP TYPE IF EXISTS SubConfigNameAndID;
+
+CREATE TYPE SubConfigNameAndID AS (SubConfigName TEXT, SubConfigID INT);
+CREATE OR REPLACE FUNCTION ListSubConfigNameAndID(CfgID INT) RETURNS SETOF SubConfigNameAndID AS $$
+DECLARE
+   tmp_type_and_id RECORD;
+   tmp_name_and_id RECORD;
+   res SubConfigNameAndID;
+BEGIN
+   FOR tmp_type_and_id IN SELECT SubConfigType, SubConfigID FROM MainConfigTable WHERE ConfigID = CfgID ORDER BY SubConfigType LOOP
+   SELECT INTO tmp_name_and_id SubConfigName FROM ConfigLookUp WHERE SubConfigType = tmp_type_and_id.SubConfigType LIMIT 1;
+
+   res.SubConfigName := tmp_name_and_id.SubConfigName;
+   res.SubConfigID   := tmp_type_and_id.SubConfigID;
+   RETURN NEXT res;
+   END LOOP;
+   RETURN;
+END;
+$$ LANGUAGE plpgsql;
+
+
+CREATE OR REPLACE FUNCTION ListSubConfigNameAndID() RETURNS SETOF RECORD AS $$
+       SELECT SubConfigName, SubConfigType FROM ConfigLookUp ORDER BY SubConfigType
+$$ LANGUAGE SQL;
+
+
 -------------------------------------------------------------------------------
 ---- determine what the relation between ConfitType and ConfigID is.
 --------------------------------------------------------------------------------
@@ -42,7 +78,6 @@ BEGIN
      SELECT INTO lastsubrun GetLastSubRun(lastrun);
 
      INSERT INTO MainRun(RunNumber,SubRunNumber,ConfigID,RunType,TimeStart) VALUES(lastrun,lastsubrun+1,CfgID,333,'now');
-
 
     RETURN lastsubrun+1;
 END;
@@ -240,12 +275,9 @@ CREATE OR REPLACE FUNCTION ReturnConfigurationByNumber(requestedConfigid INT) RE
     END;
 $$ LANGUAGE plpgsql VOLATILE STRICT;
 
-
-
-
-
-
 --------------------------------------------------------------------------------
+
+
 -----------------------------------------------------------------------------------
 ------------------------------------------------------------------------------------------
 
@@ -288,7 +320,7 @@ CREATE OR REPLACE FUNCTION CreateConfigurationType(configtabletype text,columns 
    Parameters  HSTORE  NOT NULL DEFAULT ''nchannels=>0 '' ,
    userID  VARCHAR NULL DEFAULT NULL,
    TimeStamp  TIMESTAMP NULL DEFAULT NULL,
-    PRIMARY KEY ( ConfigID,Crate,Channel ))';   
+   PRIMARY KEY ( ConfigID,Crate,Channel ))';   
 
  
    EXECUTE query; 
@@ -328,13 +360,12 @@ DECLARE
 $$ LANGUAGE plpgsql VOLATILE STRICT;
 
 
-
 ------------------------------------------------------------------------
-
-
-
-
-CREATE OR REPLACE FUNCTION InsertConfigurationSet(configtabletype text,insubconfid INT,incrate INT, inchannel INT,columns HSTORE) RETURNS INT AS $$
+CREATE OR REPLACE FUNCTION InsertConfigurationSet(configtabletype text,
+						  insubconfid INT,
+						  incrate INT, 
+						  inchannel INT,
+						  columns HSTORE) RETURNS INT AS $$
     DECLARE
     myrec RECORD;
    -- maskconfig INT;
@@ -369,11 +400,62 @@ CREATE OR REPLACE FUNCTION InsertConfigurationSet(configtabletype text,insubconf
     END;
 $$ LANGUAGE plpgsql VOLATILE STRICT;
 
+------------------------------------------------------------------------
+CREATE OR REPLACE FUNCTION MaxSubConfigID(configtablename TEXT) RETURNS INT AS $$
+DECLARE
+   myrec RECORD;
+   query TEXT;
+BEGIN
+
+   -- First find if this configuration type exists. If not, don't do anything
+   IF NOT EXISTS ( SELECT TRUE FROM ConfigLookUp WHERE SubConfigName = configtablename )    
+     THEN RAISE EXCEPTION '++++++++++ Configuration % is not defined yet! +++++++++++', configtablename;
+   END IF;
+
+   query := format('SELECT ConfigID FROM %s ORDER BY ConfigID DESC LIMIT 1;',configtablename);
+   EXECUTE query INTO myrec;
+
+   IF myrec.ConfigID IS NULL
+       THEN RETURN -1;
+   ELSE 
+       RETURN myrec.ConfigID;
+   END IF;
+END;
+$$ LANGUAGE plpgsql VOLATILE STRICT;
 
 ------------------------------------------------------------------------
 
-DROP FUNCTION IF EXISTS InsertMainConfiguration( text, HSTORE) ;
+DROP FUNCTION IF EXISTS ListCrateID( SCfgName TEXT, SCfgID INT);
+CREATE OR REPLACE FUNCTION ListCrateID ( SCfgName TEXT,
+       	  	  	               	 SCfgID   INT  ) RETURNS SETOF INT AS $$
+DECLARE
+   myrec RECORD;
+   str_query TEXT;
+   res RECORD;
+BEGIN
 
+   -- First find if this configuration type exists. If not, don't do anything
+   IF NOT EXISTS ( SELECT TRUE FROM ConfigLookUp WHERE SubConfigName = SCfgName )    
+     THEN RAISE EXCEPTION '++++++++++ Configuration % is not defined yet! +++++++++++', SCfgName;
+   END IF;
+   
+   str_query := format('SELECT TRUE FROM %s WHERE ConfigID = %s LIMIT 1;',SCfgName,SCfgID);
+   EXECUTE str_query INTO myrec;
+
+   IF myrec.bool IS NULL
+      THEN RAISE EXCEPTION '++++++++++ Configuration % does not have config ID % +++++++++++', SCfgName, SCfgID;
+   END IF;
+
+   str_query := format('SELECT crate FROM %s WHERE ConfigID = %s ORDER BY crate;',SCfgName,SCfgID);
+   for res in EXECUTE str_query LOOP
+      RETURN NEXT res.crate;
+   END LOOP;
+   RETURN;
+
+END;
+$$ LANGUAGE plpgsql VOLATILE STRICT;
+
+------------------------------------------------------------------------
 
 CREATE OR REPLACE FUNCTION InsertMainConfiguration(subconfigparameters HSTORE,confname text DEFAULT 'no_name') RETURNS INT AS $$
     DECLARE
@@ -541,7 +623,7 @@ CREATE OR REPLACE FUNCTION GetSubConfig(tablename text,mainconfigid INT) RETURNS
 
       RAISE INFO 'SELECTED % ', conftype;
 
-      mainconfquery :='SELECT  * FROM mainconfigtable WHERE subconfigtype=' || conftype || 'AND configid='||mainconfigid;  
+      mainconfquery :='SELECT  * FROM mainconfigtable WHERE subconfigtype=' || conftype || ' AND configid='||mainconfigid;  
 
       RAISE INFO ' % ', mainconfquery ;
    
@@ -554,7 +636,7 @@ CREATE OR REPLACE FUNCTION GetSubConfig(tablename text,mainconfigid INT) RETURNS
 
       for subconfigconfigrec in EXECUTE query loop
       subconfigconfigrec.ConfigName:=tablename;  --inserting the name for faster lookup later
-      subconfigconfigrec.ConfigType:=conftype;      --inserting type for faster lookup
+      subconfigconfigrec.ConfigType:=conftype;   --inserting type for faster lookup
 
       return next subconfigconfigrec;
       end loop;

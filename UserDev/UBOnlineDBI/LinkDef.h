@@ -20,10 +20,12 @@
 #pragma link C++ class ubpsql::DBConn+;
 #pragma link C++ class ubpsql::DBAppBase+;
 
-#pragma link C++ class ubpsql::RCReader+;
-#pragma link C++ class ubpsql::RCWriter+;
+#pragma link C++ class ubpsql::ConfigReader+;
+#pragma link C++ class ubpsql::ConfigWriter+;
+#pragma link C++ class ubpsql::ConfigData+;
 //ADD_NEW_CLASS ... do not change this line
 #endif
+
 
 
 
