@@ -18,6 +18,7 @@
 
 #include "LArUtil-TypeDef.hh"
 #include "AnalysisAlgConstants.h"
+#include "PxUtils.h"
 
 ///General LArSoft Utilities
 namespace calo{
@@ -35,11 +36,13 @@ namespace calo{
     
     //double dEdx_AMP(art::Ptr< recob::Hit >  hit, double pitch) const;
     //double dEdx_AMP(recob::Hit const&  hit, double pitch) const;
+    double dEdx_AMP(const larutil::PxHit *hit, double pitch) const;
     double dEdx_AMP(double dQ, double time, double pitch, unsigned int plane) const;
     double dEdx_AMP(double dQdx,double time, unsigned int plane) const;
     
     //double dEdx_AREA(art::Ptr< recob::Hit >  hit, double pitch) const;
     //double dEdx_AREA(recob::Hit const&  hit, double pitch) const;
+    double dEdx_AREA(const larutil::PxHit *hit, double pitch) const;
     double dEdx_AREA(double dQ,double time, double pitch, unsigned int plane) const;
     double dEdx_AREA(double dQdx,double time, unsigned int plane) const;
     

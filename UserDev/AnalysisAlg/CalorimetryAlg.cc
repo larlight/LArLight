@@ -107,6 +107,15 @@ namespace calo{
   }
   */
 
+  // ----------------------------------------------------------------------------------//
+  
+  double CalorimetryAlg::dEdx_AMP(const larutil::PxHit *hit, double pitch) const
+  {
+    return dEdx_AMP(hit->charge/pitch, hit->t, hit->plane);
+  }
+  
+  
+  
   ///\todo The plane argument should really be for a view instead
   // ----------------------------------------------------------------------------------//
   double CalorimetryAlg::dEdx_AMP(double dQ, double time, double pitch, unsigned int plane) const
@@ -144,6 +153,12 @@ namespace calo{
   }
   */
 
+  double CalorimetryAlg::dEdx_AREA(const larutil::PxHit *hit, double pitch) const
+  {
+    return dEdx_AREA(hit->charge/pitch, hit->t, hit->plane);
+  }
+  
+  
   // ----------------------------------------------------------------------------------//
   double CalorimetryAlg::dEdx_AREA(double dQ,double time, double pitch, unsigned int plane) const
   {
