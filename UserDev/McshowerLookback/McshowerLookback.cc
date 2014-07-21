@@ -21,7 +21,8 @@ namespace larlight {
 	this_mother_energy += pow(this_mcshow.MotherMomentum().at(i),2);
       this_mother_energy = pow(this_mother_energy, 0.5);
 
-      if(this_mother_energy < _cutoff_energy) continue;
+      if(this_mother_energy > _max_energy) continue;
+      if(this_mother_energy < _min_energy) continue;
       
       for(auto this_trackid : (std::vector<UInt_t>)this_mcshow.DaughterTrackID())
 	shower_idmap.insert(std::pair<UInt_t,UInt_t>(this_trackid,mcshower_index));

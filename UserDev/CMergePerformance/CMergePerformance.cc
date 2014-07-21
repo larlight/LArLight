@@ -48,7 +48,7 @@ namespace larlight {
       return false;
     }
 
-    _mcslb.SetCutoffEnergy(_MCShower_mother_energy_cutoff);
+    _mcslb.SetMinEnergyCut(_MCShower_mother_energy_cutoff);
 
     //fill some std::maps that are constant through the whole event
     //_shower_idmap is (G4trackid => MCShower index in ev_mcshower)
