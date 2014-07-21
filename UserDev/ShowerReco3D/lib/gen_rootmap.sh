@@ -17,7 +17,7 @@ rootlibmap() {
 ######################################################
 # ShowerReco3D
 rootlibmap libShowerReco3D.rootmap libShowerReco3D.so $USER_DEV_DIR/ShowerReco3D/LinkDef.h \
-    libCMTool.so 
+    libCMTool.so libAnalysisAlg.so
 
 
 
