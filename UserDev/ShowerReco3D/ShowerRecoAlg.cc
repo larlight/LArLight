@@ -29,14 +29,18 @@ namespace shower {
     // Reconstruct and store
     //
     fNPlanes=clusters.size();
-      
+    
+    fStartPoint.clear();
+    fEndPoint.clear();
+    fOmega2D.clear();
+    
     // First Get Start Points
     for(auto const & cl : clusters)
     {
         fStartPoint.push_back(cl.GetParams().start_point);    // for each plane
 	fEndPoint.push_back(cl.GetParams().end_point);    // for each plane
         fOmega2D.push_back(cl.GetParams().angle_2d);     
-            
+        std::cout << " planes : " <<   (int)cl.GetParams().start_point.plane << " "<< cl.GetParams().end_point.plane << " " << cl.GetParams().end_point.w <<" angle2d "<<  cl.GetParams().angle_2d  << std::endl;   
     }
     
     
@@ -75,7 +79,7 @@ namespace shower {
     double xphi=0,xtheta=0;
     
     
-    fGSer->Get3DaxisN(index_to_use[0],index_to_use[1],fOmega2D[index_to_use[0]],fOmega2D[index_to_use[0]],xphi,xtheta);
+    fGSer->Get3DaxisN(index_to_use[0],index_to_use[1],fOmega2D[index_to_use[0]]*TMath::Pi()/180.,fOmega2D[index_to_use[0]]*TMath::Pi()/180.,xphi,xtheta);
     
     std::cout << " new angles: " << xphi << " " << xtheta << std::endl; 
     
@@ -83,8 +87,11 @@ namespace shower {
     
     double xyz[3];
     // calculate start point here?
+    
+    std::cout <<" before get XYZ " << std::endl;
     fGSer-> GetXYZ(&(fStartPoint[index_to_use[0]]),&(fStartPoint[index_to_use[1]]),xyz);
     
+    std::cout << " after get XYZ  " << std::endl;
     
     
     
@@ -95,6 +102,9 @@ namespace shower {
     {
       int plane = clustit.GetParams().start_point.plane;      
       double newpitch=fGSer->PitchInView(plane,xphi,xtheta);
+      
+      double nnpitch = fGSer -> CalculatePitch(plane,xphi*TMath::Pi()/180.,xtheta*TMath::Pi()/180.);
+      std::cout << "newpitch " << newpitch << " nnpitch " <<nnpitch << std::endl;
       double totEnergy=0;
       int direction=-1;
       double dEdx_av=0,RMS_dedx=0,dedx_final=0;
@@ -110,6 +120,8 @@ namespace shower {
     
       std::vector<larutil::PxHit> hitlist =  clustit.GetHitVector(); 
       std::vector<larutil::PxHit> local_hitlist;
+      local_hitlist.clear();
+      
       for(const auto& theHit : hitlist){
     
 	double dEdx_new;
@@ -137,11 +149,11 @@ namespace shower {
     
         
      //calculate the distance from the vertex using the effective pitch metric 
-      double wdist=((theHit.w-clustit.GetParams().start_point.w)*newpitch)*direction;  //wdist is always positive
+     double wdist=((theHit.w-clustit.GetParams().start_point.w)*newpitch)*direction;  //wdist is always positive
 
     
   //   if( (fabs(wdist)<fcalodEdxlength)&&(fabs(wdist)>0.2)){  
-    if( (wdist<fcalodEdxlength)&&(wdist>0.2)){    
+     if( (wdist<fcalodEdxlength)&&(wdist>0.2)){    
   
       //vdEdx.push_back(dEdx_new);
     //vresRange.push_back(fabs(wdist));
@@ -260,7 +272,7 @@ namespace shower {
     
     
     
-    
+  // break;
     } // end loop on clusters
     
 

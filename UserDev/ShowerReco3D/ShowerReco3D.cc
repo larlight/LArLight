@@ -7,6 +7,7 @@ namespace larlight {
 
   ShowerReco3D::ShowerReco3D() : ana_base()
   {
+    _mgr=0;
     _name="ShowerReco3D";
     fClusterType = DATA::Cluster;
   }
@@ -27,7 +28,8 @@ namespace larlight {
   }
   
   bool ShowerReco3D::analyze(storage_manager* storage) {
-    
+
+    _mgr = storage;
     // Re-initialize tools
     fShowerAlgo.Reset();
     fMatchMgr.Reset();
