@@ -20,16 +20,15 @@ namespace cluster{
   class RecoUtilException;
   class SimChannelViewer;
   class WireViewer;
-  class ShowerReco2DAlgo;
+  class CRUHelper;
 }
 
-class ClusterParamsExecutor;
 class Polygon2D;
-
 
 //ADD_EMPTY_CLASS ... do not change this comment line
 
 #endif
+
 
 
 

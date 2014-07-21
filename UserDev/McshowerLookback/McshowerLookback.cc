@@ -7,7 +7,7 @@ namespace larlight {
   ///////////////////////////////////////////////////
   //Make map of trackIDs for each shower           //
   ///////////////////////////////////////////////////
-  void McshowerLookback::FillShowerMap(larlight::event_mcshower* my_mcshow, 
+  void McshowerLookback::FillShowerMap(const larlight::event_mcshower* my_mcshow, 
 				       std::map<UInt_t,UInt_t> &shower_idmap)
   {
     UInt_t mcshower_index = 0;
@@ -31,11 +31,27 @@ namespace larlight {
     
   }
   
+  void McshowerLookback::UniqueShowerID(const std::map<UInt_t,UInt_t> &shower_idmap, 
+					std::vector<UInt_t> &shower_id) const
+  {
+    shower_id.clear();
+    std::set<UInt_t> used;
+    for(auto const& pair : shower_idmap)
+
+      if(used.find(pair.second) == used.end()) used.insert(pair.second);
+
+    shower_id.reserve(used.size());
+
+    for(auto const& index : used)
+
+      shower_id.push_back(index);
+
+  }
   
   ///////////////////////////////////////////////////
   //Make map of simchannel objects for each channel//
   ///////////////////////////////////////////////////
-  void McshowerLookback::FillSimchMap(larlight::event_simch* my_simch, 
+  void McshowerLookback::FillSimchMap(const larlight::event_simch* my_simch, 
 				      std::map<UShort_t, larlight::simch> &simch_map){
     
     for(auto this_simch : *my_simch)
@@ -125,6 +141,114 @@ namespace larlight {
     if(tot_ides_charge<=0) {
       std::cerr<<"something is bad. tot_ides_charge is "<<tot_ides_charge<<"... less than one?!"<<std::endl;
       std::vector<float> bad(0,-1);
+      return bad;
+    }
+    
+    //debug
+    //  std::cout<<"debug: finished and filled part_ides_charge is (";
+    //  for(int j = 0; j < part_ides_charge.size(); ++j)
+    //    std::cout<<part_ides_charge.at(j)<<", ";
+    //  std::cout<<"), with size "<<part_ides_charge.size()<<std::endl;
+    
+    //compute the actual fractions function returns
+    std::vector<float> fractions;  
+    for(int i=0;i<(const int)MCShower_indices.size();i++){
+      fractions.push_back(part_ides_charge.at(i)/tot_ides_charge);
+    }
+    fractions.push_back(part_ides_charge_unknown_MCShower/tot_ides_charge);
+    
+    return fractions;
+    
+  }//end MatchHitsAll()
+
+
+  ///////////////////////////////////////////////////
+  //Find % of each shower in a single hit          //
+  ///////////////////////////////////////////////////
+  std::vector<float> McshowerLookback::MatchHitsAll(const std::vector<const larlight::hit*> &hits,
+						    const std::map<UShort_t, larlight::simch> &simch_map, 
+						    const std::map<UInt_t,UInt_t> &shower_idmap) const
+  {
+    ////////////////////////////////////////////////////////////////
+    //setup variables for holding charge info from various mcshowers
+    ////////////////////////////////////////////////////////////////
+
+    std::vector<UInt_t> MCShower_indices;
+    UniqueShowerID(shower_idmap,MCShower_indices);
+
+    //total MC charge deposited on that hit's wire during that hit's start->end time
+    float tot_ides_charge = 0;
+    //amount of MC charge deposited "" "" belonging to a given MCShower
+    std::vector<float> part_ides_charge((size_t)MCShower_indices.size(),0.);
+    //amount of MC charge deposited "" "" belonging to MCShower not in the map
+    float part_ides_charge_unknown_MCShower = 0;
+    
+    ////////////////////////////////////////////////////////////////
+    //Search for simchannels on hit's channel number
+    ////////////////////////////////////////////////////////////////
+
+    for(auto const& this_hit : hits) {
+      auto simch_iter = simch_map.find(this_hit->Channel());
+      if(simch_iter==simch_map.end()) 
+	std::cerr<<"Hit has no matched simchannel!!"<<std::endl;
+      
+      else{
+	
+	////////////////////////////////////////////////////////////////
+	//Found the right simchannel, so try to find ides on this simch
+	////////////////////////////////////////////////////////////////
+	
+	//(*simch_iter).second is the larlight::simch object
+	//maybe i can speed up code here by not making this big vector<ide> object... how?
+	std::vector<larlight::ide> matchedides((*simch_iter).second.TrackIDsAndEnergies(this_hit->StartTime(),this_hit->EndTime()));
+	
+	//sometimes you find a reco hit that doesn't correspond to an IDE
+	//probably the IDE does not fall within the reco-d hit range (start->end time)
+	if(matchedides.size()==0){
+	  std::cerr<<"Warning. This reco hit didn't correspond to any IDE object. Returning a null vector."<<std::endl;
+	  //std::vector<float> bad(0,-1);
+	  //return bad;
+	  continue;
+	}
+	
+	////////////////////////////////////////////////////////////////
+	//Look for the trackIDs in MCShower that belong to each found IDE
+	////////////////////////////////////////////////////////////////
+	
+	for(auto const &this_ide : matchedides){
+	  
+	  unsigned int this_trackID = abs(this_ide.trackID);
+	  tot_ides_charge+=this_ide.numElectrons;
+	  
+	  auto show_iter=shower_idmap.find(this_trackID);
+	  
+	  //if you can't find the IDE's trackID in the MCShower mapping
+	  //(it was a particle not belonging to a shower, IE excited argon decay photon
+	  //or a particle in an MCShower with energy below the cutoff energy)
+	  if(show_iter==shower_idmap.end()){
+	    part_ides_charge_unknown_MCShower+=this_ide.numElectrons;
+	  }
+	  else{
+	    //let's say MCShower_indices is (0,    1,   3) [shower 2 had too little energy to count]
+	    //part_ides should be like      (0.2, 0.6, 0.1, 0.1)
+	    //if it is 20% from shower0, 60% shower1, 10% shower3, and 10% from shower2 OR unknown showers
+	    auto it = std::find(MCShower_indices.begin(),
+				MCShower_indices.end(),
+				(*show_iter).second);
+	    if(it != MCShower_indices.end())
+	      part_ides_charge.at(*it)+=this_ide.numElectrons;
+	  }
+	  
+	}//end loop over matchedides
+	
+      }//end finding simch correspond to reco hit's cahnnel
+    
+    }//end looping over hits
+
+    if(tot_ides_charge<=0) {
+      std::cerr<<"something is bad. tot_ides_charge is "<<tot_ides_charge<<" ?!"<<std::endl;
+      std::vector<float> bad(part_ides_charge.size()+1,0);
+      (*bad.rbegin()) = -1;
       return bad;
     }
     

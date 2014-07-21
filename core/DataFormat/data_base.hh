@@ -24,6 +24,7 @@ namespace larlight{
      \class data_base
      A base coass for all data objects in LArLight
   */
+
   class data_base : public TObject {
     
   public:

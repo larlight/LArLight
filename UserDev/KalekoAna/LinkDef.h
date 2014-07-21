@@ -15,8 +15,10 @@
 #pragma link C++ class kaleko::QuickClusterAna+;
 #pragma link C++ class larlight::MCShowerStudy+;
 
+#pragma link C++ class kaleko::tmpClusterAna+;
 //ADD_NEW_CLASS
 #endif
+
 
 
 

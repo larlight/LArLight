@@ -12,6 +12,7 @@ namespace cluster{
 
   ClusterParamsAlgNew::ClusterParamsAlgNew()
   {
+    fMinNHits = 10;
     fGSer=nullptr;
     enableFANN = false;
     verbose=true;
@@ -20,6 +21,7 @@ namespace cluster{
 
   ClusterParamsAlgNew::ClusterParamsAlgNew(const std::vector<const larlight::hit*> &inhitlist)
   {
+    fMinNHits = 10;
     fGSer=nullptr;
     enableFANN = false;
     verbose=true;
@@ -28,6 +30,7 @@ namespace cluster{
 
   ClusterParamsAlgNew::ClusterParamsAlgNew(const std::vector<larutil::PxHit> &inhitlist)
   {
+    fMinNHits = 10;
     fGSer=nullptr;
     enableFANN = false;
     verbose=true;
@@ -53,7 +56,7 @@ namespace cluster{
     fPlane=fHitVector[0].plane;
     
       
-    if (fHitVector.size()<10)
+    if (fHitVector.size() < fMinNHits)
     {
       if(verbose) std::cout << " the hitlist is too small. Continuing to run may result in crash!!! " <<std::endl;
       return -1;
@@ -380,10 +383,6 @@ namespace cluster{
     if(fRough2DSlope==-999.999 || fRough2DIntercept==-999.999 ) 
       GetRoughAxis(true);      
     
-    
-    
-  
-    
     //get slope of lines orthogonal to those found crossing the shower.
     double inv_2d_slope=0;
     if(fabs(fRough2DSlope)>0.001)
@@ -409,7 +408,7 @@ namespace cluster{
 
     //std::cout << " inv_2d_slope " << inv_2d_slope << std::endl;
     
-    for(auto& hit : fHitVector)
+    for(auto const &hit : fHitVector)
     {
       
       //calculate intercepts along   
@@ -531,8 +530,6 @@ namespace cluster{
   fChargeProfile.resize(fProfileNbins,0);
   fCoarseChargeProfile.resize(fCoarseNbins,0);
   
- 
-  
   
   ////////////////////////// end of new binning
   // Some fitting variables to make a histogram:
@@ -542,7 +539,7 @@ namespace cluster{
   ort_profile.resize(NBINS);
   
   std::vector<double> ort_dist_vect;
-  ort_dist_vect.reserve(fParams.N_Hits);
+  ort_dist_vect.reserve(fHitVector.size());
   
   double current_maximum=0; 
   for(auto& hit : fHitVector)
@@ -697,7 +694,7 @@ namespace cluster{
      //forward loop
     double running_integral=fProfileIntegralForward;
     int startbin,endbin;
-    for(startbin=fProfileMaximumBin;startbin>1;startbin--)
+    for(startbin=fProfileMaximumBin; startbin>1 && startbin<fChargeProfile.size();startbin--)
     {
       running_integral-=fChargeProfile.at(startbin);
       if( fChargeProfile.at(startbin)<fChargeCutoffThreshold.at(fPlane) && running_integral/fProfileIntegralForward<0.01 )
@@ -710,7 +707,7 @@ namespace cluster{
     
     //backward loop
     running_integral=fProfileIntegralBackward;
-    for(endbin=fProfileMaximumBin;endbin<fProfileNbins-1;endbin++)
+    for(endbin=fProfileMaximumBin; endbin>0 && endbin<fProfileNbins-1; endbin++)
     {
       running_integral-=fChargeProfile.at(endbin);
       if( fChargeProfile.at(endbin)<fChargeCutoffThreshold.at(fPlane) && running_integral/fProfileIntegralBackward<0.01 )
@@ -1262,7 +1259,7 @@ namespace cluster{
     double hit_counter_forward  = 0;
     double hit_counter_backward = 0;
     
-    if (endStartDiff_y == 0 && endStartDiff_x == 0) {
+    if (verbose && endStartDiff_y == 0 && endStartDiff_x == 0) {
       std::cerr << "Error:  end point and start point are the same!\n";
       return;
     }

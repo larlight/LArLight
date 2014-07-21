@@ -56,6 +56,12 @@ namespace larlight {
 
     /// Setter for an input ROOT TDirectory name
     void set_input_rootdir(std::string name) {_storage->set_in_rootdir(name);}
+
+    /// Setter for an input ROOT TDirectory name
+    void set_output_rootdir(std::string name) {_storage->set_out_rootdir(name);}
+
+    /// Setter for an input ROOT TDirectory name
+    void set_rootdir(std::string name) {_storage->set_rootdir(name);}
     
     /// Setter for an output DATA file name
     void set_output_file(std::string name){_storage->set_out_filename(name);}

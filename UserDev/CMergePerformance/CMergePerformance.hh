@@ -16,12 +16,9 @@
 #define CMERGEPERFORMANCE_HH
 
 #include "ana_base.hh"
-#include "ClusterParamsAlgNew.hh"
 #include "CMergeManager.hh"
+#include "CRUHelper.hh"
 #include "McshowerLookback.hh"
-
-#include "CMAlgoShortestDist.hh"
-
 
 #include <TStopwatch.h>
 
@@ -38,7 +35,7 @@ namespace larlight {
      3) run cluster merging with whatever algos/parameters
      4) make those same FOM plots to compare to the original
    */
-  class CMergePerformance : public ana_base{
+  class CMergePerformance : public ana_base {
   
   public:
 
@@ -49,10 +46,11 @@ namespace larlight {
       _run_before_merging=true;
       _run_merging=true;
       _MCShower_mother_energy_cutoff = 0.02;
+      _cluster_type = DATA::FuzzyCluster;
     }
 
     /// Default destructor
-    virtual ~CMergePerformance(){};
+    virtual ~CMergePerformance(){}
 
     /** IMPLEMENT in CMergePerformance.cc!
         Initialization method to be called before the analysis event loop.
@@ -69,8 +67,13 @@ namespace larlight {
     */
     virtual bool finalize();
 
+    /** Set Cluster Type to be read in: ClusterMerger makes Cluster
+	instead of FuzzyCluster
+    */
+    void SetClusterType(DATA::DATA_TYPE type) {_cluster_type = type;}
+
     /// Getter for the CMergeManager so user can configure merge algos etc
-    ::cluster::CMergeManager& GetManager() { return _mgr; }
+    ::cmtool::CMergeManager& GetManager() { return _mgr; }
 
     /// Option to not bother with fillin FOM histos with raw fuzzyclus data
     /// This is useful if you are repeatedly running over the same file w/
@@ -82,6 +85,9 @@ namespace larlight {
     /// will just be left blank.
     /// This is useful because merging can take the most time to run
     void SetRunMerging(bool flag) { _run_merging = flag; }
+    
+    void SetDebug(bool flag) { _debug = flag; }
+
 
     protected:
 
@@ -89,18 +95,11 @@ namespace larlight {
     
     void PrepareTTree();
 
-    void FillClusterParamsVector(event_cluster* ev_cluster,
-				 event_hit* ev_hits);
-
     void FillFOMHistos(bool before_merging,
-		       event_mcshower* ev_mcshower,
-		       event_cluster* ev_cluster,
-		       event_hit* ev_hits,
-		       const std::vector< ::cluster::ClusterParamsAlgNew> &_clusterparams);
+		       const event_mcshower* ev_mcshower,
+		       const event_cluster* ev_cluster,
+		       const event_hit* ev_hits);
 
-
-    void RunMerging(event_cluster* ev_cluster,
-		    event_hit* ev_hits);
 
     ///vector of CPAN objects (before, and overwritten after merging)
     std::vector< ::cluster::ClusterParamsAlgNew> _clusterparams;
@@ -113,11 +112,16 @@ namespace larlight {
     std::vector<std::vector<unsigned short> > clus_idx_vec;
 
     //declare a member of CMergeManager class called _mgr
-    ::cluster::CMergeManager _mgr;
+    ::cmtool::CMergeManager _mgr;
+
+    /// CRU helper
+    ::cluster::CRUHelper _cru_helper;
     
     bool _run_before_merging, _run_merging;
     double _MCShower_mother_energy_cutoff;
-    
+
+    //Cluster type to be read in
+    DATA::DATA_TYPE _cluster_type;
 
     //declare mcshowerlookback object only once, not once per event
     larlight::McshowerLookback _mcslb;
@@ -125,8 +129,6 @@ namespace larlight {
     //some maps that mcshowerlookback fills once per event
     std::map<UInt_t,UInt_t> _shower_idmap;
     std::map<UShort_t,larlight::simch> _simch_map;
-
-    Double_t w2cm, t2cm;
     
     //neural net path needed
     std::string myNeuralNetPath;
@@ -138,8 +140,11 @@ namespace larlight {
     //.at(0).at(0) is before merging, plane 0
     //.at(0).at(1) is before merging, plane 1
     std::vector<std::vector<TH1D*> > hPurity;
+    std::vector<std::vector<TH1D*> > hPurityPerMCShower;
     std::vector<std::vector<TH1D*> > hEff;
+    std::vector<std::vector<TH1D*> > hEffPerMCShower;
     std::vector<std::vector<TH1D*> > hClusQoverMCQ;
+    std::vector<std::vector<TH1D*> > hQFracInBigClusters;
     std::vector<std::vector<TH2D*> > hPi0_photonanglediff_vs_Eff;
     //might as well save stuff in a TTree too
     TTree* ana_tree;
@@ -159,6 +164,7 @@ namespace larlight {
     GEO::View_t _plane;
     bool _after_merging;
 
+    bool _debug;
 
   };
 }

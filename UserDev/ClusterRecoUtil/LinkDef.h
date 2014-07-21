@@ -27,10 +27,11 @@
 #pragma link C++ class cluster::RecoUtilException+;
 #pragma link C++ class cluster::SimChannelViewer+;
 #pragma link C++ class cluster::WireViewer+;
-#pragma link C++ class cluster::ShowerReco2DAlgo+;
 
+#pragma link C++ class cluster::CRUHelper+;
 //ADD_NEW_CLASS ... do not change this line
 #endif
+
 
 
 
