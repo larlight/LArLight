@@ -28,9 +28,9 @@ namespace larlight {
     fID = -1;
     fDCosStart[0] = fDCosStart[1] = fDCosStart[2] = -1;
     fSigmaDCosStart[0] = fSigmaDCosStart[1] = fSigmaDCosStart[2] = -1;
-    fMaxWidthX = fMaxWidthY = -1;
-    fDistanceMaxWidth=-1;
-    fTotalCharge=-1;
+ //   fMaxWidthX = fMaxWidthY = -1;
+ //   fDistanceMaxWidth=-1;
+ //   fTotalCharge=-1;
   }
 
   //*********************************************************************************
