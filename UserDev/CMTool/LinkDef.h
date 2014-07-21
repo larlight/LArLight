@@ -54,6 +54,7 @@
 #pragma link C++ class cmtool::CBAlgoOutOfConeSeparate+;
 #pragma link C++ class cmtool::CBAlgoMergeAll+;
 #pragma link C++ class cmtool::CBAlgoCenterOfMass+;
+#pragma link C++ class cmtool::CBAlgoCenterOfMassSmall+;
 #pragma link C++ class cmtool::CBAlgoStartNearEnd+;
 #pragma link C++ class cmtool::CBAlgoStartTrack+;
 #pragma link C++ class cmtool::CBAlgoProhibitAllTracks+;
