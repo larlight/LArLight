@@ -29,9 +29,9 @@ OSNAMEMODE      = $(OSNAME)
 include $(MAKE_TOP_DIR)/Makefile/Makefile.${OSNAME}
 
 # set compiler options for ROOT
-CXXFLAGS +=  `root-config --cflags`
+CXXFLAGS +=  `root-config --cflags` -fpermissive
 
-CINTFLAGS += "-p"
+CINTFLAGS += "-p "
 # call the common GNUmakefile
 include $(MAKE_TOP_DIR)/Makefile/GNUmakefile.CORE
 
