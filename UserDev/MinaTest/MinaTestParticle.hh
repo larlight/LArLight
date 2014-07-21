@@ -60,9 +60,10 @@ public:
   int fPDG() const {return PDG;}
   double fEnergy() const {return Photon_.GetEnergy(); }
   int fMotherTID() const {return Photon_.GetMotherTID(); }
-  //int fMotherPDG() const {return Photon_.GetMotherPDG(); }
+  int fMotherPDG() const {return Photon_.GetMotherPDG(); }
   std::vector<double> fStartXYZT() const {return Photon_.GetStartXYZT(); }
   std::vector<double> fEndXYZT() const {return Photon_.GetEndXYZT(); }
+  double fTrackLength() const {return Photon_.GetTrackLength(); }
 
 protected:
 

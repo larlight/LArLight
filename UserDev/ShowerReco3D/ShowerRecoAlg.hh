@@ -44,8 +44,24 @@ namespace shower {
     
   protected:
 
-    ::calo::CalorimetryAlg fCaloAlg;
+   ::calo::CalorimetryAlg fCaloAlg;
 
+   larutil::GeometryUtilities  *fGSer;
+   
+  private:
+   std::vector < larutil::PxPoint > fStartPoint;    // for each plane
+   std::vector < larutil::PxPoint > fEndPoint;    // for each plane
+   std::vector < double > fOmega2D;    // for each plane
+   
+   std::vector < double > fEnergy;    // for each plane
+   std::vector < double > fdEdx;      
+   int fNPlanes;
+   
+   double fcalodEdxlength;
+   double fdEdxlength;
+   bool fUseArea;
+   
+   
   };
 }
 

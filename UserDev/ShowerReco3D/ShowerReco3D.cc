@@ -54,6 +54,8 @@ namespace larlight {
     shower_v->clear();
     shower_v->reserve(matched_pairs.size());
 
+        
+    
     // Loop over matched pairs
     for(auto const& pair : matched_pairs) {
       
@@ -61,6 +63,8 @@ namespace larlight {
       std::vector< ::cluster::ClusterParamsAlgNew> clusters;
       clusters.reserve(pair.size());
 
+      
+            
       // Create an association vector
       std::vector<unsigned short> ass_index;
       ass_index.reserve(pair.size());
@@ -73,6 +77,19 @@ namespace larlight {
 	
       }
 
+      
+      int check=0;
+      for(auto const & iter : clusters)
+      {
+	if(iter.GetNHits() > 20)
+	  check++;
+      }
+	
+	std::cout << " clusters " <<  clusters.size() << " check " << check << std::endl;
+	
+	if(check<=2)
+	  continue;
+	
       // Run algorithm
       larlight::shower result = fShowerAlgo.Reconstruct(clusters);
 

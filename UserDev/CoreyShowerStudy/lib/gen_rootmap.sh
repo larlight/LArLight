@@ -15,6 +15,5 @@ rootlibmap() {
 }
 
 ######################################################
-# MinaTest
-rootlibmap libMinaTest.rootmap libMinaTest.so $USER_DEV_DIR/MinaTest/LinkDef.h \
-    libHist.so libTree.so
+# CoreyShowerStudy
+rootlibmap libCoreyShowerStudy.rootmap libCoreyShowerStudy.so $USER_DEV_DIR/CoreyShowerStudy/LinkDef.h 
