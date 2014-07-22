@@ -51,6 +51,9 @@ namespace larlight {
     */
     virtual bool finalize();
 
+    /// hack! remove me later
+    storage_manager* GetCurrentData() {return _mgr;};
+    
     /// Function to set an input cluster type to work with
     void SetClusterType(DATA::DATA_TYPE type) { fClusterType = type; }
 
@@ -70,7 +73,9 @@ namespace larlight {
 
     /// Cluster matching code
     ::cmtool::CMatchManager fMatchMgr;
-    
+
+    /// hack! remove me later
+    storage_manager* _mgr;
   };
 }
 #endif
