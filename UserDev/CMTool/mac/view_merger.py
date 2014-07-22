@@ -30,6 +30,8 @@ my_proc.set_ana_output_file("")
 
 raw_viewer   = larlight.ClusterViewer()
 merge_viewer = larlight.MergeViewer()
+#decide if to show hit charge OR MCShowers on RHS of TCanvas
+raw_viewer.ShowShowers(True)
 
 
 merge_viewer.SetPrintClusterInfo(True)
@@ -38,18 +40,63 @@ merge_viewer.SetPrintClusterInfo(True)
 # attach merge algos here
 ########################################
 
-myalg = cmtool.CBAlgoShortestDist()
-#merge nothing:
-myalg.SetMinHits(999999)
-#merge everything:
-#myalg.SetMinHits(0)
-#myalg.SetSquaredDistanceCut(9999999)
-merge_viewer.GetManager().AddMergeAlgo(myalg)
 
 ########################################
+# Remove tracks with priority algo!
+########################################
+merge_viewer.GetManager().AddPriorityAlgo(cmtool.CPAlgoIgnoreTracks())
+
+
+
+########################################
+# PROHIBIT ALGORITHMS
+########################################
+prohib_array = cmtool.CBAlgoArray()
+
+tracksep_prohibit = cmtool.CBAlgoTrackSeparate()
+tracksep_prohibit.SetDebug(False)
+tracksep_prohibit.SetVerbose(False)
+tracksep_prohibit.SetUseEP(True)
+prohib_array.AddAlgo(tracksep_prohibit,False)
+
+outofcone_prohibit = cmtool.CBAlgoOutOfConeSeparate()
+outofcone_prohibit.SetDebug(False)
+outofcone_prohibit.SetVerbose(False)
+outofcone_prohibit.SetMaxAngleSep(20.)
+prohib_array.AddAlgo(outofcone_prohibit,False)
+
+angle_prohibit = cmtool.CBAlgoAngleIncompat()
+#this only applies if both clusters have >50 hits
+angle_prohibit.SetMinHits(50)
+angle_prohibit.SetAllow180Ambig(True)
+angle_prohibit.SetUseOpeningAngle(False)
+#this prohibits clusters w/ angles different than 10 degrees
+angle_prohibit.SetAngleCut(10.)
+angle_prohibit.SetMinLength(20.)
+angle_prohibit.SetDebug(False)
+prohib_array.AddAlgo(angle_prohibit,False)
+
+merge_viewer.GetManager().AddSeparateAlgo(prohib_array)
+
+########################################
+# MERGE ALGORITHMS
+########################################
+algo_array = cmtool.CBAlgoArray()
+
+COM_algo = cmtool.CBAlgoCenterOfMassSmall()
+COM_algo.SetDebug(False)
+COM_algo.SetVerbose(False)
+COM_algo.UseCOMInPoly(True)
+COM_algo.UseCOMClose(True)
+COM_algo.UseCOMNearClus(True)
+COM_algo.SetMaxDistance(20.)
+COM_algo.SetMaxCOMDistance(20.)
+COM_algo.SetMaxHitsSmallClus(40)
+algo_array.AddAlgo(COM_algo,False)
+
+merge_viewer.GetManager().AddMergeAlgo(algo_array)
 # done attaching merge algos
 ########################################
-
 merge_viewer.GetManager().MergeTillConverge(True)
 
 
@@ -57,8 +104,8 @@ my_proc.add_process(raw_viewer)
 
 my_proc.add_process(merge_viewer)
 
-raw_viewer.SetClusterType(larlight.DATA.FuzzyCluster)
-merge_viewer.SetClusterType(larlight.DATA.FuzzyCluster)
+raw_viewer.SetClusterType(larlight.DATA.Cluster)
+merge_viewer.SetClusterType(larlight.DATA.Cluster)
 
 gStyle.SetOptStat(0)
 

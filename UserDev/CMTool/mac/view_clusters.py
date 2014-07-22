@@ -28,6 +28,8 @@ larlight.storage_manager.get().set_data_to_read(larlight.DATA.UserInfo,False)
 my_proc.set_ana_output_file("")
 
 raw_viewer   = larlight.ClusterViewer()
+#decide if to show hit charge OR MCShowers on RHS of TCanvas
+raw_viewer.ShowShowers(True)
 
 my_proc.add_process(raw_viewer)
 
