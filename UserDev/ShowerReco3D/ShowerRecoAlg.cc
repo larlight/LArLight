@@ -56,7 +56,7 @@ namespace shower {
 	}
             
     }
-    
+   
     std::cout << " worst plane is : " << worst_plane << std::endl;
     
     int index_to_use[2]={0,1};  // for a two plane detector we have no choice.
@@ -70,16 +70,14 @@ namespace shower {
      }
        
     }
-      
-    std::cout << " indexes to use:" << index_to_use[0] << " " << index_to_use[1]  << " planes to use are: " << fStartPoint[index_to_use[0]].plane  << " " <<  fStartPoint[index_to_use[1]].plane << " " << std::endl;
-            
+               
     
     // Second Calculate 3D angle and effective pitch and start point 
   
     double xphi=0,xtheta=0;
     
     
-    fGSer->Get3DaxisN(index_to_use[0],index_to_use[1],fOmega2D[index_to_use[0]]*TMath::Pi()/180.,fOmega2D[index_to_use[0]]*TMath::Pi()/180.,xphi,xtheta);
+    fGSer->Get3DaxisN(index_to_use[0],index_to_use[1],fOmega2D[index_to_use[0]]*TMath::Pi()/180.,fOmega2D[index_to_use[1]]*TMath::Pi()/180.,xphi,xtheta);
     
     std::cout << " new angles: " << xphi << " " << xtheta << std::endl; 
     
@@ -88,10 +86,10 @@ namespace shower {
     double xyz[3];
     // calculate start point here?
     
-    std::cout <<" before get XYZ " << std::endl;
+    
     fGSer-> GetXYZ(&(fStartPoint[index_to_use[0]]),&(fStartPoint[index_to_use[1]]),xyz);
     
-    std::cout << " after get XYZ  " << std::endl;
+    std::cout << " XYZ:  " << xyz[0] << " " << xyz[1] << " " << xyz[2] << std::endl;
     
     
     
@@ -103,8 +101,8 @@ namespace shower {
       int plane = clustit.GetParams().start_point.plane;      
       double newpitch=fGSer->PitchInView(plane,xphi,xtheta);
       
-      double nnpitch = fGSer -> CalculatePitch(plane,xphi*TMath::Pi()/180.,xtheta*TMath::Pi()/180.);
-      std::cout << "newpitch " << newpitch << " nnpitch " <<nnpitch << std::endl;
+      std::cout << std::endl << " Plane: " << plane << std::endl;
+      
       double totEnergy=0;
       int direction=-1;
       double dEdx_av=0,RMS_dedx=0,dedx_final=0;
@@ -116,7 +114,6 @@ namespace shower {
           direction=1;
       
       
-      std::cout << "newpitch " << std::endl;
     
       std::vector<larutil::PxHit> hitlist =  clustit.GetHitVector(); 
       std::vector<larutil::PxHit> local_hitlist;

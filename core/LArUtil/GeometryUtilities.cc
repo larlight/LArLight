@@ -63,7 +63,7 @@ namespace larutil{
 				      Double_t &theta) const
   {
  
-    Double_t l(0),m(0),n(0);
+  //  Double_t l(0),m(0),n(0);
     Double_t ln(0),mn(0),nn(0);
     Double_t phis(0),thetan(0);
     //Double_t phin(0);//,phis(0),thetan(0);
@@ -137,6 +137,8 @@ namespace larutil{
       }	
       
     }
+    
+    
     slopeC=tan(omegaC);
     slopeI=tan(omegaI);
     //omega0=tan(omega0);
@@ -154,18 +156,20 @@ namespace larutil{
     else
       ln=-1;
     
-    //std::cout << " slopes, C:"<< slopeC << " " << (omegaC) << " I:" << slopeI << " " << omegaI <<std::endl;
-    slopeI=tan(omegaI);
+//     std::cout << " slopes, C:"<< slopeC << " " << (omegaC) << " I:" << slopeI << " " << omegaI <<std::endl;
+//     slopeI=tan(omegaI);
+//     
+//     std::cout << "omegaC, angleC " << omegaC << " " << angleC << "cond: " << omegaC-angleC << " ln: " << ln << std::endl;
+//     
+//     std::cout << " inverse slopes: " << (cos(angleI)/(slopeC*cos(angleC))) << " " << 1/slopeC << " 2: "<< 1/slopeI << std::endl;
+//     
+  //  l = 1;
     
-    //std::cout << "omegaC, angleC " << omegaC << " " << angleC << "cond: " << omegaC-angleC << " ln: " << ln << std::endl;
     
-    l = 1;
+   // m = (1/(2*sin(angleI)))*((cos(angleI)/(slopeC*cos(angleC)))-(1/slopeI) 
+//			     +nfact*(  cos(angleI)/slopeC-1/slopeI  )     );
     
-    
-    m = (1/(2*sin(angleI)))*((cos(angleI)/(slopeC*cos(angleC)))-(1/slopeI) 
-			     +nfact*(  cos(angleI)/slopeC-1/slopeI  )     );
-    
-    n = (1/(2*cos(angleC)))*((1/slopeC)+(1/slopeI) +nfact*((1/slopeC)-(1/slopeI)));
+//    n = (1/(2*cos(angleC)))*((1/slopeC)+(1/slopeI) +nfact*((1/slopeC)-(1/slopeI)));
     
     mn = (ln/(2*sin(angleI)))*((cos(angleI)/(slopeC*cos(angleC)))-(1/slopeI) 
 			       +nfact*(  cos(angleI)/(cos(angleC)*slopeC)-1/slopeI  )     );
@@ -173,13 +177,13 @@ namespace larutil{
     nn = (ln/(2*cos(angleC)))*((1/slopeC)+(1/slopeI) +nfact*((1/slopeC)-(1/slopeI)));
     
     
-    float Phi;
-    float alt_Phi;
+//    float Phi;
+//    float alt_Phi;
     // Direction angles
     if(fabs(angleC)>0.01)  // catch numeric error values 
       {
-	phi=atan(n/l);
-	//phin=atan(ln/nn);
+	
+	//phi=atan(ln/nn);
 	phis=asin(ln/TMath::Sqrt(ln*ln+nn*nn));
         
 	if(fabs(slopeC+slopeI) < 0.001)
@@ -198,51 +202,50 @@ namespace larutil{
 	
 	
 	// solve the ambiguities due to tangent periodicity
-	Phi = phi > 0. ? (TMath::Pi()/2)-phi : fabs(phi)-(TMath::Pi()/2) ; 
-	alt_Phi = phi > 0. ? (TMath::Pi()/2)-phi : fabs(phi)-(TMath::Pi()/2) ; 
-	
-	if(backwards==1){
-	  if(Phi<0){ Phi=Phi+TMath::Pi();}
-	  else if(Phi>0){Phi=Phi-TMath::Pi();}
-	}
-	
-	bool alt_condition=( ( fabs(omegaC)>0.75*TMath::Pi() && fabs(omegaI)>0.166*TMath::Pi() )|| ( fabs(omegaI)>0.75*TMath::Pi() && fabs(omegaC)>0.166*TMath::Pi() ) );
-	
-	
-	if((alt_backwards==1 && alt_condition)   || backwards==1 ){
-	  if(alt_Phi<0){alt_Phi=alt_Phi+TMath::Pi();}
-	  else if(alt_Phi>0){alt_Phi=alt_Phi-TMath::Pi();}
-	}
+// 	Phi = phi > 0. ? (TMath::Pi()/2)-phi : fabs(phi)-(TMath::Pi()/2) ; 
+// 	alt_Phi = phi > 0. ? (TMath::Pi()/2)-phi : fabs(phi)-(TMath::Pi()/2) ; 
+// 	
+// 	if(backwards==1){
+// 	  if(Phi<0){ Phi=Phi+TMath::Pi();}
+// 	  else if(Phi>0){Phi=Phi-TMath::Pi();}
+// 	}
+// 	
+// 	bool alt_condition=( ( fabs(omegaC)>0.75*TMath::Pi() && fabs(omegaI)>0.166*TMath::Pi() )|| ( fabs(omegaI)>0.75*TMath::Pi() && fabs(omegaC)>0.166*TMath::Pi() ) );
+// 	
+// 	
+// 	if((alt_backwards==1 && alt_condition)   || backwards==1 ){
+// 	  if(alt_Phi<0){alt_Phi=alt_Phi+TMath::Pi();}
+// 	  else if(alt_Phi>0){alt_Phi=alt_Phi-TMath::Pi();}
+// 	}
 	
       }
     else  // if plane is collection than Phi = omega
-      {phi=omegaC;
-	Phi=omegaC;
+      {//phi=omegaC;
+	//Phi=omegaC;
 	phis=omegaC;
-	alt_Phi=omegaC;
+	//alt_Phi=omegaC;
       }
     
     
-    theta = acos( m / (sqrt(pow(l,2)+pow(m,2)+pow(n,2)) ) ) ;
-    thetan = -asin ( mn / (sqrt(pow(l,2)+pow(mn,2)+pow(nn,2)) ) ) ;
+    //theta = acos( mn / (sqrt(pow(ln,2)+pow(mn,2)+pow(nn,2)) ) ) ;
+    thetan = -asin ( mn / (sqrt(pow(ln,2)+pow(mn,2)+pow(nn,2)) ) ) ;
     //Double_t thetah = acos( mn / (sqrt(pow(l,2)+pow(mn,2)+pow(nn,2)) ) ) ;
-    //float Theta;
-    //float alt_Theta = 0.;
+//     float Theta;
+//     float alt_Theta = 0.;
+    
+//    std::cout << " thetan " << mn << " " <<  (sqrt(pow(ln,2)+pow(mn,2)+pow(nn,2)) ) << " " << mn / (sqrt(pow(ln,2)+pow(mn,2)+pow(nn,2)) ) << std::endl;
     
     
+//     if(Phi < 0)Theta = (TMath::Pi()/2)-theta;
+//     if(Phi > 0)Theta = theta-(TMath::Pi()/2);
+//     
+//     if(alt_Phi < 0)alt_Theta = (TMath::Pi()/2)-theta;
+//     if(alt_Phi > 0)alt_Theta = theta-(TMath::Pi()/2);
     
-    
-    //if(Phi < 0)Theta = (TMath::Pi()/2)-theta;
-    //if(Phi > 0)Theta = theta-(TMath::Pi()/2);
-    
-    //if(alt_Phi < 0)alt_Theta = (TMath::Pi()/2)-theta;
-    //if(alt_Phi > 0)alt_Theta = theta-(TMath::Pi()/2);
-    
-    ////std::cout << "++++++++ GeomUtil " << Phi*180/TMath::Pi() << " " << Theta*180/TMath::Pi() << std::endl;
-    //std::cout << "++++++++ GeomUtil_angles: Phi: " << alt_Phi*180/TMath::Pi() << " Theta: " << alt_Theta*180/TMath::Pi() << std::endl;
-    
-    //std::cout << "++++++++ GeomUtil_new_angles: Phi: " << phis*180/TMath::Pi() << " Theta: " << thetan*180/TMath::Pi() << std::endl;
-    
+  /*  std::cout << "++++++++ GeomUtil old " << Phi*180/TMath::Pi() << " " << Theta*180/TMath::Pi() << std::endl;
+    std::cout << "++++++++ GeomUtil_angles ALT: Phi: " << alt_Phi*180/TMath::Pi() << " Theta: " << alt_Theta*180/TMath::Pi() << std::endl;
+    std::cout << "++++++++ GeomUtil_new_angles Sine: Phi: " << phis*180/TMath::Pi() << " Theta: " << thetan*180/TMath::Pi() << std::endl;
+  */  
     phi=phis*180/TMath::Pi();
     theta=thetan*180/TMath::Pi();
     
@@ -864,12 +867,13 @@ namespace larutil{
   {
     Double_t y,z;
   
-    UInt_t chan1 = geom->PlaneWireToChannel(p0->plane, p0->w);
-    UInt_t chan2 = geom->PlaneWireToChannel(p1->plane, p1->w);
+    UInt_t chan1 = geom->PlaneWireToChannel(p0->plane, p0->w/(fWiretoCm));
+    UInt_t chan2 = geom->PlaneWireToChannel(p1->plane, p1->w/(fWiretoCm));
 
     if(! geom->ChannelsIntersect(chan1,chan2,y,z) )
       return -1;
   
+    
     yz[0]=y;
     yz[1]=z;
   
@@ -886,8 +890,7 @@ namespace larutil{
     
     Double_t pos[3]={0.};
     geom->PlaneOriginVtx(p0->plane, pos);
- 
-    Double_t x=(p0->t - detp->TriggerOffset())*fTimetoCm+pos[0];
+    Double_t x=(p0->t)+ detp->TriggerOffset()*fTimetoCm+pos[0];
     double yz[2];
     
     GetYZ(p0,p1,yz);
@@ -1020,12 +1023,19 @@ namespace larutil{
     Double_t cosgamma = TMath::Abs(TMath::Sin(angleToVert)*dirs[1] + 
 				      TMath::Cos(angleToVert)*dirs[2]);
    
-    //   //std::cout << " ---- cosgamma: " << angleToVert*180/TMath::Pi() << " d's: " << dirs[1]
-    //  << " " << dirs[2] << " ph,th " << phi << " " << theta << std::endl; 
+//      std::cout << " ---- cosgamma: " << angleToVert*180/TMath::Pi() << " d's: " << dirs[1]
+//       << " " << dirs[2] << " ph,th " << phi << " " << theta << std::endl; 
+      
+    //  std::cout << TMath::Sin(angleToVert)*dirs[1]  << " " << TMath::Cos(angleToVert)*dirs[2] << " CGAMM: " << cosgamma << std::endl;
     if(cosgamma < 1.e-5) 
       throw LArUtilException("cosgamma is basically 0, that can't be right");
+    //{std::cout << " returning 100" << std::endl;
+//      // return 100;
     
-    return wirePitch/cosgamma;
+   // }
+    
+ //   std::cout << " returning " << wirePitch/cosgamma << std::endl;
+   return wirePitch/cosgamma;
   }
 
   
