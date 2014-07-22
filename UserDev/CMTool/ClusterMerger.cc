@@ -44,12 +44,14 @@ namespace larlight {
     std::vector<std::vector<unsigned short> > merged_indexes;
     _mgr.GetBookKeeper().PassResult(merged_indexes);
     
-    auto out_cluster_v =  (event_cluster*)(storage->get_data(DATA::Cluster));
-    out_cluster_v->clear();
-    out_cluster_v->reserve(merged_indexes.size());
-    out_cluster_v->set_event_id(ev_cluster->event_id());
-    out_cluster_v->set_run(ev_cluster->run());
-    out_cluster_v->set_subrun(ev_cluster->subrun());
+    //auto out_cluster_v =  (event_cluster*)(storage->get_data(DATA::Cluster));
+
+    ::larlight::event_cluster out_cluster_v;
+    out_cluster_v.clear();
+    out_cluster_v.reserve(merged_indexes.size());
+    out_cluster_v.set_event_id(ev_cluster->event_id());
+    out_cluster_v.set_run(ev_cluster->run());
+    out_cluster_v.set_subrun(ev_cluster->subrun());
     //tmp_index to know what plane to use
     unsigned short tmp_index = 0;
 
@@ -71,13 +73,15 @@ namespace larlight {
       }
 
       cluster out_cluster;
-      out_cluster.set_id(out_cluster_v->size());
+      out_cluster.set_id(out_cluster_v.size());
       out_cluster.set_view(ev_cluster->at(tmp_index).View());
       out_cluster.add_association(hit_type,merged_association);
-      out_cluster_v->push_back(out_cluster);
+      out_cluster_v.push_back(out_cluster);
     }
     
-  
+    (*((event_cluster*)(storage->get_data(DATA::Cluster)))) = out_cluster_v;
+
+    
     return true;
   }
 

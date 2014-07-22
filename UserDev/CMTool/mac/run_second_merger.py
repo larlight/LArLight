@@ -20,6 +20,9 @@ mgr.set_ana_output_file("")
 
 proc = fmwk.ClusterMerger()
 
+#secondmerger starts with Cluster data type (not Fuzzy!)
+#and outputs Cluster... it overwrites now
+proc.SetClusterType(larlight.DATA.Cluster)
 proc.SaveOutputCluster(True)
 
 
@@ -101,7 +104,6 @@ proc.GetManager().AddMergeAlgo(algo_array)
 # CMergeManager options
 ########################################
 proc.GetManager().MergeTillConverge(True)
-
 
 mgr.add_process(proc)
 
