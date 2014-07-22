@@ -39,6 +39,7 @@
 #include "CBAlgoOutOfConeSeparate.hh"
 #include "CBAlgoMergeAll.hh"
 #include "CBAlgoCenterOfMass.hh"
+#include "CBAlgoCenterOfMassSmall.hh"
 #include "CBAlgoStartNearEnd.hh"
 #include "CBAlgoStartTrack.hh"
 #include "CBAlgoProhibitAllTracks.hh"
@@ -105,6 +106,7 @@ namespace cmtool {
   class CBAlgoMergeTinyWithBig;
   class CBAlgoProhibitBigClusters;
   class CBAlgoCenterOfMass;
+  class CBAlgoCenterOfMassSmall;
   class CBAlgoMergeAll;
   class CBAlgoOutOfConeSeparate;
   class CBAlgoTrackSeparate;

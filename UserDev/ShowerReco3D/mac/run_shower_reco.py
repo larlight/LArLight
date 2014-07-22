@@ -7,9 +7,16 @@ if len(sys.argv) < 2:
     sys.stderr.write(msg)
     sys.exit(1)
 
-from ROOT import gSystem
+
+from ROOT import gSystem,TMath
 gSystem.Load("libShowerReco3D")
-from ROOT import larlight as fmwk, cmtool, shower
+gSystem.Load("libBase")
+gSystem.Load("libLArUtil")
+from ROOT import larlight as fmwk, cmtool, shower,larutil
+
+
+
+
 
 # Create ana_processor instance
 my_proc = fmwk.ana_processor()
@@ -46,8 +53,43 @@ print
 print  "Finished configuring ana_processor. Start event loop!"
 print
 
-# Let's run it.
-my_proc.run();
+fGSer = larutil.GeometryUtilities.GetME()
+
+while my_proc.process_event():
+
+    storage=ana_unit.GetCurrentData()
+    mctruth_v = storage.get_data(fmwk.DATA.MCTruth)
+    # Get event_mctruth ... std::vector<larlight::mctruth>
+   # 
+
+    # Get the primary particl generator vtx position
+    mct_vtx=None
+    if mctruth_v and mctruth_v.size():
+        if mctruth_v.size()>1:
+            print "Found more than 1 MCTruth. Only use the 1st one... \n \n"
+        if mctruth_v.at(0).GetParticles().at(0).PdgCode() == 11:      ## electron    
+            mct_vtx = mctruth_v.at(0).GetParticles().at(0).Trajectory().at(0).Position()
+            print "\n electron \n"
+        elif mctruth_v.at(0).GetParticles().at(0).PdgCode() == 22:    
+            trajsize= mctruth_v.at(0).GetParticles().at(0).Trajectory().size()
+            mct_vtx = mctruth_v.at(0).GetParticles().at(0).Trajectory().at(trajsize-1).Position()
+            print "\n gamma \n"
+        lep_dcosx_truth = mctruth_v.at(0).GetParticles().at(0).Trajectory().at(0).Px()/mctruth_v.at(0).GetParticles().at(0).Trajectory().at(0).E();
+        lep_dcosy_truth = mctruth_v.at(0).GetParticles().at(0).Trajectory().at(0).Py()/mctruth_v.at(0).GetParticles().at(0).Trajectory().at(0).E();
+	lep_dcosz_truth = mctruth_v.at(0).GetParticles().at(0).Trajectory().at(0).Pz()/mctruth_v.at(0).GetParticles().at(0).Trajectory().at(0).E();
+    
+        print "-----  cx,cy,cz ",lep_dcosx_truth," ",lep_dcosy_truth," ",lep_dcosz_truth,"\n";
+        
+        fMCPhistart= 0.0 
+        fMCThetastart=  0.0
+        if (not(lep_dcosx_truth == 0.0 and lep_dcosz_truth == 0.0)) :
+	  fMCPhistart=TMath.ATan2(lep_dcosx_truth,lep_dcosz_truth)
+	if  (not(lep_dcosx_truth == 0.0 and lep_dcosy_truth == 0.0 and lep_dcosz_truth == 0.0)) :
+	  fMCThetastart = TMath.Pi()*0.5-TMath.ATan2(TMath.Sqrt(lep_dcosx_truth*lep_dcosx_truth + lep_dcosz_truth*lep_dcosz_truth),lep_dcosy_truth)        
+	print " MCPHI, MCTHETA ",fMCPhistart*180/3.1415," ",fMCThetastart*180/3.1415,"\n";
+   ##PdgCode
+    print "in loop \n"
+    sys.stdin.readline()
 
 # done!
 print
