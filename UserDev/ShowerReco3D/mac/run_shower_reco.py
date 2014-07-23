@@ -66,6 +66,8 @@ fGSer = larutil.GeometryUtilities.GetME()
 
 while my_proc.process_event():
 
+
+
     storage=ana_unit.GetCurrentData()
     mctruth_v = storage.get_data(fmwk.DATA.MCTruth)
     # Get event_mctruth ... std::vector<larlight::mctruth>
@@ -99,7 +101,7 @@ while my_proc.process_event():
 	print "MC Particle Start Point: (%g,%g,%g)" % (mct_vtx[0],mct_vtx[1],mct_vtx[2])
    ##PdgCode
     print "in loop \n"
-    sys.stdin.readline()
+#    sys.stdin.readline()
 
 # done!
 print
