@@ -73,6 +73,9 @@ namespace larlight{
     /// Function to decide if to show MCshowers or hit-charge
     void ShowShowers(bool on);
 
+    /// A function to decide if the hits COLZ canvas should be shown in log-z scale
+    void SetHitsLogZ(bool flag);
+
   protected:
     /// Type of cluster to view
     DATA::DATA_TYPE cluster_type;
@@ -88,7 +91,7 @@ namespace larlight{
     std::map<UInt_t,UInt_t> _shower_idmap;
     std::map<UShort_t,larlight::simch> _simch_map;
     bool _showerColor;
-
+    bool _hits_log_z;
   };
   
 }

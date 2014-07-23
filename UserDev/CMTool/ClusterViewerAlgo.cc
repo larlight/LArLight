@@ -12,6 +12,7 @@ namespace cluster {
     _cAllCluster = nullptr;
     _cOneCluster = nullptr;
     _cTwoClusters= nullptr;
+    _hits_log_z= true;
     ShowShowers(false);
 
   }
@@ -440,7 +441,10 @@ namespace cluster {
       }
 
       _cAllCluster->cd((plane+1)*2);
-
+      
+      if(_hits_log_z)
+	gPad->SetLogz();
+      
       if ( !_showerColor )
 	_hAllHits.at(plane)->Draw("COLZ");
 

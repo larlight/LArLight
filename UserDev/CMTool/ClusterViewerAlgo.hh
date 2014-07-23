@@ -97,6 +97,9 @@ namespace cluster {
     /// A function to decide if to show shower-coded hits or charge-coded hits
     void ShowShowers(bool on) { _showerColor = on; }
     
+    /// A function to decide if the hits COLZ canvas should be shown in log-z scale
+    void SetHitsLogZ(bool flag) { _hits_log_z = flag; }
+
   protected:
 
     /// A utility function to create TH2D histogram
@@ -127,6 +130,9 @@ namespace cluster {
     TCanvas* _cAllCluster;
     TCanvas* _cOneCluster;
     TCanvas* _cTwoClusters;
+
+    //---- If hits canvas will use logZ scale ----//
+    bool _hits_log_z;
 
     //---- Things to be drawn (DATA) ----//
 
