@@ -17,6 +17,8 @@
 
 #include "ClusterViewerAlgo.hh"
 #include "GeometryUtilities.hh"
+#include "CRUHelper.hh"
+#include "McshowerLookback.hh"
 #include "ana_base.hh"
 #include <TH2D.h>
 #include <TGraph.h>
@@ -68,12 +70,25 @@ namespace larlight{
     /// Function to draw a tertiary canvas w/ two clusters on it
     void DrawTwoClusters(UChar_t plane, size_t index1, size_t index2) {_algo.DrawTwoClusters(plane,index1,index2);}
 
+    /// Function to decide if to show MCshowers or hit-charge
+    void ShowShowers(bool on);
+
   protected:
     /// Type of cluster to view
     DATA::DATA_TYPE cluster_type;
 
     /// Actual viewer code
     ::cluster::ClusterViewerAlgo _algo;
+
+    //DavidC--To color-code showers
+    //declare mcshowerlookback object only once, not once per event
+    McshowerLookback _mcslb;
+
+    //some maps that mcshowerlookback fills once per event
+    std::map<UInt_t,UInt_t> _shower_idmap;
+    std::map<UShort_t,larlight::simch> _simch_map;
+    bool _showerColor;
+
   };
   
 }

@@ -12,6 +12,15 @@ namespace larlight {
     // Class name
     _name = "ClusterViewer";
     cluster_type=DATA::FuzzyCluster;
+    ShowShowers(false);
+  }
+
+  //#######################################
+  void ClusterViewer::ShowShowers(bool on)
+  //#######################################
+  {
+    _showerColor = on;
+    _algo.ShowShowers(_showerColor);
   }
 
   //#######################################
@@ -71,13 +80,48 @@ namespace larlight {
 					    )
 				       );
 
+    std::vector<float> hit_charge_frac;
+    std::vector<UInt_t> MCShower_indices;
+    int n_showers = 0;
+
+    //DavidC
+    if ( _showerColor ) {
+      
+      //grab the MC showers
+      larlight::event_mcshower* ev_mcshower = (larlight::event_mcshower*) ( storage->get_data(larlight::DATA::MCShower));
+      if(!ev_mcshower) {
+	print(larlight::MSG::ERROR,__FUNCTION__,Form("Did not find specified data product, MCShower!"));
+	return false;
+      }
+      
+      //grab the simchannels
+      larlight::event_simch* ev_simch = (larlight::event_simch*)( storage->get_data(larlight::DATA::SimChannel));
+      if(!ev_simch) {
+	print(larlight::MSG::ERROR,__FUNCTION__,Form("Did not find specified data product, SimChannel!"));
+	return false;
+      }
+
+      _mcslb.SetMinEnergyCut(0.02);
+      _mcslb.SetMaxEnergyCut(10.0);
+      _shower_idmap.clear();
+      _mcslb.FillShowerMap(ev_mcshower,_shower_idmap);
+      _simch_map.clear();
+      _mcslb.FillSimchMap(ev_simch,_simch_map);
+      n_showers = ev_mcshower->size();
+      for(UInt_t i=0; i < ev_mcshower->size(); ++i)
+	MCShower_indices.push_back(i);
+    }
+
     // Find hit range & fill all-hits vector
     std::vector<std::pair<double,double> > xrange(nplanes,std::pair<double,double>(1e9,0));
     std::vector<std::pair<double,double> > yrange(nplanes,std::pair<double,double>(1e9,0));
     std::vector<std::vector<std::pair<double,double> > > hits_xy(nplanes,std::vector<std::pair<double,double> >());
     std::vector<std::vector<double> > hits_charge(nplanes,std::vector<double>());
-    for(auto const &h : *ev_hit) {
+    std::vector<std::vector<std::vector<std::pair<double,double> > > > shower_xy(nplanes,
+										 std::vector<std::vector<std::pair<double,double> > >(n_showers,std::vector<std::pair<double,double> >()));
 
+    for(auto const &h : *ev_hit) {
+      
       UChar_t plane = geo->ChannelToPlane(h.Channel());
       double x = h.Wire() * wire2cm;
       double y = h.PeakTime() * time2cm;
@@ -89,8 +133,35 @@ namespace larlight {
       if(yrange.at(plane).second < y ) yrange.at(plane).second = y;
       
       hits_xy.at(plane).push_back(std::pair<double,double>(x,y));
-      hits_charge.at(plane).push_back(h.Charge());
-    }
+
+
+      //DavidC
+      if ( _showerColor ){
+	hit_charge_frac.clear();
+	
+	hit_charge_frac = 
+	  _mcslb.MatchHitsAll(h,
+			      _simch_map,
+			      _shower_idmap,
+			      MCShower_indices);
+	//find item with largest fraction
+	int   max_item = 0;
+	float max_frac = 0.;
+	for ( size_t i=0; i < hit_charge_frac.size(); i++){
+	  if ( hit_charge_frac.at(i) > max_frac ) { 
+	    max_item = i;
+	    max_frac = hit_charge_frac.at(i);
+	  }
+	}
+	if ( max_item < n_showers ){
+	  shower_xy.at(plane).at(max_item).push_back(std::pair<double,double>(x,y));
+	}
+      }
+      else {
+	hits_charge.at(plane).push_back(h.Charge());
+      }
+
+    }//for all hits
 
     // Inform the algorithm about the range
     for(size_t i=0; i<nplanes; ++i)
@@ -98,7 +169,15 @@ namespace larlight {
 
     // Provide plane-hits to the algorithm
     for(size_t i=0; i<nplanes; ++i)
-      _algo.AddHits(i,hits_xy.at(i),hits_charge.at(i));
+      if ( _showerColor ){
+	for(int s=0; s < n_showers; ++s){
+	  _algo.AddShowers(i,shower_xy.at(i).at(s));
+	}
+      }
+      else
+	_algo.AddHits(i,hits_xy.at(i),hits_charge.at(i));
+    //DavidC--placeholder--instead of hits_charge.at(i)
+    //use color dependent on _mcslb return value
 
     // Find hits-per-cluster
     for(auto const &cl : *ev_clus) {
