@@ -44,8 +44,17 @@ ana_unit = fmwk.ShowerReco3D()
 # 
 # Attach Matching algorithm
 #
-algo = cmtool.CFAlgoQRatio()
-ana_unit.GetManager().AddMatchAlgo(algo)
+
+
+#Andrzej: The algorithms below are ranked by their effectiveness-- TimeOverlap is best, 
+#then 3DAngle, then StartPoint . Right now, only TimeOverlap is called.
+algo_array = cmtool.CFAlgoArray()
+#algo_array.SetMode(cmtool.CFAlgoArray.kPositiveAddition)
+algo_array.AddAlgo(cmtool.CFAlgoTimeOverlap())
+#algo_array.AddAlgo(cmtool.CFAlgo3DAngle())
+#algo_array.AddAlgo(cmtool.CFAlgoStartPointMatch())
+
+ana_unit.GetManager().AddMatchAlgo(algo_array)
 
 my_proc.add_process(ana_unit)
 
@@ -87,6 +96,7 @@ while my_proc.process_event():
 	if  (not(lep_dcosx_truth == 0.0 and lep_dcosy_truth == 0.0 and lep_dcosz_truth == 0.0)) :
 	  fMCThetastart = TMath.Pi()*0.5-TMath.ATan2(TMath.Sqrt(lep_dcosx_truth*lep_dcosx_truth + lep_dcosz_truth*lep_dcosz_truth),lep_dcosy_truth)        
 	print " MCPHI, MCTHETA ",fMCPhistart*180/3.1415," ",fMCThetastart*180/3.1415,"\n";
+	print "MC Particle Start Point: (%g,%g,%g)" % (mct_vtx[0],mct_vtx[1],mct_vtx[2])
    ##PdgCode
     print "in loop \n"
     sys.stdin.readline()

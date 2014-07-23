@@ -5,7 +5,7 @@
  * 
  * \brief Class def header for a class CFAlgoTimeOverlap
  *
- * @author ah673_NAME
+ * @author ariana hackenburg
  */
 
 /** \addtogroup CMTool
@@ -32,53 +32,29 @@ namespace cmtool {
     /// Default destructor
     virtual ~CFAlgoTimeOverlap(){};
 
-    //
-    // Author should be aware of 3 functions at least: Float, Report, 
-    // and Reset. More possibly-useful functions can be found in the later 
-    // part but commented out. All of these functions are virtual and defined
-    // in the base class.
-
-    /**
-       Core function: given a set of CPANs, return a float which indicates 
-       the compatibility the cluster combination.
+    /**This algorithm calculates the difference between start and end times for merged clusters,
+		and compares across planes to form matches. 
     */
     virtual float Float(const std::vector<const cluster::ClusterParamsAlgNew*> &clusters);
 
-    /**
-       Optional function: called after each iterative approach if a manager class is
-       run with verbosity level <= kPerIteration. Maybe useful for debugging.
-    */
+	void SetStartTimeCut(float start_time) { _start_time_cut = start_time ; } 
+
+	void SetRatioCut(float ratio) { _time_ratio_cut = ratio ; } 
+
+	void SetDebug(bool debug) { _debug = debug ; }
+
+	void SetVerbose(bool verbose) { _verbose = verbose ; }
+
     virtual void Report();
     
-    /// Function to reset the algorithm instance, called together with manager's Reset()
     virtual void Reset();
-
-    /**
-       Optional function: called at the beginning of 1st iteration. This is called per event.
-     */
-    //virtual void EventBegin(const std::vector<cluster::ClusterParamsAlgNew> &clusters);
-
-    /**
-       Optional function: called at the end of event ... after the last merging iteration is over.
-     */
-    //virtual void EventEnd();
- 
-    /**
-       Optional function: called at the beggining of each iterative loop.
-       This provides all clusters' information in case the algorithm need them. Note this
-       is called per iteration which may be more than once per event.
-     */
-    //virtual void IterationBegin(const std::vector<cluster::ClusterParamsAlgNew> &clusters);
-
-    /**
-       Optional function: called at the end of each iterative loop.
-     */
-    //virtual void IterationEnd();
 
 	protected:
 		float _time_ratio_cut ;
 		float _start_time_cut ;
-		float _time_difference_cut ;
+		bool _debug ;
+		bool _verbose ;
+
   };
 }
 #endif
