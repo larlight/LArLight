@@ -1028,11 +1028,11 @@ namespace larutil{
       
     //  std::cout << TMath::Sin(angleToVert)*dirs[1]  << " " << TMath::Cos(angleToVert)*dirs[2] << " CGAMM: " << cosgamma << std::endl;
     if(cosgamma < 1.e-5) 
-      throw LArUtilException("cosgamma is basically 0, that can't be right");
-    //{std::cout << " returning 100" << std::endl;
-//      // return 100;
+      //throw LArUtilException("cosgamma is basically 0, that can't be right");
+    {std::cout << " returning 100" << std::endl;
+       return 100;
     
-   // }
+    }
     
  //   std::cout << " returning " << wirePitch/cosgamma << std::endl;
    return wirePitch/cosgamma;
