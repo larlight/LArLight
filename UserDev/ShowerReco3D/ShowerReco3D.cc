@@ -44,7 +44,13 @@ namespace larlight {
     local_clusters.clear();
 
     // Run matching & retrieve matched cluster indices
-    fMatchMgr.Process();
+    try{
+      fMatchMgr.Process();
+    }catch( ::cmtool::CMTException &e){
+      e.what();
+      return false;
+    }
+
     auto const& matched_pairs = fMatchMgr.GetBookKeeper().GetResult();
 
     //
