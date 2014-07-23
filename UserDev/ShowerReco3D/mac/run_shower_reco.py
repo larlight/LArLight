@@ -15,9 +15,6 @@ gSystem.Load("libLArUtil")
 from ROOT import larlight as fmwk, cmtool, shower,larutil
 
 
-
-
-
 # Create ana_processor instance
 my_proc = fmwk.ana_processor()
 
@@ -41,10 +38,16 @@ my_proc.set_output_file("out.root")
 # Create analysis unit
 ana_unit = fmwk.ShowerReco3D()
 
+
+match_viewer = fmwk.MatchViewer()
+
+priority_algo = cmtool.CPAlgoNHits()
+priority_algo.SetMinHits(20)
+match_viewer.GetManager().AddPriorityAlgo(priority_algo)
+
 # 
 # Attach Matching algorithm
 #
-
 
 #Andrzej: The algorithms below are ranked by their effectiveness-- TimeOverlap is best, 
 #then 3DAngle, then StartPoint . Right now, only TimeOverlap is called.
