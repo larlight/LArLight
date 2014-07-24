@@ -15,6 +15,7 @@
 #include <sstream>
 #include "TLatex.h"
 #include <algorithm>
+#include "TMatrix.h"
 
 namespace lar1{
   class SensUtils
@@ -27,6 +28,8 @@ namespace lar1{
     TH1F* AppendHistograms(TH1F * hist1, TH1F* hist2);
 
     Float_t * CollapseMatrix(std::vector<std::vector<float> > entries,
+                             int nbinsE, int nL);
+    Float_t * CollapseMatrix(TMatrix entries,
                              int nbinsE, int nL);
 
     bool fileExists(const char *filename);

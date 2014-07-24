@@ -849,8 +849,6 @@ namespace lar1{
          = new TH2D("covMatHist","Covariance Matrix",
                     nL*nbinsE*3,0,nL*nbinsE*3-1,
                     nL*nbinsE*3,0,nL*nbinsE*3-1);
-    
-
     TH2D * fractionalMatrixHist 
          = new TH2D("fracMatHist","Fractional Error Matrix",
                     nL*nbinsE*3,0,nL*nbinsE*3-1,
@@ -859,13 +857,15 @@ namespace lar1{
          = new TH2D("corrMatHist","Correlation Matrix",
                     nL*nbinsE*3,0,nL*nbinsE*3-1,
                     nL*nbinsE*3,0,nL*nbinsE*3-1);
+    TH2D * shapeFract_MatrixHist 
+         = new TH2D("shapeMatHist","Fractional Shape Matrix",
+                    nL*nbinsE*3,0,nL*nbinsE*3-1,
+                    nL*nbinsE*3,0,nL*nbinsE*3-1);
 
     TH2D * collapsed_covarianceMatrixHist 
          = new TH2D("collapsed_covMatHist","Collapsed Covariance Matrix",
                     nL*nbinsE*2,0,nL*nbinsE*2-1,
                     nL*nbinsE*2,0,nL*nbinsE*2-1);
-    
-
     TH2D * collapsed_fractionalMatrixHist 
          = new TH2D("collapsed_fracMatHist","Collapsed Fractional Error Matrix",
                     nL*nbinsE*2,0,nL*nbinsE*2-1,
@@ -874,7 +874,10 @@ namespace lar1{
          = new TH2D("collapsed_corrMatHist","Collapsed Correlation Matrix",
                     nL*nbinsE*2,0,nL*nbinsE*2-1,
                     nL*nbinsE*2,0,nL*nbinsE*2-1);
-
+    TH2D * collapsed_shapeFract_MatrixHist 
+         = new TH2D("collapsed_shapeMatHist","Collapsed Fractional Shape Matrix",
+                    nL*nbinsE*2,0,nL*nbinsE*2-1,
+                    nL*nbinsE*2,0,nL*nbinsE*2-1);
     // Here's the method.  The nominal, no signal sample is in
     // eventsnLnullVec.  It's a vector of length nL*nbinsE*3.  It 
     // contains NO signal, and we shouldn't change that.
@@ -958,23 +961,23 @@ namespace lar1{
           part1 -= temp_events_MW_COPY[ibin] + sin22th*temp_signal_MW_COPY[ibin];
           float part2 = events_nominal_COPY[jbin] + sin22th*signal_nominal_COPY[jbin];
           part2 -= temp_events_MW_COPY[jbin] + sin22th*temp_signal_MW_COPY[jbin];
-          if (ibin == 25 && jbin == 25) {
-            std::cout << "ibin, jbin: ("<<ibin<<","<<jbin<<"), weight: " << N_weight <<std::endl;
-            std::cout << "\tpart1: " << part1 << "\t" << "part2: " << part2 << "\n";
-          }
+          // if (ibin == 25 && jbin == 25) {
+            // std::cout << "ibin, jbin: ("<<ibin<<","<<jbin<<"), weight: " << N_weight <<std::endl;
+            // std::cout << "\tpart1: " << part1 << "\t" << "part2: " << part2 << "\n";
+          // }
           covarianceMatrix[ibin][jbin] += (1.0/nWeights)*(part1*part2);
         }
       }
     }
 
 
-    // if (debug){
+    if (debug){
       std::cout << "Printing out the nominal and last used weight vectors:\n";
       for (int ibin = 0; ibin< nL*nbinsE*3; ++ibin){
         std::cout << events_nominal_COPY[ibin]  << "+" << signal_nominal_COPY[ibin]  << "\t\t";
         std::cout << saved_events_MW_COPY[ibin] << "+" << saved_signal_MW_COPY[ibin] << "\n";
       }
-    // }
+    }
 
     // std::cout << "Printing out fractional covariance matrix:"<<std::endl;
     // This loop takes the error matrix and computes subsequent matrices from it:
@@ -1044,6 +1047,7 @@ namespace lar1{
           fractional_Shape_covarianceMatrix[ibin][jbin] = Shape_covarianceMatrix[ibin][jbin]/temp;
         else
           fractional_Shape_covarianceMatrix[ibin][jbin] = 0.0;
+        shapeFract_MatrixHist -> SetBinContent(ibin+1,jbin+1,fractional_Shape_covarianceMatrix[ibin][jbin]);
       }
     }
 
@@ -1107,9 +1111,10 @@ namespace lar1{
       if (absolute_MWSource) matrixFileName += "abs_";
       matrixFileName += std::to_string(systematicInt) + "_" + detNamesString + ".root";
       TFile * fileOut = new TFile(matrixFileName,"RECREATE");
-      covarianceMatrixHist -> Write();
-      fractionalMatrixHist -> Write();
+      covarianceMatrixHist  -> Write();
+      fractionalMatrixHist  -> Write();
       correlationMatrixHist -> Write();
+      shapeFract_MatrixHist ->Write();
 
       // Collapse these matrices to remove the signal region for the write up.
       // Gotta write out the matrices into vector of vectors, collapse them, and 
@@ -1130,10 +1135,12 @@ namespace lar1{
       Float_t * collapsed_covnMat_array = utils.CollapseMatrix(covarianceMatrixVec,nbinsE,nL);
       Float_t * collapsed_fracMat_array = utils.CollapseMatrix(fractionalMatrixVec,nbinsE,nL);
       Float_t * collapsed_corrMat_array = utils.CollapseMatrix(correlationMatrixVec,nbinsE,nL);
+      Float_t * collapsed_shapeFrac_array = utils.CollapseMatrix(fractional_Shape_covarianceMatrix,nbinsE,nL);
 
-      TMatrix *collapsed_covnMat = new TMatrix(nbinsE*nL*2,nbinsE*nL*2,collapsed_covnMat_array);
-      TMatrix *collapsed_fracMat = new TMatrix(nbinsE*nL*2,nbinsE*nL*2,collapsed_fracMat_array);
-      TMatrix *collapsed_corrMat = new TMatrix(nbinsE*nL*2,nbinsE*nL*2,collapsed_corrMat_array);
+      TMatrix *collapsed_covnMat  = new TMatrix(nbinsE*nL*2,nbinsE*nL*2,collapsed_covnMat_array);
+      TMatrix *collapsed_fracMat  = new TMatrix(nbinsE*nL*2,nbinsE*nL*2,collapsed_fracMat_array);
+      TMatrix *collapsed_corrMat  = new TMatrix(nbinsE*nL*2,nbinsE*nL*2,collapsed_corrMat_array);
+      TMatrix *collapsed_shapeMat = new TMatrix(nbinsE*nL*2,nbinsE*nL*2,collapsed_shapeFrac_array);
 
       covarianceMatrix.Write();
       fractionalErrorMatrix.Write();
@@ -1150,11 +1157,13 @@ namespace lar1{
           collapsed_covarianceMatrixHist  -> SetBinContent(ibin+1, jbin+1, (*collapsed_covnMat)[ibin][jbin]);
           collapsed_fractionalMatrixHist  -> SetBinContent(ibin+1, jbin+1, (*collapsed_fracMat)[ibin][jbin]);
           collapsed_correlationMatrixHist -> SetBinContent(ibin+1, jbin+1, (*collapsed_corrMat)[ibin][jbin]);
+          collapsed_shapeFract_MatrixHist -> SetBinContent(ibin+1, jbin+1, (*collapsed_corrMat)[ibin][jbin]);
         }
       }
       collapsed_covarianceMatrixHist  -> Write();
       collapsed_fractionalMatrixHist  -> Write();
       collapsed_correlationMatrixHist -> Write();
+      collapsed_shapeFract_MatrixHist -> Write();
 
       // Dig the event rates out of the vectors and put them in the file
       // just for a cross check and to be sure what the matrices are
@@ -1801,14 +1810,16 @@ namespace lar1{
         //The current matrix is just the fractional systematics.
         //This means scaling each entry by the central values
         //And also means adding statistical errors on the diagonal.
-        //If cov_max_name.size() is zero, the use either flat systematics or nearDetStats
         
 
+        // At the end of the day, we need one vector that is the "predicted
+        // background" and one that is "background plus signal."
+        // background plus signal is easy to compute, it is just the collapsed
+        // version of the vector that contains MC backgrounds and simulate
+        // signal.  Always - whether it's shape only or shape plus rate, the 
+        // prediction vector is always this.  The background vector can be more 
+        // difficult in the shape only analysis.
         
-        // In the case of the shape only fit,
-        // Copy the unscaled vector that will be used to build error matrix
-        // Probably need to scale it as well
-        // std::vector< float > eventsnLVecTemp = eventsnLVec[dm2point];
 
         // Set up the predictive vectors:
 
@@ -1818,7 +1829,6 @@ namespace lar1{
         // Null vec holds the rates with no oscillation signal
         // But in the shape only analysis, we normalize this to account
         // for high dm2 signal affecting the "null" background
-        nullVec = utils.collapseVector(eventsnLnullVec, nbinsE, nL);
         
         //before collapsing the prediction, need to scale the oscillated signal prediction:
         std::vector<float> eventsFitVecTemp = eventsnLfitVec[dm2point]; //don't want to overwrite...
@@ -1833,13 +1843,15 @@ namespace lar1{
 
 
         predictionVec = utils.collapseVector(eventsFitVecTemp, nbinsE, nL);
-        // Now predictionVec and nullVec hold the right stuff, uncorrected
-        // for high dm2
+        // Now predictionVec and holds the right stuff
         
-        // for (auto bin : eventsFitVecTemp)
-        //   std::cout << bin << " ";
-        // std::cout <<"\n";
 
+        // In the case of the shape only fit,
+        // Copy the unscaled vector that will be used to build error matrix
+        // Probably need to scale it as well
+        // std::vector< float > eventsnLVecTemp = eventsnLVec[dm2point];
+
+        nullVec = utils.collapseVector(eventsnLnullVec, nbinsE, nL);
 
         // Here's where the shape only stuff comes into play
         double intSignalND = 0.;    double intNooscND = 0.;
@@ -1861,40 +1873,18 @@ namespace lar1{
             {
                 if (debug) std::cout << "\nScaled from: " << nullVec[2*n*nbinsE + i] << std::endl;
                 nullVec[2*n*nbinsE + i] *= scalefac[i];
-                eventsFitVecTemp[nbinsE + n*nbinsE*3 + i] *= scalefac[i];
+                // eventsFitVecTemp[nbinsE + n*nbinsE*3 + i] *= scalefac[i];
                 if (debug) std::cout << "Scaled to: " << nullVec[2*n*nbinsE + i] << std::endl;
             }
           }
         }
 
-        // for (auto bin : eventsFitVecTemp)
-        //   std::cout << bin << " ";
-        // std::cout <<"\n";
-
-        // exit(-1);
-
-        // At this point, prediction vec is the 2*nbinsE*nL long vector that holds
-        // the null+signal
-        // nullVec is the (corrected, if necessary) background
-        // That means that the central values need to be read out from nullVec
-        // It also means that the nearDetStats need to come from nullVec
-        // Therefore, dig those out:
-        // if (shapeOnlyFit)
-        // {
-        //   for (int i = 0; i < nbinsE*2; ++i)
-        //   {
-        //       nearDetStats[i+nbinsE] = 1/sqrt( nullVec.at(i+nbinsE) );
-        //   }
-        // }
-        // if (shapeOnlyFit && inflateSystematics){
-        //     for (int i = 0; i < nbinsE*2; ++i)
-        //     {
-        //         nearDetStats[i+nbinsE] = sqrt(pow(systematicInflationAmount,2)
-        //                                     + pow(nearDetStats[i+nbinsE],2));
-        //     }
-        // }        
+        // Ok, prediction vec and null vec are now the correct vectors
+        // with scaling if necessary
+        // 
 
         // Now make sure the statistical and systematic errors are correct:
+        // These aren't used in the covariance matrix analysis.
         systematicErrors.clear();
         statisticalErrors.clear();
         systematicErrors.resize(nL);
@@ -1972,7 +1962,7 @@ namespace lar1{
         //initialize the covariance matrix array:
         std::vector< std::vector<float> > entries( nbins, std::vector<float> ( nbins, 0.0 ) );
 
-
+        Float_t * entriescollapsed;
         
         if (!useCovarianceMatrix){
 
@@ -1996,10 +1986,11 @@ namespace lar1{
 
             }
           }
+          entriescollapsed = (utils.CollapseMatrix(entries,nbinsE, nL));
+
         } //end if on "cov_max_name.size() == 0"      
 
 
-	// Joseph Joseph Joseph Joseph Joseph Joseph
 
         else{
           //use the full blown covariance matrix.  Loop over every entry.
@@ -2010,28 +2001,25 @@ namespace lar1{
           if (useSignalCovarianceMatrix)
             BuildCovarianceMatrix(sin22thpoint, dm2point);
           // else if (sin22thpoint == 0 && dm2point == 0)
-           
+          
+          if (shapeOnlyFit)
+            entriescollapsed = (utils.CollapseMatrix(fractional_Shape_covarianceMatrix,nbinsE, nL));
+          else
+            entriescollapsed = (utils.CollapseMatrix(fractionalErrorMatrix,nbinsE, nL));
 
           //Can't forget to add in the statistical errors on the diagonal!
-          for (int ibin = 0; ibin < nbins; ibin++){
-            for (int jbin = 0; jbin < nbins; jbin ++){
-              double cvi = eventsFitVecTemp[ibin];
-              double cvj = eventsFitVecTemp[jbin];
-      	      // if ( (ibin%(nbinsE*3)) <nbinsE ) cvi *= sin22th; //scale the oscillated signal
-              // if ( (jbin%(nbinsE*3)) <nbinsE ) cvj *= sin22th; //scale the oscillated signal
+          for (int ibin = 0; ibin < 2*nbinsE*nL; ibin++){
+            for (int jbin = 0; jbin < 2*nbinsE*nL; jbin ++){
+              double cvi = nullVec[ibin];
+              double cvj = nullVec[jbin];
 
-              //Now scale the entries:
-              if (shapeOnlyFit)
-                entries[ibin][jbin] = fractional_Shape_covarianceMatrix[ibin][jbin]*cvi*cvj;
-              else
-                entries[ibin][jbin] = fractionalErrorMatrix[ibin][jbin]*cvi*cvj;
-              //add statistical errors on the diagonal:
+              entriescollapsed[ibin + (2*nbinsE*nL)*jbin] += cvi*cvj;
               if (ibin == jbin){
-                entries[ibin][jbin] += cvi; //cvi should equal cvj here
+                entriescollapsed[ibin + (2*nbinsE*nL)*jbin] += cvi; //cvi should equal cvj here
               }
             } //end loop on jbin
           } //end loop on ibin
-        
+
         } //end section that is using full covariance matrix
 
 /////No edits past here
@@ -2052,7 +2040,7 @@ namespace lar1{
           }
         }
 
-        Float_t * entriescollapsed = (utils.CollapseMatrix(entries,nbinsE, nL));
+        // Float_t * entriescollapsed = (utils.CollapseMatrix(entries,nbinsE, nL));
         //collapsed!
         //if debug is on, print out the collapsed matrix:
 
@@ -2120,10 +2108,11 @@ namespace lar1{
                     }
                 }
                 if (sin22thpoint == sin22thFittingPoint && dm2point == dm2FittingPoint){
-                  if (ibin == jbin){
+                  if (jbin == 25){
                     std::cout << "On bin " << ibin << ", adding chi2 = " << (predictioni-cvi)*(predictionj-cvj)* (*cov)(ibin-1,jbin-1) << std::endl;
                     if (useNearDetStats) std::cout << "  nearDetStats error on this bin is "<< nearDetStats[ibin%(2*nbinsE)] << std::endl;
-                    std::cout << "  ibin: "<< ibin << " Prediction: " << predictioni << " cvi: " << cvi;
+                    std::cout << "  ibin: "<< ibin << " Prediction: " << predictioni << " cvi: " << cvi << std::endl;
+                    std::cout << "  jbin: "<< jbin << " Prediction: " << predictionj << " cvj: " << cvj;
                     std::cout << "  M^-1: " << (*cov)(ibin-1,jbin-1) << std::endl;
                   }
                 }
