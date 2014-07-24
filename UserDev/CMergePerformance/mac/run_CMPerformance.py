@@ -30,13 +30,15 @@ my_proc.set_ana_output_file("CMP_ana_out.root");
 my_CMP = larlight.CMergePerformance()
 my_proc.add_process(my_CMP)
 
-#can toggle off running on raw fuzzycluster data and just look @ merged stuff
+#whether you want to analyze performance of raw input data 
 my_CMP.SetRunBeforeMerging(True)
-#can toggle off running merging to just make FOM plots for raw fuzzycluster data, runs faster
-my_CMP.SetRunMerging(True)
+#whether you want to run merging and analyze performance of output
+my_CMP.SetRunMerging(False)
+
+#if you aren't running merging, all of this is irrelevant:
 my_CMP.GetManager().MergeTillConverge(False)
-my_CMP.GetManager().DebugMode(cluster.CMergeManager.kNone)
-my_CMP.SetClusterType(larlight.DATA.FuzzyCluster)
+my_CMP.GetManager().DebugMode(cmtool.CMergeManager.kNone)
+my_CMP.SetClusterType(larlight.DATA.Cluster)
 my_CMP.SetDebug(False)
 
 ########################################
