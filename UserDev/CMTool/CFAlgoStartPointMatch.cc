@@ -87,9 +87,9 @@ namespace cmtool {
       area = Area2D( yS12, zS12, yS23, zS23, yS13, zS13 );
     }
     if ( _time ){
-      area = Area3D( (yS12-yS13)/2. , (zS12-zS13)/2. , startTime1,
-		     (yS13-yS23)/2. , (zS13-zS23)/2. , startTime3,
-		     (yS12-yS23)/2. , (zS13-zS23)/2. , startTime2 );
+      area = Area3D( (yS12+yS13)/2. , (zS12+zS13)/2. , startTime1,
+		     (yS13+yS23)/2. , (zS13+zS23)/2. , startTime3,
+		     (yS12+yS23)/2. , (zS13+zS23)/2. , startTime2 );
     }
     
     if ( _verbose ) { std::cout << "Area of intersections triangle is: " << area << std::endl; }

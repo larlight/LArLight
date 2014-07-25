@@ -12,6 +12,8 @@ namespace cluster {
     _cAllCluster = nullptr;
     _cOneCluster = nullptr;
     _cTwoClusters= nullptr;
+    _hits_log_z= true;
+    ShowShowers(false);
 
   }
 
@@ -23,6 +25,10 @@ namespace cluster {
     for(auto &h : _hAllHits)        { delete h; h=0; }
 
     for(auto &hs : _hClusterHits)
+      for(auto &h : hs)
+	{ delete h; h=0; }
+
+    for(auto &hs : _hShowerHits)
       for(auto &h : hs)
 	{ delete h; h=0; }
 
@@ -40,6 +46,7 @@ namespace cluster {
 
     // clear
     _hAllHits.clear();
+    _hShowerHits.clear();
     _hClusterHits.clear();
     _gClusterStart.clear();
     _gClusterEnd.clear();
@@ -50,6 +57,7 @@ namespace cluster {
 
     // resize
     _hAllHits.resize(_nplanes,nullptr);
+    _hShowerHits.resize(_nplanes,std::vector<TH2D*>());
     _hClusterHits.resize(_nplanes,std::vector<TH2D*>());
     _gClusterStart.resize(_nplanes,std::vector<TGraph*>());
     _gClusterEnd.resize(_nplanes,std::vector<TGraph*>());
@@ -113,9 +121,38 @@ namespace cluster {
 					    Form("hAllHitsPlane%02d",plane),
 					    Form("Hits for Plane %d; Wire; Time",plane));
     for(size_t i=0; i<hits_xy.size(); ++i)
-
+      //DavidC--keep track of this line
       _hAllHits.at(plane)->Fill(hits_xy.at(i).first,hits_xy.at(i).second,hits_charge.at(i));
   }
+
+  //####################################################################################
+  void ClusterViewerAlgo::AddShowers(const UChar_t plane, 
+				     const std::vector<std::pair<double,double> > &shower_hits)
+  //####################################################################################
+  {
+    if(!ReadyTakeData(true)) return;
+    if(plane >= _nplanes)
+      throw ViewerException(Form("Invalid plane ID: %d",plane));
+
+    size_t index = _hShowerHits.at(plane).size();
+    _hShowerHits.at(plane).push_back(GetPlaneViewHisto(plane,
+						       Form("hShowerHitsPlane%02dCluster%03zu",
+							    plane,
+							    index),
+						       Form("Shower Hits on Plane %d Cluster %zu; Wire; Time",
+							    plane,
+							    index)
+						       )
+				      ); 
+    
+    for(size_t i=0; i<shower_hits.size(); ++i){
+      _hShowerHits.at(plane).at(index)->Fill(shower_hits.at(i).first,shower_hits.at(i).second);
+    }
+    _hShowerHits.at(plane).at(index)->SetMarkerColor(index+1);
+    _hShowerHits.at(plane).at(index)->SetMarkerStyle(kFullStar);
+
+  }
+
 
   //############################################################################################
   void ClusterViewerAlgo::AddCluster(const UChar_t plane,
@@ -404,7 +441,25 @@ namespace cluster {
       }
 
       _cAllCluster->cd((plane+1)*2);
-      _hAllHits.at(plane)->Draw("COLZ");
+      
+      if(_hits_log_z)
+	gPad->SetLogz();
+      
+      if ( !_showerColor )
+	_hAllHits.at(plane)->Draw("COLZ");
+
+      if ( _showerColor and  _hShowerHits.at(plane).size() ){
+	for(size_t cindex=0; cindex<_hShowerHits.at(plane).size(); ++cindex) {
+	  
+	  if(!cindex) {
+	    _hShowerHits.at(plane).at(cindex)->Draw();
+	  }
+	  else{
+	    _hShowerHits.at(plane).at(cindex)->Draw("sames");
+	  }
+	}
+      }
+
 
     }
     _cAllCluster->Update();

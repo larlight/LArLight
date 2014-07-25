@@ -56,6 +56,10 @@ namespace cluster {
 		 const std::vector<std::pair<double,double> > &hits_xy,
 		 const std::vector<double> &hits_charge);
 
+    /// Appender for hits
+    void AddShowers(const UChar_t plane, 
+		    const std::vector<std::pair<double,double> > &shower_hits);
+
     /// Appender for clusters
     void AddCluster(const UChar_t plane,
 		    const std::vector<std::pair<double,double> > &cluster_hits);
@@ -89,7 +93,13 @@ namespace cluster {
 
     /// A function to count # clusters in the given plane
     size_t ClusterCount(UChar_t plane);
+
+    /// A function to decide if to show shower-coded hits or charge-coded hits
+    void ShowShowers(bool on) { _showerColor = on; }
     
+    /// A function to decide if the hits COLZ canvas should be shown in log-z scale
+    void SetHitsLogZ(bool flag) { _hits_log_z = flag; }
+
   protected:
 
     /// A utility function to create TH2D histogram
@@ -113,11 +123,16 @@ namespace cluster {
     std::vector<std::pair<double,double> > _xrange, _yrange;
     /// Boolean to confirm if range is set by a user
     std::vector<bool> _range_set;
+    /// Boolean: 0-show simch. 1-show hits associated to mcshowers
+    bool _showerColor;
 
     //---- Canvas ----//
     TCanvas* _cAllCluster;
     TCanvas* _cOneCluster;
     TCanvas* _cTwoClusters;
+
+    //---- If hits canvas will use logZ scale ----//
+    bool _hits_log_z;
 
     //---- Things to be drawn (DATA) ----//
 
@@ -125,6 +140,8 @@ namespace cluster {
     std::vector<TH2D*> _hAllHits;
     /// 2D hit map (wire [cm] vs. time [cm]) ... 1st index = plane, 2nd index = cluster
     std::vector<std::vector<TH2D*> >   _hClusterHits;
+    /// 2D hit map (wire [cm] vs. time [cm]) ... 1st index = plane, 2nd index = MCshower
+    std::vector<std::vector<TH2D*> >   _hShowerHits;
     /// Cluster start point (wire [cm], time [cm]) ... 1st index = plane, 2nd index = cluster
     std::vector<std::vector<TGraph*> > _gClusterStart;
     /// Cluster end point (wire [cm], time [cm]) ... 1st index = plane, 2nd index = cluster

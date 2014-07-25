@@ -95,15 +95,28 @@ namespace larlight {
     
     if(_fout) { 
       _fout->cd(); 
-      for(int before_after = 0; before_after < 2; ++before_after){
-	for(int nview = 0; nview < 3; ++nview){
-	  hPurity.at(before_after).at(nview)->Write();
-	  hEff.at(before_after).at(nview)->Write();
-	  hClusQoverMCQ.at(before_after).at(nview)->Write();
-	  hEffPerMCShower.at(before_after).at(nview)->Write();
-	  hPurityPerMCShower.at(before_after).at(nview)->Write();
-	  hQFracInBigClusters.at(before_after).at(nview)->Write();
-	  
+      
+      for(int nview = 0; nview < 3; ++nview){
+	//only save "before" histos if you actually filled them
+	if(_run_before_merging){
+	  hPurity.at(0).at(nview)->Write();
+	  hEff.at(0).at(nview)->Write();
+	  hClusQoverMCQ.at(0).at(nview)->Write();
+	  hEffPerMCShower.at(0).at(nview)->Write();
+	  hPurityPerMCShower.at(0).at(nview)->Write();
+	  hQFracInBigClusters.at(0).at(nview)->Write();
+	}
+	//only save "after" histos if you actually filled them
+	if(_run_merging){
+	  hPurity.at(1).at(nview)->Write();
+	  hEff.at(1).at(nview)->Write();
+	  hClusQoverMCQ.at(1).at(nview)->Write();
+	  hEffPerMCShower.at(1).at(nview)->Write();
+	  hPurityPerMCShower.at(1).at(nview)->Write();
+	  hQFracInBigClusters.at(1).at(nview)->Write();
+	}
+	//delete all the histos, whether you filled them or not
+	for(int before_after = 0; before_after < 2; ++before_after){	  
 	  delete hPurity.at(before_after).at(nview);
 	  delete hEff.at(before_after).at(nview);
 	  delete hClusQoverMCQ.at(before_after).at(nview);
@@ -112,18 +125,15 @@ namespace larlight {
 	  delete hQFracInBigClusters.at(before_after).at(nview);
 	}
       }
-      
+        
       if(ana_tree){
 	ana_tree->Write();
 	delete ana_tree;
       }
-      
     }
     else 
       print(MSG::ERROR,__FUNCTION__,"Did not find an output file pointer!!! File not opened?");
-    
-    
-    
+      
     return true;
   }
   
@@ -654,7 +664,7 @@ namespace larlight {
       double NMCSoverNClus = 
 	n_viable_MCShowers/(double)n_clusters_in_plane[iplane];
       hEff.at(after_merging).at(iplane)->Fill(NMCSoverNClus);
-      
+
       //if there are exactly 2 MCShowers in the event, fill some pi0 relevant stuff per plane
       //this needs debugging
       /*
