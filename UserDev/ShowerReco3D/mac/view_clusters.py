@@ -19,6 +19,9 @@ my_proc.set_io_mode(larlight.storage_manager.READ)
 
 my_proc.add_input_file(filename)
 
+if len(sys.argv)>2:
+    my_proc.set_rootdir(sys.argv[2])
+
 my_proc.set_ana_output_file("")
 
 raw_viewer   = larlight.ClusterViewer()
