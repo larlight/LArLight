@@ -12,7 +12,9 @@ namespace larlight {
     hMCX = hMCY = hMCZ = 0;
     hdcosX = hdcosY = hdcosZ = 0;
     
-    hEner = hMCEner = recohEner = 0;
+    hEner = hEnerFrac = hDetEnerFrac = 0;
+    
+    hMCEner = recohEner = 0;
 
     hMCMotherEner = 0;
 
@@ -30,7 +32,9 @@ namespace larlight {
     hdcosY = new TH1D("hdcosY","",100,-5,5);
     hdcosZ = new TH1D("hdcosZ","",100,-5,5);
     
-    hEner = new TH1D("hEner","",100,-1000,1000);
+    hEner = new TH1D("hEner","MC-Reco Energy; MeV; Reco Shower",100,-1000,1000);
+    hEnerFrac = new TH1D("hEnerFrac","MC-Reco Fractional Difference (Reco vs. Detected MC); Diff-Frac; Reco Shower",100,-5,5);
+    hDetEnerFrac = new TH1D("hDetEnerFrac","MC-MC Fractional Difference (Mother vs. Detected); Diff-Frac; MC Shower",100,0,1);
     hMCEner = new TH1D("hMCEner","Deposited MC Shower Energy; MeV; MCShower",100,-10,2000);
     hMCMotherEner = new TH1D("hMCMotherEner","Mother Energy; MeV; MCShower",100,-10,2000);
     recohEner = new TH1D("recohEner","",100,-10,2000);
@@ -75,10 +79,12 @@ namespace larlight {
     auto const& mcs = mcshower_v->at(mcshower_index);
     auto const& mc_mom_orig = mcs.MotherMomentum();
     auto const& mc_mom = mcs.DaughterMomentum();
-    auto const& mc_vtx = mcs.DaughterPosition();
+    auto const& mc_vtx = mcs.MotherPosition();
     std::vector<double> mc_dcos(3,0);
     for(size_t i=0; i<3; ++i)
       mc_dcos.at(i) = mc_mom.at(i)/mc_mom.at(3);
+
+    hDetEnerFrac->Fill( (mc_mom_orig.at(3)*1.e3 - mc_mom.at(3)) / (mc_mom.at(3) + mc_mom_orig.at(3)*1.e3) * 2 );
 
     // Loop over reco-ed shower and loop over corresponding clusters & hits 
     // to fill MC charge information
@@ -131,15 +137,18 @@ namespace larlight {
       hdcosZ->Fill(mc_dcos.at(2) - reco_dcos[2]);
 
       hEner->Fill(mc_mom.at(3) - reco_en.at(2));
+
       hMCEner->Fill(mc_mom.at(3));
       recohEner->Fill(reco_en.at(2));
       hMCMotherEner->Fill(mc_mom.at(3));
+
+      hEnerFrac->Fill( (mc_mom.at(3) - reco_en.at(2)) / (mc_mom.at(3) + reco_en.at(2)) * 2. );
       std::cout
 	<< "MCShower Mother Energy    : " << mc_mom_orig.at(3)*1.e3  << std::endl
 	<< "MCShower Deposited Energy : " << mc_mom.at(3)            << std::endl
 	<< "Reco-ed Energy            : " << reco_en.at(2)           << std::endl
 	<< std::endl;
-	
+      
     }
     
     return true;
@@ -157,6 +166,8 @@ namespace larlight {
       hdcosZ->Write();
     
       hEner->Write();
+      hEnerFrac->Write();
+      hDetEnerFrac->Write();
       hMCEner->Write();
       hMCMotherEner->Write();
       recohEner->Write();
