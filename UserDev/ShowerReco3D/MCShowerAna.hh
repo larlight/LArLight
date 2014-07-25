@@ -61,7 +61,7 @@ namespace larlight {
     TH1D* hMCEner;
     TH1D* hMCMotherEner;
     TH1D* recohEner;
-
+    TH1D *recorrhEner;
     ShowerBackTracker fBTAlg;
   };
 }

@@ -15,7 +15,7 @@ mgr.set_ana_output_file("out_%s" % sys.argv[1])
 
 mgr.add_process(fmwk.MCShowerAna())
 
-mgr.run()
+mgr.run(0)
 
 
 

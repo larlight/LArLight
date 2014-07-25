@@ -38,6 +38,7 @@ namespace larlight {
     hMCEner = new TH1D("hMCEner","Deposited MC Shower Energy; MeV; MCShower",100,-10,2000);
     hMCMotherEner = new TH1D("hMCMotherEner","Mother Energy; MeV; MCShower",100,-10,2000);
     recohEner = new TH1D("recohEner","",100,-10,2000);
+    recorrhEner = new TH1D("recorrhEner","",100,-1000,1000);
     
     hdEdx = new TH1D("hdEdx","",60,0,12);
 
@@ -106,26 +107,30 @@ namespace larlight {
 	hits.reserve(hit_index.size());
 	for(auto const& h_index : hit_index) {
 	  hits.push_back(&(hit_v->at(h_index)));
-	  recoq.at(plane) += hit_v->at(h_index).Charge();
+	  recoq.at(plane) += hit_v->at(h_index).Charge(true);
 	}
 	mcq_total.at(plane)    = mcs.Charge(GEO::View_t(plane));
 	mcq_detected.at(plane) = fBTAlg.MCShowerQ(hits).at(0) * detp->ElectronsToADC();
       }
 
+      auto const& reco_vtx  = reco_shower.ShowerStart();
+      auto const& reco_dcos = reco_shower.Direction();
+      auto const& reco_en   = reco_shower.Energy();
+      
       for(size_t i=0; i<3; ++i) {
 	std::cout << "Plane " << i << std::endl
 		  << "Reco-ed Q: " << recoq.at(i) << std::endl
 		  << "MC Q: " << mcq_total.at(i) << std::endl
-		  << "MC Q in this cluster: " << mcq_detected.at(i) << std::endl
+		  << "MC Q in this cluster: " << mcq_detected.at(i)  << std::endl
+		  << "corrected reco r: " << reco_en.at(i)/(mcq_detected.at(i)/mcq_total.at(i)) 
+		  << std::endl
 		  << std::endl;
       }
 
       // 
       // Fill histograms
       //
-      auto const& reco_vtx  = reco_shower.ShowerStart();
-      auto const& reco_dcos = reco_shower.Direction();
-      auto const& reco_en   = reco_shower.Energy();
+ 
      
       hdEdx->Fill(reco_shower.dEdx().at(2));
       hMCX->Fill(mc_vtx.at(0) - reco_vtx[0]);
@@ -142,6 +147,8 @@ namespace larlight {
       recohEner->Fill(reco_en.at(2));
       hMCMotherEner->Fill(mc_mom.at(3));
 
+      recorrhEner->Fill(mc_mom_orig.at(3)*1.e3 - reco_en.at(2)/(mcq_detected.at(2)/mcq_total.at(2)));
+      
       hEnerFrac->Fill( (mc_mom.at(3) - reco_en.at(2)) / (mc_mom.at(3) + reco_en.at(2)) * 2. );
       std::cout
 	<< "MCShower Mother Energy    : " << mc_mom_orig.at(3)*1.e3  << std::endl
@@ -172,6 +179,8 @@ namespace larlight {
       hMCMotherEner->Write();
       recohEner->Write();
     
+      recorrhEner->Write();
+      
       hdEdx->Write();
     }    
     return true;
