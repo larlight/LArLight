@@ -11,6 +11,10 @@ namespace larlight {
 
     hMCX = hMCY = hMCZ = 0;
     hdcosX = hdcosY = hdcosZ = 0;
+
+    hMCEdepMCQ = 0;
+
+    hAmpQEff = 0;
     
     hEner = hEnerFrac = hDetEnerFrac = 0;
     
@@ -29,6 +33,13 @@ namespace larlight {
 
     hMCQEff = new TH1D("hMCQEff","MC Charge Detected / Deposited Charge; Fraction; MCShower",
 		       201,-0.0025,1.0025);
+
+    hMCEdepMCQ = new TH2D("hMCEdepMCQ",
+			  "MC Energy vs. # of Electrons; # electrons; Energy [MeV]",
+			  100,0,3.e5,100,0,2000);
+    
+    hAmpQEff = new TH1D("hAmpQEff","# Electrons from Hit Amp / MC; Ratio; Collection Hits",
+			100,0,2);
 
     hMCX = new TH1D("hMCX","",100,-120,120);
     hMCY = new TH1D("hMCY","",100,-120,120);
@@ -72,7 +83,7 @@ namespace larlight {
     // because otherwise we have to think about which MCShower possibly corresponds to 
     // a given reconstructed shower.
     if( mcshower_v->size() != 1) {
-      std::cerr<<"Found > 1 MCShower! Ignore this event... "<<std::endl;
+      std::cerr<<Form("Found %zu MCShower! (>1) Ignore this event... ",mcshower_v->size())<<std::endl;
       return false;
     }
 
@@ -162,6 +173,10 @@ namespace larlight {
       hMCEner->Fill(mc_mom.at(3));
       hMCMotherEner->Fill(mc_mom_orig.at(3)*1.e3);
 
+      hMCEdepMCQ->Fill(mcq_detected.at(2),mc_mom.at(3));
+
+      hAmpQEff->Fill(recoq.at(2) / mcq_detected.at(2));
+
       recorrhEner->Fill(mc_mom_orig.at(3)*1.e3 - reco_en.at(2)/(mcq_detected.at(2)/mcq_total.at(2)));
       
       hEnerFrac->Fill( (mc_mom.at(3) - reco_en.at(2)) / (mc_mom.at(3) + reco_en.at(2)) * 2. );
@@ -183,6 +198,10 @@ namespace larlight {
       
       hMCEdepEff->Write();
       hMCQEff->Write();
+
+      hMCEdepMCQ->Write();
+
+      hAmpQEff->Write();
       
       hMCX->Write();
       hMCY->Write();
