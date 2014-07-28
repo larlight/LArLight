@@ -33,6 +33,8 @@ namespace shower {
     fStartPoint.clear();
     fEndPoint.clear();
     fOmega2D.clear();
+    fEnergy.clear();
+    fdEdx.clear();
     
     // First Get Start Points
     for(auto const & cl : clusters)

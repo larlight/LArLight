@@ -46,6 +46,13 @@ ana_unit = fmwk.ShowerReco3D()
 # Attach Matching algorithm
 #
 
+match_viewer = fmwk.MatchViewer()
+
+priority_algo = cmtool.CPAlgoNHits()
+priority_algo.SetMinHits(20)
+match_viewer.GetManager().AddPriorityAlgo(priority_algo)
+
+
 #Andrzej: The algorithms below are ranked by their effectiveness-- TimeOverlap is best, 
 #then 3DAngle, then StartPoint . Right now, only TimeOverlap is called.
 algo_array = cmtool.CFAlgoArray()

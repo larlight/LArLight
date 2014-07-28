@@ -12,7 +12,6 @@ if len(sys.argv) != 2:
 
 
 filename = sys.argv[1]
-#filename = "/Users/davidkaleko/Data/ShowerStudy/PDGID_11/shower_larlight_11.root"
 my_proc = larlight.ana_processor()
 my_proc.set_verbosity(larlight.MSG.DEBUG)
 
@@ -20,37 +19,22 @@ my_proc.set_io_mode(larlight.storage_manager.READ)
 
 my_proc.add_input_file(filename)
 
-larlight.storage_manager.get().set_in_rootdir("scanner")
+if len(sys.argv)>2:
+    my_proc.set_rootdir(sys.argv[2])
 
 my_proc.set_ana_output_file("")
 
 raw_viewer   = larlight.ClusterViewer()
-match_viewer = larlight.MatchViewer()
 
-match_viewer.SetPrintClusterInfo(True)
-#Show Showers: requires MC info in hadded files
-match_viewer.ShowShowers(False)
+#decide if to show hit charge OR MCShowers on RHS of TCanvas [default: false]
+#raw_viewer.ShowShowers(True)
 
-########################################
-# attach match algos here
-########################################
-
-myalg = cmtool.CFAlgoStartPointCompat()
-myalg.SetVerbose(True)
-
-match_viewer.GetManager().AddMatchAlgo(myalg)
-
-########################################
-# done attaching match algos
-########################################
+#if you're showing hit charge, whether to use log z scale [default: true]
+#raw_viewer.SetHitsLogZ(False)
 
 my_proc.add_process(raw_viewer)
 
-my_proc.add_process(match_viewer)
-
 raw_viewer.SetClusterType(larlight.DATA.Cluster)
-
-match_viewer.SetClusterType(larlight.DATA.Cluster)
 
 gStyle.SetOptStat(0)
 
@@ -68,9 +52,19 @@ while true:
 
     raw_viewer.DrawAllClusters();
 
-    match_viewer.DrawAllClusters();
 
-    print "    Hit enter to go next event..."
+#    for plane in xrange(larutil.Geometry.GetME().Nplanes()):
+#
+#        print "    Plane:", plane
+#        
+#        for cindex in xrange(merge_viewer.ClusterCount(plane)):
+#
+#            print "        Cluster:",cindex
+#            merge_viewer.DrawOneCluster(plane,cindex)
+#            sys.stdin.readline()
+#    
+
+    print "Just showed Event %d. Hit enter to go next event..." % user_input_evt_no
     sys.stdin.readline()
 
 

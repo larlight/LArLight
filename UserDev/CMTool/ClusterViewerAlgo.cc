@@ -12,6 +12,7 @@ namespace cluster {
     _cAllCluster = nullptr;
     _cOneCluster = nullptr;
     _cTwoClusters= nullptr;
+    _hits_log_z= true;
     ShowShowers(false);
 
   }
@@ -241,16 +242,16 @@ namespace cluster {
     for(auto const &h : cluster_hits)
       
       _hClusterHits.at(plane).at(index)->Fill(h.first,h.second);
-    
+
     _gClusterStart.at(plane).at(index)->SetPoint(0,cluster_start.first,cluster_start.second);
     _gClusterEnd.at(plane).at(index)->SetPoint(0,cluster_end.first,cluster_end.second);
     
     // Set Color
     _hClusterHits.at(plane).at(index)->SetMarkerColor(index+1);
     _hClusterHits.at(plane).at(index)->SetMarkerStyle(kFullStar);
-    _gClusterStart.at(plane).at(index)->SetMarkerSize(3);
+    _gClusterStart.at(plane).at(index)->SetMarkerSize(2);
     _gClusterStart.at(plane).at(index)->SetMarkerStyle(30);
-    _gClusterEnd.at(plane).at(index)->SetMarkerSize(3);
+    _gClusterEnd.at(plane).at(index)->SetMarkerSize(2);
     _gClusterEnd.at(plane).at(index)->SetMarkerStyle(29);
     
   }
@@ -302,7 +303,6 @@ namespace cluster {
     for(auto const &h : cluster_hits)
       
       _hClusterHits.at(plane).at(index)->Fill(h.first,h.second);
-    
     _gClusterStart.at(plane).at(index)->SetPoint(0,cluster_start.first,cluster_start.second);
     _gClusterEnd.at(plane).at(index)->SetPoint(0,cluster_end.first,cluster_end.second);
     
@@ -314,9 +314,9 @@ namespace cluster {
     // Set Color
     _hClusterHits.at(plane).at(index)->SetMarkerColor(index+1);
     _hClusterHits.at(plane).at(index)->SetMarkerStyle(kFullStar);
-    _gClusterStart.at(plane).at(index)->SetMarkerSize(3);
+    _gClusterStart.at(plane).at(index)->SetMarkerSize(2);
     _gClusterStart.at(plane).at(index)->SetMarkerStyle(30);
-    _gClusterEnd.at(plane).at(index)->SetMarkerSize(3);
+    _gClusterEnd.at(plane).at(index)->SetMarkerSize(2);
     _gClusterEnd.at(plane).at(index)->SetMarkerStyle(29);
     _gClusterPolygon.at(plane).at(index)->SetMarkerColor(index+1);
     _gClusterPolygon.at(plane).at(index)->SetLineColor(index+1);
@@ -427,11 +427,15 @@ namespace cluster {
 
 	if(!cindex) {
 	  _hClusterHits.at(plane).at(cindex)->Draw();
+	  if( _gClusterStart.at(plane).at(cindex)   ) _gClusterStart.at(plane).at(cindex)->Draw("P");
+	  if( _gClusterEnd.at(plane).at(cindex)     ) _gClusterEnd.at(plane).at(cindex)->Draw("P");
 	  if(_gClusterPolygon.at(plane).at(cindex))
 	    _gClusterPolygon.at(plane).at(cindex)->Draw("PL");
 	}
 	else{
 	  _hClusterHits.at(plane).at(cindex)->Draw("sames");
+	  if( _gClusterStart.at(plane).at(cindex)   ) _gClusterStart.at(plane).at(cindex)->Draw("P");
+	  if( _gClusterEnd.at(plane).at(cindex)     ) _gClusterEnd.at(plane).at(cindex)->Draw("P");
 	  if(_gClusterPolygon.at(plane).at(cindex))
 	    _gClusterPolygon.at(plane).at(cindex)->Draw("PL");
 	}
@@ -440,7 +444,10 @@ namespace cluster {
       }
 
       _cAllCluster->cd((plane+1)*2);
-
+      
+      if(_hits_log_z)
+	gPad->SetLogz();
+      
       if ( !_showerColor )
 	_hAllHits.at(plane)->Draw("COLZ");
 

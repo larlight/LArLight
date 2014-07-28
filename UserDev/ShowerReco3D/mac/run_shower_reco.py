@@ -69,6 +69,8 @@ fGSer = larutil.GeometryUtilities.GetME()
 
 while my_proc.process_event():
 
+
+
     storage=ana_unit.GetCurrentData()
     mctruth_v = storage.get_data(fmwk.DATA.MCTruth)
     # Get event_mctruth ... std::vector<larlight::mctruth>
@@ -100,6 +102,7 @@ while my_proc.process_event():
 	  fMCThetastart = TMath.Pi()*0.5-TMath.ATan2(TMath.Sqrt(lep_dcosx_truth*lep_dcosx_truth + lep_dcosz_truth*lep_dcosz_truth),lep_dcosy_truth)        
 	print " MCPHI, MCTHETA ",fMCPhistart*180/3.1415," ",fMCThetastart*180/3.1415,"\n";
 	print "MC Particle Start Point: (%g,%g,%g)" % (mct_vtx[0],mct_vtx[1],mct_vtx[2])
+	print "MC Energy: ", mctruth_v.at(0).GetParticles().at(0).Trajectory().at(0).E()
    ##PdgCode
     print "in loop \n"
     sys.stdin.readline()
