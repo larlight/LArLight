@@ -34,6 +34,7 @@ namespace shower {
     fEndPoint.clear();
     fOmega2D.clear();
     fEnergy.clear();
+    fMIPEnergy.clear();
     fdEdx.clear();
     
     // First Get Start Points
@@ -48,8 +49,9 @@ namespace shower {
     
     //decide best two planes. for now, using length in wires - flatter is better.
     
-    int worst_plane=-1;
+    int worst_plane=-1,best_plane=-1;
     double min_length=9999999;
+    double max_length=0;
     for (int ip=0;ip<fNPlanes;ip++)
     {
       if(fabs( fEndPoint[ip].w - fStartPoint[ip].w ) < min_length )
@@ -57,9 +59,14 @@ namespace shower {
 	 worst_plane=fStartPoint[ip].plane;
 	}
             
+      if(fabs( fEndPoint[ip].w - fStartPoint[ip].w ) > max_length )
+	{max_length=fabs( fEndPoint[ip].w - fStartPoint[ip].w );
+	 best_plane=fStartPoint[ip].plane;
+	}      
+            
     }
    
-    std::cout << " worst plane is : " << worst_plane << std::endl;
+    std::cout << " worst plane is : " << worst_plane << " best: "<< best_plane   << std::endl;
     
     int index_to_use[2]={0,1};  // for a two plane detector we have no choice.
     if(fNPlanes>2)
@@ -106,6 +113,9 @@ namespace shower {
       std::cout << std::endl << " Plane: " << plane << std::endl;
       
       double totEnergy=0;
+      double totLowEnergy=0;
+      double totHighEnergy=0;
+      double totMIPEnergy=0;
       int direction=-1;
       double dEdx_av=0,RMS_dedx=0,dedx_final=0;
       int npoints_first=0, npoints_sec=0;
@@ -134,11 +144,23 @@ namespace shower {
      // dEdx_MIP = fCaloAlg.dEdx_AREA_forceMIP(theHit, newpitch ); 
        dEdx_new = fCaloAlg.dEdx_AMP(&theHit , newpitch ); 
    //
+       if(dEdx_new >1.9 && dEdx_new <2.1)
+	  std::cout << "dEdx_new " << dEdx_new << " " <<dEdx_new/theHit.charge*newpitch << " "<< theHit.charge *0.0061/newpitch << std::endl;
     //calculate total energy.
       totEnergy += dEdx_new*newpitch; 
     //totNewCnrg+=dEdx_MIP;
-
-     
+      if(dEdx_new < 3.5 && dEdx_new >0 )
+      {
+	totLowEnergy +=dEdx_new*newpitch;
+	totMIPEnergy += dEdx_new*newpitch;
+      }
+      else
+      {
+	totHighEnergy += dEdx_new*newpitch;
+	int multiplier=1;
+	if(plane < 2) multiplier =2 ;
+	totMIPEnergy += theHit.charge *  0.0061*multiplier;
+      }
      larutil::PxPoint OnlinePoint; 
     // calculate the wire,time coordinates of the hit projection on to the 2D shower axis
      fGSer->GetPointOnLine(clustit.GetParams().angle_2d,&(clustit.GetParams().start_point),&theHit,OnlinePoint);
@@ -150,6 +172,9 @@ namespace shower {
      //calculate the distance from the vertex using the effective pitch metric 
      double wdist=((theHit.w-clustit.GetParams().start_point.w)*newpitch)*direction;  //wdist is always positive
 
+     if(dEdx_new < 3.5 )
+      std::cout << " CALORIMETRY:" << " Pitch " <<newpitch << " dist: " << wdist <<  " dE/dx: " << dEdx_new << "MeV/cm "  << " average: " <<  totEnergy  << "hit: wire, time " << theHit.w/fGSer->WireToCm() << " " << theHit.t/fGSer->TimeToCm() << "total energy" << totEnergy << std::endl;
+    
     
   //   if( (fabs(wdist)<fcalodEdxlength)&&(fabs(wdist)>0.2)){  
      if( (wdist<fcalodEdxlength)&&(wdist>0.2)){    
@@ -164,7 +189,7 @@ namespace shower {
     //npoints_calo++;
     //sum+=dEdx_new;
     
-    //std::cout << " CALORIMETRY:" << " Pitch " <<newpitch << " dist: " << wdist <<  " dE/dx: " << dEdx_new << "MeV/cm "  << " average: " <<  sum/npoints_calo  << "hit: wire, time " << wire << " " << time << " line,ort " << linedist << " " << ortdist<< " direction " << direction << std::endl;
+  
     
     //fDistribChargeADC[set].push_back(ch_adc);  //vector with the first De/Dx points
 //     fDistribChargeMeV[set].push_back(dEdx_new);  //vector with the first De/Dx points
@@ -263,9 +288,10 @@ namespace shower {
   
     ////std::cout << " total ENERGY, birks: " << fTotChargeMeV[set] << " MeV " << " assumeMIPs:  " << fTotChargeMeV_MIPs[set] << "MeV " <<  std::endl;
     std::cout << " total ENERGY, birks: " << totEnergy << " MeV "  << " |average:  " << dedx_final  <<    std::endl;
-
+    std::cout << " Energy:  lo:" << totLowEnergy << " hi: " << totHighEnergy << " MIP corrected " << totMIPEnergy << std::endl;
     
     fEnergy.push_back(totEnergy);    // for each plane
+    fMIPEnergy.push_back(totMIPEnergy);
     fdEdx.push_back(dedx_final); 
     
     
@@ -274,7 +300,9 @@ namespace shower {
   // break;
     } // end loop on clusters
     
-
+     result.set_total_MIPenergy(fMIPEnergy);
+     result.set_total_best_plane(best_plane);
+     
      result.set_total_energy  (fEnergy );
    //result.set_total_energy_err  (std::vector< Double_t > q)            { fSigmaTotalEnergy = q;        }
      

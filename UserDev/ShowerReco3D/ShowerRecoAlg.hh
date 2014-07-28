@@ -54,6 +54,7 @@ namespace shower {
    std::vector < double > fOmega2D;    // for each plane
    
    std::vector < double > fEnergy;    // for each plane
+   std::vector < double > fMIPEnergy;    // for each plane
    std::vector < double > fdEdx;      
    int fNPlanes;
    

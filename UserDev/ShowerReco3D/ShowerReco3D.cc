@@ -12,7 +12,7 @@ namespace larlight {
   }
   
   bool ShowerReco3D::initialize() {
-
+    _mgr = 0;
     // Make sure cluster type is a valid one
     if(fClusterType != DATA::FuzzyCluster &&
        fClusterType != DATA::CrawlerCluster &&
@@ -28,6 +28,7 @@ namespace larlight {
   
   bool ShowerReco3D::analyze(storage_manager* storage) {
 
+    _mgr = storage;
     // Re-initialize tools
     fShowerAlgo.Reset();
     fMatchMgr.Reset();

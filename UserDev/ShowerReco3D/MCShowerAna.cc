@@ -40,6 +40,17 @@ namespace larlight {
     recohEner = new TH1D("recohEner","",100,-10,2000);
     recorrhEner = new TH1D("recorrhEner","",100,-1000,1000);
     
+    //// New Histograms
+    // MIP Energy vs. True
+    hMIPEner = new TH1D("hMIPEner","MC True-Reco MIP Energy; MeV; Reco Shower",100,-1000,1000);
+    // MIP Energy vs. Deposited
+    hMIPEnerDep = new TH1D("hMIPEnerDep","MC Dep-Reco MIP Energy; MeV; Reco Shower",100,-1000,1000);
+    // corrected MIP vs. Deposited
+    hMIPEnerDepCorr = new TH1D("hMIPEnerDepCorr","MC Dep-Reco MIP Energy,Corr; MeV; Reco Shower",100,-1000,1000);
+    // MIP Energy - Deposited vs. Deposited
+    hMIPEnerDep2D = new TH2D("hMIPEnerDepvsEn","MC Dep-Reco MIP Energy vs En; MeV; Reco Shower",100,0,2000,100,-1000,1000);
+    
+    
     hdEdx = new TH1D("hdEdx","",60,0,12);
 
     return true;
@@ -107,7 +118,9 @@ namespace larlight {
 	hits.reserve(hit_index.size());
 	for(auto const& h_index : hit_index) {
 	  hits.push_back(&(hit_v->at(h_index)));
-	  recoq.at(plane) += hit_v->at(h_index).Charge(true);
+	  int multiplier=1;
+	  if(plane<2) multiplier=2;
+	  recoq.at(plane) += hit_v->at(h_index).Charge(true)*multiplier;
 	}
 	mcq_total.at(plane)    = mcs.Charge(GEO::View_t(plane));
 	mcq_detected.at(plane) = fBTAlg.MCShowerQ(hits).at(0) * detp->ElectronsToADC();
@@ -116,13 +129,16 @@ namespace larlight {
       auto const& reco_vtx  = reco_shower.ShowerStart();
       auto const& reco_dcos = reco_shower.Direction();
       auto const& reco_en   = reco_shower.Energy();
+      auto const& reco_MIPen   = reco_shower.MIPEnergy();
       
       for(size_t i=0; i<3; ++i) {
 	std::cout << "Plane " << i << std::endl
 		  << "Reco-ed Q: " << recoq.at(i) << std::endl
 		  << "MC Q: " << mcq_total.at(i) << std::endl
 		  << "MC Q in this cluster: " << mcq_detected.at(i)  << std::endl
-		  << "corrected reco r: " << reco_en.at(i)/(mcq_detected.at(i)/mcq_total.at(i)) 
+		  << " correction factor : " << (mcq_detected.at(i)/mcq_total.at(i)) << std::endl
+		  << "corrected reco r: " << reco_en.at(i)/(mcq_detected.at(i)/mcq_total.at(i))
+		  << "corrected reco MIP r: " << reco_MIPen.at(i)/(mcq_detected.at(i)/mcq_total.at(i)) 
 		  << std::endl
 		  << std::endl;
       }
@@ -143,6 +159,12 @@ namespace larlight {
 
       hEner->Fill(mc_mom.at(3) - reco_en.at(2));
 
+      hMIPEner->Fill(mc_mom_orig.at(3)*1e3 - reco_MIPen.at(2));
+      hMIPEnerDep->Fill(mc_mom.at(3) - reco_MIPen.at(2)); 
+      hMIPEnerDepCorr->Fill(mc_mom.at(3) - reco_MIPen.at(2)/(mcq_detected.at(2)/mcq_total.at(2)));
+      hMIPEnerDep2D->Fill(mc_mom.at(3),mc_mom.at(3) - reco_MIPen.at(2)); 
+      
+      
       hMCEner->Fill(mc_mom.at(3));
       recohEner->Fill(reco_en.at(2));
       hMCMotherEner->Fill(mc_mom.at(3));
@@ -182,6 +204,11 @@ namespace larlight {
       recorrhEner->Write();
       
       hdEdx->Write();
+      
+      hMIPEner->Write();
+      hMIPEnerDep->Write(); 
+      hMIPEnerDepCorr->Write(); 
+      hMIPEnerDep2D->Write(); 
     }    
     return true;
   }
