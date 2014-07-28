@@ -11,7 +11,7 @@ namespace cmtool {
   {
 		SetRatioCut(0.001) ; //(0.095) ;  
 		SetStartTimeCut(10) ;
-		SetDebug(true) ;
+		SetDebug(false) ;
 		SetVerbose(false) ;
 
   }
@@ -33,7 +33,7 @@ namespace cmtool {
 	double max_time_difference	 = 0;
 	double max_charge			 = 0;
 	double charge_ratio 		 = 1;	
-	double adjusted_charge_ratio = 1;
+	//double adjusted_charge_ratio = 1;
 
     //Preserve location in time space. Cut clusters that have similar time differences,
 	// but hit wires at very different times. 

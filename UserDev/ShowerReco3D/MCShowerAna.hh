@@ -53,6 +53,13 @@ namespace larlight {
 
     TH1D *hMCX, *hMCY, *hMCZ;
     TH1D *hdcosX, *hdcosY, *hdcosZ;
+
+    TH2D *hMCEdepMCQ;
+
+    TH1D *hAmpQEff;
+
+    TH1D *hMCEdepEff;
+    TH1D *hMCQEff;
     
     TH1D* hdEdx;
     TH1D* hEner;

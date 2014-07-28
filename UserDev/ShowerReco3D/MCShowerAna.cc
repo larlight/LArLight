@@ -11,6 +11,10 @@ namespace larlight {
 
     hMCX = hMCY = hMCZ = 0;
     hdcosX = hdcosY = hdcosZ = 0;
+
+    hMCEdepMCQ = 0;
+
+    hAmpQEff = 0;
     
     hEner = hEnerFrac = hDetEnerFrac = 0;
     
@@ -23,6 +27,19 @@ namespace larlight {
   }
 
   bool MCShowerAna::initialize() {
+
+    hMCEdepEff = new TH1D("hMCEdepEff","MC Deposited / Particle Energy; Fraction; MCShower",
+			  201,-0.0025,1.0025);
+
+    hMCQEff = new TH1D("hMCQEff","MC Charge Detected / Deposited Charge; Fraction; MCShower",
+		       201,-0.0025,1.0025);
+
+    hMCEdepMCQ = new TH2D("hMCEdepMCQ",
+			  "MC Energy vs. # of Electrons; # electrons; Energy [MeV]",
+			  100,0,3.e5,100,0,2000);
+    
+    hAmpQEff = new TH1D("hAmpQEff","# Electrons from Hit Amp / MC; Ratio; Collection Hits",
+			100,0,2);
 
     hMCX = new TH1D("hMCX","",100,-120,120);
     hMCY = new TH1D("hMCY","",100,-120,120);
@@ -77,7 +94,7 @@ namespace larlight {
     // because otherwise we have to think about which MCShower possibly corresponds to 
     // a given reconstructed shower.
     if( mcshower_v->size() != 1) {
-      std::cerr<<"Found > 1 MCShower! Ignore this event... "<<std::endl;
+      std::cerr<<Form("Found %zu MCShower! (>1) Ignore this event... ",mcshower_v->size())<<std::endl;
       return false;
     }
 
@@ -131,6 +148,7 @@ namespace larlight {
       auto const& reco_en   = reco_shower.Energy();
       auto const& reco_MIPen   = reco_shower.MIPEnergy();
       
+      /*
       for(size_t i=0; i<3; ++i) {
 	std::cout << "Plane " << i << std::endl
 		  << "Reco-ed Q: " << recoq.at(i) << std::endl
@@ -142,22 +160,32 @@ namespace larlight {
 		  << std::endl
 		  << std::endl;
       }
+      */
 
       // 
       // Fill histograms
       //
- 
-     
+
+      // MC-based efficiency
+      hMCEdepEff->Fill( mc_mom.at(3) / ((mc_mom_orig.at(3)*1.e3)) );
+      hMCQEff->Fill( mcq_detected.at(2) / mcq_total.at(2) );
+
+      // dEdX
       hdEdx->Fill(reco_shower.dEdx().at(2));
+
+      // Shower start XYZ
       hMCX->Fill(mc_vtx.at(0) - reco_vtx[0]);
       hMCY->Fill(mc_vtx.at(1) - reco_vtx[1]);
       hMCZ->Fill(mc_vtx.at(2) - reco_vtx[2]);
 
+      // dcos
       hdcosX->Fill(mc_dcos.at(0) - reco_dcos[0]);
       hdcosY->Fill(mc_dcos.at(1) - reco_dcos[1]);
       hdcosZ->Fill(mc_dcos.at(2) - reco_dcos[2]);
 
+      // Energy
       hEner->Fill(mc_mom.at(3) - reco_en.at(2));
+
 
       hMIPEner->Fill(mc_mom_orig.at(3)*1e3 - reco_MIPen.at(2));
       hMIPEnerDep->Fill(mc_mom.at(3) - reco_MIPen.at(2)); 
@@ -167,17 +195,23 @@ namespace larlight {
       
       hMCEner->Fill(mc_mom.at(3));
       recohEner->Fill(reco_en.at(2));
-      hMCMotherEner->Fill(mc_mom.at(3));
+      hMCEner->Fill(mc_mom.at(3));
+      hMCMotherEner->Fill(mc_mom_orig.at(3)*1.e3);
+
+      hMCEdepMCQ->Fill(mcq_detected.at(2),mc_mom.at(3));
+
+      hAmpQEff->Fill(recoq.at(2) / mcq_detected.at(2));
 
       recorrhEner->Fill(mc_mom_orig.at(3)*1.e3 - reco_en.at(2)/(mcq_detected.at(2)/mcq_total.at(2)));
       
       hEnerFrac->Fill( (mc_mom.at(3) - reco_en.at(2)) / (mc_mom.at(3) + reco_en.at(2)) * 2. );
+      /*
       std::cout
 	<< "MCShower Mother Energy    : " << mc_mom_orig.at(3)*1.e3  << std::endl
 	<< "MCShower Deposited Energy : " << mc_mom.at(3)            << std::endl
 	<< "Reco-ed Energy            : " << reco_en.at(2)           << std::endl
 	<< std::endl;
-      
+      */      
     }
     
     return true;
@@ -186,6 +220,14 @@ namespace larlight {
   bool MCShowerAna::finalize() {
 
     if(_fout) {
+      
+      hMCEdepEff->Write();
+      hMCQEff->Write();
+
+      hMCEdepMCQ->Write();
+
+      hAmpQEff->Write();
+      
       hMCX->Write();
       hMCY->Write();
       hMCZ->Write();

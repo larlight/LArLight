@@ -17,6 +17,7 @@
 
 #include "ClusterViewerAlgo.hh"
 #include "ClusterMatcher.hh"
+#include "McshowerLookback.hh"
 
 namespace larlight{
   /**
@@ -81,6 +82,9 @@ namespace larlight{
     /// Option to only draw track-like clusters, for debugging
     void SetDrawOnlyTracks(bool flag) { _draw_only_tracks = flag; }
 
+    /// Option to show MC Shower info on RHS of panel
+    void ShowShowers(bool on) { _algo.ShowShowers(on); _showerColor=on; }
+
   protected:
 
     ::cluster::ClusterViewerAlgo _algo;
@@ -94,6 +98,14 @@ namespace larlight{
     bool _draw_tracks;
 
     bool _draw_only_tracks;
+
+    larlight::McshowerLookback _mcslb;
+
+    //some maps that mcshowerlookback fills once per event
+    std::map<UInt_t,UInt_t> _shower_idmap;
+    std::map<UShort_t,larlight::simch> _simch_map;
+    bool _showerColor;
+
   };
   
 }
