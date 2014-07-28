@@ -26,15 +26,18 @@ my_proc.set_ana_output_file("")
 
 raw_viewer   = larlight.ClusterViewer()
 match_viewer = larlight.MatchViewer()
-mc_viewer    = larlight.MCShowerClusterViewer()
 
 match_viewer.SetPrintClusterInfo(True)
+#Show Showers: requires MC info in hadded files
+match_viewer.ShowShowers(False)
 
 ########################################
 # attach match algos here
 ########################################
 
-myalg = cmtool.CFAlgoZOverlap()
+myalg = cmtool.CFAlgoStartPointCompat()
+myalg.SetVerbose(True)
+
 match_viewer.GetManager().AddMatchAlgo(myalg)
 
 ########################################
@@ -44,8 +47,6 @@ match_viewer.GetManager().AddMatchAlgo(myalg)
 my_proc.add_process(raw_viewer)
 
 my_proc.add_process(match_viewer)
-
-my_proc.add_process(mc_viewer)
 
 raw_viewer.SetClusterType(larlight.DATA.Cluster)
 
@@ -68,8 +69,6 @@ while true:
     raw_viewer.DrawAllClusters();
 
     match_viewer.DrawAllClusters();
-
-    mc_viewer.DrawAllClusters();
 
     print "    Hit enter to go next event..."
     sys.stdin.readline()

@@ -100,6 +100,7 @@ namespace cluster {
     /// A function to decide if the hits COLZ canvas should be shown in log-z scale
     void SetHitsLogZ(bool flag) { _hits_log_z = flag; }
 
+
   protected:
 
     /// A utility function to create TH2D histogram
