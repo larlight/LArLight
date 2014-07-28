@@ -18,6 +18,10 @@ class ToyAna;
 class MinaTestEvent; //Added by Mina
 class MinaTestPhoton;
 class MinaTestParticle;
+  class ISevent;
+  class ISstep;
 //ADD_EMPTY_CLASS ... do not change this comment line
 
 #endif
+
+
