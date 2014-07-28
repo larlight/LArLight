@@ -24,7 +24,7 @@ my_proc.set_io_mode(larlight.storage_manager.READ)
 my_proc.set_input_rootdir("scanner")
 
 # Specify output root file name
-my_proc.set_ana_output_file("CMP_ana_out.root");
+my_proc.set_ana_output_file("CMPerformance.root");
 
 #attach the CMergePerformance process
 my_CMP = larlight.CMergePerformance()

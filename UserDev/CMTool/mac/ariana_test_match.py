@@ -20,7 +20,8 @@ proc = fmwk.ClusterMatcher()
 #priority_algo = cmtool.CPAlgoPolyArea()
 #priority_algo.SetMinArea(1e9)
 
-priority_algo = cmtool.CPAlgoNHits().SetMinHits(10000000)
+priority_algo = cmtool.CPAlgoNHits()
+priority_algo.SetMinHits(20)
 proc.GetManager().AddPriorityAlgo(priority_algo)
 
 proc.GetManager().AddMatchAlgo(cmtool.CFAlgoTimeOverlap())
