@@ -69,6 +69,7 @@
 #pragma link C++ class cmtool::CFAlgoTimeOverlap+;
 #pragma link C++ class cmtool::CFAlgoZOverlap+;
 #pragma link C++ class cmtool::CFAlgoStartPointMatch+;
+#pragma link C++ class cmtool::CFAlgoStartPointCompat+;
 #pragma link C++ class cmtool::CFAlgo3DAngle+;
 //ADD_CFALGO_CLASS ... do not change this line
 

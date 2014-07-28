@@ -75,13 +75,13 @@ namespace larlight {
     /// Getter for the CMergeManager so user can configure merge algos etc
     ::cmtool::CMergeManager& GetManager() { return _mgr; }
 
-    /// Option to not bother with fillin FOM histos with raw fuzzyclus data
+    /// Option to not bother with fillin FOM histos with raw input data
     /// This is useful if you are repeatedly running over the same file w/
     /// different merge algos and remaking the same raw plots is redundant
     void SetRunBeforeMerging(bool flag) { _run_before_merging = flag; }
     
     /// Option to not bother with cluster merging and just make FOM plots
-    /// for raw fuzzycluster data. The after-merge FOM histos
+    /// for raw input data. The after-merge FOM histos
     /// will just be left blank.
     /// This is useful because merging can take the most time to run
     void SetRunMerging(bool flag) { _run_merging = flag; }

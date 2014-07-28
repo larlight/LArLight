@@ -7,7 +7,6 @@ namespace larlight {
 
   ShowerReco3D::ShowerReco3D() : ana_base()
   {
-    _mgr=0;
     _name="ShowerReco3D";
     fClusterType = DATA::Cluster;
   }
@@ -29,7 +28,6 @@ namespace larlight {
   
   bool ShowerReco3D::analyze(storage_manager* storage) {
 
-    _mgr = storage;
     // Re-initialize tools
     fShowerAlgo.Reset();
     fMatchMgr.Reset();
@@ -61,8 +59,9 @@ namespace larlight {
     auto shower_v = (event_shower*)(storage->get_data(DATA::Shower));
     shower_v->clear();
     shower_v->reserve(matched_pairs.size());
-
-        
+    shower_v->set_event_id(storage->get_data(fClusterType)->event_id());
+    shower_v->set_run(storage->get_data(fClusterType)->run());
+    shower_v->set_subrun(storage->get_data(fClusterType)->subrun());
     
     // Loop over matched pairs
     for(auto const& pair : matched_pairs) {

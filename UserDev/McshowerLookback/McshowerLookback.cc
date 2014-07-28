@@ -168,7 +168,8 @@ namespace larlight {
   ///////////////////////////////////////////////////
   std::vector<float> McshowerLookback::MatchHitsAll(const std::vector<const larlight::hit*> &hits,
 						    const std::map<UShort_t, larlight::simch> &simch_map, 
-						    const std::map<UInt_t,UInt_t> &shower_idmap) const
+						    const std::map<UInt_t,UInt_t> &shower_idmap,
+						    bool fraction) const
   {
     ////////////////////////////////////////////////////////////////
     //setup variables for holding charge info from various mcshowers
@@ -258,6 +259,8 @@ namespace larlight {
     //  for(int j = 0; j < part_ides_charge.size(); ++j)
     //    std::cout<<part_ides_charge.at(j)<<", ";
     //  std::cout<<"), with size "<<part_ides_charge.size()<<std::endl;
+
+    if(!fraction) return part_ides_charge;
     
     //compute the actual fractions function returns
     std::vector<float> fractions;  
