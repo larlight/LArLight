@@ -439,10 +439,10 @@ namespace cluster {
 	  if(_gClusterPolygon.at(plane).at(cindex))
 	    _gClusterPolygon.at(plane).at(cindex)->Draw("PL");
 	}
-
-
+	
+	
       }
-
+      
       _cAllCluster->cd((plane+1)*2);
       
       if(_hits_log_z)
