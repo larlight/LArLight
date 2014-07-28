@@ -139,7 +139,7 @@ namespace cmtool {
 	else{
 		ratio_max_min = min_hits / max_hits ;
 		ratio_max_middle = middle_hits/max_hits ;	
-	//	ratio = ratio_a * ratio_max_min * ratio_max_middle ;
+		ratio = ratio_angle * ratio_max_min * ratio_max_middle ;
 		}	
 
 	if(_debug && ratio > _ratio_cut ){
