@@ -17,6 +17,7 @@
 
 #include "ClusterViewerAlgo.hh"
 #include "ClusterMerger.hh"
+#include "McshowerLookback.hh"
 
 namespace larlight{
   /**
@@ -82,6 +83,9 @@ namespace larlight{
     void SetDrawOnlyTracks(bool flag) { _draw_only_tracks = flag; }
 
   protected:
+
+    // McshowerLookback object
+    McshowerLookback _mcslb;
 
     ::cluster::ClusterViewerAlgo _algo;
 

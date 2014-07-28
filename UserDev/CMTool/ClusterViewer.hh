@@ -83,8 +83,7 @@ namespace larlight{
     /// Actual viewer code
     ::cluster::ClusterViewerAlgo _algo;
 
-    //DavidC--To color-code showers
-    //declare mcshowerlookback object only once, not once per event
+    // McshowerLookback object
     McshowerLookback _mcslb;
 
     //some maps that mcshowerlookback fills once per event
