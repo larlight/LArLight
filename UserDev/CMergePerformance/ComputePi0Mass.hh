@@ -19,8 +19,7 @@
 #include "CMatchManager.hh"
 #include "CRUHelper.hh"
 #include "ShowerRecoAlg.hh"
-#include <map> //std::map
-
+#include "ShowerBackTracker.hh"
 
 namespace larlight {
   /**
@@ -56,34 +55,20 @@ namespace larlight {
 
     float Pi0MassFormula3D(  float Energy1, float Energy2, TVector3 Direction3D_1, TVector3 Direction3D_2);
 
+    void ComputeEnergyCorrection(storage_manager* storage);
   protected:
-
-    void PrepareTTree();
 
     DATA::DATA_TYPE _shower_type;
     
     TH1D* hPi0MassPeak;
-    
-    //saving an analysis ttree for quick analysis
-    TTree* ana_tree;
-    //ttree variables
-    double _mass;
-    double _min_shower_energy_plane0;
-    double _max_shower_energy_plane0;
-    double _min_shower_dedx_plane0;
-    double _max_shower_dedx_plane0;
-    double _min_shower_energy_plane1;
-    double _max_shower_energy_plane1;
-    double _min_shower_dedx_plane1;
-    double _max_shower_dedx_plane1;
-    double _min_shower_energy_plane2;
-    double _max_shower_energy_plane2;
-    double _min_shower_dedx_plane2;
-    double _max_shower_dedx_plane2;
-    
 
     bool _debug;
 
+    std::vector<double> fEnergyCorr_MomToDaughter;
+    std::vector<double> fElectronCorr_DepToDet;
+    std::vector<double> fChargeCorr_DetToPeak;
+    ShowerBackTracker fBTAlg;
+    bool _applyEnergyCorrection;
   };
 }
 #endif
