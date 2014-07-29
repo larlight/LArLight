@@ -9,7 +9,9 @@ namespace larlight {
   shower::shower(DATA::DATA_TYPE type) : data_base(type) 
   //****************************************************
   {
-    if(_type!=DATA::Shower) {
+    if( _type!=DATA::Shower &&
+        _type!=DATA::RyanShower
+	) {
 
       Message::send(MSG::ERROR,__FUNCTION__,
 		    Form("Provided data type (%s) not supported! Reset to default.",DATA::DATA_TREE_NAME[_type].c_str()));
@@ -42,11 +44,13 @@ namespace larlight {
 						     event_base(type) 
   //*********************************************************************************
   {
-    if(_type!=DATA::Shower) {
-
+    if( _type!=DATA::Shower &&
+	_type!=DATA::RyanShower
+	) {
+      
       Message::send(MSG::ERROR,__FUNCTION__,
 		    Form("Provided data type (%s) not supported! Reset to default.",DATA::DATA_TREE_NAME[_type].c_str()));
-
+      
       _type = DATA::Shower;
     }    
     clear_data();

@@ -88,6 +88,8 @@ namespace larlight{
       TPCPulse_FixedWin,  ///< reconstructed event_pulse for TPC waveform
       Trigger,            ///< Trigger data
 
+      RyanCluster,        ///< Ryan's clustering algorithm 
+      RyanShower,         ///< Ryan's shower 
       DATA_TYPE_MAX
     };
     
@@ -136,7 +138,9 @@ namespace larlight{
       "pmt_fixedwin",
       "tpc_threswin",
       "tpc_fixedwin",
-      "trigger"
+      "trigger",
+      "ryancluster",
+      "ryanshower"
     };
     
   }
