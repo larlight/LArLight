@@ -7,8 +7,6 @@ namespace larlight {
 
   bool ComputePi0Mass::initialize() {
 
-    _applyEnergyCorrection = true;
-
     _shower_type = DATA::Shower;
 
     hPi0MassPeak = new TH1D("hPi0MassPeak","Pi0 Mass Peak in MeV",100,0,300);
@@ -40,17 +38,19 @@ namespace larlight {
       << std::endl
       << fEnergyCorr_MomToDaughter.at(0)<<" : "<<fElectronCorr_DepToDet.at(0) << std::endl
       << fEnergyCorr_MomToDaughter.at(1)<<" : "<<fElectronCorr_DepToDet.at(1) << std::endl;
-
+    
+    
     float mass = Pi0MassFormula3D( ev_shower->at(0).Energy().at(2) 
-				   * fEnergyCorr_MomToDaughter.at(0)
-				   * fElectronCorr_DepToDet.at(0),
-				   //* fChargeCorr_DetToPeak.at(0),
-				   ev_shower->at(1).Energy().at(2) 
-				   * fEnergyCorr_MomToDaughter.at(1)
-				   * fElectronCorr_DepToDet.at(1),
-				   //* fChargeCorr_DetToPeak.at(1),
-				   ev_shower->at(0).Direction(),
-				   ev_shower->at(1).Direction());
+    				   * fEnergyCorr_MomToDaughter.at(0)
+    				   * fElectronCorr_DepToDet.at(0),
+    				   //* fChargeCorr_DetToPeak.at(0),
+    				   ev_shower->at(1).Energy().at(2) 
+    				   * fEnergyCorr_MomToDaughter.at(1)
+    				   * fElectronCorr_DepToDet.at(1),
+    				   //* fChargeCorr_DetToPeak.at(1),
+    				   ev_shower->at(0).Direction(),
+    				   ev_shower->at(1).Direction());
+    
     
     hPi0MassPeak->Fill(mass);
     

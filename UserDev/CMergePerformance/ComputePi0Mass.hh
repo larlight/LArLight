@@ -31,7 +31,12 @@ namespace larlight {
   public:
 
     /// Default constructor
-    ComputePi0Mass(){ _name="ComputePi0Mass"; _fout=0; _debug=false; };
+    ComputePi0Mass(){ 
+      _name="ComputePi0Mass"; 
+      _fout=0; 
+      _debug=false; 
+      _applyEnergyCorrection=false;
+    };
 
     /// Default destructor
     virtual ~ComputePi0Mass(){};
@@ -56,6 +61,9 @@ namespace larlight {
     float Pi0MassFormula3D(  float Energy1, float Energy2, TVector3 Direction3D_1, TVector3 Direction3D_2);
 
     void ComputeEnergyCorrection(storage_manager* storage);
+
+    void SetApplyEnergyCorrection(bool flag){ _applyEnergyCorrection = flag; };
+
   protected:
 
     DATA::DATA_TYPE _shower_type;
