@@ -30,6 +30,8 @@ namespace larlight {
     const ::larutil::GeometryUtilities* geo_util = ::larutil::GeometryUtilities::GetME();
     
     const UChar_t nplanes = geo->Nplanes();
+    double  wire2cm = geo_util->WireToCm();
+    double  time2cm = geo_util->TimeToCm();
 
     //
     // Obtain event-wise data object pointers
@@ -42,6 +44,31 @@ namespace larlight {
 	       << std::endl;
       return true;
     }
+
+
+    //David Caratelli
+    //event hits used to set x-y range of TH2D so that it is same
+    //as cluster viewer panel
+    //Assume data type is fuzzycluster...does not really matter
+    event_cluster* ev_clus = (event_cluster*) ( storage->get_data(DATA::FuzzyCluster));
+    if(!ev_clus)
+      throw ::cluster::ViewerException(Form("Did not find %s data product!",
+					    DATA::DATA_TREE_NAME[DATA::FuzzyCluster].c_str()
+					    )
+				       );
+    
+    const DATA::DATA_TYPE hit_type = ev_clus->get_hit_type();
+    
+    event_hit*     ev_hit  = (event_hit*) ( storage->get_data(hit_type));
+
+
+    if(!ev_hit)
+      throw ::cluster::ViewerException(Form("Did not find %s data product!",
+					    DATA::DATA_TREE_NAME[hit_type].c_str()
+					    )
+				       );
+
+
 
     // Find all-hits, cluseter hits, range, everything at once
     std::vector<std::pair<double,double> > xrange(nplanes,std::pair<double,double>(1e9,0));
@@ -67,6 +94,26 @@ namespace larlight {
       cluster_start.at(plane).reserve(ev_mcs->size());
       cluster_end.at(plane).reserve(ev_mcs->size());
     }
+
+    //Set Range of x-y axes
+    for(auto const &h : *ev_hit) {
+      
+      UChar_t plane = geo->ChannelToPlane(h.Channel());
+      double x = h.Wire() * wire2cm;
+      double y = h.PeakTime() * time2cm;
+      
+      if(xrange.at(plane).first > x ) xrange.at(plane).first = x;
+      if(xrange.at(plane).second < x ) xrange.at(plane).second = x;
+      
+      if(yrange.at(plane).first > y ) yrange.at(plane).first = y;
+      if(yrange.at(plane).second < y ) yrange.at(plane).second = y;
+      
+    }
+    
+    // Inform the algorithm about the range
+    for(size_t i=0; i<nplanes; ++i)
+      _algo.SetRange(i,xrange.at(i),yrange.at(i));
+
 
 
     for(auto const &mcs : *ev_mcs) {
@@ -127,8 +174,8 @@ namespace larlight {
     }
 
     // Inform the algorithm about the range
-    for(size_t plane=0; plane<nplanes; ++plane)
-      _algo.SetRange(plane,xrange.at(plane),yrange.at(plane));
+    //for(size_t plane=0; plane<nplanes; ++plane)
+    //  _algo.SetRange(plane,xrange.at(plane),yrange.at(plane));
 
     // Provide all-hits and cluster info
     for(size_t plane=0; plane<nplanes; ++plane) {
