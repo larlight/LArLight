@@ -49,7 +49,7 @@ namespace larlight {
     hdcosY = new TH1D("hdcosY","",100,-5,5);
     hdcosZ = new TH1D("hdcosZ","",100,-5,5);
     
-    hEner = new TH1D("hEner","MC-Reco Energy; MeV; Reco Shower",100,-1000,1000);
+    
     hEnerFrac = new TH1D("hEnerFrac","MC-Reco Fractional Difference (Reco vs. Detected MC); Diff-Frac; Reco Shower",100,-5,5);
     hDetEnerFrac = new TH1D("hDetEnerFrac","MC-MC Fractional Difference (Mother vs. Detected); Diff-Frac; MC Shower",100,0,1);
     hMCEner = new TH1D("hMCEner","Deposited MC Shower Energy; MeV; MCShower",100,-10,2000);
@@ -58,6 +58,16 @@ namespace larlight {
     recorrhEner = new TH1D("recorrhEner","",100,-1000,1000);
     
     //// New Histograms
+    // MIP Energy vs. True
+    hEner = new TH1D("hEner","MC True-Reco  Energy; MeV; Reco Shower",100,-1000,1000);
+    //  Energy vs. Deposited
+    hEnerDep = new TH1D("hEnerDep","MC Dep-Reco  Energy; MeV; Reco Shower",100,-1000,1000);
+    // corrected  vs. Deposited
+    hEnerDepCorr = new TH1D("hEnerDepCorr","MC Dep-Reco  Energy,Corr; MeV; Reco Shower",100,-1000,1000);
+    //  Energy - Deposited vs. Deposited
+    hEnerDep2D = new TH2D("hEnerDepvsEn","MC Dep-Reco  Energy vs En; MeV; Reco Shower",100,0,2000,100,-1000,1000);
+    
+    
     // MIP Energy vs. True
     hMIPEner = new TH1D("hMIPEner","MC True-Reco MIP Energy; MeV; Reco Shower",100,-1000,1000);
     // MIP Energy vs. Deposited
@@ -192,6 +202,11 @@ namespace larlight {
       hMIPEnerDepCorr->Fill(mc_mom.at(3) - reco_MIPen.at(2)/(mcq_detected.at(2)/mcq_total.at(2)));
       hMIPEnerDep2D->Fill(mc_mom.at(3),mc_mom.at(3) - reco_MIPen.at(2)); 
       
+      hEner->Fill(mc_mom_orig.at(3)*1e3 - reco_en.at(2));
+      hEnerDep->Fill(mc_mom.at(3) - reco_en.at(2)); 
+      hEnerDepCorr->Fill(mc_mom.at(3) - reco_en.at(2)/(mcq_detected.at(2)/mcq_total.at(2)));
+      hEnerDep2D->Fill(mc_mom.at(3),mc_mom.at(3) - reco_en.at(2)); 
+      
       
       hMCEner->Fill(mc_mom.at(3));
       recohEner->Fill(reco_en.at(2));
@@ -236,7 +251,7 @@ namespace larlight {
       hdcosY->Write();
       hdcosZ->Write();
     
-      hEner->Write();
+      //hEner->Write();
       hEnerFrac->Write();
       hDetEnerFrac->Write();
       hMCEner->Write();
@@ -251,6 +266,12 @@ namespace larlight {
       hMIPEnerDep->Write(); 
       hMIPEnerDepCorr->Write(); 
       hMIPEnerDep2D->Write(); 
+      
+      hEner->Write();
+      hEnerDep->Write(); 
+      hEnerDepCorr->Write(); 
+      hEnerDep2D->Write(); 
+      
     }    
     return true;
   }

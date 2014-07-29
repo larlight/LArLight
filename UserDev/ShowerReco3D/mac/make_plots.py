@@ -3,8 +3,8 @@ import sys
 
 def make_plots():
     
-    elecs=TFile.Open("out_electrons.root","READ");
-    gammas=TFile.Open("out_gammas.root","READ");
+    elecs=TFile.Open("combined_electrons_area.root","READ");
+    gammas=TFile.Open("combined_gammas_area.root","READ");
 
 
     tels=elecs.Get("shower_tree");

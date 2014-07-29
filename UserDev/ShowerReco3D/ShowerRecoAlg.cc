@@ -142,7 +142,12 @@ namespace shower {
         //Bcorr_half = 2.*fCaloAlg.dEdx_AREA(theHit->Charge()/2.,theHit->PeakTime(), newpitch, plane); ; 
       //dEdx_sub = fCaloAlg.dEdx_AREA(theHit->Charge()-PION_CORR,theHit->PeakTime(), newpitch, plane); ; 
      // dEdx_MIP = fCaloAlg.dEdx_AREA_forceMIP(theHit, newpitch ); 
+     if(!fUseArea)
+     {
        dEdx_new = fCaloAlg.dEdx_AMP(&theHit , newpitch ); 
+     }
+     else
+       dEdx_new = fCaloAlg.dEdx_AREA(&theHit , newpitch ); 
    //
        if(dEdx_new >1.9 && dEdx_new <2.1)
 	  std::cout << "dEdx_new " << dEdx_new << " " <<dEdx_new/theHit.charge*newpitch << " "<< theHit.charge *0.0061/newpitch << std::endl;
@@ -159,7 +164,12 @@ namespace shower {
 	totHighEnergy += dEdx_new*newpitch;
 	int multiplier=1;
 	if(plane < 2) multiplier =2 ;
-	totMIPEnergy += theHit.charge *  0.0061*multiplier;
+	 if(!fUseArea){
+	  totMIPEnergy += theHit.peak *  0.0061*multiplier;
+	 }
+	 else{
+	   totMIPEnergy += theHit.charge *  0.00115*multiplier;
+	 }
       }
      larutil::PxPoint OnlinePoint; 
     // calculate the wire,time coordinates of the hit projection on to the 2D shower axis
