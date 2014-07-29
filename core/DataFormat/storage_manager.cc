@@ -445,9 +445,11 @@ namespace larlight {
     case DATA::FuzzyCluster:
     case DATA::HoughCluster:
     case DATA::ShowerAngleCluster:
+    case DATA::RyanCluster:
       _ptr_data_array[type]=(event_base*)(new event_cluster(type));
       break;
     case DATA::Shower:
+    case DATA::RyanShower:
       _ptr_data_array[type]=(event_base*)(new event_shower(type));
       break;
     case DATA::Vertex:
