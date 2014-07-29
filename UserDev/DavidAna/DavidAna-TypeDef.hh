@@ -7,6 +7,7 @@
 
 // Header files included here
 #include "SaveWF.hh"
+#include "MCinfo.hh"
 #include "EvtDisplay.hh"
 #include "HitViewer.hh"
 #include "WFCompress.hh"
@@ -21,6 +22,7 @@
 namespace larlight {
 
   class SaveWF;
+  class MCinfo;
   class EvtDisplay;
   class HitViewer;
   class WFCompress;
