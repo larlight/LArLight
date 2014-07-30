@@ -1,5 +1,4 @@
-/**
- * \file NueAppearanceFitter.hh
+ /* \file NueAppearanceFitter.hh
  *
  * \ingroup NueAppearanceFitter
  * 
@@ -91,6 +90,10 @@ namespace lar1{
 
       void setSavePlots(bool b){savePlots=b;}
 
+      void setNueBins (std::vector<float> bins){nueBins  = bins; nbins_nue = nueBins.size()-1;}
+      void setNumuBins(std::vector<float> bins){numuBins = bins; nbins_numu = numuBins.size()-1;}
+
+
       void setNpoints(int n)
       {
             npoints = n;
@@ -175,9 +178,9 @@ namespace lar1{
       double LAr1FDScale;     //Scale the event rates (uniformly across all events), far det
 
       //Histogram definitions
-      const double emin = 0.2;        //GeV
-      const double emax = 3.0;        //GeV
-      const Int_t nbinsE = 10;    //number of energy bins in each baseline, for each distribution (fosc, nue, or numu)
+      double emin;        //GeV
+      double emax;        //GeV
+      // const Int_t nbinsE = 10;    //number of energy bins in each baseline, for each distribution (fosc, nue, or numu)
       
       std::string energyType;
       // Options are etrue, eccqe, ecalo1, ecalo2;
@@ -224,6 +227,14 @@ namespace lar1{
       double chisq;
       const double deltachisq90=1.64, deltachisq3s=9.00, deltachisq5s=25.00;
 
+      // These vectors hold the bin scheme for the nue and numu samples.
+      // The default is going to be 200 MeV wide bins from 200 MeV to 3 GeV
+      // These bins can be different between nue and numu.
+      std::vector<float> nueBins;
+      std::vector<float> numuBins;
+      int nbins_nue;
+      int nbins_numu;
+
 
       std::vector < std::vector< float> > eventsnLVec;      //has osc in it
       std::vector < std::vector< float> > eventsnLfitVec;   //holds collapsed eventsnLVec spectrum, for fit
@@ -258,9 +269,9 @@ namespace lar1{
       int dm2FittingPoint;
       int sin22thFittingPoint;
 
-      //Input fractional systematics covariance matrix
-      //This is going to come from a txt file, from Georgia
-      std::vector<std::vector<float> > fracentries;
+      // //Input fractional systematics covariance matrix
+      // //This is going to come from a txt file, from Georgia
+      // std::vector<std::vector<float> > fracentries;
       std::vector<float> nearDetStats;
       std::vector<float> nullVec;
 

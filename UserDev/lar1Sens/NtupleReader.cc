@@ -28,9 +28,9 @@ namespace lar1{
     std::vector<float> defaultBins;
 
     // Default to 10 equal length bins from 0.2 GeV to 3 GeV:
-    double emin = 0.2;
+    double emin = 0.0;
     double emax = 3.0;
-    double nbins = 10.0;
+    double nbins = 120.0;
     double binSize = (emax - emin)/nbins;
     defaultBins.resize(nbins+1);
     for (double i = 0; i <= nbins; i++) {
@@ -71,9 +71,9 @@ namespace lar1{
 
     std::vector<float> defaultBins;
     // Default to 10 equal length bins from 0.2 GeV to 3 GeV:
-    double emin = 0.2;
+    double emin = 0.0;
     double emax = 3.0;
-    double nbins = 10.0;
+    double nbins = 120.0;
     double binSize = (emax - emin)/nbins;
     defaultBins.resize(nbins+1);
     for (double i = 0; i <= nbins; i++) {
@@ -207,11 +207,11 @@ std::vector<std::vector<std::vector<float> > > NtupleReader::GetMultiWeightDataO
       fileNameHistsOsc += "_";
       fileNameHistsOsc += tempstring;
     }
-    sprintf(tempstring, "%g", emin);
-    fileNameHists += tempstring;
-    fileNameHists += "_";
-    sprintf(tempstring, "%g_", emax);
-    fileNameHists += tempstring;
+    // sprintf(tempstring, "%g", emin);
+    // fileNameHists += tempstring;
+    // fileNameHists += "_";
+    // sprintf(tempstring, "%g_", emax);
+    // fileNameHists += tempstring;
     if (usingMultiWeights){
       sprintf(tempstring, "%dw_%d", nWeights,multiWeightSource);
       fileNameHists += tempstring;
@@ -222,12 +222,12 @@ std::vector<std::vector<std::vector<float> > > NtupleReader::GetMultiWeightDataO
     fileNameHists += "_hists.root";
 
 
-    fileNameHistsOsc += "_";
-    sprintf(tempstring, "%g", emin);
-    fileNameHistsOsc += tempstring;
-    fileNameHistsOsc += "_";
-    sprintf(tempstring, "%g", emax);
-    fileNameHistsOsc += tempstring;
+    // fileNameHistsOsc += "_";
+    // sprintf(tempstring, "%g", emin);
+    // fileNameHistsOsc += tempstring;
+    // fileNameHistsOsc += "_";
+    // sprintf(tempstring, "%g", emax);
+    // fileNameHistsOsc += tempstring;
     sprintf(tempstring, "_%dp_", npoints);
     fileNameHistsOsc += tempstring;
     if (usingSignalMultiWeights){
@@ -621,14 +621,15 @@ std::vector<std::vector<std::vector<float> > > NtupleReader::GetMultiWeightDataO
       if (energy == "ecalo2") fill_energy = ecalo2;
       if (energy == "elep") fill_energy = Elep;
 
-      // if ( (ibkg == kNueFromNueCC_muon       || 
-      //       ibkg == kNueFromNueCC_chargeKaon || 
-      //       ibkg == kNueFromNueCC_neutKaon)
-      //     && nuchan != 1)
-      // {
-      //   if (inno == 12 || inno == -12)
-      //     continue;
-      // }
+      if ( (ibkg == kNueFromNueCC_muon       || 
+            ibkg == kNueFromNueCC_chargeKaon || 
+            ibkg == kNueFromNueCC_neutKaon)  &&
+           nuchan != 1 &&
+           energy == "eccqe")
+      {
+        if (inno == 12 || inno == -12)
+          continue;
+      }
       // if ( (ibkg == kNueFromNueCC_muon       || 
       //       ibkg == kNueFromNueCC_chargeKaon || 
       //       ibkg == kNueFromNueCC_neutKaon)
