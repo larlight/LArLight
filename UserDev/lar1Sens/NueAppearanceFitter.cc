@@ -2582,20 +2582,20 @@ namespace lar1{
       TH1F * Other = utils.makeHistogram(OtherVec[j],nueBins);
 
 
-      // TH1F * SignalNu = utils.makeHistogram(eventsSignalBestFitNuVec[j], emin, emax);
-      // TH1F * SignalNubar = utils.makeHistogram(eventsSignalBestFitNubarVec[j], emin, emax);
-      TH1F* SignalNu = new TH1F("signal","signal",nbins_nue,&(nueBins[0]));
-      // SignalNu -> Add(SignalNubar);
-      SignalNu->SetBinContent(1,77.47);
-      SignalNu->SetBinContent(2,22.65);
-      SignalNu->SetBinContent(3,3.57);
-      SignalNu->SetBinContent(4,1.37);
-      SignalNu->SetBinContent(5,0.54);
-      SignalNu->SetBinContent(6,0.13);
-      SignalNu->SetBinContent(7,0.1);
-      SignalNu->SetBinContent(8,0.07);
-      SignalNu->SetBinContent(9,0.07);
-      SignalNu->SetBinContent(10,0.0);
+      TH1F * SignalNu = utils.makeHistogram(eventsSignalBestFitNuVec[j],nueBins);
+      TH1F * SignalNubar = utils.makeHistogram(eventsSignalBestFitNubarVec[j],nueBins);
+      // TH1F* SignalNu = new TH1F("signal","signal",nbins_nue,&(nueBins[0]));
+      SignalNu -> Add(SignalNubar);
+      // SignalNu->SetBinContent(1,77.47);
+      // SignalNu->SetBinContent(2,22.65);
+      // SignalNu->SetBinContent(3,3.57);
+      // SignalNu->SetBinContent(4,1.37);
+      // SignalNu->SetBinContent(5,0.54);
+      // SignalNu->SetBinContent(6,0.13);
+      // SignalNu->SetBinContent(7,0.1);
+      // SignalNu->SetBinContent(8,0.07);
+      // SignalNu->SetBinContent(9,0.07);
+      // SignalNu->SetBinContent(10,0.0);
 
 
       std::cout << "First bin: " << SignalNu->GetBinContent(1) <<std::endl;
@@ -2615,6 +2615,39 @@ namespace lar1{
       totalEvents.resize(nbins_nue);
       signalEvents.resize(nbins_nue);
 
+      for(int bin = 0; bin < nbins_nue; bin++)
+      {
+        NueFromNueCC_muon       -> SetBinContent(bin+1,
+                                      NueFromNueCC_muon->GetBinContent(bin+1)
+                                      /NueFromNueCC_muon->GetBinWidth(bin+1));
+        NueFromNueCC_chargeKaon -> SetBinContent(bin+1,
+                                      NueFromNueCC_chargeKaon->GetBinContent(bin+1)
+                                      /NueFromNueCC_chargeKaon->GetBinWidth(bin+1));
+        NueFromNueCC_neutKaon   -> SetBinContent(bin+1,
+                                      NueFromNueCC_neutKaon->GetBinContent(bin+1)
+                                      /NueFromNueCC_neutKaon->GetBinWidth(bin+1));
+        NueFromEScatter         -> SetBinContent(bin+1,
+                                      NueFromEScatter->GetBinContent(bin+1)
+                                      /NueFromEScatter->GetBinWidth(bin+1));
+        NueFromNC_pi0           -> SetBinContent(bin+1,
+                                      NueFromNC_pi0->GetBinContent(bin+1)
+                                      /NueFromNC_pi0->GetBinWidth(bin+1));
+        NueFromNC_delta0        -> SetBinContent(bin+1,
+                                      NueFromNC_delta0->GetBinContent(bin+1)
+                                      /NueFromNC_delta0->GetBinWidth(bin+1));
+        NueFromNumuCC           -> SetBinContent(bin+1,
+                                      NueFromNumuCC->GetBinContent(bin+1)
+                                      /NueFromNumuCC->GetBinWidth(bin+1));
+        Dirt                    -> SetBinContent(bin+1,
+                                      Dirt->GetBinContent(bin+1)
+                                      /Dirt->GetBinWidth(bin+1));
+        Other                   -> SetBinContent(bin+1,
+                                      Other->GetBinContent(bin+1)
+                                      /Other->GetBinWidth(bin+1));
+        SignalNu                -> SetBinContent(bin+1,
+                                      SignalNu->GetBinContent(bin+1)
+                                      /SignalNu->GetBinWidth(bin+1));
+      }
 
       // Set the bin errors to zero except for the very last bin:
       for (int i = 0; i < nbins_nue; ++i)
@@ -2761,7 +2794,7 @@ namespace lar1{
       //   sprintf(name, "T600 (%sm)", baselines[j].c_str());
       // }
       
-      chr->GetYaxis()->SetTitle("Events / 280 MeV");
+      chr->GetYaxis()->SetTitle("Events / MeV");
       chr->GetYaxis()->SetTitleSize(0.06);
       chr->GetYaxis()->SetTitleOffset(0.9);
       chr->GetYaxis()->CenterTitle();
@@ -2786,8 +2819,8 @@ namespace lar1{
       if (useHighDm) 
         plotUtils.add_plot_label( (char*)"Signal: (#Deltam^{2} = 50 eV^{2}, sin^{2}2#theta_{#mue} = 0.003)", 0.2, 0.81, 0.04, 1,62,12);
       else if (useGlobBF)
-        // plotUtils.add_plot_label( (char*)"Signal: (#Deltam^{2} = 0.43 eV^{2}, sin^{2}2#theta_{#mue} = 0.013)", 0.2, 0.81, 0.04, 1,62,12);
-        plotUtils.add_plot_label( (char*)"Signal: MiniBooNE Excess", 0.2, 0.81, 0.04, 1,62,12);
+        plotUtils.add_plot_label( (char*)"Signal: (#Deltam^{2} = 0.43 eV^{2}, sin^{2}2#theta_{#mue} = 0.013)", 0.2, 0.81, 0.04, 1,62,12);
+        // plotUtils.add_plot_label( (char*)"Signal: MiniBooNE Excess", 0.2, 0.81, 0.04, 1,62,12);
       else  plotUtils.add_plot_label( (char*)"Signal: (#Deltam^{2} = 1.2 eV^{2}, sin^{2}2#theta_{#mue} = 0.003)", 0.2, 0.81, 0.04, 1,62,12);
 
       plotUtils.add_plot_label((char*)"Statistical Uncertainty Only",0.2,0.76, 0.04,1,62,12);

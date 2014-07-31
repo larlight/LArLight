@@ -24,7 +24,7 @@
   n.setLAr1NDScale(1.0/(100*1.65*1.65));
   // n.setLAr1NDScale(1.0/3.0);
   n.setLAr1FDScale(1.0);
-  n.setEnergyType("eccqe");
+  n.setEnergyType("ecalo2");
   n.setUseNearDetStats(false);
   n.setShapeOnlyFit(true);
   n.setNearDetSystematicError(0.0);
@@ -33,6 +33,7 @@
   // n.setElectContainedDist(150);
 
   std::vector<float> miniboone_bins;
+  miniboone_bins.push_back(0.100);
   miniboone_bins.push_back(0.200);
   miniboone_bins.push_back(0.300);
   miniboone_bins.push_back(0.375);
@@ -45,11 +46,47 @@
   miniboone_bins.push_back(1.300);
   miniboone_bins.push_back(1.500);
   miniboone_bins.push_back(3.000);
-  std::cout << "bins:\n";
-  for (int i = 0; i < miniboone_bins.size(); i++) std::cout << miniboone_bins[i] << ", ";
+  // miniboone_bins.push_back(0.200);
+  // miniboone_bins.push_back(0.480);
+  // miniboone_bins.push_back(0.760);
+  // miniboone_bins.push_back(1.040);
+  // miniboone_bins.push_back(1.320);
+  // miniboone_bins.push_back(1.600);
+  // miniboone_bins.push_back(1.880);
+  // miniboone_bins.push_back(2.160);
+  // miniboone_bins.push_back(2.440);
+  // miniboone_bins.push_back(2.720);
+  // miniboone_bins.push_back(3.000);
+  // 
+  std::vector<float> numu_bins;
+  numu_bins.push_back(.200);
+  numu_bins.push_back(.300);
+  numu_bins.push_back(.400);
+  numu_bins.push_back(.450);
+  numu_bins.push_back(.500);
+  numu_bins.push_back(.550);
+  numu_bins.push_back(.600);
+  numu_bins.push_back(.650);
+  numu_bins.push_back(.700);
+  numu_bins.push_back(.750);
+  numu_bins.push_back(.800);
+  numu_bins.push_back(.850);
+  numu_bins.push_back(.900);
+  numu_bins.push_back(.950);
+  numu_bins.push_back(1.000);
+  numu_bins.push_back(1.250);
+  numu_bins.push_back(1.500);
+  numu_bins.push_back(2.000);
+  numu_bins.push_back(2.500);
+  numu_bins.push_back(3.000);
+  std::cout << "Nue bins:\n";
+  for (int i = 0; i < miniboone_bins.size(); i++) std::cout << miniboone_bins[i] << "\n";
+  std::cout << "Numu bins:\n";
+  for (int i = 0; i < numu_bins.size(); i++) std::cout << numu_bins[i] << "\n";
   std::cout << std::endl;
 
   n.setNueBins(miniboone_bins);
+  n.setNumuBins(numu_bins);
 
   n.setInflateSystematics(false);
   n.setSystematicInflationAmount(0.00);
