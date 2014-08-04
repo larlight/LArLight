@@ -9,7 +9,7 @@ namespace calo {
   static const bool kCaloUseModBox_ARGONEUT = false;
 
   static const double kCalAmpConstants_UB[3]  = {2.677e-3, 2.804e-3, 5.716e-3};
-  static const double kCalAreaConstants_UB[3] = {0, 0, 0};
+  static const double kCalAreaConstants_UB[3] = { 1.2093e-2, 1.2831e-2, 2.934e-2};
   static const bool kCaloUseModBox_UB = false;
 }
 

@@ -40,7 +40,10 @@ namespace larlight{
 				     fTotalEnergy(original.fTotalEnergy),
 				     fSigmaTotalEnergy(original.fSigmaTotalEnergy),
 				     fdEdx(original.fdEdx),
-				     fSigmadEdx(original.fSigmadEdx)
+				     fSigmadEdx(original.fSigmadEdx),
+				     fTotalMIPEnergy(original.fTotalMIPEnergy),
+				     fSigmaTotalMIPEnergy(original.fSigmaTotalMIPEnergy),
+				     fBestPlane(original.fBestPlane)     
     {}
     
     /// Default destructor
@@ -52,6 +55,11 @@ namespace larlight{
     void set_id            (Int_t id)              { fID = id;                }
     void set_total_energy  (std::vector< Double_t > q)            { fTotalEnergy = q;        }
     void set_total_energy_err  (std::vector< Double_t > q)            { fSigmaTotalEnergy = q;        }
+    
+    void set_total_MIPenergy  (std::vector< Double_t > q)            { fTotalMIPEnergy = q;        }
+    void set_total_MIPenergy_err  (std::vector< Double_t > q)            { fSigmaTotalMIPEnergy = q;        }
+    void set_total_best_plane  (int q)            { fBestPlane = q;        }
+    
     void set_direction     (TVector3 dir)        { fDCosStart = dir;        }
     void set_direction_err (TVector3 dir_e)      { fSigmaDCosStart = dir_e; }
     void set_start_point     (TVector3 xyz)        { fXYZstart = xyz;        }
@@ -79,6 +87,10 @@ namespace larlight{
     inline const std::vector< Double_t > Energy()    const { return fTotalEnergy;          }
     inline const std::vector< Double_t > EnergyErr() const { return fSigmaTotalEnergy;     }
     
+    inline const std::vector< Double_t > MIPEnergy()    const { return fTotalMIPEnergy;          }
+    inline const std::vector< Double_t > MIPEnergyErr() const { return fSigmaTotalMIPEnergy;     }
+    inline Int_t    best_plane()               const { return fBestPlane;               }
+    
     inline const std::vector< Double_t > dEdx()    const { return fdEdx;          }
     inline const std::vector< Double_t > dEdxErr() const { return fSigmadEdx;     }
     
@@ -94,8 +106,9 @@ namespace larlight{
     std::vector< Double_t > fdEdx;           ///< Calculated dEdx per each plane
     std::vector< Double_t > fSigmadEdx;           ///< Calculated dEdx per each plane
     
-    
-    
+    std::vector< Double_t > fTotalMIPEnergy;           ///< Calculated Energy per each plane
+    std::vector< Double_t > fSigmaTotalMIPEnergy;           ///< Calculated Energy per each plane
+    int fBestPlane;
   //  Double_t fMaxWidthX;             ///< maximum width of the prong in the x(0)
   //  Double_t fMaxWidthY;             ///< maximum width of the prong in the y(0)
   //  Double_t fDistanceMaxWidth;      ///< distance from the start of the prong to its maximum width
@@ -104,7 +117,7 @@ namespace larlight{
   private:
     
     ////////////////////////
-    ClassDef(shower,4)
+    ClassDef(shower,5)
     ////////////////////////
       
   };

@@ -60,6 +60,7 @@ algo_array.AddAlgo(cmtool.CFAlgoTimeOverlap())
 ana_unit.GetManager().AddMatchAlgo(algo_array)
 
 my_proc.add_process(ana_unit)
+my_proc.add_process(fmwk.MCShowerAna())
 
 print
 print  "Finished configuring ana_processor. Start event loop!"
@@ -69,9 +70,8 @@ fGSer = larutil.GeometryUtilities.GetME()
 
 while my_proc.process_event():
 
-
-
     storage=ana_unit.GetCurrentData()
+    print storage
     mctruth_v = storage.get_data(fmwk.DATA.MCTruth)
     # Get event_mctruth ... std::vector<larlight::mctruth>
    # 

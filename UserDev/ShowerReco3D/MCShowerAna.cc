@@ -49,13 +49,34 @@ namespace larlight {
     hdcosY = new TH1D("hdcosY","",100,-5,5);
     hdcosZ = new TH1D("hdcosZ","",100,-5,5);
     
-    hEner = new TH1D("hEner","MC-Reco Energy; MeV; Reco Shower",100,-1000,1000);
+    
     hEnerFrac = new TH1D("hEnerFrac","MC-Reco Fractional Difference (Reco vs. Detected MC); Diff-Frac; Reco Shower",100,-5,5);
     hDetEnerFrac = new TH1D("hDetEnerFrac","MC-MC Fractional Difference (Mother vs. Detected); Diff-Frac; MC Shower",100,0,1);
     hMCEner = new TH1D("hMCEner","Deposited MC Shower Energy; MeV; MCShower",100,-10,2000);
     hMCMotherEner = new TH1D("hMCMotherEner","Mother Energy; MeV; MCShower",100,-10,2000);
     recohEner = new TH1D("recohEner","",100,-10,2000);
     recorrhEner = new TH1D("recorrhEner","",100,-1000,1000);
+    
+    //// New Histograms
+    // MIP Energy vs. True
+    hEner = new TH1D("hEner","MC True-Reco  Energy; MeV; Reco Shower",100,-1000,1000);
+    //  Energy vs. Deposited
+    hEnerDep = new TH1D("hEnerDep","MC Dep-Reco  Energy; MeV; Reco Shower",100,-1000,1000);
+    // corrected  vs. Deposited
+    hEnerDepCorr = new TH1D("hEnerDepCorr","MC Dep-Reco  Energy,Corr; MeV; Reco Shower",100,-1000,1000);
+    //  Energy - Deposited vs. Deposited
+    hEnerDep2D = new TH2D("hEnerDepvsEn","MC Dep-Reco  Energy vs En; MeV; Reco Shower",100,0,2000,100,-1000,1000);
+    
+    
+    // MIP Energy vs. True
+    hMIPEner = new TH1D("hMIPEner","MC True-Reco MIP Energy; MeV; Reco Shower",100,-1000,1000);
+    // MIP Energy vs. Deposited
+    hMIPEnerDep = new TH1D("hMIPEnerDep","MC Dep-Reco MIP Energy; MeV; Reco Shower",100,-1000,1000);
+    // corrected MIP vs. Deposited
+    hMIPEnerDepCorr = new TH1D("hMIPEnerDepCorr","MC Dep-Reco MIP Energy,Corr; MeV; Reco Shower",100,-1000,1000);
+    // MIP Energy - Deposited vs. Deposited
+    hMIPEnerDep2D = new TH2D("hMIPEnerDepvsEn","MC Dep-Reco MIP Energy vs En; MeV; Reco Shower",100,0,2000,100,-1000,1000);
+    
     
     hdEdx = new TH1D("hdEdx","",60,0,12);
 
@@ -124,7 +145,9 @@ namespace larlight {
 	hits.reserve(hit_index.size());
 	for(auto const& h_index : hit_index) {
 	  hits.push_back(&(hit_v->at(h_index)));
-	  recoq.at(plane) += hit_v->at(h_index).Charge(true);
+	  int multiplier=1;
+	  if(plane<2) multiplier=2;
+	  recoq.at(plane) += hit_v->at(h_index).Charge(true)*multiplier;
 	}
 	mcq_total.at(plane)    = mcs.Charge(GEO::View_t(plane));
 	mcq_detected.at(plane) = fBTAlg.MCShowerQ(hits).at(0) * detp->ElectronsToADC();
@@ -133,6 +156,7 @@ namespace larlight {
       auto const& reco_vtx  = reco_shower.ShowerStart();
       auto const& reco_dcos = reco_shower.Direction();
       auto const& reco_en   = reco_shower.Energy();
+      auto const& reco_MIPen   = reco_shower.MIPEnergy();
       
       /*
       for(size_t i=0; i<3; ++i) {
@@ -140,7 +164,9 @@ namespace larlight {
 		  << "Reco-ed Q: " << recoq.at(i) << std::endl
 		  << "MC Q: " << mcq_total.at(i) << std::endl
 		  << "MC Q in this cluster: " << mcq_detected.at(i)  << std::endl
-		  << "corrected reco r: " << reco_en.at(i)/(mcq_detected.at(i)/mcq_total.at(i)) 
+		  << " correction factor : " << (mcq_detected.at(i)/mcq_total.at(i)) << std::endl
+		  << "corrected reco r: " << reco_en.at(i)/(mcq_detected.at(i)/mcq_total.at(i))
+		  << "corrected reco MIP r: " << reco_MIPen.at(i)/(mcq_detected.at(i)/mcq_total.at(i)) 
 		  << std::endl
 		  << std::endl;
       }
@@ -169,6 +195,20 @@ namespace larlight {
 
       // Energy
       hEner->Fill(mc_mom.at(3) - reco_en.at(2));
+
+
+      hMIPEner->Fill(mc_mom_orig.at(3)*1e3 - reco_MIPen.at(2));
+      hMIPEnerDep->Fill(mc_mom.at(3) - reco_MIPen.at(2)); 
+      hMIPEnerDepCorr->Fill(mc_mom.at(3) - reco_MIPen.at(2)/(mcq_detected.at(2)/mcq_total.at(2)));
+      hMIPEnerDep2D->Fill(mc_mom.at(3),mc_mom.at(3) - reco_MIPen.at(2)); 
+      
+      hEner->Fill(mc_mom_orig.at(3)*1e3 - reco_en.at(2));
+      hEnerDep->Fill(mc_mom.at(3) - reco_en.at(2)); 
+      hEnerDepCorr->Fill(mc_mom.at(3) - reco_en.at(2)/(mcq_detected.at(2)/mcq_total.at(2)));
+      hEnerDep2D->Fill(mc_mom.at(3),mc_mom.at(3) - reco_en.at(2)); 
+      
+      
+      hMCEner->Fill(mc_mom.at(3));
       recohEner->Fill(reco_en.at(2));
       hMCEner->Fill(mc_mom.at(3));
       hMCMotherEner->Fill(mc_mom_orig.at(3)*1.e3);
@@ -211,7 +251,7 @@ namespace larlight {
       hdcosY->Write();
       hdcosZ->Write();
     
-      hEner->Write();
+      //hEner->Write();
       hEnerFrac->Write();
       hDetEnerFrac->Write();
       hMCEner->Write();
@@ -221,6 +261,17 @@ namespace larlight {
       recorrhEner->Write();
       
       hdEdx->Write();
+      
+      hMIPEner->Write();
+      hMIPEnerDep->Write(); 
+      hMIPEnerDepCorr->Write(); 
+      hMIPEnerDep2D->Write(); 
+      
+      hEner->Write();
+      hEnerDep->Write(); 
+      hEnerDepCorr->Write(); 
+      hEnerDep2D->Write(); 
+      
     }    
     return true;
   }

@@ -111,7 +111,7 @@ namespace calo{
   
   double CalorimetryAlg::dEdx_AMP(const larutil::PxHit *hit, double pitch) const
   {
-    return dEdx_AMP(hit->charge/pitch, hit->t, hit->plane);
+    return dEdx_AMP(hit->peak/pitch, hit->t, hit->plane);
   }
   
   

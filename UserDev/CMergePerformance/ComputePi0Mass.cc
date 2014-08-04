@@ -8,9 +8,6 @@ namespace larlight {
   bool ComputePi0Mass::initialize() {
 
     _shower_type = DATA::Shower;
-    
-    ana_tree=0;
-    PrepareTTree();
 
     hPi0MassPeak = new TH1D("hPi0MassPeak","Pi0 Mass Peak in MeV",100,0,300);
 
@@ -27,86 +24,154 @@ namespace larlight {
       return false;
     }else if(ev_shower->size()<1) return false;
     
-    
-    //skip event if <2 showers are found
-    //    if(ev_shower->size() < 2) return true;
-    //for now, only consider events with ==2 showers. this std::map code makes it more complicated
-    //but it's generalizable to use events with >2 showers
+    //skip event if !2 showers found.
     if(ev_shower->size() != 2) return true;
 
+    fEnergyCorr_MomToDaughter.resize(ev_shower->size(),1);
+    fElectronCorr_DepToDet.resize(ev_shower->size(),1);
+    fChargeCorr_DetToPeak.resize(ev_shower->size(),1);
 
-    //if there are more than 2 showers, pick the two that have highest dedx in collection plane
-    int first_shower_index = -1;
-    int second_shower_index = -1;
+    if(_applyEnergyCorrection)
+      ComputeEnergyCorrection(storage);
     
-    //find the indexes of the two showers with biggest dedxes
-    //maps are auto sorted from low-to-high by first index
-    std::map<double,unsigned int> dedx_index;
+    std::cout 
+      << std::endl
+      << fEnergyCorr_MomToDaughter.at(0)<<" : "<<fElectronCorr_DepToDet.at(0) << std::endl
+      << fEnergyCorr_MomToDaughter.at(1)<<" : "<<fElectronCorr_DepToDet.at(1) << std::endl;
     
-    int index = 0;
-    for (auto const& c : *ev_shower) {
-      dedx_index.insert(std::make_pair(c.dEdx().at(2),index));
-      index++;
+    
+    float mass = Pi0MassFormula3D( ev_shower->at(0).Energy().at(2) 
+    				   * fEnergyCorr_MomToDaughter.at(0)
+    				   * fElectronCorr_DepToDet.at(0),
+    				   //* fChargeCorr_DetToPeak.at(0),
+    				   ev_shower->at(1).Energy().at(2) 
+    				   * fEnergyCorr_MomToDaughter.at(1)
+    				   * fElectronCorr_DepToDet.at(1),
+    				   //* fChargeCorr_DetToPeak.at(1),
+    				   ev_shower->at(0).Direction(),
+    				   ev_shower->at(1).Direction());
+    
+    
+    hPi0MassPeak->Fill(mass);
+    
+    return true;
+  }
+
+  void ComputePi0Mass::ComputeEnergyCorrection(storage_manager* storage)
+  {
+    
+    auto geo  = ::larutil::Geometry::GetME();
+    auto detp = ::larutil::DetectorProperties::GetME();
+
+    // Get data products from storage
+    auto mcshower_v = (event_mcshower* )( storage->get_data(DATA::MCShower) );
+    auto shower_v   = (event_shower*   )( storage->get_data(DATA::Shower)   );
+    auto cluster_v  = (event_cluster*  )( storage->get_data(DATA::Cluster)  );
+    auto hit_v      = (event_hit*      )( storage->get_data(DATA::GausHit)  );
+    
+    // Check data exists
+    if( !mcshower_v || !shower_v || !cluster_v || !hit_v) {
+      std::cerr<<"Missing some data! not doing anything..."<<std::endl;
+      return;
+    }
+
+    // Here, we assume there is only 1 MCShower exists in an event
+    // because otherwise we have to think about which MCShower possibly corresponds to 
+    // a given reconstructed shower.
+    //if( mcshower_v->size() != 1) {
+    //std::cerr<<Form("Found %zu MCShower! (>1) Ignore this event... ",mcshower_v->size())<<std::endl;
+    //return;
+    //}
+
+    //
+    // Use LArLight's version of BackTracker
+    //
+    if(!fBTAlg.Prepare(storage)) return;
+
+    std::vector<double> mcs_mother_energy(mcshower_v->size(),0);
+    std::vector<double> mcs_daughter_energy(mcshower_v->size(),0);
+    std::vector<double> mcs_deposit_charge(mcshower_v->size(),0);
+    std::vector<double> mcs_detected_charge(mcshower_v->size(),0);
+    for(size_t i=0; i<mcshower_v->size(); ++i) {
+      
+      mcs_mother_energy.at(i) = mcshower_v->at(i).MotherMomentum().at(3)*1.e3;
+      mcs_daughter_energy.at(i) = mcshower_v->at(i).DaughterMomentum().at(3);
+      mcs_deposit_charge.at(i)  = mcshower_v->at(i).Charge(GEO::View_t(2));
+      
+    }
+
+    std::vector<std::vector<double> > shower_mcq_per_mcs;
+    shower_mcq_per_mcs.reserve(shower_v->size());
+    std::vector<double> shower_mcq_total;
+    shower_mcq_total.reserve(shower_v->size());
+
+    for(auto const& reco_shower : *shower_v) {
+      
+      auto& cluster_index = reco_shower.association(DATA::Cluster);
+
+      std::vector<double> cluster_mcq_per_mcs(mcshower_v->size(),0);
+
+      // Loop over associated clusters to fill mc/reco charge info 
+      for(auto const& c_index : cluster_index) {
+
+	auto& hit_index = cluster_v->at(c_index).association(DATA::GausHit);
+	UChar_t plane = geo->ChannelToPlane(hit_v->at(hit_index.at(0)).Channel());
+	if(plane != 2) continue;
+
+	std::vector<const larlight::hit*> hits;
+	hits.reserve(hit_index.size());
+	for(auto const& h_index : hit_index)
+	  hits.push_back(&(hit_v->at(h_index)));
+	//recoq.at(plane) += hit_v->at(h_index).Charge(true);
+
+	auto const& recoq_per_mcs = fBTAlg.MCShowerQ(hits);
+	double mcq_sum = 0;
+	for(size_t i=0; i<recoq_per_mcs.size(); ++i) {
+	  mcs_detected_charge.at(i) += recoq_per_mcs.at(i) * detp->ElectronsToADC();
+	  cluster_mcq_per_mcs.at(i)     = recoq_per_mcs.at(i) * detp->ElectronsToADC();
+	  mcq_sum += recoq_per_mcs.at(i) * detp->ElectronsToADC();
+	}
+	shower_mcq_total.push_back(mcq_sum);
+	shower_mcq_per_mcs.push_back(cluster_mcq_per_mcs);
+      }
+    }
+
+    std::vector<double> fQCorrPerMCS(mcshower_v->size(),0);
+    for(size_t i=0; i<fQCorrPerMCS.size(); ++i) 
+
+      fQCorrPerMCS.at(i) = mcs_deposit_charge.at(i) / mcs_detected_charge.at(i);
+
+    fEnergyCorr_MomToDaughter.resize(shower_v->size(),1);
+    fElectronCorr_DepToDet.resize(shower_v->size(),1);
+    //fChargeCorr_DetToPeak.resize(ev_shower->size(),1);
+
+    // Loop over shower
+    for(size_t i=0; i<shower_mcq_per_mcs.size(); ++i) {
+
+      double electron_factor = 0;
+      double energy_factor   = 0;
+      // Loop over MCShower
+      for(size_t j=0; j<shower_mcq_per_mcs.at(i).size(); ++j) {
+	
+	electron_factor += shower_mcq_per_mcs.at(i).at(j) / shower_mcq_total.at(i) * fQCorrPerMCS.at(j);
+	energy_factor += shower_mcq_per_mcs.at(i).at(j) / shower_mcq_total.at(i) * mcs_mother_energy.at(j) / mcs_daughter_energy.at(j);
+	
+      }
+      std::cout<<electron_factor<<std::endl;
+      std::cout<<energy_factor<<std::endl;
+      fElectronCorr_DepToDet.at(i) = electron_factor;
+      fEnergyCorr_MomToDaughter.at(i) = energy_factor;
     }
     
-    auto iter = (dedx_index).rbegin();
     
-    //kaleko quick hack for ==2 showers
-    //    first_shower_index = (*iter).second; //index of highest dedx;
-    //    ++iter;
-    //    second_shower_index = (*iter).second;//index of second highest dedx
-
-    first_shower_index = 0;
-    second_shower_index = 1;
-    //    std::cout<<first_shower_index<<second_shower_index<<std::endl;
-
-    _mass = Pi0MassFormula3D(ev_shower->at(first_shower_index).Energy().at(2),
-			     ev_shower->at(second_shower_index).Energy().at(2),
-			     ev_shower->at(first_shower_index).Direction(),
-			     ev_shower->at(second_shower_index).Direction());
-
-
-
-    //ttree variables
-    _min_shower_energy_plane0 = std::min(ev_shower->at(first_shower_index).Energy().at(0),ev_shower->at(second_shower_index).Energy().at(0));
-    _max_shower_energy_plane0 = std::max(ev_shower->at(first_shower_index).Energy().at(0),ev_shower->at(second_shower_index).Energy().at(0));
-    _min_shower_dedx_plane0 = std::min(ev_shower->at(first_shower_index).dEdx().at(0),ev_shower->at(second_shower_index).dEdx().at(0));
-    _max_shower_dedx_plane0 = std::max(ev_shower->at(first_shower_index).dEdx().at(0),ev_shower->at(second_shower_index).dEdx().at(0));
-
-
-    _min_shower_energy_plane1 = std::min(ev_shower->at(first_shower_index).Energy().at(1),ev_shower->at(second_shower_index).Energy().at(1));
-    _max_shower_energy_plane1 = std::max(ev_shower->at(first_shower_index).Energy().at(1),ev_shower->at(second_shower_index).Energy().at(1));
-    _min_shower_dedx_plane1 = std::min(ev_shower->at(first_shower_index).dEdx().at(1),ev_shower->at(second_shower_index).dEdx().at(1));
-    _max_shower_dedx_plane1 = std::max(ev_shower->at(first_shower_index).dEdx().at(1),ev_shower->at(second_shower_index).dEdx().at(1));
-
-
-    _min_shower_energy_plane2 = std::min(ev_shower->at(first_shower_index).Energy().at(2),ev_shower->at(second_shower_index).Energy().at(2));
-    _max_shower_energy_plane2 = std::max(ev_shower->at(first_shower_index).Energy().at(2),ev_shower->at(second_shower_index).Energy().at(2));
-    _min_shower_dedx_plane2 = std::min(ev_shower->at(first_shower_index).dEdx().at(2),ev_shower->at(second_shower_index).dEdx().at(2));
-    _max_shower_dedx_plane2 = std::max(ev_shower->at(first_shower_index).dEdx().at(2),ev_shower->at(second_shower_index).dEdx().at(2));
-
-
-
-    //fill main histogram
-    hPi0MassPeak->Fill(_mass);
-    
-    //fill ana_tree
-    ana_tree->Fill();
-
-    return true;
-
-
   }
 
   bool ComputePi0Mass::finalize() {
 
-
     if(_fout) { 
       _fout->cd(); 
       hPi0MassPeak->Write();
-      ana_tree->Write();
       delete hPi0MassPeak;
-      delete ana_tree;
     }
     else 
       print(MSG::ERROR,__FUNCTION__,"Did not find an output file pointer!!! File not opened?");
@@ -119,45 +184,12 @@ namespace larlight {
   //Get PI0 Mass from photon directions and energy
   float ComputePi0Mass::Pi0MassFormula3D( float Energy1, float Energy2, TVector3 Direction3D_1, TVector3 Direction3D_2){
     
-
-    float kazu_correction_factor_RecoShowerE_to_TrueShowerE = 1.25*1.08;
-    //    float kazu_correction_factor_RecoShowerE_to_TrueShowerE = 1.;
-
     float angle_3D = acos( Direction3D_1 * Direction3D_2 );
-
-    float E1 = Energy1*kazu_correction_factor_RecoShowerE_to_TrueShowerE;
-    float E2 = Energy2*kazu_correction_factor_RecoShowerE_to_TrueShowerE;
 
     //using a formula from 
     //http://www.hep.princeton.edu/~mcdonald/examples/piondecay.pdf      
-    return pow(4. * E1 * E2 * pow(sin( 0.5 * angle_3D ),2) , 0.5);
+    return pow(4. * Energy1 * Energy2 * pow(sin( 0.5 * angle_3D ),2) , 0.5);
 
-  }
-
-  void ComputePi0Mass::PrepareTTree() {
-
-    if(!ana_tree) {
-      ana_tree = new TTree("ana_tree","");
-            
-      ana_tree->Branch("pi0mass",&_mass,"pi0mass/D");
-
-      ana_tree->Branch("min_shower_energy_plane0",&_min_shower_energy_plane0,"min_shower_energy_plane0/D");
-      ana_tree->Branch("max_shower_energy_plane0",&_max_shower_energy_plane0,"max_shower_energy_plane0/D");
-      ana_tree->Branch("min_shower_dedx_plane0",&_min_shower_dedx_plane0,"min_shower_dedx_plane0/D");
-      ana_tree->Branch("max_shower_dedx_plane0",&_max_shower_dedx_plane0,"max_shower_dedx_plane0/D"); 
-
-
-      ana_tree->Branch("min_shower_energy_plane1",&_min_shower_energy_plane1,"min_shower_energy_plane1/D");
-      ana_tree->Branch("max_shower_energy_plane1",&_max_shower_energy_plane1,"max_shower_energy_plane1/D");
-      ana_tree->Branch("min_shower_dedx_plane1",&_min_shower_dedx_plane1,"min_shower_dedx_plane1/D");
-      ana_tree->Branch("max_shower_dedx_plane1",&_max_shower_dedx_plane1,"max_shower_dedx_plane1/D"); 
-
-
-      ana_tree->Branch("min_shower_energy_plane2",&_min_shower_energy_plane2,"min_shower_energy_plane2/D");
-      ana_tree->Branch("max_shower_energy_plane2",&_max_shower_energy_plane2,"max_shower_energy_plane2/D");
-      ana_tree->Branch("min_shower_dedx_plane2",&_min_shower_dedx_plane2,"min_shower_dedx_plane2/D");
-      ana_tree->Branch("max_shower_dedx_plane2",&_max_shower_dedx_plane2,"max_shower_dedx_plane2/D"); 
-    }
   }
 
 }

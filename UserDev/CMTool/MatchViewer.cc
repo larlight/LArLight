@@ -14,7 +14,7 @@ namespace larlight {
     _name = "MatchViewer";
 
     // Show Showers
-    _showerColor = true;
+    ShowShowers(false);
     // Default values for stuff
     SetDrawPolygon(false);
     SetPrintClusterInfo(false);
