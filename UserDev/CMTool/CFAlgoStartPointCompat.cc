@@ -2,6 +2,7 @@
 #define CFALGOSTARTPOINTCOMPAT_CXX
 
 #include "CFAlgoStartPointCompat.hh"
+#include <algorithm>
 
 namespace cmtool {
 
@@ -11,7 +12,7 @@ namespace cmtool {
   {
     _w2cm = larutil::GeometryUtilities::GetME()->WireToCm();
     _t2cm = larutil::GeometryUtilities::GetME()->TimeToCm();
-    UseTime(true);
+    SetVerbose(false);
   }
 
   //-----------------------------
@@ -36,36 +37,39 @@ namespace cmtool {
     //Find 3D start point from start point on first 2 planes:
     //For now convert start point wire in cm back to wire number
     //Round to integer (sometimes output is double...why???)
-    int startWire1 = int( clusters.at(0)->GetParams().start_point.w / _w2cm );
-    double startTime1 = clusters.at(0)->GetParams().start_point.t;
-    unsigned char Pl1 = clusters.at(0)->GetParams().start_point.plane;
-    int startChan1 = larutil::Geometry::GetME()->PlaneWireToChannel(Pl1, startWire1);
-    int startWire2 = int( clusters.at(1)->GetParams().start_point.w / _w2cm );
-    double startTime2 = clusters.at(1)->GetParams().start_point.t;
-    unsigned char Pl2 = clusters.at(1)->GetParams().start_point.plane;
-    int startChan2 = larutil::Geometry::GetME()->PlaneWireToChannel(Pl2, startWire2);
-    int startWire3 = int( clusters.at(2)->GetParams().start_point.w / _w2cm );
-    double startTime3 = clusters.at(2)->GetParams().start_point.t;
-    unsigned char Pl3 = clusters.at(2)->GetParams().start_point.plane;
-    int startChan3 = larutil::Geometry::GetME()->PlaneWireToChannel(Pl3, startWire3);
+    double startWirecm0 = clusters.at(0)->GetParams().start_point.w;
+    double startTimecm0 = clusters.at(0)->GetParams().start_point.t;
+    int startWire0 = int( startWirecm0 / _w2cm );
+    unsigned char Pl0 = clusters.at(0)->GetParams().start_point.plane;
+    //int startChan1 = larutil::Geometry::GetME()->PlaneWireToChannel(Pl0, startWire0);
+    double startWirecm1 = clusters.at(1)->GetParams().start_point.w;
+    double startTimecm1 = clusters.at(1)->GetParams().start_point.t;
+    int startWire1 = int( startWirecm1 / _w2cm );
+    unsigned char Pl1 = clusters.at(1)->GetParams().start_point.plane;
+    //int startChan2 = larutil::Geometry::GetME()->PlaneWireToChannel(Pl1, startWire1);
+    double startWirecm2 = clusters.at(2)->GetParams().start_point.w;
+    double startTimecm2 = clusters.at(2)->GetParams().start_point.t;
+    int startWire2 = int( startWirecm2 / _w2cm );
+    unsigned char Pl2 = clusters.at(2)->GetParams().start_point.plane;
+    //int startChan3 = larutil::Geometry::GetME()->PlaneWireToChannel(Pl2, startWire2);
 
 
     //Get Intersections in pairs:
     //y and z indicate detector coordinate and numbers indicate planes
     //used to generate that intersection point
-    double yS12, zS12, yS13, zS13, yS23, zS23;
+    double yS01, zS01, yS02, zS02, yS12, zS12;
+
+    larutil::Geometry::GetME()->IntersectionPoint( startWire0, startWire1,
+						   Pl0, Pl1,
+						   yS01, zS01);
+
+    larutil::Geometry::GetME()->IntersectionPoint( startWire0, startWire2,
+						   Pl0, Pl2,
+						   yS02, zS02);
 
     larutil::Geometry::GetME()->IntersectionPoint( startWire1, startWire2,
 						   Pl1, Pl2,
 						   yS12, zS12);
-
-    larutil::Geometry::GetME()->IntersectionPoint( startWire1, startWire3,
-						   Pl1, Pl3,
-						   yS13, zS13);
-
-    larutil::Geometry::GetME()->IntersectionPoint( startWire2, startWire3,
-						   Pl2, Pl3,
-						   yS23, zS23);
 
     //assume X coordinate for these start-points is 0
     //i.e. only focus on projection onto wire-plane
@@ -74,40 +78,59 @@ namespace cmtool {
     //the cluster on plane C
     //For compatibility also, check that the start-point-time
     //is within the time-range of the cluster on plane C
-    Double_t Start1[3] = {-150., yS12, zS12};
-    Double_t Start2[3] = {-150., yS13, zS13};
-    Double_t Start3[3] = {-150., yS23, zS23};
-    UInt_t WireStart1, WireStart2, WireStart3;
-    try { WireStart1 = larutil::Geometry::GetME()->NearestChannel( Start1, Pl1); }
+    Double_t Start2[3] = {-100., yS01, zS01};
+    Double_t Start1[3] = {-100., yS02, zS02};
+    Double_t Start0[3] = {-100., yS12, zS12};
+    UInt_t WireStart0 = 0;
+    UInt_t WireStart1 = 0;
+    UInt_t WireStart2 = 0;
+    try { WireStart0 = larutil::Geometry::GetME()->NearestWire( Start0, Pl0); }
     catch ( ::larutil::LArUtilException &e) {
       std::cout << e.what() << std::endl;
       std::cout << "Exception caught!" << std::endl;
-      WireStart1 = 9999;
+      WireStart0 = 9999;
       }
-    try { WireStart2 = larutil::Geometry::GetME()->NearestChannel( Start2, Pl2); }
+    try { WireStart1 = larutil::Geometry::GetME()->NearestWire( Start1, Pl1); }
     catch ( ::larutil::LArUtilException &e ) {
       std::cout << e.what() << std::endl;
       std::cout << "Exception caught!" << std::endl;
-      WireStart1 = 9999;
+      WireStart0 = 9999;
       }
-    try { WireStart3 = larutil::Geometry::GetME()->NearestChannel( Start3, Pl3); }
+    try { WireStart2 = larutil::Geometry::GetME()->NearestWire( Start2, Pl2); }
     catch ( ::larutil::LArUtilException &e) {
       std::cout << e.what() << std::endl;
       std::cout << "Exception caught!" << std::endl;
-      WireStart1 = 9999;
+      WireStart0 = 9999;
       }
 
     //Now Get Hit-Range for Clusters
-    std::vector<larutil::PxHit> hits1 = clusters.at(0)->GetHitVector();
-    std::vector<larutil::PxHit> hits2 = clusters.at(1)->GetHitVector();
-    std::vector<larutil::PxHit> hits3 = clusters.at(2)->GetHitVector();
+    std::vector<larutil::PxHit> hits0 = clusters.at(0)->GetHitVector();
+    std::vector<larutil::PxHit> hits1 = clusters.at(1)->GetHitVector();
+    std::vector<larutil::PxHit> hits2 = clusters.at(2)->GetHitVector();
     //define variables for min/max time/wire of each cluster
-    double minWire1, minWire2, minWire3 = 99999;
-    double maxWire1, maxWire2, maxWire3 = 0;
-    double minTime1, minTime2, minTime3 = 99999;
-    double maxTime1, maxTime2, maxTime3 = 0;
+    double minWire0 = 9999;
+    double minWire1 = 9999;
+    double minWire2 = 9999;
+    double maxWire0 = 0;
+    double maxWire1 = 0;
+    double maxWire2 = 0;
+    double minTime0 = 9999;
+    double minTime1 = 9999;
+    double minTime2 = 9999;
+    double maxTime0 = 0;
+    double maxTime1 = 0;
+    double maxTime2 = 0;
     int hitWireTMP = 0;
     double hitTimeTMP = 0;
+
+    for (auto& h: hits0){
+      hitWireTMP = int(h.w/_w2cm);
+      hitTimeTMP = int(h.t/_t2cm);
+      if ( hitWireTMP < minWire0 ) { minWire0 = hitWireTMP; }
+      if ( hitWireTMP > maxWire0 ) { maxWire0 = hitWireTMP; }
+      if ( hitTimeTMP < minTime0 ) { minTime0 = hitTimeTMP; }
+      if ( hitTimeTMP > maxTime0 ) { maxTime0 = hitTimeTMP; }
+    }
     for (auto& h: hits1){
       hitWireTMP = int(h.w/_w2cm);
       hitTimeTMP = int(h.t/_t2cm);
@@ -124,47 +147,61 @@ namespace cmtool {
       if ( hitTimeTMP < minTime2 ) { minTime2 = hitTimeTMP; }
       if ( hitTimeTMP > maxTime2 ) { maxTime2 = hitTimeTMP; }
     }
-    for (auto& h: hits3){
-      hitWireTMP = int(h.w/_w2cm);
-      hitTimeTMP = int(h.t/_t2cm);
-      if ( hitWireTMP < minWire3 ) { minWire3 = hitWireTMP; }
-      if ( hitWireTMP > maxWire3 ) { maxWire3 = hitWireTMP; }
-      if ( hitTimeTMP < minTime3 ) { minTime3 = hitTimeTMP; }
-      if ( hitTimeTMP > maxTime3 ) { maxTime3 = hitTimeTMP; }
-    }
 
     if ( _verbose ){
-      std::cout << "Wire Start Numbers: " << std::endl;
-      std::cout << "\t" << startWire1 << std::endl;
-      std::cout << "\t" << startWire2 << std::endl;
-      std::cout << "\t" << startWire3 << std::endl;
+      std::cout << "Start W,T on plane 0: " << "[ " << startWirecm0 << ", " << startTimecm0 << " ]" << std::endl;
+      std::cout << "Start Wire, planne 0: " << startWire0 << std::endl;
+      std::cout << "Start W,T on plane 1: " << "[ " << startWirecm1 << ", " << startTimecm1 << " ]" << std::endl;
+      std::cout << "Start Wire, planne 1: " << startWire1 << std::endl;
+      std::cout << "Start W,T on plane 2: " << "[ " << startWirecm2 << ", " << startTimecm2 << " ]" << std::endl;
+      std::cout << "Start Wire, planne 2: " << startWire2 << std::endl;
+      std::cout << std::endl;
+      std::cout << "Start Reco Point from clusters on planes 1 and 2 (Z,Y):" << std::endl
+		<< "[ " << zS12 << ", " << yS12 << " ]" << std::endl;
+      std::cout << "Nearest wire on Pl0 to reco-start point from Pl1, Pl2:" << std::endl
+		<<  WireStart0 << std::endl;
+      std::cout << "Min-Max Wire for Hits from Cluster on Plane 0:" << std::endl
+		<< "[ " << minWire0 << ", " << maxWire0 << " ]" << std::endl;
+      std::cout << "Start Reco Point from clusters on planes 0 and 2 (Z,Y):" << std::endl
+		<< "[ " << zS02 << ", " << yS02 << " ]" << std::endl;
+      std::cout << "Nearest wire on Pl1 to reco-start point from Pl0, Pl2:" << std::endl
+		<<  WireStart1 << std::endl;
+      std::cout << "Min-Max Wire for Hits from Cluster on Plane 1:" << std::endl
+		<< "[ " << minWire1 << ", " << maxWire1 << " ]" << std::endl;
+      std::cout << "Start Reco Point from clusters on planes 0 and 1 (Z,Y):" << std::endl
+		<< "[ " << zS01 << ", " << yS01 << " ]" << std::endl;
+      std::cout << "Nearest wire on Pl2 to reco-start point from Pl0, Pl1:" << std::endl
+		<<  WireStart2 << std::endl;
+      std::cout << "Min-Max Wire for Hits from Cluster on Plane 2:" << std::endl
+		<< "[ " << minWire2 << ", " << maxWire2 << " ]" << std::endl;
       std::cout << std::endl;
     }
-
-    if ( _verbose ){
-      std::cout << "Intersection Pl1-Pl3: ( " << yS13 << ", " << zS13 << " )" << std::endl;  
-      std::cout << "Intersection Pl1-Pl2: ( " << yS12 << ", " << zS12 << " )" << std::endl;  
-      std::cout << "Intersection Pl2-Pl3: ( " << yS23 << ", " << zS23 << " )" << std::endl;  
-    }
-
     //Parameter used for evaluation is whether the start-point of any reconstructed start point from 2 planes
     //is in the start-end time-wire range of the other plane's cluster
-    double compat = -1;
+    double compat = 9999;
+    double retVal = -1;
 
+    if ( (WireStart0 > minWire0) and (WireStart0 < maxWire0) ){
+      if ( std::min( (WireStart0-minWire0) , (maxWire0-WireStart0) ) < compat ){
+	compat = std::min( (WireStart0-minWire0) , (maxWire0-WireStart0) );
+      }
+    }
     if ( (WireStart1 > minWire1) and (WireStart1 < maxWire1) ){
-      if (_verbose) { std::cout << "Plane 1 Match!" << std::endl; }
-      compat = 1;
+      if ( std::min( (WireStart0-minWire0) , (maxWire0-WireStart0) ) < compat ){
+	compat = std::min( (WireStart0-minWire0) , (maxWire0-WireStart0) );
+      }
     }
     if ( (WireStart2 > minWire2) and (WireStart2 < maxWire2) ){
-      if (_verbose) { std::cout << "Plane 2 Match!" << std::endl; }
-      compat = 1;
-    }
-    if ( (WireStart3 > minWire3) and (WireStart3 < maxWire3) ){
-      if (_verbose) { std::cout << "Plane 3 Match!" << std::endl; }
-      compat = 1;
+      if ( std::min( (WireStart0-minWire0) , (maxWire0-WireStart0) ) < compat ){
+	compat = std::min( (WireStart0-minWire0) , (maxWire0-WireStart0) );
+      }
     }
 
-    return compat;
+    if ( compat != 9999 )
+      retVal = 1./compat;
+
+    return retVal;
+
   }
 
   //------------------------------

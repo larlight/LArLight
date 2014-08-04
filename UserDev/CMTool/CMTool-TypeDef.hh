@@ -55,6 +55,7 @@
 #include "CFAlgoZOverlap.hh"
 #include "CFAlgoStartPointMatch.hh"
 #include "CFAlgoStartPointCompat.hh"
+#include "CFAlgoStartTimeCompat.hh"
 #include "CFAlgo3DAngle.hh"
 //ADD_CFALGO_HEADER
 
@@ -120,6 +121,7 @@ namespace cmtool {
   class CFAlgoZOverlap;
   class CFAlgoStartPointMatch;
   class CFAlgoStartPointCompat;
+  class CFAlgoStartTimeCompat;
   class CFAlgo3DAngle;
 //ADD_CFALGO_CLASS ... do not change this comment line
 
