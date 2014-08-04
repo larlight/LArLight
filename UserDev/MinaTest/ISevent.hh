@@ -34,8 +34,15 @@ public:
   /// Default destructor
   virtual ~ISevent(){};
 
-  void clear() {std::vector<ISstep>::clear(); }
+  void SetEventID(int id) { EventID = id;}
+  int  fEventID() const { return EventID; }
 
+  void clear() { EventID = -1; std::vector<ISstep>::clear(); }
+
+private:
+  
+  int EventID;
+  
   ClassDef(ISevent,1);
 
 };

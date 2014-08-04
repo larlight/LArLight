@@ -20,8 +20,12 @@ class MinaTestPhoton;
 class MinaTestParticle;
   class ISevent;
   class ISstep;
+  class ReflectivityStep;
+  class ReflectivityEvent;
 //ADD_EMPTY_CLASS ... do not change this comment line
 
 #endif
+
+
 
 
