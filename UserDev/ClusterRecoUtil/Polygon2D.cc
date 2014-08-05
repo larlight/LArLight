@@ -205,3 +205,38 @@ bool Polygon2D::Contained(const Polygon2D &poly2) const
   return true;
 
 }
+
+
+//*****************************************************
+void Polygon2D::UntanglePolygon()
+{
+
+  //loop over edges
+  for ( unsigned int i=0; i < vertices.size()-1; i++){
+    double Ax = vertices.at(i).first;
+    double Ay = vertices.at(i).second;
+    double Bx = vertices.at(i+1).first;
+    double By = vertices.at(i+1).second;
+    //loop over edges that have not been checked yet
+    for (unsigned int j=i+2; j < vertices.size()-1; j++){
+      //avoid consecutive segments
+      if ( vertices.at(i) == vertices.at(j+1) )
+	continue;
+      else{
+	double Cx = vertices.at(j).first;
+	double Cy = vertices.at(j).second;
+	double Dx = vertices.at(j+1).first;
+	double Dy = vertices.at(j+1).second;
+
+	if ( SegmentOverlap( Ax, Ay, Bx, By, Cx, Cy, Dx, Dy ) ){
+	  std::pair<float, float> tmp = vertices.at(i+1);
+	  vertices.at(i+1) = vertices.at(j);
+	  vertices.at(j) = tmp;
+	  //swapped polygon, now do recursion to make sure
+	  this->UntanglePolygon();
+	}//if crossing
+      }
+    }//second loop
+  }//first loop
+
+}

@@ -72,6 +72,8 @@
 #pragma link C++ class cmtool::CFAlgoStartPointCompat+;
 #pragma link C++ class cmtool::CFAlgoStartTimeCompat+;
 #pragma link C++ class cmtool::CFAlgo3DAngle+;
+#pragma link C++ class cmtool::CFAlgoWireOverlap+;
+#pragma link C++ class cmtool::CFAlgoVolumeOverlap+;
 //ADD_CFALGO_CLASS ... do not change this line
 
 
