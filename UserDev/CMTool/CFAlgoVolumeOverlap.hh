@@ -1,9 +1,9 @@
 /**
- * \file CFAlgoStartPointCompat.hh
+ * \file CFAlgoVolumeOverlap.hh
  *
  * \ingroup CMTool
  * 
- * \brief Class def header for a class CFAlgoStartPointCompat
+ * \brief Class def header for a class CFAlgoVolumeOverlap
  *
  * @author david_NAME
  */
@@ -11,27 +11,28 @@
 /** \addtogroup CMTool
 
     @{*/
-#ifndef CFALGOSTARTPOINTCOMPAT_HH
-#define CFALGOSTARTPOINTCOMPAT_HH
+#ifndef CFALGOVOLUMEOVERLAP_HH
+#define CFALGOVOLUMEOVERLAP_HH
 
 #include "CFloatAlgoBase.hh"
 #include <math.h>
+#include "Polygon2D.hh"
 
 namespace cmtool {
   /**
-     \class CFAlgoStartPointCompat
+     \class CFAlgoVolumeOverlap
      User implementation for CFloatAlgoBase class
      doxygen documentation!
   */
-  class CFAlgoStartPointCompat : public CFloatAlgoBase {
+  class CFAlgoVolumeOverlap : public CFloatAlgoBase {
     
   public:
     
     /// Default constructor
-    CFAlgoStartPointCompat();
+    CFAlgoVolumeOverlap();
     
     /// Default destructor
-    virtual ~CFAlgoStartPointCompat(){};
+    virtual ~CFAlgoVolumeOverlap(){};
 
     //
     // Author should be aware of 3 functions at least: Float, Report, 
@@ -60,8 +61,7 @@ namespace cmtool {
   private:
 
     double _w2cm, _t2cm;
-    double _MaxArea;
-    bool _verbose;
+    bool   _verbose;
   };
 
 

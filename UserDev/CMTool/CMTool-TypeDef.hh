@@ -55,7 +55,10 @@
 #include "CFAlgoZOverlap.hh"
 #include "CFAlgoStartPointMatch.hh"
 #include "CFAlgoStartPointCompat.hh"
+#include "CFAlgoStartTimeCompat.hh"
 #include "CFAlgo3DAngle.hh"
+#include "CFAlgoWireOverlap.hh"
+#include "CFAlgoVolumeOverlap.hh"
 //ADD_CFALGO_HEADER
 
 #include "MatchViewer.hh"
@@ -120,7 +123,10 @@ namespace cmtool {
   class CFAlgoZOverlap;
   class CFAlgoStartPointMatch;
   class CFAlgoStartPointCompat;
+  class CFAlgoStartTimeCompat;
   class CFAlgo3DAngle;
+  class CFAlgoWireOverlap;
+  class CFAlgoVolumeOverlap;
 //ADD_CFALGO_CLASS ... do not change this comment line
 
 }

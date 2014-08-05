@@ -1,9 +1,9 @@
 /**
- * \file CFAlgoStartPointCompat.hh
+ * \file CFAlgoStartTimeCompat.hh
  *
  * \ingroup CMTool
  * 
- * \brief Class def header for a class CFAlgoStartPointCompat
+ * \brief Class def header for a class CFAlgoStartTimeCompat
  *
  * @author david_NAME
  */
@@ -11,27 +11,27 @@
 /** \addtogroup CMTool
 
     @{*/
-#ifndef CFALGOSTARTPOINTCOMPAT_HH
-#define CFALGOSTARTPOINTCOMPAT_HH
+#ifndef CFALGOSTARTTIMECOMPAT_HH
+#define CFALGOSTARTTIMECOMPAT_HH
 
 #include "CFloatAlgoBase.hh"
 #include <math.h>
 
 namespace cmtool {
   /**
-     \class CFAlgoStartPointCompat
+     \class CFAlgoStartTimeCompat
      User implementation for CFloatAlgoBase class
      doxygen documentation!
   */
-  class CFAlgoStartPointCompat : public CFloatAlgoBase {
+  class CFAlgoStartTimeCompat : public CFloatAlgoBase {
     
   public:
     
     /// Default constructor
-    CFAlgoStartPointCompat();
+    CFAlgoStartTimeCompat();
     
     /// Default destructor
-    virtual ~CFAlgoStartPointCompat(){};
+    virtual ~CFAlgoStartTimeCompat(){};
 
     //
     // Author should be aware of 3 functions at least: Float, Report, 
@@ -57,11 +57,14 @@ namespace cmtool {
     /// Function to set verbose output
     void SetVerbose( bool on ) { _verbose = on; }
 
+    /// Function to set verbose output
+    void SetTimeDist( double t ) { _timeDist = t; }
+
   private:
 
     double _w2cm, _t2cm;
-    double _MaxArea;
-    bool _verbose;
+    bool   _verbose;
+    double _timeDist; // Max separation in time between start points [cm]
   };
 
 
