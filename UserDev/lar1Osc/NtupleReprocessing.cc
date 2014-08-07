@@ -168,11 +168,14 @@ namespace lar1{
     std::cout << "input file: " << InFile().Remove(InFile().Length()-5) << std::endl;
     // TString sample = "ccinc";
     // if( ccqe_only ) sample = "ccqe";
+
+   // TString outfile = InFile().ReplaceAll("lar1","users/andrzejs").Remove(InFile().Length()-5) + "_processed_";
     TString outfile = InFile().Remove(InFile().Length()-5) + "_processed_";
     // if (iDet == 5) outfile += "MB_";
     // if (iDet == 4) outfile += "IC_";
     // if (iDet == 6) outfile += "IC_600_";
     // if (iDet == 7) outfile += "IC_800_";
+
     if (scale != 1.0) {
       outfile += "scale_";
       outfile += scale;
@@ -196,6 +199,8 @@ namespace lar1{
     utils.GetDetBoundary(iDet, xmin, xmax, ymin, ymax, zmin, zmax);
 
     double ElectContainedDist = 0;
+    double ElectDistToStart = 0;
+    double ElectDistToStartYZ = 0;
     //===========================================================
     // This is all of the information that winds up in the tree, 
     // which is in turn what the sensitivity code gets.
@@ -266,7 +271,8 @@ namespace lar1{
     newt->Branch("LepE", &Elep, "LepE/D");
     newt->Branch("LepESmeared", &ElepSmeared, "LepESmeared/D");
     newt->Branch("ElectContainedDist",&ElectContainedDist,"ElectContainedDist/D");
-
+     newt->Branch("ElectDistToStart",&ElectDistToStart,"ElectDistToStart/D");
+      newt->Branch("ElectDistToStartYZ",&ElectDistToStartYZ,"ElectDistToStartYZ/D");
     //------------------------------------------------------------------
     // These are new variables that get added at the reprocessing stage
 
@@ -433,6 +439,9 @@ namespace lar1{
     TH1D *numuCC = new TH1D("NumuCC","NumuCC;Generated Neutrino Energy (GeV);Events",ebins,emin,emax);
     TH1D *numuElec = new TH1D("NumuElec","NumuElec;Generated Neutrino Energy (GeV);Events",ebins,emin,emax);
 
+    TH1D *nueTotal = new TH1D("NueTrueEnergy","NueTrueEnergy;Generated Neutrino Energy (GeV);Events",ebins,emin,emax);
+   
+    
     nueFromMuonDecay->SetFillColor(29);
     nueFromK0Decay->SetFillColor(32);
     nueFromKPlusDecay->SetFillColor(30);
@@ -460,6 +469,8 @@ namespace lar1{
     TH1D *numuCCLepE = new TH1D("NumuCCLepE", "NumuCCLepE;Muon Energy (GeV);Events",20*ebins,emin,emax);
     TH1D *numuElecLepE = new TH1D("NumuElecLepE","NumuElecLepE;Generated Neutrino Energy (GeV);Events",20*ebins,emin,emax);
 
+     TH1D *lepTotal = new TH1D("LepTrueEnergy","LepTrueEnergy;Generated Lepton Energy (GeV);Events",5*ebins,emin,emax);
+    
     nueFromMuonDecayLepE->SetFillColor(29);
     nueFromK0DecayLepE->SetFillColor(32);
     nueFromKPlusDecayLepE->SetFillColor(30);
@@ -567,12 +578,33 @@ namespace lar1{
     MuonEnergy -> SetFillColor(32);
 
     TH1D * ProtonMultiplicity = new TH1D("ProtonMultiplicity", "Proton Multiplicity (21MeV KE Threshold)", 5, 0, 5);
+    TH1D * PionMultiplicity = new TH1D("PionMultiplicity", "Pion Multiplicity (21MeV KE Threshold)", 5, 0, 5);
+    TH1D * TotalMultiplicity = new TH1D("TotalMultiplicity", "Total Multiplicity (21MeV KE Threshold)", 8, 0, 8);
     TH1D * ProtonMomentum = new TH1D("ProtonMomentum", "Proton Momentum (21 MeV KE Threshold)",120,0,3);
 
     TH2D * elecAngleVsEnergy = new TH2D("ElectronAngleVsEnergy",
-                                        "ElectronAngleVsEnergy;Electron Energy (GeV);Electron Angle (Rad)",
+                                        "ElectronAngleVsEnergy;Electron Energy (GeV);Angle (Deg)",
                                         ebins,emin,emax,30,0,180);
 
+    TH2D * elecMultipleVsEnergy = new TH2D("MultiplicityVsEnergy",
+                                        "MultiplicityVsEnergy;Electron Energy (GeV);Multiplicity",
+                                        ebins,emin,emax,7,0,7);
+    
+    TH1D  * ElectDistToStartHist =new TH1D("ElectDistToStart","ElectDistToStart",150,0,1100);
+    TH1D  * ElectDistToStartHistTop =new TH1D("ElectDistToStartTop","ElectDistToStartTop",150,0,1100);
+    TH1D  * ElectDistToStartHistBottom =new TH1D("ElectDistToStartBottom","ElectDistToStartBottom",150,0,1100);
+    
+    TH2D  * ElectDistToStartvsY =new TH2D("ElectDistToStartvsY","ElectDistToStart;Vertical Position",75,0,1100,24,-120,120);
+    
+    TH1D  * ElectDistToStartYZHist =new TH1D("ElectDistToStartYZ","ElectDistToStartYZ",150,0,1100);
+    TH1D  * ElectDistToStartYZHistTop =new TH1D("ElectDistToStartYZTop","ElectDistToStartYZTop",150,0,1100);
+    TH1D  * ElectDistToStartYZHistBottom =new TH1D("ElectDistToStartYZBottom","ElectDistToStartYZBottom",150,0,1100);
+    
+    TH2D  * ElectDistToStartYZvsY =new TH2D("ElectDistToStartYZvsY","ElectDistToStartYZ;Vertical Position",75,0,1100,24,-120,120);
+    
+    
+    
+    
     TH2D *photonCCQE = new TH2D("PhotonCCQE","PhotonCCQE;CCQE Energy (GeV);Photon Energy (GeV)",ebins,emin,emax,20*ebins,emin,emax);
     TH1D *EMShowers = new TH1D("EMShowers","EMShowers;Number of Showers in Event;Number of Events",6,-1,5);
     TH2D *CcqeVsTrueE = new TH2D("CcqeVsTrueE","CcqeVsTrueE;Generated Neutrino Energy (GeV);CCQE Energy (GeV)",30,0,3,30,0,3);
@@ -625,7 +657,8 @@ namespace lar1{
       enucalo1 = 0.0;
       enucalo2 = 0.0;
       ElectContainedDist = -1;
-      
+      ElectDistToStart = -1;
+      ElectDistToStartYZ = -1;
       // Calculate the FS lepton's 4-vector and return neutrino path length
       nuleng = CalcLepton( detect_dist );
 
@@ -757,8 +790,13 @@ namespace lar1{
           TVector3 vertex(Vx, Vy, Vz);
           TVector3 lepDir(LepPx, LepPy, LepPz);
           ElectContainedDist = utils.GetContainedLength(vertex, lepDir, iDet);
-
+          ElectDistToStart = utils.GetLengthToStart(vertex, lepDir, iDet);
+	  ElectDistToStartYZ = utils.GetYZLengthToStart(vertex, lepDir, iDet);
           electron_cand_energy = Elep;
+	  lepTotal->Fill(Elep,wgt);
+	  nueTotal->Fill(enugen,wgt);
+    
+	  
           electron_cand_angle = ThetaLep;
           enuccqe = utils.NuEnergyCCQE( 1000*electron_cand_energy, sqrt(pow(1000*electron_cand_energy,2) - pow(0.511,2)), 
                 electron_cand_angle, 0.511, iflux )/1000.0;
@@ -813,6 +851,8 @@ namespace lar1{
           if (!detNeutrinos && inno > 0) wgt = 0.0;
           if (!detAntiNeutrinos && inno < 0) wgt = 0.0;
           electron_cand_energy = Elep;
+	  lepTotal->Fill(Elep,wgt);
+	  nueTotal->Fill(enugen,wgt);
           electron_cand_angle = ThetaLep;
           enuccqe = utils.NuEnergyCCQE( 1000*electron_cand_energy, sqrt(pow(1000*electron_cand_energy,2) - pow(0.511,2)), 
                 electron_cand_angle, 0.511, iflux )/1000.0;
@@ -825,12 +865,31 @@ namespace lar1{
           TVector3 vertex(Vx, Vy, Vz);
           TVector3 lepDir(LepPx, LepPy, LepPz);
           ElectContainedDist = utils.GetContainedLength(vertex, lepDir, iDet);
-
+          ElectDistToStart = utils.GetLengthToStart(vertex, lepDir, iDet);
+	  ElectDistToStartYZ = utils.GetYZLengthToStart(vertex, lepDir, iDet);
           // Calculate the angle to z direction for the electron
           double Theta= acos(LepPz/lepDir.Mag()); 
           Theta *= 180/3.14159;
           elecAngleVsEnergy->Fill(Elep, Theta, wgt);
-
+	  
+	  if(Elep > .2) 
+	  {
+          ElectDistToStartHist->Fill(ElectDistToStart,wgt); 
+	  ElectDistToStartYZHist->Fill(ElectDistToStartYZ,wgt); 
+	  if(vertex[1]>=0){
+	    ElectDistToStartHistTop->Fill(ElectDistToStart,wgt);
+	    ElectDistToStartYZHistTop->Fill(ElectDistToStartYZ,wgt); 
+	  }
+	  else
+	    {
+            ElectDistToStartHistBottom->Fill(ElectDistToStart,wgt); 
+	    ElectDistToStartYZHistBottom->Fill(ElectDistToStartYZ,wgt); 
+	    }
+	  }
+	  
+          ElectDistToStartvsY->Fill(ElectDistToStart,vertex[1],wgt); 
+	  ElectDistToStartYZvsY->Fill(ElectDistToStartYZ,vertex[1],wgt); 
+	  
           if (ndecay < 5 && ndecay > 0){  // K0
             ibkg = 3;
             nueFromK0Decay->Fill( energy, wgt );
@@ -1043,13 +1102,21 @@ namespace lar1{
           neutron ++;
         }
       }
+  
+      int ntracks=0;
 
-
-
-      if (isCC && abs(inno) == 14 && chargedPion == 0 && neutralPion == 0){
+      if (isCC && abs(inno) == 12 && chargedPion == 0 && neutralPion == 0){
         // Fill in the info about the proton multiplicity
-        if (protonP.size() != 0) ProtonMultiplicity -> Fill(proton, fluxweight);
-        else ProtonMultiplicity -> Fill(0.0,fluxweight);
+        if (protonP.size() != 0) 
+	{ ProtonMultiplicity -> Fill(proton, fluxweight);
+	ntracks+=proton; 
+	//TotalMultiplicity-> Fill(proton, fluxweight);
+	//elecMultipleVsEnergy->Fill(proton,Elep, fluxweight);
+	}
+        else { ProtonMultiplicity -> Fill(0.0,fluxweight);
+	//TotalMultiplicity-> Fill(0.0, fluxweight);
+	}
+	PionMultiplicity ->Fill(0.0,fluxweight);
         // Fill in the proton momentum:
         for (std::vector<double>::iterator i = protonP.begin(); i != protonP.end(); ++i)
         {
@@ -1057,7 +1124,24 @@ namespace lar1{
         }
 
       }
+      else if(isCC && abs(inno) == 12 && chargedPion > 0 && neutralPion == 0)
+      {
+	ProtonMultiplicity -> Fill(proton, fluxweight);
+	PionMultiplicity -> Fill(chargedPion, fluxweight);
+// 	elecMultipleVsEnergy->Fill(proton,Elep, fluxweight);
+// 	elecMultipleVsEnergy->Fill(chargedPion,Elep, fluxweight);
+// 	TotalMultiplicity-> Fill(proton, fluxweight);
+// 	TotalMultiplicity-> Fill(chargedPion, fluxweight);
+	ntracks+=proton;
+	ntracks+=chargedPion;
+	
+      }
 
+      if(isCC && abs(inno) == 12 && neutralPion == 0 )
+      {
+      TotalMultiplicity-> Fill(ntracks, fluxweight);
+      elecMultipleVsEnergy->Fill(Elep,ntracks, fluxweight);
+      }
       //Now set the channel:
       if (isCC) iChan = 1000;
       else if (!isCC) iChan = 2000;
@@ -1230,6 +1314,8 @@ namespace lar1{
           // std::cout << "photonPos is (" << photonPos.X() << ", " << photonPos.Y() << ", " << photonPos.Z() << ")\n";
           // std::cout << "photonMom is (" << photonMom.X() << ", " << photonMom.Y() << ", " << photonMom.Z() << ")\n";
           ElectContainedDist = utils.GetContainedLength(photonPos, photonMom, iDet);
+	  ElectDistToStart = utils.GetLengthToStart(photonPos, photonMom, iDet);
+	   ElectDistToStartYZ = utils.GetYZLengthToStart(photonPos, photonMom, iDet);
           if (verbose) std::cout << "The contained length of this shower is " << ElectContainedDist << std::endl;
           // if( !(isFid && utils.VertexEnergy( geniePDG, genieE ) > vtxEcut && photonConvDist > convDistCut) || !isFid ){  // >25 MeV vtx energy and 5cm separation
 

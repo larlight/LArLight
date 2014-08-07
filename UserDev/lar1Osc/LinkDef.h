@@ -17,5 +17,7 @@
 #pragma link C++ class lar1Osc+;
 
 
+#pragma link C++ class testphots+;
 //ADD_NEW_CLASS ... do not change this line
 #endif /* __CINT__ */
+
