@@ -27,13 +27,20 @@ Either way, you can access the data with the GetData() and GetDataOsc() methods.
 
  */
 namespace lar1{
+
+  // enum MWSource {kUnisim, kPiMinus, kPiPlus, kKaon0, kKMinus, kKPlus, kTotal};
+
+
   class NtupleReader
   {
+
+
+
   public:
     NtupleReader();
     NtupleReader( std::string signal,
                   std::string path,
-                  int baseline,
+                  std::string baseline,
                   std::string beammode,
                   std::string energy,
                   int npoints,
@@ -44,6 +51,8 @@ namespace lar1{
     std::vector<std::vector<float > > GetDataOsc() const;
     std::vector<float> GetVectorFromTree(char * branchName, char * treeName = NULL, bool osc = false) const;
 
+    std::vector<std::vector< float> > GetMultiWeightData() const;
+    std::vector<std::vector<std::vector<float> > > GetMultiWeightDataOsc() const;
     //return 0 on successful completion.  Return >0 if failure.
     /* Error codes I'm using...
     1:  Unknown "mode", has to be a string that is "nu" or "nubar"
@@ -59,15 +68,18 @@ namespace lar1{
     void setSignal(std::string);
     void setPath(std::string);
     void setBeammode(std::string);
-    void setBaseline(int);
+    void setBaseline(std::string);
     void setForceRemake(bool);
     void setEnergy(std::string);
     void setNpoints(int);
+    void setNWeights(int);
     void setScale(double);
     void setSpecialNameText(std::string s);
     void setSpecialNameTextOsc(std::string s);
     void setContainedShowers(double d = 150);
+    void useMultiWeights(bool b = true, bool b_signal = false, int multiWeightSource = 6);
 
+    void setAbsolute_MWSource(bool b){absolute_MWSource = b;}
 
     int LoopNue();
     int LoopNumu();
@@ -83,12 +95,19 @@ namespace lar1{
 
     std::string signal;
     TString path;
-    int baseline;
+    std::string baseline;
     std::string beammode;
     bool forceRemake;
     std::vector<float> bins;
     std::string energy;
     int npoints;
+
+    int multiWeightSource;
+    bool absolute_MWSource;
+
+    bool usingMultiWeights;
+    bool usingSignalMultiWeights;
+
 
 
     std::string specialNameText;
@@ -111,9 +130,18 @@ namespace lar1{
     bool remakeHists() const;
     bool remakeHistsOsc() const;
 
+    int nWeights;
+
     /* data */
     std::vector<float> data;
     std::vector<std::vector<float> > dataOsc;
+
+    // std::vector<float> dataNumu;
+
+    std::vector<std::vector< float> > multiWeightData;
+    // std::vector<std::vector< float> > multiWeightDataNumu;
+    std::vector<std::vector<std::vector<float> > > multiWeightDataOsc;
+
   };
 }
 
@@ -121,11 +149,11 @@ inline void lar1::NtupleReader::setBins(std::vector<float> input_bins)  { bins =
 inline void lar1::NtupleReader::setSignal(std::string input_signal)     { signal = input_signal;}
 inline void lar1::NtupleReader::setPath(std::string input_path)         { path = input_path;}
 inline void lar1::NtupleReader::setBeammode(std::string input_beammode) { beammode = input_beammode;}
-inline void lar1::NtupleReader::setBaseline(int input_baseline)         { baseline = input_baseline;}
+inline void lar1::NtupleReader::setBaseline(std::string input_baseline) { baseline = input_baseline;}
 inline void lar1::NtupleReader::setForceRemake(bool input_forceRemake)  { forceRemake = input_forceRemake;}
 inline void lar1::NtupleReader::setEnergy(std::string input_energy)     { energy = input_energy;}
 inline void lar1::NtupleReader::setNpoints(int input_Npoints)           { npoints = input_Npoints;}
-
+inline void lar1::NtupleReader::setNWeights(int input_NWeights)         { nWeights = input_NWeights;}
 
 
 

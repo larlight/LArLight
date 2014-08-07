@@ -120,7 +120,7 @@ namespace lar1{
     leg3->AddEntry(gdummy1,"LSND 99% CL","F");
     leg3->AddEntry(gdummy3,"LSND Best Fit","P*");
     leg3->AddEntry(gdummy4,"Global Best Fit","P*");
-    leg3->AddEntry(gdummy0,"Global Fit 90% CL (J. Kopp et al. arXiv:1303.3011)");
+    leg3->AddEntry(gdummy0,"Global Fit 90% CL (arXiv:1303.3011)");
 
     return leg3;
 
@@ -146,11 +146,13 @@ namespace lar1{
     TH2D* hr1=new TH2D("hr1","hr1",500,sin22thmin,sin22thmax,500,dm2min,dm2max);
     hr1->Reset();
     hr1->SetFillColor(0);
-    hr1->SetTitle(";sin^{2}2#theta_{#mue};#Deltam^{2} (eV^{2})");
+    hr1->SetTitle(";sin^{2}2#theta_{#mue};#Deltam^{2}_{41} (eV^{2})");
     hr1->GetXaxis()->SetTitleOffset(1.1);
     hr1->GetYaxis()->SetTitleOffset(1.2);
     hr1->GetXaxis()->SetTitleSize(0.05);
     hr1->GetYaxis()->SetTitleSize(0.05);
+    hr1->GetXaxis()->CenterTitle();
+    hr1->GetYaxis()->CenterTitle();
     hr1->SetStats(kFALSE);
     return hr1;
   }

@@ -8,7 +8,7 @@ namespace lar1{
     //See up all the default arguments:
     signal = "nue";
     path = "../ntuples/";
-    baseline = 470;
+    baseline = "470";
     beammode = "nu";
     forceRemake = false;
     energy = "true";
@@ -18,14 +18,19 @@ namespace lar1{
     scale = 1;
     specialNameText = "";
 
+    usingMultiWeights = false;
+    absolute_MWSource = false;
+    usingSignalMultiWeights = false;
+    nWeights = 1000;
+
     showerContainmentDist = -999;
 
     std::vector<float> defaultBins;
 
     // Default to 10 equal length bins from 0.2 GeV to 3 GeV:
-    double emin = 0.2;
+    double emin = 0.0;
     double emax = 3.0;
-    double nbins = 10.0;
+    double nbins = 120.0;
     double binSize = (emax - emin)/nbins;
     defaultBins.resize(nbins+1);
     for (double i = 0; i <= nbins; i++) {
@@ -38,7 +43,7 @@ namespace lar1{
 
   NtupleReader::NtupleReader( std::string input_signal,
                               std::string input_path,
-                              int input_baseline,
+                              std::string input_baseline,
                               std::string input_beammode,
                               std::string input_energy,
                               int input_npoints,
@@ -59,11 +64,16 @@ namespace lar1{
     scale = 1;
     specialNameText = "";
 
+    usingMultiWeights = false;
+    absolute_MWSource = false;
+    usingSignalMultiWeights = false;
+    nWeights = 1000;
+
     std::vector<float> defaultBins;
     // Default to 10 equal length bins from 0.2 GeV to 3 GeV:
-    double emin = 0.2;
+    double emin = 0.0;
     double emax = 3.0;
-    double nbins = 10.0;
+    double nbins = 120.0;
     double binSize = (emax - emin)/nbins;
     defaultBins.resize(nbins+1);
     for (double i = 0; i <= nbins; i++) {
@@ -71,6 +81,24 @@ namespace lar1{
     }
     setBins(defaultBins);
 
+  }
+  void lar1::NtupleReader::useMultiWeights(bool b, bool signal_b, int this_multiWeightSource)
+  {
+    usingMultiWeights = b;
+    usingSignalMultiWeights = signal_b;
+    multiWeightSource = this_multiWeightSource;
+    multiWeightData.resize(nWeights);
+    multiWeightDataOsc.resize(nWeights);
+    for (int i = 0; i < nWeights; ++i)
+    {
+      multiWeightData[i].resize(bins.size());
+      multiWeightDataOsc[i].resize(npoints);
+      for (int j = 0; j < npoints; ++j)
+      {
+        multiWeightDataOsc[i][j].resize(bins.size());
+      }
+    }
+    return;
   }
 
   void NtupleReader::setScale(double input_scale){
@@ -109,17 +137,29 @@ namespace lar1{
 
   }
 
+std::vector<std::vector< float> > NtupleReader::GetMultiWeightData() const{
+  return multiWeightData;
+}
+std::vector<std::vector<std::vector<float> > > NtupleReader::GetMultiWeightDataOsc() const{
+  return multiWeightDataOsc;
+}
+
+
+
   bool NtupleReader::fileExists(const char *filename) const{
     ifstream ifile(filename);
     return ifile.is_open();
   }
+
+
+
 
   void NtupleReader::buildFileNameSource() {
 
     //Need to make the names of the files, nue and numu:
     TString Name  = "combined_ntuple_";
     Name += baseline;
-    Name += "m_";     //"combined_ntuple_470m_"
+    Name += "_";     //"combined_ntuple_470m_"
     Name += beammode; //"combined_ntuple_470m_nu"
     fileNameSource = Name;
     fileNameSourceOsc = Name;
@@ -167,21 +207,33 @@ namespace lar1{
       fileNameHistsOsc += "_";
       fileNameHistsOsc += tempstring;
     }
-    sprintf(tempstring, "%g", emin);
-    fileNameHists += tempstring;
-    fileNameHists += "_";
-    sprintf(tempstring, "%g_", emax);
-    fileNameHists += tempstring;
+    // sprintf(tempstring, "%g", emin);
+    // fileNameHists += tempstring;
+    // fileNameHists += "_";
+    // sprintf(tempstring, "%g_", emax);
+    // fileNameHists += tempstring;
+    if (usingMultiWeights){
+      sprintf(tempstring, "%dw_%d", nWeights,multiWeightSource);
+      fileNameHists += tempstring;
+      if (absolute_MWSource)
+        fileNameHists += "_abs_";
+    }
     fileNameHists += energy;
     fileNameHists += "_hists.root";
-    fileNameHistsOsc += "_";
-    sprintf(tempstring, "%g", emin);
+
+
+    // fileNameHistsOsc += "_";
+    // sprintf(tempstring, "%g", emin);
+    // fileNameHistsOsc += tempstring;
+    // fileNameHistsOsc += "_";
+    // sprintf(tempstring, "%g", emax);
+    // fileNameHistsOsc += tempstring;
+    sprintf(tempstring, "_%dp_", npoints);
     fileNameHistsOsc += tempstring;
-    fileNameHistsOsc += "_";
-    sprintf(tempstring, "%g", emax);
-    fileNameHistsOsc += tempstring;
-    sprintf(tempstring, "_%d_", npoints);
-    fileNameHistsOsc += tempstring;
+    if (usingSignalMultiWeights){
+      sprintf(tempstring, "%dw_%d", nWeights,multiWeightSource);
+      fileNameHistsOsc += tempstring;
+    }
     fileNameHistsOsc += energy;
     fileNameHistsOsc += "_hists.root";
 
@@ -200,7 +252,7 @@ namespace lar1{
 
     if (bins.size() == 0 || bins.size() == 1){
       std::cout << "NtupleReader: Error: not enough bins." <<std::endl;
-      return 6;
+      exit(6);
     }
 
     buildFileNameSource();
@@ -211,7 +263,7 @@ namespace lar1{
       std::cout << "NtupleReader: Error: No input file found.  Searched for: " <<std::endl;
       std::cout << "\t" << fileNameSource <<std::endl;
       std::cout << "\tIn: " << filePath << std::endl;
-      return 2;
+      exit(2);
     }
     SourceFound = fileExists(filePath+fileNameSourceOsc);
 
@@ -219,7 +271,7 @@ namespace lar1{
       std::cout << "NtupleReader: Error: No input file found.  Searched for: " <<std::endl;
       std::cout << "\t" << fileNameSourceOsc <<std::endl;
       std::cout << "\tIn: " << filePath << std::endl;
-      return 2;
+      exit(2);
     }
 
     //If the code gets to this point, there is an input!
@@ -264,20 +316,20 @@ namespace lar1{
       if (!UpToDate(filePath+fileNameSourceOsc,filePath+fileNameHistsOsc)){
         int val(0);
         if (signal == "nue") val = LoopNueOsc();
-        if (signal == "numu") val = LoopNumuOsc();
+        // if (signal == "numu") val = LoopNumuOsc();
         if (val != 0) return val;
       }
       else{ // Everything is good, just read in the files:
         int val(0);
         if (signal == "nue") val = ReadNueOsc();
-        if (signal == "numu") val = ReadNumuOsc();
+        // if (signal == "numu") val = ReadNumuOsc();
         if (val != 0) return val;
       }
     }
     else { // No hists file exists, make it.
       int val(0);
       if (signal == "nue") val = LoopNueOsc();
-      if (signal == "numu") val = LoopNumuOsc();
+      // if (signal == "numu") val = LoopNumuOsc();
       if (val != 0) return val;
     }
 
@@ -369,7 +421,9 @@ namespace lar1{
 
     TString dummytarget = path+fileNameSource;
     TChain *c = new TChain("EventsTot");
+    TChain *d = new TChain("EventsTot");
     Double_t fill_energy,wgt;
+    Double_t checking_wgt;
     Int_t inno,isCC,mode, ibkg;
     Double_t weight;
     Double_t Elep;
@@ -378,6 +432,7 @@ namespace lar1{
     Double_t ecalo1, ecalo2;
     Double_t ElectContainedDist;
     int nuchan;
+
 
 
     Int_t nbytes = 0,nb = 0;
@@ -390,7 +445,13 @@ namespace lar1{
     c->Add(dummytarget);
     if (c==0) return 5;
     
+    d->Reset();
+    d->Add(dummytarget);
+    if (d==0) return 5;
+    
+
     const Int_t nentries1 = Int_t(c->GetEntries());
+    // const Int_t nentries1 = 50000;
 
     std::cout<<"Input filename:\t" << dummytarget << std::endl;
     std::cout << "Number of entries at L= " << baseline << ":\t" << nentries1 << std::endl;
@@ -407,6 +468,14 @@ namespace lar1{
     c->SetBranchAddress("Ecalo1", &ecalo1);
     c->SetBranchAddress("Ecalo2", &ecalo2);
     c->SetBranchAddress("ElectContainedDist",&ElectContainedDist);
+
+    std::vector<std::vector<float> > *MultiWeight;
+    MultiWeight = 0;
+    if (usingMultiWeights) 
+      c->SetBranchAddress("MultiWeight",&MultiWeight);
+
+    d->SetBranchAddress("wgt",&checking_wgt);
+
 
     // These backgrounds are nue specific but really they're just an enumeration of ibkgs
     // Can be reused and recycled at will...
@@ -460,6 +529,17 @@ namespace lar1{
     TH1F * edistrnue     = new TH1F(Form("edistrnue%d",iHateROOTitSucksSoMuch),edistName,nbins,emin,emax);
     TH1F * eLeptonEnergy   = new TH1F(Form("eLeptonDist%d",iHateROOTitSucksSoMuch), "Distribution of lepton candidate energies.", nbins, 0.0, emax);
 
+    TH1F * eventsNueMC = new TH1F(Form("eventsNueMC%d",iHateROOTitSucksSoMuch),"MC Statistics by bin",nbins,emin,emax);
+
+    TH1F ** edistrnueMultiWeight;
+    if (usingMultiWeights)
+      edistrnueMultiWeight = new TH1F*[nWeights];
+    std::vector<std::vector<float > > edistrnueMultiWeightVec;
+    if (usingMultiWeights)
+      edistrnueMultiWeightVec.resize(nWeights);
+
+
+
     // Have the capacity to change the binning, not that I've ever used it:
     double binsArray[nbins+1];
     for (int i = 0; i < nbins+1; i ++){
@@ -478,6 +558,15 @@ namespace lar1{
     nue_kOther                   -> SetBins(nbins, binsArray);
     edistrnue                    -> SetBins(nbins, binsArray);
     eLeptonEnergy                -> SetBins(nbins, binsArray);
+    eventsNueMC                  -> SetBins(nbins, binsArray);
+
+    if (usingMultiWeights){
+      for (int i = 0; i < nWeights; ++i)
+      {
+        edistrnueMultiWeight[i] = (TH1F *)(edistrnue -> Clone());
+        edistrnueMultiWeightVec[i].resize(nbins);
+      }
+    }
 
     std::vector<float> * NueFromNueCC_muonVec = new std::vector<float>(nbins,0);
     std::vector<float> * NueFromNueCC_chargeKaonVec = new std::vector<float>(nbins,0);
@@ -490,6 +579,7 @@ namespace lar1{
     std::vector<float> * OtherVec = new std::vector<float>(nbins,0);
     std::vector<float> * edistrnueVec = new std::vector<float>(nbins,0);
     std::vector<float> * eLeptonEnergyVec = new std::vector<float>(nbins,0);
+    std::vector<float> * eventsNueMCVec = new std::vector<float>(nbins,0);
 
 
     data.resize(nbins);
@@ -501,20 +591,53 @@ namespace lar1{
 
     evtcounter = 0;
 
+
     for (ievt=0; ievt<nentries1; ievt++)
+    // for (ievt=0; ievt<50000; ievt++)
     {
-      ientry = c->LoadTree(ievt); if (ientry < 0) break; nb = c->GetEntry(ievt); nbytes += nb;
       evtcounter++;
+      ientry = d->LoadTree(ievt); if (ientry < 0) break; nb = d->GetEntry(ievt);
+      if (checking_wgt == 0){
+        // std::cout << "Skipping this event because the weight is zero." << std::endl;
+        continue;
+      }
+
+      ientry = c->LoadTree(ievt); if (ientry < 0) break; nb = c->GetEntry(ievt); nbytes += nb;
+
+      // if (ievt == 0) {
+      //   std::cout << "This is the first event, multiweight information:\n";
+      //   std::cout << "  mutliweight.size(): " << MultiWeight -> size() << std::endl;
+      //   std::cout << "  mutliweight[0].size(): " << (*MultiWeight)[0].size()<< std::endl;
+      // }
+
+      if (wgt == 0) continue;
+      if ( (ievt%10000) == 0) {
+        std::cout << "On event " << ievt << " of " << nentries1 << std::endl;
+      }
 
       if (energy == "elecCand") fill_energy = ElecCandEnergy;
       if (energy == "eccqe") fill_energy = Eccqe;
       if (energy == "ecalo1") fill_energy = ecalo1;
       if (energy == "ecalo2") fill_energy = ecalo2;
+      if (energy == "elep") fill_energy = Elep;
 
-      if (energy == "eccqe" && nuchan != 1){
+      if ( (ibkg == kNueFromNueCC_muon       || 
+            ibkg == kNueFromNueCC_chargeKaon || 
+            ibkg == kNueFromNueCC_neutKaon)  &&
+           nuchan != 1 &&
+           energy == "eccqe")
+      {
         if (inno == 12 || inno == -12)
           continue;
       }
+      // if ( (ibkg == kNueFromNueCC_muon       || 
+      //       ibkg == kNueFromNueCC_chargeKaon || 
+      //       ibkg == kNueFromNueCC_neutKaon)
+      //     && nuchan != 1)
+      // {
+      //   if (inno == 12 || inno == -12)
+      //     continue;
+      // }
       if (ibkg == kNueFromNueCC_muon       || 
           ibkg == kNueFromNueCC_chargeKaon || 
           ibkg == kNueFromNueCC_neutKaon   || 
@@ -529,7 +652,31 @@ namespace lar1{
       
       //use all the events because the weight, eff is already calculated
       weight=wgt; 
-      edistrnue->Fill(fill_energy,weight);
+      // if (!absolute_MWSource) edistrnue->Fill(fill_energy,weight);
+      if (inno == 12 || inno == -12) eventsNueMC->Fill(fill_energy);
+
+
+
+      // Now do the multiweight part
+      if (usingMultiWeights){
+        for (int i = 0; i < nWeights; ++i)
+        {
+          double mult_wgt = (*MultiWeight)[multiWeightSource][i];
+          if (absolute_MWSource){
+            if (mult_wgt != 1.0){
+              edistrnueMultiWeight[i]->Fill(fill_energy,wgt*mult_wgt);           
+              if (i == 1)
+                edistrnue->Fill(fill_energy,weight);
+            }
+          }
+          else{
+            if (i == 0) edistrnue->Fill(fill_energy,weight);
+            edistrnueMultiWeight[i]->Fill(fill_energy,wgt*mult_wgt);  
+          }
+        }
+      }
+      else edistrnue->Fill(fill_energy,weight);
+
 
       if (ibkg == kNueFromNueCC_muon      ) nue_kNueFromNueCC_muon       -> Fill(fill_energy, weight);
       if (ibkg == kNueFromNueCC_chargeKaon) nue_kNueFromNueCC_chargeKaon -> Fill(fill_energy, weight);
@@ -562,7 +709,19 @@ namespace lar1{
       (* OtherVec)[i]                   = nue_kOther          -> GetBinContent(i+1);
       (* edistrnueVec)[i]               = edistrnue           -> GetBinContent(i+1);
       (* eLeptonEnergyVec)[i]           = eLeptonEnergy       -> GetBinContent(i+1);
-      data[i]                       = edistrnue           -> GetBinContent(i+1);
+      data[i]                           = edistrnue           -> GetBinContent(i+1);
+      (*eventsNueMCVec)[i]              = eventsNueMC         -> GetBinContent(i+1);
+    }
+
+    if (usingMultiWeights){
+      for (int i = 0; i < nWeights; ++i)
+      {
+        for (int bin = 0; bin < nbins; ++bin)
+        {
+          edistrnueMultiWeightVec[i][bin] = edistrnueMultiWeight[i]->GetBinContent(bin+1);
+          multiWeightData[i][bin] = edistrnueMultiWeight[i]->GetBinContent(bin+1);
+        }
+      }
     }
 
     //Write these histograms to a file!
@@ -585,8 +744,23 @@ namespace lar1{
     t-> Branch("OtherVec", &OtherVec);
     t-> Branch("edistrnueVec", &edistrnueVec);
     t-> Branch("eLeptonEnergyVec", &eLeptonEnergyVec);
+    t-> Branch("eventsNueMCVec",&eventsNueMCVec);
+    if (usingMultiWeights){
+      for (int i = 0; i < nWeights; i ++){
+        char  name[100];
+        sprintf(name, "edistrnueMultiWeightVec_%i",i);
+        t -> Branch(name, &(edistrnueMultiWeightVec[i]));
+      }
+    }
+
 
     t->Fill();
+    if (usingMultiWeights){
+      for (int i = 0; i < nWeights; ++i)
+      {
+        edistrnueMultiWeight[i]->Write();
+      }
+    }
     edistrnue                     -> Write();
     eLeptonEnergy                 -> Write();
     nue_kNueFromNueCC_muon        -> Write();
@@ -598,6 +772,7 @@ namespace lar1{
     nue_kNueFromNumuCC            -> Write();
     nue_kDirt                     -> Write();
     nue_kOther                    -> Write();
+    eventsNueMC                   -> Write();
     t                             -> Write("tvecnue");
     delete t;
     f -> Close();
@@ -626,12 +801,32 @@ namespace lar1{
     TChain *c = new TChain("tvecnue");
     c -> Add(path+fileNameHists);
     std::vector <float>   * readInVector = 0;
+    std::vector<std::vector<float> * > multiWeightReadInVector;
+    if (usingMultiWeights) multiWeightReadInVector.resize(nWeights);
     c->SetBranchAddress("edistrnueVec",&readInVector);
+    if (usingMultiWeights){
+      for (int N_weight = 0; N_weight < nWeights; ++N_weight)
+      {
+        multiWeightReadInVector[N_weight] = 0;
+        char  name[100];
+        sprintf(name, "edistrnueMultiWeightVec_%i",N_weight);
+        c->SetBranchAddress(name,&(multiWeightReadInVector[N_weight]));
+      }
+    }
+    std::cout << "Reading in nue data, this may take a minute or two...." << std::endl;
     c-> GetEntry(0);
     data = *(readInVector);
+    if (usingMultiWeights){
+      for (int N_weight = 0; N_weight < nWeights; ++N_weight)
+      {
+        multiWeightData[N_weight] = *(multiWeightReadInVector[N_weight]);
+        delete multiWeightReadInVector[N_weight];
+      }
+    }
     delete readInVector;
     delete c;
     return 0;
+
   }
 
   int NtupleReader::LoopNueOsc(){
@@ -641,7 +836,9 @@ namespace lar1{
 
     TString dummytarget = path+fileNameSourceOsc;
     TChain *c = new TChain("EventsTot");
+    TChain *d = new TChain("EventsTot");
     Double_t fill_energy,wgt,enugen,nuleng;
+    Double_t checking_wgt;
     Int_t inno,isCC,mode;
     Double_t weight;
     // Double_t Elep;
@@ -669,11 +866,16 @@ namespace lar1{
     c->Reset();
     c->Add(dummytarget);
     if (c==0) return 5;
-
+    
+    d->Reset();
+    d->Add(dummytarget);
+    if (d==0) return 5;
+    
     const Int_t nentries2 = Int_t(c->GetEntries());
+    // const Int_t nentries2 = 50000;
 
     std::cout<<"Fosc Input filename:\t" << dummytarget << std::endl;
-    printf("Number of entries L=%im:\t %i\n",baseline,nentries2);
+    std::cout<<"Number of entries L="<<baseline<<"m: "<< nentries2<< std::endl;
     c->SetBranchAddress("energy",&fill_energy);
     c->SetBranchAddress("inno",&inno);
     c->SetBranchAddress("mode",&mode);
@@ -688,11 +890,18 @@ namespace lar1{
     c->SetBranchAddress("Ecalo2", &ecalo2);
     c->SetBranchAddress("ElectContainedDist",&ElectContainedDist);
 
+    std::vector<std::vector<float> > *MultiWeight;
+    MultiWeight = 0;
+    if (usingSignalMultiWeights)
+      c->SetBranchAddress("MultiWeight",&MultiWeight);
 
-    //loop through events once, fill in events[iL][idm2] arrays
-    std::cout<<"Evaluating histograms... Progress...\n";
+
+    d->SetBranchAddress("wgt",&checking_wgt);
+
+
+
       
-    TH1F *eventsnueosc[npoints+1];      //fullosc weighted by Posc=1*sin2(1.27dm2L/E), at each dm2 point
+    TH1F **eventsnueosc = new TH1F*[npoints+1];      //fullosc weighted by Posc=1*sin2(1.27dm2L/E), at each dm2 point
     TH1F *eventsnuefosc;          //fullosc (Posc=1)
     TH1F *eventsSignalBestFitNu;      //Number of events expected at the best fit.
     TH1F *eventsSignalBestFitNubar;     //Number of events expected at the best fit.
@@ -732,6 +941,27 @@ namespace lar1{
                                      nbins, emin, emax);
 
 
+    if (usingSignalMultiWeights){
+      std::cout << "Using Signal Multi weights." << std::endl;
+    }
+    else{
+      std::cout << "NOT using signal multi weights...." << std::endl;
+    }
+  
+    TH1F *** edistrnueoscMultiWeight;
+    if(usingSignalMultiWeights)
+    {
+      edistrnueoscMultiWeight = new TH1F**[nWeights];
+      for (int N_weight = 0; N_weight < nWeights; ++N_weight)
+      {
+        edistrnueoscMultiWeight[N_weight] = new TH1F*[npoints+1];
+        for (int point = 0; point <= npoints; ++point)
+        {
+          edistrnueoscMultiWeight[N_weight][point] = (TH1F*) edistrnueosc -> Clone();
+        }
+      }
+    }
+
     //Need vectors to save out the important information:
     std::vector<float> edistrnuefoscVec(nbins,0);
     std::vector<float> edistrnueBestFitNuVec(nbins,0);
@@ -742,6 +972,17 @@ namespace lar1{
     std::vector<float> edistrnueBestFit_globNubarVec(nbins,0);
     std::vector<std::vector<float> > edistrnueoscVec(npoints+1, std::vector<float>(nbins,0) );
     
+    std::vector<std::vector<std::vector<float> > > edistrnueoscMultiWeightVec;
+    if (usingSignalMultiWeights){
+      edistrnueoscMultiWeightVec.resize(nWeights);
+      for (int N_weight = 0; N_weight < nWeights; ++N_weight)
+      {
+        edistrnueoscMultiWeightVec[N_weight] = edistrnueoscVec;
+      }
+    }
+ 
+
+
     dataOsc.resize(npoints+1);
     for (unsigned int i = 0; i < dataOsc.size(); i++) dataOsc[i].resize(nbins);
 
@@ -758,29 +999,47 @@ namespace lar1{
     edistrnueHighDmNubar   -> SetBins(nbins, binsArray);
     edistrnueBestFit_globNu    -> SetBins(nbins, binsArray);
     edistrnueBestFit_globNubar   -> SetBins(nbins, binsArray);
+   
 
+    
     Double_t dm2Array[npoints+1];
     //Fill the array of dm2 points:
+    
 
     for (int i=0; i<=npoints; i++)  //loop over dm2 points
     {
       dm2Array[i] = pow(10., (TMath::Log10(dm2min)+ (i*1./npoints)*TMath::Log10(dm2max/dm2min)) );
       //While looping, may as well set up the histograms:
       eventsnueosc[i] = (TH1F*) edistrnueosc -> Clone();
-     }
-
+      if (usingSignalMultiWeights){
+        for (int i = 0; i < nWeights; ++i)
+        {
+          edistrnueoscMultiWeight[i][npoints] = (TH1F *) edistrnueosc -> Clone();
+        }
+      }
+    }
 
     //Now loop over events in the tree and fill each histogram for dm2 at each point.
-
+    //loop through events once, fill in events[iL][idm2] arrays
+    std::cout<<"Evaluating histograms... Progress...\n";
     evtcounter = 0;
     for (ievt=0; ievt<nentries2; ievt++)
     {
-      ientry = c->LoadTree(ievt); if (ientry < 0) break; nb = c->GetEntry(ievt); nbytes += nb;
-      evtcounter++;
-
-      if ( (ievt%100000) == 0) {
+      if ( (ievt%10000) == 0) {
         std::cout << "On event " << ievt << " of " << nentries2 << std::endl;
       }
+
+      evtcounter++;
+      ientry = d->LoadTree(ievt); if (ientry < 0) break; nb = d->GetEntry(ievt);
+      if (checking_wgt == 0){
+        // std::cout << "Skipping this event because the weight is zero." << std::endl;
+        continue;
+      }
+
+      ientry = c->LoadTree(ievt); if (ientry < 0) break; nb = c->GetEntry(ievt); nbytes += nb;
+
+
+
 
       if (energy == "elecCand") fill_energy = ElecCandEnergy;
       if (energy == "eccqe") fill_energy = Eccqe;
@@ -797,10 +1056,19 @@ namespace lar1{
         continue;
       }
 
+
       //Need to loop over dm2 points...
       for (int i=0; i<=npoints; i++){
         weight=wgt*pow((TMath::Sin(1.27*dm2Array[i]*(nuleng/100.)/(enugen*1000.))),2);
         eventsnueosc[i]->Fill(fill_energy,weight);
+        // Now do the multiweight part
+        if (usingSignalMultiWeights){
+          for (int N_weight = 0; N_weight < nWeights; ++N_weight)
+          {
+            double mutl_wgt = (*MultiWeight)[multiWeightSource][N_weight];
+            edistrnueoscMultiWeight[N_weight][i]->Fill(fill_energy,weight*mutl_wgt);
+          }
+        }
       }
 
       //Fill the scaled probability thinger:
@@ -825,10 +1093,10 @@ namespace lar1{
     if (evtcounter!=nentries2){ printf("Events loop error! Exiting...\n"); return 4; }
     //populate nueosc, and fullosc only on the first go.
     
-    eventsSignalBestFitNu     = (TH1F*)edistrnueBestFitNu->Clone();
-    eventsSignalBestFitNubar  = (TH1F*)edistrnueBestFitNubar->Clone();
-    eventsSignalHighDmNu      = (TH1F*)edistrnueHighDmNu->Clone();
-    eventsSignalHighDmNubar   = (TH1F*)edistrnueHighDmNubar->Clone();
+    eventsSignalBestFitNu           = (TH1F*)edistrnueBestFitNu->Clone();
+    eventsSignalBestFitNubar        = (TH1F*)edistrnueBestFitNubar->Clone();
+    eventsSignalHighDmNu            = (TH1F*)edistrnueHighDmNu->Clone();
+    eventsSignalHighDmNubar         = (TH1F*)edistrnueHighDmNubar->Clone();
     eventsSignalBestFit_globNu      = (TH1F*)edistrnueBestFit_globNu->Clone();
     eventsSignalBestFit_globNubar   = (TH1F*)edistrnueBestFit_globNubar->Clone();
     
@@ -854,7 +1122,20 @@ namespace lar1{
         dataOsc[point][i] = eventsnueosc[point]   -> GetBinContent(i+1);
       }
     }
+    if (usingSignalMultiWeights){
+      for (int N_weight = 0; N_weight < nWeights; ++N_weight)
+      {
+        for (int point = 0; point <= npoints; ++point)
+        {
+          for (int bin = 0; bin < nbins; ++bin)
+          {
+            edistrnueoscMultiWeightVec[N_weight][point][bin] = edistrnueoscMultiWeight[N_weight][point]->GetBinContent(bin+1);
+          }
+        }
+      }
+    }
     
+
     //write to file...
     TFile f(path+fileNameHistsOsc, "RECREATE");
     eventsnuefosc ->Write();
@@ -886,9 +1167,23 @@ namespace lar1{
       sprintf(name, "edistrnueoscVec_%i",point);
       t1 -> Branch(name, &(edistrnueoscVec[point]));
     }
+    if (usingSignalMultiWeights){
+      TTree *t2 = new TTree("tvecoscWgt", "Tree with multiweight Oscillation Signals");
+      for (int N_weight = 0; N_weight < nWeights; ++N_weight)
+      {
+        for (int point = 0; point <= npoints; point ++){
+          char  name[100];
+          sprintf(name, "edistrnueoscMultiWeightVec_%i_%i",N_weight,point);
+          t2 -> Branch(name, &(edistrnueoscMultiWeightVec[N_weight][point]));
+        }
+      }
+      t2 -> Fill();
+      t2 -> Write();
+    }
+
     t1 -> Fill();
-    t1-> Write();
-    
+    t1 -> Write();
+
     std::cout << "Successfully wrote histograms to file." << std::endl;
     
     f.Close();
@@ -903,44 +1198,77 @@ namespace lar1{
   int NtupleReader::ReadNueOsc(){
 
     dataOsc.resize(npoints+1);
-    for (unsigned int i = 0; i < dataOsc.size(); i++) dataOsc[i].resize(bins.size()-1);
+    if (usingSignalMultiWeights) multiWeightDataOsc.resize(nWeights);
+    // for (unsigned int i = 0; i < dataOsc.size(); i++) dataOsc[i].resize(bins.size()-1);
 
+    std::vector<std::vector<float> *> dataOscReadInVector;
+    dataOscReadInVector.resize(npoints+1);
+    std::vector<std::vector<std::vector<float> * > > multiWeightReadInVector;
+    if (usingSignalMultiWeights) {
+      multiWeightReadInVector.resize(nWeights);
+      for (int N_weight = 0; N_weight < nWeights; ++N_weight)
+      {
+        multiWeightReadInVector[N_weight].resize(npoints+1);
+        multiWeightDataOsc[N_weight].resize(npoints+1);
+      }
+    }
+
+    TChain *c = new TChain("tvecosc");
+    c -> Add(path+fileNameHistsOsc);
+
+    TChain *d;
+    if (usingSignalMultiWeights){
+      d = new TChain("tvecoscWgt");
+      d->Add(path+fileNameHistsOsc);
+    }
+    
     for (int ii = 0; ii <= npoints; ii++){
-      std::vector <float>   * readInVector = 0;
+      dataOscReadInVector[ii] = 0;
       char name[100];
       sprintf(name, "edistrnueoscVec_%i",ii);
       //Set up the tree and branch each time:
-      TChain *c = new TChain("tvecosc");
-      c -> Add(path+fileNameHistsOsc);
-      c -> SetBranchAddress(name, &readInVector);
-      c -> GetEntry(0);
-      dataOsc[ii] = *(readInVector);
+      c -> SetBranchAddress(name, &dataOscReadInVector[ii]);
+
       // if (debug){
       //   std::cout << "Size is " << eventsnueoscVec[b_line][ii].size() << std::endl;
       //   for (unsigned int i = 0; i < eventsnueoscVec[b_line][ii].size(); i++){
       //     std::cout << "readInVector is " << eventsnueoscVec[b_line][ii][i] << std::endl;
       //   }
       // }
-      delete c;
-      delete readInVector;
+      if (usingSignalMultiWeights){
+        for (int N_weight = 0; N_weight < nWeights; ++N_weight)
+        {
+          multiWeightReadInVector[N_weight][ii] = 0;
+          char  name2[100];
+          sprintf(name2, "edistrnueoscMultiWeightVec_%i_%i",N_weight,ii);
+          d->SetBranchAddress(name2,&multiWeightReadInVector[N_weight][ii]);
+        }
+      }
+
     }
-    // //get the other things for fullosc, that only happen once:
-    // std::vector <float>   * readInVector1 = 0;
-    // // std::vector <float>   * readInVector2 = 0;
-    // // std::vector <float>   * readInVector3 = 0;
-    // TChain *c = new TChain("tvecfosc");
-    // c -> Add(fileNameHistsOsc);
-    // // c->SetBranchAddress("edistrnuefoscVec",&readInVector1);
-    // // c->SetBranchAddress("edistrnueBestFitNuVec",&readInVector2);
-    // // c->SetBranchAddress("edistrnueBestFitNubarVec",&readInVector3);
-    // c-> GetEntry(0);
-    // eventsnuefoscVec[b_line]      = *(readInVector1);
-    // eventsSignalBestFitNuVec[b_line]  = *(readInVector2);
-    // eventsSignalBestFitNubarVec[b_line] = *(readInVector3);
-    // delete c;
-    // delete readInVector1;
-    // delete readInVector2;
-    // delete readInVector3;
+    std::cout << "Reading in nue osc data, this may take a minute or two...." << std::endl;
+    c -> GetEntry(0);
+    if (usingSignalMultiWeights) d -> GetEntry(0);
+
+
+    for (int ii = 0; ii <= npoints; ++ii)
+    {
+      dataOsc[ii] = *(dataOscReadInVector[ii]);
+      delete dataOscReadInVector[ii];
+      if (usingSignalMultiWeights){
+        for (int N_weight = 0; N_weight < nWeights; ++N_weight)
+        {
+          multiWeightDataOsc[N_weight][ii] = *(multiWeightReadInVector[N_weight][ii]);
+          delete multiWeightReadInVector[N_weight][ii];
+        }
+      }
+    }
+
+
+    // if (c) delete c;
+    // if (d) delete d;
+    // delete readInVector;
+    
 
     return 0;
   }
@@ -949,7 +1277,9 @@ namespace lar1{
     
     TString dummytarget = path+fileNameSource;
     TChain *c = new TChain("EventsTot");
+    TChain *d = new TChain("EventsTot");
     Double_t fill_energy,wgt;
+    Double_t checking_wgt;
     Int_t inno,isCC,mode, ibkg;
     Double_t weight;
     Double_t Elep;
@@ -965,11 +1295,15 @@ namespace lar1{
       
     c->Reset();
     c->Add(dummytarget);
+    d->Reset();
+    d->Add(dummytarget);
     nbytes = 0;
     evtcounter = 0;
     if (c==0) return 5;
+    if (d==0) return 5;
 
     const Int_t nentries1 = Int_t(c->GetEntries());
+    // const Int_t nentries1 = 50000;
 
     std::cout<<"Input filename:\t" << dummytarget << std::endl;
     std::cout << "Number of entries at L= " << baseline << ":\t" << nentries1 << std::endl;
@@ -984,6 +1318,14 @@ namespace lar1{
     c->SetBranchAddress("Eccqe", &Eccqe);
     c->SetBranchAddress("Ecalo1", &ecalo1);
     c->SetBranchAddress("Ecalo2", &ecalo2);
+    std::vector<std::vector<float> > * MultiWeight;
+    MultiWeight = 0;
+    if (usingMultiWeights)
+      c->SetBranchAddress("MultiWeight",&MultiWeight);
+
+    d->SetBranchAddress("wgt",&checking_wgt);
+
+
 
     // Need these for the histograms:
     double emin = bins.front();
@@ -992,11 +1334,21 @@ namespace lar1{
     static int iHateROOTitSucksSoMuch = 0;
     iHateROOTitSucksSoMuch ++;
     // This histogram holds the total nue hist.
-    TH1F * edistrnumu     = new TH1F(Form("edistrnumu%d",iHateROOTitSucksSoMuch),"Background #nu_{\{mu}} event distribution",nbins,emin,emax);
+    TH1F * edistrnumu       = new TH1F(Form("edistrnumu%d",iHateROOTitSucksSoMuch),"Background #nu_{\{mu}} event distribution",nbins,emin,emax);
+    TH1F * eventsNumuMC     = new TH1F(Form("eventsNumuMC%d",iHateROOTitSucksSoMuch),"MC event distribution for numu",nbins,emin,emax);
     TH1F * muLeptonEnergy   = new TH1F(Form("muLeptonDist%d",iHateROOTitSucksSoMuch), "Distribution of muon energies.", nbins, 0.0, emax);
 
+    TH1F ** edistnumuMultiWeight;
+    if(usingMultiWeights) 
+      edistnumuMultiWeight = new TH1F*[nWeights];
+
     std::vector<float> edistrnumuVec(nbins,0);
+    std::vector<float> eventsNumuMCVec(nbins,0);
     std::vector<float> muLeptonEnergyVec(nbins, 0);
+    std::vector<std::vector<float> > edistnumuMultiWeightVec;
+    if (usingMultiWeights) 
+      edistnumuMultiWeightVec.resize(nWeights);
+    
     data.resize(nbins);
 
     double binsArray[nbins+1];
@@ -1004,13 +1356,33 @@ namespace lar1{
       binsArray[i] = bins[i];
     }
 
+    eventsNumuMC -> SetBins(nbins, binsArray);
     edistrnumu -> SetBins(nbins, binsArray);
     muLeptonEnergy -> SetBins(nbins, binsArray);
 
+    if (usingMultiWeights){
+      for (int N_weight = 0; N_weight < nWeights; ++N_weight)
+      {
+        edistnumuMultiWeight[N_weight] = (TH1F*) edistrnumu->Clone();
+        edistnumuMultiWeightVec[N_weight].resize(nbins);
+      }
+    }
+
     for (ievt=0; ievt<nentries1; ievt++)
     {
-      ientry = c->LoadTree(ievt); if (ientry < 0) break; nb = c->GetEntry(ievt); nbytes += nb;
       evtcounter++;
+
+      ientry = d->LoadTree(ievt); if (ientry < 0) break; nb = d->GetEntry(ievt);
+      if (checking_wgt == 0){
+        // std::cout << "Skipping this event because the weight is zero." << std::endl;
+        continue;
+      }
+
+      ientry = c->LoadTree(ievt); if (ientry < 0) break; nb = c->GetEntry(ievt); nbytes += nb;
+      
+      if ( (ievt%10000) == 0) {
+        std::cout << "On event " << ievt << " of " << nentries1 << std::endl;
+      }
 
       if (energy == "elecCand") fill_energy = ElecCandEnergy;
       if (energy == "eccqe")    fill_energy = Eccqe;
@@ -1019,9 +1391,38 @@ namespace lar1{
 
       //use all the events because the weight, eff is already calculated
       weight=wgt; 
-      edistrnumu    -> Fill(fill_energy,weight);
       muLeptonEnergy  -> Fill(Elep, weight);
-      
+      eventsNumuMC -> Fill(fill_energy);
+
+      // Now do the multiweight part
+      // if (usingMultiWeights){
+      //   for (int N_weight = 0; N_weight < nWeights; ++N_weight)
+      //   {
+      //     // double mutl_wgt = (*MultiWeight)[multiWeightSource][N_weight];
+      //     double mutl_wgt = (*MultiWeight)[6][N_weight];
+      //     edistnumuMultiWeight[N_weight]->Fill(fill_energy,weight*mutl_wgt);
+      //   }
+      // }
+      if (usingMultiWeights){
+        for (int i = 0; i < nWeights; ++i)
+        {
+          double mult_wgt = (*MultiWeight)[multiWeightSource][i];
+          if (absolute_MWSource){
+            if (mult_wgt != 1.0){
+              edistnumuMultiWeight[i]->Fill(fill_energy,wgt*mult_wgt);           
+              if (i == 0)
+                edistrnumu->Fill(fill_energy,weight);
+            }
+          }
+          else{
+            if (i == 0) edistrnumu->Fill(fill_energy,weight);
+            edistnumuMultiWeight[i]->Fill(fill_energy,wgt*mult_wgt);  
+          }
+        }
+      }
+      else edistrnumu -> Fill(fill_energy,weight);
+
+
     }//end loop over events
 
     if (evtcounter!=nentries1){ printf("Events loop error! Exiting...\n"); return 4; }
@@ -1031,7 +1432,18 @@ namespace lar1{
     for (int i = 0; i < nbins;  i++){
       edistrnumuVec[i]     = edistrnumu     -> GetBinContent(i+1);
       muLeptonEnergyVec[i] = muLeptonEnergy -> GetBinContent(i+1);
+      eventsNumuMCVec[i]   = eventsNumuMC   -> GetBinContent(i+1);
       data[i]              = edistrnumu     -> GetBinContent(i+1);
+    }
+    if (usingMultiWeights){
+      for (int N_weight = 0; N_weight < nWeights; ++N_weight)
+      {
+        for (int bin = 0; bin < nbins; ++bin)
+        {
+          multiWeightData[N_weight][bin] = edistnumuMultiWeight[N_weight] -> GetBinContent(bin+1);
+          edistnumuMultiWeightVec[N_weight][bin] = edistnumuMultiWeight[N_weight] -> GetBinContent(bin+1);
+        }
+      }
     }
 
     //Write these histograms to a file!
@@ -1045,21 +1457,35 @@ namespace lar1{
     TTree *t = new TTree("tvecnumu", "Tree with vectors");
     t-> Branch("edistrnumuVec",&edistrnumuVec);
     t-> Branch("muLeptonEnergy",&muLeptonEnergyVec);
+    t-> Branch("eventsNumuMC",&eventsNumuMCVec);
 
+    if (usingMultiWeights){
+      for (int N_weight= 0; N_weight < nWeights; N_weight++){
+        char  name[100];
+        sprintf(name, "edistnumuMultiWeightVec_%i",N_weight);
+        t -> Branch(name, &(edistnumuMultiWeightVec[N_weight]));
+      }
+    }
 
-
-    t->Fill();
-    edistrnumu    -> Write();
-    muLeptonEnergy  -> Write();
-    t       -> Write("tvecnumu");
+    edistrnumu     -> Write();
+    muLeptonEnergy -> Write();
+    eventsNumuMC   -> Write();
+    t -> Fill();
+    t -> Write();
+    
     f -> Close();
     //cleaning up:
-    delete edistrnumu;          
-    delete muLeptonEnergy;        
+    // delete edistrnumu;          
+    // delete muLeptonEnergy;        
 
     // delete t;  
-    delete f;
+    // delete f;
     return 0;
+
+
+
+
+
   }
 
   int NtupleReader::LoopNumuOsc(){
@@ -1097,7 +1523,7 @@ namespace lar1{
     const Int_t nentries2 = Int_t(c->GetEntries());
 
     std::cout<<"Input filename:\t" << dummytarget << std::endl;
-    printf("Number of entries L=%im:\t %i\n",baseline,nentries2);
+    std::cout<<"Number of entries L="<<baseline<<"m: "<< nentries2<< std::endl;
     c->SetBranchAddress("energy",&fill_energy);
     c->SetBranchAddress("inno",&inno);
     c->SetBranchAddress("mode",&mode);
@@ -1170,6 +1596,7 @@ namespace lar1{
     evtcounter = 0;
     for (ievt=0; ievt<nentries2; ievt++)
     {
+      evtcounter++;
 
       if ( (ievt%100000) == 0) std::cout << "On event " << ievt << " of " << nentries2 << std::endl;
 
@@ -1179,7 +1606,6 @@ namespace lar1{
       if (energy == "ecalo2")   fill_energy = ecalo2;
 
       ientry = c->LoadTree(ievt); if (ientry < 0) break; nb = c->GetEntry(ievt); nbytes += nb;
-      evtcounter++;
       //Need to loop over dm2 points...
       for (int i=0; i<=npoints; i++){
         weight=wgt*pow((TMath::Sin(1.27*dm2Array[i]*(nuleng/100.)/(enugen*1000.))),2);
@@ -1264,11 +1690,30 @@ namespace lar1{
     c -> Add(path+fileNameHists);
     std::vector <float>   * readInVector = 0;
     c->SetBranchAddress("edistrnumuVec",&readInVector);
+    std::vector<std::vector<float> * > multiWeightReadInVector;
+    if (usingMultiWeights) multiWeightReadInVector.resize(nWeights);
+    if (usingMultiWeights){
+      for (int N_weight = 0; N_weight < nWeights; ++N_weight)
+      {
+        multiWeightReadInVector[N_weight] = 0;
+        char  name[100];
+        sprintf(name, "edistnumuMultiWeightVec_%i",N_weight);
+        c->SetBranchAddress(name,&multiWeightReadInVector[N_weight]);      
+      }
+    }
     c-> GetEntry(0);
     data = *(readInVector);
+    if (usingMultiWeights){
+      for (int N_weight = 0; N_weight < nWeights; ++N_weight)
+      {
+        multiWeightData[N_weight] = *(multiWeightReadInVector[N_weight]);
+        delete multiWeightReadInVector[N_weight];
+      }
+    }
     delete readInVector;
     delete c;
     return 0;
+
   }
 
   int NtupleReader::ReadNumuOsc(){
@@ -1291,7 +1736,7 @@ namespace lar1{
       //     std::cout << "readInVector is " << eventsnueoscVec[b_line][ii][i] << std::endl;
       //   }
       // }
-      delete c;
+      // delete c;
       delete readInVector;
     }
     return 0;
@@ -1309,7 +1754,7 @@ namespace lar1{
     std::vector <float>   * readInVector = 0;
     c->SetBranchAddress(branchName,&readInVector);
     c-> GetEntry(0);
-    delete c;
+    // if (c) delete c;
     return *(readInVector);
   }
 

@@ -54,6 +54,18 @@ namespace lar1{
     std::vector<Double_t>  *geniePx;
     std::vector<Double_t>  *geniePy;
     std::vector<Double_t>  *geniePz; 
+    Double_t        pdpx;
+    Double_t        pdpy;
+    Double_t        pdpz;
+    Double_t        pppx;
+    Double_t        pppy;
+    Double_t        pppz;
+    Double_t        tpx;
+    Double_t        tpy;
+    Double_t        tpz;
+    Int_t           ptype;
+    Int_t           tptype;
+    gan::LorentzVectorLight *neutMom;
     Double_t        Vx;
     Double_t        Vy;
     Double_t        Vz;
@@ -86,6 +98,7 @@ namespace lar1{
     // vector<vector< LorentzVectorLight> > * chargedPionPos;
     // vector<vector< LorentzVectorLight> > * chargedPionMom;
     // vector<LorentzVectorLight> * chargedPionSign;
+    std::vector<std::vector<float> > *MultiWeight;
 
     // List of branches
     TBranch        *b_iflux;   //!
@@ -113,6 +126,18 @@ namespace lar1{
     TBranch        *b_ParPx;   //!
     TBranch        *b_ParPy;   //!
     TBranch        *b_ParPz;   //!
+    TBranch        *b_pdpx;   //!
+    TBranch        *b_pdpy;   //!
+    TBranch        *b_pdpz;   //!
+    TBranch        *b_pppx;   //!
+    TBranch        *b_pppy;   //!
+    TBranch        *b_pppz;   //!
+    TBranch        *b_tpx;   //!
+    TBranch        *b_tpy;   //!
+    // TBranch        *b_tpx;   //!
+    TBranch        *b_ptype;   //!
+    TBranch        *b_tptype;   //!
+    TBranch        *b_neutMom;   //!
     TBranch        *b_geniePDG; //!
     TBranch        *b_genieE; //!
     TBranch        *b_geniePx; //!
@@ -137,6 +162,7 @@ namespace lar1{
     // TBranch        *b_chargedPionPos;
     // TBranch        *b_chargedPionMom;
     // TBranch        *b_chargedPionSign;
+    TBranch        *b_MultiWeight;   //!
 
     NtupleReprocessing(TString file = "");
     virtual ~NtupleReprocessing();
@@ -144,7 +170,7 @@ namespace lar1{
     virtual Int_t    GetEntry(Long64_t entry);
     virtual Long64_t LoadTree(Long64_t entry);
     virtual void     Init(TTree *tree);
-    virtual void     Loop(std::string, Int_t iDet = 1, Long64_t max_entry = -1, bool verbose = false, double scale = 1);
+    virtual void     Loop(std::string signal, int iDet = 1, int iLoc = 4, Long64_t max_entry = -1, bool verbose = false, double scale = 1);
     virtual Bool_t   Notify();
     virtual void     Show(Long64_t entry = -1);
     virtual TString  InFile();
@@ -265,6 +291,9 @@ namespace lar1{
      geniePx = 0;
      geniePy = 0;
      geniePz = 0;
+     neutMom = 0;
+
+     MultiWeight = 0;
 
      // chargedPionSign = 0;
      // chargedPionPos = 0;
@@ -295,7 +324,18 @@ namespace lar1{
      fChain->SetBranchAddress("Vx", &Vx, &b_Vx);
      fChain->SetBranchAddress("Vy", &Vy, &b_Vy);
      fChain->SetBranchAddress("Vz", &Vz, &b_Vz);
-
+     fChain->SetBranchAddress("pdpx", &pdpx, &b_pdpx);
+     fChain->SetBranchAddress("pdpy", &pdpy, &b_pdpy);
+     fChain->SetBranchAddress("pdpz", &pdpz, &b_pdpz);
+     fChain->SetBranchAddress("pppx", &pppx, &b_pppx);
+     fChain->SetBranchAddress("pppy", &pppy, &b_pppy);
+     fChain->SetBranchAddress("pppz", &pppz, &b_pppz);
+     fChain->SetBranchAddress("tpx", &tpx, &b_tpx);
+     fChain->SetBranchAddress("tpy", &tpy, &b_tpy);
+     // fChain->SetBranchAddress("tpx", &tpx, &b_tpx);
+     fChain->SetBranchAddress("ptype", &ptype, &b_ptype);
+     fChain->SetBranchAddress("tptype", &tptype, &b_tptype);
+     fChain->SetBranchAddress("neutMom", &neutMom, &b_neutMom);
      fChain->SetBranchAddress("GeniePDG", &geniePDG, &b_geniePDG);
      fChain->SetBranchAddress("GenieE",   &genieE, &b_genieE);
      fChain->SetBranchAddress("GeniePx", &geniePx, &b_geniePx);
@@ -324,6 +364,7 @@ namespace lar1{
      fChain->SetBranchAddress("miscPhotonConversionMom", &miscPhotonConversionMom, &b_miscPhotonConversionMom);
      fChain->SetBranchAddress("PionPos", &PionPos, &b_PionPos);
      fChain->SetBranchAddress("PionMom", &PionMom, &b_PionMom);
+     fChain->SetBranchAddress("MultiWeight", &MultiWeight, &b_MultiWeight);
 
      // fChain->SetBranchAddress("chargedPionPos",&chargedPionPos,&b_chargedPionPos);
      // fChain->SetBranchAddress("chargedPionMom",&chargedPionMom,&b_chargedPionMom);

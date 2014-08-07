@@ -11,7 +11,8 @@
 namespace lar1{
 
   void NtupleReprocessing::Loop( std::string signal,
-                                 Int_t iDet,
+                                 int iDet,
+                                 int iLoc,
                                  Long64_t max_entry,
                                  bool verbose,
                                  double scale ){
@@ -23,7 +24,14 @@ namespace lar1{
     // phot - single photon backgrounds.
     // NCpi0 - sample of events for NC disap. using NCpi0
     // numi - switch to run over numi events (correct genie sim, no larg4)
-    // 
+    //
+    
+    //These are the options available for the reprocessing:  
+    /*
+      enum beamMode {kNu, kNubar, kNu_Fosc, kNubar_Fosc };
+      enum detectorGeom {kND, kUB, kIC, kND_long, kMB};
+      enum detectorLoc  {k100m, k150m, k175m, k200m, k470m, k600m_onaxis, k600m_offaxis};
+    */
 
     //---------------------------------------------
     // some things to be configured by the user:
@@ -47,8 +55,8 @@ namespace lar1{
     double muonCCMisID   = 0.001;
 
     // NC photon vertex energy cuts
-    double vtxEcut = 0.0;     // 0.025;   // GeV
-    double convDistCut = 0.0; // 5.0;     // cm
+    // double vtxEcut = 0.0;     // 0.025;   // GeV
+    // double convDistCut = 0.0; // 5.0;     // cm
 
     double egammaThreshold = 0.0; // 0.140 // GeV
 
@@ -57,16 +65,33 @@ namespace lar1{
     Double_t prot_thresh = 0.02;
 
     Double_t detect_dist = 0;   // 10000=ND, 47000=MicroBooNE, 70000=FD
-    if (iDet == 0) detect_dist = 10000.0;
-    else if (iDet == 1) detect_dist = 47000.0;
-    else if (iDet == 2) detect_dist = 70000.0;
-    else if (iDet == 3) detect_dist = 70000.0; // 3 is MB using FD monte carlo
-    else if (iDet == 4) detect_dist = 70000.0; // 4 is IC using FD monte carlo
-    else if (iDet == 6) detect_dist = 60000.0; // 4 is IC @ 600m using FD monte carlo
-    else if (iDet == 7) detect_dist = 80000.0; // 4 is IC @ 600m using FD monte carlo
-    else if (iDet == 8) detect_dist = 15000.0; // alternative near detector locations
-    else if (iDet == 9) detect_dist = 17500.0; // alternative near detector locations
-    else if (iDet == 10) detect_dist = 20000.0; //alternative near detector locations
+
+    switch (iLoc)
+    {
+      case k100m:
+        detect_dist = 10000;
+        break;
+      case k150m:
+        detect_dist = 15000;
+        break;
+      case k175m:
+        detect_dist = 17500;
+        break;
+      case k200m:
+        detect_dist = 20000;
+        break;
+      case k470m:
+        detect_dist = 47000;
+        break;
+      case k600m_onaxis:
+        detect_dist = 60000;
+        break;
+      case k600m_offaxis:
+        detect_dist = 60000;
+        break;
+      default: 
+        detect_dist = -1;
+    }
 
     //---------------------------------------------
 
@@ -143,11 +168,14 @@ namespace lar1{
     std::cout << "input file: " << InFile().Remove(InFile().Length()-5) << std::endl;
     // TString sample = "ccinc";
     // if( ccqe_only ) sample = "ccqe";
-    TString outfile = InFile().ReplaceAll("lar1","users/andrzejs").Remove(InFile().Length()-5) + "_processed_";
-    if (iDet == 3) outfile += "MB_";
-    if (iDet == 4) outfile += "IC_";
-    if (iDet == 6) outfile += "IC_600_";
-    if (iDet == 7) outfile += "IC_800_";
+
+   // TString outfile = InFile().ReplaceAll("lar1","users/andrzejs").Remove(InFile().Length()-5) + "_processed_";
+    TString outfile = InFile().Remove(InFile().Length()-5) + "_processed_";
+    // if (iDet == 5) outfile += "MB_";
+    // if (iDet == 4) outfile += "IC_";
+    // if (iDet == 6) outfile += "IC_600_";
+    // if (iDet == 7) outfile += "IC_800_";
+
     if (scale != 1.0) {
       outfile += "scale_";
       outfile += scale;
@@ -163,6 +191,12 @@ namespace lar1{
       return;
     }  
     TTree *newt = new TTree("EventsTot", "Event info for ALL types");
+
+    // newt -> SetDirectory(0);
+
+    double xmin, xmax, ymin, ymax, zmin, zmax;
+
+    utils.GetDetBoundary(iDet, xmin, xmax, ymin, ymax, zmin, zmax);
 
     double ElectContainedDist = 0;
     double ElectDistToStart = 0;
@@ -258,7 +292,7 @@ namespace lar1{
     b_iflux->GetEntry(0); //iflux should now be filled
     double potweight;
     if (signal == "numi") potweight = utils.GetPOTNormNuMI( iflux, iDet );
-    else potweight = utils.GetPOTNorm( iflux, iDet );
+    else potweight = utils.GetPOTNorm( iflux, iLoc );
     std::cout << "POT weight = " << potweight << std::endl;
 
    
@@ -283,6 +317,9 @@ namespace lar1{
     TLorentzVector shower1X, shower2X;
     newt->Branch("Pi0Shower1X",&shower1X);
     newt->Branch("Pi0Shower2X",&shower2X);
+
+    newt->Branch("MultiWeight",&MultiWeight);
+
 
     bool isFid, isActive;
     int iChan = 0, iTop = 0;
@@ -518,14 +555,14 @@ namespace lar1{
 
     // Some plots for detector comparisons
     // The "beam spot" plots: event vertex in the fiducial volume (no cuts)
-    TH2D * beamSpot = new TH2D("BeamSpot","Event vertex Distribution",500,-150,600,500,-250,250);
+    TH2D * beamSpot = new TH2D("BeamSpot","Event vertex Distribution",250,xmin,xmax,250,ymin,ymax);
     // parent pion kinematics
     TH2D * parentKinematics = new TH2D("parentKinematics", "Neutrino Parent p_{T} vs. p_{z};p_{z};p_{T}",
                                      100,0,10,100,0,3);
     // Flux Through Both Detectors
-    TH2D * SharedFlux = new TH2D("SharedFlux","Amount of flux that passes through uB",500,-150,600,500,-250,250);
-    TH2D * nearDetOnlyFlux = new TH2D("nearDetOnlyFlux","Amount of flux that passes through ND only",500,-150,600,500,-250,250);
-    TH2D * FluxRatio = new TH2D("FluxRatio","Ratio of events in ND only to Total Events",500,-150,600,500,-250,250);
+    TH2D * SharedFlux = new TH2D("SharedFlux","Amount of flux that passes through uB",250,xmin,xmax,250,ymin,ymax);
+    TH2D * nearDetOnlyFlux = new TH2D("nearDetOnlyFlux","Amount of flux that passes through ND only",250,xmin,xmax,250,ymin,ymax);
+    TH2D * FluxRatio = new TH2D("FluxRatio","Ratio of events in ND only to Total Events",250,xmin,xmax,250,ymin,ymax);
 
 
     // vertex energy in NC pizero single photon events
@@ -573,14 +610,14 @@ namespace lar1{
     TH2D *CcqeVsTrueE = new TH2D("CcqeVsTrueE","CcqeVsTrueE;Generated Neutrino Energy (GeV);CCQE Energy (GeV)",30,0,3,30,0,3);
     TH2D *Calo1VsTrueE = new TH2D("Calo1VsTrueE","Calo1VsTrueE;Generated Neutrino Energy (GeV);Calorimetric Energy - all (GeV)",30,0,3,30,0,3);
     TH2D *Calo2VsTrueE = new TH2D("Calo2VsTrueE","Calo2VsTrueE;Generated Neutrino Energy (GeV);Calorimetric Energy - no neutrals (GeV)",30,0,3,30,0,3);
-    TH3D *photonConv = new TH3D("PhotonConv","PhotonConv;X;Y;Z",50,-500,500,50,-500,500,100,-100,1100);
-    TH1D *photonConvX = new TH1D("PhotonConvX","PhotonConvX;X",50,-500,500);
-    TH1D *photonConvY = new TH1D("PhotonConvY","PhotonConvY;Y",50,-500,500);
-    TH1D *photonConvZ = new TH1D("PhotonConvZ","PhotonConvY;Z",50,-100,1100);
-    TH3D *ncpi0bkgV = new TH3D("ncpi0bkgV","ncpi0bkgV;X;Y;Z",50,-500,500,50,-500,500,100,-100,1100);
-    TH1D *ncpi0bkgX = new TH1D("ncpi0bkgX","ncpi0bkgX;X",50,-500,500);
-    TH1D *ncpi0bkgY = new TH1D("ncpi0bkgY","ncpi0bkgY;Y",50,-500,500);
-    TH1D *ncpi0bkgZ = new TH1D("ncpi0bkgZ","ncpi0bkgZ;Z",50,-100,1100);
+    TH3D *photonConv = new TH3D("PhotonConv","PhotonConv;X;Y;Z",50,xmin,xmax,50,ymin,ymax,100,zmin,zmax);
+    TH1D *photonConvX = new TH1D("PhotonConvX","PhotonConvX;X",50,xmin, xmax);
+    TH1D *photonConvY = new TH1D("PhotonConvY","PhotonConvY;Y",50,ymin, ymax);
+    TH1D *photonConvZ = new TH1D("PhotonConvZ","PhotonConvY;Z",50,zmin, zmax);
+    TH3D *ncpi0bkgV = new TH3D("ncpi0bkgV","ncpi0bkgV;X;Y;Z",50,xmin,xmax,50,ymin,ymax,100,zmin,zmax);
+    TH1D *ncpi0bkgX = new TH1D("ncpi0bkgX","ncpi0bkgX;X",50,xmin,xmax);
+    TH1D *ncpi0bkgY = new TH1D("ncpi0bkgY","ncpi0bkgY;Y",50,ymin,ymax);
+    TH1D *ncpi0bkgZ = new TH1D("ncpi0bkgZ","ncpi0bkgZ;Z",50,zmin,zmax);
 
     // Ints to keep track of continue bails
     int N_continue_CC_muon        = 0;
@@ -653,11 +690,14 @@ namespace lar1{
       beamSpot -> Fill(Vx,Vy,fluxweight);
       parentKinematics -> Fill(ParPz,sqrt(ParPy*ParPy + ParPx*ParPx),fluxweight);
 
+
+/*
       // Now find out if this neutrino would have hit microboone
       // (but only if this is a near detector)
       // The function that does this is a ray tracing alg in utils
-      /*
+      
       if (iDet == 0 || iDet == 8 || iDet == 9 || iDet == 10){
+
 
         // Important: Putting everything in beam coordinates!
 
@@ -665,18 +705,20 @@ namespace lar1{
         // The corners of the parallelogram upstream to hit, in
         // the same coordinates.
         // The start point is the neutrino vertex, so just move to beam coords:
-        TVector3 startPoint(Vx - 130, Vy + 40, Vz);
+        TVector3 startPoint(Vx, Vy, Vz);
         // Find the start direction:  Make a vector of the neutrino path
         // from parent to vertex and then normalize.
-        TVector3 startDir(ParVx - (Vx-130), ParVy - (Vy+40), detect_dist + ParVz - Vz);
+        TVector3 startDir(neutMom->X(), neutMom->Y(), neutMom->Z());
         startDir*= 1.0/startDir.Mag();
         // The 3 corners are the bottom left, bottom right, and top left
         // corners of uboone, and then shifted forward in z by 470m - detector_dist
         // to account for the distance between detectors
         // TVector3 corner1(0.0 + 8  , -116.5 - 42, 47000-detect_dist);
-        TVector3 corner1(256.0 - 128, -116.5, 47000-detect_dist - Vz - 20000);
-        TVector3 corner2(0.0   - 128, -116.5, 47000-detect_dist - Vz - 20000);
-        TVector3 corner3(256.0 - 128,  116.5, 47000-detect_dist - Vz - 20000);
+        TVector3 corner1( 128, -116.5, 47000-detect_dist - Vz - 35000);
+        TVector3 corner2(-128, -116.5, 47000-detect_dist - Vz - 35000);
+        TVector3 corner3( 128,  116.5, 47000-detect_dist - Vz - 35000);
+
+
 
         // Now find out if the neutrino (which has interacted in ND)
         // would have passed through uB
@@ -702,7 +744,7 @@ namespace lar1{
         else
           nearDetOnlyFlux -> Fill(Vx,Vy,fluxweight);
       }
-      */
+*/
 
       // Now figure out which direction the neutrino was going in
 
@@ -729,7 +771,8 @@ namespace lar1{
                   << "\t NPi0FinalState: " << NPi0FinalState << "\n"
                   << "\t miscPhotonConversionPos->size(): " << miscPhotonConversionPos->size() << "\n"
                   << "\t NGamma: " << NGamma << "\n"
-                  << "\t egammaThreshold " << egammaThreshold << "\n";
+                  << "\t egammaThreshold " << egammaThreshold << "\n"
+                  << "\t fluxweight: " << fluxweight << "\n";
 
       }
 
@@ -895,11 +938,11 @@ namespace lar1{
 
           electron_cand_angle = utils.GetTheta( geniePx->at(muonPos), geniePy->at(muonPos), geniePz->at(muonPos) );
 
-          enuccqe = utils.NuEnergyCCQE( 1000*electron_cand_energy,
-                                        sqrt(pow(1000*electron_cand_energy,2) - pow(105.7,2)),
-                                        electron_cand_angle,
-                                        105.7,
-                                        iflux )/1000.0;
+          enuccqe = utils.NuEnergyCCQE(  1000*electron_cand_energy,
+                                         sqrt(pow(1000*electron_cand_energy,2) - pow(105.7,2)),
+                                         electron_cand_angle,
+                                         105.7,
+                                         iflux )/1000.0;
           enucalo1 = utils.NuEnergyCalo( geniePDG,
                                          genieE,
                                          true,
@@ -911,7 +954,7 @@ namespace lar1{
                                          prot_thresh ) + photon_energy;
       }
 
-      if (isCC && abs(inno) == 14 && MuonMom -> size() == 0) {
+      if (signal != "fosc" && isCC && abs(inno) == 14 && MuonMom -> size() == 0) {
         N_continue_CC_muon ++;
         continue;
       }
@@ -1286,6 +1329,7 @@ namespace lar1{
                   electron_cand_angle, 0.511, iflux )/1000.0;
             enucalo1 = utils.NuEnergyCalo( geniePDG, genieE, true, true );
             enucalo2 = utils.NuEnergyCalo( geniePDG, genieE, false, false, prot_thresh ) + photon_energy;
+            Elep = electron_cand_energy;
             
             CcqeVsTrueE->Fill( energy, enuccqe, wgt );
             Calo1VsTrueE->Fill( energy, enucalo1, wgt );
