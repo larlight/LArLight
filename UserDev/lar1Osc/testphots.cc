@@ -16,6 +16,12 @@ void testphots::run()
 
 //TCanvas * discrim2=new TCanvas("distance from start2","distance from start2");  
   
+         std::cout<<"before opening an output"<<std::endl;
+       TFile * output=new TFile("histos_for_corey.root","RECREATE");
+       std::cout<<"opened!"<<std::endl;
+  
+       TDirectory *savedir = gDirectory;
+       
 TFile          *infile1=new TFile("/uboone/data/users/andrzejs/MC_uboone.root","READ");
 TTree          *fCris=(TTree *)infile1->Get("MCTree");    //Cristoph's file
 TFile          *infile2=new TFile("/uboone/data/users/andrzejs/ComboNtuples_MC2_Proposal/combined_ntup_processed_nue.root","READ");
@@ -40,9 +46,29 @@ TTree          *fChain=(TTree *)infile2->Get("EventsTot");   // Corey's file
     TH1F * photonsYZ200top=new TH1F("photons200YZtop","photons200YZtop",150,0,1100);
     TH1F * photonsYZ100bottom=new TH1F("photons100YZbottom","photons100YZbottom",150,0,1100);
     TH1F * photonsYZ200bottom=new TH1F("photons200YZbottom","photons200YZbottom",150,0,1100);
+
+    // #### histograms for Corey
+    
+      // Default to 120 equal length bins fom 0.2 GeV to 3 GeV:
+    std::vector < float > defaultBins;
+    double emin = 0.0;
+    double emax = 3.0;
+    double nbins = 120.0;
+    double binSize = (emax - emin)/nbins;
+    defaultBins.resize(nbins+1);
+    for (double i = 0; i <= nbins; i++) {
+      defaultBins.at(i) = emin + i*binSize;
+    }
     
     
-    double emin = 0.0, emax = 3.0;
+   TH1F * photons200c=new TH1F("photons200_nocut","photons200_nocut",nbins,&(defaultBins[0]));
+   TH1F * photons200cat50=new TH1F("photons200_at50","photons200_at50",nbins,&(defaultBins[0]));
+   TH1F * photons200cat100=new TH1F("photons200_at100","photons200_at100",nbins,&(defaultBins[0]));
+   
+   
+    // #### End histograms for Corey
+    
+    emin = 0.0, emax = 3.0;
     int ebins = 15;
     TH1F * photons100energy=new TH1F("photonsenergy","photonsenergy", 5*ebins,emin,emax);
   //  TH1F * electrons100energy=new TH1F("electronsenergy","electronssenergy",150,0,3000);
@@ -132,8 +158,20 @@ TTree          *fChain=(TTree *)infile2->Get("EventsTot");   // Corey's file
      // if((*comptE)[ix]>200)
       // std::cout << " distances: " << ElectDistToStart << " "<< ElectDistToStartYZ  << std::endl;
     
+
+      
+      
       if((*comptE)[ix]>100)
       {
+	
+/// ### filling histograms for Corey	
+       photons200c->Fill((*comptE)[ix]/1000.);
+       if(ElectDistToStart>50)	
+	  photons200cat50->Fill((*comptE)[ix]/1000.);
+       if(ElectDistToStart>100)	
+	  photons200cat100->Fill((*comptE)[ix]/1000.);
+ /// ### end filling histograms for Corey	      
+       
        photons100->Fill(ElectDistToStart);
         photonsYZ100->Fill(ElectDistToStartYZ);
        photons100energy->Fill((*comptE)[ix]/1000.);
@@ -150,6 +188,8 @@ TTree          *fChain=(TTree *)infile2->Get("EventsTot");   // Corey's file
 	  
       if((*comptE)[ix]>200)
       {photons200->Fill(ElectDistToStart);
+       
+      
       photonsYZ200->Fill(ElectDistToStartYZ);
        if(vtx[1]>=0)
        {
@@ -513,6 +553,21 @@ legYZ->Draw();
       
        gPad->Print("energies.png");
       
+     //  infile1->Close();
+     //  infile2->Close();
+
+       savedir->cd();
+       
+       photons200c->Write();
+       std::cout<<"wrote 1"<<std::endl;
+       photons200cat50->Write();
+       std::cout<<"wrote 2"<<std::endl;
+       photons200cat100->Write();
+       std::cout<<"wrote 3"<<std::endl;
+       
+       output->Close();
+       std::cout<<"closed"<<std::endl;
+       
   // infile1->Close();
   // infile2->Close();
    
