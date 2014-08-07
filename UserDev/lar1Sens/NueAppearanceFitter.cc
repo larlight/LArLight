@@ -81,6 +81,8 @@ namespace lar1{
       nueBins.push_back(0.2 + i*0.2); // default is 200Mev bins from 200 to 3000
       numuBins.push_back(0.2 + i*0.2); // default is 200Mev bins from 200 to 3000
     }
+    nbins_nue = nueBins.size()-1;
+    nbins_numu = numuBins.size()-1;
     
 
   }
@@ -434,12 +436,12 @@ namespace lar1{
       if (useSignalCovarianceMatrix) signalMultiWeight.resize(nWeights);
       for (int N_weight = 0; N_weight < nWeights; ++N_weight)
       {
-        eventsNullVecMultiWeight[N_weight].resize(nbins);
+        eventsNullVecMultiWeight[N_weight].resize(nL*nbins);
         if (useSignalCovarianceMatrix){
           signalMultiWeight[N_weight].resize(npoints+1);
           for (int point = 0; point <= npoints; ++point)
           {
-            signalMultiWeight[N_weight][point].resize(nbins);
+            signalMultiWeight[N_weight][point].resize(nL*nbins);
           }
         }
       }
@@ -464,7 +466,7 @@ namespace lar1{
 
       eventsnueVec[b_line]     = utils.rebinVector(readerNue[b_line].GetData(),nueBins);
       eventsnumuVec[b_line]    = utils.rebinVector(readerNumu[b_line].GetData(),numuBins);
-      eventsnuefoscVec[b_line] = utils.rebinVector(readerNumu[b_line].GetData(),numuBins);
+      eventsnuefoscVec[b_line] = utils.rebinVector(readerNumu[b_line].GetData(),nueBins);
 
       // Getting the osc vectors and rebinning them:
       eventsnueoscVec[b_line]  = readerNue[b_line].GetDataOsc();
@@ -515,8 +517,8 @@ namespace lar1{
         auto tempMultiWeightInfoNumu   = readerNumu[b_line].GetMultiWeightData();
         std::vector<float> blankVectorNue(nbins_nue, 0);
         std::vector<float> blankVectorNumu(nbins_numu, 0);
-        blankVectorNue = utils.rebinVector(blankVectorNue,nueBins);
-        blankVectorNumu = utils.rebinVector(blankVectorNumu,nueBins);
+        // blankVectorNue = utils.rebinVector(blankVectorNue,nueBins);
+        // blankVectorNumu = utils.rebinVector(blankVectorNumu,nueBins);
 
         // append the info into the proper places, then we'll scale it as we copy it into place.
         std::vector<float> tempVector;
@@ -527,8 +529,8 @@ namespace lar1{
         {
           // this is just attaching nue_osc to nue to numu into the total, combined vector
           tempVector = utils.appendVectors(blankVectorNue,
-                            utils.rebinVector(tempMultiWeightInfoNue[N_weight],nueBins),
-                            utils.rebinVector(tempMultiWeightInfoNumu[N_weight],numuBins));
+                       utils.rebinVector(tempMultiWeightInfoNue[N_weight],nueBins),
+                       utils.rebinVector(tempMultiWeightInfoNumu[N_weight],numuBins));
           for (int point = 0; point <= npoints; ++point)
           {
             if (useSignalCovarianceMatrix) 
@@ -675,11 +677,11 @@ namespace lar1{
       //by design, the nearest detector to the source is the first in the vector
       //of baselines.
       nearDetStats.resize(nbins);
-      for (unsigned int i = nbins_nue; i < nearDetStats.size(); i++){
+      for (unsigned int i = 0; i < nearDetStats.size(); i++){
         //leaving the first nbinsE entries at 0 for the signal bins
         //for bins nbinsE -> 2*nbinsE-1, use 1/sqrt(nue events in that bin)
-        if (i < 2*nbins_nue) nearDetStats[i] = 1/sqrt(eventsnueVec[0][i-nbins_nue]);
-        else nearDetStats[i] = 1/sqrt(eventsnumuVec[0][i-nbins_nue - nbins_numu]);
+        if (i < nbins_nue) nearDetStats[i] = 1/sqrt(eventsnueVec[0][i]);
+        else nearDetStats[i] = 1/sqrt(eventsnumuVec[0][i-nbins_nue]);
       }
       if(verbose){
         std::cout << "\nNo covariance matrix entries, calculating near det errors.\n";
@@ -753,20 +755,20 @@ namespace lar1{
 
     TH2D * collapsed_covarianceMatrixHist 
          = new TH2D("collapsed_covMatHist","Collapsed Covariance Matrix",
-                    nL*nbins-nbins_nue,0,nL*nbins-nbins_nue-1,
-                    nL*nbins-nbins_nue,0,nL*nbins-nbins_nue-1);
+                    nL*(nbins-nbins_nue),0,nL*(nbins-nbins_nue)-1,
+                    nL*(nbins-nbins_nue),0,nL*(nbins-nbins_nue)-1);
     TH2D * collapsed_fractionalMatrixHist 
          = new TH2D("collapsed_fracMatHist","Collapsed Fractional Error Matrix",
-                    nL*nbins-nbins_nue,0,nL*nbins-nbins_nue-1,
-                    nL*nbins-nbins_nue,0,nL*nbins-nbins_nue-1);
+                    nL*(nbins-nbins_nue),0,nL*(nbins-nbins_nue)-1,
+                    nL*(nbins-nbins_nue),0,nL*(nbins-nbins_nue)-1);
     TH2D * collapsed_correlationMatrixHist 
          = new TH2D("collapsed_corrMatHist","Collapsed Correlation Matrix",
-                    nL*nbins-nbins_nue,0,nL*nbins-nbins_nue-1,
-                    nL*nbins-nbins_nue,0,nL*nbins-nbins_nue-1);
+                    nL*(nbins-nbins_nue),0,nL*(nbins-nbins_nue)-1,
+                    nL*(nbins-nbins_nue),0,nL*(nbins-nbins_nue)-1);
     TH2D * collapsed_shapeFract_MatrixHist 
          = new TH2D("collapsed_shapeMatHist","Collapsed Fractional Shape Matrix",
-                    nL*nbins-nbins_nue,0,nL*nbins-nbins_nue-1,
-                    nL*nbins-nbins_nue,0,nL*nbins-nbins_nue-1);
+                    nL*(nbins-nbins_nue),0,nL*(nbins-nbins_nue)-1,
+                    nL*(nbins-nbins_nue),0,nL*(nbins-nbins_nue)-1);
     // Here's the method.  The nominal, no signal sample is in
     // eventsnLnullVec.  It's a vector of length nL*nbinsE*3.  It 
     // contains NO signal, and we shouldn't change that.
@@ -816,7 +818,6 @@ namespace lar1{
     {
       temp_events_MW_COPY = eventsNullVecMultiWeight[N_weight];
       temp_signal_MW_COPY.resize(temp_events_MW_COPY.size());
-      
       if (useSignalCovarianceMatrix){
         if (dm2point != -1 && dm2point <= npoints){
           for (int bin = 0; bin < nbins_nue; ++bin){
@@ -839,13 +840,13 @@ namespace lar1{
 
         for (int jbin = 0; jbin < nL*nbins; ++jbin)
         {
-          if (debug && ibin == 53 && jbin == 20){
-            std::cout << "This is the debug point!!\n";
-            std::cout << "  nominal, i: " << events_nominal_COPY[ibin] + signal_nominal_COPY[ibin]<<std::endl;
-            std::cout << "  weights, i: " << temp_events_MW_COPY[ibin] + temp_signal_MW_COPY[ibin]<<std::endl;
-            std::cout << "  nominal, j: " << events_nominal_COPY[jbin] + signal_nominal_COPY[jbin]<<std::endl;
-            std::cout << "  weights, j: " << temp_events_MW_COPY[jbin] + temp_signal_MW_COPY[jbin]<<std::endl;
-          }
+          // if (debug && ibin == 53 && jbin == 20){
+          //   std::cout << "This is the debug point!!\n";
+          //   std::cout << "  nominal, i: " << events_nominal_COPY[ibin] + signal_nominal_COPY[ibin]<<std::endl;
+          //   std::cout << "  weights, i: " << temp_events_MW_COPY[ibin] + temp_signal_MW_COPY[ibin]<<std::endl;
+          //   std::cout << "  nominal, j: " << events_nominal_COPY[jbin] + signal_nominal_COPY[jbin]<<std::endl;
+          //   std::cout << "  weights, j: " << temp_events_MW_COPY[jbin] + temp_signal_MW_COPY[jbin]<<std::endl;
+          // }
           float part1 = events_nominal_COPY[ibin] + sin22th*signal_nominal_COPY[ibin];
           float part2 = events_nominal_COPY[jbin] + sin22th*signal_nominal_COPY[jbin];
           part1 -= temp_events_MW_COPY[ibin] + sin22th*temp_signal_MW_COPY[ibin];
@@ -857,6 +858,7 @@ namespace lar1{
           covarianceMatrix[ibin][jbin] += (1.0/nWeights)*(part1*part2);
         }
       }
+
     }
 
 
@@ -868,7 +870,8 @@ namespace lar1{
       }
     }
 
-    // std::cout << "Printing out fractional covariance matrix:"<<std::endl;
+
+
     // This loop takes the error matrix and computes subsequent matrices from it:
     // correlation matrix
     // fractional error matrix
@@ -913,6 +916,16 @@ namespace lar1{
 
     }
 
+
+    // std::cout << "Printing out fractional covariance matrix:"<<std::endl;
+    // for (int ibin = 0; ibin < nL*nbins; ++ibin){
+    //   for (int jbin = 0; jbin < nL*nbins; ++jbin){
+    //     std::cout << fractionalErrorMatrix[ibin][jbin] << "\t";
+    //   }      
+    //   std::cout << "\n";
+    // }
+
+
     // Compute the following:
     // shape only matrix
     // fractional shape only matrix
@@ -924,21 +937,40 @@ namespace lar1{
     {
       for (int jbin = 0; jbin < nbins*nL; ++jbin)
       {
-        Shape_covarianceMatrix[ibin][jbin] = covarianceMatrix[ibin][ibin];
+        Shape_covarianceMatrix[ibin][jbin] = covarianceMatrix[ibin][jbin];
+        // std::cout << "Shape matrix entry is: " << Shape_covarianceMatrix[ibin][jbin] << "\n";
         double temp = events_nominal_COPY[ibin] + sin22th*signal_nominal_COPY[ibin];
+        // std::cout << "temp is " << temp << " * " 
+                  // << events_nominal_COPY[jbin] + sin22th*signal_nominal_COPY[jbin]
+                  // << " = ";
         temp *= events_nominal_COPY[jbin] + sin22th*signal_nominal_COPY[jbin];
+        // std::cout << temp << "\n";
         temp /= n_total*n_total;
         temp *= covMatSum;
+        // std::cout << "temp gets divided by " 
+                  // << n_total << " * " << n_total << " / " << covMatSum
+                  // << " to be " << temp << "\n";
         Shape_covarianceMatrix[ibin][jbin] -= temp;
+        // std::cout << "Shape matrix entry is now: " << Shape_covarianceMatrix[ibin][jbin] << "\n";
         temp = events_nominal_COPY[ibin] + sin22th*signal_nominal_COPY[ibin];
         temp *= events_nominal_COPY[jbin] + sin22th*signal_nominal_COPY[jbin];
         if (temp != 0)
           fractional_Shape_covarianceMatrix[ibin][jbin] = Shape_covarianceMatrix[ibin][jbin]/temp;
         else
           fractional_Shape_covarianceMatrix[ibin][jbin] = 0.0;
+        // std::cout << "Frac Shape matrix entry is: " << fractional_Shape_covarianceMatrix[ibin][jbin] << "\n\n";
+
         shapeFract_MatrixHist -> SetBinContent(ibin+1,jbin+1,fractional_Shape_covarianceMatrix[ibin][jbin]);
       }
     }
+
+    // std::cout << "Printing out fractional shape covariance matrix:"<<std::endl;
+    // for (int ibin = 0; ibin < nL*nbins; ++ibin){
+    //   for (int jbin = 0; jbin < nL*nbins; ++jbin){
+    //     std::cout << fractional_Shape_covarianceMatrix[ibin][jbin] << "\t";
+    //   }      
+    //   std::cout << "\n";
+    // }
 
     // for (int bin = 0; bin < nbins*nL; ++bin)
     // {
@@ -947,7 +979,6 @@ namespace lar1{
     //   std::cout << Shape_covarianceMatrix[bin][bin] << "\t"
     //   std::cout << fractional_Shape_covarianceMatrix[bin][bin] << "\t"
     // }
-
 
     if (savePlots){
       // Need to get the name of the matrix right:
@@ -963,12 +994,12 @@ namespace lar1{
 
       // Collapse these matrices to remove the signal region for the write up.
 
-
-
       TMatrix collapsed_covnMat  = utils.CollapseMatrix(covarianceMatrix,nbins_nue,nbins_numu,nL);
       TMatrix collapsed_fracMat  = utils.CollapseMatrix(fractionalErrorMatrix,nbins_nue,nbins_numu,nL);
       TMatrix collapsed_corrMat  = utils.CollapseMatrix(correlationMatrix,nbins_nue,nbins_numu,nL);
       TMatrix collapsed_shapeMat = utils.CollapseMatrix(fractional_Shape_covarianceMatrix,nbins_nue,nbins_numu,nL);
+
+
 
       covarianceMatrix.Write();
       fractionalErrorMatrix.Write();
@@ -978,9 +1009,10 @@ namespace lar1{
       collapsed_fracMat.Write();
       collapsed_corrMat.Write();
       collapsed_shapeMat.Write();
-      for (int ibin = 0; ibin < nbins_nue+nbins_numu; ++ibin)
+
+      for (int ibin = 0; ibin < nL*(nbins_nue+nbins_numu); ++ibin)
       {
-        for (int jbin = 0; jbin < nbins_nue+nbins_numu; ++jbin)
+        for (int jbin = 0; jbin < nL*(nbins_nue+nbins_numu); ++jbin)
         {
           collapsed_covarianceMatrixHist  -> SetBinContent(ibin+1, jbin+1, collapsed_covnMat[ibin][jbin]);
           collapsed_fractionalMatrixHist  -> SetBinContent(ibin+1, jbin+1, collapsed_fracMat[ibin][jbin]);
@@ -988,6 +1020,7 @@ namespace lar1{
           collapsed_shapeFract_MatrixHist -> SetBinContent(ibin+1, jbin+1, collapsed_corrMat[ibin][jbin]);
         }
       }
+
       collapsed_covarianceMatrixHist  -> Write();
       collapsed_fractionalMatrixHist  -> Write();
       collapsed_correlationMatrixHist -> Write();
@@ -1020,6 +1053,7 @@ namespace lar1{
         numuEventRates[b_line] -> Write();
 
       }
+
 /*
       std::vector<TH1F *> nue_fractionalUncertantiesHists;
       std::vector<TH1F *> numu_fractionalUncertantiesHists;
@@ -1141,6 +1175,7 @@ namespace lar1{
     }
 
     // Plot the diagonal errors for this particular fractional Uncert. MatrixL
+  std::cout << "Checkpoint 10 " << std::endl;
 
     return 0;
 
@@ -1199,7 +1234,6 @@ namespace lar1{
         events_numu_nominal_COPY[b_line][bin] = eventsnLnullVec[b_line*nbins + bin + 2*nbins_nue];        
       }
     }
-
 
     // THIS IS WHERE TO ADD SIGNAL TO THE NUE NOMINAL BACKGROUND
 
@@ -1293,17 +1327,25 @@ namespace lar1{
         temp_events_nue_MW_COPY[b_line].resize(nbins_nue);
         temp_events_numu_MW_COPY[b_line].resize(nbins_numu);
         temp_signal_MW_COPY[b_line].resize(nbins_nue);
+        // std::cout << "eventsNullVecMultiWeight.size()" << eventsNullVecMultiWeight.size() << std::endl;
 
         for (int bin = 0; bin < nbins_nue; ++bin)
         {
+          // std::cout << "eventsNullVecMultiWeight[N_weight].size(): " 
+          //           << eventsNullVecMultiWeight[N_weight].size()
+          //           << "\neventsNullVecMultiWeight[N_weight][bin]: " 
+          //           << eventsNullVecMultiWeight[N_weight][bin]
+          //           << std::endl;
           temp_events_nue_MW_COPY[b_line][bin]  = eventsNullVecMultiWeight[N_weight][b_line*nbins + bin + nbins_nue];
           if (dm2point != -1)
             temp_signal_MW_COPY[b_line][bin]    = signalMultiWeight[N_weight][dm2point][b_line*nbins + bin];
         }
+
         for (int bin = 0; bin < nbins_numu; ++bin)
         {
           temp_events_numu_MW_COPY[b_line][bin] = eventsNullVecMultiWeight[N_weight][b_line*nbins + bin + 2*nbins_nue];
         }
+
       }
 
 
@@ -1347,6 +1389,7 @@ namespace lar1{
                *(temp_numu_Ratio[b_line][bin] - nominal_numu_Ratio[b_line][bin]);     
         }
       }
+
     }
 
     if (debug){
@@ -1402,7 +1445,7 @@ namespace lar1{
       char temp[100];
       sprintf(temp,"nue_ratioplot_%i",i);
       nue_ratioPlots[i] = new TH1F(temp,"Ratio Plot",nbins_nue,&(nueBins[0]));
-      sprintf(temp,"#nu_{e} Ratio of %s to %s",baselines[0].c_str(),baselines[i+1].c_str());
+      sprintf(temp,"#nu_{e} Ratio of %s to %s",baselinesFancy[0].c_str(),baselinesFancy[i+1].c_str());
       nue_ratioPlots[i] -> SetTitle("");
       nue_ratioPlots[i] -> SetMinimum(0);
       nue_ratioPlots[i] -> SetMaximum(0.5);
@@ -1415,7 +1458,8 @@ namespace lar1{
       nue_ratioPlots[i] -> GetXaxis() -> CenterTitle();
       // nue_ratioPlots[i] -> GetYaxis() -> CenterTitle();
       nue_ratioPlots[i] -> GetXaxis() -> SetTitleSize(.05);
-      nue_ratioPlots[i] -> GetYaxis() -> SetTitle("T600 (600m, on axis) / LAr1-ND (100m)");
+      sprintf(temp,"%s / %s", baselinesFancy[i+1].c_str(),baselinesFancy[0].c_str());
+      nue_ratioPlots[i] -> GetYaxis() -> SetTitle(temp);
       nue_ratioPlots[i] -> GetYaxis() -> SetTitleSize(.045);
       nue_ratioPlots[i] -> GetYaxis() -> SetTitleOffset(1.6);
 
@@ -1608,6 +1652,7 @@ namespace lar1{
       std::cout << "dm^2: " << dm2point << " of " << npoints << std::endl;      
       // for (int sin22thpoint = 250; sin22thpoint <= npoints; sin22thpoint++){
       for (int sin22thpoint = 0; sin22thpoint <= npoints; sin22thpoint++){
+        // std::cout << "sin22th: " << sin22thpoint << " of " << npoints << std::endl;      
         chisq = 0.0; //reset the chisq!
         systematicErrors.clear();
         statisticalErrors.clear();
@@ -1691,10 +1736,10 @@ namespace lar1{
           {
             for (int i = 0; i < nbins_nue; ++ i)
             {
-                if (debug) std::cout << "\nScaled from: " << nullVec[2*b_line*nbins_nue + i] << std::endl;
-                nullVec[2*b_line*nbins_nue + i] *= scalefac[i];
+                if (debug) std::cout << "\nScaled from: " << nullVec[b_line*(nbins_nue+nbins_numu) + i] << std::endl;
+                nullVec[b_line*(nbins_nue+nbins_numu) + i] *= scalefac[i];
                 // eventsFitVecTemp[nbinsE + n*nbinsE*3 + i] *= scalefac[i];
-                if (debug) std::cout << "Scaled to: " << nullVec[2*b_line*nbins_nue + i] << std::endl;
+                if (debug) std::cout << "Scaled to: " << nullVec[b_line*(nbins_nue+nbins_numu) + i] << std::endl;
             }
           }
         }
@@ -1736,9 +1781,9 @@ namespace lar1{
               else if (useCovarianceMatrix){
                 statisticalErrors[b_line][i] = 1/sqrt(nullVec.at(i+b_line*(nbins_nue+nbins_numu)));
                 if (shapeOnlyFit)
-                  systematicErrors[b_line][i] = sqrt(fractional_Shape_covarianceMatrix[b_line*nbins*3+nbins_nue+i][b_line*nbins*3+nbins_nue+i]);
+                  systematicErrors[b_line][i] = sqrt(fractional_Shape_covarianceMatrix[b_line*nbins+nbins_nue+i][b_line*nbins+nbins_nue+i]);
                 else
-                  systematicErrors[b_line][i] = sqrt(fractionalErrorMatrix[b_line*nbins*3+nbins_nue+i][b_line*nbins*3+nbins_nue+i]);
+                  systematicErrors[b_line][i] = sqrt(fractionalErrorMatrix[b_line*nbins+nbins_nue+i][b_line*nbins+nbins_nue+i]);
               }
               else{ // no near det stats
                 statisticalErrors[b_line][i] = 1/sqrt(nullVec.at(i+b_line*(nbins_numu+nbins_nue)));
@@ -1768,11 +1813,11 @@ namespace lar1{
             systematicErrorsPlotting.at(i).resize(nbins_nue);
             for (int bin = 0; bin < nbins_nue; ++ bin)
             {
-              fittingSignal[i].push_back(predictionVec.at(bin + 2*i*(nbins_nue+nbins_numu)));
-              fittingBackgr[i].push_back(nullVec.at(bin + 2*i*(nbins_nue+nbins_numu)));
+              fittingSignal[i].push_back(predictionVec.at(bin + i*(nbins_nue+nbins_numu)));
+              fittingBackgr[i].push_back(nullVec.at(bin + i*(nbins_nue+nbins_numu)));
               double error = 0;
-              error += pow(nullVec.at(bin + 2*i*(nbins_nue+nbins_numu))*statisticalErrors[i][bin],2);
-              error += pow(nullVec.at(bin + 2*i*(nbins_nue+nbins_numu))*systematicErrors[i][bin],2);
+              error += pow(nullVec.at(bin + i*(nbins_nue+nbins_numu))*statisticalErrors[i][bin],2);
+              error += pow(nullVec.at(bin + i*(nbins_nue+nbins_numu))*systematicErrors[i][bin],2);
               fittingErrors[i].push_back(sqrt(error));
               statisticalErrorsPlotting[i][bin] = statisticalErrors[i][bin];
               systematicErrorsPlotting[i][bin]  = systematicErrors[i][bin];
@@ -1819,7 +1864,7 @@ namespace lar1{
           // But first, call the method to build the covariance matrix!
           // Build each time if using signal in covariance matrix
           // Only once if otherwise
-          
+
           // if (dm2point == 0 && sin22thpoint == 0) BuildCovarianceMatrix();
           if (useSignalCovarianceMatrix)
             BuildCovarianceMatrix(sin22thpoint, dm2point);
@@ -1829,18 +1874,53 @@ namespace lar1{
             entries = fractional_Shape_covarianceMatrix;
           else
             entries = fractionalErrorMatrix;
+          
+          // just for debugging at the moment, printing out the 
+          // errors in a few spots for debugging:
+          // std::cout << "error at (1,1): " << entries[1][1] <<"\n"; 
+          // std::cout << "error at (1,2): " << entries[1][2] <<"\n"; 
+          // std::cout << "error at (2,1): " << entries[2][1] <<"\n"; 
+          // std::cout << "error at (2,2): " << entries[2][1] <<"\n"; 
+          // std::cout << "error at (2,4): " << entries[2][1] <<"\n"; 
+          // std::cout << "error at (4,2): " << entries[2][1] <<"\n"; 
+          
+          if (nL > 1){
+            // std::cout << "error at (1+nbins,1+nbins): " << entries[1+nbins][1+nbins] <<"\n"; 
+            // std::cout << "error at (1+nbins,2+nbins): " << entries[1+nbins][2+nbins] <<"\n"; 
+            // std::cout << "error at (2+nbins,1+nbins): " << entries[2+nbins][1+nbins] <<"\n"; 
+            // std::cout << "error at (2+nbins,2+nbins): " << entries[2+nbins][2+nbins] <<"\n"; 
+            // std::cout << "error at (2+nbins,4+nbins): " << entries[2+nbins][4+nbins] <<"\n"; 
+            // std::cout << "error at (4+nbins,2+nbins): " << entries[4+nbins][2+nbins] <<"\n"; 
+
+          }
 
           //Can't forget to add in the statistical errors on the diagonal!
           for (int ibin = 0; ibin < nbins*nL; ibin++){
             for (int jbin = 0; jbin < nbins*nL; jbin ++){
               double cvi(0.0);
-              if (ibin % nbins > nbins_nue ) cvi = nullVec[ibin-nbins_nue];
+              if (ibin % nbins >= nbins_nue ) {
+                int bin = (ibin/nbins)*(nbins_nue+nbins_numu);
+                bin += (ibin % nbins) - nbins_nue;
+                cvi = nullVec[bin];
+                // if (jbin == 0){
+                //   std::cout << "Setting cvi to " << cvi << ", ibin is " << ibin
+                //             << ", bin is " << bin << std::endl;
+                // }
+              }
               double cvj(0.0);
-              if (jbin % nbins > nbins_nue ) cvj = nullVec[jbin-nbins_nue];
+              if (jbin % nbins >= nbins_nue ){
+                int bin = (jbin/nbins)*(nbins_nue+nbins_numu);
+                bin += (jbin % nbins) - nbins_nue;
+                cvj = nullVec[bin];
+                // if (ibin == 0){
+                //   std::cout << "Setting cvj to " << cvj << ", jbin is " << jbin
+                //             << ", bin is " << bin << std::endl;
+                // }
+              }
 
               entries[ibin][jbin] *= cvi*cvj;
               if (ibin == jbin){
-                entries[ibin][jbin] += cvi; //cvi should equal cvj here
+                if (ibin > nbins) entries[ibin][jbin] += cvi; //cvi should equal cvj here
               }
             } //end loop on jbin
           } //end loop on ibin
@@ -1855,9 +1935,9 @@ namespace lar1{
         //for debugging, can print out covariance matrix:
         //
         if (debug){
-          for (unsigned int i = 0; i < nbins*nL; i ++){
+          for ( int i = 0; i < nbins*nL; i ++){
             std::cout << i << "\t";
-            for (unsigned int j = 0; j < nbins*nL; j++){
+            for ( int j = 0; j < nbins*nL; j++){
               std::cout << entries[i][j] << " ";
             }
             std::cout << std::endl;
@@ -1872,9 +1952,9 @@ namespace lar1{
           //the matrix should be nbins- nL*nbinsE on each side.  Print:
           std::cout << "\nPrinting collapsed covariance matrix:\n";
           // unsigned int side = nbins-nL*nbinsE;
-          for (unsigned int i = 0; i < (nbins-nbins_nue)*nL; i ++){
+          for ( int i = 0; i < (nbins-nbins_nue)*nL; i ++){
             std::cout << i << "\t";
-            for (unsigned int j = 0; j < (nbins-nbins_nue)*nL; j++){
+            for ( int j = 0; j < (nbins-nbins_nue)*nL; j++){
               std::cout << entriescollapsed[i][j] << " ";
             }
             std::cout << std::endl;
@@ -1884,19 +1964,19 @@ namespace lar1{
         
 
 
-
         //Now create the inverse covariance matrix.  Root can invert for us:
         // TMatrix *M = new TMatrix(nbins-nL*nbinsE,nbins-nL*nbinsE,entriescollapsed);
-        // if (dm2point == npoints && sin22thpoint == npoints){
-        //   TCanvas * collapsedCanvas = new TCanvas("cc","cc",700,700);
-        //   M->Draw("surf");
-        //   TCanvas * uncollapsedCanvas = new TCanvas("cc2","cc2",700,700);
-        //   covarianceMatrix.Draw("surf");
+        // if (dm2point == npoints/2 && sin22thpoint == npoints/2){
+          // TCanvas * collapsedCanvas = new TCanvas("cc","cc",700,700);
+          // entries.Draw("surf");
+          // TCanvas * uncollapsedCanvas = new TCanvas("cc2","cc2",700,700);
+          // entriescollapsed.Draw("surf");
         // }
         //inverse cov matrix, M^{-1}, used in chi2 calculation
         // TMatrix *cov = new TMatrix(nbins-nL*nbinsE,nbins-nL*nbinsE);
         TMatrix *cov = &(entriescollapsed.Invert()); //this is used in chi2 calculation
         // cov = &(M->Invert()); //this is used in chi2 calculation
+// return -1;
 
 
         //Checking collapsing:
@@ -1908,7 +1988,6 @@ namespace lar1{
             std::cout << "\n";
           }
         }
-
         //This is the actual chi2 calculation
         //Energy spectrum fit
         //loop over collapsed bins
@@ -1921,7 +2000,6 @@ namespace lar1{
                 float cvi = nullVec[ibin];
                 float cvj = nullVec[jbin];
 
-                // The prediction doesn't change
                 float predictioni = predictionVec[ibin];
                 float predictionj = predictionVec[jbin];
                 
@@ -1933,7 +2011,7 @@ namespace lar1{
                     }
                 }
                 if (sin22thpoint == sin22thFittingPoint && dm2point == dm2FittingPoint){
-                  if (jbin == 25){
+                  if (jbin == ibin){
                     std::cout << "On bin " << ibin 
                               << ", adding chi2 = " 
                               << (predictioni-cvi)*(predictionj-cvj)

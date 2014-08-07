@@ -133,12 +133,12 @@ namespace lar1{
   {
     gStyle->SetOptStat(0000);
     gStyle->SetOptFit(0000);
-    gStyle->SetPadBorderMode(0);
-    gStyle->SetPadBottomMargin(0.15);
-    gStyle->SetPadLeftMargin(0.15);
+    // gStyle->SetPadBorderMode(0);
+    gStyle->SetPadBottomMargin(0.16);
+    gStyle->SetPadLeftMargin(0.16);
     gStyle->SetPadRightMargin(0.05);
     gStyle->SetFrameBorderMode(0);
-    gStyle->SetCanvasBorderMode(0);
+    // gStyle->SetCanvasBorderMode(0);
     gStyle->SetPalette(0);
     gStyle->SetCanvasColor(0);
     gStyle->SetPadColor(0);

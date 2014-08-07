@@ -92,7 +92,7 @@ namespace lar1
     // 
     // I'm not going to check for pathological cases where bins is more fine than
     // the default bins, sorry.  Just don't do that.
-    for(int inputBin = 0; inputBin < inputVector.size(); inputBin++){
+    for(unsigned int inputBin = 0; inputBin < inputVector.size(); inputBin++){
       // So, we want to find out where to put this input data
       // into the output data.  That means seeing where this bin's boundaries
       // lie wrt the input bins.
@@ -106,7 +106,7 @@ namespace lar1
       if (default_bins[inputBin] > bins.back()) continue;
       // Next, look at each bin and find where this input bin [lower] 
       // is greater than or equal to a final bin:
-      int tempLowerBin = 0;
+      unsigned int tempLowerBin = 0;
       for (tempLowerBin = 0; tempLowerBin < bins.size(); ++tempLowerBin)
       {
         if (default_bins[inputBin] == bins[tempLowerBin]){
@@ -200,7 +200,7 @@ namespace lar1
     return ret;
   }
 
-  std::vector<std::vector<float> > CollapseMatrix(
+  std::vector<std::vector<float> > SensUtils::CollapseMatrix(
                                     std::vector<std::vector<float> > entries,
                                     int nbins_nue, int nbins_numu, int nL)
   {
@@ -241,9 +241,9 @@ namespace lar1
         
         // this if is true if it's an osc bin
         if (jbin % nbins < nbins_nue)
-          j_destination += (ibin % nbins);
+          j_destination += (jbin % nbins);
         else //not an osc bin, so the destination is shorter by nbins_nue
-          j_destination += (ibin % nbins)-nbins_nue;
+          j_destination += (jbin % nbins)-nbins_nue;
 
 
         // Now the destination is set, just fill the matrix up:
@@ -255,7 +255,7 @@ namespace lar1
 
   }
 
-  TMatrix CollapseMatrix(TMatrix entries,
+  TMatrix SensUtils::CollapseMatrix(TMatrix entries,
                          int nbins_nue, int nbins_numu, int nL)
   {
 
@@ -295,10 +295,13 @@ namespace lar1
         
         // this if is true if it's an osc bin
         if (jbin % nbins < nbins_nue)
-          j_destination += (ibin % nbins);
+          j_destination += (jbin % nbins);
         else //not an osc bin, so the destination is shorter by nbins_nue
-          j_destination += (ibin % nbins)-nbins_nue;
+          j_destination += (jbin % nbins)-nbins_nue;
 
+        // if (jbin == 0)
+          // std::cout << "ibin is " << ibin << ", destination is " 
+                    // << i_destination << std::endl;
 
         // Now the destination is set, just fill the matrix up:
         collapsedMatrix[i_destination][j_destination] += entries[ibin][jbin];
@@ -774,6 +777,8 @@ namespace lar1
                                  std::vector<float> & bins){
     if (bins.size() != input.size()+1){
       std::cerr << "Error in make histogram, number of bins doesn't match input size.\n";
+      std::cerr << "  bins: " << bins.size() << "\n";
+      std::cerr << "  input: " << input.size() << "\n";
       exit(-1);
     }
     static int i = 0;
