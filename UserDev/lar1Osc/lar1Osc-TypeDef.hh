@@ -24,6 +24,8 @@ namespace lar1{
   class FluxRWnubar;
   class NtupleReprocessing;
 }
+  class testphots;
 //ADD_EMPTY_CLASS ... do not change this comment line
 
 #endif
+

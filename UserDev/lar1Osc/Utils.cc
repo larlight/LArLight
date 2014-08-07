@@ -840,6 +840,31 @@ namespace lar1{
   }
 
 
+    double  Utils::GetLengthToStart(TVector3 startPoint, TVector3 startDir, int idet){
+
+    if (!IsActive(idet, startPoint)){
+      // std::cout << "Failed the IsActive cut!\n";
+      return 0;
+    }
+    return GetContainedLength(startPoint,-startDir,idet);
+
+  }
+  
+  
+   double  Utils::GetYZLengthToStart(TVector3 startPoint, TVector3 startDir, int idet){
+
+    if (!IsActive(idet, startPoint)){
+      // std::cout << "Failed the IsActive cut!\n";
+      return 0;
+    }
+    
+    TVector3 newdir=startDir;
+    newdir[0]=0;
+    return GetContainedLength(startPoint,-newdir,idet);
+
+  }
+  
+  
   // bool PhotonsAreParallel(TVector3 & photon1_start, TVector3 & photon1_mom
   //                         TVector3 & photon2_start, TVector3 & photon2_mom)
   // {
