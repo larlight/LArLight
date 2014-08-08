@@ -60,7 +60,7 @@ public:
     TrackLength = track_length;
   };
 
-  int GetEnergy() const { return Energy; }
+  double GetEnergy() const { return Energy; }
   int GetMotherTID() const { return MotherTID; }
   int GetMotherPDG() const { return MotherPDG; }
   std::vector<double> GetStartXYZT() const { return StartXYZT; }

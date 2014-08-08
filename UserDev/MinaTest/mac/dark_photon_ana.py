@@ -3,9 +3,9 @@ from ROOT import *
 
 ch=TChain("myana/Toy_tree","")
 
-ch.AddFile(sys.argv[1])
-
-print "File opened"
+for i in range(1,76):
+    ch.AddFile("DarkPhotonCosmicHist__%s.root" %i)
+    print "File number %s opened" %i
 
 my_ana = DarkPhotonAnaC()
 

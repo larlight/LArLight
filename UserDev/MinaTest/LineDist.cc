@@ -19,7 +19,7 @@ double LineDist::Calc(const MinaTestParticle& part1, const MinaTestParticle& par
 
   //Compute the necessary cross products, dot products, etc.                                                                                                                           
   std::vector<double> cross = {(b[1]*d[2] - d[1]*b[2]), -(b[0]*d[1] - b[1]*d[0]), (b[0]*d[2] - b[2]*d[0])};
-  double dist = ((cross[0]*c_a[0] + cross[1]*c_a[1] + cross[2]*c_a[2]) / std::sqrt(cross[0]*cross[0] + cross[1]*cross[1] + cross[2]*cross[2]));
+  double dist = (std::abs((cross[0]*c_a[0] + cross[1]*c_a[1] + cross[2]*c_a[2])) / std::sqrt(cross[0]*cross[0] + cross[1]*cross[1] + cross[2]*cross[2]));
 
   return dist;
 }
