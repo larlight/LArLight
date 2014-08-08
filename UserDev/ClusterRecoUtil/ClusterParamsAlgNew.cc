@@ -86,6 +86,7 @@ namespace cluster{
       (*fHitVector.rbegin()).t = h->PeakTime() * fGSer->TimeToCm();
       (*fHitVector.rbegin()).w = h->Wire() * fGSer->WireToCm();
       (*fHitVector.rbegin()).charge = h->Charge();
+      (*fHitVector.rbegin()).peak = h->Charge(true);
       (*fHitVector.rbegin()).plane = plane;
     }
     fPlane=fHitVector[0].plane;

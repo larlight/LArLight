@@ -5,7 +5,7 @@
  * 
  * \brief Class def header for a class CFAlgo3DAngle
  *
- * @author ah673_NAME
+ * @author ariana hackenburg
  */
 
 /** \addtogroup CMTool
@@ -28,19 +28,13 @@ namespace cmtool {
     
     /// Default constructor
     CFAlgo3DAngle();
-    
+   
     /// Default destructor
     virtual ~CFAlgo3DAngle(){};
 
-    //
-    // Author should be aware of 3 functions at least: Float, Report, 
-    // and Reset. More possibly-useful functions can be found in the later 
-    // part but commented out. All of these functions are virtual and defined
-    // in the base class.
-
     /**
-       Core function: given a set of CPANs, return a float which indicates 
-       the compatibility the cluster combination.
+      Calculate 3d angles from all permutations of the 3 planes.  Weight them according to
+	  charge profile. Choose the 2 best weights and compare those 2 theta and phi 
     */
     virtual float Float(const std::vector<const cluster::ClusterParamsAlgNew*> &clusters);
 
@@ -50,52 +44,35 @@ namespace cmtool {
 	*/
 	virtual void FixPhiTheta(double &phi, double &theta) ;
 
-	/**
-		Set max and min phi and theta for ratio calculations
-	*/
+	//Set max and min phi and theta for ratio calculations
 	virtual void SetMaxMin(const double phi_1, const double phi_2,double &max_1,double &max_2);
 	
-	/**
-		Order the hits per plane to make cuts convenient
-	*/
-	virtual void SortHits(const double hits_0, const double hits_1, const double hits_2, double &most, double &middle, double &least) ;
+	//Order the theta, phi, hits per plane to make cuts convenient
+	virtual void SetMaxMiddleMin(const double first, const double second, const double third, double &most, double &middle, double &least) ;
 
-    /**
-       Optional function: called after each iterative approach if a manager class is
-       run with verbosity level <= kPerIteration. Maybe useful for debugging.
-    */
+	virtual void ChooseThetaOrPhi(const double theta1, const double theta2, const double theta3, const double phi1, const double phi2, const double phi3, double &ratio_angle);
+
+	void SetDebug(bool debug) { _debug = debug ; }
+	
+	void SetThetaCut(float theta_cut ) { _theta_cut = theta_cut ; }
+
+	void SetPhiCut(float phi_cut ) { _phi_cut = phi_cut ; }
+
+	void SetRatio(float ratio ) { _ratio_cut = ratio ; }
+
     virtual void Report();
-    
-    /// Function to reset the algorithm instance, called together with manager's Reset()
     virtual void Reset();
-
-    /**
-       Optional function: called at the beginning of 1st iteration. This is called per event.
-     */
-    //virtual void EventBegin(const std::vector<cluster::ClusterParamsAlgNew> &clusters);
-
-    /**
-       Optional function: called at the end of event ... after the last merging iteration is over.
-     */
-    //virtual void EventEnd();
- 
-    /**
-       Optional function: called at the beggining of each iterative loop.
-       This provides all clusters' information in case the algorithm need them. Note this
-       is called per iteration which may be more than once per event.
-     */
-    //virtual void IterationBegin(const std::vector<cluster::ClusterParamsAlgNew> &clusters);
-
-    /**
-       Optional function: called at the end of each iterative loop.
-     */
-    //virtual void IterationEnd();
 
 	protected:
 	
-		float _theta_cut ;
-		float _phi_cut	 ; 
-		float _ratio_cut ;
+	float _theta_cut ;
+	float _phi_cut	 ; 
+	float _ratio_cut ;
+	float _debug 	 ;
+
+	//Histogram for charge profile
+	TH1D *cProfile ;
+
   };
 }
 #endif

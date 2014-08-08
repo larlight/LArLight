@@ -56,7 +56,7 @@ namespace cluster {
       h.t = hit.PeakTime() * geou->TimeToCm();
       h.w = hit.Wire()     * geou->WireToCm();
 
-      h.charge = hit.Charge(false);
+      h.charge = hit.Charge();
       h.peak   = hit.Charge(true);
       h.plane  = plane;
 

@@ -39,6 +39,7 @@
 #include "CBAlgoOutOfConeSeparate.hh"
 #include "CBAlgoMergeAll.hh"
 #include "CBAlgoCenterOfMass.hh"
+#include "CBAlgoCenterOfMassSmall.hh"
 #include "CBAlgoStartNearEnd.hh"
 #include "CBAlgoStartTrack.hh"
 #include "CBAlgoProhibitAllTracks.hh"
@@ -53,7 +54,11 @@
 #include "CFAlgoTimeOverlap.hh"
 #include "CFAlgoZOverlap.hh"
 #include "CFAlgoStartPointMatch.hh"
+#include "CFAlgoStartPointCompat.hh"
+#include "CFAlgoStartTimeCompat.hh"
 #include "CFAlgo3DAngle.hh"
+#include "CFAlgoWireOverlap.hh"
+#include "CFAlgoVolumeOverlap.hh"
 //ADD_CFALGO_HEADER
 
 #include "MatchViewer.hh"
@@ -105,6 +110,7 @@ namespace cmtool {
   class CBAlgoMergeTinyWithBig;
   class CBAlgoProhibitBigClusters;
   class CBAlgoCenterOfMass;
+  class CBAlgoCenterOfMassSmall;
   class CBAlgoMergeAll;
   class CBAlgoOutOfConeSeparate;
   class CBAlgoTrackSeparate;
@@ -116,7 +122,11 @@ namespace cmtool {
   class CFAlgoTimeOverlap;
   class CFAlgoZOverlap;
   class CFAlgoStartPointMatch;
+  class CFAlgoStartPointCompat;
+  class CFAlgoStartTimeCompat;
   class CFAlgo3DAngle;
+  class CFAlgoWireOverlap;
+  class CFAlgoVolumeOverlap;
 //ADD_CFALGO_CLASS ... do not change this comment line
 
 }

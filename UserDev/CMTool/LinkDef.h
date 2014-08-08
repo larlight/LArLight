@@ -54,6 +54,7 @@
 #pragma link C++ class cmtool::CBAlgoOutOfConeSeparate+;
 #pragma link C++ class cmtool::CBAlgoMergeAll+;
 #pragma link C++ class cmtool::CBAlgoCenterOfMass+;
+#pragma link C++ class cmtool::CBAlgoCenterOfMassSmall+;
 #pragma link C++ class cmtool::CBAlgoStartNearEnd+;
 #pragma link C++ class cmtool::CBAlgoStartTrack+;
 #pragma link C++ class cmtool::CBAlgoProhibitAllTracks+;
@@ -68,7 +69,11 @@
 #pragma link C++ class cmtool::CFAlgoTimeOverlap+;
 #pragma link C++ class cmtool::CFAlgoZOverlap+;
 #pragma link C++ class cmtool::CFAlgoStartPointMatch+;
+#pragma link C++ class cmtool::CFAlgoStartPointCompat+;
+#pragma link C++ class cmtool::CFAlgoStartTimeCompat+;
 #pragma link C++ class cmtool::CFAlgo3DAngle+;
+#pragma link C++ class cmtool::CFAlgoWireOverlap+;
+#pragma link C++ class cmtool::CFAlgoVolumeOverlap+;
 //ADD_CFALGO_CLASS ... do not change this line
 
 

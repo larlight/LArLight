@@ -29,17 +29,17 @@ match_viewer = larlight.MatchViewer()
 mc_viewer    = larlight.MCShowerClusterViewer()
 
 match_viewer.SetPrintClusterInfo(True)
-
+match_viewer.ShowShowers(True)
 ########################################
 # attach match algos here
 ########################################
 
 
 priority_algo = cmtool.CPAlgoNHits()
-priority_algo.SetMinHits(50)
+priority_algo.SetMinHits(20)
 match_viewer.GetManager().AddPriorityAlgo(priority_algo)
 
-myalg = cmtool.CFAlgoQRatio()
+myalg = cmtool.CFAlgoStartPointMatch()
 match_viewer.GetManager().AddMatchAlgo(myalg)
 
 ########################################
@@ -69,6 +69,8 @@ gStyle.SetOptStat(0)
 #start on first event always
 user_input_evt_no = -1;
 
+counter = 0
+
 while true:
 
     try:
@@ -84,6 +86,8 @@ while true:
 
     mc_viewer.DrawAllClusters();
 
+    print "Event ID is: " ,counter
+    counter+=1
     print "    Hit enter to go next event..."
     sys.stdin.readline()
 

@@ -21,7 +21,8 @@ namespace larlight {
 	this_mother_energy += pow(this_mcshow.MotherMomentum().at(i),2);
       this_mother_energy = pow(this_mother_energy, 0.5);
 
-      if(this_mother_energy < _cutoff_energy) continue;
+      if(this_mother_energy > _max_energy) continue;
+      if(this_mother_energy < _min_energy) continue;
       
       for(auto this_trackid : (std::vector<UInt_t>)this_mcshow.DaughterTrackID())
 	shower_idmap.insert(std::pair<UInt_t,UInt_t>(this_trackid,mcshower_index));
@@ -167,7 +168,8 @@ namespace larlight {
   ///////////////////////////////////////////////////
   std::vector<float> McshowerLookback::MatchHitsAll(const std::vector<const larlight::hit*> &hits,
 						    const std::map<UShort_t, larlight::simch> &simch_map, 
-						    const std::map<UInt_t,UInt_t> &shower_idmap) const
+						    const std::map<UInt_t,UInt_t> &shower_idmap,
+						    bool fraction) const
   {
     ////////////////////////////////////////////////////////////////
     //setup variables for holding charge info from various mcshowers
@@ -257,6 +259,8 @@ namespace larlight {
     //  for(int j = 0; j < part_ides_charge.size(); ++j)
     //    std::cout<<part_ides_charge.at(j)<<", ";
     //  std::cout<<"), with size "<<part_ides_charge.size()<<std::endl;
+
+    if(!fraction) return part_ides_charge;
     
     //compute the actual fractions function returns
     std::vector<float> fractions;  

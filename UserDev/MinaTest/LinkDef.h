@@ -19,7 +19,10 @@
 #pragma link C++ class MinaTestParticle+;
 #pragma link C++ class DarkPhotonAnaC+;
 #pragma link C++ class LineDist+;
+#pragma link C++ class ISevent+;
+#pragma link C++ class ISstep+;
+#pragma link C++ class ReflectivityStep+;
+#pragma link C++ class ReflectivityEvent+;
 //ADD_NEW_CLASS ... do not change this line
 #endif
-
 

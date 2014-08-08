@@ -12,7 +12,7 @@ namespace larlight {
   }
   
   bool ShowerReco3D::initialize() {
-
+    _mgr = 0;
     // Make sure cluster type is a valid one
     if(fClusterType != DATA::FuzzyCluster &&
        fClusterType != DATA::CrawlerCluster &&
@@ -27,7 +27,8 @@ namespace larlight {
   }
   
   bool ShowerReco3D::analyze(storage_manager* storage) {
-    
+
+    _mgr = storage;
     // Re-initialize tools
     fShowerAlgo.Reset();
     fMatchMgr.Reset();
@@ -42,7 +43,13 @@ namespace larlight {
     local_clusters.clear();
 
     // Run matching & retrieve matched cluster indices
-    fMatchMgr.Process();
+    try{
+      fMatchMgr.Process();
+    }catch( ::cmtool::CMTException &e){
+      e.what();
+      return false;
+    }
+
     auto const& matched_pairs = fMatchMgr.GetBookKeeper().GetResult();
 
     //
@@ -53,7 +60,10 @@ namespace larlight {
     auto shower_v = (event_shower*)(storage->get_data(DATA::Shower));
     shower_v->clear();
     shower_v->reserve(matched_pairs.size());
-
+    shower_v->set_event_id(storage->get_data(fClusterType)->event_id());
+    shower_v->set_run(storage->get_data(fClusterType)->run());
+    shower_v->set_subrun(storage->get_data(fClusterType)->subrun());
+    
     // Loop over matched pairs
     for(auto const& pair : matched_pairs) {
       
@@ -61,6 +71,8 @@ namespace larlight {
       std::vector< ::cluster::ClusterParamsAlgNew> clusters;
       clusters.reserve(pair.size());
 
+      
+            
       // Create an association vector
       std::vector<unsigned short> ass_index;
       ass_index.reserve(pair.size());
@@ -73,6 +85,19 @@ namespace larlight {
 	
       }
 
+      
+      int check=0;
+      for(auto const & iter : clusters)
+      {
+	if(iter.GetNHits() > 20)
+	  check++;
+      }
+	
+	std::cout << " clusters " <<  clusters.size() << " check " << check << std::endl;
+	
+	if(check<=2)
+	  continue;
+	
       // Run algorithm
       larlight::shower result = fShowerAlgo.Reconstruct(clusters);
 

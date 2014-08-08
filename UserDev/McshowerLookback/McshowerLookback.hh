@@ -31,7 +31,7 @@ namespace larlight {
   public:
     
     /// Default constructor (min energy is 0.02GeV)
-    McshowerLookback(){ _cutoff_energy = 0.02; };
+    McshowerLookback(){ _min_energy = 0.02; _max_energy = 1.e3;};
     
     /// Takes in event_mcshowers and fills a map of 
     /// (G4trackid of daughter particle => MCShower index in ev_mcshower)
@@ -62,9 +62,11 @@ namespace larlight {
 
     std::vector<float> MatchHitsAll(const std::vector<const larlight::hit*> &hits,
 				    const std::map<UShort_t, larlight::simch> &simch_map, 
-				    const std::map<UInt_t,UInt_t> &shower_idmap) const;
+				    const std::map<UInt_t,UInt_t> &shower_idmap,
+				    bool fraction=true) const;
     
-    void SetCutoffEnergy(double energy) { _cutoff_energy = energy; }
+    void SetMaxEnergyCut(double energy) { _max_energy = energy; }
+    void SetMinEnergyCut(double energy) { _min_energy = energy; }
     
     //std::vector<double> MatchHitsAll;
     //double MatchClusOne;
@@ -76,7 +78,8 @@ namespace larlight {
     
   protected:
     
-    double _cutoff_energy;
+    double _max_energy;
+    double _min_energy;
   };
   
 }
