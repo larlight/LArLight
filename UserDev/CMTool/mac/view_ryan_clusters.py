@@ -5,29 +5,28 @@ from ROOT import *
 # Now import ana_processor & your class. For this example, ana_base.
 gSystem.Load("libCMTool")
 from ROOT import *
-if len(sys.argv) != 2:
+if not len(sys.argv) in [2,3]:
     print
     print "*** Improper usage. Usage: python viewclusters.py /path/to/input/file.root ***"
     print
 
-
 filename = sys.argv[1]
+
 my_proc = larlight.ana_processor()
-my_proc.set_verbosity(larlight.MSG.DEBUG)
+
+#my_proc.set_verbosity(larlight.MSG.DEBUG)
 
 my_proc.set_io_mode(larlight.storage_manager.READ)
 
 my_proc.add_input_file(filename)
 
-larlight.storage_manager.get().set_in_rootdir("scanner")
-larlight.storage_manager.get().set_data_to_read(larlight.DATA.MCTruth,False)
-larlight.storage_manager.get().set_data_to_read(larlight.DATA.Shower,False)
-larlight.storage_manager.get().set_data_to_read(larlight.DATA.Calorimetry,False)
-larlight.storage_manager.get().set_data_to_read(larlight.DATA.UserInfo,False)
-
 my_proc.set_ana_output_file("")
 
-raw_viewer   = larlight.ClusterViewer()
+raw_viewer = larlight.ClusterViewer()
+
+if len(sys.argv)>2:
+
+    my_proc.set_input_rootdir(sys.argv[2])
 
 #decide if to show hit charge OR MCShowers on RHS of TCanvas [default: false]
 #raw_viewer.ShowShowers(True)
@@ -37,7 +36,7 @@ raw_viewer   = larlight.ClusterViewer()
 
 my_proc.add_process(raw_viewer)
 
-raw_viewer.SetClusterType(larlight.DATA.Cluster)
+raw_viewer.SetClusterType(larlight.DATA.RyanCluster)
 
 gStyle.SetOptStat(0)
 
