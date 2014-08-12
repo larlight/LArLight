@@ -42,7 +42,8 @@ namespace larlight {
 	type != DATA::FuzzyCluster &&
 	type != DATA::CrawlerCluster &&
 	type != DATA::ShowerAngleCluster &&
-	type != DATA::HoughCluster )
+	type != DATA::HoughCluster &&
+	type != DATA::RyanCluster )
 
       print(MSG::ERROR,__FUNCTION__,Form("Not a valid cluster type: %s",DATA::DATA_TREE_NAME[type].c_str()));
     
