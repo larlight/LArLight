@@ -226,9 +226,12 @@ namespace larlight {
       hMatchQEff->Fill(qratio_max);
     }
 
-    hMatchQEffEvent->Fill(max_eff);
+    if(reco_match_v.size()) {
 
-    hMatchNumEff->Fill( (float)(mcshower_id.size()) / (float)(reco_match_v.size()) );
+      hMatchQEffEvent->Fill(max_eff);
+
+      hMatchNumEff->Fill( (float)(mcshower_id.size()) / (float)(reco_match_v.size()) );
+    }
 
     return true;
   }
