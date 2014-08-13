@@ -20,11 +20,15 @@
 #include <map>
 #include <vector>
 #include <TH1D.h>
+#include <TH2D.h>
 #include <sstream>
 #include <stdio.h>
 #include <string.h>
 #include <cmath>
 #include <deque>
+#include <fstream>
+#include <TVector3.h>
+#include <TLorentzVector.h>
 
 
 namespace larlight {
@@ -57,9 +61,22 @@ namespace larlight {
     */
     virtual bool finalize();
 
+    void SetVerbose(bool on) { _verbose = on; }
+
     protected:
 
+    bool _verbose;
     int _evtN;
+    ofstream outFile;
+
+    TH1D * eEnergy;
+    TH1D * eAngle;
+    TH1D * gEnergypre;
+    TH1D * gEnergypost;
+    TH1D * gAngle;
+    TH2D * eEvseAngle;
+    TH2D * eEvsgAngle;
+    TH2D * gEvsgAngle;
 
   };
 }
