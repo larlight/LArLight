@@ -51,8 +51,7 @@ namespace larlight {
 	
 	  print(MSG::ERROR,__FUNCTION__,
 		Form("Detected event-alignment mismatch! (%d != %d)",
-		     _ptr_data_array[ptr_index]->event_id(),
-		     _ptr_data_array[(size_t)(DATA::Event)]->event_id() )
+		     _ptr_data_array[ptr_index]->event_id(), _current_event_id)
 		);
 	  
 	  return 0;
