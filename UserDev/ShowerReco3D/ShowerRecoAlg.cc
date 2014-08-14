@@ -117,7 +117,8 @@ namespace shower {
       double totHighEnergy=0;
       double totMIPEnergy=0;
       int direction=-1;
-      double dEdx_av=0,RMS_dedx=0,dedx_final=0;
+      //double RMS_dedx=0;
+      double dEdx_av=0,dedx_final=0;
       int npoints_first=0, npoints_sec=0;
       
      //override direction if phi (XZ angle) is less than 90 degrees 
@@ -211,9 +212,9 @@ namespace shower {
     
     //first pass at average dE/dx
      if(wdist<fdEdxlength 
-      && ((direction==1 && theHit.w>clustit.GetParams().start_point.w)     //take no hits before vertex (depending on direction)
-      || (direction==-1 && theHit.w<clustit.GetParams().start_point.w)  ) 
-	     && ortdist<3.5 && linedist < fdEdxlength ){
+	&& ((direction==1 && theHit.w>clustit.GetParams().start_point.w)     //take no hits before vertex (depending on direction)
+	    || (direction==-1 && theHit.w<clustit.GetParams().start_point.w) ) 
+	&& ortdist<3.5 && linedist < fdEdxlength ){
 	      
 	      dEdx_av+= dEdx_new;
 	      local_hitlist.push_back(theHit);
@@ -278,21 +279,21 @@ namespace shower {
     //fDistribAfterMin[set].push_back(MinBefore);
 	//fDistribBeforeMin[set].push_back(MinAfter);
     
-    if( (dEdx > (mevav2cm-fRMS_corr) )
-	    && (dEdx < (mevav2cm+fRMS_corr) ) 
-		|| (newpitch > 0.3*fdEdxlength ) ) {
-	    dedx_final+= dEdx; 
-	    npoints_sec++;
-	  }
+     if( ((dEdx > (mevav2cm-fRMS_corr) )
+	  && (dEdx < (mevav2cm+fRMS_corr) )) 
+	 || (newpitch > 0.3*fdEdxlength ) ) {
+       dedx_final+= dEdx; 
+       npoints_sec++;
+     }
      
-    }
+ }
     
-  
-  
-    if(npoints_sec>0){
-	dedx_final/=npoints_sec;
-        
-    }
+ 
+ 
+ if(npoints_sec>0){
+   dedx_final/=npoints_sec;
+   
+ }
   
  
   

@@ -5,10 +5,13 @@
 
 namespace larlight {
 
-  ShowerReco3D::ShowerReco3D() : ana_base()
+  ShowerReco3D::ShowerReco3D() : ana_base(), fMatchMgr(nullptr)
   {
     _name="ShowerReco3D";
     fClusterType = DATA::Cluster;
+
+    auto geom = ::larutil::Geometry::GetME();
+    fMatchMgr = new ::cmtool::CMatchManager(geom->Nplanes());
   }
   
   bool ShowerReco3D::initialize() {
@@ -17,12 +20,13 @@ namespace larlight {
     if(fClusterType != DATA::FuzzyCluster &&
        fClusterType != DATA::CrawlerCluster &&
        fClusterType != DATA::ShowerAngleCluster &&
-       fClusterType != DATA::Cluster)
+       fClusterType != DATA::Cluster &&
+       fClusterType != DATA::RyanCluster)
 
       throw ::cluster::RecoUtilException(Form("Not supported cluster type: %s",
 					      DATA::DATA_TREE_NAME[fClusterType].c_str())
 					 );
-
+    
     return true;
   }
   
@@ -31,26 +35,26 @@ namespace larlight {
     _mgr = storage;
     // Re-initialize tools
     fShowerAlgo.Reset();
-    fMatchMgr.Reset();
+    fMatchMgr->Reset();
 
     // Retrieve clusters and fed into the algorithm
     std::vector<std::vector<larutil::PxHit> > local_clusters;
 
     fCRUHelper.GeneratePxHit(storage,fClusterType,local_clusters);
     
-    fMatchMgr.SetClusters(local_clusters);
+    fMatchMgr->SetClusters(local_clusters);
 
     local_clusters.clear();
 
     // Run matching & retrieve matched cluster indices
     try{
-      fMatchMgr.Process();
+      fMatchMgr->Process();
     }catch( ::cmtool::CMTException &e){
       e.what();
       return false;
     }
 
-    auto const& matched_pairs = fMatchMgr.GetBookKeeper().GetResult();
+    auto const& matched_pairs = fMatchMgr->GetBookKeeper().GetResult();
 
     //
     // Run shower reco algorithm and store output
@@ -81,7 +85,7 @@ namespace larlight {
 
 	ass_index.push_back(cluster_index);
 	
-	clusters.push_back( fMatchMgr.GetInputClusters().at(cluster_index) );
+	clusters.push_back( fMatchMgr->GetInputClusters().at(cluster_index) );
 	
       }
 
