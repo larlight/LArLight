@@ -29,6 +29,13 @@ namespace cmtool {
   float CFAlgo3DAngle::Float(const std::vector<const cluster::ClusterParamsAlgNew*> &clusters)
   //----------------------------------------------------------------------------------------------
   {
+    // Code-block by Kazu starts
+    // This ensures all entries in "clusters" pointer vector are valid pointers.
+    // You may take out this block if you want to allow matching using clusters from only 2 planes.
+    // But make sure you handle the case of null pointer
+    for(auto const& ptr : clusters) if(!ptr) return -1;
+    // Code-block by Kazu ends
+
 
 	int plane_0 = clusters.at(0)->GetParams().start_point.plane ;
 	int plane_1 = clusters.at(1)->GetParams().start_point.plane ;

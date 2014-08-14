@@ -5,6 +5,18 @@
 
 namespace larlight {
 
+
+  ClusterMatcher::ClusterMatcher() : _mgr(nullptr)
+  { 
+    _name="ClusterMatcher"; 
+    _fout=0; 
+    _cluster_type = DATA::FuzzyCluster; 
+
+    auto geom = ::larutil::Geometry::GetME();
+    _mgr = new ::cmtool::CMatchManager(geom->Nplanes());
+    
+  }
+
   bool ClusterMatcher::initialize() {
 
     if(_cluster_type != DATA::FuzzyCluster &&
@@ -16,7 +28,7 @@ namespace larlight {
 					      DATA::DATA_TREE_NAME[_cluster_type].c_str())
 					 );
 
-    if(_fout) _mgr.SetAnaFile(_fout);
+    if(_fout) _mgr->SetAnaFile(_fout);
 
     return true;
   }
@@ -27,11 +39,11 @@ namespace larlight {
 
     _cru_helper.GeneratePxHit(storage,_cluster_type,local_clusters);
 
-    _mgr.Reset();
+    _mgr->Reset();
 
-    _mgr.SetClusters(local_clusters);
+    _mgr->SetClusters(local_clusters);
 
-    _mgr.Process();
+    _mgr->Process();
 
     return true;
   }
