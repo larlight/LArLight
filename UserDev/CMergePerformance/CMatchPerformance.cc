@@ -5,6 +5,19 @@
 
 namespace larlight {
 
+  CMatchPerformance::CMatchPerformance() : fMgr(nullptr)
+  { 
+    _name="CMatchPerformance";
+    _fout=0; 
+    hMatchQEff=0;
+    hMatchNumEff=0;
+    hMatchQEffEvent=0;
+    _cluster_type = DATA::Cluster;
+    auto geom = ::larutil::Geometry::GetME();
+    fMgr = new ::cmtool::CMatchManager(geom->Nplanes());
+  };
+
+
   bool CMatchPerformance::initialize() {
 
     fBTAlgo.SetMaxEnergyCut(1900/2.);
@@ -55,20 +68,20 @@ namespace larlight {
 
     fHelper.GeneratePxHit(storage,_cluster_type,clusters);
 
-    fMgr.Reset();
+    fMgr->Reset();
 
-    fMgr.SetClusters(clusters);
+    fMgr->SetClusters(clusters);
 
     try{
 
-      fMgr.Process();
+      fMgr->Process();
     }catch( ::cmtool::CMTException &e){
       e.what();
       return false;
     }
 
     // Done matching clusters. Get result
-    auto bk = fMgr.GetBookKeeper();
+    auto bk = fMgr->GetBookKeeper();
 
     std::vector<std::vector<unsigned int> > reco_match_v;
     bk.PassResult(reco_match_v);
