@@ -63,7 +63,7 @@ namespace cmtool {
     //
     ComputePriority(_in_clusters);
 
-    if(!_planes.size()) return false;
+    if(_planes.size()<2) return false;
 
     if(_planes.size() > _nplanes)
 
