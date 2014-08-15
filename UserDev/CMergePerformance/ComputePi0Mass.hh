@@ -64,19 +64,39 @@ namespace larlight {
 
     void SetApplyEnergyCorrection(bool flag){ _applyEnergyCorrection = flag; };
 
+    
+    static ComputePi0Mass* GetInstance() { 
+      if(!me) me = new ComputePi0Mass;
+      return me; 
+    }
+    
+    float GetMass(){ return _mass; };
+
   protected:
 
     DATA::DATA_TYPE _shower_type;
     
     TH1D* hPi0MassPeak;
 
+    TH1D* hEnergyCorr_MomToDaughter;
+    TH1D* hElectronCorr_DepToDet;
+
     bool _debug;
+    
+    float _mass;
 
     std::vector<double> fEnergyCorr_MomToDaughter;
     std::vector<double> fElectronCorr_DepToDet;
     std::vector<double> fChargeCorr_DetToPeak;
     ShowerBackTracker fBTAlg;
     bool _applyEnergyCorrection;
+
+    
+  private:
+    
+    static ComputePi0Mass *me; // attempt at a shared object instance ptr
+
+
   };
 }
 #endif

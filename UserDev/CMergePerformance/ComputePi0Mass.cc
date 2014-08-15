@@ -11,10 +11,16 @@ namespace larlight {
 
     hPi0MassPeak = new TH1D("hPi0MassPeak","Pi0 Mass Peak in MeV",100,0,300);
 
+    hEnergyCorr_MomToDaughter = new TH1D("hEnergyCorr_MomToDaughter","Correction: hEnergyCorr_MomToDaughter",100,0.9,1.5);
+
+    hElectronCorr_DepToDet = new TH1D("hElectronCorr_DepToDet","Correction: hElectronCorr_DepToDet",100,0,4);
+
     return true;
   }
   
   bool ComputePi0Mass::analyze(storage_manager* storage) {
+
+    _mass = -99999.;
 
     // Load the Showers... need to run shower reconstruction first!
     auto ev_shower = (const event_shower*)(storage->get_data(_shower_type));
@@ -33,27 +39,40 @@ namespace larlight {
 
     if(_applyEnergyCorrection)
       ComputeEnergyCorrection(storage);
-    
+    /*
     std::cout 
       << std::endl
       << fEnergyCorr_MomToDaughter.at(0)<<" : "<<fElectronCorr_DepToDet.at(0) << std::endl
       << fEnergyCorr_MomToDaughter.at(1)<<" : "<<fElectronCorr_DepToDet.at(1) << std::endl;
+    */
     
+    //    _mass = Pi0MassFormula3D( ev_shower->at(0).MIPEnergy().at(2) 
+    //    				   * fEnergyCorr_MomToDaughter.at(0)
+    //    				   * fElectronCorr_DepToDet.at(0),
+    //    				   //* fChargeCorr_DetToPeak.at(0),
+    //    				   ev_shower->at(1).MIPEnergy().at(2) 
+    //    				   * fEnergyCorr_MomToDaughter.at(1)
+    //    				   * fElectronCorr_DepToDet.at(1),
+    //    				   //* fChargeCorr_DetToPeak.at(1),
+    //    				   ev_shower->at(0).Direction(),
+    //    				   ev_shower->at(1).Direction());
     
-    float mass = Pi0MassFormula3D( ev_shower->at(0).Energy().at(2) 
-    				   * fEnergyCorr_MomToDaughter.at(0)
-    				   * fElectronCorr_DepToDet.at(0),
-    				   //* fChargeCorr_DetToPeak.at(0),
-    				   ev_shower->at(1).Energy().at(2) 
-    				   * fEnergyCorr_MomToDaughter.at(1)
-    				   * fElectronCorr_DepToDet.at(1),
-    				   //* fChargeCorr_DetToPeak.at(1),
-    				   ev_shower->at(0).Direction(),
-    				   ev_shower->at(1).Direction());
+
+    _mass = Pi0MassFormula3D( ev_shower->at(0).MIPEnergy().at(2) 
+			      * 1.302 + 50,
+			      ev_shower->at(1).MIPEnergy().at(2)
+			      * 1.302 + 50,
+			      ev_shower->at(0).Direction(),
+			      ev_shower->at(1).Direction());
     
-    
-    hPi0MassPeak->Fill(mass);
-    
+    std::cout<<"in compute thing, mass is "<<_mass<<std::endl;
+    hPi0MassPeak->Fill(_mass);
+    for(int i = 0; i<2; ++i){
+      hEnergyCorr_MomToDaughter->Fill(fEnergyCorr_MomToDaughter.at(i));
+      hElectronCorr_DepToDet->Fill(fElectronCorr_DepToDet.at(i));
+    }
+     
+
     return true;
   }
 
@@ -157,8 +176,10 @@ namespace larlight {
 	energy_factor += shower_mcq_per_mcs.at(i).at(j) / shower_mcq_total.at(i) * mcs_mother_energy.at(j) / mcs_daughter_energy.at(j);
 	
       }
+      /*
       std::cout<<electron_factor<<std::endl;
       std::cout<<energy_factor<<std::endl;
+      */
       fElectronCorr_DepToDet.at(i) = electron_factor;
       fEnergyCorr_MomToDaughter.at(i) = energy_factor;
     }
@@ -171,7 +192,12 @@ namespace larlight {
     if(_fout) { 
       _fout->cd(); 
       hPi0MassPeak->Write();
+      hEnergyCorr_MomToDaughter->Write();
+      hElectronCorr_DepToDet->Write();
+
       delete hPi0MassPeak;
+      delete hEnergyCorr_MomToDaughter;
+      delete hElectronCorr_DepToDet;
     }
     else 
       print(MSG::ERROR,__FUNCTION__,"Did not find an output file pointer!!! File not opened?");
