@@ -4,6 +4,9 @@
 #include "ComputePi0Mass.hh"
 
 namespace larlight {
+  
+  ComputePi0Mass* ComputePi0Mass::me = 0;
+
 
   bool ComputePi0Mass::initialize() {
 

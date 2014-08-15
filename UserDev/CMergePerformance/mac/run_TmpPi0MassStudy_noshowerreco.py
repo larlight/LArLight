@@ -15,7 +15,8 @@ for x in xrange(len(sys.argv)):
 
 processor.set_ana_output_file("ana.root")
 
-pi0Mass_module = fmwk.ComputePi0Mass()
+pi0Mass_module = fmwk.ComputePi0Mass.GetInstance()
+
 tmp_pi0massstudy_module = fmwk.TmpPi0MassStudy()
 
 processor.add_process(pi0Mass_module)
