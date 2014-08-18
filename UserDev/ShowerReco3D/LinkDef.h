@@ -12,9 +12,13 @@
 #pragma link C++ namespace shower;
 #pragma link C++ class shower::ShowerRecoAlg+;
 #pragma link C++ class larlight::ShowerReco3D+;
+#pragma link C++ class larlight::MCShowerAna+;
+#pragma link C++ class larlight::ShowerBackTracker+;
 //ADD_NEW_CLASS ... do not change this line
 
 #endif
+
+
 
 
 

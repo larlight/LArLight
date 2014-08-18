@@ -29,6 +29,13 @@ namespace cmtool {
   //----------------------------------------------------------------------------------------------
   {
 
+    // Code-block by Kazu starts
+    // This ensures all entries in "clusters" pointer vector are valid pointers.
+    // You may take out this block if you want to allow matching using clusters from only 2 planes.
+    // But make sure you handle the case of null pointer
+    for(auto const& ptr : clusters) if(!ptr) return -1;
+    // Code-block by Kazu ends
+
     //This algorithm now works for 3 planes: find 3Dstart point from first 2 planes and find
     //How well that agrees with 3rd plane's start point location.
 
@@ -87,9 +94,9 @@ namespace cmtool {
       area = Area2D( yS12, zS12, yS23, zS23, yS13, zS13 );
     }
     if ( _time ){
-      area = Area3D( (yS12-yS13)/2. , (zS12-zS13)/2. , startTime1,
-		     (yS13-yS23)/2. , (zS13-zS23)/2. , startTime3,
-		     (yS12-yS23)/2. , (zS13-zS23)/2. , startTime2 );
+      area = Area3D( (yS12+yS13)/2. , (zS12+zS13)/2. , startTime1,
+		     (yS13+yS23)/2. , (zS13+zS23)/2. , startTime3,
+		     (yS12+yS23)/2. , (zS13+zS23)/2. , startTime2 );
     }
     
     if ( _verbose ) { std::cout << "Area of intersections triangle is: " << area << std::endl; }

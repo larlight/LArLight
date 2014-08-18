@@ -10,6 +10,7 @@
 #pragma link off all functions;
 
 #pragma link C++ class larlight::SaveWF+;
+#pragma link C++ class larlight::MCinfo+;
 #pragma link C++ class larlight::EvtDisplay+;
 #pragma link C++ class larlight::HitViewer+;
 #pragma link C++ class larlight::WFCompress+;

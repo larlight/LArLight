@@ -9,6 +9,8 @@
 #include "CMergePerformance.hh"
 #include "ShowerCalo.hh"
 #include "CMatchPerformance.hh"
+#include "ComputePi0Mass.hh"
+#include "TmpPi0MassStudy.hh"
 //ADD_NEW_HEADER ... do not change this comment line
 
 // Class forward declaration here
@@ -18,6 +20,8 @@ namespace larlight {
   class CMergePerformance;
 
   class CMatchPerformance;
+  class ComputePi0Mass;
+  class TmpPi0MassStudy;
 //ADD_ANA_CLASS ... do not change this comment line
 
 }

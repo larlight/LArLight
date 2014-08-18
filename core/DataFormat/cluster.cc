@@ -14,7 +14,8 @@ namespace larlight{
 	_type != DATA::DBCluster &&
 	_type != DATA::CrawlerCluster &&
 	_type != DATA::HoughCluster &&
-	_type != DATA::ShowerAngleCluster )
+	_type != DATA::ShowerAngleCluster &&
+	_type != DATA::RyanCluster )
 
       {
 	Message::send(MSG::ERROR,__FUNCTION__,
@@ -37,7 +38,8 @@ namespace larlight{
 	_type != DATA::DBCluster &&
 	_type != DATA::CrawlerCluster &&
 	_type != DATA::HoughCluster &&
-	_type != DATA::ShowerAngleCluster )
+	_type != DATA::ShowerAngleCluster &&
+	_type != DATA::RyanCluster )
 
       {
 	Message::send(MSG::ERROR,__FUNCTION__,

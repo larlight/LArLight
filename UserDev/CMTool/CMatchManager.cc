@@ -7,7 +7,13 @@ namespace cmtool {
 
   CMatchManager::CMatchManager() : CMManagerBase()
   {
+    throw CMTException("Default ctor needs # planes as an argument!");
+  }
+
+  CMatchManager::CMatchManager(size_t nplanes) : CMManagerBase()
+  {
     _match_algo = nullptr;
+    _nplanes    = nplanes;
     Reset();
   }
 
@@ -17,7 +23,6 @@ namespace cmtool {
     if(_match_algo) _match_algo->Reset();
     if(_priority_algo) _priority_algo->Reset();
     _book_keeper.Reset();
-    
   }
 
   void CMatchManager::EventBegin()
@@ -58,12 +63,13 @@ namespace cmtool {
     //
     ComputePriority(_in_clusters);
 
-    if(!_planes.size()) return false;
+    if(_planes.size()<2) return false;
 
-    if(_planes.size() != ((*_planes.rbegin())+1))
- 
-      throw CMTException("Some planes do not contain any cluster!");
+    if(_planes.size() > _nplanes)
 
+      throw CMTException("Found more plane IDs than specified number of planes!");
+
+    // Index array of clusters per plane
     std::vector<std::vector<size_t> > cluster_array;
 
     cluster_array.resize( _planes.size() );
@@ -83,15 +89,28 @@ namespace cmtool {
     while(1) {
       
       ptr_v.clear();
-      ptr_v.reserve(cluster_array.size());
+      ptr_v.reserve(_nplanes);
 
+      auto plane_id_iter = _planes.begin();
       for(size_t plane=0; plane<ctr.size(); ++plane) {
 
 	size_t cluster_index = cluster_array.at(plane).at(ctr.at(plane));
 
 	tmp_index_v.at(plane) = (unsigned int)cluster_index;
+
+	while( plane_id_iter != _planes.end() && (*plane_id_iter) > ptr_v.size()) {
+
+	  ptr_v.push_back(nullptr);
+	  ++plane_id_iter;
+	}
+
 	ptr_v.push_back( (&(_in_clusters.at(cluster_index))) );
 
+      }
+      while( plane_id_iter != _planes.end() && ptr_v.size() < _nplanes) {
+	
+	ptr_v.push_back(nullptr);
+	++plane_id_iter;
       }
 
       float score = _match_algo->Float(ptr_v);

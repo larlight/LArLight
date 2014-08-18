@@ -19,6 +19,9 @@ mgr.set_ana_output_file("")
 
 proc = fmwk.ClusterMerger()
 
+#set the input cluster type... prelim merger starts with 
+#FuzzyCluster and outputs Cluster
+proc.SetClusterType(larlight.DATA.FuzzyCluster)
 proc.SaveOutputCluster(True)
 
 

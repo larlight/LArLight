@@ -12,7 +12,9 @@
 #pragma link C++ class ::larlight::ShowerCalo+;
 #pragma link C++ class ::larlight::CMergePerformance+;
 
-#pragma link C++ class larlight::CMatchPerformance+;
+#pragma link C++ class ::larlight::CMatchPerformance+;
+#pragma link C++ class ::larlight::ComputePi0Mass+;
+#pragma link C++ class ::larlight::TmpPi0MassStudy+;
 //ADD_NEW_CLASS ... do not change this line
 
 #endif

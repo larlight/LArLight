@@ -38,6 +38,7 @@ private:
   bool PolyOverlapSegments(const Polygon2D &poly2) const;
   bool PointInside(const std::pair<float,float> &point) const;
   bool Contained(const Polygon2D &poly2) const;
+  void UntanglePolygon();
 };
 
 

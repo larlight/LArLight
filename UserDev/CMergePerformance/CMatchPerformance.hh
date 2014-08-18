@@ -30,17 +30,10 @@ namespace larlight {
   public:
 
     /// Default constructor
-    CMatchPerformance(){ 
-      _name="CMatchPerformance";
-      _fout=0; 
-      hMatchQEff=0;
-      hMatchNumEff=0;
-      hMatchQEffEvent=0;
-      _cluster_type = DATA::Cluster;
-    };
+    CMatchPerformance();
 
     /// Default destructor
-    virtual ~CMatchPerformance(){};
+    virtual ~CMatchPerformance(){ delete fMgr; };
 
     /** IMPLEMENT in CMatchPerformance.cc!
         Initialization method to be called before the analysis event loop.
@@ -57,7 +50,7 @@ namespace larlight {
     */
     virtual bool finalize();
 
-    ::cmtool::CMatchManager& GetManager() { return fMgr; }
+    ::cmtool::CMatchManager& GetManager() { return *fMgr; }
 
     McshowerLookback& GetBTAlgo() { return fBTAlgo; }
 
@@ -67,7 +60,7 @@ namespace larlight {
 
     ::cluster::CRUHelper fHelper;
 
-    ::cmtool::CMatchManager fMgr;
+    ::cmtool::CMatchManager *fMgr;
 
     McshowerLookback fBTAlgo;
 

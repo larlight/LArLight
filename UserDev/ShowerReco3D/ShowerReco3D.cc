@@ -5,45 +5,56 @@
 
 namespace larlight {
 
-  ShowerReco3D::ShowerReco3D() : ana_base()
+  ShowerReco3D::ShowerReco3D() : ana_base(), fMatchMgr(nullptr)
   {
     _name="ShowerReco3D";
     fClusterType = DATA::Cluster;
+
+    auto geom = ::larutil::Geometry::GetME();
+    fMatchMgr = new ::cmtool::CMatchManager(geom->Nplanes());
   }
   
   bool ShowerReco3D::initialize() {
-
+    _mgr = 0;
     // Make sure cluster type is a valid one
     if(fClusterType != DATA::FuzzyCluster &&
        fClusterType != DATA::CrawlerCluster &&
        fClusterType != DATA::ShowerAngleCluster &&
-       fClusterType != DATA::Cluster)
+       fClusterType != DATA::Cluster &&
+       fClusterType != DATA::RyanCluster)
 
       throw ::cluster::RecoUtilException(Form("Not supported cluster type: %s",
 					      DATA::DATA_TREE_NAME[fClusterType].c_str())
 					 );
-
+    
     return true;
   }
   
   bool ShowerReco3D::analyze(storage_manager* storage) {
-    
+
+    _mgr = storage;
     // Re-initialize tools
     fShowerAlgo.Reset();
-    fMatchMgr.Reset();
+    fMatchMgr->Reset();
 
     // Retrieve clusters and fed into the algorithm
     std::vector<std::vector<larutil::PxHit> > local_clusters;
 
     fCRUHelper.GeneratePxHit(storage,fClusterType,local_clusters);
     
-    fMatchMgr.SetClusters(local_clusters);
+    fMatchMgr->SetClusters(local_clusters);
 
     local_clusters.clear();
 
     // Run matching & retrieve matched cluster indices
-    fMatchMgr.Process();
-    auto const& matched_pairs = fMatchMgr.GetBookKeeper().GetResult();
+    try{
+      fMatchMgr->Process();
+    }catch( ::cmtool::CMTException &e){
+      e.what();
+      return false;
+    }
+
+    auto const& matched_pairs = fMatchMgr->GetBookKeeper().GetResult();
 
     //
     // Run shower reco algorithm and store output
@@ -53,7 +64,10 @@ namespace larlight {
     auto shower_v = (event_shower*)(storage->get_data(DATA::Shower));
     shower_v->clear();
     shower_v->reserve(matched_pairs.size());
-
+    shower_v->set_event_id(storage->get_data(fClusterType)->event_id());
+    shower_v->set_run(storage->get_data(fClusterType)->run());
+    shower_v->set_subrun(storage->get_data(fClusterType)->subrun());
+    
     // Loop over matched pairs
     for(auto const& pair : matched_pairs) {
       
@@ -61,6 +75,8 @@ namespace larlight {
       std::vector< ::cluster::ClusterParamsAlgNew> clusters;
       clusters.reserve(pair.size());
 
+      
+            
       // Create an association vector
       std::vector<unsigned short> ass_index;
       ass_index.reserve(pair.size());
@@ -69,10 +85,23 @@ namespace larlight {
 
 	ass_index.push_back(cluster_index);
 	
-	clusters.push_back( fMatchMgr.GetInputClusters().at(cluster_index) );
+	clusters.push_back( fMatchMgr->GetInputClusters().at(cluster_index) );
 	
       }
 
+      
+      int check=0;
+      for(auto const & iter : clusters)
+      {
+	if(iter.GetNHits() > 20)
+	  check++;
+      }
+	
+	std::cout << " clusters " <<  clusters.size() << " check " << check << std::endl;
+	
+	if(check<=2)
+	  continue;
+	
       // Run algorithm
       larlight::shower result = fShowerAlgo.Reconstruct(clusters);
 
