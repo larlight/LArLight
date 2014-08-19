@@ -204,7 +204,7 @@ namespace kaleko {
     //loop over the reconstructed clusters
     for(auto const i_cluster: *ev_cluster){
       
-      const std::vector<unsigned short> ass_index(i_cluster.association(hit_type));
+      auto const& ass_index = i_cluster.association(hit_type);
       if(ass_index.size()<15) continue;
 
       const UChar_t plane = larutil::Geometry::GetME()->ChannelToPlane(ev_hits->at((*ass_index.begin())).Channel());
@@ -312,7 +312,7 @@ namespace kaleko {
       double clus_q = 0;
       
       //list of the hits's indicies associated with this cluster
-      std::vector<unsigned short> hit_index(ev_cluster->at(clus_index).association(hit_type));
+      auto const& hit_index = ev_cluster->at(clus_index).association(hit_type);
       
       //skip the cluster if there are <15 hits. don't increment params_index
       if( (int)hit_index.size() < 15) continue;

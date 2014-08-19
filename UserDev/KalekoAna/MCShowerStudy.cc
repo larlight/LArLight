@@ -235,7 +235,7 @@ namespace larlight {
       }
       
       //list of the hits's indicies associated with this cluster
-      std::vector<unsigned short> hit_index(i_cluster.association(hit_type));
+      auto const& hit_index = i_cluster.association(hit_type);
       
       //vector to hold these actual hits
       std::vector<larlight::hit> hits(hit_index.size());
