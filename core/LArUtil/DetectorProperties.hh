@@ -56,19 +56,19 @@ namespace larutil {
     Double_t TimeOffsetV()       const { return fTimeOffsetV; }
     Double_t TimeOffsetZ()       const { return fTimeOffsetZ; }
     
-    Double_t ConvertXToTicks(Double_t X,     Int_t p) {
+    Double_t ConvertXToTicks(Double_t X,     Int_t p) const {
       return (X / fXTicksCoefficient +  fXTicksOffsets.at(p));
     }
 
-    Double_t ConvertTicksToX(Double_t ticks, Int_t p) {
+    Double_t ConvertTicksToX(Double_t ticks, Int_t p) const {
       return (ticks - fXTicksOffsets.at(p) ) * fXTicksCoefficient;
     }
     
-    Double_t GetXTicksOffset(Int_t p) {
+    Double_t GetXTicksOffset(Int_t p) const {
       return fXTicksOffsets.at(p);
     }
 
-    Double_t GetXTicksCoefficient() {
+    Double_t GetXTicksCoefficient() const {
       return fXTicksCoefficient;
     }
     
