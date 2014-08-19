@@ -12,4 +12,5 @@
 *.info
 *~
 *.pcm
+*.swp
 /GNUmakefile
