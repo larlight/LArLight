@@ -41,7 +41,7 @@ namespace larlight {
 
     const DATA::DATA_TYPE hit_type = ev_cluster->get_hit_type();
 
-    std::vector<std::vector<unsigned short> > merged_indexes;
+    std::vector<std::vector<unsigned int> > merged_indexes;
     _mgr.GetBookKeeper().PassResult(merged_indexes);
     
     //auto out_cluster_v =  (event_cluster*)(storage->get_data(DATA::Cluster));
@@ -53,11 +53,11 @@ namespace larlight {
     out_cluster_v.set_run(ev_cluster->run());
     out_cluster_v.set_subrun(ev_cluster->subrun());
     //tmp_index to know what plane to use
-    unsigned short tmp_index = 0;
+    unsigned int tmp_index = 0;
 
     for(auto const& indexes : merged_indexes) {
 
-      std::vector<unsigned short> merged_association;
+      std::vector<unsigned int> merged_association;
 
       for(auto const& cluster_index : indexes) {
 
