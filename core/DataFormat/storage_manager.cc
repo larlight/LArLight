@@ -631,7 +631,7 @@ namespace larlight {
 
       return false;
 
-    _current_event_id = -1;
+    _current_event_id = DATA::INVALID_INT;
 
     // If this is BOTH mode, then read all relevant data products & check alignment here
     if( _mode == BOTH ) {
@@ -644,7 +644,7 @@ namespace larlight {
 
 	  if(_read_data_array[i] &&  _check_alignment) {
 
-	    if(_current_event_id == DATA::INVALID_UINT) 
+	    if(_current_event_id == DATA::INVALID_INT) 
 
 	      _current_event_id = _ptr_data_array[i]->event_id();
 
