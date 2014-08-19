@@ -43,7 +43,7 @@ namespace larlight {
 
       if( _check_alignment ) {
 
-	if(_current_event_id<0) 
+	if(_current_event_id==DATA::INVALID_INT) 
 
 	  _current_event_id = _ptr_data_array[ptr_index]->event_id();
 
@@ -115,7 +115,7 @@ namespace larlight {
       break;
     }
     
-    _current_event_id = -1;
+    _current_event_id = DATA::INVALID_INT;
     _index=0;
     _nevents=0;
     _nevents_written=0;
@@ -635,6 +635,14 @@ namespace larlight {
 
     // If this is BOTH mode, then read all relevant data products & check alignment here
     if( _mode == BOTH ) {
+
+      // if DATA::Event is present, use that as absolute check
+      if( _in_ch[(size_t)(DATA::Event)] ) {
+	
+	_in_ch[(size_t)(DATA::Event)]->GetEntry(_index);
+	
+	_current_event_id = _ptr_data_array[DATA::Event]->event_id();
+      }
 
       for(size_t i=0; i<DATA::DATA_TYPE_MAX; ++i) { 
       
