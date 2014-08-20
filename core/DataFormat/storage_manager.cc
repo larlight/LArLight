@@ -43,7 +43,7 @@ namespace larlight {
 
       if( _check_alignment ) {
 
-	if(_current_event_id<0) 
+	if(_current_event_id==DATA::INVALID_INT) 
 
 	  _current_event_id = _ptr_data_array[ptr_index]->event_id();
 
@@ -115,7 +115,7 @@ namespace larlight {
       break;
     }
     
-    _current_event_id = -1;
+    _current_event_id = DATA::INVALID_INT;
     _index=0;
     _nevents=0;
     _nevents_written=0;
