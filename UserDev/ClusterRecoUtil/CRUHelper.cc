@@ -80,6 +80,7 @@ namespace cluster {
     case ::larlight::DATA::DBCluster:
     case ::larlight::DATA::FuzzyCluster:
     case ::larlight::DATA::CrawlerCluster:
+    case ::larlight::DATA::RyanCluster:
       break;
     default:
       throw RecoUtilException(Form("Not cluster data type: %s",
