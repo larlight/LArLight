@@ -49,13 +49,13 @@ namespace larlight{
     DATA::DATA_TYPE data_type() const {return _type; }
 
     /// Adder for a set of association
-    void add_association(DATA::DATA_TYPE type, const std::vector<unsigned int> ass);
+    void add_association(DATA::DATA_TYPE type, const std::vector<unsigned short> ass);
 
     /// Getter for # of associations
     size_t size_association(DATA::DATA_TYPE type) const;
      
     /// Getter of an association
-    const std::vector<unsigned int> association(DATA::DATA_TYPE type, size_t index=0) const;
+    const std::vector<unsigned short> association(DATA::DATA_TYPE type, size_t index=0) const;
 
   protected:
     
@@ -63,10 +63,10 @@ namespace larlight{
     DATA::DATA_TYPE _type;
 
     /// Association storage ... allow multiple set of associations
-    std::map<larlight::DATA::DATA_TYPE,std::vector<std::vector<unsigned int> > > _ass;
+    std::map<larlight::DATA::DATA_TYPE,std::vector<std::vector<unsigned short> > > _ass;
     
     ////////////////////////
-    ClassDef(data_base,5)
+    ClassDef(data_base,4)
     ////////////////////////
       
   };
@@ -124,7 +124,7 @@ namespace larlight{
     UInt_t fEventID;
 
     ////////////////////////
-    ClassDef(event_base,4)
+    ClassDef(event_base,3)
     ////////////////////////
       
   };

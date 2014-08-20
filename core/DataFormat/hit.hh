@@ -93,7 +93,7 @@ namespace larlight{
   private:
     
     ////////////////////////
-    ClassDef(hit,3)
+    ClassDef(hit,2)
     ////////////////////////
       
   };
@@ -140,7 +140,7 @@ namespace larlight{
   private:
     
     ////////////////////////
-    ClassDef(event_hit,4)
+    ClassDef(event_hit,3)
     ////////////////////////
   };
 }

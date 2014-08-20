@@ -193,7 +193,7 @@ void  JsonComposer::composeHits()
         const larlight::cluster& clus = (*clusters)[iclus];
         size_t nass = clus.size_association(type);
         if(nass) {
-          std::vector<unsigned int> ass = clus.association(type);
+          std::vector<unsigned short> ass = clus.association(type);
           for(size_t iass=0;iass<ass.size();iass++) {
             size_t ihit = ass[iass];
             if(v.size()>ihit) v[ihit].add(clusname,(int)iclus);
@@ -265,7 +265,7 @@ void  JsonComposer::composeClusters()
         std::string name2 = DATA::DATA_TREE_NAME[itype2];
         size_t nass = clus.size_association(type2); // Might be more than one; just look at first one.
         if(nass) {
-          std::vector<unsigned int> ass = clus.association(type2);
+          std::vector<unsigned short> ass = clus.association(type2);
           jclus.add("hits_"+name2,ass);
         }
       }
