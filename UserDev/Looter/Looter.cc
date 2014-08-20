@@ -184,7 +184,7 @@ void Looter::read_clusters(larlight::storage_manager& storage)
 
 
     // Attempt to find association data to hits.
-    std::map<int,std::vector<unsigned short> > map_to_hits;
+    std::map<int,std::vector<unsigned int> > map_to_hits;
     //
     // I would like to also put this stuff here, instead of just in the hits area.
     // Also, I really should support multiple hit lists...
