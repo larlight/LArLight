@@ -40,6 +40,7 @@ namespace larlight {
   {
     if( type != DATA::Cluster &&
 	type != DATA::FuzzyCluster &&
+	type != DATA::DBCluster &&
 	type != DATA::CrawlerCluster &&
 	type != DATA::ShowerAngleCluster &&
 	type != DATA::HoughCluster &&
