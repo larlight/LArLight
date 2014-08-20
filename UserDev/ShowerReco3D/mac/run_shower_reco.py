@@ -38,12 +38,9 @@ my_proc.set_output_file("out.root")
 # Create analysis unit
 ana_unit = fmwk.ShowerReco3D()
 
-
-match_viewer = fmwk.MatchViewer()
-
 priority_algo = cmtool.CPAlgoNHits()
 priority_algo.SetMinHits(20)
-match_viewer.GetManager().AddPriorityAlgo(priority_algo)
+ana_unit.GetManager().AddPriorityAlgo(priority_algo)
 
 # 
 # Attach Matching algorithm

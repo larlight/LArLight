@@ -109,7 +109,7 @@ namespace larlight {
     /// _clusterparams has 1:1 mapping to ev_cluster
     /// after merging it is something like {{1,2,3},{4},...} and will be
     /// retreived from a CBookKeeper function
-    std::vector<std::vector<unsigned int> > clus_idx_vec;
+    std::vector<std::vector<unsigned short> > clus_idx_vec;
 
     //declare a member of CMergeManager class called _mgr
     ::cmtool::CMergeManager _mgr;

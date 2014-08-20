@@ -161,7 +161,7 @@ namespace larlight {
 
       // Create hit list
       std::vector<const larlight::hit*> hits;
-      auto const& hit_indices = c.association(hit_type);
+      const std::vector<unsigned short> &hit_indices = c.association(hit_type);
       hits.reserve(hit_indices.size());
 
       cluster_charge.push_back(0);

@@ -78,7 +78,7 @@ namespace larlight {
       
             
       // Create an association vector
-      std::vector<unsigned int> ass_index;
+      std::vector<unsigned short> ass_index;
       ass_index.reserve(pair.size());
 
       for(auto const& cluster_index : pair) {
