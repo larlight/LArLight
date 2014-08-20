@@ -63,7 +63,7 @@ namespace larlight {
 	double tmpxyz[3] = 
 	  { qdep.at(0), qdep.at(1), qdep.at(2) };
 
-	//std::vector<unsigned short> channels(geo->Nplanes(),::larlight::DATA::INVALID_USHORT);
+	//std::vector<unsigned int> channels(geo->Nplanes(),::larlight::DATA::INVALID_UINT);
 
 	// Loop over planes
 	for(size_t iplane = 0; iplane < geo->Nplanes(); ++iplane) {
@@ -97,7 +97,7 @@ namespace larlight {
 	}
       }
 
-      std::vector<std::vector<unsigned short> > mc_hit_ass(geo->Nplanes(), std::vector<unsigned short>());
+      std::vector<std::vector<unsigned int> > mc_hit_ass(geo->Nplanes(), std::vector<unsigned int>());
       
       for(auto const& hits : unique_hits) {
 

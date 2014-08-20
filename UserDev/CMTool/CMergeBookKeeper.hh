@@ -32,34 +32,34 @@ namespace cmtool {
      CMergeBookKeeper keeps track of which clusters are asked to merge together, and it can be
      asked to return a vector of merged cluster indexes.
   */
-  class CMergeBookKeeper : public std::vector<unsigned short>{
+  class CMergeBookKeeper : public std::vector<unsigned int>{
     
   public:
     
     /// Default constructor
-    CMergeBookKeeper(unsigned short nclusters=0);
+    CMergeBookKeeper(unsigned int nclusters=0);
     
     /// Default destructor
     virtual ~CMergeBookKeeper(){};
 
     /// Reset method
-    void Reset(unsigned short nclusters=0);
+    void Reset(unsigned int nclusters=0);
 
     /// Method to set a pair of clusters to prohibit from merging
-    void ProhibitMerge(unsigned short index1, unsigned short index2);
+    void ProhibitMerge(unsigned int index1, unsigned int index2);
 
     /// Method to inqury if a combination is prohibited to merge
-    bool MergeAllowed(unsigned short index1, unsigned short index2);
+    bool MergeAllowed(unsigned int index1, unsigned int index2);
 
     /// Method to merge 2 clusters via index numbers
-    void Merge(unsigned short index1, unsigned short index2);
+    void Merge(unsigned int index1, unsigned int index2);
 
     /**
        Method to retrieve a vector of cluster indexes which 
        is merged with the input cluster index. All indexes here
        are regarding the original cluster index.
     */
-    std::vector<unsigned short> GetMergedSet(unsigned short index1) const;
+    std::vector<unsigned int> GetMergedSet(unsigned int index1) const;
 
     /**
        Method to ask if a given 2 clusters are already merged.
@@ -67,18 +67,18 @@ namespace cmtool {
        a merged cluster sets from GetMergedIndexes and check if
        two clusters are merged.
     */
-    bool IsMerged(unsigned short index1, unsigned short index2) const;
+    bool IsMerged(unsigned int index1, unsigned int index2) const;
 
     /**
        A method to get the full result. The return is a vector
        of merged cluster indexes (which is a vector of original cluster indexes).
     */
-    void PassResult(std::vector<std::vector<unsigned short> > &result) const;
+    void PassResult(std::vector<std::vector<unsigned int> > &result) const;
 
 
-    std::vector<std::vector<unsigned short> > GetResult() const
+    std::vector<std::vector<unsigned int> > GetResult() const
     { 
-      std::vector<std::vector<unsigned short> > result; 
+      std::vector<std::vector<unsigned int> > result; 
       PassResult(result);
       return result;
     }

@@ -103,7 +103,7 @@ namespace cmtool {
 
     std::vector<CMergeBookKeeper> _book_keeper_v;
 
-    std::vector<std::vector<unsigned short> > _tmp_merged_indexes;
+    std::vector<std::vector<unsigned int> > _tmp_merged_indexes;
 
     std::vector<cluster::ClusterParamsAlgNew> _tmp_merged_clusters;
 
