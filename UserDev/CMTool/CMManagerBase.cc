@@ -10,7 +10,7 @@ namespace cmtool {
     _fout = 0;
     _debug_mode = kNone;
     _priority_algo = nullptr;
-    _min_nhits = 0;
+    SetMinNHits(0);
     _merge_till_converge = false;
     Reset();
   }
@@ -39,13 +39,17 @@ namespace cmtool {
     tmp_alg.SetVerbose(false);
 
     for(auto const &c : clusters) {
-      
+
       _in_clusters.push_back(tmp_alg);
+
       (*_in_clusters.rbegin()).Initialize();
 
-      if((*_in_clusters.rbegin()).SetHits(c) < 1) continue;
+
+      if((*_in_clusters.rbegin()).SetHits(c) < _min_nhits+3) continue;
       (*_in_clusters.rbegin()).DisableFANN();
+
       (*_in_clusters.rbegin()).FillParams(true,true,true,true,true,false);
+
       (*_in_clusters.rbegin()).FillPolygon();
 
     }
