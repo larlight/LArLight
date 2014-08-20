@@ -84,6 +84,20 @@ while true:
 
         match_viewer.DrawAllClusters();
 
+        bk = match_viewer.GetManager().GetBookKeeper()
+
+        res = bk.GetResult()
+
+        print "\033[93m","Found %d matched pairs!","\033[00m"
+        for x in xrange(res.size()):
+
+            print 'Pair',x,
+            for y in xrange(res.at(x).size()):
+
+                print res.at(x).at(y),
+
+            print
+
         print "    Hit enter to go next event..."
     except larutil.LArUtilException:
         print "skipping"
