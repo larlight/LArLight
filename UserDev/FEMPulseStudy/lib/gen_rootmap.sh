@@ -17,7 +17,7 @@ rootlibmap() {
 ######################################################
 # FEMPulseStudy
 rootlibmap libFEMPulseStudy.rootmap libFEMPulseStudy.so $USER_DEV_DIR/FEMPulseStudy/LinkDef.h \
-    libAnalysis.so
+    libAnalysis.so libDataFormat.so libBase.so libGui.so 
 
 
 
