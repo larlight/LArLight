@@ -19,19 +19,27 @@ namespace larlight {
   bool MCShowerClusterer::analyze(storage_manager* storage) {
 
     auto geo = ::larutil::Geometry::GetME();
-    auto geoutil = ::larutil::GeometryUtilities::GetME();
+    //auto geoutil = ::larutil::GeometryUtilities::GetME();
 
     // Get MCShower objects from storage
     auto mcshower_v = (event_mcshower* )( storage->get_data(DATA::MCShower) );
 
+    auto simch_v = (event_simch*)(storage->get_data(DATA::SimChannel) );
+
     // Check MCShower object exists
     if( !mcshower_v ) {
-      std::cerr<<"MCShower object DNE! Skipping event..."<<std::endl;
+      print(MSG::ERROR,__FUNCTION__,"MCShower object DNE! Skipping event...");
+      return false;
+    }
+    if( !simch_v ) {
+      print(MSG::ERROR,__FUNCTION__,"SimChannel object DNE! Skipping event...");
       return false;
     }
 
     // Output hits
     auto out_hit_v = (event_hit*)(storage->get_data(DATA::Hit));
+    if(out_hit_v->size())
+      print(MSG::WARNING,__FUNCTION__,"DATA::Hit is not empty. Clearing it...");
     out_hit_v->clear_data();
     out_hit_v->set_event_id(mcshower_v->event_id());
     out_hit_v->set_run(mcshower_v->run());
@@ -39,6 +47,8 @@ namespace larlight {
 
     // Output clusters
     auto out_clus_v = (event_cluster*)(storage->get_data(DATA::Cluster));
+    if(out_clus_v->size())
+      print(MSG::WARNING,__FUNCTION__,"DATA::Cluster is not empty. Clearing it...");
     out_clus_v->clear_data();
     out_clus_v->reserve(mcshower_v->size() * _nplanes);
     out_clus_v->set_event_id(mcshower_v->event_id());
@@ -46,81 +56,118 @@ namespace larlight {
     out_clus_v->set_subrun(mcshower_v->subrun());
 
     // Loop over MCShowers
-    for(size_t ishower = 0; ishower < mcshower_v->size(); ++ishower){
+    for(size_t shower_index = 0; shower_index < mcshower_v->size(); ++shower_index) {
+      
+      // Get shower object
+      auto const& ishower = mcshower_v->at(shower_index);
 
-      // Get the charge deposition points of all daughters
-      // Outer vector size is # of charge deposition points
-      // Inner vector size is 4: the actual vertex (x,y,z,E)
-      auto const& qdeps = mcshower_v->at(ishower).DaughterPoints();
+      // Get a set of daughter track IDs
+      std::set<unsigned int> daughters;
+      for(auto const& id : ishower.DaughterTrackID())
+	daughters.insert(id);
 
-      // Unique local hit container
-      std::vector<std::map<float,larlight::hit > > unique_hits(geo->Nchannels(),std::map<float,larlight::hit>());
+      // Create an output cluster container
+      std::vector<larlight::cluster> clusters(geo->Nplanes(),larlight::cluster());
+      for(size_t plane=0; plane<geo->Nplanes(); ++plane)
+	clusters.at(plane).set_view(geo->PlaneToView(plane));
 
-      // Loop over the charge deposition points
-      for(auto const& qdep : qdeps) {
+      // Create an output cluster-hit association container
+      std::vector<std::vector<unsigned int> > assn_ch(geo->Nplanes(),std::vector<unsigned int>());
 
-	// Use Geometry utilities to find the wire, time & channel for this plane
-	double tmpxyz[3] = 
-	  { qdep.at(0), qdep.at(1), qdep.at(2) };
+      // Loop over channels
+      for(auto const& sch : *simch_v) {
 
-	//std::vector<unsigned short> channels(geo->Nplanes(),::larlight::DATA::INVALID_USHORT);
+	// Get channel number
+	auto const& ch = sch.Channel();
 
-	// Loop over planes
-	for(size_t iplane = 0; iplane < geo->Nplanes(); ++iplane) {
-	  
-	  double *tmp = tmpxyz;
-	  larutil::PxPoint ipxp = geoutil->Get2DPointProjection(tmp,iplane);
+	auto const& w  = geo->ChannelToWire(ch);
 
-	  auto const& ch = geo->PlaneWireToChannel(iplane,ipxp.w);
+	auto const& plane = geo->ChannelToPlane(ch);
 
-	  auto hit_iter = unique_hits.at(ch).find(ipxp.t);
+	auto const& view  = geo->PlaneToView(plane);
 
-	  if(hit_iter == unique_hits.at(ch).end()) {
+	// Retrieve data for all energy deposition in this channel
+	auto& tdc_ide_map = sch.TDCIDEMap();
 
-	    ::larlight::hit h;
-	    h.set_wire  ( ipxp.w);
-	    h.set_times ( ipxp.t - (_hitwidth/2),
-			  ipxp.t,
-			  ipxp.t + (_hitwidth/2) );
-	    h.set_charge  ( qdep.at(3), qdep.at(3) );
-	    h.set_channel ( geo->PlaneWireToChannel(iplane,ipxp.w) );
-	    h.set_view    ( geo->PlaneToView(iplane) );
+	// Loop over all energy deposition data
+	for(auto const& tdc_ide : tdc_ide_map) {
 
-	    unique_hits.at(ch).insert(std::make_pair(ipxp.t, h));
+	  // Get timing
+	  auto const& tdc = tdc_ide.first;
 
-	  }else{
+	  double hitq = 0;
+	  bool   hit_found = false;
+	  // Loop over all energy deposition @ this timing
+	  for(auto const& this_ide : tdc_ide.second) {
 
-	    (*hit_iter).second.set_charge( (*hit_iter).second.Charge() + qdep.at(3),
-					   (*hit_iter).second.Charge() + qdep.at(3) );
+	    // If nothing to do with this MCShower, ignore.
+	    if(daughters.find(this_ide.trackID) == daughters.end()) continue;
 	    
+	    hit_found = true;
+	    hitq += this_ide.numElectrons;
 	  }
-	}
-      }
 
-      std::vector<std::vector<unsigned int> > mc_hit_ass(geo->Nplanes(), std::vector<unsigned int>());
-      
-      for(auto const& hits : unique_hits) {
+	  if(!hit_found) continue;
 
-	for(auto const& hmap_iter : hits) {
+	  // Create a hit
+	  ::larlight::hit h;
+	  h.set_wire    ( w    );
+	  h.set_channel ( ch   );
+	  h.set_times   ( tdc - (_hitwidth/2), 
+			  tdc, 
+			  tdc + (_hitwidth/2) );
+	  h.set_view    ( view );
+	  h.set_charge  ( hitq, hitq );
 
-	  auto const& h = hmap_iter.second;
-
-	  mc_hit_ass.at(h.View()).push_back(out_hit_v->size());
+	  switch(view) {
+	    
+	  case ::larlight::GEO::kU:
+	  case ::larlight::GEO::kV:
+	    h.set_sigtype( ::larlight::GEO::kInduction   );
+	    break;
+	  case ::larlight::GEO::kW:
+	    //case ::larlight::GEO::kZ:
+	    h.set_sigtype( ::larlight::GEO::kCollection  );
+	    break;
+	  default:
+	    h.set_sigtype( ::larlight::GEO::kMysteryType );
+	  }
+	  
 	  out_hit_v->push_back(h);
+	  
+	  assn_ch.at(plane).push_back(out_hit_v->size()-1);
+
+	  clusters.at(plane).set_charge(clusters.at(plane).Charge());
 
 	}
-
       }
       
-      for(size_t iplane = 0; iplane < geo->Nplanes(); ++iplane) {
+      //
+      // Store
+      //
 
-	out_clus_v->push_back(::larlight::cluster());
+      // MCShower->Cluster association
+      std::vector<unsigned int> assn_cs;
+      assn_cs.reserve(geo->Nplanes());
 
-	(*(out_clus_v->rbegin())).set_view(geo->PlaneToView(iplane));
-	(*(out_clus_v->rbegin())).add_association(::larlight::DATA::Hit,mc_hit_ass.at(iplane));
+      for(size_t plane = 0; plane<geo->Nplanes(); ++plane) {
+
+	if(!(assn_ch.at(plane).size())) continue;
+
+	clusters.at(plane).set_id(out_clus_v->size());
+
+	clusters.at(plane).set_view(geo->PlaneToView(plane));
+	
+	clusters.at(plane).add_association(DATA::Hit,assn_ch.at(plane));
+
+	assn_cs.push_back(out_clus_v->size());
+
+	out_clus_v->push_back(clusters.at(plane));
 
       }
-      
+
+      mcshower_v->at(shower_index).add_association(DATA::Cluster,assn_cs);
+
     }
  
     return true;
