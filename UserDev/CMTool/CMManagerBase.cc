@@ -43,7 +43,7 @@ namespace cmtool {
       _in_clusters.push_back(tmp_alg);
       (*_in_clusters.rbegin()).Initialize();
 
-      if((*_in_clusters.rbegin()).SetHits(c) < 1) continue;
+      if((*_in_clusters.rbegin()).SetHits(c) < 3) continue;
       (*_in_clusters.rbegin()).DisableFANN();
       (*_in_clusters.rbegin()).FillParams(true,true,true,true,true,false);
       (*_in_clusters.rbegin()).FillPolygon();
