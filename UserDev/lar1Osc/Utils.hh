@@ -26,39 +26,54 @@ namespace lar1{
     ~Utils();
     
     Double_t GetFluxWeight( Double_t energy, Int_t iflux, Int_t inno, Int_t ndecay );
-    Double_t GetTheta( TVector3 mom, TVector3 ref = TVector3(0,0,1) );
-    Double_t GetTheta( Double_t px, Double_t py, Double_t pz, TVector3 ref = TVector3(0,0,1) );
-    Double_t GetPhi( TVector3 mom, TVector3 ref = TVector3(0,0,1) );
-    Double_t GetPhi( Double_t px, Double_t py );
-    Double_t NuEnergyCCQE( Double_t l_energy, Double_t l_p, Double_t l_theta, Double_t mass, Int_t mode, bool verbose = false );
+    Double_t GetTheta( const TVector3 & mom, 
+                       const TVector3 & ref = TVector3(0,0,1) ) const;
+    Double_t GetTheta( Double_t px, Double_t py, 
+                       Double_t pz, const TVector3 & ref = TVector3(0,0,1) ) const;
+    Double_t GetPhi( TVector3 mom, 
+                     TVector3 ref = TVector3(0,0,1) ) const;
+    Double_t GetPhi( Double_t px, Double_t py ) const;
+    Double_t NuEnergyCCQE( Double_t l_energy, Double_t l_p, 
+                           Double_t l_theta, Double_t mass, 
+                           Int_t mode, bool verbose = false ) const;
     Double_t NuEnergyCalo( std::vector<Int_t> *pdg, std::vector<Double_t> *energy, 
-  			 Bool_t include_neutrons = false, Bool_t include_pizeros = false, Double_t prot_thresh = 0, bool verbose = false );
+  			               Bool_t include_neutrons = false, 
+                           Bool_t include_pizeros = false, 
+                           Double_t prot_thresh = 0, 
+                           bool verbose = false ) const;
     Double_t VertexEnergy( std::vector<Int_t> *pdg, std::vector<Double_t> *energy, 
-  			 Double_t prot_thresh = 0.0, Double_t pion_thresh = 0.0, bool verbose = false );
+  			               Double_t prot_thresh = 0.0, Double_t pion_thresh = 0.0, 
+                           bool verbose = false ) const;
     Double_t TotalPhotonEnergy( Int_t idet, 
                                 std::vector<gan::LorentzVectorLight> *p1pos,
                                 std::vector<gan::LorentzVectorLight> *p1mom,
                                 std::vector<gan::LorentzVectorLight> *p2pos,
-                                std::vector<gan::LorentzVectorLight> *p2mom );
+                                std::vector<gan::LorentzVectorLight> *p2mom ) const;
 
     // bool PhotonsAreParallel(TVector3 & photon1_start, TVector3 & photon1_mom
     //                         TVector3 & photon2_start, TVector3 & photon2_mom);
 
     // Detector property functions:
-    Bool_t   IsFiducial( Int_t idet, TVector3 vtx, Double_t fidCut = 17.0 );
-    Bool_t   IsActive( Int_t idet, TVector3 vtx, double cut = 0 );
-    Bool_t   IsFiducialMB( Int_t idet, TVector3 vtx, Double_t fidCut = 17.0 );
-    Double_t GetFidMass( Int_t idet );
-    Double_t GetActiveMass( Int_t idet );
+    Bool_t   IsFiducial( Int_t idet, const TVector3 & vtx,
+                         Double_t fidCut = 17.0 ) const;
+    Bool_t   IsActive( Int_t idet, TVector3 vtx, double cut = 0 ) const;
+    Bool_t   IsFiducialMB( Int_t idet, TVector3 vtx, 
+                           Double_t fidCut = 17.0 ) const;
+    Double_t GetFidMass( Int_t idet ) const;
+    Double_t GetActiveMass( Int_t idet ) const;
     void     GetDetBoundary( Int_t idet, Double_t &xmin, Double_t &xmax, 
-  			     Double_t &ymin, Double_t &ymax, Double_t &zmin, Double_t &zmax ); 
+  			                 Double_t &ymin, Double_t &ymax, 
+                             Double_t &zmin, Double_t &zmax ) const; 
     
-    Double_t GetPOTNorm( Int_t iflux, Int_t iLoc );
-    Double_t GetPOTNormNuMI( Int_t iflux, Int_t iDet );
+    Double_t GetPOTNorm( Int_t iflux, Int_t iLoc ) const;
+    Double_t GetPOTNormNuMI( Int_t iflux, Int_t iDet ) const;
 
-    double   GetContainedLength(TVector3 startPoint, TVector3 startDir, int idet);
-    double   GetLengthToStart(TVector3 startPoint, TVector3 startDir, int idet);
-    double   GetYZLengthToStart(TVector3 startPoint, TVector3 startDir, int idet);
+    double   GetContainedLength(const TVector3 & startPoint, 
+                                const TVector3 & startDir, int idet) const;
+    double   GetLengthToStart(  const TVector3 & startPoint, 
+                                const TVector3 & startDir, int idet) const;
+    double   GetYZLengthToStart(const TVector3 & startPoint, 
+                                const TVector3 & startDir, int idet) const;
     void ScaleFarDet(double scaleFactor=1);
 
     //This function returns true if the line along direction startDir that starts at startPos

@@ -24,6 +24,7 @@ namespace lar1{
     nWeights = 1000;
 
     showerContainmentDist = -999;
+    minDistanceToStart = 0;
 
     std::vector<float> defaultBins;
 
@@ -116,6 +117,9 @@ namespace lar1{
   void NtupleReader::setContainedShowers(double d){
     showerContainmentDist = d;
   }
+  void NtupleReader::setMinDistanceToStart(double d){
+    minDistanceToStart = d;
+  }
 
   //Not passing references here, since it's small and called infrequently
   std::vector<float> NtupleReader::GetData() const{
@@ -137,12 +141,12 @@ namespace lar1{
 
   }
 
-std::vector<std::vector< float> > NtupleReader::GetMultiWeightData() const{
-  return multiWeightData;
-}
-std::vector<std::vector<std::vector<float> > > NtupleReader::GetMultiWeightDataOsc() const{
-  return multiWeightDataOsc;
-}
+  std::vector<std::vector< float> > NtupleReader::GetMultiWeightData() const{
+    return multiWeightData;
+  }
+  std::vector<std::vector<std::vector<float> > > NtupleReader::GetMultiWeightDataOsc() const{
+    return multiWeightDataOsc;
+  }
 
 
 
@@ -192,8 +196,8 @@ std::vector<std::vector<std::vector<float> > > NtupleReader::GetMultiWeightDataO
     //Template name: "sourceFile_emin_emax_npoints_energy_hists.root"
 
     // Variables used in naming:
-    double emin = bins.front();
-    double emax = bins.back();
+    // double emin = bins.front();
+    // double emax = bins.back();
     // int nbins = bins.size() - 1;
     char tempstring[100];
     //path to the file that holds histos:
@@ -202,6 +206,13 @@ std::vector<std::vector<std::vector<float> > > NtupleReader::GetMultiWeightDataO
     fileNameHists += "_";
     if(showerContainmentDist != -999){
       sprintf(tempstring, "cont%g",showerContainmentDist );
+      fileNameHists += tempstring;
+      fileNameHists += "_";
+      fileNameHistsOsc += "_";
+      fileNameHistsOsc += tempstring;
+    }
+    if(minDistanceToStart != 0){
+      sprintf(tempstring, "dist%g",minDistanceToStart );
       fileNameHists += tempstring;
       fileNameHists += "_";
       fileNameHistsOsc += "_";
@@ -431,6 +442,7 @@ std::vector<std::vector<std::vector<float> > > NtupleReader::GetMultiWeightDataO
     Double_t Eccqe;
     Double_t ecalo1, ecalo2;
     Double_t ElectContainedDist;
+    Double_t ElectDistToStart;
     int nuchan;
 
 
@@ -468,6 +480,8 @@ std::vector<std::vector<std::vector<float> > > NtupleReader::GetMultiWeightDataO
     c->SetBranchAddress("Ecalo1", &ecalo1);
     c->SetBranchAddress("Ecalo2", &ecalo2);
     c->SetBranchAddress("ElectContainedDist",&ElectContainedDist);
+    c->SetBranchAddress("ElectDistToStart"  ,&ElectDistToStart);
+
 
     std::vector<std::vector<float> > *MultiWeight;
     MultiWeight = 0;
@@ -648,8 +662,11 @@ std::vector<std::vector<std::vector<float> > > NtupleReader::GetMultiWeightDataO
         if(ElectContainedDist < showerContainmentDist){
           continue;
         }
+
       }
-      
+      if(ElectDistToStart < minDistanceToStart){
+          continue;
+      }  
       //use all the events because the weight, eff is already calculated
       weight=wgt; 
       // if (!absolute_MWSource) edistrnue->Fill(fill_energy,weight);
@@ -846,6 +863,7 @@ std::vector<std::vector<std::vector<float> > > NtupleReader::GetMultiWeightDataO
     Double_t Eccqe;
     Double_t ecalo1, ecalo2;
     Double_t ElectContainedDist;
+    Double_t ElectDistToStart;
     int nuchan;
 
     Int_t nbytes = 0,nb = 0;
@@ -889,6 +907,7 @@ std::vector<std::vector<std::vector<float> > > NtupleReader::GetMultiWeightDataO
     c->SetBranchAddress("Ecalo1", &ecalo1);
     c->SetBranchAddress("Ecalo2", &ecalo2);
     c->SetBranchAddress("ElectContainedDist",&ElectContainedDist);
+    c->SetBranchAddress("ElectDistToStart"  ,&ElectDistToStart);
 
     std::vector<std::vector<float> > *MultiWeight;
     MultiWeight = 0;
@@ -1053,6 +1072,9 @@ std::vector<std::vector<std::vector<float> > > NtupleReader::GetMultiWeightDataO
 
       if(ElectContainedDist < showerContainmentDist){
         // std::cout << "Skipping this fosc event in the containment cut.\n";
+        continue;
+      }
+      if(ElectDistToStart < minDistanceToStart){
         continue;
       }
 
@@ -1756,6 +1778,50 @@ std::vector<std::vector<std::vector<float> > > NtupleReader::GetMultiWeightDataO
     c-> GetEntry(0);
     // if (c) delete c;
     return *(readInVector);
+  }
+
+  std::vector<float> NtupleReader::GetComptonBackgroundFromFile(std::string fileName, int cut){
+
+    std::vector<float> photons200_nocutVec;
+    std::vector<float> photons200_at50Vec;
+    std::vector<float> photons200_at100Vec;
+    photons200_nocutVec.resize(bins.size()-1);
+    photons200_at50Vec.resize(bins.size()-1);
+    photons200_at100Vec.resize(bins.size()-1);
+
+    if (!fileExists(fileName.c_str())){
+      std::cout << "WARNING: cosmics file "  << fileName << " does not exist,"
+                << " returning an empty vector instead." << std::endl;
+      return photons200_nocutVec;
+    }
+
+    TFile * file = new TFile((TString)fileName, "READ");
+    TH1F * photons200_nocut = (TH1F*)file -> Get("photons200_nocut");
+    TH1F * photons200_at50  = (TH1F*)file -> Get("photons200_at50");
+    TH1F * photons200_at100 = (TH1F*)file -> Get("photons200_at100");
+    
+    // It's nasty but here is the spot to apply efficiency:
+    for (int i = 4; i < bins.size()-1; i ++){
+      photons200_nocutVec[i] = (0.8) * photons200_nocut -> GetBinContent(i+1);
+      photons200_at50Vec[i]  = (0.8) * photons200_at50  -> GetBinContent(i+1);
+      photons200_at100Vec[i] = (0.8) * photons200_at100 -> GetBinContent(i+1);
+    }
+    file->Close();
+
+    // std::cout << "bin\tElow\tNull\t50\t100\n";
+    // for (int i = 0; i < bins.size()-1; i ++){
+    //   std::cout << i << "\t" << bins[i] << "\t"
+    //             << photons200_nocutVec[i] << "\t"
+    //             << photons200_at50Vec[i]  << "\t"
+    //             << photons200_at100Vec[i] << "\n";
+    // }
+    std::cout << std::endl;
+
+    if (cut == 50) return photons200_at50Vec;
+    if (cut == 100) return photons200_at100Vec;
+    else return photons200_nocutVec;
+
+
   }
 
 }

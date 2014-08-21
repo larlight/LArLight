@@ -25,7 +25,7 @@ void testphots::run()
 TFile          *infile1=new TFile("/uboone/data/users/andrzejs/MC_uboone.root","READ");
 TTree          *fCris=(TTree *)infile1->Get("MCTree");    //Cristoph's file
 TFile          *infile2=new TFile("/uboone/data/users/andrzejs/ComboNtuples_MC2_Proposal/combined_ntup_processed_nue.root","READ");
-TTree          *fChain=(TTree *)infile2->Get("EventsTot");   // Corey's file
+// TTree          *fChain=(TTree *)infile2->Get("EventsTot");   // Corey's file
 
     
     
@@ -150,7 +150,7 @@ TTree          *fChain=(TTree *)infile2->Get("EventsTot");   // Corey's file
       {
       //(128.175 , 0 , 518.4)
       TVector3 vtx((*comptx)[ix]/10.+128.175, (*compty)[ix]/10.+0, (*comptz)[ix]/10.+518.4);
-      int isFid = utils.IsFiducial( iDet, vtx );
+      // int isFid = utils.IsFiducial( iDet, vtx );
     
       TVector3 lepDir((*comptPx)[ix], (*comptPy)[ix]+0, (*comptPz)[ix]);
       double ElectDistToStart = utils.GetLengthToStart(vtx, lepDir, iDet);

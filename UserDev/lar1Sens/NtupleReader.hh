@@ -77,9 +77,12 @@ namespace lar1{
     void setSpecialNameText(std::string s);
     void setSpecialNameTextOsc(std::string s);
     void setContainedShowers(double d = 150);
+    void setMinDistanceToStart(double d = 0.0);
     void useMultiWeights(bool b = true, bool b_signal = false, int multiWeightSource = 6);
 
     void setAbsolute_MWSource(bool b){absolute_MWSource = b;}
+
+    std::vector<float> GetComptonBackgroundFromFile(std::string file, int cut = 0);
 
     int LoopNue();
     int LoopNumu();
@@ -116,6 +119,7 @@ namespace lar1{
     double scale;
 
     double showerContainmentDist;
+    double minDistanceToStart;
 
     TString fileNameHists;
     TString fileNameHistsOsc;

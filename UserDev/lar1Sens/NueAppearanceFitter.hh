@@ -93,6 +93,8 @@ namespace lar1{
       void setNueBins (std::vector<float> bins){nueBins  = bins; nbins_nue = nueBins.size()-1;}
       void setNumuBins(std::vector<float> bins){numuBins = bins; nbins_numu = numuBins.size()-1;}
 
+      void setIncludeCosmics(bool b = false){includeCosmics = b;}
+      void setCosmicsFile(std::string s){cosmicsFile = s;}
 
       void setNpoints(int n)
       {
@@ -118,6 +120,7 @@ namespace lar1{
       void setNearDetSystematicError(double d){nearDetSystematicError = d;}
 
       void setElectContainedDist(double d){ElectContainedDist = d;}
+      void setMinDistanceToStart(double d){minDistanceToStart = d;}
 
       void setUseInfiniteStatistics(bool b){useInfiniteStatistics = b;}
 
@@ -302,6 +305,7 @@ namespace lar1{
       std::vector< std::vector<float> >  NueFromNumuCCVec;
       std::vector< std::vector<float> >  DirtVec;
       std::vector< std::vector<float> >  OtherVec;
+      std::vector< std::vector<float> >  NueFromCosmicsVec;
 
       // This vector is the null vector for the multiweight stuff.
       // if is long enough to accomodate *all* samples (fosc, nue, numu)xnL 
@@ -324,10 +328,11 @@ namespace lar1{
       TMatrix Mixed_covarianceMatrix;
       TMatrix Norm_covarianceMatrix;
 
-
-
+      bool includeCosmics;
+      std::string cosmicsFile;
 
       double ElectContainedDist;
+      double minDistanceToStart;
 
   };
 

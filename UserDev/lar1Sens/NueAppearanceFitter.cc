@@ -66,7 +66,8 @@ namespace lar1{
     dm2FittingPoint = 0.9*npoints/2;
     sin22thFittingPoint = 0.25*npoints/2;
 
-    ElectContainedDist=-999;
+    ElectContainedDist = -999;
+    minDistanceToStart = -999;
 
     systematicInflationAmount = 0.0;
     inflateSystematics = false;
@@ -192,6 +193,11 @@ namespace lar1{
         sprintf(tempstring,"cont%g_",ElectContainedDist);
         fileNameRoot += tempstring;
     }
+    if (minDistanceToStart != -999) {
+        char tempstring[100];
+        sprintf(tempstring,"dist%g_",minDistanceToStart);
+        fileNameRoot += tempstring;
+    }
 
     if ( (use100m && use150m) ||
          (use100m && use200m) ||
@@ -203,6 +209,7 @@ namespace lar1{
     if (use100m){
       NtupleReader a("nue",fileSource, "100m", mode, energyType, npoints, forceRemake);
       a.setContainedShowers(ElectContainedDist);
+      a.setMinDistanceToStart(minDistanceToStart);
       a.setSpecialNameText(specialNameText);
       a.setSpecialNameTextOsc(specialNameTextOsc);
       if (useCovarianceMatrix){
@@ -220,6 +227,7 @@ namespace lar1{
     if (use150m){
       NtupleReader a("nue",fileSource, "150m", mode, energyType, npoints, forceRemake);
       a.setContainedShowers(ElectContainedDist);
+      a.setMinDistanceToStart(minDistanceToStart);
       a.setSpecialNameText(specialNameText);
       a.setSpecialNameTextOsc(specialNameTextOsc);
       if (useCovarianceMatrix){
@@ -237,6 +245,7 @@ namespace lar1{
     if (use200m){
       NtupleReader a("nue",fileSource, "200m", mode, energyType, npoints, forceRemake);
       a.setContainedShowers(ElectContainedDist);
+      a.setMinDistanceToStart(minDistanceToStart);
       a.setSpecialNameText(specialNameText);
       a.setSpecialNameTextOsc(specialNameTextOsc);
       if (useCovarianceMatrix){
@@ -254,6 +263,7 @@ namespace lar1{
     if (use100mLong){
       NtupleReader a("nue",fileSource, "100m", mode, energyType, npoints, forceRemake);
       a.setContainedShowers(ElectContainedDist);
+      a.setMinDistanceToStart(minDistanceToStart);
       a.setSpecialNameText("long");
       a.setSpecialNameTextOsc("long");
       if (useCovarianceMatrix){
@@ -272,6 +282,7 @@ namespace lar1{
     if (use470m){
       NtupleReader a("nue",fileSource, "470m", mode, energyType, npoints, forceRemake);
       a.setContainedShowers(ElectContainedDist);
+      a.setMinDistanceToStart(minDistanceToStart);
       // a.setSpecialNameText(specialNameText);
       a.setSpecialNameTextOsc(specialNameTextOsc);
       if (useCovarianceMatrix){
@@ -290,6 +301,7 @@ namespace lar1{
     if (useT600_onaxis) {
       NtupleReader a("nue",fileSource, "600m_onaxis", mode, energyType, npoints, forceRemake);
       a.setContainedShowers(ElectContainedDist);
+      a.setMinDistanceToStart(minDistanceToStart);
       a.setSpecialNameText(specialNameText);
       a.setSpecialNameTextOsc(specialNameTextOsc);
       if (useCovarianceMatrix){
@@ -308,6 +320,7 @@ namespace lar1{
     if (useT600_offaxis) {
       NtupleReader a("nue",fileSource,  "600m_offaxis", mode, energyType, npoints, forceRemake);
       a.setContainedShowers(ElectContainedDist);
+      a.setMinDistanceToStart(minDistanceToStart);
       a.setSpecialNameText(specialNameText);
       a.setSpecialNameTextOsc(specialNameTextOsc);
       if (useCovarianceMatrix){
@@ -430,6 +443,7 @@ namespace lar1{
     eventsNumuMCStats.resize(nL);
     DirtVec.resize(nL);
     OtherVec.resize(nL);
+    NueFromCosmicsVec.resize(nL);
 
     if (useCovarianceMatrix){
       eventsNullVecMultiWeight.resize(nWeights);
@@ -496,6 +510,8 @@ namespace lar1{
       NueFromNumuCCVec[b_line]           = utils.rebinVector(readerNue[b_line].GetVectorFromTree( (char*) "NueFromNumuCCVec"),nueBins);
       DirtVec[b_line]                    = utils.rebinVector(readerNue[b_line].GetVectorFromTree( (char*) "DirtVec"),nueBins);
       OtherVec[b_line]                   = utils.rebinVector(readerNue[b_line].GetVectorFromTree( (char*) "OtherVec"),nueBins);
+      // if (includeCosmics)
+        NueFromCosmicsVec[b_line]        = utils.rebinVector(readerNue[b_line].GetComptonBackgroundFromFile(cosmicsFile, minDistanceToStart),nueBins);
       
       if (useHighDm){
         eventsSignalBestFitNuVec[b_line]    = utils.rebinVector(readerNue[b_line].GetVectorFromTree( (char*) "edistrnueHighDmNuVec",(char*)"tvecfosc",true),nueBins);
@@ -567,11 +583,13 @@ namespace lar1{
         NueFromNC_pi0Vec[b_line][bin]             *= scales[b_line];
         NueFromNC_delta0Vec[b_line][bin]          *= scales[b_line];
         NueFromNumuCCVec[b_line][bin]             *= scales[b_line];
+        NueFromCosmicsVec[b_line][bin]            *= scales[b_line];
         DirtVec[b_line][bin]                      *= scales[b_line];
         OtherVec[b_line][bin]                     *= scales[b_line];
         eventsSignalBestFitNuVec[b_line][bin]     *= scales[b_line]*sin22thBF;
         eventsSignalBestFitNubarVec[b_line][bin]  *= scales[b_line]*sin22thBF;
-
+        if (includeCosmics)
+          eventsnueVec[b_line][bin] += NueFromCosmicsVec[b_line][bin];
       }
       for(int bin = 0; bin < nbins_numu; bin++){
         eventsnumuVec[b_line][bin] *= scales[b_line];
@@ -680,8 +698,14 @@ namespace lar1{
       for (unsigned int i = 0; i < nearDetStats.size(); i++){
         //leaving the first nbinsE entries at 0 for the signal bins
         //for bins nbinsE -> 2*nbinsE-1, use 1/sqrt(nue events in that bin)
-        if (i < nbins_nue) nearDetStats[i] = 1/sqrt(eventsnueVec[0][i]);
-        else nearDetStats[i] = 1/sqrt(eventsnumuVec[0][i-nbins_nue]);
+        if (i < nbins_nue)
+          continue;
+        if (i < 2*nbins_nue){
+          nearDetStats[i] = 1/sqrt(eventsnueVec[0][i-nbins_nue]);
+        }
+        else {
+          nearDetStats[i] = 1/sqrt(eventsnumuVec[0][i-2*nbins_nue]);
+        }
       }
       if(verbose){
         std::cout << "\nNo covariance matrix entries, calculating near det errors.\n";
@@ -691,6 +715,14 @@ namespace lar1{
         }
       }
 
+      // std::cout << "Testing whether the photons are in the sample:"<< std::endl;
+      // for (int i = 0; i < nbins_nue; i ++){
+      //   std::cout << "Comptons:\n";
+      //   for(int b_line = 0; b_line < nL; b_line ++){
+      //     std::cout << NueFromCosmicsVec[b_line][i]<<"\t";
+      //   }
+      //   std::cout << std::endl;
+      // }
 
   // }
 
@@ -706,6 +738,8 @@ namespace lar1{
 
     
     }
+    std::cout << "finishing up... " << std::endl;
+
     return 0;
   }
 
@@ -795,6 +829,19 @@ namespace lar1{
 
     events_nominal_COPY = eventsnLnullVec;
     signal_nominal_COPY.resize(events_nominal_COPY.size());
+
+    // Don't want to include any cosmics in the matrix calculation, so:
+    if (includeCosmics){
+      for (int b_line = 0; b_line < nL; ++b_line)
+      {
+        for (int bin = 0; bin < nbins_nue; ++bin)
+        {
+          events_nominal_COPY[b_line*(nbins)+nbins_nue+bin] -= NueFromCosmicsVec[b_line][bin];
+        }
+        
+      }
+      
+    }
 
     if (useSignalCovarianceMatrix){
       if(dm2point != -1 && dm2point <= npoints){
@@ -2658,7 +2705,7 @@ namespace lar1{
       TH1F * NueFromNumuCC = utils.makeHistogram(NueFromNumuCCVec[j],nueBins);
       TH1F * Dirt = utils.makeHistogram(DirtVec[j],nueBins);
       TH1F * Other = utils.makeHistogram(OtherVec[j],nueBins);
-
+      TH1F * NueFromCosmics = utils.makeHistogram(NueFromCosmicsVec[j],nueBins);
 
       TH1F * SignalNu = utils.makeHistogram(eventsSignalBestFitNuVec[j],nueBins);
       TH1F * SignalNubar = utils.makeHistogram(eventsSignalBestFitNubarVec[j],nueBins);
@@ -2674,6 +2721,7 @@ namespace lar1{
       // SignalNu->SetBinContent(8,0.07);
       // SignalNu->SetBinContent(9,0.07);
       // SignalNu->SetBinContent(10,0.0);
+    std::cout << "Check 0\n";
 
 
       std::cout << "First bin: " << SignalNu->GetBinContent(1) <<std::endl;
@@ -2688,6 +2736,7 @@ namespace lar1{
       NueFromNumuCC           -> SetFillColor(kBlue-9);
       Dirt                    -> SetFillColor(15);
       Other                   -> SetFillColor(8);
+      NueFromCosmics          -> SetFillColor(kPink);
 
       std::vector< float > totalEvents, signalEvents;
       totalEvents.resize(nbins_nue);
@@ -2725,6 +2774,9 @@ namespace lar1{
         SignalNu                -> SetBinContent(bin+1,
                                       SignalNu->GetBinContent(bin+1)
                                       /SignalNu->GetBinWidth(bin+1));
+        NueFromCosmics          -> SetBinContent(bin+1,
+                                      NueFromCosmics->GetBinContent(bin+1)
+                                      /NueFromCosmics->GetBinWidth(bin+1));
       }
 
       // Set the bin errors to zero except for the very last bin:
@@ -2749,6 +2801,8 @@ namespace lar1{
         totalEvents[i]      += Dirt -> GetBinContent(i+1);
         Other               -> SetBinError(i+1, 0.0);
         totalEvents[i]      += Other -> GetBinContent(i+1);
+        NueFromCosmics      -> SetBinError(i+1, 0.0);
+        totalEvents[i]      += NueFromCosmics -> GetBinContent(i+1);
         signalEvents[i]     = SignalNu -> GetBinContent(i+1);
       }
       std::cout << "First bin: " << SignalNu->GetBinContent(1) <<std::endl;;
@@ -2763,6 +2817,7 @@ namespace lar1{
       }
       std::cout << "First bin: " << SignalNu->GetBinContent(1) <<std::endl;;
       
+    std::cout << "Check 1\n";
       
       stack -> Add(NueFromNueCC_muon);
       stack -> Add(NueFromNueCC_chargeKaon);
@@ -2774,6 +2829,7 @@ namespace lar1{
       // stack -> Add(Dirt);
       // stack -> Add(Other);
       // stack ->Add(MBPhotExcess);
+      stack -> Add(NueFromCosmics);
 
       SignalNu -> SetLineStyle(0);
       SignalNu -> SetLineColor(1);
@@ -2785,6 +2841,7 @@ namespace lar1{
       integral += NueFromNueCC_neutKaon->Integral();
       integral += NueFromNC_pi0->Integral();
       integral += NueFromNumuCC->Integral();
+      integral += NueFromCosmics -> Integral();
 
       std::cout << "Total number of events in the background at L = " 
                 << baselines[j] << ": " << integral << std::endl;
@@ -2801,9 +2858,11 @@ namespace lar1{
       leg->AddEntry(NueFromNC_pi0, "NC #pi^{0}");
       // leg->AddEntry(NueFromNC_delta0, "#Delta #rightarrow N#gamma");
       leg->AddEntry(NueFromNumuCC, "#nu_{#mu} CC");
+      leg->AddEntry(NueFromCosmics, "Cosmics MisID");
       // leg->AddEntry(Dirt, "Dirt");
       // leg->AddEntry(Other, "Other");
       leg->AddEntry(SignalNu,"Signal");
+
 
       leg -> SetTextSize(0.04);
       leg -> SetFillStyle(0);
@@ -2842,6 +2901,7 @@ namespace lar1{
         if (j == 2) max *= 2.1;
       }
       std::cout << "Max val (scaled): " << max << "\n";
+    std::cout << "Check 2\n";
 
 
 
@@ -2871,6 +2931,7 @@ namespace lar1{
       // else if (baselines[j] == "800m"){
       //   sprintf(name, "T600 (%sm)", baselines[j].c_str());
       // }
+    std::cout << "Check 3\n";
       
       chr->GetYaxis()->SetTitle("Events / MeV");
       chr->GetYaxis()->SetTitleSize(0.06);
@@ -2916,6 +2977,7 @@ namespace lar1{
 
     }
     
+    std::cout << "Check 4\n";
 
 
     if (specialNameText != "") fileNameRoot = fileNameRoot + specialNameText + "_";
@@ -2939,7 +3001,7 @@ namespace lar1{
       // stackedCanvas[i] -> Print(fileName, "eps");
     }
    
-
+    std::cout << "Check 5\n";
     return 0;
 
   }

@@ -14,6 +14,7 @@ namespace lar1{
                                  int iDet,
                                  int iLoc,
                                  Long64_t max_entry,
+                                 bool skipMultiWeights,
                                  bool verbose,
                                  double scale ){
 
@@ -271,8 +272,8 @@ namespace lar1{
     newt->Branch("LepE", &Elep, "LepE/D");
     newt->Branch("LepESmeared", &ElepSmeared, "LepESmeared/D");
     newt->Branch("ElectContainedDist",&ElectContainedDist,"ElectContainedDist/D");
-     newt->Branch("ElectDistToStart",&ElectDistToStart,"ElectDistToStart/D");
-      newt->Branch("ElectDistToStartYZ",&ElectDistToStartYZ,"ElectDistToStartYZ/D");
+    newt->Branch("ElectDistToStart",  &ElectDistToStart,  "ElectDistToStart/D");
+    newt->Branch("ElectDistToStartYZ",&ElectDistToStartYZ,"ElectDistToStartYZ/D");
     //------------------------------------------------------------------
     // These are new variables that get added at the reprocessing stage
 
@@ -318,7 +319,8 @@ namespace lar1{
     newt->Branch("Pi0Shower1X",&shower1X);
     newt->Branch("Pi0Shower2X",&shower2X);
 
-    newt->Branch("MultiWeight",&MultiWeight);
+    if (signal != "fosc" || skipMultiWeights)
+      newt->Branch("MultiWeight",&MultiWeight);
 
 
     bool isFid, isActive;
@@ -560,7 +562,7 @@ namespace lar1{
     TH2D * parentKinematics = new TH2D("parentKinematics", "Neutrino Parent p_{T} vs. p_{z};p_{z};p_{T}",
                                      100,0,10,100,0,3);
     // Flux Through Both Detectors
-    TH2D * SharedFlux = new TH2D("SharedFlux","Amount of flux that passes through uB",250,xmin,xmax,250,ymin,ymax);
+    // TH2D * SharedFlux = new TH2D("SharedFlux","Amount of flux that passes through uB",250,xmin,xmax,250,ymin,ymax);
     TH2D * nearDetOnlyFlux = new TH2D("nearDetOnlyFlux","Amount of flux that passes through ND only",250,xmin,xmax,250,ymin,ymax);
     TH2D * FluxRatio = new TH2D("FluxRatio","Ratio of events in ND only to Total Events",250,xmin,xmax,250,ymin,ymax);
 
@@ -791,12 +793,12 @@ namespace lar1{
           TVector3 lepDir(LepPx, LepPy, LepPz);
           ElectContainedDist = utils.GetContainedLength(vertex, lepDir, iDet);
           ElectDistToStart = utils.GetLengthToStart(vertex, lepDir, iDet);
-	  ElectDistToStartYZ = utils.GetYZLengthToStart(vertex, lepDir, iDet);
+          ElectDistToStartYZ = utils.GetYZLengthToStart(vertex, lepDir, iDet);
           electron_cand_energy = Elep;
-	  lepTotal->Fill(Elep,wgt);
-	  nueTotal->Fill(enugen,wgt);
+          lepTotal->Fill(Elep,wgt);
+          nueTotal->Fill(enugen,wgt);
     
-	  
+         
           electron_cand_angle = ThetaLep;
           enuccqe = utils.NuEnergyCCQE( 1000*electron_cand_energy, sqrt(pow(1000*electron_cand_energy,2) - pow(0.511,2)), 
                 electron_cand_angle, 0.511, iflux )/1000.0;
@@ -851,74 +853,74 @@ namespace lar1{
           if (!detNeutrinos && inno > 0) wgt = 0.0;
           if (!detAntiNeutrinos && inno < 0) wgt = 0.0;
           electron_cand_energy = Elep;
-	  lepTotal->Fill(Elep,wgt);
-	  nueTotal->Fill(enugen,wgt);
+          lepTotal->Fill(Elep,wgt);
+          nueTotal->Fill(enugen,wgt);
           electron_cand_angle = ThetaLep;
           enuccqe = utils.NuEnergyCCQE( 1000*electron_cand_energy, sqrt(pow(1000*electron_cand_energy,2) - pow(0.511,2)), 
                 electron_cand_angle, 0.511, iflux )/1000.0;
           enucalo1 = utils.NuEnergyCalo( geniePDG, genieE, true, true );
           enucalo2 = utils.NuEnergyCalo( geniePDG, genieE, false, false, prot_thresh ) + photon_energy;
-          CcqeVsTrueE->Fill( energy, enuccqe, wgt );
+          CcqeVsTrueE->Fill(  energy, enuccqe, wgt );
           Calo1VsTrueE->Fill( energy, enucalo1, wgt );
           Calo2VsTrueE->Fill( energy, enucalo2, wgt );
 
           TVector3 vertex(Vx, Vy, Vz);
           TVector3 lepDir(LepPx, LepPy, LepPz);
           ElectContainedDist = utils.GetContainedLength(vertex, lepDir, iDet);
-          ElectDistToStart = utils.GetLengthToStart(vertex, lepDir, iDet);
-	  ElectDistToStartYZ = utils.GetYZLengthToStart(vertex, lepDir, iDet);
+          ElectDistToStart   = utils.GetLengthToStart(  vertex, lepDir, iDet);
+          ElectDistToStartYZ = utils.GetYZLengthToStart(vertex, lepDir, iDet);
           // Calculate the angle to z direction for the electron
           double Theta= acos(LepPz/lepDir.Mag()); 
           Theta *= 180/3.14159;
           elecAngleVsEnergy->Fill(Elep, Theta, wgt);
-	  
-	  if(Elep > .2) 
-	  {
-          ElectDistToStartHist->Fill(ElectDistToStart,wgt); 
-	  ElectDistToStartYZHist->Fill(ElectDistToStartYZ,wgt); 
-	  if(vertex[1]>=0){
-	    ElectDistToStartHistTop->Fill(ElectDistToStart,wgt);
-	    ElectDistToStartYZHistTop->Fill(ElectDistToStartYZ,wgt); 
-	  }
-	  else
-	    {
+         
+          if(Elep > .2) 
+          {
+            ElectDistToStartHist->Fill(ElectDistToStart,wgt); 
+            ElectDistToStartYZHist->Fill(ElectDistToStartYZ,wgt); 
+            if(vertex[1]>=0){
+            ElectDistToStartHistTop->Fill(ElectDistToStart,wgt);
+            ElectDistToStartYZHistTop->Fill(ElectDistToStartYZ,wgt); 
+          }
+          else
+          {
             ElectDistToStartHistBottom->Fill(ElectDistToStart,wgt); 
-	    ElectDistToStartYZHistBottom->Fill(ElectDistToStartYZ,wgt); 
-	    }
-	  }
-	  
-          ElectDistToStartvsY->Fill(ElectDistToStart,vertex[1],wgt); 
-	  ElectDistToStartYZvsY->Fill(ElectDistToStartYZ,vertex[1],wgt); 
-	  
-          if (ndecay < 5 && ndecay > 0){  // K0
-            ibkg = 3;
-            nueFromK0Decay->Fill( energy, wgt );
-            nueFromK0DecayLepE->Fill( Elep, wgt );
-            nueFromK0DecayCCQE->Fill( enuccqe, wgt );
-            nueFromK0DecayCalo->Fill( enucalo2, wgt );
-            if( enucalo2 > 0.2 && enucalo2 < 0.475 ) NnueFromK0Decay_LE += wgt;
-          }
-          else if (ndecay > 4 && ndecay < 11){  // K+
-            ibkg = 2;
-            nueFromKPlusDecay->Fill( energy, wgt );
-            nueFromKPlusDecayLepE->Fill( Elep, wgt );
-            nueFromKPlusDecayCCQE->Fill( enuccqe, wgt );
-            nueFromKPlusDecayCalo->Fill( enucalo2, wgt );
-            if( enucalo2 > 0.2 && enucalo2 < 0.475 ) NnueFromKPlusDecay_LE += wgt;
-          }
-          else if (ndecay == 11 || ndecay == 12){  // mu
-            ibkg = 1;
-            nueFromMuonDecay->Fill( energy, wgt ); 
-            nueFromMuonDecayLepE->Fill( Elep, wgt ); 
-            nueFromMuonDecayCCQE->Fill( enuccqe, wgt );
-            nueFromMuonDecayCalo->Fill( enucalo2, wgt );
-            if( enucalo2 > 0.2 && enucalo2 < 0.475 ) NnueFromMuonDecay_LE += wgt;
+            ElectDistToStartYZHistBottom->Fill(ElectDistToStartYZ,wgt); 
           }
         }
-        else if( signal == "numu" )
-          efficiency = 0.0;
+         
+        ElectDistToStartvsY->Fill(ElectDistToStart,vertex[1],wgt); 
+        ElectDistToStartYZvsY->Fill(ElectDistToStartYZ,vertex[1],wgt); 
+         
+        if (ndecay < 5 && ndecay > 0){  // K0
+          ibkg = 3;
+          nueFromK0Decay->Fill( energy, wgt );
+          nueFromK0DecayLepE->Fill( Elep, wgt );
+          nueFromK0DecayCCQE->Fill( enuccqe, wgt );
+          nueFromK0DecayCalo->Fill( enucalo2, wgt );
+          if( enucalo2 > 0.2 && enucalo2 < 0.475 ) NnueFromK0Decay_LE += wgt;
+        }
+        else if (ndecay > 4 && ndecay < 11){  // K+
+          ibkg = 2;
+          nueFromKPlusDecay->Fill( energy, wgt );
+          nueFromKPlusDecayLepE->Fill( Elep, wgt );
+          nueFromKPlusDecayCCQE->Fill( enuccqe, wgt );
+          nueFromKPlusDecayCalo->Fill( enucalo2, wgt );
+          if( enucalo2 > 0.2 && enucalo2 < 0.475 ) NnueFromKPlusDecay_LE += wgt;
+        }
+        else if (ndecay == 11 || ndecay == 12){  // mu
+          ibkg = 1;
+          nueFromMuonDecay->Fill( energy, wgt ); 
+          nueFromMuonDecayLepE->Fill( Elep, wgt ); 
+          nueFromMuonDecayCCQE->Fill( enuccqe, wgt );
+          nueFromMuonDecayCalo->Fill( enucalo2, wgt );
+          if( enucalo2 > 0.2 && enucalo2 < 0.475 ) NnueFromMuonDecay_LE += wgt;
+        }
+      }
+      else if( signal == "numu" )
+        efficiency = 0.0;
 
-        electronCC += fluxweight*efficiency;
+      electronCC += fluxweight*efficiency;
 
       }
       if (signal == "numi" && isFid && isCC && abs(inno) == 14){
@@ -995,7 +997,12 @@ namespace lar1{
           ibkg = 7;
           efficiency = muonCCMisID;
           wgt = fluxweight*efficiency;
-
+          
+          TVector3 vertex(Vx, Vy, Vz);
+          TVector3 lepDir(LepPx, LepPy, LepPz);
+          ElectContainedDist = utils.GetContainedLength(vertex, lepDir, iDet);
+          ElectDistToStart   = utils.GetLengthToStart(  vertex, lepDir, iDet);
+          ElectDistToStartYZ = utils.GetYZLengthToStart(vertex, lepDir, iDet);
 
           electron_cand_energy = MuonMom->at(0).E();
           electron_cand_angle = utils.GetTheta( MuonMom->at(0).X(), MuonMom->at(0).Y(), MuonMom->at(0).Z() );
@@ -1003,7 +1010,7 @@ namespace lar1{
                 electron_cand_angle, 0.511, iflux )/1000.0;
           enucalo1 = utils.NuEnergyCalo( geniePDG, genieE, true, true );
           enucalo2 = utils.NuEnergyCalo( geniePDG, genieE, false, false, prot_thresh ) + photon_energy;
-          CcqeVsTrueE->Fill( energy, enuccqe, wgt );
+          CcqeVsTrueE->Fill(  energy, enuccqe,  wgt );
           Calo1VsTrueE->Fill( energy, enucalo1, wgt );
           Calo2VsTrueE->Fill( energy, enucalo2, wgt );
 
@@ -1027,7 +1034,11 @@ namespace lar1{
         iTop ++;  //Should be an electron in these events
         iChan = 2000; //This is an other case!
 
-
+        TVector3 vertex(Vx, Vy, Vz);
+        TVector3 lepDir(LepPx, LepPy, LepPz);
+        ElectContainedDist = utils.GetContainedLength(vertex, lepDir, iDet);
+        ElectDistToStart   = utils.GetLengthToStart(  vertex, lepDir, iDet);
+        ElectDistToStartYZ = utils.GetYZLengthToStart(vertex, lepDir, iDet);
 
         ibkg = 4;
         efficiency = electronIDeff;
@@ -1107,16 +1118,17 @@ namespace lar1{
 
       if (isCC && abs(inno) == 12 && chargedPion == 0 && neutralPion == 0){
         // Fill in the info about the proton multiplicity
-        if (protonP.size() != 0) 
-	{ ProtonMultiplicity -> Fill(proton, fluxweight);
-	ntracks+=proton; 
-	//TotalMultiplicity-> Fill(proton, fluxweight);
-	//elecMultipleVsEnergy->Fill(proton,Elep, fluxweight);
-	}
-        else { ProtonMultiplicity -> Fill(0.0,fluxweight);
-	//TotalMultiplicity-> Fill(0.0, fluxweight);
-	}
-	PionMultiplicity ->Fill(0.0,fluxweight);
+        if (protonP.size() != 0) { 
+          ProtonMultiplicity -> Fill(proton, fluxweight);
+          ntracks+=proton; 
+          //TotalMultiplicity-> Fill(proton, fluxweight);
+          //elecMultipleVsEnergy->Fill(proton,Elep, fluxweight);
+        }
+        else { 
+          ProtonMultiplicity -> Fill(0.0,fluxweight);
+          //TotalMultiplicity-> Fill(0.0, fluxweight);
+        }
+        PionMultiplicity ->Fill(0.0,fluxweight);
         // Fill in the proton momentum:
         for (std::vector<double>::iterator i = protonP.begin(); i != protonP.end(); ++i)
         {
@@ -1126,21 +1138,21 @@ namespace lar1{
       }
       else if(isCC && abs(inno) == 12 && chargedPion > 0 && neutralPion == 0)
       {
-	ProtonMultiplicity -> Fill(proton, fluxweight);
-	PionMultiplicity -> Fill(chargedPion, fluxweight);
-// 	elecMultipleVsEnergy->Fill(proton,Elep, fluxweight);
-// 	elecMultipleVsEnergy->Fill(chargedPion,Elep, fluxweight);
-// 	TotalMultiplicity-> Fill(proton, fluxweight);
-// 	TotalMultiplicity-> Fill(chargedPion, fluxweight);
-	ntracks+=proton;
-	ntracks+=chargedPion;
-	
+       ProtonMultiplicity -> Fill(proton, fluxweight);
+       PionMultiplicity -> Fill(chargedPion, fluxweight);
+//        elecMultipleVsEnergy->Fill(proton,Elep, fluxweight);
+//        elecMultipleVsEnergy->Fill(chargedPion,Elep, fluxweight);
+//        TotalMultiplicity-> Fill(proton, fluxweight);
+//        TotalMultiplicity-> Fill(chargedPion, fluxweight);
+       ntracks+=proton;
+       ntracks+=chargedPion;
+       
       }
 
       if(isCC && abs(inno) == 12 && neutralPion == 0 )
       {
-      TotalMultiplicity-> Fill(ntracks, fluxweight);
-      elecMultipleVsEnergy->Fill(Elep,ntracks, fluxweight);
+        TotalMultiplicity-> Fill(ntracks, fluxweight);
+        elecMultipleVsEnergy->Fill(Elep,ntracks, fluxweight);
       }
       //Now set the channel:
       if (isCC) iChan = 1000;
@@ -1314,50 +1326,50 @@ namespace lar1{
           // std::cout << "photonPos is (" << photonPos.X() << ", " << photonPos.Y() << ", " << photonPos.Z() << ")\n";
           // std::cout << "photonMom is (" << photonMom.X() << ", " << photonMom.Y() << ", " << photonMom.Z() << ")\n";
           ElectContainedDist = utils.GetContainedLength(photonPos, photonMom, iDet);
-	  ElectDistToStart = utils.GetLengthToStart(photonPos, photonMom, iDet);
-	   ElectDistToStartYZ = utils.GetYZLengthToStart(photonPos, photonMom, iDet);
+          ElectDistToStart   = utils.GetLengthToStart(  photonPos, photonMom, iDet);
+          ElectDistToStartYZ = utils.GetYZLengthToStart(photonPos, photonMom, iDet);
           if (verbose) std::cout << "The contained length of this shower is " << ElectContainedDist << std::endl;
           // if( !(isFid && utils.VertexEnergy( geniePDG, genieE ) > vtxEcut && photonConvDist > convDistCut) || !isFid ){  // >25 MeV vtx energy and 5cm separation
 
-            ibkg = 5;
-            efficiency = photonMisID;
-            wgt = fluxweight*efficiency;
-            
-            electron_cand_energy = photonE;
-            electron_cand_angle = photonTheta;
-            enuccqe = utils.NuEnergyCCQE( 1000*electron_cand_energy, sqrt(pow(1000*electron_cand_energy,2) - pow(0.511,2)), 
-                  electron_cand_angle, 0.511, iflux )/1000.0;
-            enucalo1 = utils.NuEnergyCalo( geniePDG, genieE, true, true );
-            enucalo2 = utils.NuEnergyCalo( geniePDG, genieE, false, false, prot_thresh ) + photon_energy;
-            Elep = electron_cand_energy;
-            
-            CcqeVsTrueE->Fill( energy, enuccqe, wgt );
-            Calo1VsTrueE->Fill( energy, enucalo1, wgt );
-            Calo2VsTrueE->Fill( energy, enucalo2, wgt );
-            
-            singlePhotonPi0->Fill( energy, wgt ); 
-            singlePhotonPi0PhoE->Fill( photonE, wgt );
-            singlePhotonPi0CCQE->Fill( enuccqe, wgt );
-            singlePhotonPi0Calo->Fill( enucalo2, wgt );
-    
-            photonCCQE->Fill( enuccqe, photonE, wgt );
+          ibkg = 5;
+          efficiency = photonMisID;
+          wgt = fluxweight*efficiency;
           
-            if( enucalo2 > 0.2 && enucalo2 < 0.475 ){   // analyze LE region
-              NsinglePhotonPi0_LE += wgt;
-              ncpi0bkgV->Fill( Vx, Vy, Vz, wgt );
-              ncpi0bkgX->Fill( Vx, wgt );
-              ncpi0bkgY->Fill( Vy, wgt );
-              ncpi0bkgZ->Fill( Vz, wgt );
+          electron_cand_energy = photonE;
+          electron_cand_angle = photonTheta;
+          enuccqe = utils.NuEnergyCCQE( 1000*electron_cand_energy, sqrt(pow(1000*electron_cand_energy,2) - pow(0.511,2)), 
+                electron_cand_angle, 0.511, iflux )/1000.0;
+          enucalo1 = utils.NuEnergyCalo( geniePDG, genieE, true, true );
+          enucalo2 = utils.NuEnergyCalo( geniePDG, genieE, false, false, prot_thresh ) + photon_energy;
+          Elep = electron_cand_energy;
+          
+          CcqeVsTrueE->Fill( energy, enuccqe, wgt );
+          Calo1VsTrueE->Fill( energy, enucalo1, wgt );
+          Calo2VsTrueE->Fill( energy, enucalo2, wgt );
+          
+          singlePhotonPi0->Fill( energy, wgt ); 
+          singlePhotonPi0PhoE->Fill( photonE, wgt );
+          singlePhotonPi0CCQE->Fill( enuccqe, wgt );
+          singlePhotonPi0Calo->Fill( enucalo2, wgt );
+    
+          photonCCQE->Fill( enuccqe, photonE, wgt );
+          
+          if( enucalo2 > 0.2 && enucalo2 < 0.475 ){   // analyze LE region
+            NsinglePhotonPi0_LE += wgt;
+            ncpi0bkgV->Fill( Vx, Vy, Vz, wgt );
+            ncpi0bkgX->Fill( Vx, wgt );
+            ncpi0bkgY->Fill( Vy, wgt );
+            ncpi0bkgZ->Fill( Vz, wgt );
         
-              photonConv->Fill( photonPos.X(), photonPos.Y(), photonPos.Z() );
-              photonConvX->Fill( photonPos.X() );
-              photonConvY->Fill( photonPos.Y() );
-              photonConvZ->Fill( photonPos.Z() );
-            }
+            photonConv->Fill( photonPos.X(), photonPos.Y(), photonPos.Z() );
+            photonConvX->Fill( photonPos.X() );
+            photonConvY->Fill( photonPos.Y() );
+            photonConvZ->Fill( photonPos.Z() );
+          }
             
-            NCsinglePhoton += wgt;
-            singlePhotonE.push_back( photonE );
-            singlePhotonTheta.push_back( photonTheta );
+          NCsinglePhoton += wgt;
+          singlePhotonE.push_back( photonE );
+          singlePhotonTheta.push_back( photonTheta );
     
           // }
         }
@@ -1435,7 +1447,7 @@ namespace lar1{
       //----------------------------------------------
       // Analyze single photon final state events
       //----------------------------------------------
-      if (NGamma != miscPhotonConversionPos -> size()) {
+      if (NGamma != (int) miscPhotonConversionPos -> size()) {
         N_continue_Gamma_mismatch ++;
         continue;
       }

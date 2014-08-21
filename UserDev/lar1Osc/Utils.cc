@@ -115,7 +115,7 @@ namespace lar1{
     return;
   }
 
-  Double_t Utils::GetPOTNormNuMI(Int_t iflux, Int_t iDet){
+  Double_t Utils::GetPOTNormNuMI(Int_t iflux, Int_t iDet) const{
 /*
     Double_t POT_Sim = 1;
     Double_t POTnorm = 1;
@@ -164,7 +164,7 @@ namespace lar1{
    return 1;
   }
 
-  Double_t Utils::GetPOTNorm( Int_t iflux, Int_t iLoc){
+  Double_t Utils::GetPOTNorm( Int_t iflux, Int_t iLoc) const{
 
     // Simple function, really, but put into utils to abstract it out of reprocessing.
     // 
@@ -365,13 +365,13 @@ namespace lar1{
   //=========================================================================================
   // Polar angle Theta - angle between momentum vector and z-axis
   //=========================================================================================
-  Double_t Utils::GetTheta( TVector3 mom, TVector3 ref ){
+  Double_t Utils::GetTheta( const TVector3 & mom, const TVector3 & ref ) const{
 
     return GetTheta( mom.X(), mom.Y(), mom.Z(), ref );
     
   }
 
-  Double_t Utils::GetTheta( Double_t px, Double_t py, Double_t pz, TVector3 ref ){
+  Double_t Utils::GetTheta( Double_t px, Double_t py, Double_t pz, const TVector3 & ref ) const{
 
     // a.b = |a| |b| cos(theta)
     Double_t cosTheta = (ref.X()*px + ref.Y()*py + ref.Z()*pz) / (sqrt(px*px + py*py + pz*pz) * ref.Mag());
@@ -383,14 +383,14 @@ namespace lar1{
   //=================================================================================
   // Polar angle Phi - angle in the x-y plane, x-axis = 0
   //=================================================================================
-  Double_t Utils::GetPhi( TVector3 mom, TVector3 ref ){
+  Double_t Utils::GetPhi( TVector3 mom, TVector3 ref ) const{
 
     mom.RotateUz(ref.Unit());
     return GetPhi( mom.X(), mom.Y() );
     
   }
 
-  Double_t Utils::GetPhi( Double_t px, Double_t py ){
+  Double_t Utils::GetPhi( Double_t px, Double_t py ) const{
 
     return atan2( py, px );
 
@@ -400,7 +400,7 @@ namespace lar1{
   // CCQE neutrino energy
   //=================================================================================
   Double_t Utils::NuEnergyCCQE( Double_t l_energy, Double_t l_p, Double_t l_theta,
-                                Double_t mass, Int_t mode, bool verbose ){
+                                Double_t mass, Int_t mode, bool verbose ) const{
     
     Double_t M_n = 939.565;    // MeV/c2
     Double_t M_p = 938.272;    // MeV/c2
@@ -442,7 +442,7 @@ namespace lar1{
   //=================================================================================
   Double_t Utils::NuEnergyCalo(std::vector<Int_t> *pdg, std::vector<Double_t> *energy,
                                Bool_t include_neutrons, Bool_t include_pizeros,
-                               Double_t prot_thresh, bool verbose ){
+                               Double_t prot_thresh, bool verbose ) const{
 
     if ( verbose ) std::cout << "Determining calorimetric energy" << std::endl;
 
@@ -479,7 +479,7 @@ namespace lar1{
   // Get the visible energy near the interaction vertex
   //=================================================================================
   Double_t Utils::VertexEnergy( std::vector<Int_t> *pdg, std::vector<Double_t> *energy, 
-                                Double_t prot_thresh, Double_t pion_thresh, bool verbose  ){
+                                Double_t prot_thresh, Double_t pion_thresh, bool verbose  ) const{
 
     if ( verbose ) std::cout << "Determining kinetic energy near vertex" << std::endl;
 
@@ -520,7 +520,7 @@ namespace lar1{
                                     std::vector<gan::LorentzVectorLight> *p1pos,
                                     std::vector<gan::LorentzVectorLight> *p1mom,
                                     std::vector<gan::LorentzVectorLight> *p2pos,
-                                    std::vector<gan::LorentzVectorLight> *p2mom ){
+                                    std::vector<gan::LorentzVectorLight> *p2mom ) const{
     
     if( p1pos->size() != p1mom->size() || p2pos->size() != p2mom->size() ){
       std::cout << "photon vectors don't match!!" << std::endl;
@@ -555,7 +555,7 @@ namespace lar1{
   void Utils::GetDetBoundary(Int_t idet, 
                              Double_t &xmin, Double_t &xmax, 
   			                     Double_t &ymin, Double_t &ymax,
-                             Double_t &zmin, Double_t &zmax ){
+                             Double_t &zmin, Double_t &zmax ) const{
     
     // LAr1-ND
     if( idet == kND){
@@ -619,7 +619,7 @@ namespace lar1{
   //=========================================================================================
   // Check if point is in some fiducial volume definition
   //==========================================================================================
-  Bool_t Utils::IsFiducial( Int_t idet, TVector3 vtx, Double_t fidCut){
+  Bool_t Utils::IsFiducial( Int_t idet, const TVector3 & vtx, Double_t fidCut) const{
     
     if (idet == kMB) return IsFiducialMB(idet, vtx, fidCut);
 
@@ -653,7 +653,7 @@ namespace lar1{
 
   }
 
-  Bool_t Utils::IsFiducialMB(Int_t idet, TVector3 vtx, double fidCut)
+  Bool_t Utils::IsFiducialMB(Int_t idet, TVector3 vtx, double fidCut) const
   {
     if (idet != kMB) return false;
 
@@ -666,7 +666,7 @@ namespace lar1{
   //=========================================================================================
   // Check if point is in some active volume definition
   //==========================================================================================
-  Bool_t Utils::IsActive( Int_t idet, TVector3 vtx, double cut ){
+  Bool_t Utils::IsActive( Int_t idet, TVector3 vtx, double cut ) const{
 
     if (idet == kMB) return IsFiducialMB(idet,vtx,0.0);
     
@@ -690,7 +690,7 @@ namespace lar1{
   //=========================================================================================
   // Calculate fiducial mass
   //=========================================================================================
-  Double_t Utils::GetFidMass( Int_t idet ){
+  Double_t Utils::GetFidMass( Int_t idet ) const{
     
     Double_t xmin(0.0), xmax(0.0), ymin(0.0), ymax(0.0), zmin(0.0), zmax(0.0);
 
@@ -723,7 +723,7 @@ namespace lar1{
   //=========================================================================================
   // Calculate fiducial mass
   //=========================================================================================
-  Double_t Utils::GetActiveMass( Int_t idet ){
+  Double_t Utils::GetActiveMass( Int_t idet ) const{
     
     Double_t xmin(0.0), xmax(0.0), ymin(0.0), ymax(0.0), zmin(0.0), zmax(0.0);
 
@@ -828,27 +828,32 @@ namespace lar1{
 
   }
 
-  double  Utils::GetContainedLength(TVector3 startPoint, TVector3 startDir, int idet){
+  double  Utils::GetContainedLength(const TVector3 & startPoint, 
+                                    const TVector3 & startDir, 
+                                    int idet) const{
 
     if (!IsActive(idet, startPoint)){
       // std::cout << "Failed the IsActive cut!\n";
       return 0;
     }
-    startDir *= 1.0/startDir.Mag();
-    double distance = 1;
+    double increment = 1/startDir.Mag();
+    // startDir *= 1.0/startDir.Mag();
+    double distance = increment;
     while (IsActive(idet, startPoint + startDir*distance)){
       // std::cout << "Current pos is (" 
       //           << (startPoint + startDir*distance).X() << ", "
       //           << (startPoint + startDir*distance).Y() << ", "
       //           << (startPoint + startDir*distance).Z() << ")\n";
-      distance ++;
+      distance += increment;
     }
     return distance;
 
   }
 
 
-    double  Utils::GetLengthToStart(TVector3 startPoint, TVector3 startDir, int idet){
+  double  Utils::GetLengthToStart(const TVector3 & startPoint, 
+                                  const TVector3 & startDir, 
+                                  int idet)  const{
 
     if (!IsActive(idet, startPoint)){
       // std::cout << "Failed the IsActive cut!\n";
@@ -859,7 +864,9 @@ namespace lar1{
   }
   
   
-   double  Utils::GetYZLengthToStart(TVector3 startPoint, TVector3 startDir, int idet){
+  double  Utils::GetYZLengthToStart(const TVector3 & startPoint,
+                                    const TVector3 & startDir,
+                                    int idet) const{
 
     if (!IsActive(idet, startPoint)){
       // std::cout << "Failed the IsActive cut!\n";
