@@ -343,7 +343,7 @@ namespace larlight {
     clus_idx_vec.clear();
     if(!after_merging){
       for(int i = 0; i < ev_cluster->size(); ++i){
-	std::vector<unsigned int> temporary(1,i);
+	std::vector<unsigned short> temporary(1,i);
      	clus_idx_vec.push_back(temporary);
       }
     }
@@ -401,12 +401,12 @@ namespace larlight {
       //if after merging, this may be hits from multiple clusters
       //combine the assiciations from all merged clusters into one vector of hit indices to loop over
       //container to hold the final list of hit indices for this(these) cluster(s)
-      std::vector<unsigned int> ass_index;
+      std::vector<unsigned short> ass_index;
       ass_index.clear();
       //loop over this(these) cluster(s) index(indices)
       for(int in_clus_idx = 0; in_clus_idx < clus_idx_vec.at(outer_clus_idx).size(); ++in_clus_idx){
 	//grab the hit associations for each cluster
-	const std::vector<unsigned int> tmp_ass_index(ev_cluster->at(clus_idx_vec.at(outer_clus_idx).at(in_clus_idx)).association(hit_type));
+	const std::vector<unsigned short> tmp_ass_index(ev_cluster->at(clus_idx_vec.at(outer_clus_idx).at(in_clus_idx)).association(hit_type));
 	// and concatenate it to ass_index
 	ass_index.insert( ass_index.end(), tmp_ass_index.begin(), tmp_ass_index.end() );
       }

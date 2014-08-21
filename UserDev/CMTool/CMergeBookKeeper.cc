@@ -5,17 +5,17 @@
 
 namespace cmtool {
 
-  CMergeBookKeeper::CMergeBookKeeper(unsigned int nclusters)
+  CMergeBookKeeper::CMergeBookKeeper(unsigned short nclusters)
   { 
     Reset(nclusters);
   }
 
-  void CMergeBookKeeper::Reset(unsigned int nclusters)
+  void CMergeBookKeeper::Reset(unsigned short nclusters)
   {
     _prohibit_merge.clear();
     _prohibit_merge.reserve(nclusters);
-    std::vector<unsigned int>::clear();
-    std::vector<unsigned int>::reserve(nclusters);
+    std::vector<unsigned short>::clear();
+    std::vector<unsigned short>::reserve(nclusters);
 
     for(size_t i=0; i<nclusters; ++i) {
       this->push_back(i);
@@ -25,7 +25,7 @@ namespace cmtool {
     
   }
 
-  void CMergeBookKeeper::ProhibitMerge(unsigned int index1, unsigned int index2)
+  void CMergeBookKeeper::ProhibitMerge(unsigned short index1, unsigned short index2)
   {
     if(index1 == index2)
 
@@ -48,8 +48,8 @@ namespace cmtool {
 
   }
 
-  bool CMergeBookKeeper::MergeAllowed(unsigned int index1,
-				 unsigned int index2)
+  bool CMergeBookKeeper::MergeAllowed(unsigned short index1,
+				 unsigned short index2)
   {
 
     if(index1 == index2)
@@ -72,7 +72,7 @@ namespace cmtool {
     
   }
 
-  void CMergeBookKeeper::Merge(unsigned int index1, unsigned int index2)
+  void CMergeBookKeeper::Merge(unsigned short index1, unsigned short index2)
   {
 
     if(index1 == index2)
@@ -239,7 +239,7 @@ namespace cmtool {
 
   }
 
-  bool CMergeBookKeeper::IsMerged(unsigned int index1, unsigned int index2) const
+  bool CMergeBookKeeper::IsMerged(unsigned short index1, unsigned short index2) const
   { 
     if( index1 >= this->size() || index2 >= this->size() )
       throw CMTException(Form("Invalid cluster index: %d or %d",index1,index2));
@@ -248,14 +248,14 @@ namespace cmtool {
   }
 
   
-  std::vector<unsigned int> CMergeBookKeeper::GetMergedSet(unsigned int index1) const
+  std::vector<unsigned short> CMergeBookKeeper::GetMergedSet(unsigned short index1) const
   {
 
     if( index1 >= this->size() )
       throw CMTException(Form("Invalid cluster index: %d ",index1));
 
     auto out_index = this->at(index1);
-    std::vector<unsigned int> result;
+    std::vector<unsigned short> result;
     
     for(size_t i=0; i<this->size(); ++i)
       if( this->at(i) == out_index ) result.push_back(i);
@@ -263,11 +263,11 @@ namespace cmtool {
     return result;
   }
 
-  void CMergeBookKeeper::PassResult(std::vector<std::vector<unsigned int> > &result) const
+  void CMergeBookKeeper::PassResult(std::vector<std::vector<unsigned short> > &result) const
   {
 
     result.clear();
-    result.resize(_out_cluster_count, std::vector<unsigned int>());
+    result.resize(_out_cluster_count, std::vector<unsigned short>());
 
     for(size_t i=0; i<this->size(); ++i)
       result.at(this->at(i)).push_back(i);
@@ -276,7 +276,7 @@ namespace cmtool {
   void CMergeBookKeeper::Combine(const CMergeBookKeeper &another)
   {
     // Check length compatibility between this instance's result and "another"
-    std::vector<std::vector<unsigned int> > my_result;
+    std::vector<std::vector<unsigned short> > my_result;
     this->PassResult(my_result);
     if(my_result.size() != another.size()) {
       throw CMTException(Form("Input has an incompatible size (%zu != %zu)",
@@ -287,7 +287,7 @@ namespace cmtool {
     }
 
     // Check if "another" result is different from input
-    std::vector<std::vector<unsigned int> > another_result;
+    std::vector<std::vector<unsigned short> > another_result;
     another.PassResult(another_result);
     if(another_result.size() >= my_result.size())
       throw CMTException(Form("The input has equal or more number of output clusters (%zu>=%zu)",
@@ -301,7 +301,7 @@ namespace cmtool {
       if(ares.size()==1) continue;
 
       // Get one of cluster to be used for merging
-      unsigned int target = my_result.at(ares.at(0)).at(0);
+      unsigned short target = my_result.at(ares.at(0)).at(0);
 
       for(auto const &res_index : ares) {
 
