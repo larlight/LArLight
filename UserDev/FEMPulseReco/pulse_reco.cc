@@ -5,17 +5,9 @@
 
 namespace larlight {
 
-  //***************************************************************
-  pulse_reco::pulse_reco() : ana_base(),  _reco_algo_v(), _ped_algo(){
-  //***************************************************************
-
-    _reco_algo_v.clear();
-
-    _ped_nsample_cosmic = 1;
-
-    _ped_nsample_beam   = 8;
-
-    _ped_method = kHEAD;
+  //*************************************
+  pulse_reco::pulse_reco() : ana_base() {
+  //*************************************
 
     _name="pulse_reco";
 
@@ -27,15 +19,10 @@ namespace larlight {
   bool pulse_reco::initialize(){
   //***************************************************************
 
-    if(!(_reco_algo_v.size())) {
-
-      print(MSG::ERROR,__PRETTY_FUNCTION__,"Pulse reconstruction algorithm not set!");
-
-      return false;
-    }
-
     if(_input_type == DATA::PMTFIFO) print(MSG::NORMAL,__FUNCTION__,"Analyzing PMT waveform...");
+
     else if(_input_type == DATA::TPCFIFO) print(MSG::NORMAL,__FUNCTION__,"Analyzing TPC waveform...");
+
     else {
 
       print (MSG::ERROR,__FUNCTION__,
@@ -43,6 +30,34 @@ namespace larlight {
 		  _input_type,DATA::PMTFIFO,DATA::TPCFIFO));
 
       return false;
+    }
+
+    _output_data_type.clear();
+    for(size_t i=0; i<_mgr.algo_count(); ++i) {
+
+      auto const name = _mgr.get_algo(i).name();
+
+      if(name == "algo_threshold") {
+
+	if(_input_type==DATA::PMTFIFO) _output_data_type.push_back(DATA::PMTPulse_ThresWin);
+	else _output_data_type.push_back(DATA::TPCPulse_ThresWin);
+
+      }else if(name == "algo_fixed_window"){
+
+	if(_input_type==DATA::PMTFIFO) _output_data_type.push_back(DATA::PMTPulse_FixedWin);
+	else _output_data_type.push_back(DATA::TPCPulse_FixedWin);	
+
+      }else{
+
+	print (MSG::WARNING,__FUNCTION__,
+	       Form("Unrecognized algorithm name: %s ... will use a generic storage type DATA::Pulse!",
+		    name.c_str())
+	       );
+
+	_output_data_type.push_back(DATA::Pulse);
+
+      }
+
     }
 
     return true;
@@ -71,7 +86,7 @@ namespace larlight {
 	  continue;
 	}
 
-	status = status && run_reco(&wf);
+	status = status && _mgr.run_reco(wf);
 
 	store_reco(storage, &wf, wf.disc_id());
 	
@@ -80,7 +95,7 @@ namespace larlight {
     } // end of PMT waveform loop
     else if(_input_type == DATA::TPCFIFO) {
 
-      event_tpcfifo *tpc_waveforms = (event_tpcfifo*)(storage->get_data(_input_type));
+      auto const& tpc_waveforms = (event_tpcfifo*)(storage->get_data(_input_type));
 
       bool status = true;
       
@@ -97,7 +112,7 @@ namespace larlight {
 	  continue;
 	}
 
-	status = status && run_reco(&wf);
+	status = status && _mgr.run_reco(wf);
 
 	store_reco(storage, &wf, FEM::DISC_MAX);
 	
@@ -116,77 +131,6 @@ namespace larlight {
     
   }
 
-  //**********************************************************
-  bool pulse_reco::run_reco(const std::vector<UShort_t>* wf)
-  //**********************************************************
-  {
-
-    bool status=true;
-    //
-    // Step 1: apply pedestal estimation
-    //  
-    double ped_mean = 0;
-    double sigma  = 0;
-    // Figure out whether this is a beam readout or not
-    size_t ped_nsample = ( is_beam(wf) ? _ped_nsample_beam : _ped_nsample_cosmic);
-    
-    switch(_ped_method){
-      
-    case kHEAD:
-      
-      _ped_algo.compute_pedestal(wf, 0, ped_nsample);
-      
-      ped_mean = _ped_algo.mean();
-      
-      sigma  = _ped_algo.sigma();
-      
-      break;
-      
-    case kTAIL:
-      
-      _ped_algo.compute_pedestal(wf, (wf->size()-ped_nsample), ped_nsample);
-      
-      ped_mean = _ped_algo.mean();
-      
-      sigma  = _ped_algo.sigma();
-      
-      break;
-      
-    case kBOTH:
-      
-      _ped_algo.compute_pedestal(wf, 0, ped_nsample);
-      
-      ped_mean = _ped_algo.mean();
-      
-      sigma  = _ped_algo.sigma();
-      
-      _ped_algo.compute_pedestal(wf, (wf->size()-ped_nsample), ped_nsample);
-      
-      if( sigma > _ped_algo.sigma() ) {
-	
-	ped_mean = _ped_algo.mean();
-	
-	sigma  = _ped_algo.sigma();
-	
-      }
-      
-      break;
-    }
-
-    //
-    // Step 2: apply reco algos
-    //
-    for(auto reco_algo : _reco_algo_v){
-
-      reco_algo->set_ped_mean(ped_mean);
-      
-      reco_algo->set_ped_rms (sigma);
-      
-      status = status && reco_algo->reco(wf);
-    }
-    return status;
-  }
-
   //**********************************************************************************
   void pulse_reco::store_reco(storage_manager* storage,
 			      const fifo* wf,
@@ -197,11 +141,13 @@ namespace larlight {
     //
     // Store reconstructed pulses
     //
-    for(auto reco_algo : _reco_algo_v){
+    for(size_t i=0; i<_mgr.algo_count(); ++i) {
 
-      event_pulse* pulses = (event_pulse*)(storage->get_data(reco_algo->storage_type()));
+      auto const& algo = _mgr.get_algo(i);
 
-      for(size_t i=0; i < reco_algo->get_npulse(); ++i) {
+      event_pulse* pulses = (event_pulse*)(storage->get_data(_output_data_type.at(i)));
+
+      for(size_t i=0; i < algo.get_npulse(); ++i) {
 	
 	// Fill output data product for waveform-wise info
 	pulse my_pulse(pulses->data_type());
@@ -212,19 +158,19 @@ namespace larlight {
 	my_pulse.set_readout_frame_number  ( wf->readout_frame_number()        );
 	my_pulse.set_disc_id               ( disc_id                           );
 	  
-	my_pulse.set_ped_mean   ( reco_algo->ped_mean()            );
-	my_pulse.set_ped_rms    ( reco_algo->ped_rms()             );
-	my_pulse.set_charge     ( reco_algo->get_pulse(i)->area    );
-	my_pulse.set_pulse_peak ( reco_algo->get_pulse(i)->peak    );
-	my_pulse.set_start_time ( reco_algo->get_pulse(i)->t_start );
-	my_pulse.set_max_time   ( reco_algo->get_pulse(i)->t_max   );
-	my_pulse.set_end_time   ( reco_algo->get_pulse(i)->t_end   );
+	my_pulse.set_ped_mean   ( algo.ped_mean()            );
+	my_pulse.set_ped_rms    ( algo.ped_rms()             );
+	my_pulse.set_charge     ( algo.get_pulse(i).area    );
+	my_pulse.set_pulse_peak ( algo.get_pulse(i).peak    );
+	my_pulse.set_start_time ( algo.get_pulse(i).t_start );
+	my_pulse.set_max_time   ( algo.get_pulse(i).t_max   );
+	my_pulse.set_end_time   ( algo.get_pulse(i).t_end   );
 
 	pulses->push_back(my_pulse);
 
 	// Accumulate event-wise charge/amplitude sum
-	pulses->set_sum_charge ( pulses->sum_charge() + reco_algo->get_pulse(i)->area);
-	pulses->set_sum_peak   ( pulses->sum_peak()   + reco_algo->get_pulse(i)->peak);
+	pulses->set_sum_charge ( pulses->sum_charge() + algo.get_pulse(i).area);
+	pulses->set_sum_peak   ( pulses->sum_peak()   + algo.get_pulse(i).peak);
 	pulses->set_npulse     ( pulses->npulse()     + 1                            );
 	
       } // end of reco-ed pulse loop
@@ -235,8 +181,6 @@ namespace larlight {
   //***************************************************************
   bool pulse_reco::finalize() {
   //***************************************************************
-
-    _fout->cd();
 
     return true;
 

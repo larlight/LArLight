@@ -3,36 +3,36 @@
 
 #include "preco_algo_base.hh"
 
-namespace larlight {
+namespace optreco {
 
-  //***************************************************************
-  bool check_index(const std::vector<UShort_t> *wf, const size_t &begin, size_t &end)
-  //***************************************************************
+  //***************************************************************************************
+  bool check_index(const std::vector<unsigned short> &wf, const size_t &begin, size_t &end)
+  //***************************************************************************************
   {
-    if(begin >= wf->size() || end >= wf->size() || begin > end){
+    if(begin >= wf.size() || end >= wf.size() || begin > end){
 
-      Message::send(MSG::ERROR,__FUNCTION__,
-		    Form("Invalid arguments: waveform length = %zu, begin = %zu, end = %zu!",
-			 wf->size(), begin, end));
+      std::cerr << "\033[93m" << __FUNCTION__ << "\033[00m"
+		<<  Form("Invalid arguments: waveform length = %zu, begin = %zu, end = %zu!",
+			 wf.size(), begin, end)
+		<< std::endl;
+
       return false;
 
     }
 
-    if(!end) end = wf->size() - 1;
+    if(!end) end = wf.size() - 1;
 
     return true;
   }
 
-  //***************************************************************
-  preco_algo_base::preco_algo_base() : larlight_base(), _pulse()
-  //***************************************************************
+  //*******************************************
+  preco_algo_base::preco_algo_base() : _pulse()
+  //*******************************************
   {
 
     _name = "preco_algo_base";
 
     _ped_mean = _ped_rms = -1;
-
-    _tpc_input = false;
 
     reset();
 
@@ -49,29 +49,31 @@ namespace larlight {
   }
 
   //***************************************************************
-  const pulse_param* preco_algo_base::get_pulse(size_t index) const
+  const pulse_param& preco_algo_base::get_pulse(size_t index) const
   //***************************************************************
   {
 
-    if(index >= _pulse_v.size()) return 0;
+    if(index >= _pulse_v.size()) 
 
-    else return &(_pulse_v.at(index));
+      throw preco_exception("Invalid index for pulse_param query!");
+
+    else return _pulse_v.at(index);
 
   }
 
-  //***************************************************************
-  bool preco_algo_base::integral(const std::vector<UShort_t> *wf,
+  //*******************************************************************
+  bool preco_algo_base::integral(const std::vector<unsigned short> &wf,
 				 double &result,
 				 size_t begin,
 				 size_t end) const
-  //***************************************************************
+  //*******************************************************************
   {
 
     if(!check_index(wf,begin,end)) return false;
 
-    std::vector<UShort_t>::const_iterator begin_iter(wf->begin());
+    std::vector<unsigned short>::const_iterator begin_iter(wf.begin());
 
-    std::vector<UShort_t>::const_iterator end_iter(wf->begin());
+    std::vector<unsigned short>::const_iterator end_iter(wf.begin());
 
     begin_iter = begin_iter + begin;
 
@@ -82,12 +84,12 @@ namespace larlight {
     return true;
   }
 
-  //***************************************************************
-  bool preco_algo_base::derivative(const std::vector<UShort_t> *wf,
+  //********************************************************************
+  bool preco_algo_base::derivative(const std::vector<unsigned short> &wf,
 				   std::vector<int32_t> &diff,
 				   size_t begin,
 				   size_t end) const 
-  //***************************************************************
+  //********************************************************************
   {
 
     if(check_index(wf,begin,end)){
@@ -97,7 +99,7 @@ namespace larlight {
 
       for(size_t index = begin ; index <= end ; ++index)
 
-	diff.push_back(wf->at(index+1) - wf->at(index));
+	diff.push_back(wf.at(index+1) - wf.at(index));
 
       return true;
     }
@@ -107,14 +109,14 @@ namespace larlight {
   }
 
   //***************************************************************
-  size_t preco_algo_base::max(const std::vector<UShort_t> *wf,
+  size_t preco_algo_base::max(const std::vector<unsigned short> &wf,
 			      double &result,
 			      size_t begin,
 			      size_t end) const
   //***************************************************************
   {
 
-    size_t target_index = wf->size() + 1;
+    size_t target_index = wf.size() + 1;
 
     result = 0;
 
@@ -122,7 +124,7 @@ namespace larlight {
 
       for(size_t index = begin; index <= end; ++index)
 
-	if( result < wf->at(index)) { target_index = index; result = (double)(wf->at(index)); }
+	if( result < wf.at(index)) { target_index = index; result = (double)(wf.at(index)); }
 
     }
 
@@ -131,14 +133,14 @@ namespace larlight {
   }
 
   //***************************************************************
-  size_t preco_algo_base::min(const std::vector<UShort_t> *wf,
+  size_t preco_algo_base::min(const std::vector<unsigned short> &wf,
 			      double &result,
 			      size_t begin,
 			      size_t end) const
   //***************************************************************
   {
 
-    size_t target_index = wf->size() + 1;
+    size_t target_index = wf.size() + 1;
 
     result = 4096;
 
@@ -146,7 +148,7 @@ namespace larlight {
 
       for(size_t index = begin; index <= end; ++index)
 
-	if( result > wf->at(index)) { target_index = index; result = (double)(wf->at(index)); }
+	if( result > wf.at(index)) { target_index = index; result = (double)(wf.at(index)); }
 
     }
 

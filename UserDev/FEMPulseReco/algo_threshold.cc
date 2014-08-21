@@ -3,7 +3,7 @@
 
 #include "algo_threshold.hh"
 
-namespace larlight {
+namespace optreco {
 
   //***************************************************************
   algo_threshold::algo_threshold() : preco_algo_base() {
@@ -26,7 +26,7 @@ namespace larlight {
   }
 
   //***************************************************************
-  bool algo_threshold::reco(const std::vector<UShort_t> *wf) {
+  bool algo_threshold::reco(const std::vector<unsigned short> &wf) {
   //***************************************************************
 
     bool fire = false;
@@ -39,7 +39,7 @@ namespace larlight {
 
     reset();
 
-    for(auto value : *wf){
+    for(auto const& value : wf){
 
       if( !fire && ((double)value) > threshold ){
 

@@ -15,13 +15,15 @@
 #ifndef PRECO_ALGO_BASE_HH
 #define PRECO_ALGO_BASE_HH
 
-#include "Base-TypeDef.hh"
+#include "preco_exception.hh"
 #include <TString.h>
 #include <cmath>
 #include <functional>
 #include <numeric>
+#include <vector>
+#include <iostream>
 
-namespace larlight {
+namespace optreco {
 
   struct pulse_param{
 
@@ -30,12 +32,12 @@ namespace larlight {
 
     pulse_param(){
       reset_param();
-    };
+    }
 
     void reset_param(){      
       peak = area = -1;
       t_start = t_max = t_end = -1;
-    };
+    }
 
   };
 
@@ -44,7 +46,7 @@ namespace larlight {
      The base class of pulse reconstruction algorithms. All algorithms should inherit from this calss
      to be executed by a manager class, pulse_reco. Note that this class does not depend on the rest
      of the framework except for the use of constants. In order to reconstruct a pulse, all it requires
-     is a std::vector<UShort_t> type object (i.e. raw waveform), waveform pedestal, and its standard
+     is a std::vector<unsigned short> type object (i.e. raw waveform), waveform pedestal, and its standard
      deviation. All of these are to be provided by an executer. Reconstructed pulse parameters are
      stored in the pulse_param struct object.
 
@@ -54,7 +56,7 @@ namespace larlight {
      max and min algorithms. Inherit children classes are encouraged to use these provided methods
      when possible.
    */
-  class preco_algo_base : public larlight_base {
+  class preco_algo_base {
 
   public:
 
@@ -62,48 +64,39 @@ namespace larlight {
     preco_algo_base();
 
     /// Default destructor
-    virtual ~preco_algo_base(){};
-
-    /**
-       A method to return the storage event_pulse type enum.
-       A children reco algo class should implement the unique,  relevant type to be returned.
-    */
-    virtual DATA::DATA_TYPE storage_type(){return DATA::DATA_TYPE_MAX;};
+    virtual ~preco_algo_base(){}
 
     /// A method to be called event-wise to reset parameters
     virtual void reset();
 
+    /// Getter for the algo's name
+    const std::string& name() const { return _name; }
+
     /** A core method: this executes the algorithm and stores reconstructed parameters
 	in the pulse_param struct object.
      */
-    virtual bool reco(const std::vector<UShort_t> *wf)=0;
+    virtual bool reco(const std::vector<unsigned short> &wf)=0;
 
     /** A getter for the pulse_param struct object. 
 	Reconstruction algorithm may have more than one pulse reconstructed from an input waveform.
 	Note you must, accordingly, provide an index key to specify which pulse_param object to be retrieved.
      */
-    const pulse_param* get_pulse(size_t index=0) const;
+    const pulse_param& get_pulse(size_t index=0) const;
 
     /// A getter for the number of reconstructed pulses from the input waveform
-    size_t get_npulse() const   {return _pulse_v.size();};
+    size_t get_npulse() const   {return _pulse_v.size();}
 
     /// A setter for the pedestal mean value
-    void set_ped_mean(double v) { _ped_mean = v; };
+    void set_ped_mean(double v) { _ped_mean = v; }
 
     /// A setter for the pedestal standard deviation
-    void set_ped_rms(double v)  { _ped_rms = v; };
+    void set_ped_rms(double v)  { _ped_rms = v; }
 
     /// A getter for the set pedestal mean value
-    double ped_mean() const     {return _ped_mean; };
+    double ped_mean() const     {return _ped_mean; }
 
     /// A getter for the set pedestal standard deviation
-    double ped_rms() const      {return _ped_rms;  };
-
-    /// A setter for TPC waveform
-    void set_tpc_data(bool itis=true){ _tpc_input=itis;};
-
-    /// A getter for input data type (TPC or PMT) ... true = TPC
-    bool tpc_data() const {return _tpc_input;};
+    double ped_rms() const      {return _ped_rms;  }
 
   protected:
 
@@ -119,8 +112,8 @@ namespace larlight {
     /// Pedestal standard deviation
     double _ped_rms;
 
-    /// Boolean to differentiate TPC/PMT ... true=TPC
-    bool _tpc_input;
+    /// Name of an algorithm, used by a manager or users
+    std::string _name;
 
   protected:
 
@@ -128,25 +121,25 @@ namespace larlight {
        A method to integrate an waveform from index "begin" to the "end". The result is filled in "result" reference.
        If the "end" is default (=0), then "end" is set to the last index of the waveform.
     */
-    bool integral   (const std::vector<UShort_t> *wf, double &result, size_t begin=0, size_t end=0) const;
+    bool integral   (const std::vector<unsigned short> &wf, double &result, size_t begin=0, size_t end=0) const;
 
     /**
        A method to compute derivative, which is a simple subtraction of previous ADC sample from each sample.
        The result is stored in the input "diff" reference vector which is Int_t type as a derivative could be negative.
     */
-    bool derivative (const std::vector<UShort_t> *wf, std::vector<Int_t> &diff, size_t begin=0, size_t end=0) const;
+    bool derivative (const std::vector<unsigned short> &wf, std::vector<Int_t> &diff, size_t begin=0, size_t end=0) const;
 
     /**
        A method to return the maximum value of ADC sample within the index from "begin" to "end".
        If the "end" is default (=0), then "end" is set to the last index of the waveform.
     */
-    size_t max(const std::vector<UShort_t> *wf, double &result, size_t begin=0, size_t end=0) const;
+    size_t max(const std::vector<unsigned short> &wf, double &result, size_t begin=0, size_t end=0) const;
 
     /**
        A method to return the minimum value of ADC sample within the index from "begin" to "end".
        If the "end" is default (=0), then "end" is set to the last index of the waveform.
     */
-    size_t min(const std::vector<UShort_t> *wf, double &result, size_t begin=0, size_t end=0) const;
+    size_t min(const std::vector<unsigned short> &wf, double &result, size_t begin=0, size_t end=0) const;
 
   };
 }
