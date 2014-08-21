@@ -97,7 +97,7 @@ namespace larlight {
 	}
       }
 
-      std::vector<std::vector<unsigned short> > mc_hit_ass(geo->Nplanes(), std::vector<unsigned short>());
+      std::vector<std::vector<unsigned int> > mc_hit_ass(geo->Nplanes(), std::vector<unsigned int>());
       
       for(auto const& hits : unique_hits) {
 

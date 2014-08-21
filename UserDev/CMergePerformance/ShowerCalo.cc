@@ -279,7 +279,7 @@ namespace larlight {
     
     _clusHits.clear();
     //Get the hits from each cluster and loop over them
-    std::vector<unsigned short> ass_index(clus->association(hit_type));
+    auto const& ass_index(clus->association(hit_type));
     // Compute cluster parameters (ClusterParamsAlgNew) and store (_clusterparams)
     
     _clusHits.reserve(ass_index.size());
@@ -434,7 +434,7 @@ namespace larlight {
     //Make clusterparams for this cluster
     //FillClusterParams( clus, ev_hits);
     //Get the hits from each cluster and loop over them
-    std::vector<unsigned short> ass_index(clus->association(hit_type));
+    auto const& ass_index(clus->association(hit_type));
     // Compute cluster parameters (ClusterParamsAlgNew) and store (_clusterparams)
     std::vector<larutil::PxHit> tmp_hits;
     tmp_hits.reserve(ass_index.size());
@@ -486,7 +486,7 @@ namespace larlight {
 
     for(auto const i_cluster: *ev_cluster){
       
-      const std::vector<unsigned short> ass_index(i_cluster.association(hit_type));
+      auto const& ass_index(i_cluster.association(hit_type));
       if(ass_index.size()<15) continue;
 
       const UChar_t plane = larutil::Geometry::GetME()->ChannelToPlane(ev_hits->at((*ass_index.begin())).Channel());
@@ -528,9 +528,9 @@ namespace larlight {
 
   //--------------------------------------------------------------
   std::vector< std::vector<int> > ShowerCalo::FindBestClusters(event_mcshower* ev_mcshower,
-								event_cluster* ev_cluster,
-								   event_hit* ev_hits,
-								const std::vector< ::cluster::ClusterParamsAlgNew> &_clusterparams){
+							       event_cluster* ev_cluster,
+							       event_hit* ev_hits,
+							       const std::vector< ::cluster::ClusterParamsAlgNew> &_clusterparams){
     
     //make a vector of MCShower indices 
     //McshowerLookback has a default 20MeV cut on these energies, don't have to do it here
@@ -585,12 +585,12 @@ namespace larlight {
       //if after merging, this may be hits from multiple clusters
       //combine the assiciations from all merged clusters into one vector of hit indices to loop over
       //container to hold the final list of hit indices for this(these) cluster(s)
-      std::vector<unsigned short> ass_index;
+      std::vector<unsigned int> ass_index;
       ass_index.clear();
       //loop over this(these) cluster(s) index(indices)
       for(unsigned int in_clus_idx = 0; in_clus_idx < clus_idx_vec.at(outer_clus_idx).size(); ++in_clus_idx){
 	//grab the hit associations for each cluster
-	const std::vector<unsigned short> tmp_ass_index(ev_cluster->at(clus_idx_vec.at(outer_clus_idx).at(in_clus_idx)).association(hit_type));
+	auto const& tmp_ass_index(ev_cluster->at(clus_idx_vec.at(outer_clus_idx).at(in_clus_idx)).association(hit_type));
 	// and concatenate it to ass_index
 	ass_index.insert( ass_index.end(), tmp_ass_index.begin(), tmp_ass_index.end() );
       }

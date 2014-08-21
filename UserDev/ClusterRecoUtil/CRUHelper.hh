@@ -37,7 +37,7 @@ namespace cluster {
     virtual ~CRUHelper(){};
 
     /// Generate: from 1 set of hits => 1 CPAN using indexes (association)
-    void GenerateCPAN(const std::vector<unsigned short>& hit_index,
+    void GenerateCPAN(const std::vector<unsigned int>& hit_index,
 		      const larlight::event_hit* hits,
 		      ClusterParamsAlgNew &cpan) const;
     
@@ -47,7 +47,7 @@ namespace cluster {
 		      std::vector<cluster::ClusterParamsAlgNew> &cpan_v) const;
 
     /// Generate: from 1 set of hits => 1 set of PxHits using indexes (association)
-    void GeneratePxHit(const std::vector<unsigned short>& hit_index,
+    void GeneratePxHit(const std::vector<unsigned int>& hit_index,
 		       const larlight::event_hit* hits,
 		       std::vector<larutil::PxHit> &pxhits) const;
 

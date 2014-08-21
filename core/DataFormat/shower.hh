@@ -117,7 +117,7 @@ namespace larlight{
   private:
     
     ////////////////////////
-    ClassDef(shower,5)
+    ClassDef(shower,6)
     ////////////////////////
       
   };
@@ -148,7 +148,7 @@ namespace larlight{
   private:
     
     ////////////////////////
-    ClassDef(event_shower,3)
+    ClassDef(event_shower,4)
     ////////////////////////
   };
 }

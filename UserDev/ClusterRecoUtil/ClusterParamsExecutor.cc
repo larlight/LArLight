@@ -30,7 +30,7 @@ namespace cluster {
     }
 
     cluster_hits.clear();
-    const std::vector<UShort_t> &hit_index_v = i_cluster.association(hit_type);
+    auto const& hit_index_v = i_cluster.association(hit_type);
 
     UChar_t plane = larutil::Geometry::GetME()->ChannelToPlane(hits->at(*hit_index_v.begin()).Channel());
 

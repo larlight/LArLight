@@ -6,13 +6,13 @@
 namespace larlight {
 
   //*******************************************************************************************
-  void data_base::add_association(DATA::DATA_TYPE type, const std::vector<unsigned short> ass)
+  void data_base::add_association(DATA::DATA_TYPE type, const std::vector<unsigned int> ass)
   //*******************************************************************************************
   {
 
     if( _ass.find(type) == _ass.end() )
       
-      _ass[type]=std::vector<std::vector<unsigned short> >();
+      _ass[type]=std::vector<std::vector<unsigned int> >();
     
     _ass[type].push_back(ass);
     
@@ -32,7 +32,7 @@ namespace larlight {
   }
   
   //*************************************************************************************************
-  const std::vector<unsigned short> data_base::association(DATA::DATA_TYPE type, size_t index) const
+  const std::vector<unsigned int> data_base::association(DATA::DATA_TYPE type, size_t index) const
   //*************************************************************************************************
   {
     
@@ -43,7 +43,7 @@ namespace larlight {
       Message::send(MSG::ERROR,__FUNCTION__,
 		    Form("There is no association to %s",DATA::DATA_TREE_NAME[type].c_str()));
       
-      return std::vector<unsigned short>();
+      return std::vector<unsigned int>();
       
     }
     
@@ -52,7 +52,7 @@ namespace larlight {
       Message::send(MSG::ERROR,__FUNCTION__,
 		    Form("There are only %zu associations. No association @ index=%zu",ass_length,index));
       
-      return std::vector<unsigned short>();
+      return std::vector<unsigned int>();
       
     }
     
