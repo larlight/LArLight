@@ -29,7 +29,7 @@ if len(sys.argv)>2:
     my_proc.set_input_rootdir(sys.argv[2])
 
 #decide if to show hit charge OR MCShowers on RHS of TCanvas [default: false]
-#raw_viewer.ShowShowers(True)
+#raw_viewer.SetDrawShowers(True)
 
 #if you're showing hit charge, whether to use log z scale [default: true]
 #raw_viewer.SetHitsLogZ(False)

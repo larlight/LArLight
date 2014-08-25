@@ -82,6 +82,9 @@ namespace larlight{
     /// Option to only draw track-like clusters, for debugging
     void SetDrawOnlyTracks(bool flag) { _draw_only_tracks = flag; }
 
+    /// Show start and end points in event display
+    void SetDrawStartEnd(bool on) { _showStartEnd = on; }
+
   protected:
 
     // McshowerLookback object
@@ -98,6 +101,8 @@ namespace larlight{
     bool _draw_tracks;
 
     bool _draw_only_tracks;
+
+    bool _showStartEnd; /// show start and end points
   };
   
 }

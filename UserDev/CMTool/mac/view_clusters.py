@@ -26,7 +26,7 @@ my_proc.set_ana_output_file("")
 raw_viewer   = larlight.ClusterViewer()
 
 #decide if to show hit charge OR MCShowers on RHS of TCanvas [default: false]
-#raw_viewer.ShowShowers(True)
+#raw_viewer.SetDrawShowers(True)
 
 #if you're showing hit charge, whether to use log z scale [default: true]
 #raw_viewer.SetHitsLogZ(False)
