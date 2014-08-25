@@ -10,6 +10,7 @@ namespace larlight{
   //############################################################################
   {
     if( _type != DATA::Cluster &&
+	_type != DATA::MCShowerCluster &&
 	_type != DATA::FuzzyCluster &&
 	_type != DATA::DBCluster &&
 	_type != DATA::CrawlerCluster &&
@@ -34,6 +35,7 @@ namespace larlight{
   //####################################################################################
   {
     if( _type != DATA::Cluster &&
+	_type != DATA::MCShowerCluster &&
 	_type != DATA::FuzzyCluster &&
 	_type != DATA::DBCluster &&
 	_type != DATA::CrawlerCluster &&
@@ -57,12 +59,13 @@ namespace larlight{
 
     // Assume there's only 1 unique association
     
-    if(size_association(DATA::Hit))        return DATA::Hit;
-    if(size_association(DATA::GausHit))    return DATA::GausHit;
-    if(size_association(DATA::RFFHit))     return DATA::RFFHit;
-    if(size_association(DATA::FFTHit))     return DATA::FFTHit;
-    if(size_association(DATA::CrawlerHit)) return DATA::CrawlerHit;
-    if(size_association(DATA::APAHit))     return DATA::APAHit;
+    if(size_association(DATA::Hit))         return DATA::Hit;
+    if(size_association(DATA::MCShowerHit)) return DATA::MCShowerHit;
+    if(size_association(DATA::GausHit))     return DATA::GausHit;
+    if(size_association(DATA::RFFHit))      return DATA::RFFHit;
+    if(size_association(DATA::FFTHit))      return DATA::FFTHit;
+    if(size_association(DATA::CrawlerHit))  return DATA::CrawlerHit;
+    if(size_association(DATA::APAHit))      return DATA::APAHit;
     else
       Message::send(MSG::ERROR,__FUNCTION__,"Did not find any associated hit!");
     return DATA::DATA_TYPE_MAX;
