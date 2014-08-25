@@ -20,7 +20,7 @@ namespace cmtool {
   }
 
   //----------------------------------------------------------------------------------------------
-  float CFAlgoZOverlap::Float(const std::vector<const cluster::ClusterParamsAlgNew*> &clusters)
+  float CFAlgoZOverlap::Float(const std::vector<const cluster::ClusterParamsAlg*> &clusters)
   //----------------------------------------------------------------------------------------------
   {
     // Code-block by Kazu starts

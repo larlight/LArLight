@@ -15,8 +15,8 @@
 
 #pragma link C++ class std::vector<const larutil::PxHit*>+;
 
-#pragma link C++ class cluster::ClusterParamsAlgNew+;
-#pragma link C++ class std::vector<cluster::ClusterParamsAlgNew>+;
+#pragma link C++ class cluster::ClusterParamsAlg+;
+#pragma link C++ class std::vector<cluster::ClusterParamsAlg>+;
 
 #pragma link C++ class cluster::cluster_params+;
 #pragma link C++ class std::vector<cluster::cluster_params>+;
@@ -24,7 +24,7 @@
 #pragma link C++ class cluster::ClusterParamsExecutor+;
 #pragma link C++ class std::vector<cluster::ClusterParamsExecutor>+;
 
-#pragma link C++ class cluster::RecoUtilException+;
+#pragma link C++ class cluster::CRUException+;
 #pragma link C++ class cluster::SimChannelViewer+;
 #pragma link C++ class cluster::WireViewer+;
 

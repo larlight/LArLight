@@ -280,7 +280,7 @@ namespace larlight {
     _clusHits.clear();
     //Get the hits from each cluster and loop over them
     auto const& ass_index(clus->association(hit_type));
-    // Compute cluster parameters (ClusterParamsAlgNew) and store (_clusterparams)
+    // Compute cluster parameters (ClusterParamsAlg) and store (_clusterparams)
     
     _clusHits.reserve(ass_index.size());
     const UChar_t plane = larutil::Geometry::GetME()->ChannelToPlane(ev_hits->at((*ass_index.begin())).Channel());
@@ -316,7 +316,7 @@ namespace larlight {
   //--------------------------------------------------
   void ShowerCalo::GetParams( std::vector<larutil::PxHit> clusHits ){
 
-    ::cluster::ClusterParamsAlgNew params = ::cluster::ClusterParamsAlgNew();// = ClusterParamsAlgNew(tmp_hits);  
+    ::cluster::ClusterParamsAlg params = ::cluster::ClusterParamsAlg();// = ClusterParamsAlg(tmp_hits);  
     _params.SetVerbose(false);
     _params.SetHits(clusHits);
     _params.FillParams(true, true, true, true, true, true);
@@ -435,7 +435,7 @@ namespace larlight {
     //FillClusterParams( clus, ev_hits);
     //Get the hits from each cluster and loop over them
     auto const& ass_index(clus->association(hit_type));
-    // Compute cluster parameters (ClusterParamsAlgNew) and store (_clusterparams)
+    // Compute cluster parameters (ClusterParamsAlg) and store (_clusterparams)
     std::vector<larutil::PxHit> tmp_hits;
     tmp_hits.reserve(ass_index.size());
     const UChar_t plane = larutil::Geometry::GetME()->ChannelToPlane(ev_hits->at((*ass_index.begin())).Channel());
@@ -449,7 +449,7 @@ namespace larlight {
       tmp_hits.push_back(h);
     }
 
-    ::cluster::ClusterParamsAlgNew params = ::cluster::ClusterParamsAlgNew();// = ClusterParamsAlgNew(tmp_hits);  
+    ::cluster::ClusterParamsAlg params = ::cluster::ClusterParamsAlg();// = ClusterParamsAlg(tmp_hits);  
     params.SetVerbose(false);
     params.SetHits(tmp_hits);
     params.FillParams();
@@ -478,7 +478,7 @@ namespace larlight {
   void ShowerCalo::FillClusterParamsVector(event_cluster* ev_cluster,
 						  event_hit* ev_hits){
 
-    // Now we make ClusterParamsAlgNew instance per cluster
+    // Now we make ClusterParamsAlg instance per cluster
     _clusterparams.clear();
 
     //loop over the reconstructed clusters
@@ -491,7 +491,7 @@ namespace larlight {
 
       const UChar_t plane = larutil::Geometry::GetME()->ChannelToPlane(ev_hits->at((*ass_index.begin())).Channel());
 
-      // Compute cluster parameters (ClusterParamsAlgNew) and store (_clusterparams)
+      // Compute cluster parameters (ClusterParamsAlg) and store (_clusterparams)
       std::vector<larutil::PxHit> tmp_hits;
       tmp_hits.reserve(ass_index.size());
 
@@ -505,7 +505,7 @@ namespace larlight {
       }
       
 
-      _clusterparams.push_back(::cluster::ClusterParamsAlgNew());
+      _clusterparams.push_back(::cluster::ClusterParamsAlg());
 	
       try {
 	(*_clusterparams.rbegin()).SetVerbose(false);
@@ -513,9 +513,9 @@ namespace larlight {
 	(*_clusterparams.rbegin()).SetHits(tmp_hits);
 	(*_clusterparams.rbegin()).FillPolygon();
 	(*_clusterparams.rbegin()).FillParams();
-      }catch( ::cluster::RecoUtilException) {
+      }catch( ::cluster::CRUException) {
 	
-	print(larlight::MSG::ERROR,__FUNCTION__,Form("Cluster %d too bad to run ClusterParamsAlgNew!",i_cluster.ID()));
+	print(larlight::MSG::ERROR,__FUNCTION__,Form("Cluster %d too bad to run ClusterParamsAlg!",i_cluster.ID()));
       }
       
     } //end loop over ev_cluster
@@ -530,7 +530,7 @@ namespace larlight {
   std::vector< std::vector<int> > ShowerCalo::FindBestClusters(event_mcshower* ev_mcshower,
 							       event_cluster* ev_cluster,
 							       event_hit* ev_hits,
-							       const std::vector< ::cluster::ClusterParamsAlgNew> &_clusterparams){
+							       const std::vector< ::cluster::ClusterParamsAlg> &_clusterparams){
     
     //make a vector of MCShower indices 
     //McshowerLookback has a default 20MeV cut on these energies, don't have to do it here

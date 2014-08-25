@@ -23,9 +23,9 @@ namespace larlight {
        fClusterType != DATA::Cluster &&
        fClusterType != DATA::RyanCluster)
 
-      throw ::cluster::RecoUtilException(Form("Not supported cluster type: %s",
-					      DATA::DATA_TREE_NAME[fClusterType].c_str())
-					 );
+      throw ::cluster::CRUException(Form("Not supported cluster type: %s",
+					 DATA::DATA_TREE_NAME[fClusterType].c_str())
+				    );
     
     return true;
   }
@@ -72,7 +72,7 @@ namespace larlight {
     for(auto const& pair : matched_pairs) {
       
       // Create a vector of clusters to be passed onto the algorithm
-      std::vector< ::cluster::ClusterParamsAlgNew> clusters;
+      std::vector< ::cluster::ClusterParamsAlg> clusters;
       clusters.reserve(pair.size());
 
       

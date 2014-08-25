@@ -23,7 +23,7 @@ namespace cmtool {
   }
 
   //----------------------------------------------------------------------------------------------
-  float CFAlgoStartPointCompat::Float(const std::vector<const cluster::ClusterParamsAlgNew*> &clusters)
+  float CFAlgoStartPointCompat::Float(const std::vector<const cluster::ClusterParamsAlg*> &clusters)
   //----------------------------------------------------------------------------------------------
   {
 

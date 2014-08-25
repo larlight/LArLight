@@ -12,9 +12,9 @@ namespace larlight {
        _cluster_type != DATA::ShowerAngleCluster &&
        _cluster_type != DATA::Cluster)
 
-      throw ::cluster::RecoUtilException(Form("Not supported cluster type: %s",
-					      DATA::DATA_TREE_NAME[_cluster_type].c_str())
-					 );
+      throw ::cluster::CRUException(Form("Not supported cluster type: %s",
+					 DATA::DATA_TREE_NAME[_cluster_type].c_str())
+				    );
 
     if(_fout) _mgr.SetAnaFile(_fout);
 

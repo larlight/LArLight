@@ -20,7 +20,7 @@ namespace cmtool {
   }
 
   //------------------------------------------------------------------------------------------
-  //void CBAlgoProhibitAllTracks::EventBegin(const std::vector<cluster::ClusterParamsAlgNew> &clusters)
+  //void CBAlgoProhibitAllTracks::EventBegin(const std::vector<cluster::ClusterParamsAlg> &clusters)
   //------------------------------------------------------------------------------------------
   //{
   //
@@ -34,7 +34,7 @@ namespace cmtool {
   //}
 
   //-----------------------------------------------------------------------------------------------
-  //void CBAlgoProhibitAllTracks::IterationBegin(const std::vector<cluster::ClusterParamsAlgNew> &clusters)
+  //void CBAlgoProhibitAllTracks::IterationBegin(const std::vector<cluster::ClusterParamsAlg> &clusters)
   //-----------------------------------------------------------------------------------------------
   //{
   //
@@ -48,8 +48,8 @@ namespace cmtool {
   //}
   
   //----------------------------------------------------------------
-  bool CBAlgoProhibitAllTracks::Bool(const ::cluster::ClusterParamsAlgNew &cluster1,
-			       const ::cluster::ClusterParamsAlgNew &cluster2)
+  bool CBAlgoProhibitAllTracks::Bool(const ::cluster::ClusterParamsAlg &cluster1,
+			       const ::cluster::ClusterParamsAlg &cluster2)
   //----------------------------------------------------------------
   {
     //return true means don't prohibit these two clusters

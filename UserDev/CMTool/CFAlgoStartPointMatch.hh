@@ -43,7 +43,7 @@ namespace cmtool {
        Core function: given a set of CPANs, return a float which indicates 
        the compatibility the cluster combination.
     */
-    virtual float Float(const std::vector<const cluster::ClusterParamsAlgNew*> &clusters);
+    virtual float Float(const std::vector<const cluster::ClusterParamsAlg*> &clusters);
 
     /**
        Optional function: called after each iterative approach if a manager class is
@@ -69,7 +69,7 @@ namespace cmtool {
     /**
        Optional function: called at the beginning of 1st iteration. This is called per event.
      */
-    //virtual void EventBegin(const std::vector<cluster::ClusterParamsAlgNew> &clusters);
+    //virtual void EventBegin(const std::vector<cluster::ClusterParamsAlg> &clusters);
 
     /**
        Optional function: called at the end of event ... after the last merging iteration is over.
@@ -81,7 +81,7 @@ namespace cmtool {
        This provides all clusters' information in case the algorithm need them. Note this
        is called per iteration which may be more than once per event.
      */
-    //virtual void IterationBegin(const std::vector<cluster::ClusterParamsAlgNew> &clusters);
+    //virtual void IterationBegin(const std::vector<cluster::ClusterParamsAlg> &clusters);
 
     /**
        Optional function: called at the end of each iterative loop.

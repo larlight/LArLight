@@ -6,7 +6,7 @@
 namespace cluster {
 
 
-  ClusterParamsExecutor::ClusterParamsExecutor() : ClusterParamsAlgNew()
+  ClusterParamsExecutor::ClusterParamsExecutor() : ClusterParamsAlg()
   {
     hCurrentHit = 0;
 
@@ -22,10 +22,10 @@ namespace cluster {
     
     larlight::DATA::DATA_TYPE hit_type = i_cluster.get_hit_type();
     if(!hits) {
-      throw cluster::RecoUtilException("Invalid hit (didn't find data!)");
+      throw cluster::CRUException("Invalid hit (didn't find data!)");
       return -1;
     }else if(hit_type != hits->data_type()){
-      throw cluster::RecoUtilException("Unmatched hit type!");
+      throw cluster::CRUException("Unmatched hit type!");
       return -1;
     }
 

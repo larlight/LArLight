@@ -22,7 +22,7 @@ namespace cmtool {
   }
 
   //----------------------------------------------------------------------------------------------
-  float CFAlgoWireOverlap::Float(const std::vector<const cluster::ClusterParamsAlgNew*> &clusters)
+  float CFAlgoWireOverlap::Float(const std::vector<const cluster::ClusterParamsAlg*> &clusters)
   //----------------------------------------------------------------------------------------------
   {
     // Code-block by Kazu starts

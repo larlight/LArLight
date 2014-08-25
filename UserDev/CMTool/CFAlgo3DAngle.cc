@@ -26,7 +26,7 @@ namespace cmtool {
   }
 
   //----------------------------------------------------------------------------------------------
-  float CFAlgo3DAngle::Float(const std::vector<const cluster::ClusterParamsAlgNew*> &clusters)
+  float CFAlgo3DAngle::Float(const std::vector<const cluster::ClusterParamsAlg*> &clusters)
   //----------------------------------------------------------------------------------------------
   {
     // Code-block by Kazu starts

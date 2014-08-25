@@ -14,7 +14,7 @@ namespace cmtool {
   }
 
   //----------------------------------------------------------------------------------------------
-  float CFAlgoArray::Float(const std::vector<const cluster::ClusterParamsAlgNew*> &clusters)
+  float CFAlgoArray::Float(const std::vector<const cluster::ClusterParamsAlg*> &clusters)
   //----------------------------------------------------------------------------------------------
   {
 
