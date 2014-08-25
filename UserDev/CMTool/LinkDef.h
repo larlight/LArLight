@@ -67,6 +67,7 @@
 #pragma link C++ class cmtool::CFAlgoArray+;
 #pragma link C++ class cmtool::CFAlgoQRatio+;
 #pragma link C++ class cmtool::CFAlgoTimeOverlap+;
+#pragma link C++ class cmtool::CFAlgoTimeProf+;
 #pragma link C++ class cmtool::CFAlgoZOverlap+;
 #pragma link C++ class cmtool::CFAlgoStartPointMatch+;
 #pragma link C++ class cmtool::CFAlgoStartPointCompat+;

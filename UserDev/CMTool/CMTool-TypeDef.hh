@@ -59,6 +59,7 @@
 #include "CFAlgo3DAngle.hh"
 #include "CFAlgoWireOverlap.hh"
 #include "CFAlgoVolumeOverlap.hh"
+#include "CFAlgoTimeProf.hh"
 //ADD_CFALGO_HEADER
 
 #include "MatchViewer.hh"
@@ -126,6 +127,7 @@ namespace cmtool {
   class CFAlgo3DAngle;
   class CFAlgoWireOverlap;
   class CFAlgoVolumeOverlap;
+  class CFAlgoTimeProf;
 //ADD_CFALGO_CLASS ... do not change this comment line
 
 }
