@@ -13,13 +13,14 @@ namespace larlight {
     _name = "ClusterViewer";
     cluster_type=DATA::FuzzyCluster;
     //default is to use hits viewer (need to hadd files first for MC showerviewer)
-    ShowShowers(false);
+    SetDrawShowers(false);
     //default is now to use log-z scale for hits viewer
     SetHitsLogZ(true);
+    SetDrawStartEnd(false);
   }
 
   //#######################################
-  void ClusterViewer::ShowShowers(bool on)
+  void ClusterViewer::SetDrawShowers(bool on)
   //#######################################
   {
     _showerColor = on;
@@ -212,10 +213,15 @@ namespace larlight {
       
       }
 
-      _algo.AddCluster(plane,
-		       cluster_hits,
-		       cluster_start,
-		       cluster_end);
+      if ( _showStartEnd )
+	_algo.AddCluster(plane,
+			 cluster_hits,
+			 cluster_start,
+			 cluster_end);
+      else
+	_algo.AddCluster(plane,
+			 cluster_hits);
+      
     }
 
     return true;

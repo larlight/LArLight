@@ -19,6 +19,7 @@ namespace larlight {
     SetMinHitsToDraw(0);
     SetDrawTracks(true);
     SetDrawOnlyTracks(false);
+    SetDrawStartEnd(false);
   }
   
   //################################################################
@@ -130,36 +131,49 @@ namespace larlight {
 	//if it's not a track, draw it only if !_draw_only_tracks
 	if(!is_track){
 	  if(!_draw_only_tracks){
-	    if(_draw_polygon){
+	    if( _draw_polygon and _showStartEnd )
 	      _algo.AddCluster(plane,
 			       cluster_hits,
 			       cluster_start,
 			       cluster_end,
 			       cluster_polygon);
-	    }
-	    else{
+	    else if ( _draw_polygon and !_showStartEnd )
+	      _algo.AddCluster(plane,
+			       cluster_hits,
+			       cluster_polygon);
+	    else if ( !_draw_polygon and _showStartEnd )
 	      _algo.AddCluster(plane,
 			       cluster_hits,
 			       cluster_start,
 			       cluster_end);
-	    }
-	  }
+	    else if ( !_draw_polygon and !_showStartEnd )
+	      _algo.AddCluster(plane,
+			       cluster_hits);
+
+	  }//end if draw only tracks
 	}//end if it is not a track
 	
 	else{//if it is a track, draw it if _draw_tracks is true
 	  if(_draw_tracks){
 	    if(_draw_polygon){
+	    if( _draw_polygon and _showStartEnd )
 	      _algo.AddCluster(plane,
 			       cluster_hits,
 			       cluster_start,
 			       cluster_end,
 			       cluster_polygon);
-	    }
-	    else{
+	    else if ( _draw_polygon and !_showStartEnd )
+	      _algo.AddCluster(plane,
+			       cluster_hits,
+			       cluster_polygon);
+	    else if ( !_draw_polygon and _showStartEnd )
 	      _algo.AddCluster(plane,
 			       cluster_hits,
 			       cluster_start,
 			       cluster_end);
+	    else if ( !_draw_polygon and !_showStartEnd )
+	      _algo.AddCluster(plane,
+			       cluster_hits);
 	    }
 	  }//end if(_draw_tracks)
 	}//end if it is a track
