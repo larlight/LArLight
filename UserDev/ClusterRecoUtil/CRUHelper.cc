@@ -76,6 +76,7 @@ namespace cluster {
     switch(cluster_type) {
       
     case ::larlight::DATA::Cluster:
+    case ::larlight::DATA::MCShowerCluster:
     case ::larlight::DATA::ShowerAngleCluster:
     case ::larlight::DATA::DBCluster:
     case ::larlight::DATA::FuzzyCluster:
