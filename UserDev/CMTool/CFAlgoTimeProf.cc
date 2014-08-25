@@ -48,7 +48,7 @@ namespace cmtool {
   }
 
   //----------------------------------------------------------------------------------------------
-  float CFAlgoTimeProf::Float(const std::vector<const cluster::ClusterParamsAlgNew*> &clusters)
+  float CFAlgoTimeProf::Float(const std::vector<const cluster::ClusterParamsAlg*> &clusters)
   //----------------------------------------------------------------------------------------------
   {
   // We now have a vector a clusters.

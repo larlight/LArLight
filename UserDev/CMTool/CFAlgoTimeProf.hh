@@ -38,7 +38,7 @@ namespace cmtool {
     // part but commented out. All of these functions are virtual and defined
     // in the base class.
 
-    virtual float Float(const std::vector<const cluster::ClusterParamsAlgNew*> &clusters);
+    virtual float Float(const std::vector<const cluster::ClusterParamsAlg*> &clusters);
 
     virtual void Report();
     
