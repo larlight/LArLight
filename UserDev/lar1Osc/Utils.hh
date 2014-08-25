@@ -113,6 +113,7 @@ namespace lar1{
     // const static Int_t kND175 = 9;
     // const static Int_t kND200 = 10;
 
+    int mc_generation;
     
 
     double fidCut_x, fidCut_y, fidCut_zUp, fidCut_zDown;

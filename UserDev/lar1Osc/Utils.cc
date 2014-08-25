@@ -10,7 +10,8 @@
 namespace lar1{
   Utils::Utils(){
 
-    std::cout <<"Initializing Utils"<<std::endl;
+    mc_generation = 2;
+    std::cout <<"Initializing Utils with mc_generation =" << mc_generation<<std::endl;
 
     PotNormNubar  = 10e20;
     PotNormNu     = 6.6e20;
@@ -47,13 +48,22 @@ namespace lar1{
     // Other option, shorter
 
     // iDet = 1
-    ub_xmin =  -128.0;
-    ub_xmax =  128.0;
-    ub_ymin = -116.5;
-    ub_ymax =  116.5;
-    ub_zmin =  0.0;
-    ub_zmax =  1036.0;
-    
+    if (mc_generation == 3){
+      ub_xmin =  -128.0;
+      ub_xmax =  128.0;
+      ub_ymin = -116.5;
+      ub_ymax =  116.5;
+      ub_zmin =  0.0;
+      ub_zmax =  1036.0;
+    }
+    else if (mc_generation == 2){
+      ub_xmin =  0.0;
+      ub_xmax =  2*128.0;
+      ub_ymin = -116.5;
+      ub_ymax =  116.5;
+      ub_zmin =  0.0;
+      ub_zmax =  1036.0;
+    }
     // make FD 8.4m on a side to get to the MB equivalent FV (in size, not tonage)
     // fd_xmin =  -420.0;
     // fd_xmax =  420.0;
@@ -186,13 +196,17 @@ namespace lar1{
         switch (iflux)
         {
           case kNu:
-            POT_Sim = 7.879E+19;
+            if (mc_generation == 3) POT_Sim = 7.879E+19;
+            if (mc_generation == 2) POT_Sim = 1.74e20;
             break;
           case kNu_Fosc:
-            POT_Sim = 7.637E+19;
+            if (mc_generation == 3) POT_Sim = 7.637E+19;
+            if (mc_generation == 2) POT_Sim = 1.79e20;
             break;
           case kNubar:
+            if (mc_generation == 2) POT_Sim = 8.87e20;
           case kNubar_Fosc:
+            if (mc_generation == 2) POT_Sim = 7.42e20;
           default:
             POT_Sim = -1;
             break;
@@ -200,6 +214,10 @@ namespace lar1{
         }
         break;
       case k150m:
+        if (mc_generation != 3){
+          std::cerr << "ERROR: the mc version selected is invalid for this detector\n.";
+          exit(-1);
+        }
         switch (iflux)
         {
           case kNu:
@@ -211,11 +229,15 @@ namespace lar1{
           case kNubar:
           case kNubar_Fosc:
           default:
-          POT_Sim = -1;
+            POT_Sim = -1;
             break;
         }
         break;
       case k175m:
+        if (mc_generation != 3){
+          std::cerr << "ERROR: the mc version selected is invalid for this detector\n.";
+          exit(-1);
+        }
         switch (iflux)
         {
           case kNu:
@@ -228,6 +250,10 @@ namespace lar1{
         }
         break;
       case k200m:
+        if (mc_generation != 3){
+          std::cerr << "ERROR: the mc version selected is invalid for this detector\n.";
+          exit(-1);
+        }
         switch (iflux)
         {
           case kNu:
@@ -247,19 +273,27 @@ namespace lar1{
         switch (iflux)
         {
           case kNu:
-            POT_Sim = 6.053E+21;
+            if (mc_generation == 3) POT_Sim = 6.053E+21;
+            if (mc_generation == 2) POT_Sim = 5.57E+21;
             break;
           case kNu_Fosc:
-            POT_Sim = 2.592E+21;
+            if (mc_generation == 3) POT_Sim = 2.592E+21;
+            if (mc_generation == 2) POT_Sim = 3.70E+22;
             break;
           case kNubar:
+            if (mc_generation == 2) POT_Sim = 3.70E+22;
           case kNubar_Fosc:
+            if (mc_generation == 2) POT_Sim = 3.58E+22;
           default:
             POT_Sim = -1;
             break;
         }
         break;
       case k600m_onaxis:
+        if (mc_generation != 3){
+          std::cerr << "ERROR: the mc version selected is invalid for this detector\n.";
+          exit(-1);
+        }
         switch (iflux)
         {
           case kNu:
@@ -277,6 +311,10 @@ namespace lar1{
         }
         break;
       case k600m_offaxis:
+        if (mc_generation != 3){
+          std::cerr << "ERROR: the mc version selected is invalid for this detector\n.";
+          exit(-1);
+        }
         switch (iflux)
         {
           case kNu:
@@ -836,15 +874,15 @@ namespace lar1{
       // std::cout << "Failed the IsActive cut!\n";
       return 0;
     }
-    double increment = 1/startDir.Mag();
+    TVector3 unitDir = startDir.Unit();
     // startDir *= 1.0/startDir.Mag();
-    double distance = increment;
-    while (IsActive(idet, startPoint + startDir*distance)){
+    double distance = 1;
+    while (IsActive(idet, startPoint + unitDir*distance)){
       // std::cout << "Current pos is (" 
       //           << (startPoint + startDir*distance).X() << ", "
       //           << (startPoint + startDir*distance).Y() << ", "
       //           << (startPoint + startDir*distance).Z() << ")\n";
-      distance += increment;
+      distance ++;
     }
     return distance;
 
