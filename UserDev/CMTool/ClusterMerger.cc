@@ -7,10 +7,13 @@ namespace larlight {
 
   bool ClusterMerger::initialize() {
 
-    if(_cluster_type != DATA::FuzzyCluster &&
-       _cluster_type != DATA::CrawlerCluster &&
-       _cluster_type != DATA::ShowerAngleCluster &&
-       _cluster_type != DATA::Cluster)
+    if( _cluster_type != DATA::Cluster &&
+	_cluster_type != DATA::MCShowerCluster &&
+	_cluster_type != DATA::DBCluster &&
+	_cluster_type != DATA::FuzzyCluster &&
+	_cluster_type != DATA::CrawlerCluster &&
+	_cluster_type != DATA::ShowerAngleCluster &&
+	_cluster_type != DATA::RyanCluster)
 
       throw ::cluster::CRUException(Form("Not supported cluster type: %s",
 					 DATA::DATA_TREE_NAME[_cluster_type].c_str())

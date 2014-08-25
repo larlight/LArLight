@@ -17,11 +17,13 @@ namespace larlight {
   bool ShowerReco3D::initialize() {
     _mgr = 0;
     // Make sure cluster type is a valid one
-    if(fClusterType != DATA::FuzzyCluster &&
-       fClusterType != DATA::CrawlerCluster &&
-       fClusterType != DATA::ShowerAngleCluster &&
-       fClusterType != DATA::Cluster &&
-       fClusterType != DATA::RyanCluster)
+    if( fClusterType != DATA::Cluster &&
+	fClusterType != DATA::MCShowerCluster &&
+	fClusterType != DATA::DBCluster &&
+        fClusterType != DATA::FuzzyCluster &&
+	fClusterType != DATA::CrawlerCluster &&
+	fClusterType != DATA::ShowerAngleCluster &&
+	fClusterType != DATA::RyanCluster)
 
       throw ::cluster::CRUException(Form("Not supported cluster type: %s",
 					 DATA::DATA_TREE_NAME[fClusterType].c_str())
