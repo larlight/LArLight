@@ -32,7 +32,7 @@ match_viewer = larlight.MatchViewer()
 match_viewer.SetPrintClusterInfo(True)
 
 #Show Showers: requires MC info in hadded files
-match_viewer.ShowShowers(False)
+match_viewer.SetDrawShowers(False)
 
 ########################################
 # attach match algos here

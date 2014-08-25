@@ -25,7 +25,7 @@ namespace cmtool {
   }
 
   //------------------------------------------------------------------------------
-  float CPAlgoIgnoreTracks::Priority(const ::cluster::ClusterParamsAlgNew &cluster)
+  float CPAlgoIgnoreTracks::Priority(const ::cluster::ClusterParamsAlg &cluster)
   //------------------------------------------------------------------------------
   {
     //return -1 for tracks, otherwise return nhits
@@ -46,7 +46,7 @@ namespace cmtool {
   }
     
 
-  bool CPAlgoIgnoreTracks::IsTrack(const ::cluster::ClusterParamsAlgNew &cluster)
+  bool CPAlgoIgnoreTracks::IsTrack(const ::cluster::ClusterParamsAlg &cluster)
   {
     double fPrincipal = TMath::Log(1-cluster.GetParams().eigenvalue_principal);
 

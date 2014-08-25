@@ -44,7 +44,7 @@ namespace cmtool {
        Core function: given a set of CPANs, return a float which indicates 
        the compatibility the cluster combination.
     */
-    virtual float Float(const std::vector<const cluster::ClusterParamsAlgNew*> &clusters);
+    virtual float Float(const std::vector<const cluster::ClusterParamsAlg*> &clusters);
 
     /**
        Optional function: called after each iterative approach if a manager class is

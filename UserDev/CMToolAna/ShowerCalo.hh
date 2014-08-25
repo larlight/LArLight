@@ -16,7 +16,7 @@
 #define SHOWERCALO_HH
 
 #include "ana_base.hh"
-#include "ClusterParamsAlgNew.hh"
+#include "ClusterParamsAlg.hh"
 #include "McshowerLookback.hh"
 
 
@@ -91,7 +91,7 @@ namespace larlight {
     std::vector< std::vector<int> > FindBestClusters(event_mcshower* ev_mcshower,
 						     event_cluster* ev_cluster,
 						     event_hit* ev_hits,
-						     const std::vector< ::cluster::ClusterParamsAlgNew> &_clusterparams);
+						     const std::vector< ::cluster::ClusterParamsAlg> &_clusterparams);
     
     
     //Histograms created
@@ -112,8 +112,8 @@ namespace larlight {
     bool _debug;
     Double_t w2cm, t2cm;
     ///vector of CPAN objects (before, and overwritten after merging)
-    std::vector< ::cluster::ClusterParamsAlgNew> _clusterparams;
-    ::cluster::ClusterParamsAlgNew _params;
+    std::vector< ::cluster::ClusterParamsAlg> _clusterparams;
+    ::cluster::ClusterParamsAlg _params;
     std::vector<larutil::PxHit> _clusHits;
     std::vector<std::vector<unsigned short> > clus_idx_vec;
     //neural net path needed

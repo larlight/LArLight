@@ -3,8 +3,8 @@
 #
 
 # specific names for this package
-DICT  = CMergePerformanceCint
-SHLIB = libCMergePerformance.so
+DICT  = CMToolAnaCint
+SHLIB = libCMToolAna.so
 SOURCES = $(wildcard *.cc)
 HEADERS = $(wildcard *.hh)
 OBJECTS = $(SOURCES:.cc=.o)

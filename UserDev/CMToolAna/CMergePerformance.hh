@@ -102,7 +102,7 @@ namespace larlight {
 
 
     ///vector of CPAN objects (before, and overwritten after merging)
-    std::vector< ::cluster::ClusterParamsAlgNew> _clusterparams;
+    std::vector< ::cluster::ClusterParamsAlg> _clusterparams;
 
     /// vector of vector of cluster indices for looping over _clusterparmas
     /// before merging it is just {{1},{2},{3},{4},...} since 

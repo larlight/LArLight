@@ -36,8 +36,8 @@ namespace cmtool {
     virtual ~CBAlgoShortestDist(){};
     
     /// Overloaded (from CBoolAlgoBase) Bool function
-    virtual bool Bool(const ::cluster::ClusterParamsAlgNew &cluster1,
-		      const ::cluster::ClusterParamsAlgNew &cluster2);
+    virtual bool Bool(const ::cluster::ClusterParamsAlg &cluster1,
+		      const ::cluster::ClusterParamsAlg &cluster2);
     
     
     /// Method to set cut value in cm^2 for distance compatibility test

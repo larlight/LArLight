@@ -31,7 +31,11 @@ namespace larlight {
   public:
 
     /// Default constructor
-    MCShowerClusterer(){ _name="MCShowerClusterer"; _fout=0; }
+    MCShowerClusterer(){ 
+      _name="MCShowerClusterer"; 
+      _fout=0;
+      _group_overlapping_hits=true;
+    }
 
     /// Default destructor
     virtual ~MCShowerClusterer(){}
@@ -51,11 +55,26 @@ namespace larlight {
     */
     virtual bool finalize();
     
+
+    //A function to check if a hit overlaps an already-made hit in time.
+    //if it does not, function returns -1
+    //if it does, function returns the index in original_hit_v of the hit it overlaps
+    //note, i want this to return size_t but size_t can't be negative... how do i deal with this?
+    int DoesHitOverlapExisting(event_hit* original_hit_v,UInt_t channel,Double_t start,Double_t end);
+    
+    //function to set whether to group overlapping hits as a single hit
+    //(true by default.. reduces number of hits by a factor of ~10)
+    void SetGroupOverlappingHits(bool flag) { _group_overlapping_hits = flag; };
+
   protected:
 
     size_t _nplanes;
 
     Double_t _hitwidth;
+
+    bool _group_overlapping_hits;
+
+
 
   };
 }

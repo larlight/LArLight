@@ -26,7 +26,7 @@ namespace cmtool {
   }
 
   //------------------------------------------------------------------------------------------
-  //void CBAlgoStartTrack::EventBegin(const std::vector<cluster::ClusterParamsAlgNew> &clusters)
+  //void CBAlgoStartTrack::EventBegin(const std::vector<cluster::ClusterParamsAlg> &clusters)
   //------------------------------------------------------------------------------------------
   //{
   //
@@ -40,7 +40,7 @@ namespace cmtool {
   //}
 
   //-----------------------------------------------------------------------------------------------
-  //void CBAlgoStartTrack::IterationBegin(const std::vector<cluster::ClusterParamsAlgNew> &clusters)
+  //void CBAlgoStartTrack::IterationBegin(const std::vector<cluster::ClusterParamsAlg> &clusters)
   //-----------------------------------------------------------------------------------------------
   //{
   //
@@ -54,8 +54,8 @@ namespace cmtool {
   //}
   
   //----------------------------------------------------------------
-  bool CBAlgoStartTrack::Bool(const ::cluster::ClusterParamsAlgNew &cluster1,
-			       const ::cluster::ClusterParamsAlgNew &cluster2)
+  bool CBAlgoStartTrack::Bool(const ::cluster::ClusterParamsAlg &cluster1,
+			       const ::cluster::ClusterParamsAlg &cluster2)
   //----------------------------------------------------------------
   {
     
@@ -144,7 +144,7 @@ namespace cmtool {
   }
     
 
-  bool CBAlgoStartTrack::IsStartTrack(const ::cluster::ClusterParamsAlgNew &cluster)
+  bool CBAlgoStartTrack::IsStartTrack(const ::cluster::ClusterParamsAlg &cluster)
   {
     if(cluster.GetParams().eigenvalue_principal > _min_EP) 
       return true;
@@ -153,7 +153,7 @@ namespace cmtool {
      
   }
 
-  bool CBAlgoStartTrack::IsOverlappingBlob(const ::cluster::ClusterParamsAlgNew &cluster)
+  bool CBAlgoStartTrack::IsOverlappingBlob(const ::cluster::ClusterParamsAlg &cluster)
   {
     if(cluster.GetParams().width > _min_width && 
        cluster.GetParams().opening_angle > _min_opening_angle &&

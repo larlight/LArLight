@@ -34,7 +34,7 @@ namespace cmtool {
 
     _in_clusters.reserve(clusters.size());
 
-    ::cluster::ClusterParamsAlgNew tmp_alg;
+    ::cluster::ClusterParamsAlg tmp_alg;
     tmp_alg.SetMinNHits(_min_nhits);
     tmp_alg.SetVerbose(false);
 
@@ -43,7 +43,7 @@ namespace cmtool {
       _in_clusters.push_back(tmp_alg);
       (*_in_clusters.rbegin()).Initialize();
 
-      if((*_in_clusters.rbegin()).SetHits(c) < 1) continue;
+      if((*_in_clusters.rbegin()).SetHits(c) < 3) continue;
       (*_in_clusters.rbegin()).DisableFANN();
       (*_in_clusters.rbegin()).FillParams(true,true,true,true,true,false);
       (*_in_clusters.rbegin()).FillPolygon();
@@ -52,7 +52,7 @@ namespace cmtool {
     
   }
 
-  void CMManagerBase::SetClusters(const std::vector<cluster::ClusterParamsAlgNew> &clusters)
+  void CMManagerBase::SetClusters(const std::vector<cluster::ClusterParamsAlg> &clusters)
   {
     _in_clusters = clusters;
   }
@@ -89,7 +89,7 @@ namespace cmtool {
 
   }
 
-  void CMManagerBase::ComputePriority(const std::vector<cluster::ClusterParamsAlgNew> &clusters) {
+  void CMManagerBase::ComputePriority(const std::vector<cluster::ClusterParamsAlg> &clusters) {
 
     _priority.clear();
     _planes.clear();

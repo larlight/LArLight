@@ -1,70 +1,61 @@
 /**
- * \file MCShowerQuality.hh
+ * \file MCShowerEff.hh
  *
- * \ingroup CMTool
+ * \ingroup ShowerReco3D
  * 
- * \brief Class def header for a class MCShowerQuality
+ * \brief Class def header for a class MCShowerEff
  *
  * @author kazuhiro
  */
 
-/** \addtogroup CMTool
+/** \addtogroup ShowerReco3D
 
     @{*/
 
-#ifndef MCSHOWERQUALITY_HH
-#define MCSHOWERQUALITY_HH
-
-#include <TH1D.h>
-#include <TH2D.h>
+#ifndef MCSHOWEREFF_HH
+#define MCSHOWEREFF_HH
 
 #include "ana_base.hh"
+#include "Geometry.hh"
+#include "DetectorProperties.hh"
+#include "ShowerBackTracker.hh"
 
 namespace larlight {
   /**
-     \class MCShowerQuality
+     \class MCShowerEff
      User custom analysis class made by kazuhiro
    */
-  class MCShowerQuality : public ana_base{
+  class MCShowerEff : public ana_base{
   
   public:
 
     /// Default constructor
-    MCShowerQuality();
+    MCShowerEff(){ _name="MCShowerEff"; _fout=0;};
 
     /// Default destructor
-    virtual ~MCShowerQuality(){};
+    virtual ~MCShowerEff(){};
 
-    void SetEnergyCut(double energy) {_energy_min = energy;}
-
-    /** IMPLEMENT in MCShowerQuality.cc!
+    /** IMPLEMENT in MCShowerEff.cc!
         Initialization method to be called before the analysis event loop.
     */ 
     virtual bool initialize();
 
-    /** IMPLEMENT in MCShowerQuality.cc! 
+    /** IMPLEMENT in MCShowerEff.cc! 
         Analyze a data event-by-event  
     */
     virtual bool analyze(storage_manager* storage);
 
-    /** IMPLEMENT in MCShowerQuality.cc! 
+    /** IMPLEMENT in MCShowerEff.cc! 
         Finalize method to be called after all events processed.
     */
     virtual bool finalize();
 
-    protected:
+  protected:
 
-    double _energy_min;
+    std::vector<TH1D*> vMergeQEff;
+    std::vector<TH1D*> vMergeQPur;
 
-    double _dx;
-
-    TH1D* _hCount;
-
-    TH2D* _hEnergy;
-
-    TH2D* _hDEDX;
-
-    TH1D* _hEnergyFrac;
+    ShowerBackTracker fBTAlg;
 
   };
 }

@@ -69,9 +69,8 @@
 #include "ClusterViewer.hh"
 #include "ClusterMerger.hh"
 #include "ClusterMatcher.hh"
-#include "MCShowerQuality.hh"
 #include "MergeViewer.hh"
-#include "MCShowerClusterViewer.hh"
+//#include "MCShowerClusterViewer.hh"
 
 // Class forward declaration here
 namespace cmtool {
@@ -140,11 +139,10 @@ namespace larlight {
 
   class ClusterMerger;
   class ClusterMatcher;
-  class MCShowerQuality;
 
   class ClusterViewer;
   class MergeViewer;
-  class MCShowerClusterCiewer;
+  //  class MCShowerClusterViewer;
   class MatchViewer;
 //ADD_ANA_CLASS ... do not change this comment line
 }

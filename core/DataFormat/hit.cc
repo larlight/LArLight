@@ -11,6 +11,7 @@ namespace larlight {
   //#################################################
   {
     if( _type != DATA::Hit &&
+	_type != DATA::MCShowerHit &&
 	_type != DATA::CrawlerHit &&
 	_type != DATA::GausHit &&
 	_type != DATA::APAHit &&
@@ -71,6 +72,7 @@ namespace larlight {
   //#################################################################################
   {
     if( _type != DATA::Hit &&
+	_type != DATA::MCShowerHit &&
 	_type != DATA::CrawlerHit &&
 	_type != DATA::GausHit &&
 	_type != DATA::APAHit &&

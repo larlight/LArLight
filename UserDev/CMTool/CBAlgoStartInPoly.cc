@@ -26,8 +26,8 @@ namespace cmtool {
   }//end reconfigure function
 
   
-  bool CBAlgoStartInPoly::Bool(const ::cluster::ClusterParamsAlgNew &cluster1,
-			       const ::cluster::ClusterParamsAlgNew &cluster2)
+  bool CBAlgoStartInPoly::Bool(const ::cluster::ClusterParamsAlg &cluster1,
+			       const ::cluster::ClusterParamsAlg &cluster2)
   {
 
     //skip if both polygons do not have minimum number of hits
