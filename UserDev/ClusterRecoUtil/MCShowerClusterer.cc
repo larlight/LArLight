@@ -2,6 +2,8 @@
 #define MCSHOWERCLUSTERER_CC
 
 #include "MCShowerClusterer.hh"
+//tmp debug
+#include <algorithm>
 
 namespace larlight {
 
@@ -121,34 +123,51 @@ namespace larlight {
 
 	  if(!hit_found) continue;
 
-	  // Create a hit
-	  ::larlight::hit h;
-	  h.set_wire    ( w    );
-	  h.set_channel ( ch   );
-	  h.set_times   ( tdc - (_hitwidth/2), 
-			  tdc, 
-			  tdc + (_hitwidth/2) );
-	  h.set_view    ( view );
-	  h.set_charge  ( hitq, hitq );
-
-	  switch(view) {
+	  // Create a hit (and association)
+	  // ONLY IF IT DOESN'T OVERLAP AN EXISTING HIT, ELSE MODIFY THAT EXISTING HIT
+	  int overlap_index = DoesHitOverlapExisting(out_hit_v,ch,tdc-(_hitwidth/2),tdc+(_hitwidth/2));
+	  if(overlap_index == -1){
+	    ::larlight::hit h;
+	    h.set_wire    ( w    );
+	    h.set_channel ( ch   );
+	    h.set_times   ( tdc - (_hitwidth/2), 
+			    tdc, 
+			    tdc + (_hitwidth/2) );
+	    h.set_view    ( view );
+	    h.set_charge  ( hitq, hitq );
 	    
-	  case ::larlight::GEO::kU:
-	  case ::larlight::GEO::kV:
-	    h.set_sigtype( ::larlight::GEO::kInduction   );
-	    break;
-	  case ::larlight::GEO::kW:
-	    //case ::larlight::GEO::kZ:
-	    h.set_sigtype( ::larlight::GEO::kCollection  );
-	    break;
-	  default:
-	    h.set_sigtype( ::larlight::GEO::kMysteryType );
+	    switch(view) {
+	      
+	    case ::larlight::GEO::kU:
+	    case ::larlight::GEO::kV:
+	      h.set_sigtype( ::larlight::GEO::kInduction   );
+	      break;
+	    case ::larlight::GEO::kW:
+	      //case ::larlight::GEO::kZ:
+	      h.set_sigtype( ::larlight::GEO::kCollection  );
+	      break;
+	    default:
+	      h.set_sigtype( ::larlight::GEO::kMysteryType );
+	    }
+	    
+	    out_hit_v->push_back(h);
+	    
+	    assn_ch.at(plane).push_back(out_hit_v->size()-1);
+	    
+	  } //kaleko end doesoverlap
+	  
+	  //if this hit overlaps an existing hit, modify the existing hit
+	  else{
+	    Double_t newstart = std::min(tdc-(_hitwidth/2),out_hit_v->at(overlap_index).StartTime());
+	    Double_t newend   = std::max(tdc+(_hitwidth/2),out_hit_v->at(overlap_index).EndTime());
+	    Double_t newpeak  = newstart + ((newend-newstart)/2);
+	    Double_t newq     = out_hit_v->at(overlap_index).Charge() + hitq;
+	    out_hit_v->at(overlap_index).set_times(newstart,newpeak,newend);
+	    out_hit_v->at(overlap_index).set_charge(newq,newq);
 	  }
-	  
-	  out_hit_v->push_back(h);
-	  
-	  assn_ch.at(plane).push_back(out_hit_v->size()-1);
 
+
+	  //whether or not hit overlaps other hits, add to cluster charge
 	  clusters.at(plane).set_charge(clusters.at(plane).Charge() + hitq);
 
 	}
@@ -190,5 +209,26 @@ namespace larlight {
     return true;
   }
 
+  int MCShowerClusterer::DoesHitOverlapExisting(event_hit* original_hit_v,UInt_t channel,Double_t start,Double_t end) {
+
+
+    if(!_group_overlapping_hits) return -1;
+
+    //check if there are overlapping hits on the same channel with this fancy c++11 find_if thing
+    //(if existing hit duration includes the current hit start time, or
+    // if existing hit duration includes the current hit end time)
+
+    auto it = std::find_if(original_hit_v->begin(),
+			   original_hit_v->end(),
+			   [&channel,&start,&end](const ::larlight::hit &ihit) {return ihit.Channel() == channel && ( (ihit.StartTime()<start && ihit.EndTime()>start) || (ihit.StartTime()<end && ihit.EndTime()>end) );});
+
+
+    //if overlapping hit found, return the index in original_hit_v of that hit
+    if(it != original_hit_v->end())
+      return (int)(it-original_hit_v->begin());
+
+    //return -1 if hit does not overlap any existing hits
+    return -1;
+  }
 }
 #endif
