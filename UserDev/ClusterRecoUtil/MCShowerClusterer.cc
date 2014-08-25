@@ -37,18 +37,26 @@ namespace larlight {
     }
 
     // Output hits
-    auto out_hit_v = (event_hit*)(storage->get_data(DATA::Hit));
+    auto out_hit_v = (event_hit*)(storage->get_data(DATA::MCShowerHit));
+    if(!out_hit_v) {
+      print(MSG::ERROR,__FUNCTION__,"DATA::MCShowerHit could not be retrieved!");
+      return false;
+    }
     if(out_hit_v->size())
-      print(MSG::WARNING,__FUNCTION__,"DATA::Hit is not empty. Clearing it...");
+      print(MSG::WARNING,__FUNCTION__,"DATA::MCShowerHit is not empty. Clearing it...");
     out_hit_v->clear_data();
     out_hit_v->set_event_id(mcshower_v->event_id());
     out_hit_v->set_run(mcshower_v->run());
     out_hit_v->set_subrun(mcshower_v->subrun());
 
     // Output clusters
-    auto out_clus_v = (event_cluster*)(storage->get_data(DATA::Cluster));
+    auto out_clus_v = (event_cluster*)(storage->get_data(DATA::MCShowerCluster));
+    if(!out_clus_v) {
+      print(MSG::ERROR,__FUNCTION__,"DATA::MCShowerCluster could not be retrieved!");
+      return false;
+    }
     if(out_clus_v->size())
-      print(MSG::WARNING,__FUNCTION__,"DATA::Cluster is not empty. Clearing it...");
+      print(MSG::WARNING,__FUNCTION__,"DATA::MCShowerCluster is not empty. Clearing it...");
     out_clus_v->clear_data();
     out_clus_v->reserve(mcshower_v->size() * _nplanes);
     out_clus_v->set_event_id(mcshower_v->event_id());
@@ -100,8 +108,12 @@ namespace larlight {
 	  // Loop over all energy deposition @ this timing
 	  for(auto const& this_ide : tdc_ide.second) {
 
+	    unsigned int daughter_track = 0;
+	    if(this_ide.trackID > 0) daughter_track = this_ide.trackID;
+	    else daughter_track = (-1 * this_ide.trackID);
+
 	    // If nothing to do with this MCShower, ignore.
-	    if(daughters.find(this_ide.trackID) == daughters.end()) continue;
+	    if(daughters.find(daughter_track) == daughters.end()) continue;
 	    
 	    hit_found = true;
 	    hitq += this_ide.numElectrons;
@@ -137,7 +149,7 @@ namespace larlight {
 	  
 	  assn_ch.at(plane).push_back(out_hit_v->size()-1);
 
-	  clusters.at(plane).set_charge(clusters.at(plane).Charge());
+	  clusters.at(plane).set_charge(clusters.at(plane).Charge() + hitq);
 
 	}
       }
@@ -158,7 +170,7 @@ namespace larlight {
 
 	clusters.at(plane).set_view(geo->PlaneToView(plane));
 	
-	clusters.at(plane).add_association(DATA::Hit,assn_ch.at(plane));
+	clusters.at(plane).add_association(DATA::MCShowerHit,assn_ch.at(plane));
 
 	assn_cs.push_back(out_clus_v->size());
 
@@ -166,7 +178,7 @@ namespace larlight {
 
       }
 
-      mcshower_v->at(shower_index).add_association(DATA::Cluster,assn_cs);
+      mcshower_v->at(shower_index).add_association(DATA::MCShowerCluster,assn_cs);
 
     }
  
