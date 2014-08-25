@@ -30,7 +30,7 @@ namespace cmtool {
     CFAlgoTimeProf();
     
     /// Default destructor
-    virtual ~CFAlgoTimeProf(){};
+    virtual ~CFAlgoTimeProf();
 
     //
     // Author should be aware of 3 functions at least: Float, Report, 
@@ -72,7 +72,14 @@ namespace cmtool {
 	
 	float TProfCompare(std::vector<larutil::PxHit> hita ,std::vector<larutil::PxHit> hitb);	
 
-	
+    TH1D *siga, *siginta, *sigb, *sigintb;
+
+    /*
+(Form("sig_a"),Form("sig_a"),nts,0,nts);
+    TH1D* siginta(Form("sigint_a"),Form("sigint_a"),nts,0,nts);
+    TH1D* sigb(Form("sig_b"),Form("sig_b"),nts,0,nts);
+    TH1D* sigintb(Form("sigint_b"),Form("sigint_b"),nts,0,nts);
+    */	
 
   };
 }

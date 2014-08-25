@@ -18,10 +18,26 @@
 namespace cmtool {
 
   //-------------------------------------------------------
-  CFAlgoTimeProf::CFAlgoTimeProf() : CFloatAlgoBase()
+  CFAlgoTimeProf::CFAlgoTimeProf() : CFloatAlgoBase(),
+				     siga(nullptr),
+				     siginta(nullptr),
+				     sigb(nullptr),
+				     sigintb(nullptr)
   //-------------------------------------------------------
   {
 
+  }
+
+  //-------------------------------
+  CFAlgoTimeProf::~CFAlgoTimeProf()
+  //-------------------------------
+  {
+    if(siga) delete siga;
+    if(sigb) delete sigb;
+    if(siginta) delete siginta;
+    if(sigintb) delete sigintb;
+
+    siga = sigb = siginta = sigintb = nullptr;
   }
 
   //-----------------------------
@@ -149,41 +165,47 @@ namespace cmtool {
     double ks = 0.0;
     std::vector< std::vector<TH1D*> > signals(nplanes);
     std::vector< std::vector<TH1D*> > pulses(nplanes);
-    std::vector<TH1D*>  sigint;
-	TH1D siga(Form("sig_a"),Form("sig_a"),nts,0,nts);
-	TH1D siginta(Form("sigint_a"),Form("sigint_a"),nts,0,nts);
-	TH1D sigb(Form("sig_b"),Form("sig_b"),nts,0,nts);
-	TH1D sigintb(Form("sigint_b"),Form("sigint_b"),nts,0,nts);
+
+    // One-time only initialization of class-member histograms
+    if(!siga) siga = new TH1D("sig_a","sig_a",nts,0,nts);
+    siga->Reset();
+      
+    if(!siginta) siginta = new TH1D("sigint_a","sigint_a",nts,0,nts);
+    siginta->Reset();
+      
+    if(!sigb) sigb = new TH1D("sig_b","sig_b",nts,0,nts);
+    sigb->Reset();
+      
+    if(!sigintb) sigintb = new TH1D("sigint_b","sigint_b",nts,0,nts);
+    sigintb = new TH1D("sigint_b","sigint_b",nts,0,nts);
 	 
 // First loop over hits in A and make the hist
 // in this case let's just use plane 0,1
-	for( auto const& ha : hita){
+        for( auto const& ha : hita){
           double time = ha.t;
           time -= larutil::DetectorProperties::GetME()->GetXTicksOffset(ha.plane)*larutil::GeometryUtilities::GetME()->TimeToCm();
           double charge = ha.charge;
-          int bin = siga.FindBin(time);
-          siga.SetBinContent(bin,siga.GetBinContent(bin)+charge);
-          for (int j = bin; j<=siga.GetNbinsX(); ++j){
-            siginta.SetBinContent(j,siginta.GetBinContent(j)+charge);
+          int bin = siga->FindBin(time);
+          siga->SetBinContent(bin,siga->GetBinContent(bin)+charge);
+          for (int j = bin; j<=siga->GetNbinsX(); ++j){
+            siginta->SetBinContent(j,siginta->GetBinContent(j)+charge);
           }
         }
-        if (siginta.Integral()) siginta.Scale(1./siginta.GetBinContent(siginta.GetNbinsX()));
-        sigint.push_back(new TH1D(siginta));
+        if (siginta->Integral()) siginta->Scale(1./siginta->GetBinContent(siginta->GetNbinsX()));
 	for( auto const& hb : hitb){
           double time = hb.t;
           time -= larutil::DetectorProperties::GetME()->GetXTicksOffset(hb.plane)*larutil::GeometryUtilities::GetME()->TimeToCm();
           double charge = hb.charge;
-          int bin = sigb.FindBin(time);
-          sigb.SetBinContent(bin,sigb.GetBinContent(bin)+charge);
-          for (int j = bin; j<=sigb.GetNbinsX(); ++j){
-            sigintb.SetBinContent(j,sigintb.GetBinContent(j)+charge);
+          int bin = sigb->FindBin(time);
+          sigb->SetBinContent(bin,sigb->GetBinContent(bin)+charge);
+          for (int j = bin; j<=sigb->GetNbinsX(); ++j){
+            sigintb->SetBinContent(j,sigintb->GetBinContent(j)+charge);
           }
         }
-        if (sigintb.Integral()) sigintb.Scale(1./sigintb.GetBinContent(sigintb.GetNbinsX()));
-        sigint.push_back(new TH1D(sigintb));
-       ks = sigint[0]->KolmogorovTest(sigint[1]);
-//	delete sigint;
-return ks;
+        if (sigintb->Integral()) sigintb->Scale(1./sigintb->GetBinContent(sigintb->GetNbinsX()));
+	ks = siginta->KolmogorovTest(sigintb);
+
+	return ks;
  }
 
   //------------------------------
