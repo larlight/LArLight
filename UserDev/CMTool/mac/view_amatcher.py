@@ -26,7 +26,7 @@ my_proc.set_ana_output_file("")
 
 raw_viewer   = larlight.ClusterViewer()
 match_viewer = larlight.MatchViewer()
-mc_viewer    = larlight.MCShowerClusterViewer()
+#mc_viewer    = larlight.MCShowerClusterViewer()
 
 match_viewer.SetPrintClusterInfo(True)
 match_viewer.ShowShowers(True)
@@ -50,7 +50,7 @@ my_proc.add_process(raw_viewer)
 
 my_proc.add_process(match_viewer)
 
-my_proc.add_process(mc_viewer)
+#my_proc.add_process(mc_viewer)
 
 raw_viewer.SetClusterType(larlight.DATA.Cluster)
 
@@ -84,7 +84,7 @@ while true:
 
     match_viewer.DrawAllClusters();
 
-    mc_viewer.DrawAllClusters();
+    #mc_viewer.DrawAllClusters();
 
     print "Event ID is: " ,counter
     counter+=1
