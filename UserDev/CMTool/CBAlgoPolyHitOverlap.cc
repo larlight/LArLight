@@ -19,8 +19,8 @@ namespace cmtool {
   }//end reconfigure function
 
   
-  bool CBAlgoPolyHitOverlap::Bool(const ::cluster::ClusterParamsAlgNew &cluster1,
-				  const ::cluster::ClusterParamsAlgNew &cluster2)
+  bool CBAlgoPolyHitOverlap::Bool(const ::cluster::ClusterParamsAlg &cluster1,
+				  const ::cluster::ClusterParamsAlg &cluster2)
   {
 
     //Check and see if a certain fraction of hits of a cluster

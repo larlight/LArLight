@@ -18,7 +18,7 @@
 #include <TH1D.h>
 
 #include "ana_base.hh"
-#include "ClusterParamsAlgNew.hh"
+#include "ClusterParamsAlg.hh"
 
 
 namespace larlight {
@@ -53,7 +53,7 @@ namespace larlight {
 
     protected:
 
-    ::cluster::ClusterParamsAlgNew  fCPAlg; 
+    ::cluster::ClusterParamsAlg  fCPAlg; 
 
     larutil::GeometryUtilities  *fGSer;
     /// Example histogram to be saved in analysis root file (separate from data product)

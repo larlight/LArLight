@@ -27,8 +27,8 @@ namespace cmtool {
 
   } //end constructor
 
-  bool CBAlgoShortestDist::Bool(const ::cluster::ClusterParamsAlgNew &cluster1,
-				const ::cluster::ClusterParamsAlgNew &cluster2)
+  bool CBAlgoShortestDist::Bool(const ::cluster::ClusterParamsAlg &cluster1,
+				const ::cluster::ClusterParamsAlg &cluster2)
   {
     
     //if number of hits not large enough skip

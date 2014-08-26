@@ -1,7 +1,7 @@
-#ifndef CLUSTERPARAMSALGNEW_HH
-#define CLUSTERPARAMSALGNEW_HH
+#ifndef CLUSTERPARAMSALG_HH
+#define CLUSTERPARAMSALG_HH
 
-#include "ClusterParamsAlgNew.hh"
+#include "ClusterParamsAlg.hh"
 
 //-----Math-------
 #include <math.h>       
@@ -10,7 +10,7 @@
 
 namespace cluster{
 
-  ClusterParamsAlgNew::ClusterParamsAlgNew()
+  ClusterParamsAlg::ClusterParamsAlg()
   {
     fMinNHits = 10;
     fGSer=nullptr;
@@ -19,7 +19,7 @@ namespace cluster{
     Initialize();
   }
 
-  ClusterParamsAlgNew::ClusterParamsAlgNew(const std::vector<const larlight::hit*> &inhitlist)
+  ClusterParamsAlg::ClusterParamsAlg(const std::vector<const larlight::hit*> &inhitlist)
   {
     fMinNHits = 10;
     fGSer=nullptr;
@@ -28,7 +28,7 @@ namespace cluster{
     SetHits(inhitlist);
   }
 
-  ClusterParamsAlgNew::ClusterParamsAlgNew(const std::vector<larutil::PxHit> &inhitlist)
+  ClusterParamsAlg::ClusterParamsAlg(const std::vector<larutil::PxHit> &inhitlist)
   {
     fMinNHits = 10;
     fGSer=nullptr;
@@ -37,14 +37,14 @@ namespace cluster{
     SetHits(inhitlist);
   }
 
-  int ClusterParamsAlgNew::SetHits(const std::vector<larutil::PxHit> &inhitlist){
+  int ClusterParamsAlg::SetHits(const std::vector<larutil::PxHit> &inhitlist){
 
     Initialize();
 
     // Make default values
     // Is done by the struct
     if(!(inhitlist.size())) {
-      throw RecoUtilException("Provided empty hit list!");
+      throw CRUException("Provided empty hit list!");
       return -1;
     }
 
@@ -66,12 +66,12 @@ namespace cluster{
     
   }
 
-  int ClusterParamsAlgNew::SetHits(const std::vector<const larlight::hit*> &inhitlist){
+  int ClusterParamsAlg::SetHits(const std::vector<const larlight::hit*> &inhitlist){
 
     // Make default values
     // Is done by the struct
     if(!(inhitlist.size())) {
-      throw RecoUtilException("Provided empty hit list!");
+      throw CRUException("Provided empty hit list!");
       return -1;
     }
     
@@ -102,7 +102,7 @@ namespace cluster{
     
   }
 
-  void  ClusterParamsAlgNew::GetFANNVector(std::vector<float> & data){
+  void  ClusterParamsAlg::GetFANNVector(std::vector<float> & data){
     unsigned int length = 13;
     if (data.size() != length) 
       data.resize(length);
@@ -122,13 +122,13 @@ namespace cluster{
     return;
   }
 
-  // std::vector<float> & ClusterParamsAlgNew::GetFANNVector(){
+  // std::vector<float> & ClusterParamsAlg::GetFANNVector(){
   //   std::vector<float> result;
   //   GetFANNVector(result);
   //   return result;
   // }
 
-  void  ClusterParamsAlgNew::PrintFANNVector(){
+  void  ClusterParamsAlg::PrintFANNVector(){
     std::vector<float> data;
     GetFANNVector(data);
     if(verbose){
@@ -151,14 +151,14 @@ namespace cluster{
   }
 
 
-  void ClusterParamsAlgNew::SetArgoneutGeometry(){
+  void ClusterParamsAlg::SetArgoneutGeometry(){
     larutil::LArUtilManager::Reconfigure(larlight::GEO::kArgoNeuT);
   }
 
 
 
 
-  void ClusterParamsAlgNew::Initialize()
+  void ClusterParamsAlg::Initialize()
   {
 
     // Set pointer attributes
@@ -205,15 +205,15 @@ namespace cluster{
 
   }
 
-  void ClusterParamsAlgNew::EnableFANN(){
+  void ClusterParamsAlg::EnableFANN(){
       enableFANN = true;
       ::cluster::FANNService::GetME()->GetFANNModule().LoadFromFile(fNeuralNetPath);
       return;
   }
 
-  void ClusterParamsAlgNew::Report(){
+  void ClusterParamsAlg::Report(){
     if(verbose) {
-      std::cout << "ClusterParamsAlgNew Report: "  << "\n"
+      std::cout << "ClusterParamsAlg Report: "  << "\n"
 		<< "\tFinishedGetAverages "        << fFinishedGetAverages << "\n"
 		<< "\tFinishedGetRoughAxis "       << fFinishedGetRoughAxis << "\n"
 		<< "\tFinishedGetProfileInfo "     << fFinishedGetProfileInfo << "\n"
@@ -225,7 +225,7 @@ namespace cluster{
     }
   }
 
-  void ClusterParamsAlgNew::FillParams(bool override_DoGetAverages      ,  
+  void ClusterParamsAlg::FillParams(bool override_DoGetAverages      ,  
                                        bool override_DoGetRoughAxis     ,  
                                        bool override_DoGetProfileInfo   ,  
                                        // bool override_DoRefineDirection  ,
@@ -243,7 +243,7 @@ namespace cluster{
     TrackShowerSeparation(override_DoTrackShowerSep);
   }
 
-  void ClusterParamsAlgNew::GetAverages(bool override){
+  void ClusterParamsAlg::GetAverages(bool override){
     if(!override) { //Override being set, we skip all this logic.
       //OK, no override. Stop if we're already finshed.
       if (fFinishedGetAverages) return;
@@ -289,7 +289,7 @@ namespace cluster{
     fParams.charge_wgt_y /= fParams.sum_charge;
 
     if(fPrincipal.GetMeanValues()->GetNrows()<2) {
-      throw cluster::RecoUtilException();
+      throw cluster::CRUException();
       return;
     }
 
@@ -307,7 +307,7 @@ namespace cluster{
   }
 
   // Also does the high hitlist
-  void ClusterParamsAlgNew::GetRoughAxis(bool override){
+  void ClusterParamsAlg::GetRoughAxis(bool override){
     if(!override) { //Override being set, we skip all this logic.
       //OK, no override. Stop if we're already finshed.
       if (fFinishedGetRoughAxis) return;
@@ -369,7 +369,7 @@ namespace cluster{
   }
 
 
-  void ClusterParamsAlgNew::GetProfileInfo(bool override)  {
+  void ClusterParamsAlg::GetProfileInfo(bool override)  {
     if(!override) { //Override being set, we skip all this logic.
       //OK, no override. Stop if we're already finshed.
       if (fFinishedGetProfileInfo) return;
@@ -789,7 +789,7 @@ namespace cluster{
    * direction
    * @param override [description]
    */
-  void ClusterParamsAlgNew::RefineStartPoints(bool override) {
+  void ClusterParamsAlg::RefineStartPoints(bool override) {
 
     //
     // Why override is not used here? Kazu 05/01/2014
@@ -1036,7 +1036,7 @@ namespace cluster{
   ////
   /////////////////////////////////////////////////////////////
   
-  void ClusterParamsAlgNew::GetFinalSlope(bool override) {
+  void ClusterParamsAlg::GetFinalSlope(bool override) {
     if(!override) { //Override being set, we skip all this logic.
       //OK, no override. Stop if we're already finshed.
       if (fFinishedGetFinalSlope) return;
@@ -1212,7 +1212,7 @@ namespace cluster{
    * the cluster.  Then the start point is refined later.
    * @param override [description]
    */
-  void ClusterParamsAlgNew::RefineDirection(bool override) {
+  void ClusterParamsAlg::RefineDirection(bool override) {
     //
     // We don't use "override"? Should we remove? 05/01/14
     //
@@ -1463,7 +1463,7 @@ namespace cluster{
   } //end RefineDirection
   
 
-  void ClusterParamsAlgNew::FillPolygon()
+  void ClusterParamsAlg::FillPolygon()
   {
     if(fHitVector.size()) {
       std::vector<const larutil::PxHit*> container_polygon;
@@ -1484,7 +1484,7 @@ namespace cluster{
   
   ///////////////////////////////////////////////////////////////////////////////////
   
-  void ClusterParamsAlgNew::RefineStartPointAndDirection(bool override){
+  void ClusterParamsAlg::RefineStartPointAndDirection(bool override){
     // This function is meant to pick the direction.
     // It refines both the start and end point, and then asks 
     // if it should flip.
@@ -1541,7 +1541,7 @@ namespace cluster{
     return;   
   }
 
-  void ClusterParamsAlgNew::TrackShowerSeparation(bool override){
+  void ClusterParamsAlg::TrackShowerSeparation(bool override){
     if(!override) return;
     if(verbose) std::cout << " ---- Trying T/S sep. ------ \n";
     if (enableFANN){

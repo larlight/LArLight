@@ -209,7 +209,7 @@ namespace cmtool {
 	  for(auto const& hit : _tmp_merged_clusters.at(index).GetHitVector())
 	    tmp_hits.push_back(hit);
 	}
-	_out_clusters.push_back(::cluster::ClusterParamsAlgNew());
+	_out_clusters.push_back(::cluster::ClusterParamsAlg());
 	(*_out_clusters.rbegin()).SetVerbose(false);
 	(*_out_clusters.rbegin()).DisableFANN();
 	
@@ -232,7 +232,7 @@ namespace cmtool {
     return true;
   }
 
-  void CMergeManager::RunMerge(const std::vector<cluster::ClusterParamsAlgNew> &in_clusters,
+  void CMergeManager::RunMerge(const std::vector<cluster::ClusterParamsAlg> &in_clusters,
 			       CMergeBookKeeper &book_keeper) const
   {
     RunMerge(in_clusters,
@@ -240,7 +240,7 @@ namespace cmtool {
 	     book_keeper);
   }
 
-  void CMergeManager::RunMerge(const std::vector<cluster::ClusterParamsAlgNew> &in_clusters,
+  void CMergeManager::RunMerge(const std::vector<cluster::ClusterParamsAlg> &in_clusters,
 			       const std::vector<bool> &merge_flag,
 			       CMergeBookKeeper &book_keeper) const
   {
@@ -333,7 +333,7 @@ namespace cmtool {
 
   }
 
-  void CMergeManager::RunSeparate(const std::vector<cluster::ClusterParamsAlgNew> &in_clusters,
+  void CMergeManager::RunSeparate(const std::vector<cluster::ClusterParamsAlg> &in_clusters,
 				  CMergeBookKeeper &book_keeper) const
   {
     /*

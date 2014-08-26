@@ -5,17 +5,18 @@
 
 # Load libraries
 import os, ROOT, sys
-from ROOT import gSystem
+from ROOT import *
+from ROOT import larlight as fmwk
 gSystem.Load("libAnalysis")
 
 # Now import ana_processor & your class. For this example, ana_base.
 from ROOT import *
 
 # Create ana_processor instance
-my_proc=ana_processor()
+my_proc=fmwk.ana_processor()
 
 # We want to read & write the data file
-my_proc.set_io_mode(storage_manager.BOTH)
+my_proc.set_io_mode(fmwk.storage_manager.BOTH)
 
 # Set input root file: this is decoder output root file.
 # This time, we use a sample file prepared.
@@ -29,15 +30,15 @@ my_proc.set_ana_output_file("ana.root")
 my_proc.set_output_file("out.root")
 
 # Create pulse reconstruction instance to be attached to ana_processor
-preco = pulse_reco()
+preco = fmwk.pulse_reco()
 
 # Add pulse reconstruction algorithms you wish to run
-preco.add_reco_algo(algo_fixed_window())
-preco.add_reco_algo(algo_threshold())
+preco.get_manager().add_reco_algo(optreco.algo_fixed_window())
+preco.get_manager().add_reco_algo(optreco.algo_threshold())
 
 # Set parameters for pedestal estimation
-preco.set_ped_algo(preco.kHEAD)
-preco.set_ped_nsample_cosmic(1)
+preco.get_manager().set_ped_algo(optreco.preco_manager.kHEAD)
+preco.get_manager().set_ped_nsample_cosmic(1)
 
 # Attach pulse reco unit to ana_processor
 my_proc.add_process(preco)

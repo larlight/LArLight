@@ -16,7 +16,7 @@
 
 #include "preco_algo_base.hh"
 
-namespace larlight {
+namespace optreco {
 
   /**
      \class algo_threshold
@@ -40,14 +40,8 @@ namespace larlight {
     /// Default destructor
     virtual ~algo_threshold(){};
 
-    /**
-       A method to return the storage event_pulse type enum.
-       This one returns DATA::XXXPulse_ThresWin
-    */
-    virtual DATA::DATA_TYPE storage_type(){return (_tpc_input ? DATA::TPCPulse_ThresWin : DATA::PMTPulse_ThresWin);}
-
     /// Implementation of preco_algo_base::reco method
-    virtual bool reco(const std::vector<UShort_t> *wf);
+    virtual bool reco(const std::vector<unsigned short> &wf);
 
     /// Implementation of preco_algo_base::reset method
     virtual void reset();

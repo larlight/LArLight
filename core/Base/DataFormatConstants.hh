@@ -47,17 +47,20 @@ namespace larlight{
       MCShower,           ///< LArSoft utility class MCShower
       Wire,               ///< Wire
       Hit,                ///< Hit
+      MCShowerHit,        ///< Hit created from MCShower
       CrawlerHit,         ///< ClusterCrawler Hit algo
       GausHit,            ///< Gaus Hit algo
       APAHit,             ///< APA Hit algo
       FFTHit,             ///< FFT Hit algo
       RFFHit,             ///< RFF Hit algo
       Cluster,            ///< Cluster
+      MCShowerCluster,    ///< Cluster created from MCShower
       FuzzyCluster,       ///< Fuzzy Cluster
       DBCluster,          ///< DBCluster
       CrawlerCluster,     ///< Crawler
       HoughCluster,       ///< Hough
       ShowerAngleCluster, ///< ShowerAngleCluster
+      RyanCluster,        ///< Ryan's clustering algorithm for pi0
       Seed,               ///< Seed
       SpacePoint,         ///< Spacepoints
       Track,              ///< Track
@@ -65,6 +68,7 @@ namespace larlight{
       Kalman3DSPS,        ///< Track (Kalman3DSPS)
       Kalman3DHit,        ///< Track (Kalman3DHit)
       Shower,             ///< Shower
+      RyanShower,         ///< Ryan's shower
       Vertex,             ///< Vertex
       FeatureVertex,      ///< FeatureVertex
       HarrisVertex,       ///< HarrisVertex
@@ -88,8 +92,6 @@ namespace larlight{
       TPCPulse_FixedWin,  ///< reconstructed event_pulse for TPC waveform
       Trigger,            ///< Trigger data
 
-      RyanCluster,        ///< Ryan's clustering algorithm 
-      RyanShower,         ///< Ryan's shower 
       DATA_TYPE_MAX
     };
     
@@ -104,17 +106,20 @@ namespace larlight{
       "mcshower",
       "wire",
       "hit",
+      "mcshit",
       "crawlerhit",
       "gaushit",
       "apahit",
       "ffthit",
       "rffhit",
       "cluster",
+      "mcscluster",
       "fuzzycluster",
       "dbcluster",
       "crawlercluster",
       "houghcluster",
       "showeranglecluster",
+      "ryancluster",
       "seed",
       "sps",
       "track",
@@ -122,6 +127,7 @@ namespace larlight{
       "kalman3dsps",
       "kalman3dhit",
       "shower",
+      "ryanshower",
       "vertex",
       "feature_vtx",
       "harris_vtx",
@@ -138,9 +144,7 @@ namespace larlight{
       "pmt_fixedwin",
       "tpc_threswin",
       "tpc_fixedwin",
-      "trigger",
-      "ryancluster",
-      "ryanshower"
+      "trigger"
     };
     
   }

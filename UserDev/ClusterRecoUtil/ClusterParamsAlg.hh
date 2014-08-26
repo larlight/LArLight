@@ -1,13 +1,13 @@
 ////////////////////////////////////////////////////////////////////////
-// ClusterParamsAlgNew.h
+// ClusterParamsAlg.h
 //
-// ClusterParamsAlgNew class
+// ClusterParamsAlg class
 //
 // Andrzej Szelc (andrzej.szelc@yale.edu)
 //
 ////////////////////////////////////////////////////////////////////////
-#ifndef CLUSTERPARAMSALGNEW_H
-#define CLUSTERPARAMSALGNEW_H
+#ifndef CLUSTERPARAMSALG_H
+#define CLUSTERPARAMSALG_H
 
 #include <TMath.h>
 #include <TH2F.h>
@@ -19,7 +19,7 @@
 
 #include "PxUtils.h"
 #include "ClusterParams.hh"
-#include "RecoUtilException.hh"
+#include "CRUException.hh"
 #include "LArUtilManager.hh"
 #include "FANNService.hh"
 
@@ -32,20 +32,20 @@
 
 namespace cluster {
    
-  class ClusterParamsAlgNew {
+  class ClusterParamsAlg {
 
   public:
 
     /// Default constructor
-    ClusterParamsAlgNew();
+    ClusterParamsAlg();
 
     /// Alternative constructor with larlight's hits
-    ClusterParamsAlgNew(const std::vector<const larlight::hit*>&);
+    ClusterParamsAlg(const std::vector<const larlight::hit*>&);
 
     /// Alternative constructor with larutil::PxHit vector
-    ClusterParamsAlgNew(const std::vector<larutil::PxHit>&);
+    ClusterParamsAlg(const std::vector<larutil::PxHit>&);
 
-    ~ClusterParamsAlgNew(){};
+    ~ClusterParamsAlg(){};
 
     void Initialize();
 
@@ -258,7 +258,7 @@ namespace cluster {
 
     std::string fNeuralNetPath;
 
-  }; //class ClusterParamsAlgNew
+  }; //class ClusterParamsAlg
   
 } //namespace cluster
 

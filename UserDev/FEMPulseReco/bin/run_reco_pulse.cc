@@ -19,17 +19,18 @@ int main(int argc, char** argv){
 
   my_proc.set_ana_output_file("ana.root");
 
-  larlight::pulse_reco* preco = new larlight::pulse_reco;
+  larlight::pulse_reco preco;
+
+  optreco::algo_fixed_window algo;
 
   //preco->set_reco_algo(new algo_threshold);
-  preco->add_reco_algo(new larlight::algo_fixed_window);
+  preco.get_manager().add_reco_algo(&algo);
 
-  preco->set_ped_algo(preco->kHEAD);
+  preco.get_manager().set_ped_algo(preco.get_manager().kHEAD);
   
-  preco->set_ped_nsample_cosmic(3);
+  preco.get_manager().set_ped_nsample_cosmic(3);
 
-  my_proc.add_process(preco);
-  
+  my_proc.add_process(&preco);
 
   // Let's run it.
 

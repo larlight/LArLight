@@ -21,7 +21,7 @@ namespace shower {
   }
 
 
-  ::larlight::shower ShowerRecoAlg::Reconstruct(const std::vector< ::cluster::ClusterParamsAlgNew>& clusters)
+  ::larlight::shower ShowerRecoAlg::Reconstruct(const std::vector< ::cluster::ClusterParamsAlg>& clusters)
   {
 
     ::larlight::shower result;

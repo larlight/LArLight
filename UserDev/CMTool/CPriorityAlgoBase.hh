@@ -37,7 +37,7 @@ namespace cmtool {
        Core function: given the CPAN input, return whether a cluster should be
        merged or not.
     */
-    virtual float Priority(const cluster::ClusterParamsAlgNew &cluster)
+    virtual float Priority(const cluster::ClusterParamsAlg &cluster)
     { 
       if(cluster.GetNHits()) return 1.;
       return 0.1;

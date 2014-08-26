@@ -16,7 +16,7 @@
 
 #include <iostream>
 
-#include "ClusterParamsAlgNew.hh"
+#include "ClusterParamsAlg.hh"
 #include "CPriorityAlgoBase.hh"
 
 namespace cmtool {
@@ -66,10 +66,10 @@ namespace cmtool {
     void SetClusters(const std::vector<std::vector<larutil::PxHit> > &clusters);
 
     /// A simple method to add a cluster
-    void SetClusters(const std::vector<cluster::ClusterParamsAlgNew> &clusters);
+    void SetClusters(const std::vector<cluster::ClusterParamsAlg> &clusters);
 
     /// A getter for input clusters
-    const std::vector<cluster::ClusterParamsAlgNew>&  GetInputClusters() const 
+    const std::vector<cluster::ClusterParamsAlg>&  GetInputClusters() const 
     { return _in_clusters; }
 
     /// A setter for minimum # of hits ... passed onto ClusterParamsAlg
@@ -84,7 +84,7 @@ namespace cmtool {
   protected:
 
     /// Function to compute priority
-    void ComputePriority(const std::vector<cluster::ClusterParamsAlgNew>& clusters);
+    void ComputePriority(const std::vector<cluster::ClusterParamsAlg>& clusters);
 
     /// FMWK function called @ beginning of Process()
     virtual void EventBegin(){}
@@ -103,14 +103,14 @@ namespace cmtool {
 
   protected:
 
-    /// Minimum number of hits: the limit set for ClusterParamsAlgNew
+    /// Minimum number of hits: the limit set for ClusterParamsAlg
     unsigned int _min_nhits;
 
     /// Debug mode switch
     CMMSGLevel_t _debug_mode;
 
     /// Input clusters
-    std::vector<cluster::ClusterParamsAlgNew> _in_clusters;
+    std::vector<cluster::ClusterParamsAlg> _in_clusters;
 
     /// Priority algorithm
     ::cmtool::CPriorityAlgoBase* _priority_algo;

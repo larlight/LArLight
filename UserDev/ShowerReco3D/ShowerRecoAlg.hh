@@ -40,7 +40,7 @@ namespace shower {
     void Reset(){}
 
     /// Function to reconstruct a shower
-    ::larlight::shower Reconstruct(const std::vector< ::cluster::ClusterParamsAlgNew>& );
+    ::larlight::shower Reconstruct(const std::vector< ::cluster::ClusterParamsAlg>& );
     
   protected:
 

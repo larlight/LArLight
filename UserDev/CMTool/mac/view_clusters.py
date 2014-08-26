@@ -20,17 +20,13 @@ my_proc.set_io_mode(larlight.storage_manager.READ)
 my_proc.add_input_file(filename)
 
 larlight.storage_manager.get().set_in_rootdir("scanner")
-larlight.storage_manager.get().set_data_to_read(larlight.DATA.MCTruth,False)
-larlight.storage_manager.get().set_data_to_read(larlight.DATA.Shower,False)
-larlight.storage_manager.get().set_data_to_read(larlight.DATA.Calorimetry,False)
-larlight.storage_manager.get().set_data_to_read(larlight.DATA.UserInfo,False)
 
 my_proc.set_ana_output_file("")
 
 raw_viewer   = larlight.ClusterViewer()
 
 #decide if to show hit charge OR MCShowers on RHS of TCanvas [default: false]
-#raw_viewer.ShowShowers(True)
+#raw_viewer.SetDrawShowers(True)
 
 #if you're showing hit charge, whether to use log z scale [default: true]
 #raw_viewer.SetHitsLogZ(False)

@@ -84,7 +84,7 @@ namespace cmtool {
     // Loop over possible combinations
     std::vector<size_t> ctr(cluster_array.size(),0);
     std::vector<unsigned int> tmp_index_v(cluster_array.size(),0);
-    std::vector<const cluster::ClusterParamsAlgNew*> ptr_v;
+    std::vector<const cluster::ClusterParamsAlg*> ptr_v;
 
     while(1) {
       

@@ -17,15 +17,17 @@ namespace larlight {
   bool ShowerReco3D::initialize() {
     _mgr = 0;
     // Make sure cluster type is a valid one
-    if(fClusterType != DATA::FuzzyCluster &&
-       fClusterType != DATA::CrawlerCluster &&
-       fClusterType != DATA::ShowerAngleCluster &&
-       fClusterType != DATA::Cluster &&
-       fClusterType != DATA::RyanCluster)
+    if( fClusterType != DATA::Cluster &&
+	fClusterType != DATA::MCShowerCluster &&
+	fClusterType != DATA::DBCluster &&
+        fClusterType != DATA::FuzzyCluster &&
+	fClusterType != DATA::CrawlerCluster &&
+	fClusterType != DATA::ShowerAngleCluster &&
+	fClusterType != DATA::RyanCluster)
 
-      throw ::cluster::RecoUtilException(Form("Not supported cluster type: %s",
-					      DATA::DATA_TREE_NAME[fClusterType].c_str())
-					 );
+      throw ::cluster::CRUException(Form("Not supported cluster type: %s",
+					 DATA::DATA_TREE_NAME[fClusterType].c_str())
+				    );
     
     return true;
   }
@@ -72,13 +74,13 @@ namespace larlight {
     for(auto const& pair : matched_pairs) {
       
       // Create a vector of clusters to be passed onto the algorithm
-      std::vector< ::cluster::ClusterParamsAlgNew> clusters;
+      std::vector< ::cluster::ClusterParamsAlg> clusters;
       clusters.reserve(pair.size());
 
       
             
       // Create an association vector
-      std::vector<unsigned short> ass_index;
+      std::vector<unsigned int> ass_index;
       ass_index.reserve(pair.size());
 
       for(auto const& cluster_index : pair) {

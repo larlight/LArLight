@@ -21,7 +21,7 @@ namespace cmtool {
   }
 
   //-------------------------------------------------------------------------------------
-  void CBAlgoArray::EventBegin(const std::vector<cluster::ClusterParamsAlgNew> &clusters)
+  void CBAlgoArray::EventBegin(const std::vector<cluster::ClusterParamsAlg> &clusters)
   //-------------------------------------------------------------------------------------
   {
     for(auto &algo : _algo_array) algo->EventBegin(clusters);
@@ -35,7 +35,7 @@ namespace cmtool {
   }
 
   //-------------------------------------------------------------------------------------
-  void CBAlgoArray::IterationBegin(const std::vector<cluster::ClusterParamsAlgNew> &clusters)
+  void CBAlgoArray::IterationBegin(const std::vector<cluster::ClusterParamsAlg> &clusters)
   //-------------------------------------------------------------------------------------
   {
     for(auto &algo : _algo_array) algo->IterationBegin(clusters);
@@ -49,8 +49,8 @@ namespace cmtool {
   }
 
   //--------------------------------------------------------------------
-  bool CBAlgoArray::Bool(const ::cluster::ClusterParamsAlgNew &cluster1,
-			 const ::cluster::ClusterParamsAlgNew &cluster2)
+  bool CBAlgoArray::Bool(const ::cluster::ClusterParamsAlg &cluster1,
+			 const ::cluster::ClusterParamsAlg &cluster2)
   //--------------------------------------------------------------------
   {
     bool status = true;

@@ -16,8 +16,8 @@ namespace cmtool {
 
   } //end constructor
 
-  bool CBAlgoAngleAlign::Bool(const ::cluster::ClusterParamsAlgNew &cluster1,
-			      const ::cluster::ClusterParamsAlgNew &cluster2)
+  bool CBAlgoAngleAlign::Bool(const ::cluster::ClusterParamsAlg &cluster1,
+			      const ::cluster::ClusterParamsAlg &cluster2)
   {
     
     double angle1 = cluster1.GetParams().angle_2d;

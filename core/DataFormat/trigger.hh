@@ -48,7 +48,7 @@ namespace larlight {
     void set_trig_sample_number(UInt_t t) {_trig_sample_number=t;}
     
     /// Setter for trigger ID
-    void set_trig_number(UShort_t n)     {_trig_number=n;}
+    void set_trig_number(UInt_t n)     {_trig_number=n;}
     
     /// Setter for PMT trigger data
     void set_pmt_data(UShort_t data)      {_pmt_data=data;}

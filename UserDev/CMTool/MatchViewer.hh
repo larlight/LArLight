@@ -83,7 +83,7 @@ namespace larlight{
     void SetDrawOnlyTracks(bool flag) { _draw_only_tracks = flag; }
 
     /// Option to show MC Shower info on RHS of panel
-    void ShowShowers(bool on) { _algo.ShowShowers(on); _showerColor=on; }
+    void SetDrawShowers(bool on) { _algo.ShowShowers(on); _showerColor=on; }
 
   protected:
 

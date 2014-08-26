@@ -431,6 +431,7 @@ namespace larlight {
       _ptr_data_array[type]=(event_base*)(new event_wire(type));
       break;
     case DATA::Hit:
+    case DATA::MCShowerHit:
     case DATA::CrawlerHit:
     case DATA::GausHit:
     case DATA::APAHit:
@@ -439,6 +440,7 @@ namespace larlight {
       _ptr_data_array[type]=(event_base*)(new event_hit(type));
       break;
     case DATA::Cluster:
+    case DATA::MCShowerCluster:
     case DATA::CrawlerCluster:
     case DATA::DBCluster:
     case DATA::FuzzyCluster:

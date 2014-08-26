@@ -196,7 +196,7 @@ namespace kaleko {
     }
 
 
-    // Now we make ClusterParamsAlgNew instance per cluster ... so initialize _clusterparams vector to its expected length;
+    // Now we make ClusterParamsAlg instance per cluster ... so initialize _clusterparams vector to its expected length;
 
     _clusterparams.clear();
     //    _clusterparams.reserve(ev_cluster->size());
@@ -209,7 +209,7 @@ namespace kaleko {
 
       const UChar_t plane = larutil::Geometry::GetME()->ChannelToPlane(ev_hits->at((*ass_index.begin())).Channel());
 
-      // Section A: Compute cluster parameters (ClusterParamsAlgNew) and store (_clusterparams)
+      // Section A: Compute cluster parameters (ClusterParamsAlg) and store (_clusterparams)
       std::vector<larutil::PxHit> tmp_hits;
       tmp_hits.reserve(ass_index.size());
 
@@ -226,16 +226,16 @@ namespace kaleko {
       }
       
 
-      _clusterparams.push_back(::cluster::ClusterParamsAlgNew());
+      _clusterparams.push_back(::cluster::ClusterParamsAlg());
 	
       try {
 	(*_clusterparams.rbegin()).setNeuralNetPath(myNeuralNetPath);
 	(*_clusterparams.rbegin()).SetHits(tmp_hits);
 	(*_clusterparams.rbegin()).FillPolygon();
 	(*_clusterparams.rbegin()).FillParams();
-      }catch( cluster::RecoUtilException) {
+      }catch( cluster::CRUException) {
 	
-	print(larlight::MSG::ERROR,__FUNCTION__,Form("Cluster %d too bad to run ClusterParamsAlgNew!",i_cluster.ID()));
+	print(larlight::MSG::ERROR,__FUNCTION__,Form("Cluster %d too bad to run ClusterParamsAlg!",i_cluster.ID()));
       }
       
     } //end loop over ev_cluster
@@ -255,7 +255,7 @@ namespace kaleko {
   void QuickClusterAna::CalculateTTreeVars(larlight::event_cluster* ev_cluster, 
 					   larlight::event_mcshower* ev_mcshower, 
 					   larlight::event_hit* ev_hits, 
-					   const std::vector<cluster::ClusterParamsAlgNew> &_clusterparams){
+					   const std::vector<cluster::ClusterParamsAlg> &_clusterparams){
     
     //clear the TTree variables before doing any calculations (or, set to non-physical values
     //to indicate that somehting has gone wrong if you find those values in your output tree)

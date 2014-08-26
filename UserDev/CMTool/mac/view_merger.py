@@ -30,11 +30,17 @@ my_proc.set_ana_output_file("")
 
 raw_viewer   = larlight.ClusterViewer()
 merge_viewer = larlight.MergeViewer()
-#decide if to show hit charge OR MCShowers on RHS of TCanvas
-raw_viewer.ShowShowers(True)
 
+########################################
+# decide what to show on display
+########################################
+#SetDrawShowers: requires MC info in hadded files
+raw_viewer.SetDrawShowers(False)
+raw_viewer.SetDrawStartEnd(False)
 
 merge_viewer.SetPrintClusterInfo(True)
+merge_viewer.SetDrawStartEnd(False)
+merge_viewer.SetDrawPolygon(False)
 
 ########################################
 # attach merge algos here
@@ -104,8 +110,8 @@ my_proc.add_process(raw_viewer)
 
 my_proc.add_process(merge_viewer)
 
-raw_viewer.SetClusterType(larlight.DATA.Cluster)
-merge_viewer.SetClusterType(larlight.DATA.Cluster)
+raw_viewer.SetClusterType(larlight.DATA.FuzzyCluster)
+merge_viewer.SetClusterType(larlight.DATA.FuzzyCluster)
 
 gStyle.SetOptStat(0)
 

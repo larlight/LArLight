@@ -65,7 +65,7 @@ namespace kaleko {
     void CalculateTTreeVars(larlight::event_cluster* ev_cluster, 
 			    larlight::event_mcshower* ev_mcshower, 
 			    larlight::event_hit* ev_hits, 
-			    const std::vector<cluster::ClusterParamsAlgNew> &_clusterparams);
+			    const std::vector<cluster::ClusterParamsAlg> &_clusterparams);
 
     void PrepareHistos();
 
@@ -74,7 +74,7 @@ namespace kaleko {
 
     bool FinalRecoCutTest(const larlight::cluster &i_cluster);
 
-    std::vector<cluster::ClusterParamsAlgNew> _clusterparams;
+    std::vector<cluster::ClusterParamsAlg> _clusterparams;
     
 
     

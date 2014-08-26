@@ -13,7 +13,7 @@ namespace cmtool {
   }
 
   //------------------------------------------------------------------------
-  float CPAlgoNHits::Priority(const ::cluster::ClusterParamsAlgNew &cluster)
+  float CPAlgoNHits::Priority(const ::cluster::ClusterParamsAlg &cluster)
   //------------------------------------------------------------------------
   {
     auto nhit = cluster.GetNHits();

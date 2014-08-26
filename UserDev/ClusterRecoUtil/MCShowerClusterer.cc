@@ -2,6 +2,8 @@
 #define MCSHOWERCLUSTERER_CC
 
 #include "MCShowerClusterer.hh"
+//tmp debug
+#include <algorithm>
 
 namespace larlight {
 
@@ -19,26 +21,44 @@ namespace larlight {
   bool MCShowerClusterer::analyze(storage_manager* storage) {
 
     auto geo = ::larutil::Geometry::GetME();
-    auto geoutil = ::larutil::GeometryUtilities::GetME();
+    //auto geoutil = ::larutil::GeometryUtilities::GetME();
 
     // Get MCShower objects from storage
     auto mcshower_v = (event_mcshower* )( storage->get_data(DATA::MCShower) );
 
+    auto simch_v = (event_simch*)(storage->get_data(DATA::SimChannel) );
+
     // Check MCShower object exists
     if( !mcshower_v ) {
-      std::cerr<<"MCShower object DNE! Skipping event..."<<std::endl;
+      print(MSG::ERROR,__FUNCTION__,"MCShower object DNE! Skipping event...");
+      return false;
+    }
+    if( !simch_v ) {
+      print(MSG::ERROR,__FUNCTION__,"SimChannel object DNE! Skipping event...");
       return false;
     }
 
     // Output hits
-    auto out_hit_v = (event_hit*)(storage->get_data(DATA::Hit));
+    auto out_hit_v = (event_hit*)(storage->get_data(DATA::MCShowerHit));
+    if(!out_hit_v) {
+      print(MSG::ERROR,__FUNCTION__,"DATA::MCShowerHit could not be retrieved!");
+      return false;
+    }
+    if(out_hit_v->size())
+      print(MSG::WARNING,__FUNCTION__,"DATA::MCShowerHit is not empty. Clearing it...");
     out_hit_v->clear_data();
     out_hit_v->set_event_id(mcshower_v->event_id());
     out_hit_v->set_run(mcshower_v->run());
     out_hit_v->set_subrun(mcshower_v->subrun());
 
     // Output clusters
-    auto out_clus_v = (event_cluster*)(storage->get_data(DATA::Cluster));
+    auto out_clus_v = (event_cluster*)(storage->get_data(DATA::MCShowerCluster));
+    if(!out_clus_v) {
+      print(MSG::ERROR,__FUNCTION__,"DATA::MCShowerCluster could not be retrieved!");
+      return false;
+    }
+    if(out_clus_v->size())
+      print(MSG::WARNING,__FUNCTION__,"DATA::MCShowerCluster is not empty. Clearing it...");
     out_clus_v->clear_data();
     out_clus_v->reserve(mcshower_v->size() * _nplanes);
     out_clus_v->set_event_id(mcshower_v->event_id());
@@ -46,81 +66,139 @@ namespace larlight {
     out_clus_v->set_subrun(mcshower_v->subrun());
 
     // Loop over MCShowers
-    for(size_t ishower = 0; ishower < mcshower_v->size(); ++ishower){
+    for(size_t shower_index = 0; shower_index < mcshower_v->size(); ++shower_index) {
+      
+      // Get shower object
+      auto const& ishower = mcshower_v->at(shower_index);
 
-      // Get the charge deposition points of all daughters
-      // Outer vector size is # of charge deposition points
-      // Inner vector size is 4: the actual vertex (x,y,z,E)
-      auto const& qdeps = mcshower_v->at(ishower).DaughterPoints();
+      // Get a set of daughter track IDs
+      std::set<unsigned int> daughters;
+      for(auto const& id : ishower.DaughterTrackID())
+	daughters.insert(id);
 
-      // Unique local hit container
-      std::vector<std::map<float,larlight::hit > > unique_hits(geo->Nchannels(),std::map<float,larlight::hit>());
+      // Create an output cluster container
+      std::vector<larlight::cluster> clusters(geo->Nplanes(),larlight::cluster());
+      for(size_t plane=0; plane<geo->Nplanes(); ++plane)
+	clusters.at(plane).set_view(geo->PlaneToView(plane));
 
-      // Loop over the charge deposition points
-      for(auto const& qdep : qdeps) {
+      // Create an output cluster-hit association container
+      std::vector<std::vector<unsigned int> > assn_ch(geo->Nplanes(),std::vector<unsigned int>());
 
-	// Use Geometry utilities to find the wire, time & channel for this plane
-	double tmpxyz[3] = 
-	  { qdep.at(0), qdep.at(1), qdep.at(2) };
+      // Loop over channels
+      for(auto const& sch : *simch_v) {
 
-	//std::vector<unsigned short> channels(geo->Nplanes(),::larlight::DATA::INVALID_USHORT);
+	// Get channel number
+	auto const& ch = sch.Channel();
 
-	// Loop over planes
-	for(size_t iplane = 0; iplane < geo->Nplanes(); ++iplane) {
-	  
-	  double *tmp = tmpxyz;
-	  larutil::PxPoint ipxp = geoutil->Get2DPointProjection(tmp,iplane);
+	auto const& w  = geo->ChannelToWire(ch);
 
-	  auto const& ch = geo->PlaneWireToChannel(iplane,ipxp.w);
+	auto const& plane = geo->ChannelToPlane(ch);
 
-	  auto hit_iter = unique_hits.at(ch).find(ipxp.t);
+	auto const& view  = geo->PlaneToView(plane);
 
-	  if(hit_iter == unique_hits.at(ch).end()) {
+	// Retrieve data for all energy deposition in this channel
+	auto& tdc_ide_map = sch.TDCIDEMap();
 
-	    ::larlight::hit h;
-	    h.set_wire  ( ipxp.w);
-	    h.set_times ( ipxp.t - (_hitwidth/2),
-			  ipxp.t,
-			  ipxp.t + (_hitwidth/2) );
-	    h.set_charge  ( qdep.at(3), qdep.at(3) );
-	    h.set_channel ( geo->PlaneWireToChannel(iplane,ipxp.w) );
-	    h.set_view    ( geo->PlaneToView(iplane) );
+	// Loop over all energy deposition data
+	for(auto const& tdc_ide : tdc_ide_map) {
 
-	    unique_hits.at(ch).insert(std::make_pair(ipxp.t, h));
+	  // Get timing
+	  auto const& tdc = tdc_ide.first;
 
-	  }else{
+	  double hitq = 0;
+	  bool   hit_found = false;
+	  // Loop over all energy deposition @ this timing
+	  for(auto const& this_ide : tdc_ide.second) {
 
-	    (*hit_iter).second.set_charge( (*hit_iter).second.Charge() + qdep.at(3),
-					   (*hit_iter).second.Charge() + qdep.at(3) );
+	    unsigned int daughter_track = 0;
+	    if(this_ide.trackID > 0) daughter_track = this_ide.trackID;
+	    else daughter_track = (-1 * this_ide.trackID);
+
+	    // If nothing to do with this MCShower, ignore.
+	    if(daughters.find(daughter_track) == daughters.end()) continue;
 	    
+	    hit_found = true;
+	    hitq += this_ide.numElectrons;
 	  }
+
+	  if(!hit_found) continue;
+
+	  // Create a hit (and association)
+	  // ONLY IF IT DOESN'T OVERLAP AN EXISTING HIT, ELSE MODIFY THAT EXISTING HIT
+	  int overlap_index = DoesHitOverlapExisting(out_hit_v,ch,tdc-(_hitwidth/2),tdc+(_hitwidth/2));
+	  if(overlap_index == -1){
+	    ::larlight::hit h;
+	    h.set_wire    ( w    );
+	    h.set_channel ( ch   );
+	    h.set_times   ( tdc - (_hitwidth/2), 
+			    tdc, 
+			    tdc + (_hitwidth/2) );
+	    h.set_view    ( view );
+	    h.set_charge  ( hitq, hitq );
+	    
+	    switch(view) {
+	      
+	    case ::larlight::GEO::kU:
+	    case ::larlight::GEO::kV:
+	      h.set_sigtype( ::larlight::GEO::kInduction   );
+	      break;
+	    case ::larlight::GEO::kW:
+	      //case ::larlight::GEO::kZ:
+	      h.set_sigtype( ::larlight::GEO::kCollection  );
+	      break;
+	    default:
+	      h.set_sigtype( ::larlight::GEO::kMysteryType );
+	    }
+	    
+	    out_hit_v->push_back(h);
+	    
+	    assn_ch.at(plane).push_back(out_hit_v->size()-1);
+	    
+	  } //kaleko end doesoverlap
+	  
+	  //if this hit overlaps an existing hit, modify the existing hit
+	  else{
+	    Double_t newstart = std::min(tdc-(_hitwidth/2),out_hit_v->at(overlap_index).StartTime());
+	    Double_t newend   = std::max(tdc+(_hitwidth/2),out_hit_v->at(overlap_index).EndTime());
+	    Double_t newpeak  = newstart + ((newend-newstart)/2);
+	    Double_t newq     = out_hit_v->at(overlap_index).Charge() + hitq;
+	    out_hit_v->at(overlap_index).set_times(newstart,newpeak,newend);
+	    out_hit_v->at(overlap_index).set_charge(newq,newq);
+	  }
+
+
+	  //whether or not hit overlaps other hits, add to cluster charge
+	  clusters.at(plane).set_charge(clusters.at(plane).Charge() + hitq);
+
 	}
       }
-
-      std::vector<std::vector<unsigned short> > mc_hit_ass(geo->Nplanes(), std::vector<unsigned short>());
       
-      for(auto const& hits : unique_hits) {
+      //
+      // Store
+      //
 
-	for(auto const& hmap_iter : hits) {
+      // MCShower->Cluster association
+      std::vector<unsigned int> assn_cs;
+      assn_cs.reserve(geo->Nplanes());
 
-	  auto const& h = hmap_iter.second;
+      for(size_t plane = 0; plane<geo->Nplanes(); ++plane) {
 
-	  mc_hit_ass.at(h.View()).push_back(out_hit_v->size());
-	  out_hit_v->push_back(h);
+	if(!(assn_ch.at(plane).size())) continue;
 
-	}
+	clusters.at(plane).set_id(out_clus_v->size());
+
+	clusters.at(plane).set_view(geo->PlaneToView(plane));
+	
+	clusters.at(plane).add_association(DATA::MCShowerHit,assn_ch.at(plane));
+
+	assn_cs.push_back(out_clus_v->size());
+
+	out_clus_v->push_back(clusters.at(plane));
 
       }
-      
-      for(size_t iplane = 0; iplane < geo->Nplanes(); ++iplane) {
 
-	out_clus_v->push_back(::larlight::cluster());
+      mcshower_v->at(shower_index).add_association(DATA::MCShowerCluster,assn_cs);
 
-	(*(out_clus_v->rbegin())).set_view(geo->PlaneToView(iplane));
-	(*(out_clus_v->rbegin())).add_association(::larlight::DATA::Hit,mc_hit_ass.at(iplane));
-
-      }
-      
     }
  
     return true;
@@ -131,5 +209,26 @@ namespace larlight {
     return true;
   }
 
+  int MCShowerClusterer::DoesHitOverlapExisting(event_hit* original_hit_v,UInt_t channel,Double_t start,Double_t end) {
+
+
+    if(!_group_overlapping_hits) return -1;
+
+    //check if there are overlapping hits on the same channel with this fancy c++11 find_if thing
+    //(if existing hit duration includes the current hit start time, or
+    // if existing hit duration includes the current hit end time)
+
+    auto it = std::find_if(original_hit_v->begin(),
+			   original_hit_v->end(),
+			   [&channel,&start,&end](const ::larlight::hit &ihit) {return ihit.Channel() == channel && ( (ihit.StartTime()<start && ihit.EndTime()>start) || (ihit.StartTime()<end && ihit.EndTime()>end) );});
+
+
+    //if overlapping hit found, return the index in original_hit_v of that hit
+    if(it != original_hit_v->end())
+      return (int)(it-original_hit_v->begin());
+
+    //return -1 if hit does not overlap any existing hits
+    return -1;
+  }
 }
 #endif

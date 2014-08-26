@@ -87,7 +87,7 @@ namespace larlight{
     GEO::View_t           fView;           ///< View associated w/ this cluster
     
     ////////////////////////
-    ClassDef(cluster,2)
+    ClassDef(cluster,3)
     ////////////////////////
       
   };
@@ -120,7 +120,7 @@ namespace larlight{
   private:
     
     ////////////////////////
-    ClassDef(event_cluster,3)
+    ClassDef(event_cluster,4)
     ////////////////////////
   };
 }
