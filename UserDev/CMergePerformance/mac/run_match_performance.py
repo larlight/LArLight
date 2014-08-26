@@ -13,12 +13,12 @@ priority_algo.SetMinHits(20)
 
 algo_array = cmtool.CFAlgoArray()
 #algo_array.SetMode(cmtool.CFAlgoArray.kPositiveAddition)
-#algo_array.AddAlgo(cmtool.CFAlgoTimeOverlap())
-algo_array.AddAlgo(cmtool.CFAlgoStartPointMatch())
 algo_array.AddAlgo(cmtool.CFAlgo3DAngle())
+#algo_array.AddAlgo(cmtool.CFAlgoStartPointMatch())
+algo_array.AddAlgo(cmtool.CFAlgoTimeOverlap())
 #algo_array.AddAlgo(cmtool.CFAlgoZOverlap())
 
-match_algo = cmtool.CFAlgoStartPointMatch()
+#match_algo = cmtool.CFAlgoStartPointMatch()
 
 ana_module.GetManager().AddMatchAlgo(algo_array)
 ana_module.GetManager().AddPriorityAlgo(priority_algo)
