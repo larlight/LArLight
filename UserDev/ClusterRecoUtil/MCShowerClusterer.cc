@@ -118,7 +118,20 @@ namespace larlight {
 	    if(daughters.find(daughter_track) == daughters.end()) continue;
 	    
 	    hit_found = true;
-	    hitq += this_ide.numElectrons;
+
+	    //hard-coding fit functions DC has figured out to 
+	    //convert number of electrons to charge
+	    //USING AMPLITUDE FOR NOW
+	    //http://www.nevis.columbia.edu/~dcaratelli/showandtell/U_Wire_MaxWire_vs_Qin_078_20.png
+	    //CAN DO SIMILAR WITH AREA IF YOU WANT
+	    if(view==::larlight::GEO::kU)
+	      hitq += (this_ide.numElectrons/1000)*1.33 - 0.443;
+	    else if(view==::larlight::GEO::kV)
+	      hitq += (this_ide.numElectrons/1000)*.938 - 0.222;
+	    else if(view==::larlight::GEO::kW)
+	      hitq += (this_ide.numElectrons/1000)*1.79 + 0.507;
+	    else {std::cout<<"wtf"<<std::endl;return false;}
+
 	  }
 
 	  if(!hit_found) continue;
@@ -134,6 +147,7 @@ namespace larlight {
 			    tdc, 
 			    tdc + (_hitwidth/2) );
 	    h.set_view    ( view );
+
 	    h.set_charge  ( hitq, hitq );
 	    
 	    switch(view) {
