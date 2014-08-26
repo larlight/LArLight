@@ -1,9 +1,11 @@
-// #include <vector>+
+// #include <vector>
+// #include <iostream>
 
 {
   gSystem->Load("lib/liblar1Sens.so");
   lar1::NueAppearanceFitter n;
-  n.setFileSource("/Users/cja33/lar1_data/");
+  n.setFileSource("output/cosmics/100_cut/");
+  // n.setFileSource("output/nominal/");
   n.setVerbose(true);
   n.setDebug(false);
   n.setSpecialNameText("");
@@ -21,7 +23,7 @@
   n.setUseT600_onaxis(false);
   n.setUseT600_offaxis(false);
   n.setUbooneScale(1.0);
-  n.setLAr1NDScale(1.0/(100*1.65*1.65));
+  n.setLAr1NDScale(1.0);
   // n.setLAr1NDScale(1.0/3.0);
   n.setLAr1FDScale(1.0);
   n.setEnergyType("ecalo2");
@@ -30,16 +32,20 @@
   n.setNearDetSystematicError(0.0);
   n.setForceRemake(false);
   n.setUseInfiniteStatistics(false);
-  // n.setElectContainedDist(150);
+  n.setElectContainedDist(-999);
+
+  n.setIncludeCosmics(true);
+  n.setCosmicsFile("output/cosmics/100_cut/histos_for_corey.root");
+  n.setMinDistanceToStart(10200);
 
   std::vector<float> miniboone_bins;
-  miniboone_bins.push_back(0.100);
+  // miniboone_bins.push_back(0.100);
   miniboone_bins.push_back(0.200);
   miniboone_bins.push_back(0.300);
-  miniboone_bins.push_back(0.375);
-  miniboone_bins.push_back(0.475);
-  miniboone_bins.push_back(0.550);
-  miniboone_bins.push_back(0.675);
+  miniboone_bins.push_back(0.400);
+  miniboone_bins.push_back(0.500);
+  miniboone_bins.push_back(0.600);
+  miniboone_bins.push_back(0.700);
   miniboone_bins.push_back(0.800);
   miniboone_bins.push_back(0.950);
   miniboone_bins.push_back(1.100);
@@ -120,12 +126,5 @@
   n.MakeEventRatePlots();
   // n.MakeAltSensPlot();
 
-/*
-Total number of events in the background at L = 100m: 18782.8
-Total number of events in the background at L = 150m: 8136.13
-Total number of events in the background at L = 200m: 4472.6
-
- */
-
-
+  return;
 }
