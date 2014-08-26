@@ -10,11 +10,11 @@ namespace cmtool {
   //-------------------------------------------------------
   {
 
-	SetDebug(false) ;
+	SetDebug(true) ;
 	SetThetaCut(30) ;
 	SetPhiCut(30)  ;
-	SetRatio(0.05) ;
-	cProfile = new TH1D("cProfile","Charge Profile",300,0,300);	
+	SetRatio(0.1) ;
+//	cProfile = new TH1D("cProfile","Charge Profile",300,0,300);	
 
   }
 
@@ -39,6 +39,7 @@ namespace cmtool {
 	double angle_2d_2 = clusters.at(2)->GetParams().angle_2d;
 
 	//Calculate angles theta and phi for cluster pairs across 2 planes
+	//Theta goes from -90 to 90, phi from -180 to 180
 	double phi_01    = 0;   	
 	double theta_01  = 0;
 	double phi_12    = 0;   
@@ -97,7 +98,7 @@ namespace cmtool {
 	//Calculate phi and theta from first 2 planes; check if third plane is consistent
 	larutil::GeometryUtilities::GetME()->Get3DaxisN(plane_0,plane_1,angle_2d_0,angle_2d_1,phi_01,theta_01);	
 	larutil::GeometryUtilities::GetME()->Get3DaxisN(plane_1,plane_2,angle_2d_1,angle_2d_2,phi_12,theta_12);	
-	larutil::GeometryUtilities::GetME()->Get3DaxisN(plane_2,plane_0,angle_2d_2,angle_2d_0,phi_02,theta_02);	
+	larutil::GeometryUtilities::GetME()->Get3DaxisN(plane_2,plane_0,angle_2d_2,angle_2d_0,phi_02,theta_02);
 
 	//Adjust the range of phis/thetas that are bigger than 360 or less than 0.
 	FixPhiTheta(phi_01,theta_01);
@@ -115,34 +116,36 @@ namespace cmtool {
 	double ratio_max_middle =1;
 	double ratio 		= 1;		
 
-	//Test ratio for ChooseThetaOrPhi
+	//Ratio for theta angle
 	double ratio_angle =1;
 
-	//This takes into account the fact that 0 and 360 having the same relative value (for both theta and phi)
-	if(min_phi + 360 < max_phi +_phi_cut && min_phi +360 > max_phi - _phi_cut)
+	//This takes into account the fact that 0 and 360 having the same relative value (for phi; 0 and 180 for theta)
+	while(min_phi + 360 < max_phi +_phi_cut && min_phi +360 > max_phi - _phi_cut)
 	 {	
 		min_phi +=360 ;
 		SetMaxMiddleMin(max_phi, middle_phi, min_phi,max_phi,middle_phi,min_phi);
 	  }
 
-	 if(min_theta + 360 < max_theta +_theta_cut && min_theta +360 > max_theta -  _theta_cut)
+	 while(min_theta + 180 < max_theta +_theta_cut && min_theta +180 > max_theta -  _theta_cut)
 	  {	
-		min_theta +=360 ;
+		min_theta +=180 ;
 		SetMaxMiddleMin(max_theta,middle_theta,min_theta,max_theta,middle_theta,min_theta);
 	   }
 
-	ChooseThetaOrPhi(max_theta,middle_theta,min_theta,max_phi,middle_phi,min_phi,ratio_angle);
+//	ChooseThetaOrPhi(max_theta,middle_theta,min_theta,max_phi,middle_phi,min_phi,ratio_angle);
+
+	ratio_angle = middle_theta/max_theta; 
 
 	//Test to make sure that max hits is not too much bigger than min
-	if(max_hits > middle_hits + 600 )
+	if(max_hits > middle_hits +600 )
 		ratio *=0.01 ;
 	else{
 		ratio_max_min = min_hits / max_hits ;
 		ratio_max_middle = middle_hits/max_hits ;	
-		ratio = ratio_angle * ratio_max_min * ratio_max_middle ;
+		ratio = ratio_angle*ratio_max_middle*ratio_max_min ; // * ratio_max_min * ratio_max_middle ;
 		}	
 
-	if(_debug && ratio > _ratio_cut ){
+	if(_debug){// && ratio > _ratio_cut ){
 		std::cout<<"\nNhits planes 0, 1, 2: " <<clusters.at(0)->GetParams().N_Hits<<", "<<clusters.at(1)->GetParams().N_Hits
 				 <<", "<<clusters.at(2)->GetParams().N_Hits ;
 		std::cout<<"\nTotal ratio is: " <<ratio<<" ratio_angle: "<<ratio_angle ; 
@@ -161,7 +164,7 @@ namespace cmtool {
 		std::cout<<"For plane 0 and 2: "<<std::endl ;
 		std::cout<<"\tPhi : "<<phi_02<<std::endl ;
 		std::cout<<"\tTheta : "<<theta_02<<std::endl;
-		std::cout<<"MATCH FOUND************************"<<std::endl<<std::endl;
+		std::cout<<"\nMATCH FOUND************************"<<std::endl<<std::endl; 
 	}
 	
 	
@@ -173,14 +176,14 @@ namespace cmtool {
  //--------------------------------	
    {
 		while(phi <= 0)
-			phi +=360 ;
+			phi += 360 ;
 		while(phi > 360)
 			phi -= 360 ;
 
 		while(theta <= 0)
-			theta += 360 ;
-	    while(theta > 360)
-			theta-=360;
+			theta += 180 ;
+	    while(theta > 180)
+			theta-=180;
 	}	
 
   //------------------------------
@@ -286,6 +289,8 @@ namespace cmtool {
 	double theta_diff_2 = 0;
 	double phi_diff_1 = 0;
 	double phi_diff_2 = 0;
+	double ratio_phi  = 1;
+	double ratio_theta = 1;
 
 	//Note: We only need theta_diff_2, phi_diff_2 in the event that theta_diff_1, phi_diff_1 are 0	
 	theta_diff_1 = theta_max - theta_middle ;
@@ -295,22 +300,23 @@ namespace cmtool {
 
 
 	if(theta_diff_1 != 0 ){
-    	if(phi_diff_1 != 0 && phi_diff_1 < theta_diff_1) 
-			ratio_angle = phi_middle/phi_max ; 
-		else if(phi_diff_1 ==0 && phi_diff_2 < theta_diff_1) 
-			ratio_angle =  phi_min/phi_middle;
-		else 
-			ratio_angle = theta_middle/theta_max;
+    	if(phi_diff_1 != 0 ) //&& phi_diff_1 < theta_diff_1) 
+			ratio_phi = phi_middle/phi_max ; 
+		else if(phi_diff_1 ==0) // && phi_diff_2 < theta_diff_1) 
+			ratio_phi =  phi_min/phi_middle;
+
+		ratio_theta = theta_middle/theta_max;
 		}
 	else if(theta_diff_1 ==0){
-    	if(phi_diff_1 != 0 && phi_diff_1 < theta_diff_2) 
-			ratio_angle = phi_middle/phi_max ; 
-		else if(phi_diff_1 ==0 && phi_diff_2 < theta_diff_2) 
-			ratio_angle =  phi_min/phi_middle;
-		else 
-			ratio_angle = theta_min/theta_middle;
+    	if(phi_diff_1 != 0)// && phi_diff_1 < theta_diff_2) 
+			ratio_phi = phi_middle/phi_max ; 
+		else if(phi_diff_1 ==0) // && phi_diff_2 < theta_diff_2) 
+			ratio_phi =  phi_min/phi_middle;
+
+		ratio_theta = theta_min/theta_middle;
 		}
 	
+	ratio_angle= ratio_theta * ratio_phi ;
 
 	}
 

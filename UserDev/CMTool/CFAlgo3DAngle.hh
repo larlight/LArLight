@@ -71,7 +71,7 @@ namespace cmtool {
 	float _debug 	 ;
 
 	//Histogram for charge profile
-	TH1D *cProfile ;
+//	TH1D *cProfile ;
 
   };
 }
