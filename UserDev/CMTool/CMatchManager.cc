@@ -29,8 +29,7 @@ namespace cmtool {
   {
     if(_debug_mode <= kPerMerging) {
       if(_match_algo)    _match_algo->SetVerbose(true);
-      //if(_priority_algo) _priority_algo->SetVerbose(true);
-      _priority_algo->SetVerbose(true);
+      if(_priority_algo) _priority_algo->SetVerbose(true);
     }
 
     _match_algo->IterationBegin(_in_clusters);
