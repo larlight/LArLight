@@ -177,7 +177,7 @@ namespace cmtool {
     sigb->Reset();
       
     if(!sigintb) sigintb = new TH1D("sigint_b","sigint_b",nts,0,nts);
-    sigintb = new TH1D("sigint_b","sigint_b",nts,0,nts);
+    sigintb->Reset();
 	 
 // First loop over hits in A and make the hist
 // in this case let's just use plane 0,1
