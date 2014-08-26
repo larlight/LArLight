@@ -3,9 +3,9 @@
 
 #include "ShowerRecoAlg.hh"
 
-namespace shower {
+namespace showerreco {
   
-  ShowerRecoAlg::ShowerRecoAlg()
+  ShowerRecoAlg::ShowerRecoAlg() : ShowerRecoAlgBase()
   {
     
     fNPlanes=0;

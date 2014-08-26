@@ -17,7 +17,7 @@
 
 #include "ana_base.hh"
 #include "DataFormat-TypeDef.hh"
-#include "ShowerRecoAlg.hh"
+#include "ShowerRecoAlgBase.hh"
 #include "CRUHelper.hh"
 #include "CMatchManager.hh"
 
@@ -51,6 +51,9 @@ namespace larlight {
     */
     virtual bool finalize();
 
+    /// Attach algo
+    void SetShowerAlgo(::showerreco::ShowerRecoAlgBase *alg) { fShowerAlgo = alg;}
+
     /// hack! remove me later
     storage_manager* GetCurrentData() {return _mgr;};
     
@@ -69,7 +72,7 @@ namespace larlight {
     ::cluster::CRUHelper fCRUHelper;
 
     /// Shower reconstruction algorithm
-    ::shower::ShowerRecoAlg fShowerAlgo;
+    ::showerreco::ShowerRecoAlgBase *fShowerAlgo;
 
     /// Cluster matching code
     ::cmtool::CMatchManager *fMatchMgr;

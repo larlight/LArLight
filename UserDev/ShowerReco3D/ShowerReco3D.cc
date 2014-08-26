@@ -5,7 +5,7 @@
 
 namespace larlight {
 
-  ShowerReco3D::ShowerReco3D() : ana_base(), fMatchMgr(nullptr)
+  ShowerReco3D::ShowerReco3D() : ana_base(), fMatchMgr(nullptr), fShowerAlgo(nullptr)
   {
     _name="ShowerReco3D";
     fClusterType = DATA::Cluster;
@@ -16,6 +16,12 @@ namespace larlight {
   
   bool ShowerReco3D::initialize() {
     _mgr = 0;
+    if(!fShowerAlgo) {
+      
+      throw ::cluster::CRUException("Shower reco algorithm not attached... aborting.");
+      return false;
+
+    }
     // Make sure cluster type is a valid one
     if( fClusterType != DATA::Cluster &&
 	fClusterType != DATA::MCShowerCluster &&
@@ -36,7 +42,7 @@ namespace larlight {
 
     _mgr = storage;
     // Re-initialize tools
-    fShowerAlgo.Reset();
+    fShowerAlgo->Reset();
     fMatchMgr->Reset();
 
     // Retrieve clusters and fed into the algorithm
@@ -105,7 +111,7 @@ namespace larlight {
 	  continue;
 	
       // Run algorithm
-      larlight::shower result = fShowerAlgo.Reconstruct(clusters);
+      larlight::shower result = fShowerAlgo->Reconstruct(clusters);
 
       // Add association
       result.add_association(fClusterType,ass_index);

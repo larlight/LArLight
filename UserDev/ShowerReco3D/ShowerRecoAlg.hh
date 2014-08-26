@@ -14,18 +14,16 @@
 #ifndef SHOWERRECOALG_HH
 #define SHOWERRECOALG_HH
 
-#include <iostream>
-#include "shower.hh"
+#include "ShowerRecoAlgBase.hh"
 #include "CalorimetryAlg.hh"
-#include "ClusterParamsAlg.hh"
-namespace shower {
+namespace showerreco {
   
   /**
      \class ShowerRecoAlg
      User defined class ShowerRecoAlg ... these comments are used to generate
      doxygen documentation!
   */
-  class ShowerRecoAlg{
+  class ShowerRecoAlg : public ShowerRecoAlgBase{
     
   public:
     
@@ -36,14 +34,11 @@ namespace shower {
     virtual ~ShowerRecoAlg(){}
 
     /// Function to reset algorithm, to be called @ beginning of each event
-    void Reset(){}
+    virtual void Reset(){}
 
     /// Function to reconstruct a shower
-    ::larlight::shower Reconstruct(const std::vector< ::cluster::ClusterParamsAlg>& );
+    virtual ::larlight::shower Reconstruct(const std::vector< ::cluster::ClusterParamsAlg>& );
 
-    /// Verbosity switch
-    void Verbose(bool on=true) { fVerbosity=on; }
-    
   protected:
 
    ::calo::CalorimetryAlg fCaloAlg;
@@ -52,9 +47,6 @@ namespace shower {
    
   private:
     
-    /// Verbosity flag
-    bool fVerbosity;
-
    std::vector < larutil::PxPoint > fStartPoint;    // for each plane
    std::vector < larutil::PxPoint > fEndPoint;    // for each plane
    std::vector < double > fOmega2D;    // for each plane
