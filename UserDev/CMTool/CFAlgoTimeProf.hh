@@ -67,12 +67,10 @@ namespace cmtool {
      */
     //virtual void IterationEnd();
 
-
    private:
 	
-	float TProfCompare(std::vector<larutil::PxHit> hita ,std::vector<larutil::PxHit> hitb);	
+    float TProfCompare(std::vector<larutil::PxHit> hita ,std::vector<larutil::PxHit> hitb);	
 
-    TH1D *siga, *siginta, *sigb, *sigintb;
 
     /*
 (Form("sig_a"),Form("sig_a"),nts,0,nts);
