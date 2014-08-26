@@ -35,7 +35,7 @@ match_viewer.ShowShowers(False)
 # attach match algos here
 ########################################
 
-myalg = cmtool.CFAlgoStartPointCompat()
+myalg = cmtool.CFAlgoWireOverlap()
 myalg.SetVerbose(True)
 
 match_viewer.GetManager().AddMatchAlgo(myalg)
