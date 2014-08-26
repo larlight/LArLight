@@ -16,9 +16,8 @@
 
 #include <iostream>
 #include "shower.hh"
-#include "CMatchManager.hh"
 #include "CalorimetryAlg.hh"
-
+#include "ClusterParamsAlg.hh"
 namespace shower {
   
   /**
@@ -41,6 +40,9 @@ namespace shower {
 
     /// Function to reconstruct a shower
     ::larlight::shower Reconstruct(const std::vector< ::cluster::ClusterParamsAlg>& );
+
+    /// Verbosity switch
+    void Verbose(bool on=true) { fVerbosity=on; }
     
   protected:
 
@@ -49,6 +51,10 @@ namespace shower {
    larutil::GeometryUtilities  *fGSer;
    
   private:
+    
+    /// Verbosity flag
+    bool fVerbosity;
+
    std::vector < larutil::PxPoint > fStartPoint;    // for each plane
    std::vector < larutil::PxPoint > fEndPoint;    // for each plane
    std::vector < double > fOmega2D;    // for each plane
