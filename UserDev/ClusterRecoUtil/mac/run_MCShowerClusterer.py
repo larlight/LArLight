@@ -17,8 +17,11 @@ for x in xrange(len(sys.argv)):
 
 #need to save output file from shower module otherwise it won't work
 processor.set_output_file("out.root")
+processor.set_output_rootdir("scanner")
 
 processor.set_ana_output_file("")
+
+
 
 mod = fmwk.MCShowerClusterer()
 

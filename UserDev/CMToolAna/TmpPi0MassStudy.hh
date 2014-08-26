@@ -50,6 +50,13 @@ namespace larlight {
 
   protected:
 
+    void PrepareAnaTree();
+
+    TTree* ana_tree;
+
+    float _mass;
+    float _MC_energy;
+    
   };
 }
 #endif

@@ -7,7 +7,6 @@ namespace larlight {
   
   ComputePi0Mass* ComputePi0Mass::me = 0;
 
-
   bool ComputePi0Mass::initialize() {
 
     _shower_type = DATA::Shower;
@@ -31,8 +30,11 @@ namespace larlight {
       print(MSG::ERROR,__FUNCTION__,Form("Data product \"%s\" not found...",
 					 DATA::DATA_TREE_NAME[_shower_type].c_str()));
       return false;
-    }else if(ev_shower->size()<1) return false;
-    
+    }else if(ev_shower->size()<1) {
+      print(MSG::ERROR,__FUNCTION__,Form("There are 0 showers in this event! Skipping......"));      
+      return false;
+    }
+
     //skip event if !2 showers found.
     if(ev_shower->size() != 2) return true;
 
@@ -61,12 +63,21 @@ namespace larlight {
     //    				   ev_shower->at(1).Direction());
     
 
-    _mass = Pi0MassFormula3D( ev_shower->at(0).MIPEnergy().at(2) 
-			      * 1.302 + 50,
-			      ev_shower->at(1).MIPEnergy().at(2)
-			      * 1.302 + 50,
-			      ev_shower->at(0).Direction(),
-			      ev_shower->at(1).Direction());
+    //    _mass = Pi0MassFormula3D( ev_shower->at(0).MIPEnergy().at(2) 
+    //			      * 1.302 + 50,
+    //			      ev_shower->at(1).MIPEnergy().at(2)
+    //			      * 1.302 + 50,
+    //			      ev_shower->at(0).Direction(),
+    //			      ev_shower->at(1).Direction());
+    
+
+    
+    _mass = Pi0MassFormula3D( ev_shower->at(0).MIPEnergy().at(2), 
+    			      ev_shower->at(1).MIPEnergy().at(2),
+    			      ev_shower->at(0).Direction(),
+    			      ev_shower->at(1).Direction());
+    
+
     
     std::cout<<"in compute thing, mass is "<<_mass<<std::endl;
     hPi0MassPeak->Fill(_mass);
