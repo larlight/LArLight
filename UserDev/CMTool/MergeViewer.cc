@@ -149,13 +149,11 @@ namespace larlight {
 	    else if ( !_draw_polygon and !_showStartEnd )
 	      _algo.AddCluster(plane,
 			       cluster_hits);
-
 	  }//end if draw only tracks
 	}//end if it is not a track
 	
 	else{//if it is a track, draw it if _draw_tracks is true
 	  if(_draw_tracks){
-	    if(_draw_polygon){
 	    if( _draw_polygon and _showStartEnd )
 	      _algo.AddCluster(plane,
 			       cluster_hits,
@@ -174,7 +172,6 @@ namespace larlight {
 	    else if ( !_draw_polygon and !_showStartEnd )
 	      _algo.AddCluster(plane,
 			       cluster_hits);
-	    }
 	  }//end if(_draw_tracks)
 	}//end if it is a track
       }//end only drawing clusters with more than min hits
