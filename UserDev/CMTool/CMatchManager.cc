@@ -93,8 +93,6 @@ namespace cmtool {
 
       cluster_array.at( plane_to_index.at(_in_clusters.at((*riter).second).Plane()) ).push_back((*riter).second);
 
-    std::cout<<"done making clusters..."<<std::endl;
-
     // Loop over possible combinations
     std::vector<size_t> ctr(cluster_array.size(),0);
     std::vector<unsigned int> tmp_index_v(cluster_array.size(),0);
@@ -153,7 +151,7 @@ namespace cmtool {
       
       if(abort) break;
     }
-    std::cout<<"done looping all combinations..."<<std::endl;
+
     if(_debug_mode <= kPerIteration) {
       if(_match_algo) _match_algo->Report();
       if(_priority_algo) _priority_algo->Report();
