@@ -43,7 +43,7 @@ namespace showerreco {
 
    ::calo::CalorimetryAlg fCaloAlg;
 
-   larutil::GeometryUtilities  *fGSer;
+    larutil::GeometryUtilities  *fGSer;
    
   private:
     

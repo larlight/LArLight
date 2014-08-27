@@ -5,7 +5,7 @@
 
 namespace showerreco {
   
-  ShowerRecoAlg::ShowerRecoAlg() : ShowerRecoAlgBase()
+  ShowerRecoAlg::ShowerRecoAlg() : ShowerRecoAlgBase(), fGSer(nullptr)
   {
     
     fNPlanes=0;
