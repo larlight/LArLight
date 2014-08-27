@@ -54,6 +54,7 @@ namespace larlight {
 
     private: 
 	std::pair<double,double> HighQSlope(std::vector<unsigned int> hitindex , larlight::event_hit *const hits);
+	std::vector<std::pair<std::vector<unsigned int>,std::vector<unsigned int>>> ForceRegions(larlight::event_hit *const hits, std::vector<std::pair<double,double>> APP);
 
   };
 }

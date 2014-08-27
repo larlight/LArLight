@@ -18,7 +18,9 @@ my_proc = fmwk.ana_processor()
 my_proc.add_input_file(sys.argv[1])
 
 # Specify IO mode
-my_proc.set_io_mode(fmwk.storage_manager.READ)
+my_proc.set_io_mode(fmwk.storage_manager.BOTH)
+# setting the output file
+my_proc.set_output_file("out.root")
 
 # Specify input TDirectory name if given
 if len(sys.argv) > 2:
