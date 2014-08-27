@@ -22,6 +22,7 @@ namespace larlight {
   
   bool NCfilter::analyze(storage_manager* storage) {
   
+
 	// grab the incoming clusters. 
 	// these should be clusters that are very primative. like DB or hough
 	auto Incoming_cluster = (const event_cluster*)(storage->get_data(DATA::DBCluster));
@@ -29,7 +30,6 @@ namespace larlight {
         auto const& hits = (event_hit*)(storage->get_data(hit_type));
 	// make the output cluster
 //	auto Output_cluster = (const event_cluster*)(storage->get_data(DATA::RyanCluster));
-/*	
 
  	int nplanes = larutil::Geometry::GetME()->Nplanes();
 	std::vector<std::pair<double,double>> AvgPairSI(nplanes);	
@@ -95,7 +95,6 @@ namespace larlight {
 
 
 std::cout<<AvgPairSI.size()<<std::endl;
-*/	
 
     return true;
   }
