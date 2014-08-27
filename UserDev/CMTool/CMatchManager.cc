@@ -71,14 +71,29 @@ namespace cmtool {
     // Index array of clusters per plane
     std::vector<std::vector<size_t> > cluster_array;
 
-    cluster_array.resize( _planes.size() );
-    
+    // Resize to # of planes w/ clusters
+    cluster_array.reserve(_planes.size());
+
+    // Make a map of plane number => cluster_array index
+    std::vector<size_t> plane_to_index;
+    plane_to_index.reserve(_nplanes);
+    for(size_t plane=0; plane<_nplanes; ++plane){
+
+      if( _planes.find(plane) == _planes.end() ) plane_to_index.push_back(_nplanes);
+      
+      else {
+	plane_to_index.push_back(cluster_array.size());
+	cluster_array.push_back(std::vector<size_t>());
+      }
+    }
+
     for(auto riter = _priority.rbegin();
 	riter != _priority.rend();
 	++riter) 
 
-      cluster_array.at( _in_clusters.at((*riter).second).Plane()).push_back((*riter).second);
+      cluster_array.at( plane_to_index.at(_in_clusters.at((*riter).second).Plane()) ).push_back((*riter).second);
 
+    std::cout<<"done making clusters..."<<std::endl;
 
     // Loop over possible combinations
     std::vector<size_t> ctr(cluster_array.size(),0);
@@ -138,7 +153,7 @@ namespace cmtool {
       
       if(abort) break;
     }
-
+    std::cout<<"done looping all combinations..."<<std::endl;
     if(_debug_mode <= kPerIteration) {
       if(_match_algo) _match_algo->Report();
       if(_priority_algo) _priority_algo->Report();
