@@ -41,7 +41,7 @@ namespace showerreco {
     virtual ::larlight::shower Reconstruct(const std::vector< ::cluster::ClusterParamsAlg>& ) = 0;
     
     /// Verbosity switch
-    void Verbose(bool on=true) { fVerbosity=on; }
+    virtual void Verbose(bool on=true) { fVerbosity=on; }
     
   protected:
     

@@ -14,6 +14,7 @@
 #pragma link C++ class larlight::MCShowerAna+;
 #pragma link C++ class larlight::ShowerBackTracker+;
 //ADD_NEW_CLASS ... do not change this line
+#pragma link C++ class showerreco::ShowerRecoAlgBase+;
 #pragma link C++ class showerreco::ShowerRecoAlg+;
 //ADD_NEW_ALG_CLASS ... do not change this line
 #endif
