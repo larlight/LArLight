@@ -1227,7 +1227,7 @@ namespace larutil{
     std::vector<const larutil::PxHit*> ordered_hits;
     ordered_hits.reserve(hitlist.size());
     for(auto hiter = hitmap.rbegin();
-	qintegral < qtotal*0.95;
+	qintegral < qtotal*0.95 && hiter != hitmap.rend();
 	++hiter) {
 
       qintegral += (*hiter).first;
