@@ -4,7 +4,7 @@
 {
   gSystem->Load("lib/liblar1Sens.so");
   lar1::NueAppearanceFitter n;
-  n.setFileSource("output/cosmics/100_cut/");
+  n.setFileSource("output/no_cut/");
   // n.setFileSource("output/nominal/");
   n.setVerbose(true);
   n.setDebug(false);
@@ -12,7 +12,7 @@
   n.setSpecialNameTextOsc("");
   n.setSpecialNameText_far("");
   n.setSpecialNameTextOsc_far("");
-  n.setFlatSystematicError(0.00);
+  n.setFlatSystematicError(0.20);
   n.setMode("nu");
   n.setUse100m(false);
   n.setUse150m(false);
@@ -29,28 +29,28 @@
   n.setEnergyType("ecalo2");
   n.setUseNearDetStats(false);
   n.setShapeOnlyFit(true);
-  n.setNearDetSystematicError(0.0);
+  n.setNearDetSystematicError(0.2);
   n.setForceRemake(false);
   n.setUseInfiniteStatistics(false);
   n.setElectContainedDist(-999);
 
   n.setIncludeCosmics(true);
-  n.setCosmicsFile("output/cosmics/100_cut/histos_for_corey.root");
-  n.setMinDistanceToStart(10200);
+  n.setCosmicsFile("output/no_cut/histos_for_corey.root");
+  n.setMinDistanceToStart(0);
 
   std::vector<float> miniboone_bins;
   // miniboone_bins.push_back(0.100);
   miniboone_bins.push_back(0.200);
-  miniboone_bins.push_back(0.300);
-  miniboone_bins.push_back(0.400);
+  miniboone_bins.push_back(0.350);
   miniboone_bins.push_back(0.500);
-  miniboone_bins.push_back(0.600);
-  miniboone_bins.push_back(0.700);
+  miniboone_bins.push_back(0.650);
   miniboone_bins.push_back(0.800);
   miniboone_bins.push_back(0.950);
   miniboone_bins.push_back(1.100);
   miniboone_bins.push_back(1.300);
   miniboone_bins.push_back(1.500);
+  miniboone_bins.push_back(1.750);
+  miniboone_bins.push_back(2.000);
   miniboone_bins.push_back(3.000);
   // miniboone_bins.push_back(0.200);
   // miniboone_bins.push_back(0.480);
@@ -111,7 +111,7 @@
 
   n.setAbsolute_MWSource(false);
 
-  n.setNpoints(50);
+  n.setNpoints(500);
   n.setNWeights(1000);
 
   n.setSavePlots(true);
@@ -120,10 +120,10 @@
   n.ReadData();
   // n.BuildCovarianceMatrix();
   // n.MakeRatioPlots();
-  // n.Loop();
+  n.Loop();
   // n.MakePlots();
   // n.MakeSimplePlot();
-  n.MakeEventRatePlots();
+  // n.MakeEventRatePlots();
   // n.MakeAltSensPlot();
 
   return;

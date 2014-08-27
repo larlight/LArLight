@@ -278,7 +278,7 @@ namespace lar1{
             break;
           case kNu_Fosc:
             if (mc_generation == 3) POT_Sim = 2.592E+21;
-            if (mc_generation == 2) POT_Sim = 3.70E+22;
+            if (mc_generation == 2) POT_Sim = 5.37E+21;
             break;
           case kNubar:
             if (mc_generation == 2) POT_Sim = 3.70E+22;

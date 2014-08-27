@@ -21,6 +21,34 @@ bool fileExists(const char *filename)
   return ifile.is_open();
 }
 
+std::vector<float> smoothVector(const std::vector<float> & data, int range = 3){
+  
+  std::vector<float> output(data.size(), 0.0);
+  for (int i = 0; i < data.size(); ++i)
+  {
+    if (i < range){
+      for (int val = 0; val <= 2*i; val ++){
+        output[i] += data[val];
+      }
+      output[i] /= 2*i+1;      
+    }
+    if (i >= data.size() - range){
+      double temp_range= data.size() - i - 1;
+      for (int val = i - temp_range; val <= i + temp_range; val ++){
+        output[i] += data[val];
+      }
+      output[i] /= 2*temp_range+1;     
+    }
+    else{
+      for (int val = i - range; val <= i + range; val ++){
+        output[i] += data[val];
+      }
+      output[i] /= 2*range+1;
+    }
+  }
+  return output;
+}
+
 void add_plot_label( char* label, double x, double y, double size = 0.05, int color = 1, int font = 62, int align = 22 ){
 
   TLatex *latex = new TLatex( x, y, label );
@@ -83,9 +111,10 @@ void plot(std::string sens = "5s"){
   // First, want the names of all the chi2 files to read in:
   std::vector<TString> files;
 
-  files.push_back("files/nue_appearance_ecalo2_nuND_100m_T600_onaxis_covMat_shapeOnly_chi2.root");
-  files.push_back("files/nue_appearance_ecalo2_nuND_150m_T600_onaxis_covMat_shapeOnly_chi2.root");
-  files.push_back("files/nue_appearance_ecalo2_nuND_200m_T600_onaxis_covMat_shapeOnly_chi2.root");
+  files.push_back("output/nominal/nue_appearance_ecalo2_dist0_nuuB__flatStats_chi2.root");
+  files.push_back("output/no_cut/nue_appearance_ecalo2_dist0_nuuB__flatStats_chi2.root");
+  files.push_back("output/50_cut/nue_appearance_ecalo2_dist50_nuuB__flatStats_chi2.root");
+  files.push_back("output/100_cut/nue_appearance_ecalo2_dist100_nuuB__flatStats_chi2.root");
 
   // files.push_back("equalStats_chi2/nue_appearance_ecalo2_nuND_100m_T600_onaxis_covMat_shapeOnly_chi2.root");
   // files.push_back("equalStats_chi2/nue_appearance_ecalo2_nuND_150m_T600_onaxis_covMat_shapeOnly_chi2.root");
@@ -105,11 +134,17 @@ void plot(std::string sens = "5s"){
   colors.push_back(kBlack);
   colors.push_back(kRed-3);
   colors.push_back(kBlue-3);
+  colors.push_back(kGreen);
 
   std::vector<std::string> names;
-  names.push_back(" LAr1-ND (100m), T600 (600m)");
-  names.push_back(" LAr1-ND (150m), T600 (600m)");
-  names.push_back(" LAr1-ND (200m), T600 (600m)");
+  // names.push_back(" LAr1-ND (100m), T600 (600m)");
+  // names.push_back(" LAr1-ND (150m), T600 (600m)");
+  // names.push_back(" LAr1-ND (200m), T600 (600m)");
+  // names.push_back(" LAr1-ND (100m), T600 (600m)");
+  names.push_back(" MicroBooNE, nominal");
+  names.push_back(" MicroBooNE, no cosmics cut");
+  names.push_back(" MicroBooNE, 50cm cosmics cut");
+  names.push_back(" MicroBooNE, 100cm cosmics cut");
 
 
   // using "sens" to determine which curve to plot against
@@ -122,7 +157,7 @@ void plot(std::string sens = "5s"){
 
   // gROOT->ProcessLine(".L header.C+");
 
-  int npoints = 250;
+  int npoints = 500;
   // configure the dm2, sin22th points:
   double dm2min(0.01), dm2max(100.0);
   double sin22thmin(0.0001), sin22thmax(1.0);
@@ -231,6 +266,7 @@ void plot(std::string sens = "5s"){
       std::cout << "dm2: " << dm2_IndexToPoint[point]
                 << ", sigma: " << sqrt(chi2_alongLine_byFile[file][point]) << std::endl;
     }
+    chi2_alongLine_byFile[file] = smoothVector(chi2_alongLine_byFile[file]);
   }
 
   // for(unsigned int file = 0; file < files.size(); file ++ ){
@@ -257,7 +293,7 @@ void plot(std::string sens = "5s"){
   graphsForPlotting.resize(files.size());
   for(unsigned int file = 0; file < files.size(); file ++ ){
     graphsForPlotting[file] = new TGraph(npoints+1,&(dm2_IndexToPoint[0]), &(chi2_alongLine_byFile[file][0]));
-    graphsForPlotting[file] -> SetLineWidth(2);
+    graphsForPlotting[file] -> SetLineWidth(3);
     graphsForPlotting[file] -> SetLineColor(colors[file]);
     leg->AddEntry(graphsForPlotting[file],names[file].c_str(),"l");
   }
@@ -281,10 +317,10 @@ void plot(std::string sens = "5s"){
   // graphsForPlotting.front() -> SetMinimum()
   // etc.
   //
-  TH2D *hr1__1 = new TH2D("hr1__1","",500,0.1,dm2max,500,1.1,15);
+  TH2D *hr1__1 = new TH2D("hr1__1","",500,0.1,dm2max,500,1.1,10);
   hr1__1->SetDirectory(0);
   hr1__1->SetStats(0);
-  hr1__1->GetYaxis()->SetTitle("C.L. Coverage of 100m 5#sigma C.L. [#sigma]");
+  hr1__1->GetYaxis()->SetTitle("Coverage of nominal uB 5#sigma C.L. [#sigma]");
   // hr1__1->GetYaxis()->SetTitle("Ratio of 90% C.L. Limits");
   hr1__1->GetYaxis()->CenterTitle(true);
   hr1__1->GetYaxis()->SetLabelFont(62);
@@ -304,10 +340,10 @@ void plot(std::string sens = "5s"){
   hr1__1->GetXaxis()->SetTitleOffset(1.2);
   
   hr1__1->Draw("");
-
+  
   // graphsForPlotting.front()->Draw("l");
   for(unsigned int file = 0; file < files.size(); file ++ ){
-    graphsForPlotting[file] ->Draw("cl same");
+    graphsForPlotting[file] ->Draw("l same");
   }
 
   leg->Draw("same");
@@ -325,7 +361,7 @@ void plot(std::string sens = "5s"){
   tex_mode->SetTextSize(0.025);
   tex_mode->Draw();
 
-  TLatex *tex_un = new TLatex(.18,.87,"Statistical and Flux Uncert. Only");
+  TLatex *tex_un = new TLatex(.18,.87,"Statistical and 20\% Systematic Uncert. Only");
   // TLatex *tex_un = new TLatex(.18,.87,"Statistical Uncert. Only");
   tex_un->SetNDC();
   tex_un->SetTextFont(62);
@@ -348,14 +384,14 @@ void plot(std::string sens = "5s"){
   tex_ana->SetNDC();
   tex_ana->SetTextFont(62);
   tex_ana->SetTextSize(0.03);
-  tex_ana->Draw();
+  // tex_ana->Draw();
 
   TLatex *tex_sca = new TLatex(.18,.66,"ND Stats. Scaled to 100m");
   tex_sca->SetNDC();
   tex_sca->SetTextFont(62);
   tex_sca->SetTextColor(kRed-3);
   tex_sca->SetTextSize(0.025);
-  tex_sca->Draw();
+  // tex_sca->Draw();
 
 
   std::cout << "Finished plotting!" << std::endl;

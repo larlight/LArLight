@@ -132,6 +132,8 @@ namespace lar1{
     fileNameRoot += "_";
 
 
+    if (!includeCosmics) cosmicsFile = "";
+
     emin = nueBins.front();
     emax = nueBins.back();
   
@@ -2165,11 +2167,11 @@ namespace lar1{
 
     std::cout<<"Drawing LSND intervals...\n\n";
 
-    TCanvas* c3 = new TCanvas("c3","Sensitivity",700,700);
+    TCanvas* c3 = new TCanvas("c3","Sensitivity",900,700);
     // c3->Divide(1,2);
-    TPad * pad1 = new TPad("pad1","pad1",0,0.25,0.75,1);
-    TPad * pad2 = new TPad("pad2","pad2",0,0,0.75,0.25);
-    TPad * pad3 = new TPad("pad3","pad3",0.75,0,1,1);
+    TPad * pad1 = new TPad("pad1","pad1",0,0.25,0.6,1);
+    TPad * pad2 = new TPad("pad2","pad2",0,0,0.6,0.25);
+    TPad * pad3 = new TPad("pad3","pad3",0.6,0,1,1);
 
     pad1 -> Draw();
     pad2 -> Draw();
@@ -2210,20 +2212,12 @@ namespace lar1{
     systematicHist.resize(nL);
     statisticalHist.resize(nL);
 
-
-    // std::cout << "fittingSignal ... " << fittingSignal[nL-1].at(0)  << std::endl;
-    // std::cout << "fittingSignal ... " << fittingSignal[nL-1].at(1)  << std::endl;
-    // std::cout << "fittingSignal ... " << fittingSignal[nL-1].at(2)  << std::endl;
-    // std::cout << "fittingSignal ... " << fittingSignal[nL-1].at(3)  << std::endl;
-    // std::cout << "fittingBackgr ... " << fittingBackgr[nL-1].at(0) << std::endl;
-    // std::cout << "fittingBackgr ... " << fittingBackgr[nL-1].at(1) << std::endl;
-    // std::cout << "fittingBackgr ... " << fittingBackgr[nL-1].at(2) << std::endl;
-    // std::cout << "fittingBackgr ... " << fittingBackgr[nL-1].at(3) << std::endl;
-    // std::cout << "fittingErrors ... " << fittingErrors[nL-1].at(0) << std::endl;
-    // std::cout << "fittingErrors ... " << fittingErrors[nL-1].at(1) << std::endl;
-    // std::cout << "fittingErrors ... " << fittingErrors[nL-1].at(2) << std::endl;
-    // std::cout << "fittingErrors ... " << fittingErrors[nL-1].at(3) << std::endl;
-
+    for (int bin = 0; bin < nbins_nue; bin++){
+      std::cout << "fittingSignal(" << bin << ") ... " << fittingSignal[nL-1].at(bin) << std::endl;
+      std::cout << "fittingBackgr(" << bin << ")  ... " << fittingBackgr[nL-1].at(bin) << std::endl;
+      std::cout << "fittingErrors(" << bin << ")  ... " << fittingErrors[nL-1].at(bin) << std::endl;
+      std::cout << "bin width    (" << bin << ")  ... " << nueBins.at(bin+1) - nueBins.at(bin)  << std::endl;
+    }
     std::vector<TH1F *> fittingSignalHist;
     std::vector<TH1F *> fittingBackgrHist;
 
@@ -2254,8 +2248,8 @@ namespace lar1{
       std::cout << "1/nL is " << 1.0/nL << std::endl;
       padtemp->Draw();
       padtemp -> cd();
-      systematicHist[i]  = utils.makeHistogram(systematicErrorsPlotting[i],0.2,3.0);
-      statisticalHist[i] = utils.makeHistogram(statisticalErrorsPlotting[i],0.2,3.0);
+      systematicHist[i]  = utils.makeHistogram(systematicErrorsPlotting[i],nueBins);
+      statisticalHist[i] = utils.makeHistogram(statisticalErrorsPlotting[i],nueBins);
       systematicHist[i] -> SetTitle(Form("%s Fractional Errors",names[i].c_str()));
       systematicHist[i] -> SetTitleSize(12);
       // systematicHist[i] -> GetYaxis()->SetTitle("");
@@ -2290,8 +2284,8 @@ namespace lar1{
       std::cout << "1/nL is " << 1.0/nL << std::endl;
       padtemp->Draw();
       padtemp -> cd();
-      fittingSignalHist[i]  = utils.makeHistogram(fittingSignal[i],0.2,3.0);
-      fittingBackgrHist[i] = utils.makeHistogram(fittingBackgr[i],0.2,3.0);
+      fittingSignalHist[i]  = utils.makeHistogram(fittingSignal[i],nueBins);
+      fittingBackgrHist[i] = utils.makeHistogram(fittingBackgr[i],nueBins);
       fittingSignalHist[i] -> SetTitle(Form("%s Signal and Background",names[i].c_str()));
       fittingSignalHist[i] -> SetTitleSize(12);
       // fittingSignalHist[i] -> GetYaxis()->SetTitle("");
@@ -2313,8 +2307,16 @@ namespace lar1{
       fittingBackgrHist[i] -> SetLineColor(1);
       fittingSignalHist[i] -> SetLineWidth(2);
       fittingBackgrHist[i] -> SetLineWidth(2);
-      for (int bin = 0; bin < nbins_nue; bin++)
+      for (int bin = 0; bin < nbins_nue; bin++){
         fittingBackgrHist[i]->SetBinError(bin+1,fittingErrors[i][bin]); 
+        fittingBackgrHist[i]->SetBinContent(bin+1,
+                                    fittingBackgrHist[i]->GetBinContent(bin+1)
+                                    /fittingBackgrHist[i]->GetBinWidth(bin+1));
+        fittingSignalHist[i]->SetBinContent(bin+1,
+                                    fittingSignalHist[i]->GetBinContent(bin+1)
+                                    /fittingSignalHist[i]->GetBinWidth(bin+1));
+
+      }
       fittingSignalHist[i] -> Draw("hist");
       fittingBackgrHist[i] -> Draw("E hist same");
       if (i == nL-1){
@@ -2479,6 +2481,7 @@ namespace lar1{
     }
 
     TCanvas * tempCanv = new TCanvas("tempCanv","temp canvas",650,650);
+    tempCanv -> cd();
     TPad * padTemp = new TPad("padTemp","padTemp",0,0,1,1);
     padTemp->Draw();
 
@@ -2721,7 +2724,6 @@ namespace lar1{
       // SignalNu->SetBinContent(8,0.07);
       // SignalNu->SetBinContent(9,0.07);
       // SignalNu->SetBinContent(10,0.0);
-    std::cout << "Check 0\n";
 
 
       std::cout << "First bin: " << SignalNu->GetBinContent(1) <<std::endl;
@@ -2748,13 +2750,59 @@ namespace lar1{
       std::cout << "  NueFromNueCC_neutKaon: ...." << NueFromNueCC_neutKaon -> Integral() << "\n";
       std::cout << "  NueFromEScatter: .........." << NueFromEScatter -> Integral() << "\n";
       std::cout << "  NueFromNC_pi0: ............" << NueFromNC_pi0 -> Integral() << "\n";
-      std::cout << "  NueFromNC_pi0: ............" << NueFromNC_pi0 -> Integral() << "\n";
       std::cout << "  NueFromNC_delta0: ........." << NueFromNC_delta0 -> Integral() << "\n";
       std::cout << "  NueFromNumuCC: ............" << NueFromNumuCC -> Integral() << "\n";
       std::cout << "  Dirt: ....................." << Dirt -> Integral() << "\n";
       std::cout << "  Other: ...................." << Other -> Integral() << "\n";
       std::cout << "  NueFromCosmics: ..........." << NueFromCosmics -> Integral() << "\n";
       std::cout << "  SignalNu: ................." << SignalNu -> Integral() << "\n";
+
+      std::cout << "Backgrounds by type for first bins: " << std::endl;
+      std::cout << "  NueFromNueCC_muon: ........[" 
+                << NueFromNueCC_muon->GetBinContent(1) << "]\t["
+                << NueFromNueCC_muon->GetBinContent(2) << "]\t[" 
+                << NueFromNueCC_muon->GetBinContent(3)<< "]\n";
+      std::cout << "  NueFromNueCC_chargeKaon: ..[" 
+                << NueFromNueCC_chargeKaon->GetBinContent(1) << "]\t["
+                << NueFromNueCC_chargeKaon->GetBinContent(2) << "]\t[" 
+                << NueFromNueCC_chargeKaon->GetBinContent(3)<< "]\n";
+      std::cout << "  NueFromNueCC_neutKaon: ....[" 
+                << NueFromNueCC_neutKaon->GetBinContent(1) << "]\t["
+                << NueFromNueCC_neutKaon->GetBinContent(2) << "]\t[" 
+                << NueFromNueCC_neutKaon->GetBinContent(3)<< "]\n";
+      std::cout << "  NueFromEScatter: ..........[" 
+                << NueFromEScatter->GetBinContent(1) << "]\t["
+                << NueFromEScatter->GetBinContent(2) << "]\t[" 
+                << NueFromEScatter->GetBinContent(3)<< "]\n";
+      std::cout << "  NueFromNC_pi0: ............[" 
+                << NueFromNC_pi0->GetBinContent(1) << "]\t["
+                << NueFromNC_pi0->GetBinContent(2) << "]\t[" 
+                << NueFromNC_pi0->GetBinContent(3)<< "]\n";
+      std::cout << "  NueFromNC_delta0: .........[" 
+                << NueFromNC_delta0->GetBinContent(1) << "]\t["
+                << NueFromNC_delta0->GetBinContent(2) << "]\t[" 
+                << NueFromNC_delta0->GetBinContent(3)<< "]\n";
+      std::cout << "  NueFromNumuCC: ............[" 
+                << NueFromNumuCC->GetBinContent(1) << "]\t["
+                << NueFromNumuCC->GetBinContent(2) << "]\t[" 
+                << NueFromNumuCC->GetBinContent(3)<< "]\n";
+      std::cout << "  Dirt: .....................[" 
+                << Dirt->GetBinContent(1) << "]\t["
+                << Dirt->GetBinContent(2) << "]\t[" 
+                << Dirt->GetBinContent(3)<< "]\n";
+      std::cout << "  Other: ....................[" 
+                << Other->GetBinContent(1) << "]\t["
+                << Other->GetBinContent(2) << "]\t[" 
+                << Other->GetBinContent(3)<< "]\n";
+      std::cout << "  NueFromCosmics: ...........[" 
+                << NueFromCosmics->GetBinContent(1) << "]\t["
+                << NueFromCosmics->GetBinContent(2) << "]\t[" 
+                << NueFromCosmics->GetBinContent(3)<< "]\n";
+      std::cout << "  SignalNu: .................[" 
+                << SignalNu->GetBinContent(1) << "]\t["
+                << SignalNu->GetBinContent(2) << "]\t[" 
+                << SignalNu->GetBinContent(3)<< "]\n";
+
 
       for(int bin = 0; bin < nbins_nue; bin++)
       {
@@ -2816,22 +2864,77 @@ namespace lar1{
         Other               -> SetBinError(i+1, 0.0);
         totalEvents[i]      += Other -> GetBinContent(i+1);
         NueFromCosmics      -> SetBinError(i+1, 0.0);
-        totalEvents[i]      += NueFromCosmics -> GetBinContent(i+1);
+        if (includeCosmics)
+          totalEvents[i]      += NueFromCosmics -> GetBinContent(i+1);
         signalEvents[i]     = SignalNu -> GetBinContent(i+1);
       }
+
+      std::cout << "Backgrounds by type for first bins AFTER scaling: " << std::endl;
+      std::cout << "  NueFromNueCC_muon: ........[" 
+                << NueFromNueCC_muon->GetBinContent(1) << "]\t["
+                << NueFromNueCC_muon->GetBinContent(2) << "]\t[" 
+                << NueFromNueCC_muon->GetBinContent(3)<< "]\n";
+      std::cout << "  NueFromNueCC_chargeKaon: ..[" 
+                << NueFromNueCC_chargeKaon->GetBinContent(1) << "]\t["
+                << NueFromNueCC_chargeKaon->GetBinContent(2) << "]\t[" 
+                << NueFromNueCC_chargeKaon->GetBinContent(3)<< "]\n";
+      std::cout << "  NueFromNueCC_neutKaon: ....[" 
+                << NueFromNueCC_neutKaon->GetBinContent(1) << "]\t["
+                << NueFromNueCC_neutKaon->GetBinContent(2) << "]\t[" 
+                << NueFromNueCC_neutKaon->GetBinContent(3)<< "]\n";
+      std::cout << "  NueFromEScatter: ..........[" 
+                << NueFromEScatter->GetBinContent(1) << "]\t["
+                << NueFromEScatter->GetBinContent(2) << "]\t[" 
+                << NueFromEScatter->GetBinContent(3)<< "]\n";
+      std::cout << "  NueFromNC_pi0: ............[" 
+                << NueFromNC_pi0->GetBinContent(1) << "]\t["
+                << NueFromNC_pi0->GetBinContent(2) << "]\t[" 
+                << NueFromNC_pi0->GetBinContent(3)<< "]\n";
+      std::cout << "  NueFromNC_delta0: .........[" 
+                << NueFromNC_delta0->GetBinContent(1) << "]\t["
+                << NueFromNC_delta0->GetBinContent(2) << "]\t[" 
+                << NueFromNC_delta0->GetBinContent(3)<< "]\n";
+      std::cout << "  NueFromNumuCC: ............[" 
+                << NueFromNumuCC->GetBinContent(1) << "]\t["
+                << NueFromNumuCC->GetBinContent(2) << "]\t[" 
+                << NueFromNumuCC->GetBinContent(3)<< "]\n";
+      std::cout << "  Dirt: .....................[" 
+                << Dirt->GetBinContent(1) << "]\t["
+                << Dirt->GetBinContent(2) << "]\t[" 
+                << Dirt->GetBinContent(3)<< "]\n";
+      std::cout << "  Other: ....................[" 
+                << Other->GetBinContent(1) << "]\t["
+                << Other->GetBinContent(2) << "]\t[" 
+                << Other->GetBinContent(3)<< "]\n";
+      std::cout << "  NueFromCosmics: ...........[" 
+                << NueFromCosmics->GetBinContent(1) << "]\t["
+                << NueFromCosmics->GetBinContent(2) << "]\t[" 
+                << NueFromCosmics->GetBinContent(3)<< "]\n";
+      std::cout << "  SignalNu: .................[" 
+                << SignalNu->GetBinContent(1) << "]\t["
+                << SignalNu->GetBinContent(2) << "]\t[" 
+                << SignalNu->GetBinContent(3)<< "]\n";
+      std::cout << "  Total Background: .........[" 
+                << totalEvents.at(0) << "]\t["
+                << totalEvents.at(1) << "]\t[" 
+                << totalEvents.at(2)<< "]\n";
       std::cout << "First bin: " << SignalNu->GetBinContent(1) <<std::endl;;
       
       
       //Now set the errors on the last hist going in:
       for (int i = 0; i < nbins_nue; ++i)
       {
-        NueFromNumuCC -> SetBinError(i+1, sqrt(totalEvents[i]));
-        SignalNu->SetBinContent(i+1, totalEvents[i]+SignalNu->GetBinContent(i+1));
-        SignalNu->SetBinError(i+1, sqrt(signalEvents[i]));
+        // double error = sqrt(totalEvents[i]);
+        double error = sqrt(totalEvents[i] / (nueBins[i+1] - nueBins[i]));
+        std::cout << "error " << i << " is " << error << std::endl;
+        if (includeCosmics) NueFromCosmics -> SetBinError(i+1,error);
+        else
+          NueFromNumuCC -> SetBinError(i+1, error);
+        SignalNu->SetBinContent(i+1, totalEvents[i]+signalEvents[i]);
+        SignalNu->SetBinError(i+1, sqrt(signalEvents[i]/ (nueBins[i+1] - nueBins[i])));
       }
       std::cout << "First bin: " << SignalNu->GetBinContent(1) <<std::endl;;
       
-    std::cout << "Check 1\n";
       
       stack -> Add(NueFromNueCC_muon);
       stack -> Add(NueFromNueCC_chargeKaon);
@@ -2843,7 +2946,7 @@ namespace lar1{
       // stack -> Add(Dirt);
       // stack -> Add(Other);
       // stack ->Add(MBPhotExcess);
-      stack -> Add(NueFromCosmics);
+      if (includeCosmics) stack -> Add(NueFromCosmics);
 
       SignalNu -> SetLineStyle(0);
       SignalNu -> SetLineColor(1);
@@ -2872,7 +2975,7 @@ namespace lar1{
       leg->AddEntry(NueFromNC_pi0, "NC #pi^{0}");
       // leg->AddEntry(NueFromNC_delta0, "#Delta #rightarrow N#gamma");
       leg->AddEntry(NueFromNumuCC, "#nu_{#mu} CC");
-      leg->AddEntry(NueFromCosmics, "Cosmics MisID");
+      if (includeCosmics) leg->AddEntry(NueFromCosmics, "Cosmics");
       // leg->AddEntry(Dirt, "Dirt");
       // leg->AddEntry(Other, "Other");
       leg->AddEntry(SignalNu,"Signal");
@@ -2883,7 +2986,6 @@ namespace lar1{
       leg -> SetFillColor(0);
       leg -> SetBorderSize(0);
       // leg3->SetTextSize(0.03);
-      std::cout << "First bin: " << SignalNu->GetBinContent(1) <<std::endl;;
 
 //Start here
 
@@ -2915,7 +3017,6 @@ namespace lar1{
         if (j == 2) max *= 2.1;
       }
       std::cout << "Max val (scaled): " << max << "\n";
-    std::cout << "Check 2\n";
 
 
 
@@ -2946,7 +3047,6 @@ namespace lar1{
       // else if (baselines[j] == "800m"){
       //   sprintf(name, "T600 (%sm)", baselines[j].c_str());
       // }
-    std::cout << "Check 3\n";
       
       chr->GetYaxis()->SetTitle("Events / MeV");
       chr->GetYaxis()->SetTitleSize(0.06);
@@ -2992,7 +3092,6 @@ namespace lar1{
 
     }
     
-    std::cout << "Check 4\n";
 
 
     if (specialNameText != "") fileNameRoot = fileNameRoot + specialNameText + "_";
@@ -3016,7 +3115,6 @@ namespace lar1{
       // stackedCanvas[i] -> Print(fileName, "eps");
     }
    
-    std::cout << "Check 5\n";
     return 0;
 
   }
