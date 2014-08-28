@@ -11,7 +11,7 @@ namespace larlight {
     fClusterType = DATA::Cluster;
 
     auto geom = ::larutil::Geometry::GetME();
-    fMatchMgr = new ::cmtool::CMatchManager(geom->Nplanes());
+    if(!fMatchMgr) fMatchMgr = new ::cmtool::CMatchManager(geom->Nplanes());
   }
   
   bool ShowerReco3D::initialize() {
@@ -97,19 +97,6 @@ namespace larlight {
 	
       }
 
-      
-      int check=0;
-      for(auto const & iter : clusters)
-      {
-	if(iter.GetNHits() > 20)
-	  check++;
-      }
-	
-	std::cout << " clusters " <<  clusters.size() << " check " << check << std::endl;
-	
-	if(check<=2)
-	  continue;
-	
       // Run algorithm
       larlight::shower result = fShowerAlgo->Reconstruct(clusters);
 
