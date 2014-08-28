@@ -134,12 +134,22 @@ namespace larlight {
 
 	  }
 
+
 	  if(!hit_found) continue;
+
+
+	  //instead of merging hits, try cutting on amplitude
+	  //wes says cut on 6 for collection and 3 for induction
+	  if( (view == ::larlight::GEO::kU && hitq < 3) ||
+	      (view == ::larlight::GEO::kV && hitq < 3) ||
+	      (view == ::larlight::GEO::kW && hitq < 6) ) 
+	    continue;
 
 	  // Create a hit (and association)
 	  // ONLY IF IT DOESN'T OVERLAP AN EXISTING HIT, ELSE MODIFY THAT EXISTING HIT
 	  int overlap_index = DoesHitOverlapExisting(out_hit_v,ch,tdc-(_hitwidth/2),tdc+(_hitwidth/2));
 	  if(overlap_index == -1){
+
 	    ::larlight::hit h;
 	    h.set_wire    ( w    );
 	    h.set_channel ( ch   );
@@ -174,6 +184,7 @@ namespace larlight {
 	  else{
 	    Double_t newstart = std::min(tdc-(_hitwidth/2),out_hit_v->at(overlap_index).StartTime());
 	    Double_t newend   = std::max(tdc+(_hitwidth/2),out_hit_v->at(overlap_index).EndTime());
+	    //to-do: implement weighted average by charge here
 	    Double_t newpeak  = newstart + ((newend-newstart)/2);
 	    Double_t newq     = out_hit_v->at(overlap_index).Charge() + hitq;
 	    out_hit_v->at(overlap_index).set_times(newstart,newpeak,newend);

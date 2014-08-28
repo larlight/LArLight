@@ -27,7 +27,7 @@ mod = fmwk.MCShowerClusterer()
 
 #whether to group overlapping hits into single hit objects. TRUE by default
 #reduces number of hits by a factor of ~10
-#mod.SetGroupOverlappingHits(False)
+mod.SetGroupOverlappingHits(False)
 
 processor.add_process(mod)
 
