@@ -213,6 +213,12 @@ namespace larlight {
       
       }
 
+      if(plane == nplanes) {
+
+	throw ::cluster::ViewerException("No associated hits found!");
+
+	return true;
+      }
       if ( _showStartEnd )
 	_algo.AddCluster(plane,
 			 cluster_hits,
