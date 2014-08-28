@@ -867,8 +867,40 @@ namespace larutil{
   {
     Double_t y,z;
   
-    UInt_t chan1 = geom->PlaneWireToChannel(p0->plane, p0->w/(fWiretoCm));
-    UInt_t chan2 = geom->PlaneWireToChannel(p1->plane, p1->w/(fWiretoCm));
+    // Force to the closest wires if not in the range
+    int z0 = p0->w / fWiretoCm;
+    int z1 = p1-> w/ fWiretoCm;
+    if(z0 < 0) {
+      std::cout << "\033[93mWarning\033[00m \033[95m<<GeometryUtilities::GetYZ>>\033[00m" << std::endl
+		<< " 2D wire position " << p0->w << " [cm] corresponds to negative wire number." << std::endl
+		<< " Forcing it to wire=0..." << std::endl
+		<< "\033[93mWarning ends...\033[00m"<<std::endl;
+      z0 = 0;
+    }
+    else if(z0 >= geom->Nwires(p0->plane)){
+      std::cout << "\033[93mWarning\033[00m \033[95m<<GeometryUtilities::GetYZ>>\033[00m" << std::endl
+		<< " 2D wire position " << p0->w << " [cm] exceeds max wire number " << (geom->Nwires(p0->plane)-1) <<std::endl
+		<< " Forcing it to the max wire number..." << std::endl
+		<< "\033[93mWarning ends...\033[00m"<<std::endl;
+      z0 = geom->Nwires(p0->plane) - 1;
+    }
+    if(z1 < 0) {
+      std::cout << "\033[93mWarning\033[00m \033[95m<<GeometryUtilities::GetYZ>>\033[00m" << std::endl
+		<< " 2D wire position " << p1->w << " [cm] corresponds to negative wire number." << std::endl
+		<< " Forcing it to wire=0..." << std::endl
+		<< "\033[93mWarning ends...\033[00m"<<std::endl;
+      z1 = 0;
+    }
+    if(z1 >= geom->Nwires(p1->plane)){
+      std::cout << "\033[93mWarning\033[00m \033[95m<<GeometryUtilities::GetYZ>>\033[00m" << std::endl
+		<< " 2D wire position " << p1->w << " [cm] exceeds max wire number " << (geom->Nwires(p0->plane)-1) <<std::endl
+		<< " Forcing it to the max wire number..." << std::endl
+		<< "\033[93mWarning ends...\033[00m"<<std::endl;
+      z1 = geom->Nwires(p1->plane) - 1;
+    }
+
+    UInt_t chan1 = geom->PlaneWireToChannel(p0->plane, z0);
+    UInt_t chan2 = geom->PlaneWireToChannel(p1->plane, z1);
 
     if(! geom->ChannelsIntersect(chan1,chan2,y,z) )
       return -1;
@@ -1195,7 +1227,7 @@ namespace larutil{
     std::vector<const larutil::PxHit*> ordered_hits;
     ordered_hits.reserve(hitlist.size());
     for(auto hiter = hitmap.rbegin();
-	qintegral < qtotal*0.95;
+	qintegral < qtotal*0.95 && hiter != hitmap.rend();
 	++hiter) {
 
       qintegral += (*hiter).first;

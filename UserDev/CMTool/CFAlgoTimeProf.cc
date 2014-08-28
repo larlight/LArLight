@@ -18,11 +18,7 @@
 namespace cmtool {
 
   //-------------------------------------------------------
-  CFAlgoTimeProf::CFAlgoTimeProf() : CFloatAlgoBase(),
-				     siga(nullptr),
-				     siginta(nullptr),
-				     sigb(nullptr),
-				     sigintb(nullptr)
+  CFAlgoTimeProf::CFAlgoTimeProf() : CFloatAlgoBase()
   //-------------------------------------------------------
   {
 
@@ -32,12 +28,6 @@ namespace cmtool {
   CFAlgoTimeProf::~CFAlgoTimeProf()
   //-------------------------------
   {
-    if(siga) delete siga;
-    if(sigb) delete sigb;
-    if(siginta) delete siginta;
-    if(sigintb) delete sigintb;
-
-    siga = sigb = siginta = sigintb = nullptr;
   }
 
   //-----------------------------
@@ -90,35 +80,35 @@ namespace cmtool {
 	float tprof12 = -1;
 	if(hits0.size()>0)
 	{
-	pl0 = true;
-		if(hits1.size()>0)
-		{
-		pl1 = true;
-		//we need to do a profile
-		tprof01 =TProfCompare(hits0,hits1);
-		}// hits1size>0
-		if(hits2.size()>0)
-		{
-		pl2 = true;
-		//we need to do a profile
-		tprof02 =TProfCompare(hits0,hits2);
+	  pl0 = true;
+	  if(hits1.size()>0)
+	    {
+	      pl1 = true;
+	      //we need to do a profile
+	      tprof01 =TProfCompare(hits0,hits1);
+	    }// hits1size>0
+	  if(hits2.size()>0)
+	    {
+	      pl2 = true;
+	      //we need to do a profile
+	      tprof02 =TProfCompare(hits0,hits2);
 		}// hits2size>0
 	}// hits0size >0
-
+	
 	if(hits1.size()>0)
-	{
-	pl1 = true;
-		if(hits2.size()>0)
-		{
+	  {
+	    pl1 = true;
+	    if(hits2.size()>0)
+	      {
 		pl2 = true;
 		//we need to do a profile
 		tprof12 =TProfCompare(hits1,hits2);
-		}//hits2.size>0
-	}// hits1size>0
-
+	      }//hits2.size>0
+	  }// hits1size>0
+	
 	// This is going to be slow is we are having to re-calutlate this ever time. For now it will have to do
-
-//	std::cout<< " \t summary of timeprof Planes that are accepted :" <<pl0<<" | " <<pl1<<" | " <<pl2<<" |"<<std::endl;
+	
+	//	std::cout<< " \t summary of timeprof Planes that are accepted :" <<pl0<<" | " <<pl1<<" | " <<pl2<<" |"<<std::endl;
 	std::vector<float> tprofmatches;	
 	std::cout<< " \t                  Value of timeprof(01,02,12) :" <<tprof01<<" | " <<tprof02<<" | " <<tprof12<<" |"<<std::endl;
 	tprofmatches.push_back(tprof01);
@@ -158,54 +148,71 @@ namespace cmtool {
 // Making a function to do the profile test
  float CFAlgoTimeProf::TProfCompare(std::vector<larutil::PxHit> hita ,std::vector<larutil::PxHit> hitb)
  {
-	    int nts = larutil::DetectorProperties::GetME()->NumberTimeSamples()*larutil::GeometryUtilities::GetME()->TimeToCm();
-	// Where is this?
-    //int nplanes = geom->Nplanes();
-    int nplanes = 3;
-    double ks = 0.0;
-    std::vector< std::vector<TH1D*> > signals(nplanes);
-    std::vector< std::vector<TH1D*> > pulses(nplanes);
+   int nts = larutil::DetectorProperties::GetME()->NumberTimeSamples()*larutil::GeometryUtilities::GetME()->TimeToCm();
+   // Where is this?
+   //int nplanes = geom->Nplanes();
+   int nplanes = 3;
+   double ks = 0.0;
+   std::vector< std::vector<TH1D*> > signals(nplanes);
+   std::vector< std::vector<TH1D*> > pulses(nplanes);
+   
+   double time_diff = ( larutil::DetectorProperties::GetME()->GetXTicksOffset(hita.at(0).plane) - 
+			larutil::DetectorProperties::GetME()->GetXTicksOffset(hitb.at(0).plane) ) * larutil::GeometryUtilities::GetME()->TimeToCm();
+   
+   // First go look for the min & max of hits 
+   double min_time = larutil::DetectorProperties::GetME()->NumberTimeSamples()*larutil::GeometryUtilities::GetME()->TimeToCm();
+   double max_time = 0;
+   for(auto const& h : hita) {
+     if(h.t > max_time) max_time = h.t;
+     if(h.t < min_time) min_time = h.t;
+   }
+   for(auto const& h : hitb) {
+     if( (h.t + time_diff) > max_time ) max_time = h.t + time_diff;
+     if( (h.t + time_diff) < min_time ) min_time = h.t + time_diff;
+   }
 
-    // One-time only initialization of class-member histograms
-    if(!siga) siga = new TH1D("sig_a","sig_a",nts,0,nts);
-    siga->Reset();
-      
-    if(!siginta) siginta = new TH1D("sigint_a","sigint_a",nts,0,nts);
-    siginta->Reset();
-      
-    if(!sigb) sigb = new TH1D("sig_b","sig_b",nts,0,nts);
-    sigb->Reset();
-      
-    if(!sigintb) sigintb = new TH1D("sigint_b","sigint_b",nts,0,nts);
-    sigintb = new TH1D("sigint_b","sigint_b",nts,0,nts);
-	 
-// First loop over hits in A and make the hist
-// in this case let's just use plane 0,1
-        for( auto const& ha : hita){
-          double time = ha.t;
-          time -= larutil::DetectorProperties::GetME()->GetXTicksOffset(ha.plane)*larutil::GeometryUtilities::GetME()->TimeToCm();
-          double charge = ha.charge;
-          int bin = siga->FindBin(time);
-          siga->SetBinContent(bin,siga->GetBinContent(bin)+charge);
-          for (int j = bin; j<=siga->GetNbinsX(); ++j){
-            siginta->SetBinContent(j,siginta->GetBinContent(j)+charge);
-          }
-        }
-        if (siginta->Integral()) siginta->Scale(1./siginta->GetBinContent(siginta->GetNbinsX()));
-	for( auto const& hb : hitb){
-          double time = hb.t;
-          time -= larutil::DetectorProperties::GetME()->GetXTicksOffset(hb.plane)*larutil::GeometryUtilities::GetME()->TimeToCm();
-          double charge = hb.charge;
-          int bin = sigb->FindBin(time);
-          sigb->SetBinContent(bin,sigb->GetBinContent(bin)+charge);
-          for (int j = bin; j<=sigb->GetNbinsX(); ++j){
-            sigintb->SetBinContent(j,sigintb->GetBinContent(j)+charge);
-          }
-        }
-        if (sigintb->Integral()) sigintb->Scale(1./sigintb->GetBinContent(sigintb->GetNbinsX()));
-	ks = siginta->KolmogorovTest(sigintb);
+   TH1D histo_a("ha", "", 200, min_time-1, max_time+1);
+   TH1D histo_b("hb", "", 200, min_time-1, max_time+1);
+   TH1D histo_inta("hinta", "", 200, min_time-1, max_time+1);
+   TH1D histo_intb("hintb", "", 200, min_time-1, max_time+1);
 
-	return ks;
+   // First loop over hits in A and make the hist
+   // in this case let's just use plane 0,1
+   for( auto const& ha : hita){
+     double time = ha.t;
+     //time -= larutil::DetectorProperties::GetME()->GetXTicksOffset(ha.plane)*larutil::GeometryUtilities::GetME()->TimeToCm();
+     double charge = ha.charge;
+
+     int bin = histo_a.FindBin(time);
+     histo_a.SetBinContent(bin,histo_a.GetBinContent(bin)+charge);
+     for (int j = bin; j<=histo_a.GetNbinsX(); ++j){
+       histo_inta.SetBinContent(j,histo_inta.GetBinContent(j)+charge);
+     }
+   }
+   if (histo_inta.Integral()) histo_inta.Scale(1./histo_inta.GetBinContent(histo_inta.GetNbinsX()));
+   for( auto const& hb : hitb){
+     double time = hb.t + time_diff;
+     //time -= larutil::DetectorProperties::GetME()->GetXTicksOffset(hb.plane)*larutil::GeometryUtilities::GetME()->TimeToCm();
+     double charge = hb.charge;
+     int bin = histo_b.FindBin(time);
+     histo_b.SetBinContent(bin,histo_b.GetBinContent(bin)+charge);
+     for (int j = bin; j<=histo_b.GetNbinsX(); ++j){
+       histo_intb.SetBinContent(j,histo_intb.GetBinContent(j)+charge);
+     }
+   }
+
+   std::cout 
+     << "siga: "<< histo_a.GetEntries() << std::endl
+     << "sigb: "<< histo_b.GetEntries() << std::endl
+     << "siginta: "<<histo_inta.GetEntries() << std::endl
+     << "sigintb: "<<histo_intb.GetEntries() << std::endl
+     << std::endl;
+
+   if (histo_intb.Integral()) histo_intb.Scale(1./histo_intb.GetBinContent(histo_intb.GetNbinsX()));
+   ks = histo_inta.KolmogorovTest(&histo_intb);
+
+   std::cout<<ks<<std::endl;
+   return ks;
  }
 
   //------------------------------

@@ -1,62 +1,61 @@
 /**
- * \file TmpPi0MassStudy.hh
+ * \file NCfilter.hh
  *
- * \ingroup CMergePerformance
+ * \ingroup NCfilter
  * 
- * \brief Class def header for a class TmpPi0MassStudy
+ * \brief Class def header for a class NCfilter
  *
- * @author davidkaleko
+ * @author ryan
  */
 
-/** \addtogroup CMergePerformance
+/** \addtogroup NCfilter
 
     @{*/
 
-#ifndef TMPPI0MASSSTUDY_HH
-#define TMPPI0MASSSTUDY_HH
+#ifndef NCFILTER_HH
+#define NCFILTER_HH
 
 #include "ana_base.hh"
-#include "ComputePi0Mass.hh"
+#include "LArUtilBase.hh"
+
+
 
 namespace larlight {
   /**
-     \class TmpPi0MassStudy
-     User custom analysis class made by davidkaleko
+     \class NCfilter
+     User custom analysis class made by ryan
    */
-  class TmpPi0MassStudy : public ana_base{
+  class NCfilter : public ana_base{
   
   public:
 
     /// Default constructor
-    TmpPi0MassStudy(){ _name="TmpPi0MassStudy"; _fout=0;};
+    NCfilter() : ana_base() { _name="NCfilter"; }
 
     /// Default destructor
-    virtual ~TmpPi0MassStudy(){};
+    virtual ~NCfilter(){};
 
-    /** IMPLEMENT in TmpPi0MassStudy.cc!
+    /** IMPLEMENT in NCfilter.cc!
         Initialization method to be called before the analysis event loop.
     */ 
     virtual bool initialize();
 
-    /** IMPLEMENT in TmpPi0MassStudy.cc! 
+    /** IMPLEMENT in NCfilter.cc! 
         Analyze a data event-by-event  
     */
     virtual bool analyze(storage_manager* storage);
 
-    /** IMPLEMENT in TmpPi0MassStudy.cc! 
+    /** IMPLEMENT in NCfilter.cc! 
         Finalize method to be called after all events processed.
     */
     virtual bool finalize();
 
-  protected:
+    protected:
 
-    void PrepareAnaTree();
+    private: 
+	std::pair<double,double> HighQSlope(std::vector<unsigned int> hitindex , larlight::event_hit *const hits);
+	std::vector<std::pair<std::vector<unsigned int>,std::vector<unsigned int>>> ForceRegions(larlight::event_hit *const hits, std::vector<std::pair<double,double>> APP);
 
-    TTree* ana_tree;
-
-    float _mass;
-    float _MC_energy;
-    
   };
 }
 #endif

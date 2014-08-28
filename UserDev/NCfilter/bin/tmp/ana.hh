@@ -1,62 +1,54 @@
 /**
- * \file TmpPi0MassStudy.hh
+ * \file Ana_Class_Name.hh
  *
- * \ingroup CMergePerformance
+ * \ingroup Working_Package
  * 
- * \brief Class def header for a class TmpPi0MassStudy
+ * \brief Class def header for a class Ana_Class_Name
  *
- * @author davidkaleko
+ * @author ryan
  */
 
-/** \addtogroup CMergePerformance
+/** \addtogroup Working_Package
 
     @{*/
 
-#ifndef TMPPI0MASSSTUDY_HH
-#define TMPPI0MASSSTUDY_HH
+#ifndef ANA_CLASS_NAME_HH
+#define ANA_CLASS_NAME_HH
 
 #include "ana_base.hh"
-#include "ComputePi0Mass.hh"
 
 namespace larlight {
   /**
-     \class TmpPi0MassStudy
-     User custom analysis class made by davidkaleko
+     \class Ana_Class_Name
+     User custom analysis class made by ryan
    */
-  class TmpPi0MassStudy : public ana_base{
+  class Ana_Class_Name : public ana_base{
   
   public:
 
     /// Default constructor
-    TmpPi0MassStudy(){ _name="TmpPi0MassStudy"; _fout=0;};
+    Ana_Class_Name(){ _name="Ana_Class_Name"; _fout=0;};
 
     /// Default destructor
-    virtual ~TmpPi0MassStudy(){};
+    virtual ~Ana_Class_Name(){};
 
-    /** IMPLEMENT in TmpPi0MassStudy.cc!
+    /** IMPLEMENT in Ana_Class_Name.cc!
         Initialization method to be called before the analysis event loop.
     */ 
     virtual bool initialize();
 
-    /** IMPLEMENT in TmpPi0MassStudy.cc! 
+    /** IMPLEMENT in Ana_Class_Name.cc! 
         Analyze a data event-by-event  
     */
     virtual bool analyze(storage_manager* storage);
 
-    /** IMPLEMENT in TmpPi0MassStudy.cc! 
+    /** IMPLEMENT in Ana_Class_Name.cc! 
         Finalize method to be called after all events processed.
     */
     virtual bool finalize();
 
-  protected:
+    protected:
 
-    void PrepareAnaTree();
-
-    TTree* ana_tree;
-
-    float _mass;
-    float _MC_energy;
-    
   };
 }
 #endif
