@@ -1,5 +1,5 @@
-#ifndef EMPTY_CLASS_NAME_HH
-#define EMPTY_CLASS_NAME_HH
+#ifndef EMPTY_CLASS_NAME_CC
+#define EMPTY_CLASS_NAME_CC
 
 #include "Empty_Class_Name.hh"
 
