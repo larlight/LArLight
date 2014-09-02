@@ -16,7 +16,11 @@
 #define NCFILTER_HH
 
 #include "ana_base.hh"
+#include "DivReg.hh"
+#include "ForceRegions.hh"
+#include "CRUHelper.hh"
 #include "LArUtilBase.hh"
+
 
 
 
@@ -52,11 +56,16 @@ namespace larlight {
 
     protected:
 
+	::cluster::DivReg fDivReg;
+        ::cluster::CRUHelper fCRUHelper;
+        ::cluster::ForceRegions fForceRegions;
+
+
+
     private: 
 	std::pair<double,double> HighQSlope(std::vector<unsigned int> hitindex ,larlight::event_hit const* hits);
-	std::vector<std::pair<std::vector<unsigned int>,std::vector<unsigned int>>> ForceRegions(larlight::event_hit const* hits, 
-												 std::vector<std::pair<double,double>> APP);
-
+	std::vector<std::pair<std::vector<unsigned int>,std::vector<unsigned int>>> ForceRegions(larlight::event_hit const* hits,std::vector<std::pair<double,double>> APP);
+//	std::vector<std::pair<std::vector<unsigned int>,std::vector<unsigned int>>> CheckQuality(larlight::event_hit *const hits,std::vector<std::pair<std::vector<unsigned int>,std::vector<unsigned int>>> protocluster, std::vector<bool> Flags);
   };
 }
 #endif

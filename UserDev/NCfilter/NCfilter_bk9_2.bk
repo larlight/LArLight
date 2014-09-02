@@ -77,13 +77,8 @@ namespace larlight {
 
 //====================Ending with alg===================
 
-	
 // make the regions
-	
-   std::vector<std::pair<std::vector<unsigned int>,std::vector<unsigned int>>>  blah;
-   blah = fForceRegions.ForceTwoRegions(hitsvect, AvgPairSI);
- 
-//   std::vector<std::pair<std::vector<unsigned int>,std::vector<unsigned int>>>  blah = ForcedRegions(hits,AvgPairSI);
+   std::vector<std::pair<std::vector<unsigned int>,std::vector<unsigned int>>>  blah = ForceRegions( hits, AvgPairSI);
     
     std::cout<< "\033[94m lets see what things do  "<< blah[0].first.size()<<"  , \033[00m"<<blah[0].second.size()<<std::endl;
     std::cout<< "\033[95m lets see what things do  "<< blah[1].first.size()<<"  , \033[00m"<<blah[1].second.size()<<std::endl;
@@ -192,6 +187,39 @@ namespace larlight {
 // Adding some fuctions 
 //---------------------
 
+
+//---------------------------------------------------------------------------------------------
+  std::pair<double,double>   NCfilter::HighQSlope(std::vector<unsigned int> hitindex , 
+						  larlight::event_hit const* hits){
+	double T2CM = larutil::GeometryUtilities::GetME()->TimeToCm();	
+	double W2CM = larutil::GeometryUtilities::GetME()->WireToCm();	
+        double totcharge  = 0;
+        double avgcharge = 0;
+        double awiretime=  0;
+        double awire =  0;
+        double atime =  0;
+        double awirewire = 0;
+	int na=0;
+for(auto const& hit_index : hitindex) {
+                totcharge+=hits->at(hit_index).Charge();}
+        avgcharge=totcharge/hitindex.size();
+
+for(auto const& hit_index : hitindex) {
+                if(hits->at(hit_index).Charge()>avgcharge){
+                na+=1;
+                awiretime += hits->at(hit_index).Wire() * hits->at(hit_index).PeakTime()*W2CM*T2CM;
+                awire += hits->at(hit_index).Wire()*W2CM;
+                atime += hits->at(hit_index).PeakTime()*T2CM;
+                awirewire += hits->at(hit_index).Wire()*W2CM*hits->at(hit_index).Wire()*W2CM;
+                                        }//if charge
+                                   }//end of regiona for loop
+	double aroughslope = (na * awiretime - awire * atime)/(na*awirewire-awire*awire);
+	double aroughcept= atime/na - aroughslope *(awire/na);
+	std::pair<double,double> rs(aroughslope,aroughcept);
+	return rs;
+
+	}//endl of QWtSlope func
+  //---------------------------------------------------------------------------------------------
   //---------------------------------------------------------------------------------------------
   std::vector<std::pair<std::vector<unsigned int>,std::vector<unsigned int>>>  NCfilter::ForceRegions(larlight::event_hit const* hits, 
 												      std::vector<std::pair<double,double>> APP){
@@ -216,6 +244,17 @@ namespace larlight {
       if(regionval<0.0000) vectplanepair[cplane].second.push_back(a);
     }// for loop over hit index
     
+    /*
+      if(hit->View()==plane){
+      double regionval= (-slope * hit->WireID().Wire+ hit->PeakTime() - cept) / sqrt(slope*slope +1);
+      if(regionval>0.0000){
+      tra.push_back(hit);}
+      if(regionval<0.0000){
+      trb.push_back(hit);}
+      }
+      }
+      std::pair<std::vector<art::Ptr<recob::Hit> >,std::vector<art::Ptr<recob::Hit> > > tr(tra,trb);
+    */
     return vectplanepair;
     
   }// FOrce Regions

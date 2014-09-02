@@ -52,78 +52,80 @@ namespace larlight {
     Output_cluster->set_run(Incoming_cluster->run());
     Output_cluster->set_subrun(Incoming_cluster->subrun());
     
-
-
-	// Need some bool to check about the quality of the protoclusters
-        // need some flags to see which planes to pursue  clustering in
-        std::vector<bool> flagplanes(3,false);
     int nplanes = larutil::Geometry::GetME()->Nplanes();
     std::vector<std::pair<double,double>> AvgPairSI(nplanes);	
-
-
-
-//============Starting with  first pass alg============
-
-// make a vector of clusters
-	std::vector<larlight::cluster> clustervect;
+    // Need to get the average of the incomming clusters
+    // Everything is in CM space already
+    double S0 = 0;
+    double S1 = 0;
+    double S2 = 0;
+    double I0 = 0;
+    double I1 = 0;
+    double I2 = 0;
+    int count0 = 0;
+    int count1 = 0;
+    int count2 = 0;
     for(auto const& c : *Incoming_cluster) {
-	clustervect.push_back(c);
-	}
-	std::vector<larlight::hit> hitsvect;
-    for(auto const& h : *hits) {
-	hitsvect.push_back(h);
-	}
-	AvgPairSI = fDivReg.SplitLineC(clustervect, hitsvect);
-
-//====================Ending with alg===================
-
-	
-// make the regions
-	
-   std::vector<std::pair<std::vector<unsigned int>,std::vector<unsigned int>>>  blah;
-   blah = fForceRegions.ForceTwoRegions(hitsvect, AvgPairSI);
- 
-//   std::vector<std::pair<std::vector<unsigned int>,std::vector<unsigned int>>>  blah = ForcedRegions(hits,AvgPairSI);
+      auto const& hit_index_array = c.association(hit_type);
+      // only run when we have a cluster of hits greater than
+      if(hit_index_array.size()>15){
+	std::pair<double,double>qws= HighQSlope(hit_index_array, hits);
+	//std::cout<<qws.first<<"  ,   "<<qws.second<<std::endl;
+	if(hits->at(hit_index_array[0]).View()==0){
+	  count0+=1;
+	  S0+=qws.first;
+	  I0+=qws.second;
+	  //std::cout<<" We have a 0 plane "<<std::endl;
+	}// if view ==0
+	if(hits->at(hit_index_array[0]).View()==1){
+	  count1+=1;
+	  S1+=qws.first;
+	  I1+=qws.second;
+	  //std::cout<<" We have a 1 plane "<<std::endl;
+	}// if view ==1	
+	if(hits->at(hit_index_array[0]).View()==2){
+	  count2+=1;
+	  S2+=qws.first;
+	  I2+=qws.second;
+	  //std::cout<<" We have a 2 plane "<<std::endl;
+	}// if view ==2
+      }//  if hits are over 15
+    }// for loop over the incoming clusters
+    
+    if(count0>0){
+      std::pair<double,double>  t0(S0/count0,I0/count0);
+      AvgPairSI[0] = t0;}
+    else{
+      std::pair<double,double> n0(-999,-999);
+      AvgPairSI[0] = n0;}
+    
+    if(count1>0){
+      std::pair<double,double>  t1(S1/count1,I1/count1);
+      AvgPairSI[1] = t1;}
+    else{
+      std::pair<double,double> n1(-999,-999);
+      AvgPairSI[1] = n1;}
+    
+    if(count2>0){
+      std::pair<double,double>  t2(S2/count2,I2/count2);
+      AvgPairSI[2] = t2;}
+    else{
+      std::pair<double,double> n2(-999,-999);
+      AvgPairSI[2] = n2;}
+    std::cout<<" Size of avg pairs"<<AvgPairSI.size()<<std::endl;
+    
+    
+    // Now that we know the average... let's try to force it into two regions
+    std::vector<std::pair<std::vector<unsigned int>,std::vector<unsigned int>>>  blah = ForceRegions( hits, AvgPairSI);
+    
     
     std::cout<< "\033[94m lets see what things do  "<< blah[0].first.size()<<"  , \033[00m"<<blah[0].second.size()<<std::endl;
     std::cout<< "\033[95m lets see what things do  "<< blah[1].first.size()<<"  , \033[00m"<<blah[1].second.size()<<std::endl;
     std::cout<< "\033[96m lets see what things do  "<< blah[2].first.size()<<"  , \033[00m"<<blah[2].second.size()<<std::endl;
-//Thatt 
-	// build in a quality check
-// Need to now check what we have?
-// if the force reg failed try new approach.
-
-// first check that each region has more than a certain amount of hits
-// This can be a function to check over all of the planes 
-
-        //============================ 
-
-// firstpass is a vector of pairs that has the hit ass index in them... so these are effectivly clusters of hits. 
-
-
-
-
-
-        //============================ 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    // Lets fill these hits out into clusters. 
+    
+    
+    // Lets fill these hits out into clusters. o
+    
     
     for( unsigned int a=0 ; a<blah.size();a++){
 
@@ -192,6 +194,39 @@ namespace larlight {
 // Adding some fuctions 
 //---------------------
 
+
+//---------------------------------------------------------------------------------------------
+  std::pair<double,double>   NCfilter::HighQSlope(std::vector<unsigned int> hitindex , 
+						  larlight::event_hit const* hits){
+	double T2CM = larutil::GeometryUtilities::GetME()->TimeToCm();	
+	double W2CM = larutil::GeometryUtilities::GetME()->WireToCm();	
+        double totcharge  = 0;
+        double avgcharge = 0;
+        double awiretime=  0;
+        double awire =  0;
+        double atime =  0;
+        double awirewire = 0;
+	int na=0;
+for(auto const& hit_index : hitindex) {
+                totcharge+=hits->at(hit_index).Charge();}
+        avgcharge=totcharge/hitindex.size();
+
+for(auto const& hit_index : hitindex) {
+                if(hits->at(hit_index).Charge()>avgcharge){
+                na+=1;
+                awiretime += hits->at(hit_index).Wire() * hits->at(hit_index).PeakTime()*W2CM*T2CM;
+                awire += hits->at(hit_index).Wire()*W2CM;
+                atime += hits->at(hit_index).PeakTime()*T2CM;
+                awirewire += hits->at(hit_index).Wire()*W2CM*hits->at(hit_index).Wire()*W2CM;
+                                        }//if charge
+                                   }//end of regiona for loop
+	double aroughslope = (na * awiretime - awire * atime)/(na*awirewire-awire*awire);
+	double aroughcept= atime/na - aroughslope *(awire/na);
+	std::pair<double,double> rs(aroughslope,aroughcept);
+	return rs;
+
+	}//endl of QWtSlope func
+  //---------------------------------------------------------------------------------------------
   //---------------------------------------------------------------------------------------------
   std::vector<std::pair<std::vector<unsigned int>,std::vector<unsigned int>>>  NCfilter::ForceRegions(larlight::event_hit const* hits, 
 												      std::vector<std::pair<double,double>> APP){
@@ -216,47 +251,20 @@ namespace larlight {
       if(regionval<0.0000) vectplanepair[cplane].second.push_back(a);
     }// for loop over hit index
     
+    /*
+      if(hit->View()==plane){
+      double regionval= (-slope * hit->WireID().Wire+ hit->PeakTime() - cept) / sqrt(slope*slope +1);
+      if(regionval>0.0000){
+      tra.push_back(hit);}
+      if(regionval<0.0000){
+      trb.push_back(hit);}
+      }
+      }
+      std::pair<std::vector<art::Ptr<recob::Hit> >,std::vector<art::Ptr<recob::Hit> > > tr(tra,trb);
+    */
     return vectplanepair;
     
   }// FOrce Regions
-
- 
-  //---------------------------------------------------------------------------------------------
-  //---------------------------------------------------------------------------------------------
-
-/*
-std::vector<std::pair<std::vector<unsigned int>,std::vector<unsigned int>>>  NCfilter::CheckQuality(larlight::event_hit *const hits,std::vector<std::pair<std::vector<unsigned int>,std::vector<unsigned int>>> protocluster, std::vector<bool> Flags){
-
-
-        // First Check based on bool.... if there is already a bool? Might not need this in here... Should do it in the code to fill clusters
-	fucnflag0= false;
-	fucnflag1= false;
-	fucnflag2= false;
-	
-	
-
-        // Checking the time profile
-        for( unsigned int a=0 ; a<protocluster.size();a++){
-
-
-                for(unsigned int k =0 ; k<protocluster[a].first.size(); k++){
-
-
-                                }// protocluster for loop over a first cluster  
-
-                }// for loop over protocluster
-
-
-	}// End of Check Quality Func
-
-*/
-
-
-
-
-
-
-
 
 }
 #endif
