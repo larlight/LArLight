@@ -171,20 +171,26 @@ namespace larlight {
     while(status){
       
       status=process_event();
-      
-      if(nevents && nevents < _nevents){
-	Message::send(MSG::NORMAL,__FUNCTION__,Form("Processed %d/%d events! Aborting...",_nevents,nevents));
-	finalize();
-	break;
-      }
-      
-      if(nevents > 10 && (_nevents >= ten_percent_ctr * nevents/10)) {
-	
-	sprintf(_buf," ... %3d%% done ...",ten_percent_ctr*10);
-	Message::send(MSG::NORMAL,__FUNCTION__,_buf);
+
+      if( nevents >= 10 && (_nevents >= ten_percent_ctr * nevents/10.) ) {
+
+	if(ten_percent_ctr) {
+	  sprintf(_buf," ... %3d%% done ...",ten_percent_ctr*10);
+	  Message::send(MSG::NORMAL,__FUNCTION__,_buf);
+	}
 	ten_percent_ctr++;
       }
       
+      if(nevents && nevents == _nevents){
+	Message::send(MSG::NORMAL,__FUNCTION__,Form("Processed %d/%d events! Aborting...",_nevents,nevents));
+
+	_storage->next_event();
+	
+	status = finalize();
+
+	break;
+      }
+            
       if(_process!=PROCESSING) break;
       
     }
