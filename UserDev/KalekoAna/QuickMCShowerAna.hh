@@ -1,9 +1,9 @@
 /**
- * \file QuicMCShowerAna.hh
+ * \file QuickMCShowerAna.hh
  *
  * \ingroup KalekoAna
  * 
- * \brief Class def header for a class QuicMCShowerAna
+ * \brief Class def header for a class QuickMCShowerAna
  *
  * @author davidkaleko
  */
@@ -19,30 +19,30 @@
 
 namespace kaleko {
   /**
-     \class QuicMCShowerAna
+     \class QuickMCShowerAna
      User custom analysis class made by davidkaleko
    */
-  class QuicMCShowerAna : public larlight::ana_base{
+  class QuickMCShowerAna : public larlight::ana_base{
   
   public:
 
     /// Default constructor
-    QuicMCShowerAna(){ _name="QuicMCShowerAna"; _fout=0;};
+    QuickMCShowerAna(){ _name="QuickMCShowerAna"; _fout=0;};
 
     /// Default destructor
-    virtual ~QuicMCShowerAna(){};
+    virtual ~QuickMCShowerAna(){};
 
-    /** IMPLEMENT in QuicMCShowerAna.cc!
+    /** IMPLEMENT in QuickMCShowerAna.cc!
         Initialization method to be called before the analysis event loop.
     */ 
     virtual bool initialize();
 
-    /** IMPLEMENT in QuicMCShowerAna.cc! 
+    /** IMPLEMENT in QuickMCShowerAna.cc! 
         Analyze a data event-by-event  
     */
     virtual bool analyze(larlight::storage_manager* storage);
 
-    /** IMPLEMENT in QuicMCShowerAna.cc! 
+    /** IMPLEMENT in QuickMCShowerAna.cc! 
         Finalize method to be called after all events processed.
     */
     virtual bool finalize();

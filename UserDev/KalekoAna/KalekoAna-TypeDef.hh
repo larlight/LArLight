@@ -11,7 +11,7 @@
 #include "QuickClusterAna.hh"
 #include "MCShowerStudy.hh"
 #include "tmpClusterAna.hh"
-#include "QuicMCShowerAna.hh"
+#include "QuickMCShowerAna.hh"
 //ADD_NEW_HEADER
 
 // Class forward declaration here
@@ -20,7 +20,7 @@ namespace kaleko {
   class UtilFunctions;
   class QuickClusterAna;
   class tmpClusterAna;
-  class QuicMCShowerAna;
+  class QuickMCShowerAna;
   //ADD_ANA_CLASS
 }
 

@@ -16,7 +16,7 @@
 #pragma link C++ class larlight::MCShowerStudy+;
 
 #pragma link C++ class kaleko::tmpClusterAna+;
-#pragma link C++ class kaleko::QuicMCShowerAna+;
+#pragma link C++ class kaleko::QuickMCShowerAna+;
 //ADD_NEW_CLASS
 #endif
 

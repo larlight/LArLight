@@ -25,10 +25,10 @@ fmwk.storage_manager.get().set_in_rootdir("scanner")
 my_proc.set_io_mode(fmwk.storage_manager.READ)
 
 # Specify output root file name
-my_proc.set_ana_output_file("QuicMCShowerAna_ana_out.root");
+my_proc.set_ana_output_file("QuickMCShowerAna_ana_out.root");
 
 # Attach a template process
-my_ana= kaleko.QuicMCShowerAna()
+my_ana= kaleko.QuickMCShowerAna()
 my_proc.add_process(my_ana)
 
 print

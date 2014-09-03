@@ -1,11 +1,11 @@
 #ifndef QUICMCSHOWERANA_CC
 #define QUICMCSHOWERANA_CC
 
-#include "QuicMCShowerAna.hh"
+#include "QuickMCShowerAna.hh"
 
 namespace kaleko {
 
-  bool QuicMCShowerAna::initialize() {
+  bool QuickMCShowerAna::initialize() {
     
     _ana_tree=0;
     PrepareTTree();
@@ -13,7 +13,7 @@ namespace kaleko {
     return true;
   }
   
-  bool QuicMCShowerAna::analyze(larlight::storage_manager* storage) {
+  bool QuickMCShowerAna::analyze(larlight::storage_manager* storage) {
     
     ClearTTreeVars();
     
@@ -51,7 +51,7 @@ namespace kaleko {
 
   }
 
-  bool QuicMCShowerAna::finalize() {
+  bool QuickMCShowerAna::finalize() {
 
     if(_fout) {
       
@@ -68,7 +68,7 @@ namespace kaleko {
     return true;
   }
   
-  void QuicMCShowerAna::PrepareTTree() {
+  void QuickMCShowerAna::PrepareTTree() {
 
 
     if(!_ana_tree) {
@@ -80,7 +80,7 @@ namespace kaleko {
     }
   }
 
-  void QuicMCShowerAna::ClearTTreeVars() {
+  void QuickMCShowerAna::ClearTTreeVars() {
 
     _mom_energy = -1.;
     _reco_energy = -1.;
