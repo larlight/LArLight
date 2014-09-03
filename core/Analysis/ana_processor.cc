@@ -104,6 +104,10 @@ namespace larlight {
   }
   
   Bool_t ana_processor::process_event(UInt_t index){
+
+    if(index == DATA::INVALID_UINT) index = _index;
+
+    _index = index;
     
     if(_process==INIT) {
       
@@ -118,7 +122,7 @@ namespace larlight {
     if(_process==READY)
       _process=PROCESSING;
     
-    Bool_t event_found = index ? _storage->go_to(index) : _storage->next_event();
+    bool event_found = _storage->go_to(index);
     
     if(event_found){
 
@@ -155,22 +159,19 @@ namespace larlight {
     
     _index=start_index;
     
-    if(start_index)
-      _storage->go_to(start_index);
-    
     if(!nevents)
       nevents=_storage->get_entries();
-    if(nevents > (_storage->get_entries() - start_index))
-      nevents=_storage->get_entries() - start_index;
+    if(nevents > (_storage->get_entries() - _index))
+      nevents=_storage->get_entries() - _index;
     
-    sprintf(_buf,"Processing %d events from entry %d...",nevents, start_index);
+    sprintf(_buf,"Processing %d events from entry %d...",nevents, _index);
     Message::send(MSG::NORMAL,__FUNCTION__,_buf);
     
     int ten_percent_ctr=0;
     
     while(status){
       
-      status=process_event();
+      status=process_event(_index);
 
       if( nevents >= 10 && (_nevents >= ten_percent_ctr * nevents/10.) ) {
 

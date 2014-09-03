@@ -83,7 +83,7 @@ namespace larlight {
     Bool_t run(UInt_t start_index=0, UInt_t nevents=0);
     
     /// A method to process just one event.
-    Bool_t process_event(UInt_t index=0);
+    Bool_t process_event(UInt_t index=DATA::INVALID_UINT);
     
     /// A method to append analysis class instance. Returns index number.
     Size_t add_process(ana_base* ana){_analyzers.push_back(ana); return _analyzers.size()-1;}
