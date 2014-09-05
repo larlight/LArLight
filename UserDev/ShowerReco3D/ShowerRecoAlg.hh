@@ -14,19 +14,16 @@
 #ifndef SHOWERRECOALG_HH
 #define SHOWERRECOALG_HH
 
-#include <iostream>
-#include "shower.hh"
-#include "CMatchManager.hh"
+#include "ShowerRecoAlgBase.hh"
 #include "CalorimetryAlg.hh"
-
-namespace shower {
+namespace showerreco {
   
   /**
      \class ShowerRecoAlg
      User defined class ShowerRecoAlg ... these comments are used to generate
      doxygen documentation!
   */
-  class ShowerRecoAlg{
+  class ShowerRecoAlg : public ShowerRecoAlgBase{
     
   public:
     
@@ -37,18 +34,19 @@ namespace shower {
     virtual ~ShowerRecoAlg(){}
 
     /// Function to reset algorithm, to be called @ beginning of each event
-    void Reset(){}
+    virtual void Reset(){}
 
     /// Function to reconstruct a shower
-    ::larlight::shower Reconstruct(const std::vector< ::cluster::ClusterParamsAlgNew>& );
-    
+    virtual ::larlight::shower Reconstruct(const std::vector< ::cluster::ClusterParamsAlg>& );
+
   protected:
 
    ::calo::CalorimetryAlg fCaloAlg;
 
-   larutil::GeometryUtilities  *fGSer;
+    larutil::GeometryUtilities  *fGSer;
    
   private:
+    
    std::vector < larutil::PxPoint > fStartPoint;    // for each plane
    std::vector < larutil::PxPoint > fEndPoint;    // for each plane
    std::vector < double > fOmega2D;    // for each plane

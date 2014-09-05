@@ -17,7 +17,7 @@
 
 #include "preco_algo_base.hh"
 
-namespace larlight {
+namespace optreco {
 
   /**
      \class algo_fixed_window
@@ -37,14 +37,8 @@ namespace larlight {
     /// Default destructor
     virtual ~algo_fixed_window(){};
 
-    /**
-       A method to return the storage event_pulse type enum.
-       This one returns DATA::XXXPulse_FixedWin
-    */
-    virtual DATA::DATA_TYPE storage_type(){return (_tpc_input ? DATA::TPCPulse_FixedWin : DATA::PMTPulse_FixedWin);}
-
     /// Implementation of preco_algo_base::reco() method
-    virtual bool reco(const std::vector<UShort_t> *wf);
+    virtual bool reco(const std::vector<unsigned short> &wf);
 
     /// Implementation of preco_algo_base::reset() method
     virtual void reset();

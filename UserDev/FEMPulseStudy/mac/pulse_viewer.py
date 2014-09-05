@@ -3,23 +3,25 @@ import ROOT,sys
 ROOT.gSystem.Load("libAnalysis")
 
 from ROOT import *
-
+from ROOT import larlight as fmwk
 def main(pv_ptr) :
 
-    proc=ana_processor()
+    proc=fmwk.ana_processor()
 
     #    proc.set_verbosity(MSG.DEBUG)
 
     proc.set_ana_output_file("ana.root")
     
-    proc.set_io_mode(storage_manager.READ)
+    proc.set_io_mode(fmwk.storage_manager.READ)
     
-    proc.set_data_to_read(DATA_STRUCT.PULSE_COLLECTION)
-    proc.set_data_to_read(DATA_STRUCT.FIXED_WIN_PULSE_COLLECTION)
-    proc.set_data_to_read(DATA_STRUCT.THRES_WIN_PULSE_COLLECTION)
+#    proc.set_data_to_read(fmwk.DATA.Pulse)
+#    proc.set_data_to_read(fmwk.DATA.PMTPulse_FixedWin)
+    proc.set_data_to_read(fmwk.DATA.PMTPulse_ThresWin)
 
     proc.add_input_file(sys.argv[1])
     
+    proc.set_ana_output_file("")
+
     proc.add_process(pv_ptr)
 
     while 1:
@@ -31,7 +33,7 @@ def main(pv_ptr) :
         # get list of channels that got a pulse
         ch = pv_ptr.next_channel()
             
-        while not ch==PMT.INVALID_CH:
+        while not ch==fmwk.FEM.INVALID_CH:
                 
             for x in xrange(pv_ptr.get_npulse(ch)):
                 print "pulse %d/%d" % (x+1,pv_ptr.get_npulse(ch))
@@ -191,5 +193,5 @@ if __name__=="__main__":
 
     user_input=sys.stdin.readline()
 
-    pv_ptr=pulse_viewer()
+    pv_ptr=fmwk.pulse_viewer()
     main(pv_ptr)

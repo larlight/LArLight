@@ -29,10 +29,14 @@ namespace cmtool {
   */
   class CMatchManager : public CMManagerBase {
 
-  public:
-    
-    /// Default constructor
+  private:
+
+    /// Default constructor is private because we need an argument to configure w/ # planes in the detector
     CMatchManager();
+
+  public:
+
+    CMatchManager(size_t nplanes);
     
     /// Default destructor
     virtual ~CMatchManager(){}
@@ -74,6 +78,9 @@ namespace cmtool {
 
     /// Merging algorithm
     ::cmtool::CFloatAlgoBase* _match_algo;
+
+    /// Number of planes
+    size_t _nplanes;
 
   };
 }

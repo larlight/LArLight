@@ -71,10 +71,13 @@ namespace larlight{
     void DrawTwoClusters(UChar_t plane, size_t index1, size_t index2) {_algo.DrawTwoClusters(plane,index1,index2);}
 
     /// Function to decide if to show MCshowers or hit-charge
-    void ShowShowers(bool on);
+    void SetDrawShowers(bool on);
 
     /// A function to decide if the hits COLZ canvas should be shown in log-z scale
     void SetHitsLogZ(bool flag);
+
+    /// A function to decide if to show start & end points
+    void SetDrawStartEnd(bool on) { _showStartEnd = on; }
 
   protected:
     /// Type of cluster to view
@@ -91,6 +94,7 @@ namespace larlight{
     std::map<UShort_t,larlight::simch> _simch_map;
     bool _showerColor;
     bool _hits_log_z;
+    bool _showStartEnd; /// decide if tho show start and end points
   };
   
 }

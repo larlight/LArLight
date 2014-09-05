@@ -22,8 +22,8 @@ namespace cmtool {
   }//end reconfigure function
 
   
-  bool CBAlgoPolyOverlap::Bool(const ::cluster::ClusterParamsAlgNew &cluster1,
-			       const ::cluster::ClusterParamsAlgNew &cluster2)
+  bool CBAlgoPolyOverlap::Bool(const ::cluster::ClusterParamsAlg &cluster1,
+			       const ::cluster::ClusterParamsAlg &cluster2)
   {
 
     if( (cluster1.GetParams().N_Hits < _min_hits) ||

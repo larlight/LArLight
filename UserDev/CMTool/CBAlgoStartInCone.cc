@@ -29,8 +29,8 @@ namespace cmtool {
   }//end reconfigure function
 
   
-  bool CBAlgoStartInCone::Bool(const ::cluster::ClusterParamsAlgNew &cluster1,
-			       const ::cluster::ClusterParamsAlgNew &cluster2)
+  bool CBAlgoStartInCone::Bool(const ::cluster::ClusterParamsAlg &cluster1,
+			       const ::cluster::ClusterParamsAlg &cluster2)
   {
 
     //apply filter on hit number and length immediately

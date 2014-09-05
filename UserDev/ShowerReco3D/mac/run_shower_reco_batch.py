@@ -42,16 +42,18 @@ my_proc.set_data_to_read(fmwk.DATA.Shower,False)
 # Create analysis unit
 ana_unit = fmwk.ShowerReco3D()
 
+# Attach shower reco alg
+ana_unit.SetShowerAlgo(showerreco.ShowerRecoAlg())
+
+# Specify cluster type
+ana_unit.SetClusterType(fmwk.DATA.Cluster)
+
 # 
 # Attach Matching algorithm
 #
-
-match_viewer = fmwk.MatchViewer()
-
 priority_algo = cmtool.CPAlgoNHits()
 priority_algo.SetMinHits(20)
-match_viewer.GetManager().AddPriorityAlgo(priority_algo)
-
+ana_unit.GetManager().AddPriorityAlgo(priority_algo)
 
 #Andrzej: The algorithms below are ranked by their effectiveness-- TimeOverlap is best, 
 #then 3DAngle, then StartPoint . Right now, only TimeOverlap is called.

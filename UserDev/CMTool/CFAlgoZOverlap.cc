@@ -20,9 +20,16 @@ namespace cmtool {
   }
 
   //----------------------------------------------------------------------------------------------
-  float CFAlgoZOverlap::Float(const std::vector<const cluster::ClusterParamsAlgNew*> &clusters)
+  float CFAlgoZOverlap::Float(const std::vector<const cluster::ClusterParamsAlg*> &clusters)
   //----------------------------------------------------------------------------------------------
   {
+    // Code-block by Kazu starts
+    // This ensures all entries in "clusters" pointer vector are valid pointers.
+    // You may take out this block if you want to allow matching using clusters from only 2 planes.
+    // But make sure you handle the case of null pointer
+    for(auto const& ptr : clusters) if(!ptr) return -1;
+    // Code-block by Kazu ends
+
 
 	double wire_distance 		= 0;
 	double ratio 				= 1;

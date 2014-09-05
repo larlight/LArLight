@@ -16,7 +16,7 @@
 
 #include <iostream>
 #include "storage_manager.hh"
-#include "ClusterParamsAlgNew.hh"
+#include "ClusterParamsAlg.hh"
 
 namespace cluster {
 
@@ -37,17 +37,17 @@ namespace cluster {
     virtual ~CRUHelper(){};
 
     /// Generate: from 1 set of hits => 1 CPAN using indexes (association)
-    void GenerateCPAN(const std::vector<unsigned short>& hit_index,
+    void GenerateCPAN(const std::vector<unsigned int>& hit_index,
 		      const larlight::event_hit* hits,
-		      ClusterParamsAlgNew &cpan) const;
+		      ClusterParamsAlg &cpan) const;
     
     /// Generate: CPAN vector from event storage by specifying cluster type
     void GenerateCPAN(larlight::storage_manager* storage,
 		      const larlight::DATA::DATA_TYPE cluster_type,
-		      std::vector<cluster::ClusterParamsAlgNew> &cpan_v) const;
+		      std::vector<cluster::ClusterParamsAlg> &cpan_v) const;
 
     /// Generate: from 1 set of hits => 1 set of PxHits using indexes (association)
-    void GeneratePxHit(const std::vector<unsigned short>& hit_index,
+    void GeneratePxHit(const std::vector<unsigned int>& hit_index,
 		       const larlight::event_hit* hits,
 		       std::vector<larutil::PxHit> &pxhits) const;
 

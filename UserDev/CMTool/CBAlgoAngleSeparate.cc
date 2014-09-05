@@ -18,8 +18,8 @@ namespace cmtool {
   }
 
   //--------------------------------------------------------
-  bool CBAlgoAngleSeparate::Bool(const ::cluster::ClusterParamsAlgNew &cluster1,
-				 const ::cluster::ClusterParamsAlgNew &cluster2)
+  bool CBAlgoAngleSeparate::Bool(const ::cluster::ClusterParamsAlg &cluster1,
+				 const ::cluster::ClusterParamsAlg &cluster2)
   //--------------------------------------------------------
   {
 

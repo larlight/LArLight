@@ -35,11 +35,11 @@ namespace cmtool {
     virtual ~CBAlgoAngleSeparate(){};
  
     /**
-       Core function: given the ClusterParamsAlgNew input, return whether a cluster should be
+       Core function: given the ClusterParamsAlg input, return whether a cluster should be
        merged or not.
     */
-    virtual bool Bool(const ::cluster::ClusterParamsAlgNew &cluster1,
-		      const ::cluster::ClusterParamsAlgNew &cluster2);
+    virtual bool Bool(const ::cluster::ClusterParamsAlg &cluster1,
+		      const ::cluster::ClusterParamsAlg &cluster2);
 
     /// Set Debug Mode on or off
     void SetDebug(bool on) { _debug = on; }

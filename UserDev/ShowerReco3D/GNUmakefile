@@ -36,5 +36,3 @@ CINTFLAGS += "-p "
 # call the common GNUmakefile
 include $(MAKE_TOP_DIR)/Makefile/GNUmakefile.CORE
 
-
-

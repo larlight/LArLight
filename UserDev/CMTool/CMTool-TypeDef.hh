@@ -59,6 +59,7 @@
 #include "CFAlgo3DAngle.hh"
 #include "CFAlgoWireOverlap.hh"
 #include "CFAlgoVolumeOverlap.hh"
+#include "CFAlgoTimeProf.hh"
 //ADD_CFALGO_HEADER
 
 #include "MatchViewer.hh"
@@ -69,9 +70,8 @@
 #include "ClusterViewer.hh"
 #include "ClusterMerger.hh"
 #include "ClusterMatcher.hh"
-#include "MCShowerQuality.hh"
 #include "MergeViewer.hh"
-#include "MCShowerClusterViewer.hh"
+//#include "MCShowerClusterViewer.hh"
 
 // Class forward declaration here
 namespace cmtool {
@@ -127,6 +127,7 @@ namespace cmtool {
   class CFAlgo3DAngle;
   class CFAlgoWireOverlap;
   class CFAlgoVolumeOverlap;
+  class CFAlgoTimeProf;
 //ADD_CFALGO_CLASS ... do not change this comment line
 
 }
@@ -140,11 +141,10 @@ namespace larlight {
 
   class ClusterMerger;
   class ClusterMatcher;
-  class MCShowerQuality;
 
   class ClusterViewer;
   class MergeViewer;
-  class MCShowerClusterCiewer;
+  //  class MCShowerClusterViewer;
   class MatchViewer;
 //ADD_ANA_CLASS ... do not change this comment line
 }

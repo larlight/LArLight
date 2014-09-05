@@ -27,9 +27,16 @@ my_proc.set_ana_output_file("")
 raw_viewer   = larlight.ClusterViewer()
 match_viewer = larlight.MatchViewer()
 
+
+########################################
+# decide what to show on display
+########################################
+raw_viewer.SetDrawShowers(False)
+raw_viewer.SetDrawStartEnd(False)
+
 match_viewer.SetPrintClusterInfo(True)
 #Show Showers: requires MC info in hadded files
-match_viewer.ShowShowers(False)
+match_viewer.SetDrawShowers(False)
 
 ########################################
 # attach match algos here

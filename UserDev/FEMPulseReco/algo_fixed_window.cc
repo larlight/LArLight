@@ -3,7 +3,7 @@
 
 #include "algo_fixed_window.hh"
 
-namespace larlight {
+namespace optreco {
 
   //***************************************************************
   algo_fixed_window::algo_fixed_window() : preco_algo_base() {
@@ -29,9 +29,9 @@ namespace larlight {
 
   }
 
-  //***************************************************************
-  bool algo_fixed_window::reco(const std::vector<UShort_t> *wf) {
-  //***************************************************************
+  //*******************************************************************
+  bool algo_fixed_window::reco(const std::vector<unsigned short> &wf) {
+  //*******************************************************************
 
     this->reset();
 
@@ -39,7 +39,7 @@ namespace larlight {
 
     if(!_index_end)
 
-      _pulse_v[0].t_end = (double)(wf->size() - 1);
+      _pulse_v[0].t_end = (double)(wf.size() - 1);
 
     else
 

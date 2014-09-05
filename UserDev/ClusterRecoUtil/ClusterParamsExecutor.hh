@@ -15,7 +15,7 @@
 #define CLUSTERPARAMSEXECUTOR_HH
 
 #include "ana_base.hh"
-#include "ClusterParamsAlgNew.hh"
+#include "ClusterParamsAlg.hh"
 #include "Geometry.hh"
 #include <TH2D.h>
 #include <TF1.h>
@@ -27,7 +27,7 @@ namespace cluster {
      User defined class ClusterParamsExecutor ... these comments are used to generate
      doxygen documentation!
   */
-  class ClusterParamsExecutor : public ClusterParamsAlgNew {
+  class ClusterParamsExecutor : public ClusterParamsAlg {
     
   public:
     
@@ -35,7 +35,7 @@ namespace cluster {
     ClusterParamsExecutor();
 
     ClusterParamsExecutor(const ClusterParamsExecutor& orig)
-      : ::cluster::ClusterParamsAlgNew::ClusterParamsAlgNew(orig),
+      : ::cluster::ClusterParamsAlg::ClusterParamsAlg(orig),
         hCurrentHit(nullptr),
         hHit(),
         _useHitBlurring(orig._useHitBlurring),

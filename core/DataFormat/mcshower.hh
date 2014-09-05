@@ -41,21 +41,11 @@ namespace larlight {
 				       fMotherMomentum(origin.fMotherMomentum),
 				       fMotherPhi(origin.fMotherPhi),
 				       fMotherTheta(origin.fMotherTheta),
-				       fMotherAngleU(origin.fMotherAngleU),
-				       fMotherAngleV(origin.fMotherAngleV),
-				       fMotherAngleW(origin.fMotherAngleW),
 				       fDaughterTrackID(origin.fDaughterTrackID),
 				       fDaughterVtx(origin.fDaughterVtx),
 				       fDaughterMomentum(origin.fDaughterMomentum),
                                        fDaughterPhi(origin.fDaughterPhi),
-                                       fDaughterTheta(origin.fDaughterTheta),
-				       fDaughterAngleU(origin.fDaughterAngleU),
-				       fDaughterAngleV(origin.fDaughterAngleV),
-                                       fDaughterAngleW(origin.fDaughterAngleW),
-                                       fChargeU(origin.fChargeU),
-                                       fChargeV(origin.fChargeV),
-                                       fChargeW(origin.fChargeW),
-                                       fEdepVtx(origin.fEdepVtx)
+                                       fDaughterTheta(origin.fDaughterTheta)
     {}
 
     /// Clear method
@@ -79,9 +69,6 @@ namespace larlight {
     void MotherAngle3D (Double_t &phi, Double_t &theta) const
     { phi = fMotherPhi; theta = fMotherTheta;}
 
-    /// Shower mother's 2D angle
-    Double_t MotherAngle2D(const GEO::View_t view) const;
-
     /// Array of daughters' track ID
     const std::vector<UInt_t>&  DaughterTrackID() const
     { return fDaughterTrackID; }
@@ -98,24 +85,16 @@ namespace larlight {
     void DaughterAngle3D(Float_t &phi, Float_t &theta) const
     { phi = fDaughterPhi; theta = fDaughterTheta; }
 
-    /// Daughter's 2D angle
-    Float_t DaughterAngle2D(const GEO::View_t view) const;
-
     /// Charge deposited by daughters per plane
-    Float_t Charge(const GEO::View_t view) const;
-
-    /// Dauighter Charge Deposition Points
-    const std::vector<std::vector<Float_t> >& DaughterPoints() const
-    { return fEdepVtx; }
-    
+    Float_t Charge(const size_t plane) const;
 
     //--- Setters ---//
 
     void SetMotherID(Int_t pdgid, UInt_t trackid)
     { fMotherPDGID = pdgid; fMotherTrackID = trackid; }
 
-    void SetMotherAngles(Double_t phi, Double_t theta, Double_t u, Double_t v, Double_t w)
-    { fMotherPhi = phi; fMotherTheta = theta; fMotherAngleU = u; fMotherAngleV = v; fMotherAngleW = w; }
+    void SetMotherAngles(Double_t phi, Double_t theta)
+    { fMotherPhi = phi; fMotherTheta = theta; }
 
     void SetMotherPoint(const std::vector<Double_t> &vtx);
 
@@ -128,15 +107,11 @@ namespace larlight {
     void SetDaughterTrackList(const std::vector<UInt_t> &list)
     { fDaughterTrackID = list; }
 
-    void SetDaughterAngles(Double_t phi, Double_t theta, Double_t u, Double_t v, Double_t w)
-    { fDaughterPhi = phi; fDaughterTheta = theta; fDaughterAngleU = u; fDaughterAngleV = v; fDaughterAngleW = w; }
+    void SetDaughterAngles(Double_t phi, Double_t theta)
+    { fDaughterPhi = phi; fDaughterTheta = theta; }
 
-    void SetPlaneCharge(Float_t qU, Float_t qV, Float_t qW)
-    { fChargeU = qU; fChargeV = qV; fChargeW = qW; }
-
-    void AddEdepVtx(const std::vector<Float_t>& vtx);
-
-    void SetEdepVtx(const std::vector<std::vector<Float_t> >& vtx);
+    void SetPlaneCharge(const std::vector<Float_t>& q)
+    { fPlaneCharge = q; }
 
   private:
 
@@ -149,12 +124,6 @@ namespace larlight {
     Double_t fMotherPhi;
     /// mother 3D angle theta (along shower angle definition, not ordinary coord. system)
     Double_t fMotherTheta;
-    /// mother 2D angle on U-plane
-    Double_t fMotherAngleU;
-    /// mother 2D angle on V-plane
-    Double_t fMotherAngleV;
-    /// mother 2D angle on W-plane
-    Double_t fMotherAngleW;
 
     //---- Daughter info ----//
     std::vector<UInt_t>  fDaughterTrackID;  ///< Daughters' track ID
@@ -164,23 +133,12 @@ namespace larlight {
     Float_t fDaughterPhi;
     /// daughter 3D angle theta (along shower angle definition, not ordinary coord. system)
     Float_t fDaughterTheta;
-    /// daughter 2D angle on U-plane
-    Float_t fDaughterAngleU;
-    /// daughter 2D angle on V-plane
-    Float_t fDaughterAngleV;
-    /// daughter 2D angle on W-plane
-    Float_t fDaughterAngleW;
 
     //---- Charge per plane ----//
-    Float_t fChargeU; ///< Charge deposit on U plane
-    Float_t fChargeV; ///< Charge deposit on V plane
-    Float_t fChargeW; ///< Charge deposit on W plane
-
-    /// Charge deposition points
-    std::vector<std::vector<Float_t> > fEdepVtx;
+    std::vector<Float_t> fPlaneCharge; ///< Charge deposit per plane
 
     ////////////////////////
-    ClassDef(mcshower,2)
+    ClassDef(mcshower,3)
     ////////////////////////
       
   };

@@ -17,7 +17,7 @@
 
 #include "ana_base.hh"
 #include "DataFormat-TypeDef.hh"
-#include "ShowerRecoAlg.hh"
+#include "ShowerRecoAlgBase.hh"
 #include "CRUHelper.hh"
 #include "CMatchManager.hh"
 
@@ -34,7 +34,7 @@ namespace larlight {
     ShowerReco3D();
 
     /// Default destructor
-    virtual ~ShowerReco3D(){}
+    virtual ~ShowerReco3D(){ delete fMatchMgr; }
 
     /** IMPLEMENT in ShowerReco3D.cc!
         Initialization method to be called before the analysis event loop.
@@ -51,6 +51,9 @@ namespace larlight {
     */
     virtual bool finalize();
 
+    /// Attach algo
+    void SetShowerAlgo(::showerreco::ShowerRecoAlgBase *alg) { fShowerAlgo = alg;}
+
     /// hack! remove me later
     storage_manager* GetCurrentData() {return _mgr;};
     
@@ -58,7 +61,7 @@ namespace larlight {
     void SetClusterType(DATA::DATA_TYPE type) { fClusterType = type; }
 
     /// Getter for MatchManager instance, to attach algorithms
-    ::cmtool::CMatchManager& GetManager() { return fMatchMgr; }
+    ::cmtool::CMatchManager& GetManager() { return *fMatchMgr; }
 
   protected:
 
@@ -69,10 +72,10 @@ namespace larlight {
     ::cluster::CRUHelper fCRUHelper;
 
     /// Shower reconstruction algorithm
-    ::shower::ShowerRecoAlg fShowerAlgo;
+    ::showerreco::ShowerRecoAlgBase *fShowerAlgo;
 
     /// Cluster matching code
-    ::cmtool::CMatchManager fMatchMgr;
+    ::cmtool::CMatchManager *fMatchMgr;
 
     /// hack! remove me later
     storage_manager* _mgr;

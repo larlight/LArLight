@@ -12,7 +12,7 @@ from ROOT import gSystem,TMath
 gSystem.Load("libShowerReco3D")
 gSystem.Load("libBase")
 gSystem.Load("libLArUtil")
-from ROOT import larlight as fmwk, cmtool, shower,larutil
+from ROOT import larlight as fmwk, cmtool, showerreco,larutil
 
 
 # Create ana_processor instance
@@ -38,12 +38,15 @@ my_proc.set_output_file("out.root")
 # Create analysis unit
 ana_unit = fmwk.ShowerReco3D()
 
+# Attach shower reco alg
+ana_unit.SetShowerAlgo(showerreco.ShowerRecoAlg())
 
-match_viewer = fmwk.MatchViewer()
+# Specify cluster type
+ana_unit.SetClusterType(fmwk.DATA.Cluster)
 
 priority_algo = cmtool.CPAlgoNHits()
 priority_algo.SetMinHits(20)
-match_viewer.GetManager().AddPriorityAlgo(priority_algo)
+ana_unit.GetManager().AddPriorityAlgo(priority_algo)
 
 # 
 # Attach Matching algorithm

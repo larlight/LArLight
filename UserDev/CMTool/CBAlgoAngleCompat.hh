@@ -34,8 +34,8 @@ namespace cmtool {
     virtual ~CBAlgoAngleCompat(){};
         
     /// Overloaded (from CBoolAlgoBase) Bool function
-    virtual bool Bool(const ::cluster::ClusterParamsAlgNew &cluster1,
-		      const ::cluster::ClusterParamsAlgNew &cluster2);
+    virtual bool Bool(const ::cluster::ClusterParamsAlg &cluster1,
+		      const ::cluster::ClusterParamsAlg &cluster2);
 
     /// Method to set debug mode
     void SetDebug(bool on) { _debug = on; }

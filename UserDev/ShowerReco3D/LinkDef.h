@@ -9,14 +9,16 @@
 #pragma link off all classes;
 #pragma link off all functions;
 
-#pragma link C++ namespace shower;
-#pragma link C++ class shower::ShowerRecoAlg+;
+#pragma link C++ namespace showerreco;
 #pragma link C++ class larlight::ShowerReco3D+;
 #pragma link C++ class larlight::MCShowerAna+;
 #pragma link C++ class larlight::ShowerBackTracker+;
 //ADD_NEW_CLASS ... do not change this line
-
+#pragma link C++ class showerreco::ShowerRecoAlgBase+;
+#pragma link C++ class showerreco::ShowerRecoAlg+;
+//ADD_NEW_ALG_CLASS ... do not change this line
 #endif
+
 
 
 

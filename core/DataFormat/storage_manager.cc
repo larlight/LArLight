@@ -43,7 +43,7 @@ namespace larlight {
 
       if( _check_alignment ) {
 
-	if(_current_event_id<0) 
+	if(_current_event_id==DATA::INVALID_INT) 
 
 	  _current_event_id = _ptr_data_array[ptr_index]->event_id();
 
@@ -51,8 +51,7 @@ namespace larlight {
 	
 	  print(MSG::ERROR,__FUNCTION__,
 		Form("Detected event-alignment mismatch! (%d != %d)",
-		     _ptr_data_array[ptr_index]->event_id(),
-		     _ptr_data_array[(size_t)(DATA::Event)]->event_id() )
+		     _ptr_data_array[ptr_index]->event_id(), _current_event_id)
 		);
 	  
 	  return 0;
@@ -116,7 +115,7 @@ namespace larlight {
       break;
     }
     
-    _current_event_id = -1;
+    _current_event_id = DATA::INVALID_INT;
     _index=0;
     _nevents=0;
     _nevents_written=0;
@@ -432,6 +431,7 @@ namespace larlight {
       _ptr_data_array[type]=(event_base*)(new event_wire(type));
       break;
     case DATA::Hit:
+    case DATA::MCShowerHit:
     case DATA::CrawlerHit:
     case DATA::GausHit:
     case DATA::APAHit:
@@ -440,6 +440,7 @@ namespace larlight {
       _ptr_data_array[type]=(event_base*)(new event_hit(type));
       break;
     case DATA::Cluster:
+    case DATA::MCShowerCluster:
     case DATA::CrawlerCluster:
     case DATA::DBCluster:
     case DATA::FuzzyCluster:
@@ -632,7 +633,7 @@ namespace larlight {
 
       return false;
 
-    _current_event_id = -1;
+    _current_event_id = DATA::INVALID_INT;
 
     // If this is BOTH mode, then read all relevant data products & check alignment here
     if( _mode == BOTH ) {
@@ -645,7 +646,7 @@ namespace larlight {
 
 	  if(_read_data_array[i] &&  _check_alignment) {
 
-	    if(_current_event_id == DATA::INVALID_UINT) 
+	    if(_current_event_id == DATA::INVALID_INT) 
 
 	      _current_event_id = _ptr_data_array[i]->event_id();
 

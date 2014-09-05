@@ -36,8 +36,8 @@ namespace cmtool {
   }
 
   //--------------------------------------------------------
-  bool CBAlgoTrackSeparate::Bool(const ::cluster::ClusterParamsAlgNew &cluster1,
-			const ::cluster::ClusterParamsAlgNew &cluster2)
+  bool CBAlgoTrackSeparate::Bool(const ::cluster::ClusterParamsAlg &cluster1,
+			const ::cluster::ClusterParamsAlg &cluster2)
   //--------------------------------------------------------
   {
     //if you are using EP method for this algo:

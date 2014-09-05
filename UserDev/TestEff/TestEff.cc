@@ -2,7 +2,7 @@
 #define TESTEFF_CC
 
 #include "TestEff.hh"
-// #include "../ClusterRecoUtil/ClusterParamsAlgNew.hh"
+// #include "../ClusterRecoUtil/ClusterParamsAlg.hh"
 #include "ClusterParams.hh"
 #include "LArUtilManager.hh"
 
@@ -420,7 +420,7 @@ namespace larlight {
     /// /////////////////////////////////////////////// End Getting MC Truth info out.	    
     }
   
-   //cluster::ClusterParamsAlgNew  fCPAlg; // = new cluster::ClusterParamsAlgNew();
+   //cluster::ClusterParamsAlg  fCPAlg; // = new cluster::ClusterParamsAlg();
 ///  //////////////// start looping on clusters or planes to get all hits.
  
      fRun=my_hit_v->run();
@@ -575,7 +575,7 @@ namespace larlight {
         }
 
 
-        ::cluster::ClusterParamsAlgNew  fCPAlg;
+        ::cluster::ClusterParamsAlg  fCPAlg;
 
         fCPAlg.Initialize();
         fCPAlg.setNeuralNetPath("../FANN/trained_nets/cascade_argo_clusters.net");

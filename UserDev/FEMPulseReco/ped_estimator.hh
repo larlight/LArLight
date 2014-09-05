@@ -16,17 +16,17 @@
 #ifndef PED_ESTIMATOR_HH
 #define PED_ESTIMATOR_HH
 
-#include "Base-TypeDef.hh"
-#include "DataFormat-TypeDef.hh"
+#include <TString.h>
+#include <iostream>
 #include <cmath>
-
-namespace larlight {
+#include <vector>
+namespace optreco {
 
   /**
      \class ped_estimator
      A class that calculates pedestal mean & standard deviation (here and elsewhere called as "RMS").   
    */
-  class ped_estimator : public larlight_base {
+  class ped_estimator {
 
   public:
 
@@ -37,7 +37,9 @@ namespace larlight {
     virtual ~ped_estimator(){};
 
     /// Method to compute a pedestal of the input waveform using "nsample" ADC samples from "start" index.
-    void compute_pedestal(const std::vector<UShort_t>* wf, size_t start, size_t nsample);
+    void compute_pedestal(const std::vector<unsigned short>& wf, 
+			  size_t start, 
+			  size_t nsample);
 
     /// Getter of the pedestal mean value
     double mean(){return _mean;};

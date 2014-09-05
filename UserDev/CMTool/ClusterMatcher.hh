@@ -18,6 +18,7 @@
 #include "ana_base.hh"
 #include "CMatchManager.hh"
 #include "CRUHelper.hh"
+#include "Geometry.hh"
 namespace larlight {
   /**
      \class ClusterMatcher
@@ -28,10 +29,10 @@ namespace larlight {
   public:
 
     /// Default constructor
-    ClusterMatcher(){ _name="ClusterMatcher"; _fout=0; _cluster_type = DATA::FuzzyCluster; }
+    ClusterMatcher();
 
     /// Default destructor
-    virtual ~ClusterMatcher(){}
+    virtual ~ClusterMatcher(){ delete _mgr; }
 
     /** IMPLEMENT in ClusterMatcher.cc!
         Initialization method to be called before the analysis event loop.
@@ -50,11 +51,11 @@ namespace larlight {
 
     void SetClusterType(DATA::DATA_TYPE type) {_cluster_type = type;}
 
-    ::cmtool::CMatchManager& GetManager() { return _mgr; }
+    ::cmtool::CMatchManager& GetManager() { return *_mgr; }
 
   protected:
 
-    ::cmtool::CMatchManager _mgr;
+    ::cmtool::CMatchManager *_mgr;
 
     DATA::DATA_TYPE _cluster_type;
 

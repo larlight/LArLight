@@ -34,7 +34,7 @@ namespace cmtool {
     virtual ~CBAlgoStartInPoly(){};
  
     /**
-       Core function: given the ClusterParamsAlgNew input, return whether a cluster should be
+       Core function: given the ClusterParamsAlg input, return whether a cluster should be
        merged or not.
     */
 
@@ -44,8 +44,8 @@ namespace cmtool {
     void SetDebug(bool debug) { _debug = debug; }
 
     /// Merging Algorithm is Here
-    virtual bool Bool(const ::cluster::ClusterParamsAlgNew &cluster1,
-		      const ::cluster::ClusterParamsAlgNew &cluster2);
+    virtual bool Bool(const ::cluster::ClusterParamsAlg &cluster1,
+		      const ::cluster::ClusterParamsAlg &cluster2);
 
     /// Method to re-configure the instance
     void reconfigure();

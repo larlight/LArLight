@@ -89,7 +89,7 @@ namespace kaleko {
     //loop over the reconstructed clusters
     for(auto const i_cluster: *ev_cluster){
 
-      const std::vector<unsigned short> ass_index(i_cluster.association(hit_type));
+      auto const& ass_index = i_cluster.association(hit_type);
             
       const UChar_t plane = larutil::Geometry::GetME()->ChannelToPlane(ev_hits->at((*ass_index.begin())).Channel());
        
