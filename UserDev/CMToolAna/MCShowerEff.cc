@@ -32,8 +32,11 @@ namespace larlight {
 
     // Get data products from storage
     //auto cluster_v  = (event_cluster*  )( storage->get_data(DATA::FuzzyCluster)  );
-    auto cluster_v  = (event_cluster*  )( storage->get_data(DATA::Cluster)  );
-    auto hit_v      = (event_hit*      )( storage->get_data(DATA::GausHit)  );
+    auto cluster_v  = (event_cluster*  )( storage->get_data(fClusterType)  );
+
+    auto const hit_type = cluster_v->get_hit_type();
+
+    auto hit_v      = (event_hit*      )( storage->get_data(hit_type) );
 
     // Check data exists
     if( !cluster_v || !hit_v) {
@@ -67,7 +70,7 @@ namespace larlight {
     cluster_plane_v.reserve(cluster_v->size());
     for(auto const& c : *cluster_v) {
 
-      auto const hit_index = c.association(DATA::GausHit);
+      auto const hit_index = c.association(hit_type);
 
       std::vector<const larlight::hit*> c_hits;
       c_hits.reserve(hit_index.size());
