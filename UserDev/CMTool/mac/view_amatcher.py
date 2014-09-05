@@ -30,7 +30,7 @@ match_viewer = larlight.MatchViewer()
 
 match_viewer.SetPrintClusterInfo(True)
 #match_viewer.ShowShowers(False)
-match_viewer.SetDrawShowers(True)
+#match_viewer.SetDrawShowers(True)
 ########################################
 # attach match algos here
 ########################################

@@ -14,7 +14,6 @@ namespace cmtool {
 	SetThetaCut(30) ;
 	SetPhiCut(30)  ;
 	SetRatio(0.1) ;
-//	cProfile = new TH1D("cProfile","Charge Profile",300,0,300);	
 
   }
 
