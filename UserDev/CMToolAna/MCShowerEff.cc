@@ -34,13 +34,27 @@ namespace larlight {
     //auto cluster_v  = (event_cluster*  )( storage->get_data(DATA::FuzzyCluster)  );
     auto cluster_v  = (event_cluster*  )( storage->get_data(fClusterType)  );
 
+    // Check data exists
+    if( !cluster_v ) {
+      print(MSG::ERROR,__FUNCTION__,Form("Missing %s! not doing anything...",DATA::DATA_TREE_NAME[fClusterType].c_str()));
+      return false;
+    }
+    if(!(cluster_v->size())) {
+      print(MSG::ERROR,__FUNCTION__,Form("Cluster %s is empty! not doing anything...",DATA::DATA_TREE_NAME[fClusterType].c_str()));
+      return false;
+    }
+
     auto const hit_type = cluster_v->get_hit_type();
 
     auto hit_v      = (event_hit*      )( storage->get_data(hit_type) );
 
     // Check data exists
-    if( !cluster_v || !hit_v) {
-      std::cerr<<"Missing some data! not doing anything..."<<std::endl;
+    if( !hit_v ){
+      print(MSG::ERROR,__FUNCTION__,Form("Missing %s is empty! not doing anything...",DATA::DATA_TREE_NAME[hit_type].c_str()));
+      return false;
+    }
+    if( !(hit_v->size()) ){
+      print(MSG::ERROR,__FUNCTION__,Form("Hit %s is empty! not doing anything...",DATA::DATA_TREE_NAME[hit_type].c_str()));
       return false;
     }
 
@@ -98,12 +112,12 @@ namespace larlight {
       
       std::vector<float>  max_q(geom->Nplanes(),0);
       std::vector<size_t> rep_cluster_index(geom->Nplanes(),1e4);
-
+      
       for(size_t c_index=0; c_index<cluster_mcq_v.size(); ++c_index) {
 
 	auto const& plane = cluster_plane_v.at(c_index);
 
-	std::cout << "cluster "<<c_index<<" ... "<<"plane "<<plane<<" ... "<<cluster_mcq_v.at(c_index).at(mcs_index)<<std::endl;
+	//std::cout << "cluster "<<c_index<<" ... "<<"plane "<<plane<<" ... "<<cluster_mcq_v.at(c_index).at(mcs_index)<<std::endl;
 
 	if( max_q.at(plane) < cluster_mcq_v.at(c_index).at(mcs_index) ) {
 	  

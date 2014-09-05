@@ -8,7 +8,6 @@ if len(sys.argv) < 2:
     sys.exit(1)
 
 from ROOT import gSystem
-gSystem.Load("libCMergePerformance")
 from ROOT import larlight, cluster, cmtool
 
 # Create ana_processor instance
@@ -24,12 +23,13 @@ my_proc.set_io_mode(larlight.storage_manager.READ)
 my_proc.set_input_rootdir("scanner")
 
 # Specify output root file name
-my_proc.set_ana_output_file("CMPerformance.root");
+my_proc.set_ana_output_file("MCShowerErr.root");
 
 #attach the CMergePerformance process
 my_unit = larlight.MCShowerEff()
 
-my_unit.SetClusterType(larlight.RyanCluster)
+my_unit.SetClusterType(larlight.DATA.RyanCluster)
+#my_unit.SetClusterType(larlight.DATA.FuzzyCluster)
 
 my_proc.add_process(my_unit)
 
