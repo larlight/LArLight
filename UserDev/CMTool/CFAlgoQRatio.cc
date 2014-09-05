@@ -26,10 +26,9 @@ namespace cmtool {
   {
 
     // Code-block by Kazu starts
-    // This ensures all entries in "clusters" pointer vector are valid pointers.
+    // This ensures the algorithm works only if # clusters is > 2 (and not =2)
     // You may take out this block if you want to allow matching using clusters from only 2 planes.
-    // But make sure you handle the case of null pointer
-    for(auto const& ptr : clusters) if(!ptr) return -1;
+    if(clusters.size()==2) return -1;
     // Code-block by Kazu ends
     
     double q_max = -1;
