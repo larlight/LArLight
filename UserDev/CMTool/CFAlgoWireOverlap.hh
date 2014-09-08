@@ -58,10 +58,15 @@ namespace cmtool {
     /// Function to set verbose output
     void SetVerbose( bool on ) { _verbose = on; }
 
+    /// Function to set debug output
+    void SetDebug( bool on ) { _debug = on; }
+
   private:
 
     double _w2cm, _t2cm;
     bool   _verbose;
+    bool   _debug;
+
   };
 
 
