@@ -30,7 +30,7 @@ namespace larlight {
   public:
 
     /// Default constructor
-    MCShowerEff(){ _name="MCShowerEff"; _fout=0;};
+    MCShowerEff(){ _name="MCShowerEff"; _fout=0; fClusterType=DATA::Cluster;};
 
     /// Default destructor
     virtual ~MCShowerEff(){};
@@ -50,9 +50,16 @@ namespace larlight {
     */
     virtual bool finalize();
 
+    /// Set cluster type
+    void SetClusterType(DATA::DATA_TYPE type)
+    { fClusterType = type; }
+
   protected:
 
+    DATA::DATA_TYPE fClusterType;
+
     std::vector<TH1D*> vMergeQEff;
+
     std::vector<TH1D*> vMergeQPur;
 
     ShowerBackTracker fBTAlg;

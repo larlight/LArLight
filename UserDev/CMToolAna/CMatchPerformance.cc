@@ -20,8 +20,6 @@ namespace larlight {
 
   bool CMatchPerformance::initialize() {
 
-    fBTAlgo.SetMaxEnergyCut(1900/2.);
-
     auto geo = ::larutil::Geometry::GetME();
     _view_to_plane.clear();
     _view_to_plane.resize(geo->Nplanes(),DATA::INVALID_UCHAR);
