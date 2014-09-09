@@ -22,7 +22,7 @@ namespace larlight {
   }
   
   bool NCfilter::analyze(storage_manager* storage) {
-    
+        
     // grab the incoming clusters. 
     // these should be clusters that are very primative. like DB or hough
     auto Incoming_cluster = (const event_cluster*)(storage->get_data(DATA::DBCluster));
@@ -31,16 +31,11 @@ namespace larlight {
     
     if(!hits || !Incoming_cluster) {
       print(MSG::ERROR,__FUNCTION__,"No DBCluster or associated hits found!");
+      throw std::exception();
       return false;
     }
-    if(!(Incoming_cluster->size())){
-      print(MSG::WARNING,__FUNCTION__,Form("Event %d has no DBCluster...",Incoming_cluster->event_id()));
-      return true;
-    }
-    else if(!(hits->size())){
-      print(MSG::ERROR,__FUNCTION__,Form("Event %d has no hits (but there's DBCluster!!!)",Incoming_cluster->event_id()));
-      return false;
-    }
+
+    // First of all create an output
     // make the output cluster
     auto Output_cluster = (event_cluster*)(storage->get_data(DATA::RyanCluster));
     
@@ -51,16 +46,23 @@ namespace larlight {
     Output_cluster->set_event_id(Incoming_cluster->event_id());
     Output_cluster->set_run(Incoming_cluster->run());
     Output_cluster->set_subrun(Incoming_cluster->subrun());
+
+    if(!(Incoming_cluster->size())){
+      print(MSG::WARNING,__FUNCTION__,Form("Event %d has no DBCluster...",Incoming_cluster->event_id()));
+      return true;
+    }
+    else if(!(hits->size())){
+      print(MSG::ERROR,__FUNCTION__,Form("Event %d has no hits (but there's DBCluster!!!)",Incoming_cluster->event_id()));
+      return false;
+    }
+
+    // Need some bool to check about the quality of the protoclusters
+    // need some flags to see which planes to pursue  clustering in
+    unsigned int nplanes = larutil::Geometry::GetME()->Nplanes();
+    std::vector<std::pair<double,double>> AvgPairSI(nplanes);	
+    std::vector<std::pair<std::vector<unsigned int>,std::vector<unsigned int>>> BestClusters(nplanes);
+    std::vector<bool> FlagGoodPlanes(nplanes,false);
     
-
-
-	// Need some bool to check about the quality of the protoclusters
-        // need some flags to see which planes to pursue  clustering in
-    	unsigned int nplanes = larutil::Geometry::GetME()->Nplanes();
-    	std::vector<std::pair<double,double>> AvgPairSI(nplanes);	
-	std::vector<std::pair<std::vector<unsigned int>,std::vector<unsigned int>>> BestClusters(nplanes);
-        std::vector<bool> FlagGoodPlanes(nplanes,false);
-
 
 
 //============Starting with  first pass alg============
