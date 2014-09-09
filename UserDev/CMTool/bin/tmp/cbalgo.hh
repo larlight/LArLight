@@ -42,8 +42,8 @@ namespace cmtool {
        Core function: given two CPAN inputs, return a boolean which indicates 
        whether two clusters are compatible or not
     */
-    virtual bool Bool(const ::cluster::ClusterParamsAlgNew &cluster1,
-		      const ::cluster::ClusterParamsAlgNew &cluster2);
+    virtual bool Bool(const ::cluster::ClusterParamsAlg &cluster1,
+		      const ::cluster::ClusterParamsAlg &cluster2);
 
     /**
        Optional function: called after each iterative approach if a manager class is
@@ -57,7 +57,7 @@ namespace cmtool {
     /**
        Optional function: called at the beginning of 1st iteration. This is called per event.
      */
-    //virtual void EventBegin(const std::vector<cluster::ClusterParamsAlgNew> &clusters);
+    //virtual void EventBegin(const std::vector<cluster::ClusterParamsAlg> &clusters);
 
     /**
        Optional function: called at the end of event ... after the last merging iteration is over.
@@ -69,7 +69,7 @@ namespace cmtool {
        This provides all clusters' information in case the algorithm need them. Note this
        is called per iteration which may be more than once per event.
      */
-    //virtual void IterationBegin(const std::vector<cluster::ClusterParamsAlgNew> &clusters);
+    //virtual void IterationBegin(const std::vector<cluster::ClusterParamsAlg> &clusters);
 
     /**
        Optional function: called at the end of each iterative loop.
