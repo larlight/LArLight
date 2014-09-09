@@ -213,7 +213,7 @@ namespace larlight {
     }
     
     Bool_t status=true;
-    _fout->cd();
+
     for(std::vector<ana_base*>::iterator iter(_analyzers.begin());
 	iter!=_analyzers.end();
 	++iter) {
