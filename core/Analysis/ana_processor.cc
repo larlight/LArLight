@@ -186,8 +186,6 @@ namespace larlight {
 	Message::send(MSG::NORMAL,__FUNCTION__,Form("Processed %d/%d events! Aborting...",_nevents,nevents));
 
 	_storage->next_event();
-	
-	status = finalize();
 
 	break;
       }
@@ -195,13 +193,16 @@ namespace larlight {
       if(_process!=PROCESSING) break;
       
     }
-    
+
+    if(_process != FINISHED)
+      status = finalize();
+
     return status;
     
   }
   
   Bool_t ana_processor::finalize() {
-    
+
     if(_verbosity[MSG::DEBUG])
       Message::send(MSG::DEBUG,__PRETTY_FUNCTION__,"called...");
     
@@ -212,11 +213,12 @@ namespace larlight {
     }
     
     Bool_t status=true;
+    _fout->cd();
     for(std::vector<ana_base*>::iterator iter(_analyzers.begin());
 	iter!=_analyzers.end();
 	++iter) {
       
-      _ana_status[(*iter)]=_ana_status[(*iter)] && (*iter)->finalize();
+      _ana_status[(*iter)]= (*iter)->finalize() && _ana_status[(*iter)];
       
       status = status && _ana_status[(*iter)];
     }

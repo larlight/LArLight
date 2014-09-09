@@ -10,6 +10,7 @@ namespace larlight {
     auto geom = ::larutil::Geometry::GetME();
 
     vMergeQEff.clear();
+    vMergeQPur.clear();
 
     for(size_t i=0; i<geom->Nplanes(); ++i) {
 
@@ -40,7 +41,7 @@ namespace larlight {
       return false;
     }
     if(!(cluster_v->size())) {
-      print(MSG::ERROR,__FUNCTION__,Form("Cluster %s is empty! not doing anything...",DATA::DATA_TREE_NAME[fClusterType].c_str()));
+      print(MSG::WARNING,__FUNCTION__,Form("Cluster %s is empty! not doing anything...",DATA::DATA_TREE_NAME[fClusterType].c_str()));
       return false;
     }
 
@@ -106,9 +107,9 @@ namespace larlight {
     // Per MCShower, compute the maximum charge efficiency
     std::vector<std::vector<size_t> > rep_cluster_index(geom->Nplanes(),std::vector<size_t>(mcs_q_v.at(0).size(),1e4));
 
-    std::cout<<std::endl<<"event "<<cluster_v->event_id()<<std::endl;
+    //std::cout<<std::endl<<"event "<<cluster_v->event_id()<<std::endl;
     for(size_t mcs_index=0; mcs_index < mcs_q_v.at(0).size(); ++mcs_index) {
-      std::cout<<"mcshower "<<mcs_index<<std::endl;
+      //std::cout<<"mcshower "<<mcs_index<<std::endl;
       
       std::vector<float>  max_q(geom->Nplanes(),0);
       std::vector<size_t> rep_cluster_index(geom->Nplanes(),1e4);
@@ -139,7 +140,7 @@ namespace larlight {
 	  
 	  qsum += q;
 
-	std::cout<<"plane "<<plane<<" "<<max_q.at(plane)<<"/"<<qsum<<std::endl;
+	//std::cout<<"plane "<<plane<<" "<<max_q.at(plane)<<"/"<<qsum<<std::endl;
 	vMergeQPur.at(plane)->Fill( max_q.at(plane) / qsum );
       }
     }
@@ -150,6 +151,11 @@ namespace larlight {
   bool MCShowerEff::finalize() {
 
     if(_fout) {
+
+      print(MSG::INFO,__PRETTY_FUNCTION__,
+	    "Saving histograms...");
+      
+      _fout->cd();
       
       for(auto& h : vMergeQEff) h->Write();
       for(auto& h : vMergeQPur) h->Write();
