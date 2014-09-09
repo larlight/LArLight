@@ -41,6 +41,7 @@ priority_algo.SetMinHits(20)
 match_viewer.GetManager().AddPriorityAlgo(priority_algo)
 
 myalg = cmtool.CFAlgo3DAngle()
+myalg.SetDebug(False)
 match_viewer.GetManager().AddMatchAlgo(myalg)
 
 ########################################
