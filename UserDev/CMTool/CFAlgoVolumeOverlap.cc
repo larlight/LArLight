@@ -35,55 +35,77 @@ namespace cmtool {
     //This algorithm now works for 3 planes: find 3Dstart point from first 2 planes and find
     //How well that agrees with 3rd plane's start point location.
 
-    //So first, make sure clusters vector has only 3 elements. If not return -1
-    if ( clusters.size() != 3 )
+    //So first, make sure clusters vector has more than 1 element.
+    //If not, return -1. Algorithm does not make sense
+    if ( clusters.size() == 1 )
       return -1;
 
-    //Get hits for all 3 clusters
-    std::vector<larutil::PxHit> hits0 = clusters.at(0)->GetHitVector();
-    std::vector<larutil::PxHit> hits1 = clusters.at(1)->GetHitVector();
-    std::vector<larutil::PxHit> hits2 = clusters.at(2)->GetHitVector();
+    if (_verbose) { std::cout << "Number of clusters taken into account: " << clusters.size() << std::endl; }
     
-    //Get Wire-Range and Time-Range for all 3 clusters
-    int startWire0 = 9999, endWire0 = 0;
-    int startWire1 = 9999, endWire1 = 0;
-    int startWire2 = 9999, endWire2 = 0;
-    float startTime0 = 9999, endTime0 = 0;
-    float startTime1 = 9999, endTime1 = 0;
-    float startTime2 = 9999, endTime2 = 0;
+    //Nomenclature:
+    //Planes: U == 0; V == 1; Y == 2.
 
-    for (auto& hit: hits0){
-      if ( int(hit.w / _w2cm) < startWire0 ) { startWire0 = int(hit.w / _w2cm); }
-      if ( int(hit.w / _w2cm) > endWire0 )   { endWire0   = int(hit.w / _w2cm); }
-      if ( hit.t < startTime0 ) { startTime0 = hit.t; }
-      if ( hit.t > endTime0 )   { endTime0   = hit.t; }
+    //Get hits for all 3 clusters
+    std::vector<std::vector<larutil::PxHit> > Hits(3, std::vector<larutil::PxHit>());
+
+    for (size_t c=0; c < clusters.size(); c++)
+      Hits.at( clusters.at(c)->Plane() ) = clusters.at(c)->GetHitVector();
+
+    //std::vector<larutil::PxHit> hits0 = clusters.at(0)->GetHitVector();
+    //std::vector<larutil::PxHit> hits1 = clusters.at(1)->GetHitVector();
+    //std::vector<larutil::PxHit> hits2 = clusters.at(2)->GetHitVector();
+    
+    //Wire Range Vector. Entries 0,1,2 correspond to planes
+    std::vector<int> StartWires;
+    std::vector<int> EndWires;
+    std::vector<float> StartTimes;
+    std::vector<float> EndTimes;
+    //loop over number of planes and pre-fill StartWires and EndWires
+    for (int pl=0; pl < 3; pl++){
+      StartWires.push_back(9999);
+      EndWires.push_back(0);
+      StartTimes.push_back(9999);
+      EndTimes.push_back(0);
     }
-    for (auto& hit: hits1){
-      if ( int(hit.w / _w2cm) < startWire1 ) { startWire1 = int(hit.w / _w2cm); }
-      if ( int(hit.w / _w2cm) > endWire1 )   { endWire1   = int(hit.w / _w2cm); }
-      if ( hit.t < startTime1 ) { startTime1 = hit.t; }
-      if ( hit.t > endTime1 )   { endTime1   = hit.t; }
+
+    for (size_t h=0; h < Hits.size(); h++){
+      for ( auto& hit: Hits.at(h) ){
+	if ( Hits.at(h).size() == 0 ){
+	  std::cout << "Need to insert fake hit ranges...";
+	}
+	else{
+	  if ( int(hit.w / _w2cm) < StartWires.at(h) ) { StartWires.at(h) = int(hit.w / _w2cm); }
+	  if ( int(hit.w / _w2cm) > EndWires.at(h) )   { EndWires.at(h)   = int(hit.w / _w2cm); }
+	  if ( hit.t < StartTimes.at(h) ) { StartTimes.at(h) = hit.t; }
+	  if ( hit.t > EndTimes.at(h) )   { EndTimes.at(h)   = hit.t; }
+	}
+      }//for all hits in range
+    }//for all hit-lists (i.e. for all clusters)
+
+    //if one of the plane's wire-range is still [9999, 0] then replace it
+    //with min/max wire number from that plane
+    //This allows for easy 2-Plane matching: if we are ignoring one plane
+    //completely by giving the wire-range for the whole plane the intersection
+    //will effectively be the intersection of the other two planes
+    for (size_t h=0; h < Hits.size(); h++){
+      if ( StartWires.at(h) == 9999 ) { StartWires.at(h) = 1; }
+      if ( EndWires.at(h) == 0 ) { EndWires.at(h) = larutil::Geometry::GetME()->Nwires(h)-1; }
     }
-    for (auto& hit: hits2){
-      if ( int(hit.w / _w2cm) < startWire2 ) { startWire2 = int(hit.w / _w2cm); }
-      if ( int(hit.w / _w2cm) > endWire2 )   { endWire2   = int(hit.w / _w2cm); }
-      if ( hit.t < startTime2 ) { startTime2 = hit.t; }
-      if ( hit.t > endTime2 )   { endTime2   = hit.t; }
-    }
+
 
     //Find overlap in time between three planes
-    if ( (startTime1 > endTime0) or (startTime1 > endTime2) or
-	 (startTime2 > endTime0) or (startTime2 > endTime1) or
-	 (startTime0 > endTime1) or (startTime0 > endTime2) ){
+    if ( (StartTimes.at(1) > EndTimes.at(0)) or (StartTimes.at(1) > EndTimes.at(2)) or
+	 (StartTimes.at(2) > EndTimes.at(0)) or (StartTimes.at(2) > EndTimes.at(1)) or
+	 (StartTimes.at(0) > EndTimes.at(1)) or (StartTimes.at(0) > EndTimes.at(2)) ){
       if (_verbose) { std::cout << "No Time-Overlap!" << std::endl << std::endl; }
       return -1;
     }
     //do two planes at a time...start with U and V
     float Tmin=9999, Tmax=0;
-    ( startTime1 > startTime0 ) ? (Tmin = startTime1) : (Tmin = startTime0);
-    if (startTime2 > Tmin) { Tmin = startTime2; }
-    ( endTime1 < endTime0 ) ? (Tmax = endTime1) : (Tmax = endTime0);
-    if (endTime2 < Tmax) { Tmax = endTime2; }
+    ( StartTimes.at(1) > StartTimes.at(0) ) ? (Tmin = StartTimes.at(1)) : (Tmin = StartTimes.at(0));
+    if (StartTimes.at(2) > Tmin) { Tmin = StartTimes.at(2); }
+    ( EndTimes.at(1) < EndTimes.at(0) ) ? (Tmax = EndTimes.at(1)) : (Tmax = EndTimes.at(0));
+    if (EndTimes.at(2) < Tmax) { Tmax = EndTimes.at(2); }
     float Trange = Tmax-Tmin;
 
     //Now get start & end points of all these wires
@@ -100,24 +122,20 @@ namespace cmtool {
     Double_t xyzEnd2WireStart[3] = {0., 0., 0.}; 
     Double_t xyzEnd2WireEnd[3]   = {0., 0., 0.}; 
 
-    if (_verbose) {
-      std::cout << "Wire and Time Ranges:" << std::endl;
-      std::cout << "U-Plane: Wire[ " << startWire0 << ", " << endWire0 << "]" 
-		<< "\tTime[ " << startTime0 << ", " << endTime0 << "]" << std::endl;
-      std::cout << "V-Plane: Wire[ " << startWire1 << ", " << endWire1 << "]"
-		<< "\tTime[ " << startTime1 << ", " << endTime1 << "]" << std::endl;
-      std::cout << "Y-Plane: Wire[ " << startWire2 << ", " << endWire2 << "]"
-		<< "\tTime[ " << startTime2 << ", " << endTime2 << "]" << std::endl;
+    if (_debug) {
+      std::cout << "Wire Ranges:" << std::endl;
+      std::cout << "U-Plane: [ " << StartWires.at(0) << ", " << EndWires.at(0) << "]" << std::endl;
+      std::cout << "V-Plane: [ " << StartWires.at(1) << ", " << EndWires.at(1) << "]" << std::endl;
+      std::cout << "Y-Plane: [ " << StartWires.at(2) << ", " << EndWires.at(2) << "]" << std::endl;
       std::cout << std::endl;
     }
-    if (_verbose) { std::cout << "Time-Range is: [ " << Tmin << ", " << Tmax << "] Size: " << Trange << std::endl << std::endl; }  
 
-    larutil::Geometry::GetME()->WireEndPoints(0, startWire0, xyzStart0WireStart, xyzStart0WireEnd);
-    larutil::Geometry::GetME()->WireEndPoints(0, endWire0, xyzEnd0WireStart, xyzEnd0WireEnd);
-    larutil::Geometry::GetME()->WireEndPoints(1, startWire1, xyzStart1WireStart, xyzStart1WireEnd);
-    larutil::Geometry::GetME()->WireEndPoints(1, endWire1, xyzEnd1WireStart, xyzEnd1WireEnd);
-    larutil::Geometry::GetME()->WireEndPoints(2, startWire2, xyzStart2WireStart, xyzStart2WireEnd);
-    larutil::Geometry::GetME()->WireEndPoints(2, endWire2, xyzEnd2WireStart, xyzEnd2WireEnd);
+    larutil::Geometry::GetME()->WireEndPoints(0, StartWires.at(0), xyzStart0WireStart, xyzStart0WireEnd);
+    larutil::Geometry::GetME()->WireEndPoints(0, EndWires.at(0), xyzEnd0WireStart, xyzEnd0WireEnd);
+    larutil::Geometry::GetME()->WireEndPoints(1, StartWires.at(1), xyzStart1WireStart, xyzStart1WireEnd);
+    larutil::Geometry::GetME()->WireEndPoints(1, EndWires.at(1), xyzEnd1WireStart, xyzEnd1WireEnd);
+    larutil::Geometry::GetME()->WireEndPoints(2, StartWires.at(2), xyzStart2WireStart, xyzStart2WireEnd);
+    larutil::Geometry::GetME()->WireEndPoints(2, EndWires.at(2), xyzEnd2WireStart, xyzEnd2WireEnd);
     //check that z-positions for plane2 are the same...if not error!
     //if ( xyzStart2WireStart[2] != xyzStart2WireEnd[2] ) { std::cout << "Y-wire does not have same Z start and end..." << std::endl; }
     double zMin = xyzStart2WireStart[2];
@@ -156,7 +174,7 @@ namespace cmtool {
     double UupZmin = slopeU * zMin + bUup; 
     double UupZmax = slopeU * zMax + bUup;
 
-    if (_verbose){
+    if (_debug){
       std::cout << "Y-Plane and U-Plane points [Z,Y]:" << std::endl;
       std::cout << "\t\t[ " << zMin << ", " << UdnZmin << "]" << std::endl;
       std::cout << "\t\t[ " << zMin << ", " << UupZmin << "]" << std::endl;
@@ -174,7 +192,7 @@ namespace cmtool {
     //The intersection points of these two polygons is the 
     //overall intersection Area of the 3 clusters on the Y-Z plane.
 
-    //Go through all siegment intersections. If one is found add to 
+    //Go through all segment intersections. If one is found add to 
     //list of points.
     //Create a list of points for polygon
     std::vector< std::pair<float,float> > WireIntersection;
@@ -237,19 +255,46 @@ namespace cmtool {
     //need to disentangle in case points added in incorrect order
     //then calculate area
     Polygon2D WirePolygon(WireIntersection);    
+    //Variable to hold final output Area
+    double PolyArea = -1;
     //Check order
     WirePolygon.UntanglePolygon();
 
+    //Create a Polygon for the Y-Z TPC Plane
+    std::vector< std::pair<float,float> > TPCCorners;
+    TPCCorners.push_back( std::make_pair(0., -larutil::Geometry::GetME()->DetHalfHeight()) );
+    TPCCorners.push_back( std::make_pair(larutil::Geometry::GetME()->DetLength(), -larutil::Geometry::GetME()->DetHalfHeight()) );
+    TPCCorners.push_back( std::make_pair(larutil::Geometry::GetME()->DetLength(), larutil::Geometry::GetME()->DetHalfHeight()) );
+    TPCCorners.push_back( std::make_pair(0., larutil::Geometry::GetME()->DetHalfHeight()) );
+    Polygon2D TPCPolygon(TPCCorners);
     if (_verbose){
-      std::cout << "Intersection Polygon Coordinates [Z,Y]: " << std::endl;
-      for (unsigned int s=0; s < WirePolygon.Size(); s++)
-	std::cout << "\t\t[ " << WirePolygon.Point(s).first << ", " << WirePolygon.Point(s).second << "]" << std::endl;
-      std::cout << std::endl;
+      if (TPCPolygon.Contained(WirePolygon) ){
+	if (_verbose) {
+	  std::cout << "Wire Overlap contained in TPC" << std::endl;
+	  std::cout << "Intersection Polygon Coordinates [Z,Y]: " << std::endl;
+	  for (unsigned int s=0; s < WirePolygon.Size(); s++)
+	    std::cout << "\t\t[ " << WirePolygon.Point(s).first << ", " << WirePolygon.Point(s).second << "]" << std::endl;
+	  std::cout << std::endl;
+	}
+	PolyArea = WirePolygon.Area();
+      }
+	else {
+	  if (_verbose) {
+	    std::cout << "Wire overlap not fully contained in TPC" << std::endl;
+	    std::cout << "Intersection Polygon Coordinates [Z,Y]: " << std::endl;
+	    for (unsigned int s=0; s < WirePolygon.Size(); s++)
+	      std::cout << "\t\t[ " << WirePolygon.Point(s).first << ", " << WirePolygon.Point(s).second << "]" << std::endl;
+	    std::cout << std::endl;
+	  }
+	  //product polygon should be the intersection of WirePolygon and TPCPolygon
+	  Polygon2D IntersectionPolygon(TPCPolygon, WirePolygon);
+	  PolyArea = IntersectionPolygon.Area();
+	}
     }
     
     //return polygon area -> larger = better!
-    if (_verbose) { std::cout << "Intersection area: " << WirePolygon.Area() << std::endl << std::endl; }    
-    return  Trange*WirePolygon.Area();
+    if (_verbose) { std::cout << "Intersection area: " << PolyArea << std::endl << std::endl; }    
+    return  Trange*PolyArea;
   }
 
   //------------------------------
