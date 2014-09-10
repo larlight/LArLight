@@ -50,8 +50,6 @@ namespace cmtool {
 	//Order the theta, phi, hits per plane to make cuts convenient
 	virtual void SetMaxMiddleMin(const double first, const double second, const double third, double &most, double &middle, double &least) ;
 
-	virtual void ChooseThetaOrPhi(const double theta1, const double theta2, const double theta3, const double phi1, const double phi2, const double phi3, double &ratio_angle);
-
 	void SetDebug(bool debug) { _debug = debug ; }
 	
 	void SetThetaCut(float theta_cut ) { _theta_cut = theta_cut ; }
