@@ -37,14 +37,17 @@ match_viewer.SetPrintClusterInfo(True)
 
 
 priority_algo = cmtool.CPAlgoNHits()
-priority_algo.SetMinHits(27)
+priority_algo.SetMinHits(22)
 match_viewer.GetManager().AddPriorityAlgo(priority_algo)
 
 angleAlg = cmtool.CFAlgo3DAngle()
-angleAlg.SetRatio(0.098)
+angleAlg.SetRatio(0.1)
 angleAlg.SetDebug(False)
 
-match_viewer.GetManager().AddMatchAlgo(angleAlg)
+timeAlg = cmtool.CFAlgoTimeOverlap()
+timeAlg.SetDebug(True)
+
+match_viewer.GetManager().AddMatchAlgo(timeAlg)
 
 ########################################
 # done attaching match algos

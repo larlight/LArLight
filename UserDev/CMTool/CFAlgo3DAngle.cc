@@ -166,7 +166,7 @@ namespace cmtool {
 	//GeometryUtilities returns theta=-999 when 2d Angle=0--Don't know
 	//how else to deal with that. This seems to work.
 	if( theta_01 == -999 || theta_12 == -999 || theta_02 == -999)
-		ratio = -1 ;
+		return -1 ;
 
 
 	if(_debug && ratio > _ratio_cut ){
@@ -218,20 +218,6 @@ namespace cmtool {
 
 	}	
 
-  //------------------------------
-  void CFAlgo3DAngle::SetMaxMin(const double angle_1, const double angle_2, double &max_angle, double &min_angle)
-  //------------------------------
-	{
-
-		if(angle_1 > angle_2){
-			max_angle = angle_1 ;
-			min_angle = angle_2 ;
-		 }
-		else{
-			max_angle = angle_2;
-			min_angle	= angle_1 ;
-		  }
-   }
 
   //------------------------------
   void CFAlgo3DAngle::SetMaxMiddleMin(const double first, const double second, const double third, double &max, double &middle, double &min) 
