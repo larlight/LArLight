@@ -15,7 +15,7 @@ algo_array = cmtool.CFAlgoArray()
 #algo_array.SetMode(cmtool.CFAlgoArray.kPositiveAddition)
 algo_array.AddAlgo(cmtool.CFAlgo3DAngle())
 #algo_array.AddAlgo(cmtool.CFAlgoStartPointMatch())
-algo_array.AddAlgo(cmtool.CFAlgoTimeOverlap())
+#algo_array.AddAlgo(cmtool.CFAlgoTimeOverlap())
 #algo_array.AddAlgo(cmtool.CFAlgoZOverlap())
 
 #match_algo = cmtool.CFAlgoStartPointMatch()
