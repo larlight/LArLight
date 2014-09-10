@@ -14,7 +14,9 @@ from ROOT import larlight, cluster, cmtool
 my_proc = larlight.ana_processor()
 
 # Set input root file
-my_proc.add_input_file(sys.argv[1])
+for x in xrange(len(sys.argv)-1):
+
+    my_proc.add_input_file(sys.argv[x+1])
 
 # Specify IO mode
 my_proc.set_io_mode(larlight.storage_manager.READ)
@@ -32,6 +34,8 @@ my_unit.SetClusterType(larlight.DATA.RyanCluster)
 #my_unit.SetClusterType(larlight.DATA.FuzzyCluster)
 
 my_proc.add_process(my_unit)
+
+my_proc.set_verbosity(larlight.MSG.DEBUG)
 
 print
 print  "Finished configuring ana_processor. Start event loop!"
