@@ -44,13 +44,8 @@ namespace cmtool {
 	*/
 	virtual void FixPhiTheta(double &phi, double &theta) ;
 
-	//Set max and min phi and theta for ratio calculations
-	virtual void SetMaxMin(const double phi_1, const double phi_2,double &max_1,double &max_2);
-	
 	//Order the theta, phi, hits per plane to make cuts convenient
 	virtual void SetMaxMiddleMin(const double first, const double second, const double third, double &most, double &middle, double &least) ;
-
-	virtual void ChooseThetaOrPhi(const double theta1, const double theta2, const double theta3, const double phi1, const double phi2, const double phi3, double &ratio_angle);
 
 	void SetDebug(bool debug) { _debug = debug ; }
 	
@@ -71,7 +66,7 @@ namespace cmtool {
 	float _debug 	 ;
 
 	//Histogram for charge profile
-	TH1D *cProfile ;
+//	TH1D *cProfile ;
 
   };
 }
