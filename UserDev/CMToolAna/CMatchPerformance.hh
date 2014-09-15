@@ -37,13 +37,19 @@ namespace larlight {
 
     /** IMPLEMENT in CMatchPerformance.cc!
         Initialization method to be called before the analysis event loop.
-    */ 
+    )*/ 
     virtual bool initialize();
 
     /** IMPLEMENT in CMatchPerformance.cc! 
         Analyze a data event-by-event  
     */
     virtual bool analyze(storage_manager* storage);
+
+  /** Set Cluster Type to be read in: ClusterMerger makes Cluster
+    instead of FuzzyCluster
+    */
+    void SetClusterType(DATA::DATA_TYPE type) {_cluster_type = type;}
+
 
     /** IMPLEMENT in CMatchPerformance.cc! 
         Finalize method to be called after all events processed.
