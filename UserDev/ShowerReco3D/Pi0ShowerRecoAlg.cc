@@ -1,11 +1,11 @@
-#ifndef SHOWERRECOALG_CXX
-#define SHOWERRECOALG_CXX
+#ifndef PI0SHOWERRECOALG_CXX
+#define PI0SHOWERRECOALG_CXX
 
-#include "ShowerRecoAlg.hh"
+#include "Pi0ShowerRecoAlg.hh"
 
 namespace showerreco {
   
-  ShowerRecoAlg::ShowerRecoAlg() : ShowerRecoAlgBase(), fGSer(nullptr)
+  Pi0ShowerRecoAlg::Pi0ShowerRecoAlg() : ShowerRecoAlgBase(), fGSer(nullptr)
   {
     
     fPlaneID.clear();
@@ -22,7 +22,7 @@ namespace showerreco {
   }
 
 
-  ::larlight::shower ShowerRecoAlg::Reconstruct(const std::vector< ::cluster::ClusterParamsAlg>& clusters)
+  ::larlight::shower Pi0ShowerRecoAlg::Reconstruct(const std::vector< ::cluster::ClusterParamsAlg>& clusters)
   {
     
     ::larlight::shower result;
