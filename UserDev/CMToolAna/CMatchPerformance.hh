@@ -19,6 +19,7 @@
 #include "McshowerLookback.hh"
 #include "CMatchManager.hh"
 #include "CRUHelper.hh"
+#include "TStopwatch.h"
 
 namespace larlight {
   /**
@@ -78,6 +79,9 @@ namespace larlight {
 
     /// # MCShower / # matched cluster pairs (kinda efficiency)
     TH1D* hMatchNumEff;
+
+    /// Internal timer
+    TStopwatch fWatch;
 
     std::vector<UChar_t> _view_to_plane;
   };
