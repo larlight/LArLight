@@ -29,6 +29,7 @@ namespace showerreco {
     //
     // Reconstruct and store
     //
+    fPlaneID.clear();
     fStartPoint.clear();
     fEndPoint.clear();
     fOmega2D.clear();
@@ -41,7 +42,7 @@ namespace showerreco {
       {
         fStartPoint.push_back(cl.GetParams().start_point);    // for each plane
 	fEndPoint.push_back(cl.GetParams().end_point);    // for each plane
-        fOmega2D.push_back(cl.GetParams().angle_2d);     
+        fOmega2D.push_back(cl.GetParams().angle_2d);
 	fPlaneID.push_back(cl.Plane());
 	if(fVerbosity) {
 	  std::cout << " planes : " <<   (int)cl.GetParams().start_point.plane 
@@ -59,19 +60,19 @@ namespace showerreco {
     double min_length=9999999;
     double max_length=0;
     for (int ip=0;ip<fPlaneID.size();ip++)
-    {
-      if(fabs( fEndPoint[ip].w - fStartPoint[ip].w ) < min_length )
-	{
-	  min_length=fabs( fEndPoint[ip].w - fStartPoint[ip].w );
-	  worst_plane=fPlaneID.at(ip);
-	}
-      
-      if(fabs( fEndPoint[ip].w - fStartPoint[ip].w ) > max_length )
-	{
-	  max_length=fabs( fEndPoint[ip].w - fStartPoint[ip].w );
-	  best_plane=fPlaneID.at(ip);
-	}      
-    }
+      {
+	if(fabs( fEndPoint[ip].w - fStartPoint[ip].w ) < min_length )
+	  {
+	    min_length=fabs( fEndPoint[ip].w - fStartPoint[ip].w );
+	    worst_plane=fPlaneID.at(ip);
+	  }
+	
+	if(fabs( fEndPoint[ip].w - fStartPoint[ip].w ) > max_length )
+	  {
+	    max_length=fabs( fEndPoint[ip].w - fStartPoint[ip].w );
+	    best_plane=fPlaneID.at(ip);
+	  }      
+      }
     
     if(fVerbosity)
       std::cout << " worst plane is : " << worst_plane << " best: "<< best_plane   << std::endl;

@@ -29,6 +29,7 @@ namespace showerreco {
     //
     // Reconstruct and store
     //
+    fPlaneID.clear();
     fStartPoint.clear();
     fEndPoint.clear();
     fOmega2D.clear();
