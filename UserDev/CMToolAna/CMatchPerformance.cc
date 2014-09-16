@@ -20,6 +20,8 @@ namespace larlight {
 
   bool CMatchPerformance::initialize() {
 
+    print(MSG::DEBUG,__PRETTY_FUNCTION__,"called...");
+
     auto geo = ::larutil::Geometry::GetME();
     _view_to_plane.clear();
     _view_to_plane.resize(geo->Nplanes(),DATA::INVALID_UCHAR);
@@ -52,6 +54,8 @@ namespace larlight {
   }
   
   bool CMatchPerformance::analyze(storage_manager* storage) {
+
+    print(MSG::DEBUG,__PRETTY_FUNCTION__,"called...");
 
     auto geo = ::larutil::Geometry::GetME();
 
@@ -234,10 +238,18 @@ namespace larlight {
 
       if(max_eff < qratio_max) max_eff = qratio_max;
 
+      if(this->get_verbosity() <= MSG::DEBUG) 
+
+	print(MSG::DEBUG,__PRETTY_FUNCTION__,Form("Matching efficiency: %g",qratio_max));
+
       hMatchQEff->Fill(qratio_max);
     }
 
     if(reco_match_v.size()) {
+
+      if(this->get_verbosity() <= MSG::DEBUG) 
+
+	print(MSG::DEBUG,__PRETTY_FUNCTION__,Form("MAX efficiency in this event: %g",max_eff));
 
       hMatchQEffEvent->Fill(max_eff);
 
@@ -248,6 +260,8 @@ namespace larlight {
   }
 
   bool CMatchPerformance::finalize() {
+
+    print(MSG::DEBUG,__PRETTY_FUNCTION__,"called...");
 
     if(_fout) {
 
