@@ -80,7 +80,7 @@ namespace larlight {
     if(this->get_verbosity()==MSG::DEBUG)
 
       print(MSG::DEBUG,Form("CMatchPerformance::%s",__FUNCTION__),
-	    Form("Time to compute CPAN for all clusters: %g",fWatch.RealTime()));
+	    Form("Time to convert Hit=>PxHit for all clusters: %g",fWatch.RealTime()));
 
     fWatch.Start();
 
