@@ -37,6 +37,22 @@ namespace cluster{
     SetHits(inhitlist);
   }
 
+  void ClusterParamsAlg::TimeReport() const {
+
+    std::cout<< "  <<ClusterParamsAlg::TimeReport>> starts..."<<std::endl;
+    for(size_t i=0; i<fTimeRecord_ProcName.size(); ++i){
+
+      std::cout << "    Function: " 
+		<< fTimeRecord_ProcName[i].c_str() 
+		<< " ... Time = " 
+		<< fTimeRecord_ProcTime[i]
+		<< " [s]"
+		<< std::endl;
+      
+    }   
+    std::cout<< "  <<ClusterParamsAlg::TimeReport>> ends..."<<std::endl;
+  }
+
   int ClusterParamsAlg::SetHits(const std::vector<larutil::PxHit> &inhitlist){
 
     Initialize();
@@ -161,6 +177,12 @@ namespace cluster{
   void ClusterParamsAlg::Initialize()
   {
 
+    fTimeRecord_ProcName.clear();
+    fTimeRecord_ProcTime.clear();
+
+    TStopwatch localWatch;
+    localWatch.Start();
+
     // Set pointer attributes
     if(!fGSer) fGSer = (larutil::GeometryUtilities*)(larutil::GeometryUtilities::GetME());
 
@@ -202,7 +224,8 @@ namespace cluster{
     
     // Initialize the neural network:
     // enableFANN = false;
-
+    fTimeRecord_ProcName.push_back("Initialize");
+    fTimeRecord_ProcTime.push_back(localWatch.RealTime());
   }
 
   void ClusterParamsAlg::EnableFANN(){
@@ -248,6 +271,9 @@ namespace cluster{
       //OK, no override. Stop if we're already finshed.
       if (fFinishedGetAverages) return;
     }
+
+    TStopwatch localWatch;
+    localWatch.Start();
 
     TPrincipal fPrincipal(2,"D");
 
@@ -304,7 +330,11 @@ namespace cluster{
 
     fFinishedGetAverages = true;
     // Report();
+
+    fTimeRecord_ProcName.push_back("GetAverages");
+    fTimeRecord_ProcTime.push_back(localWatch.RealTime());
   }
+
 
   // Also does the high hitlist
   void ClusterParamsAlg::GetRoughAxis(bool override){
@@ -317,6 +347,9 @@ namespace cluster{
       //Try to run the previous function if not yet done.
       if (!fFinishedGetAverages) GetAverages(true);
     }
+
+    TStopwatch localWatch;
+    localWatch.Start();
 
     double rmsx = 0.0;
     double rmsy = 0.0;
@@ -365,6 +398,9 @@ namespace cluster{
  
     fFinishedGetRoughAxis = true;    
     // Report();
+
+    fTimeRecord_ProcName.push_back("GetRoughAxis");
+    fTimeRecord_ProcTime.push_back(localWatch.RealTime());
     return;
   }
 
@@ -378,6 +414,10 @@ namespace cluster{
     } else {
       if (!fFinishedGetRoughAxis) GetRoughAxis(true);
     }
+
+    TStopwatch localWatch;
+    localWatch.Start();
+
     bool drawOrtHistos = false;
       
     //these variables need to be initialized to other values? 
@@ -775,7 +815,10 @@ namespace cluster{
 
     fFinishedGetProfileInfo = true;
     // Report();
-    
+
+    fTimeRecord_ProcName.push_back("GetProfileInfo");
+    fTimeRecord_ProcTime.push_back(localWatch.RealTime());
+
     return;
   }
   
@@ -790,6 +833,9 @@ namespace cluster{
    * @param override [description]
    */
   void ClusterParamsAlg::RefineStartPoints(bool override) {
+
+    TStopwatch localWatch;
+    localWatch.Start();
 
     //
     // Why override is not used here? Kazu 05/01/2014
@@ -854,6 +900,10 @@ namespace cluster{
       // and use them to get the axis
       
       fFinishedRefineStartPoints = true;
+
+      fTimeRecord_ProcName.push_back("RefineStartPoints");
+      fTimeRecord_ProcTime.push_back(localWatch.RealTime());
+
       return;
     }
     
@@ -952,6 +1002,9 @@ namespace cluster{
       // and use them to get the axis
       
       fFinishedRefineStartPoints = true;
+
+      fTimeRecord_ProcName.push_back("RefineStartPoints");
+      fTimeRecord_ProcTime.push_back(localWatch.RealTime());
       return;
     }
     //need to find the min of the distance of vertex in tilda-space
@@ -1028,6 +1081,10 @@ namespace cluster{
 
     fFinishedRefineStartPoints = true;
    // Report();
+
+    fTimeRecord_ProcName.push_back("RefineStartPoints");
+    fTimeRecord_ProcTime.push_back(localWatch.RealTime());
+
     return;
   }
   
@@ -1047,6 +1104,8 @@ namespace cluster{
       if (!fFinishedRefineStartPoints) RefineStartPoints(true);
     }
 
+    TStopwatch localWatch;
+    localWatch.Start();
     /**
      * Calculates the following variables:
      * angle_2d
@@ -1198,9 +1257,9 @@ namespace cluster{
     }
     
     /// end testing
-    
-    
-    
+       
+    fTimeRecord_ProcName.push_back("GetFinalSlope");
+    fTimeRecord_ProcTime.push_back(localWatch.RealTime());
     
     fFinishedGetFinalSlope = true;
     return;
@@ -1217,6 +1276,9 @@ namespace cluster{
     // We don't use "override"? Should we remove? 05/01/14
     //
     if(!override) override = true;
+
+    TStopwatch localWatch;
+    localWatch.Start();
 
     // if(!override) { //Override being set, we skip all this logic.
     //   //OK, no override. Stop if we're already finshed.
@@ -1262,6 +1324,9 @@ namespace cluster{
     
     if (verbose && endStartDiff_y == 0 && endStartDiff_x == 0) {
       std::cerr << "Error:  end point and start point are the same!\n";
+
+      fTimeRecord_ProcName.push_back("RefineDirection");
+      fTimeRecord_ProcTime.push_back(localWatch.RealTime());
       return;
     }
 
@@ -1459,12 +1524,19 @@ namespace cluster{
 
     fFinishedRefineDirection = true;
 
+    fTimeRecord_ProcName.push_back("RefineDirection");
+    fTimeRecord_ProcTime.push_back(localWatch.RealTime());
+
     // return;
   } //end RefineDirection
   
 
   void ClusterParamsAlg::FillPolygon()
   {
+
+    TStopwatch localWatch;
+    localWatch.Start();
+
     if(fHitVector.size()) {
       std::vector<const larutil::PxHit*> container_polygon;
       fGSer->SelectPolygonHitList(fHitVector,container_polygon);
@@ -1479,6 +1551,9 @@ namespace cluster{
       }
       fParams.PolyObject = Polygon2D( vertices );
     }
+
+    fTimeRecord_ProcName.push_back("FillPolygon");
+    fTimeRecord_ProcTime.push_back(localWatch.RealTime());
   }
   
   
@@ -1488,59 +1563,68 @@ namespace cluster{
     // This function is meant to pick the direction.
     // It refines both the start and end point, and then asks 
     // if it should flip.
-    
+
+    TStopwatch localWatch;
+    localWatch.Start();
+
     if(verbose) std::cout << " here!!! "  << std::endl;
     
     if(!override) { //Override being set, we skip all this logic.
       //OK, no override. Stop if we're already finshed.
-    if (fFinishedRefineStartPointAndDirection) return;
+      if (fFinishedRefineStartPointAndDirection) {
+	fTimeRecord_ProcName.push_back("RefineStartPointAndDirection");
+	fTimeRecord_ProcTime.push_back(localWatch.RealTime());
+	return;
+      }
       //Try to run the previous function if not yet done.
-    if (!fFinishedGetProfileInfo) GetProfileInfo(true);
+      if (!fFinishedGetProfileInfo) GetProfileInfo(true);
     } else {
       //Try to run the previous function if not yet done.
       if (!fFinishedGetProfileInfo) GetProfileInfo(true);
     }
     if(verbose){
-    std::cout << "REFINING .... " << std::endl;
-    std::cout << "  Rough start and end point: " << std::endl; 
-    std::cout << "    s: (" << fParams.start_point.w << ", " 
-              << fParams.start_point.t << ")" << std::endl;
-    std::cout << "    e: (" << fParams.end_point.w << ", " 
-              << fParams.end_point.t << ")" << std::endl;
+      std::cout << "REFINING .... " << std::endl;
+      std::cout << "  Rough start and end point: " << std::endl; 
+      std::cout << "    s: (" << fParams.start_point.w << ", " 
+		<< fParams.start_point.t << ")" << std::endl;
+      std::cout << "    e: (" << fParams.end_point.w << ", " 
+		<< fParams.end_point.t << ")" << std::endl;
     }
     RefineStartPoints();
     if(verbose){
-    std::cout << "  Once Refined start and end point: " << std::endl;
-    std::cout << "    s: (" << fParams.start_point.w << ", " 
-              << fParams.start_point.t << ")" << std::endl;
-    std::cout << "    e: (" << fParams.end_point.w << ", " 
-              << fParams.end_point.t << ")" << std::endl;
-    std::swap(fParams.start_point,fParams.end_point);
-    std::swap(fRoughBeginPoint,fRoughEndPoint);
+      std::cout << "  Once Refined start and end point: " << std::endl;
+      std::cout << "    s: (" << fParams.start_point.w << ", " 
+		<< fParams.start_point.t << ")" << std::endl;
+	std::cout << "    e: (" << fParams.end_point.w << ", " 
+		  << fParams.end_point.t << ")" << std::endl;
+	std::swap(fParams.start_point,fParams.end_point);
+	std::swap(fRoughBeginPoint,fRoughEndPoint);
     }
     RefineStartPoints();
     if(verbose) {
-    std::cout << "  Twice Refined start and end point: " << std::endl;
-    std::cout << "    s: (" << fParams.start_point.w << ", " 
-              << fParams.start_point.t << ")" << std::endl;
-    std::cout << "    e: (" << fParams.end_point.w << ", " 
-              << fParams.end_point.t << ")" << std::endl;
-    std::swap(fParams.start_point,fParams.end_point);
-    std::swap(fRoughBeginPoint,fRoughEndPoint);
+      std::cout << "  Twice Refined start and end point: " << std::endl;
+      std::cout << "    s: (" << fParams.start_point.w << ", " 
+		<< fParams.start_point.t << ")" << std::endl;
+      std::cout << "    e: (" << fParams.end_point.w << ", " 
+		<< fParams.end_point.t << ")" << std::endl;
+      std::swap(fParams.start_point,fParams.end_point);
+      std::swap(fRoughBeginPoint,fRoughEndPoint);
     }
     RefineDirection();
     if(verbose) {
-    std::cout << "  Final start and end point: " << std::endl;
-    std::cout << "    s: (" << fParams.start_point.w << ", " 
-              << fParams.start_point.t << ")" << std::endl;
-    std::cout << "    e: (" << fParams.end_point.w << ", " 
-              << fParams.end_point.t << ")" << std::endl;
+      std::cout << "  Final start and end point: " << std::endl;
+      std::cout << "    s: (" << fParams.start_point.w << ", " 
+		<< fParams.start_point.t << ")" << std::endl;
+      std::cout << "    e: (" << fParams.end_point.w << ", " 
+		<< fParams.end_point.t << ")" << std::endl;
     }
     fParams.direction = (fParams.start_point.w < fParams.end_point.w)   ? 1 : -1;     
-	      
+    
+    fTimeRecord_ProcName.push_back("RefineStartPointAndDirection");
+    fTimeRecord_ProcTime.push_back(localWatch.RealTime());
     return;   
   }
-
+  
   void ClusterParamsAlg::TrackShowerSeparation(bool override){
     if(!override) return;
     if(verbose) std::cout << " ---- Trying T/S sep. ------ \n";
