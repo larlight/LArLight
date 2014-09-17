@@ -75,6 +75,7 @@
 #pragma link C++ class cmtool::CFAlgo3DAngle+;
 #pragma link C++ class cmtool::CFAlgoWireOverlap+;
 #pragma link C++ class cmtool::CFAlgoVolumeOverlap+;
+#pragma link C++ class cmtool::CFAlgoChargeDistrib+;
 //ADD_CFALGO_CLASS ... do not change this line
 
 
@@ -83,6 +84,7 @@
 #pragma link C++ class larlight::MatchViewer+;
 //ADD_NEW_CLASS ... do not change this line
 #endif
+
 
 
 

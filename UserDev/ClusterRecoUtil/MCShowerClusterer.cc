@@ -13,7 +13,7 @@ namespace larlight {
 
     //all hits will have the same width
     //guessing at this value now from looking at fEndTime-fStartTime for single e- shower hits
-    _hitwidth = 6000.;
+    _hitwidth = 3.;
 
     return true;
   }
@@ -153,9 +153,14 @@ namespace larlight {
 	    ::larlight::hit h;
 	    h.set_wire    ( w    );
 	    h.set_channel ( ch   );
-	    h.set_times   ( tdc - (_hitwidth/2), 
+
+	    double start_time = tdc - (_hitwidth/2);
+	    if(start_time<0) start_time = 0;
+
+	    h.set_times   ( start_time,
 			    tdc, 
 			    tdc + (_hitwidth/2) );
+
 	    h.set_view    ( view );
 
 	    h.set_charge  ( hitq, hitq );

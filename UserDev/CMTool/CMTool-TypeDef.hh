@@ -60,6 +60,7 @@
 #include "CFAlgoWireOverlap.hh"
 #include "CFAlgoVolumeOverlap.hh"
 #include "CFAlgoTimeProf.hh"
+#include "CFAlgoChargeDistrib.hh"
 //ADD_CFALGO_HEADER
 
 #include "MatchViewer.hh"
@@ -128,6 +129,7 @@ namespace cmtool {
   class CFAlgoWireOverlap;
   class CFAlgoVolumeOverlap;
   class CFAlgoTimeProf;
+  class CFAlgoChargeDistrib;
 //ADD_CFALGO_CLASS ... do not change this comment line
 
 }
@@ -152,6 +154,7 @@ namespace larlight {
 
 //ADD_EMPTY_CLASS ... do not change this comment line
 #endif
+
 
 
 

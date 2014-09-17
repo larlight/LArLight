@@ -100,7 +100,13 @@ namespace larlight {
       //sometimes you find a reco hit that doesn't correspond to an IDE
       //probably the IDE does not fall within the reco-d hit range (start->end time)
       if(matchedides.size()==0){
-	std::cerr<<"Warning. This reco hit didn't correspond to any IDE object. Returning a null vector."<<std::endl;
+	std::cerr
+	  << Form("Warning: a hit (channel=%d, peak=%g start=>end : %g => %g", 
+		  this_hit.Channel(),
+		  this_hit.PeakTime(),
+		  this_hit.StartTime(),
+		  this_hit.EndTime())
+	  <<std::endl;
 	std::vector<float> bad(0,-1);
 	return bad;
       }
@@ -207,7 +213,13 @@ namespace larlight {
 	//sometimes you find a reco hit that doesn't correspond to an IDE
 	//probably the IDE does not fall within the reco-d hit range (start->end time)
 	if(matchedides.size()==0){
-	  std::cerr<<"Warning. This reco hit didn't correspond to any IDE object. Returning a null vector."<<std::endl;
+	  std::cerr
+	    << Form("Warning: a hit (channel=%d, peak=%g start=>end : %g => %g", 
+		    this_hit->Channel(),
+		    this_hit->PeakTime(),
+		    this_hit->StartTime(),
+		    this_hit->EndTime())
+	    << std::endl;
 	  //std::vector<float> bad(0,-1);
 	  //return bad;
 	  continue;

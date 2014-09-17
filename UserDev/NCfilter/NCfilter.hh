@@ -18,7 +18,9 @@
 #include "ana_base.hh"
 #include "DivReg.hh"
 #include "ForceRegions.hh"
+#include "Quality.hh"
 #include "CRUHelper.hh"
+#include "PlaneCheckMatch.hh"
 #include "LArUtilBase.hh"
 
 
@@ -59,13 +61,14 @@ namespace larlight {
 	::cluster::DivReg fDivReg;
         ::cluster::CRUHelper fCRUHelper;
         ::cluster::ForceRegions fForceRegions;
+        ::cluster::Quality fQuality;
+        ::cluster::PlaneCheckMatch fPlaneCheckMatch;
 
 
 
     private: 
 	std::pair<double,double> HighQSlope(std::vector<unsigned int> hitindex ,larlight::event_hit const* hits);
-	std::vector<std::pair<std::vector<unsigned int>,std::vector<unsigned int>>> ForceRegions(larlight::event_hit const* hits,std::vector<std::pair<double,double>> APP);
-//	std::vector<std::pair<std::vector<unsigned int>,std::vector<unsigned int>>> CheckQuality(larlight::event_hit *const hits,std::vector<std::pair<std::vector<unsigned int>,std::vector<unsigned int>>> protocluster, std::vector<bool> Flags);
+	std::vector<std::pair<std::vector<unsigned int>,std::vector<unsigned int>>> CheckQuality(larlight::event_hit *const hits,std::vector<std::pair<std::vector<unsigned int>,std::vector<unsigned int>>> protocluster, std::vector<bool> Flags);
   };
 }
 #endif

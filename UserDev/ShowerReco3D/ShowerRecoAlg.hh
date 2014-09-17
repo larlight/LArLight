@@ -54,7 +54,7 @@ namespace showerreco {
    std::vector < double > fEnergy;    // for each plane
    std::vector < double > fMIPEnergy;    // for each plane
    std::vector < double > fdEdx;      
-   int fNPlanes;
+   std::vector <unsigned char> fPlaneID;
    
    double fcalodEdxlength;
    double fdEdxlength;

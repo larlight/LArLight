@@ -30,7 +30,9 @@ namespace cluster {
 	// what ever I want it to return 
    // std::vector<std::vector<unsigned int> > Cluster(const std::vector<std::vector<larutil::PxHit>>& hits) const;
   std::vector<std::pair<double,double>> SplitLine(const std::vector<std::vector<larutil::PxHit>>& hits) const;
-  std::vector<std::pair<double,double>> SplitLineC(const std::vector<larlight::cluster>& clusters, const std::vector<larlight::hit>& hits) const;
+  std::vector<std::pair<double,double>> SplitLineC(const std::vector<larlight::cluster>& clusters,const std::vector<larlight::hit>& hits) const;
+  std::vector<std::pair<double,double>> FlipLineC(const std::vector<larlight::cluster>& clusters,const std::vector<larlight::hit>& hits) const;
+  std::vector<std::pair<double,double>> RotateLineC(const std::vector<larlight::cluster>& clusters,const std::vector<larlight::hit>& hits) const;
 
   };
 }

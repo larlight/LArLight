@@ -20,7 +20,7 @@ namespace cmtool {
   }
 
   //------------------------------------------------------------------------------
-  float CPAlgo_Class_Name::Priority(const ::cluster::ClusterParamsAlgNew &cluster)
+  float CPAlgo_Class_Name::Priority(const ::cluster::ClusterParamsAlg &cluster)
   //------------------------------------------------------------------------------
   {
     if(cluster.GetNHits()) return 1.;

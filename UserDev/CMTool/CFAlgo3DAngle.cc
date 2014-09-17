@@ -13,8 +13,7 @@ namespace cmtool {
 	SetDebug(false) ;
 	SetThetaCut(30) ;
 	SetPhiCut(30)  ;
-	SetRatio(0.05) ;
-	cProfile = new TH1D("cProfile","Charge Profile",300,0,300);	
+	SetRatio(0.1) ;
 
   }
 
@@ -30,39 +29,37 @@ namespace cmtool {
   //----------------------------------------------------------------------------------------------
   {
     // Code-block by Kazu starts
-    // This ensures all entries in "clusters" pointer vector are valid pointers.
+    // This ensures the algorithm works only if # clusters is > 2 (and not =2)
     // You may take out this block if you want to allow matching using clusters from only 2 planes.
-    // But make sure you handle the case of null pointer
-    for(auto const& ptr : clusters) if(!ptr) return -1;
+    if(clusters.size()==2 || clusters.size()==1) return -1;
     // Code-block by Kazu ends
 
 
-	int plane_0 = clusters.at(0)->GetParams().start_point.plane ;
-	int plane_1 = clusters.at(1)->GetParams().start_point.plane ;
-	int plane_2 = clusters.at(2)->GetParams().start_point.plane ;
-
+	int plane_0 = clusters.at(0)->Plane();
+	int plane_1 = clusters.at(1)->Plane();
+	int plane_2 = clusters.at(2)->Plane();
 	double angle_2d_0 = clusters.at(0)->GetParams().angle_2d;
 	double angle_2d_1 = clusters.at(1)->GetParams().angle_2d;
 	double angle_2d_2 = clusters.at(2)->GetParams().angle_2d;
+	auto hits_0 = clusters.at(0)->GetParams().N_Hits ;
+	auto hits_1 = clusters.at(1)->GetParams().N_Hits ;
+	auto hits_2 = clusters.at(2)->GetParams().N_Hits ;
+
 
 	//Calculate angles theta and phi for cluster pairs across 2 planes
+	//Theta goes from -90 to 90, phi from -180 to 180
 	double phi_01    = 0;   	
 	double theta_01  = 0;
 	double phi_12    = 0;   
 	double theta_12  = 0;
-	double phi_02 	= 0;
-	double theta_02 = 0;
+	double phi_02 	 = 0;
+	double theta_02  = 0;
 
 	double max_phi(0), middle_phi(0), min_phi(0);
 	double max_theta(0), middle_theta(0), min_theta(0); 
 
-	auto hits_0 = clusters.at(0)->GetParams().N_Hits ;
-	auto hits_1 = clusters.at(1)->GetParams().N_Hits ;
-	auto hits_2 = clusters.at(2)->GetParams().N_Hits ;
-	
 	//For ordering hits and rejecting pairs which have a large difference in hit number
 	double max_hits(0), middle_hits(0), min_hits(0) ;
-
 
 ////////CHARGE PROFILE CALCULATION
 /*	double hitDistance_radius = 0;
@@ -104,7 +101,7 @@ namespace cmtool {
 	//Calculate phi and theta from first 2 planes; check if third plane is consistent
 	larutil::GeometryUtilities::GetME()->Get3DaxisN(plane_0,plane_1,angle_2d_0,angle_2d_1,phi_01,theta_01);	
 	larutil::GeometryUtilities::GetME()->Get3DaxisN(plane_1,plane_2,angle_2d_1,angle_2d_2,phi_12,theta_12);	
-	larutil::GeometryUtilities::GetME()->Get3DaxisN(plane_2,plane_0,angle_2d_2,angle_2d_0,phi_02,theta_02);	
+	larutil::GeometryUtilities::GetME()->Get3DaxisN(plane_2,plane_0,angle_2d_2,angle_2d_0,phi_02,theta_02);
 
 	//Adjust the range of phis/thetas that are bigger than 360 or less than 0.
 	FixPhiTheta(phi_01,theta_01);
@@ -117,49 +114,81 @@ namespace cmtool {
 
 	//Order hits from most to least 	
 	SetMaxMiddleMin(hits_0,hits_1,hits_2,max_hits,middle_hits,min_hits);
-	
+
+	//Ratio for hits	
 	double ratio_max_min = 1;
 	double ratio_max_middle =1;
+
+	//Ratio for theta angle
+	double ratio_theta1 = 1;
+	double ratio_theta2 = 1; 
+	
+	//Total ratio
 	double ratio 		= 1;		
 
-	//Test ratio for ChooseThetaOrPhi
-	double ratio_angle =1;
-
-	//This takes into account the fact that 0 and 360 having the same relative value (for both theta and phi)
-	if(min_phi + 360 < max_phi +_phi_cut && min_phi +360 > max_phi - _phi_cut)
-	 {	
+	//This takes into account the fact that 0 and 360 having the same relative value (for phi; 0 and 180 for theta)
+	while(min_phi + 360 < max_phi +_phi_cut && min_phi +360 > max_phi - _phi_cut)
+      {	
 		min_phi +=360 ;
 		SetMaxMiddleMin(max_phi, middle_phi, min_phi,max_phi,middle_phi,min_phi);
 	  }
 
-	 if(min_theta + 360 < max_theta +_theta_cut && min_theta +360 > max_theta -  _theta_cut)
-	  {	
-		min_theta +=360 ;
-		SetMaxMiddleMin(max_theta,middle_theta,min_theta,max_theta,middle_theta,min_theta);
-	   }
+	ratio_theta2 = min_theta / max_theta;
+	ratio_theta1 = middle_theta / max_theta; 
+	
+	ratio_max_min = min_hits / max_hits ;
+	ratio_max_middle = middle_hits / max_hits ;	
 
-	ChooseThetaOrPhi(max_theta,middle_theta,min_theta,max_phi,middle_phi,min_phi,ratio_angle);
+	ratio = ratio_theta1* ratio_theta2 ; 
 
+
+	//Want to take into account several situations with the goal of not adding hit-weight
+	//to matches which are likely correct :
+	//(1) Normal case: At least one of the theta ratios is smaller than 0.9 --weight 
+	// 	  if middle/max ratio is too small ( < 0.63) .  
+	//(2) If both theta ratios are big ( >0.92 ), but middle/max hit ratio is small, 
+	//    weight the ratio to make it smaller
+	//(3) Sometimes more than 1 set of clusters have very big theta ratios( >0.96 )--  
+	//    In these cases, look to min/max hit ratio--weight ratio if this is too small
+	if(( ratio_theta1 < 0.92 || ratio_theta2 <0.92) && ratio_max_middle < 0.63 )
+		ratio *= ratio_max_middle ;
+	
+	if( (ratio_theta1 > 0.92 && ratio_theta2 > 0.92) && ratio_max_middle < 0.63 )
+		ratio *= ratio_max_middle ;
+
+	if( (ratio_theta1 > 0.96 && ratio_theta2 > 0.96) && ratio_max_middle > 0.63 && ratio_max_min < 0.75)
+		ratio *= ratio_max_middle;
+		
 	//Test to make sure that max hits is not too much bigger than min
-	if(max_hits > middle_hits + 600 )
-		ratio *=0.01 ;
-	else{
-		ratio_max_min = min_hits / max_hits ;
-		ratio_max_middle = middle_hits/max_hits ;	
-		ratio = ratio_angle * ratio_max_min * ratio_max_middle ;
-		}	
+	if( ratio_max_min <0.28)
+		ratio *= ratio_max_min ;
+
+	//GeometryUtilities returns theta=-999 when 2d Angle=0--Don't know
+	//how else to deal with that. This seems to work.
+	if( theta_01 == -999 || theta_12 == -999 || theta_02 == -999)
+		return -1 ;
+
 
 	if(_debug && ratio > _ratio_cut ){
 		std::cout<<"\nNhits planes 0, 1, 2: " <<clusters.at(0)->GetParams().N_Hits<<", "<<clusters.at(1)->GetParams().N_Hits
 				 <<", "<<clusters.at(2)->GetParams().N_Hits ;
-		std::cout<<"\nTotal ratio is: " <<ratio<<" ratio_angle: "<<ratio_angle ; 
-		std::cout<<"\nStart End Points:  "<<clusters.at(0)->GetParams().start_point.w<<", "<<clusters.at(0)->GetParams().end_point.w<<"\n\t\t"
-		<<clusters.at(1)->GetParams().start_point.w<<", "<<clusters.at(1)->GetParams().end_point.w<<"\n\t\t "
-		<<clusters.at(2)->GetParams().start_point.w<<", "<<clusters.at(2)->GetParams().end_point.w;
-	
+		std::cout<<"\n\nTheta1 , Theta2 : "<<ratio_theta1<<", "<<ratio_theta2;
+		std::cout<<"\nHits ratio mid : "<<ratio_max_middle ;
+		std::cout<<"\nHits ratio min : "<<ratio_max_min ;
+		std::cout<<"\nTotal ratio is: " <<ratio<<" ***************";
+
+
+		std::cout<<"\n\n0: 2dAngle: "<<clusters.at(0)->GetParams().cluster_angle_2d<<std::endl;
+		std::cout<<"1: 2dAngle: "<<clusters.at(1)->GetParams().cluster_angle_2d<<std::endl;
+		std::cout<<"2: 2dAngle: "<<clusters.at(2)->GetParams().cluster_angle_2d<<std::endl;
 		std::cout<<"\nTheta,Phi MaxMM : "<<max_theta<<", "<<middle_theta<<", "<<min_theta<<"\n\t\t"
 				 <<max_phi<<", "<<middle_phi<<", "<<min_phi;
-		std::cout<<"\nFor planes 0 and 1: "<<std::endl ;
+		
+		std::cout<<"\nStart End Points:  "<<clusters.at(0)->GetParams().start_point.t<<", "<<clusters.at(0)->GetParams().end_point.t<<"\n\t\t"
+		<<clusters.at(1)->GetParams().start_point.t<<", "<<clusters.at(1)->GetParams().end_point.t<<"\n\t\t "
+		<<clusters.at(2)->GetParams().start_point.t<<", "<<clusters.at(2)->GetParams().end_point.t;
+
+/*		std::cout<<"\nFor planes 0 and 1: "<<std::endl ;
 		std::cout<<"\tPhi : "<<phi_01<<std::endl;
 		std::cout<<"\tTheta : "<<theta_01<<std::endl ;
 		std::cout<<"For planes 1 and 2: "<<std::endl ;
@@ -167,10 +196,9 @@ namespace cmtool {
 		std::cout<<"\tTheta : "<<theta_12<<std::endl ;
 		std::cout<<"For plane 0 and 2: "<<std::endl ;
 		std::cout<<"\tPhi : "<<phi_02<<std::endl ;
-		std::cout<<"\tTheta : "<<theta_02<<std::endl;
-		std::cout<<"MATCH FOUND************************"<<std::endl<<std::endl;
+		std::cout<<"\tTheta : "<<theta_02<<std::endl; */
+		std::cout<<"\nNEW CLUSTERS PAIRS NOW\n\n\n"<<std::endl<<std::endl;
 	}
-	
 	
 	return(ratio > _ratio_cut ? ratio : -1) ;
   }
@@ -179,31 +207,17 @@ namespace cmtool {
   void CFAlgo3DAngle::FixPhiTheta(double &phi, double &theta)
  //--------------------------------	
    {
-		while(phi <= 0)
-			phi +=360 ;
-		while(phi > 360)
+		while(phi <= 30)
+			phi += 360 ;
+		while(phi > 720)
 			phi -= 360 ;
 
-		while(theta <= 0)
-			theta += 360 ;
-	    while(theta > 360)
-			theta-=360;
+
+		if(theta != -999)
+			theta += 180 ;
+
 	}	
 
-  //------------------------------
-  void CFAlgo3DAngle::SetMaxMin(const double angle_1, const double angle_2, double &max_angle, double &min_angle)
-  //------------------------------
-	{
-
-		if(angle_1 > angle_2){
-			max_angle = angle_1 ;
-			min_angle = angle_2 ;
-		 }
-		else{
-			max_angle = angle_2;
-			min_angle	= angle_1 ;
-		  }
-   }
 
   //------------------------------
   void CFAlgo3DAngle::SetMaxMiddleMin(const double first, const double second, const double third, double &max, double &middle, double &min) 
@@ -284,42 +298,6 @@ namespace cmtool {
 	
 
 }
-
- //--------------------------------
-  void CFAlgo3DAngle::ChooseThetaOrPhi(const double theta_max, const double theta_middle, const double theta_min, const double phi_max, const double phi_middle, const double phi_min, double &ratio_angle)
- //--------------------------------	
-   {
-	double theta_diff_1 = 0;
-	double theta_diff_2 = 0;
-	double phi_diff_1 = 0;
-	double phi_diff_2 = 0;
-
-	//Note: We only need theta_diff_2, phi_diff_2 in the event that theta_diff_1, phi_diff_1 are 0	
-	theta_diff_1 = theta_max - theta_middle ;
-	theta_diff_2 = theta_middle - theta_min ;
-	phi_diff_1  = phi_max - phi_middle ;
-	phi_diff_2  = phi_middle - phi_min ;
-
-
-	if(theta_diff_1 != 0 ){
-    	if(phi_diff_1 != 0 && phi_diff_1 < theta_diff_1) 
-			ratio_angle = phi_middle/phi_max ; 
-		else if(phi_diff_1 ==0 && phi_diff_2 < theta_diff_1) 
-			ratio_angle =  phi_min/phi_middle;
-		else 
-			ratio_angle = theta_middle/theta_max;
-		}
-	else if(theta_diff_1 ==0){
-    	if(phi_diff_1 != 0 && phi_diff_1 < theta_diff_2) 
-			ratio_angle = phi_middle/phi_max ; 
-		else if(phi_diff_1 ==0 && phi_diff_2 < theta_diff_2) 
-			ratio_angle =  phi_min/phi_middle;
-		else 
-			ratio_angle = theta_min/theta_middle;
-		}
-	
-
-	}
 
 
   //------------------------------

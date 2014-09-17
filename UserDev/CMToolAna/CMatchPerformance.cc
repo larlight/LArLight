@@ -20,7 +20,7 @@ namespace larlight {
 
   bool CMatchPerformance::initialize() {
 
-    fBTAlgo.SetMaxEnergyCut(1900/2.);
+    print(MSG::DEBUG,Form("CMatchPerformance::%s",__FUNCTION__),"called...");
 
     auto geo = ::larutil::Geometry::GetME();
     _view_to_plane.clear();
@@ -55,6 +55,13 @@ namespace larlight {
   
   bool CMatchPerformance::analyze(storage_manager* storage) {
 
+    if(this->get_verbosity()==MSG::DEBUG) {
+
+      std::cout<<std::endl;
+      print(MSG::DEBUG,Form("CMatchPerformance::%s",__FUNCTION__),"start...");
+
+    }
+
     auto geo = ::larutil::Geometry::GetME();
 
     //
@@ -66,19 +73,32 @@ namespace larlight {
 
     std::vector<std::vector<larutil::PxHit> > clusters;
 
+    fWatch.Start();
+
     fHelper.GeneratePxHit(storage,_cluster_type,clusters);
+    
+    if(this->get_verbosity()==MSG::DEBUG)
+
+      print(MSG::DEBUG,Form("CMatchPerformance::%s",__FUNCTION__),
+	    Form("Time to convert Hit=>PxHit for all clusters: %g",fWatch.RealTime()));
+
+    fWatch.Start();
 
     fMgr->Reset();
 
     fMgr->SetClusters(clusters);
 
     try{
-
       fMgr->Process();
     }catch( ::cmtool::CMTException &e){
       e.what();
       return false;
     }
+
+    if(this->get_verbosity()==MSG::DEBUG)
+
+      print(MSG::DEBUG,Form("CMatchPerformance::%s",__FUNCTION__),
+	    Form("Time to process matching: %g",fWatch.RealTime()));
 
     // Done matching clusters. Get result
     auto bk = fMgr->GetBookKeeper();
@@ -109,14 +129,27 @@ namespace larlight {
 
     }
 
+    if(this->get_verbosity()==MSG::DEBUG) 
+      print(MSG::DEBUG,Form("CMatchPerformance::%s",__FUNCTION__),
+	    Form("Event %d found %zu matches...",ev_mcshower->event_id(),reco_match_v.size()));
+    
+    if(!(reco_match_v.size())) return true;
+
     // Convert to necessary map for back-tracking
     std::map<UInt_t,UInt_t> shower_idmap;
 
     std::map<UShort_t, larlight::simch> simch_map;
 
+    fWatch.Start();
+
     fBTAlgo.FillShowerMap(ev_mcshower, shower_idmap);
 
     fBTAlgo.FillSimchMap(ev_simch, simch_map);
+
+    if(this->get_verbosity()==MSG::DEBUG)
+
+      print(MSG::DEBUG,Form("CMatchPerformance::%s",__FUNCTION__),
+	    Form("Time to prepare McshowerLookback: %g",fWatch.RealTime()));
 
     // Preparation done
 
@@ -157,6 +190,7 @@ namespace larlight {
     std::vector<double> cluster_charge;
     qfrac_v.reserve(ev_cluster->size());
     cluster_charge.reserve(ev_cluster->size());
+    fWatch.Start();
     for(auto const& c : *ev_cluster) {
 
       // Create hit list
@@ -176,6 +210,11 @@ namespace larlight {
 
     }
 
+    if(this->get_verbosity()==MSG::DEBUG)
+
+      print(MSG::DEBUG,Form("CMatchPerformance::%s",__FUNCTION__),
+	    Form("Time to back-track all clusters: %g",fWatch.RealTime()));
+
     //
     // Find the best matched pair (and its charge) per MCShower
     //
@@ -186,6 +225,7 @@ namespace larlight {
     std::vector<std::vector<double> > bmatch_q  (mcshower_id.size(),std::vector<double>(geo->Nplanes(),0));
     std::vector<std::vector<size_t> > bmatch_id (mcshower_id.size(),std::vector<size_t>(geo->Nplanes(),0));
 
+    fWatch.Start();
     for(size_t shower_index=0; shower_index < mcshower_id.size(); ++shower_index) {
 
       for(size_t cluster_index=0; cluster_index < ev_cluster->size(); ++cluster_index) {
@@ -206,10 +246,16 @@ namespace larlight {
       }
     }
 
+    if(this->get_verbosity()==MSG::DEBUG)
+
+      print(MSG::DEBUG,Form("CMatchPerformance::%s",__FUNCTION__),
+	    Form("Time to find best matched pair(s): %g",fWatch.RealTime()));
+
     //
     // Evaluate efficiency
     //
     double max_eff=0;
+    fWatch.Start();
     for(auto const& match : reco_match_v) {
 
       // Compute efficiency per MCShower
@@ -236,10 +282,23 @@ namespace larlight {
 
       if(max_eff < qratio_max) max_eff = qratio_max;
 
+      if(this->get_verbosity() <= MSG::DEBUG) 
+
+	print(MSG::DEBUG,Form("CMatchPerformance::%s",__FUNCTION__),Form("Matching efficiency: %g",qratio_max));
+
       hMatchQEff->Fill(qratio_max);
     }
 
+    if(this->get_verbosity()==MSG::DEBUG)
+
+      print(MSG::DEBUG,Form("CMatchPerformance::%s",__FUNCTION__),
+	    Form("Time to evaluate every matched pair: %g",fWatch.RealTime()));
+
     if(reco_match_v.size()) {
+
+      if(this->get_verbosity() <= MSG::DEBUG) 
+
+	print(MSG::DEBUG,Form("CMatchPerformance::%s",__FUNCTION__),Form("MAX efficiency in this event: %g",max_eff));
 
       hMatchQEffEvent->Fill(max_eff);
 
@@ -250,6 +309,10 @@ namespace larlight {
   }
 
   bool CMatchPerformance::finalize() {
+
+    if(this->get_verbosity()==MSG::DEBUG)
+      
+      print(MSG::DEBUG,Form("CMatchPerformance::%s",__FUNCTION__),"called...");
 
     if(_fout) {
 

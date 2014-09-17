@@ -20,8 +20,8 @@ namespace cmtool {
   }
 
   //--------------------------------------------------------------------------
-  bool CBAlgo_Class_Name::Bool(const ::cluster::ClusterParamsAlgNew &cluster1,
-			       const ::cluster::ClusterParamsAlgNew &cluster2)
+  bool CBAlgo_Class_Name::Bool(const ::cluster::ClusterParamsAlg &cluster1,
+			       const ::cluster::ClusterParamsAlg &cluster2)
   //--------------------------------------------------------------------------
   {
     if(cluster1.GetNHits() && cluster2.GetNHits()) return false;

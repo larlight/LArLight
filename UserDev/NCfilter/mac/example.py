@@ -25,7 +25,7 @@ my_proc.set_output_file("out.root")
 # Specify input TDirectory name if given
 if len(sys.argv) > 2:
 
-    my_proc.set_input_rootdir(sys.argv[2])
+    my_proc.set_rootdir(sys.argv[2])
 
 # Specify output root file name
 my_proc.set_ana_output_file("from_test_ana_you_can_remove_me.root");

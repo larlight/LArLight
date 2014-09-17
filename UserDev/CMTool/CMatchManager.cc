@@ -156,6 +156,8 @@ namespace cmtool {
   bool CMatchManager::IterationProcess()
   {
 
+    TStopwatch localWatch;
+
     //
     // Create plane-by-plane vectors
     //
@@ -223,8 +225,25 @@ namespace cmtool {
 	ptr_v.push_back(&(_in_clusters.at(in_cluster_index)));
 
       }
+
+      if(_debug_mode <= kPerMerging){
+	
+	std::cout
+	  << "    \033[93m"
+	  << "Inspecting a pair (";
+	for(auto const& index : tmp_index_v)
+	  std::cout << index << " ";
+	std::cout<<") \033[00m" << std::flush;
+
+	localWatch.Start();
+
+      }
       
       auto const& score = _match_algo->Float(ptr_v);
+
+      if(_debug_mode <= kPerMerging)
+
+	std::cout << " ... Time taken = " << localWatch.RealTime() << " [s]" << std::endl;
 
       if(score>0)
 	

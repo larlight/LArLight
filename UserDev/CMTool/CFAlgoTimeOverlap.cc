@@ -29,10 +29,9 @@ namespace cmtool {
    {
 
     // Code-block by Kazu starts
-    // This ensures all entries in "clusters" pointer vector are valid pointers.
+    // This ensures the algorithm works only if # clusters is > 2 (and not =2)
     // You may take out this block if you want to allow matching using clusters from only 2 planes.
-    // But make sure you handle the case of null pointer
-    for(auto const& ptr : clusters) if(!ptr) return -1;
+    if(clusters.size()==2) return -1;
     // Code-block by Kazu ends
 
 	double ratio				 = 1;
@@ -40,7 +39,6 @@ namespace cmtool {
 	double max_time_difference	 = 0;
 	double max_charge			 = 0;
 	double charge_ratio 		 = 1;	
-	//double adjusted_charge_ratio = 1;
 
     //Preserve location in time space. Cut clusters that have similar time differences,
 	// but hit wires at very different times. 
@@ -48,6 +46,11 @@ namespace cmtool {
 	double end_t				 = 0;
 	double prev_start_t 		 = 0;
 	double prev_end_t 		 = 0;
+
+	double max_hits = 0;
+	double min_hits = 0;
+	double middle_hits = 0;
+
 
 	for(auto const& c : clusters){
 
@@ -66,6 +69,10 @@ namespace cmtool {
 	
 	}
 
+		auto hits_0 = clusters.at(0)->GetParams().N_Hits; 
+		auto hits_1 = clusters.at(1)->GetParams().N_Hits; 
+		auto hits_2 = clusters.at(2)->GetParams().N_Hits; 
+
 	 for(auto const& c: clusters){
 		if(c->Plane()==0){
 			ratio=1;
@@ -74,7 +81,12 @@ namespace cmtool {
 		
 		double length = c->GetParams().length ;
 		auto charge = c->GetParams().sum_charge ;		
-	
+
+
+
+		  //Order hits from most to least     
+    	 SetMaxMiddleMin(hits_0,hits_1,hits_2,max_hits,middle_hits,min_hits);
+
      		//Make start_t always smaller
 			if(c->GetParams().start_point.t > c->GetParams().end_point.t){
 					start_t = c->GetParams().end_point.t   ;
@@ -93,10 +105,11 @@ namespace cmtool {
 			time_difference  = end_t - start_t ; 
 
 			ratio *= time_difference/max_time_difference ;
-//			charge_ratio *= charge/max_charge ;
-//			adjusted_charge_ratio = charge_ratio * ratio ;
-	
-			ratio *= charge_ratio ;
+
+			charge_ratio = middle_hits/max_hits ;// charge/max_charge ;
+
+			if(c->Plane() == 2)	
+				ratio *= charge_ratio ;
 	
 			//If current cluster's start time is not within some range of the previous cluster's start time,
 			//modify ratio to disallow matching
@@ -111,7 +124,7 @@ namespace cmtool {
 			prev_start_t = start_t ;
 			prev_end_t 	 = end_t ;	
 		
-			if( _verbose ){//&& ratio > _time_ratio_cut ){
+			if( _debug && c->Plane() ==2 && ratio > _time_ratio_cut ){
 				std::cout<<"\nPLANE: "<<c->Plane() ;
 				std::cout<<"\nStart point: "<<start_t<<std::endl;
 				std::cout<<"End Point: "<<end_t  <<std::endl;
@@ -120,7 +133,8 @@ namespace cmtool {
 				std::cout<<"Max time diff: "<<max_time_difference<<std::endl;
 				std::cout<<"Ratio for each cluster: "<<ratio<<std::endl;
 //				std::cout<<"Charge: "<<charge<<std::endl;
-//				std::cout<<"Charge Ratio: "<<charge_ratio<<std::endl;
+				std::cout<<"Charge Ratio: "<<charge_ratio<<std::endl;
+				std::cout<<"Hits are: "<<min_hits<<", "<<middle_hits<<", "<<max_hits<<std::endl;
 //				std::cout<<"Adjusted Charge Ratio: "<<adjusted_charge_ratio<<std::endl;
 				std::cout<<"Length and Width: "<<c->GetParams().length<<", "<<c->GetParams().width<<std::endl;
 				} 
@@ -133,6 +147,90 @@ namespace cmtool {
 	return (ratio > _time_ratio_cut ? ratio : -1 ); 
 
 }
+
+//------------------------------
+  void CFAlgoTimeOverlap::SetMaxMiddleMin(const double first, const double second, const double third, double &max, double &middle, double &min)
+  //------------------------------
+  {
+
+    if(first > second && first > third){
+        max = first;
+        }
+    else if (first > second && first < third){
+        max = third ;
+        middle = first ;
+        min = second ;
+        }
+    else if (first > third && first < second){
+        max = second ;
+        middle = first ;
+        min = third ;
+        }
+    else if(first <second && first <third)
+        min = first ;
+
+
+    if (max == first && second > third){
+        middle = second ;
+        min = third    ;
+        }
+    else if (max ==first && third > second){
+        middle = third ;    
+        min = second    ;   
+        }   
+
+    if(min ==first && second > third){
+        middle = third ;
+        max = second;
+        }   
+    else if(min ==first && third > second){
+        middle = second ;
+        max = third ;
+        }   
+
+
+    //Very rarely, the angles(or hits) may be equal
+    if( first == second && first > third ){
+        max = first;
+        middle = second ;
+        min = third ;
+        }
+    else if( first == second && first < third){
+        max = third;
+        middle = first ;
+        min = second ;
+        }
+
+ 	 else if( first ==third && first > second){
+        max = first;
+        middle = third;
+        min = second;
+        }
+
+    else if( first == third && first < second){
+        max = second ;
+        middle = first;
+        min = third ;
+        }
+
+    else if( second ==third && second < first){
+        max = first;
+        middle = third;
+        min = second;
+        }
+
+    else if( second == third && second > first){
+        max = second;
+        middle = third;
+        min = first ;
+        }
+
+
+}
+
+
+
+
 
 
   //------------------------------

@@ -25,6 +25,8 @@ namespace cmtool {
   void CMManagerBase::SetClusters(const std::vector<std::vector<larutil::PxHit> > &clusters)
   {
 
+    TStopwatch localWatch;
+
     // Reset
     this->Reset();
 
@@ -45,8 +47,20 @@ namespace cmtool {
 
       if((*_in_clusters.rbegin()).SetHits(c) < 3) continue;
       (*_in_clusters.rbegin()).DisableFANN();
-      (*_in_clusters.rbegin()).FillParams(true,true,true,true,true,false);
+      //(*_in_clusters.rbegin()).FillParams(true,true,true,true,true,false);
+      (*_in_clusters.rbegin()).FillParams(false,false,false,false,false,false);
       (*_in_clusters.rbegin()).FillPolygon();
+
+    }
+
+    if(_time_report) {
+      std::cout << Form("  CMManagerBase Time Report: SetClusters (CPAN computation) = %g [s]",
+			localWatch.RealTime())
+		<< " ... details below." << std::endl;
+
+      for(auto const& c : _in_clusters)
+
+	c.TimeReport();
 
     }
     
@@ -54,7 +68,15 @@ namespace cmtool {
 
   void CMManagerBase::SetClusters(const std::vector<cluster::ClusterParamsAlg> &clusters)
   {
+    TStopwatch localWatch;
+
+    localWatch.Start();
+
     _in_clusters = clusters;
+
+    if(_time_report) std::cout << Form("  CMManagerBase Time Report: SetClusters (copy) = %g [s]",
+				       localWatch.RealTime())
+			       << std::endl;
   }
 
   void CMManagerBase::Process()
@@ -63,33 +85,67 @@ namespace cmtool {
     if(!(_in_clusters.size()))
 
       return;
-    
+
+    TStopwatch localWatch;
+
+    localWatch.Start();
+
     EventBegin();
+
+    if(_time_report) std::cout << Form("  CMManagerBase Time Report: EventBegin = %g [s]",
+				     localWatch.RealTime())
+			       << std::endl;
 
     bool keep_going = true;
 
     while(keep_going) {
 
+      localWatch.Start();
+
       IterationBegin();
 
+      if(_time_report) std::cout << Form("  CMManagerBase Time Report: IterationBegin = %g [s]",
+				       localWatch.RealTime())
+				 << std::endl;
+
+      localWatch.Start();
+      
       keep_going = IterationProcess();
+
+      if(_time_report) std::cout << Form("  CMManagerBase Time Report: IterationProcess = %g [s]",
+					 localWatch.RealTime())
+				 << std::endl;
+      localWatch.Start();
 
       IterationEnd();
 
-      if(!_merge_till_converge)
+      if(_time_report) std::cout << Form("  CMManagerBase Time Report: IterationEnd = %g [s]",
+					 localWatch.RealTime())
+				 << std::endl;
 
+      if(!_merge_till_converge)
+	
 	break;
     }
 
     if(!keep_going && _debug_mode <= kPerIteration)
       
       std::cout << "\033[93m  Iterative approach = OFF ... exiting from iteration loop. \033[00m" << std::endl;
+    
+    localWatch.Start();
 
     EventEnd();
 
+    if(_time_report) std::cout << Form("  CMManagerBase Time Report: EventEnd = %g [s]",
+				       localWatch.RealTime())
+			       << std::endl;
+    
   }
 
   void CMManagerBase::ComputePriority(const std::vector<cluster::ClusterParamsAlg> &clusters) {
+
+    TStopwatch localWatch;
+    localWatch.Start();
 
     _priority.clear();
     _planes.clear();
@@ -124,6 +180,10 @@ namespace cmtool {
       
     }
     
+    if(_time_report) std::cout << Form("  CMManagerBase Time Report: ComputePriority = %g [s]",
+				       localWatch.RealTime())
+			       << std::endl;
+
   }
 
 

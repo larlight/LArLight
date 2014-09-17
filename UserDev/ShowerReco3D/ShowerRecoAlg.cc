@@ -8,7 +8,7 @@ namespace showerreco {
   ShowerRecoAlg::ShowerRecoAlg() : ShowerRecoAlgBase(), fGSer(nullptr)
   {
     
-    fNPlanes=0;
+    fPlaneID.clear();
     fStartPoint.clear();
     fEndPoint.clear();
     fOmega2D.clear();
@@ -29,8 +29,7 @@ namespace showerreco {
     //
     // Reconstruct and store
     //
-    fNPlanes=clusters.size();
-    
+    fPlaneID.clear();
     fStartPoint.clear();
     fEndPoint.clear();
     fOmega2D.clear();
@@ -43,7 +42,8 @@ namespace showerreco {
       {
         fStartPoint.push_back(cl.GetParams().start_point);    // for each plane
 	fEndPoint.push_back(cl.GetParams().end_point);    // for each plane
-        fOmega2D.push_back(cl.GetParams().angle_2d);     
+        fOmega2D.push_back(cl.GetParams().angle_2d);
+	fPlaneID.push_back(cl.Plane());
 	if(fVerbosity) {
 	  std::cout << " planes : " <<   (int)cl.GetParams().start_point.plane 
 		    << " " << cl.GetParams().end_point.plane 
@@ -59,29 +59,29 @@ namespace showerreco {
     int worst_plane=-1,best_plane=-1;
     double min_length=9999999;
     double max_length=0;
-    for (int ip=0;ip<fNPlanes;ip++)
-    {
-      if(fabs( fEndPoint[ip].w - fStartPoint[ip].w ) < min_length )
-	{
-	  min_length=fabs( fEndPoint[ip].w - fStartPoint[ip].w );
-	  worst_plane=fStartPoint[ip].plane;
-	}
-      
-      if(fabs( fEndPoint[ip].w - fStartPoint[ip].w ) > max_length )
-	{
-	  max_length=fabs( fEndPoint[ip].w - fStartPoint[ip].w );
-	  best_plane=fStartPoint[ip].plane;
-	}      
-    }
+    for (int ip=0;ip<fPlaneID.size();ip++)
+      {
+	if(fabs( fEndPoint[ip].w - fStartPoint[ip].w ) < min_length )
+	  {
+	    min_length=fabs( fEndPoint[ip].w - fStartPoint[ip].w );
+	    worst_plane=fPlaneID.at(ip);
+	  }
+	
+	if(fabs( fEndPoint[ip].w - fStartPoint[ip].w ) > max_length )
+	  {
+	    max_length=fabs( fEndPoint[ip].w - fStartPoint[ip].w );
+	    best_plane=fPlaneID.at(ip);
+	  }      
+      }
     
     if(fVerbosity)
       std::cout << " worst plane is : " << worst_plane << " best: "<< best_plane   << std::endl;
     
     int index_to_use[2]={0,1};  // for a two plane detector we have no choice.
-    if(fNPlanes>2)
+    if(fPlaneID.size()>2)
       {
 	int local_index=0;
-	for(int ip=0;ip<fNPlanes;ip++) 
+	for(int ip=0;ip<fPlaneID.size();ip++) 
 	  {
 	    if(fStartPoint[ip].plane!=worst_plane) 
 	      index_to_use[local_index++]=ip;
@@ -95,7 +95,12 @@ namespace showerreco {
     double xphi=0,xtheta=0;
     
     
-    fGSer->Get3DaxisN(index_to_use[0],index_to_use[1],fOmega2D[index_to_use[0]]*TMath::Pi()/180.,fOmega2D[index_to_use[1]]*TMath::Pi()/180.,xphi,xtheta);
+    fGSer->Get3DaxisN(index_to_use[0],
+		      index_to_use[1],
+		      fOmega2D[index_to_use[0]]*TMath::Pi()/180.,
+		      fOmega2D[index_to_use[1]]*TMath::Pi()/180.,
+		      xphi,
+		      xtheta);
     
     if(fVerbosity)
       std::cout << " new angles: " << xphi << " " << xtheta << std::endl; 
@@ -112,9 +117,10 @@ namespace showerreco {
       std::cout << " XYZ:  " << xyz[0] << " " << xyz[1] << " " << xyz[2] << std::endl;
     
     // Third calculate dE/dx and total energy for all planes, because why not?
-    for(auto const &clustit : clusters)
+    //for(auto const &clustit : clusters)
+    for(size_t cl_index=0; cl_index < fPlaneID.size(); ++cl_index) 
       {
-	int plane = clustit.GetParams().start_point.plane;      
+	int plane = fPlaneID.at(cl_index);
 	double newpitch=fGSer->PitchInView(plane,xphi,xtheta);
 	
 	if(fVerbosity)
@@ -131,12 +137,10 @@ namespace showerreco {
 	
 	//override direction if phi (XZ angle) is less than 90 degrees 
 	// this is shady, and needs to be rethought.
-	if(fabs(clustit.GetParams().angle_2d)<90)
+	if(fabs(fOmega2D.at(cl_index)) < 90)
           direction=1;
 	
-	
-	
-	std::vector<larutil::PxHit> hitlist =  clustit.GetHitVector(); 
+	std::vector<larutil::PxHit> hitlist = clusters.at(cl_index).GetHitVector(); 
 	std::vector<larutil::PxHit> local_hitlist;
 	local_hitlist.clear();
 	
@@ -182,14 +186,17 @@ namespace showerreco {
 	    }
 	  larutil::PxPoint OnlinePoint; 
 	  // calculate the wire,time coordinates of the hit projection on to the 2D shower axis
-	  fGSer->GetPointOnLine(clustit.GetParams().angle_2d,&(clustit.GetParams().start_point),&theHit,OnlinePoint);
+	  fGSer->GetPointOnLine(fOmega2D.at(cl_index),
+				&(fStartPoint.at(cl_index)),
+				&theHit,
+				OnlinePoint);
 	  
 	  double ortdist=fGSer->Get2DDistance(&OnlinePoint,&theHit);
-	  double linedist=fGSer->Get2DDistance(&OnlinePoint,&(clustit.GetParams().start_point));
+	  double linedist=fGSer->Get2DDistance(&OnlinePoint,&(fStartPoint.at(cl_index)));
 	  
 	  
 	  //calculate the distance from the vertex using the effective pitch metric 
-	  double wdist=((theHit.w-clustit.GetParams().start_point.w)*newpitch)*direction;  //wdist is always positive
+	  double wdist=((theHit.w-fStartPoint.at(cl_index).w)*newpitch)*direction;  //wdist is always positive
 	  
 	  if(fVerbosity && dEdx_new < 3.5 )
 	    std::cout << " CALORIMETRY:" 
@@ -226,9 +233,10 @@ namespace showerreco {
 	    
 	    //first pass at average dE/dx
 	    if(wdist<fdEdxlength 
-	       && ((direction==1 && theHit.w>clustit.GetParams().start_point.w)     //take no hits before vertex (depending on direction)
-		   || (direction==-1 && theHit.w<clustit.GetParams().start_point.w) ) 
-	       && ortdist<3.5 && linedist < fdEdxlength ){
+	       //take no hits before vertex (depending on direction)
+	       && ((direction==1 && theHit.w > fStartPoint.at(cl_index).w) || (direction==-1 && theHit.w < fStartPoint.at(cl_index).w) )
+	       && ortdist<3.5 
+	       && linedist < fdEdxlength ){
 	      
 	      dEdx_av+= dEdx_new;
 	      local_hitlist.push_back(theHit);
@@ -327,7 +335,7 @@ namespace showerreco {
     
 	// break;
       } // end loop on clusters
-    
+
     result.set_total_MIPenergy(fMIPEnergy);
     result.set_total_best_plane(best_plane);
     
@@ -349,7 +357,7 @@ namespace showerreco {
 
     // done
     return result;
-  }
+    }
 
 }
 
