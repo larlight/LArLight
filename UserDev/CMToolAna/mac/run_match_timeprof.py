@@ -5,6 +5,9 @@ from ROOT import larlight as fmwk
 processor = fmwk.ana_processor()
 
 processor.set_io_mode(fmwk.storage_manager.READ)
+
+processor.set_verbosity(fmwk.MSG.DEBUG)
+
 #Getting rid of segfaults likea boss
 ana_module = fmwk.CMatchPerformance()
 
@@ -26,7 +29,8 @@ algo_array.AddAlgo(cmtool.CFAlgo3DAngle())
 ana_module.GetManager().AddMatchAlgo(algo_array)
 ana_module.GetManager().AddPriorityAlgo(priority_algo)
 
-
+ana_module.GetManager().DebugMode(cmtool.CMManagerBase.kPerMerging)
+ana_module.GetManager().ReportTimings(True)
 #processor.add_process(shower_reco)
 processor.add_process(ana_module)
 

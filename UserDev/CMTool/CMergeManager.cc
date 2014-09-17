@@ -168,10 +168,10 @@ namespace cmtool {
 
     for(size_t i=0; i<_tmp_merged_indexes.size(); ++i)
       
-	if(_tmp_merged_indexes.at(i).size()==1)
-	  
-	  merge_switch.at(i) = false;
-
+      if(_tmp_merged_indexes.at(i).size()==1)
+	
+	merge_switch.at(i) = false;
+    
     ComputePriority(_tmp_merged_clusters);
     
     // Run separation algorithm

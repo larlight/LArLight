@@ -163,13 +163,20 @@ namespace larlight {
 
 	_storage->next_event();
 
-      }else{
+      }else if(_fin.eof()){
 
 	Message::send(MSG::WARNING,__FUNCTION__,"Skip saving the last event...");
 
-	status=false;
+	// Torelate the last event failure in case file is not closed properly
+	//status=false;
+	status = true;
 
-      }    
+      }else{
+
+	Message::send(MSG::ERROR,__FUNCTION__,"Encountered a bad event before eof! Terminating...");
+	status = false;
+
+      }
     }
 
     return status;

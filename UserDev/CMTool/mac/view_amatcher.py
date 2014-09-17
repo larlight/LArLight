@@ -29,18 +29,25 @@ match_viewer = larlight.MatchViewer()
 #mc_viewer    = larlight.MCShowerClusterViewer()
 
 match_viewer.SetPrintClusterInfo(True)
-match_viewer.SetDrawShowers(True)
+#match_viewer.ShowShowers(False)
+#match_viewer.SetDrawShowers(True)
 ########################################
 # attach match algos here
 ########################################
 
 
 priority_algo = cmtool.CPAlgoNHits()
-priority_algo.SetMinHits(20)
+priority_algo.SetMinHits(22)
 match_viewer.GetManager().AddPriorityAlgo(priority_algo)
 
-myalg = cmtool.CFAlgoStartPointMatch()
-match_viewer.GetManager().AddMatchAlgo(myalg)
+angleAlg = cmtool.CFAlgo3DAngle()
+angleAlg.SetRatio(0.1)
+angleAlg.SetDebug(False)
+
+timeAlg = cmtool.CFAlgoTimeOverlap()
+timeAlg.SetDebug(True)
+
+match_viewer.GetManager().AddMatchAlgo(timeAlg)
 
 ########################################
 # done attaching match algos

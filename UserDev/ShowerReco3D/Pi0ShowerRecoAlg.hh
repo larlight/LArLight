@@ -1,9 +1,9 @@
 /**
- * \file ShowerRecoAlg.hh
+ * \file Pi0ShowerRecoAlg.hh
  *
  * \ingroup ShowerReco3D
  * 
- * \brief Class def header for a class ShowerRecoAlg
+ * \brief Class def header for a class Pi0ShowerRecoAlg
  *
  * @author kazuhiro
  */
@@ -11,27 +11,27 @@
 /** \addtogroup ShowerReco3D
 
     @{*/
-#ifndef SHOWERRECOALG_HH
-#define SHOWERRECOALG_HH
+#ifndef PI0SHOWERRECOALG_HH
+#define PI0SHOWERRECOALG_HH
 
 #include "ShowerRecoAlgBase.hh"
 #include "CalorimetryAlg.hh"
 namespace showerreco {
   
   /**
-     \class ShowerRecoAlg
-     User defined class ShowerRecoAlg ... these comments are used to generate
+     \class Pi0ShowerRecoAlg
+     User defined class Pi0ShowerRecoAlg ... these comments are used to generate
      doxygen documentation!
   */
-  class ShowerRecoAlg : public ShowerRecoAlgBase{
+  class Pi0ShowerRecoAlg : public ShowerRecoAlgBase{
     
   public:
     
     /// Default constructor
-    ShowerRecoAlg();
+    Pi0ShowerRecoAlg();
     
     /// Default destructor
-    virtual ~ShowerRecoAlg(){}
+    virtual ~Pi0ShowerRecoAlg(){}
 
     /// Function to reset algorithm, to be called @ beginning of each event
     virtual void Reset(){}

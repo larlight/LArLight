@@ -267,29 +267,27 @@ namespace cmtool {
     TPCCorners.push_back( std::make_pair(larutil::Geometry::GetME()->DetLength(), larutil::Geometry::GetME()->DetHalfHeight()) );
     TPCCorners.push_back( std::make_pair(0., larutil::Geometry::GetME()->DetHalfHeight()) );
     Polygon2D TPCPolygon(TPCCorners);
-    if (_verbose){
-      if (TPCPolygon.Contained(WirePolygon) ){
-	if (_verbose) {
-	  std::cout << "Wire Overlap contained in TPC" << std::endl;
-	  std::cout << "Intersection Polygon Coordinates [Z,Y]: " << std::endl;
-	  for (unsigned int s=0; s < WirePolygon.Size(); s++)
-	    std::cout << "\t\t[ " << WirePolygon.Point(s).first << ", " << WirePolygon.Point(s).second << "]" << std::endl;
-	  std::cout << std::endl;
-	}
-	PolyArea = WirePolygon.Area();
+    if (TPCPolygon.Contained(WirePolygon) ){
+      if (_verbose) {
+	std::cout << "Wire Overlap contained in TPC" << std::endl;
+	std::cout << "Intersection Polygon Coordinates [Z,Y]: " << std::endl;
+	for (unsigned int s=0; s < WirePolygon.Size(); s++)
+	  std::cout << "\t\t[ " << WirePolygon.Point(s).first << ", " << WirePolygon.Point(s).second << "]" << std::endl;
+	std::cout << std::endl;
       }
-	else {
-	  if (_verbose) {
-	    std::cout << "Wire overlap not fully contained in TPC" << std::endl;
-	    std::cout << "Intersection Polygon Coordinates [Z,Y]: " << std::endl;
-	    for (unsigned int s=0; s < WirePolygon.Size(); s++)
-	      std::cout << "\t\t[ " << WirePolygon.Point(s).first << ", " << WirePolygon.Point(s).second << "]" << std::endl;
-	    std::cout << std::endl;
-	  }
-	  //product polygon should be the intersection of WirePolygon and TPCPolygon
-	  Polygon2D IntersectionPolygon(TPCPolygon, WirePolygon);
-	  PolyArea = IntersectionPolygon.Area();
-	}
+      PolyArea = WirePolygon.Area();
+    }
+    else {
+      if (_verbose) {
+	std::cout << "Wire overlap not fully contained in TPC" << std::endl;
+	std::cout << "Intersection Polygon Coordinates [Z,Y]: " << std::endl;
+	for (unsigned int s=0; s < WirePolygon.Size(); s++)
+	  std::cout << "\t\t[ " << WirePolygon.Point(s).first << ", " << WirePolygon.Point(s).second << "]" << std::endl;
+	std::cout << std::endl;
+      }
+      //product polygon should be the intersection of WirePolygon and TPCPolygon
+      Polygon2D IntersectionPolygon(TPCPolygon, WirePolygon);
+      PolyArea = IntersectionPolygon.Area();
     }
     
     //return polygon area -> larger = better!

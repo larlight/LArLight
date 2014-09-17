@@ -18,6 +18,7 @@
 
 #include "ClusterParamsAlg.hh"
 #include "CPriorityAlgoBase.hh"
+#include "TStopwatch.h"
 
 namespace cmtool {
 
@@ -52,6 +53,9 @@ namespace cmtool {
 
     /// Method to enable debug mode (lots of couts)
     void DebugMode(CMMSGLevel_t level) {_debug_mode=level;}
+
+    /// Method to enable timing profile cout
+    void ReportTimings(bool time_report=true) { _time_report = time_report; }
 
     /// Method to reset itself
     void Reset();
@@ -103,6 +107,9 @@ namespace cmtool {
 
   protected:
 
+    /// Timing verbosity flag
+    bool _time_report;
+    
     /// Minimum number of hits: the limit set for ClusterParamsAlg
     unsigned int _min_nhits;
 
