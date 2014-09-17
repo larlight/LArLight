@@ -50,9 +50,14 @@ namespace larlight {
     */
     virtual bool finalize();
 
+    /// Getter for CMatchManager
     ::cmtool::CMatchManager& GetManager() { return *fMgr; }
 
+    /// Getter for BackTracking algorithm
     McshowerLookback& GetBTAlgo() { return fBTAlgo; }
+
+    /// Setter for a cluster type
+    void SetClusterType(DATA::DATA_TYPE type) { _cluster_type = type; }
 
   protected:
 
