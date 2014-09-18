@@ -17,19 +17,21 @@ namespace larlight {
 
     hPi0CosCM = new TH1D("hPi0CosCM","Pi0 Cos CM",22,-0.1,1.1);
 
-    hPi0MassPeak_GoodEnergy = new TH1D("hPi0MassPeakGoodEnergy","Pi0 Mass Peak in MeV",50,0,500);
-    hPi0MassPeak_GoodAngle = new TH1D("hPi0MassPeakGoodAngle","Pi0 Mass Peak in MeV",50,0,500);
+    hPi0MassPeak_GoodEnergy = new TH1D("hPi0MassPeakGoodEnergy","Pi0 Mass Peak in MeV (True Photon Energy)",50,0,500);
+    hPi0MassPeak_GoodAngle = new TH1D("hPi0MassPeakGoodAngle","Pi0 Mass Peak in MeV (True Opening Angle)",50,0,500);
     hPi0MassPeak_GoodAnglePull = new TH1D("hPi0MassPeakGoodAnglePull","Pi0 Mass Pull GoodAngle",50,-200,200);
 
-    hPi0MassPeak_TrueDetector = new TH1D("hPi0MassPeakTrueDetector","Pi0 Mass Peak From True Detector in MeV",50,0,500);
+    hPi0MassPeak_TrueDetector = new TH1D("hPi0MassPeakTrueDetector","Pi0 Mass Peak in MeV (True Detector: Photon Energy & Opening Angle) ",50,0,500);
 
 
 
 
     hPhotondos = new TH2D("hPhotondos","Photondos",50,0,1,50,0,1);
-    hOpeningAngle = new TH2D("hPhotonOpening","PhotonAngle",50,0,180,50,0,180);
+    hOpeningAngle = new TH2D("hPhotonOpening","PhotonAngle",32,0,3.14,32,0,3.14);
 
-    hPi0MassPeakdoscut = new TH1D("hPi0MassPeakdoscut","Pi0 Mass Peak in MeV",50,0,500);
+    hPi0MassPeakdoscut = new TH1D("hPi0MassPeakdoscut","Pi0 Mass Peak in MeV (Cut on (E1-E2)/(E1_E2) )",50,0,500);
+    hPi0MassPeakanglecut = new TH1D("hPi0MassPeakanglecut","Pi0 Mass Peak in MeV (Cut Opening Angle )",50,0,500);
+    hPi0MassPeakdosanglecut = new TH1D("hPi0MassPeakdosanglecut","Pi0 Mass Peak in MeV (Cut on Opening Angle and DOS)",50,0,500);
 
 
     hEnergyCorr_MomToDaughter = new TH1D("hEnergyCorr_MomToDaughter","Correction: hEnergyCorr_MomToDaughter",100,0.9,1.5);
@@ -69,7 +71,17 @@ namespace larlight {
 					 DATA::DATA_TREE_NAME[_cluster_type].c_str(),
 					 DATA::DATA_TREE_NAME[_shower_type].c_str()));
       return false;
+
     }
+
+    // Now get hit
+    auto const hit_type = ev_cluster->get_hit_type();
+    auto ev_hit    = (const event_hit*)(storage->get_data(hit_type));
+    if(!ev_hit){
+      print(MSG::ERROR,__FUNCTION__,Form("Associated hit not found!"));
+      return false;
+    }      
+
 
     //skip event if !2 showers found.
     if(ev_shower->size() != 2) return true;
@@ -108,16 +120,28 @@ namespace larlight {
     
     size_t best_cluster1 = 0;
     for(auto const& index : ev_shower->at(0).association(_cluster_type)) {
-      if(ev_shower->at(0).best_plane() == ev_cluster->at(index).View()) break;
+      
+      // walk-around ... use hit to get plane id since forgotten to store plane id in cluster! --kazu 
+      auto const hit_index = ev_cluster->at(index).association(hit_type).at(0);
+      auto const cluster_plane_id = ev_hit->at(hit_index).View();
+
+      if(ev_shower->at(0).best_plane() == cluster_plane_id) break;
+
       ++best_cluster1;
     }
 
     size_t best_cluster2 = 0;
     for(auto const& index : ev_shower->at(1).association(_cluster_type)) {
-      if(ev_shower->at(1).best_plane() == ev_cluster->at(index).View()) break;
+
+      // walk-around ... use hit to get plane id since forgotten to store plane id in cluster! --kazu 
+      auto const hit_index = ev_cluster->at(index).association(hit_type).at(0);
+      auto const cluster_plane_id = ev_hit->at(hit_index).View();
+
+      if(ev_shower->at(1).best_plane() == cluster_plane_id) break;
+
       ++best_cluster2;
     }
-    
+    std::cout<<best_cluster1<<" : "<<best_cluster2<<std::endl;
     _mass = Pi0MassFormula3D( ev_shower->at(0).MIPEnergy().at(best_cluster1), 
     			      ev_shower->at(1).MIPEnergy().at(best_cluster2),
     			      ev_shower->at(0).Direction(),
@@ -219,10 +243,13 @@ std::vector<float> mcs_mother_energy(mc_shower->size(),0);
     	hPi0MassPeak_TrueDetector->Fill(_mass_detectorTrue);
     	hPi0CosCM->Fill(_pi0_coscm);
     	hPhotondos->Fill(_photon_dosReco,_photon_dosTrue);
-	float recoangle = acos( mcs_Daughter_directio[0]* mcs_Daughter_directio[1] );
-    	hopeningangle->Fill(recoangle,_photon_dosTrue);
+	float truthangle = acos( mcs_Daughter_direction[0]* mcs_Daughter_direction[1] );
+	float recoangle  = acos(ev_shower->at(0).Direction()*ev_shower->at(1).Direction());
+    	hOpeningAngle->Fill(recoangle,truthangle);
 
-	if(_photon_dosReco>0.4 && _photon_dosReco<0.8) hPi0MassPeakdoscut->Fill(3.6*_mass);
+	if(_photon_dosReco>0.3 && _photon_dosReco<0.8) hPi0MassPeakdoscut->Fill(3.6*_mass);
+	if(recoangle>0 && recoangle<1.4) hPi0MassPeakanglecut->Fill(3.6*_mass);
+	if(recoangle>0 && recoangle<1.4&&_photon_dosReco>0.3 && _photon_dosReco<0.8) hPi0MassPeakdosanglecut->Fill(3.6*_mass);
 	}
 
  
@@ -356,7 +383,10 @@ std::vector<float> mcs_mother_energy(mc_shower->size(),0);
       hPi0CosCM->Write();
       hPi0MassPeak_TrueDetector->Write();
       hPhotondos->Write();
+      hOpeningAngle->Write();
       hPi0MassPeakdoscut->Write();
+      hPi0MassPeakanglecut->Write();
+      hPi0MassPeakdosanglecut->Write();
 
 
 
