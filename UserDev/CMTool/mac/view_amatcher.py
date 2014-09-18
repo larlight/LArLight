@@ -40,14 +40,22 @@ priority_algo = cmtool.CPAlgoNHits()
 priority_algo.SetMinHits(22)
 match_viewer.GetManager().AddPriorityAlgo(priority_algo)
 
+algo_array = cmtool.CFAlgoArray()
+
 angleAlg = cmtool.CFAlgo3DAngle()
 angleAlg.SetRatio(0.1)
-angleAlg.SetDebug(False)
+angleAlg.SetDebug(True)
 
 timeAlg = cmtool.CFAlgoTimeOverlap()
 timeAlg.SetDebug(True)
 
-match_viewer.GetManager().AddMatchAlgo(timeAlg)
+volAlg = cmtool.CFAlgoVolumeOverlap()
+
+algo_array.AddAlgo(angleAlg)
+algo_array.AddAlgo(timeAlg)
+#algo_array.AddAlgo(volAlg)
+
+match_viewer.GetManager().AddMatchAlgo(algo_array)
 
 ########################################
 # done attaching match algos
@@ -60,8 +68,10 @@ my_proc.add_process(match_viewer)
 #my_proc.add_process(mc_viewer)
 
 raw_viewer.SetClusterType(larlight.DATA.Cluster)
+#raw_viewer.SetClusterType(larlight.DATA.MCShowerCluster)
 
 match_viewer.SetClusterType(larlight.DATA.Cluster)
+#match_viewer.SetClusterType(larlight.DATA.MCShowerCluster)
 
 gStyle.SetOptStat(0)
 

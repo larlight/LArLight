@@ -12,8 +12,8 @@ namespace cmtool {
 
 	SetDebug(false) ;
 	SetThetaCut(30) ;
-	SetPhiCut(30)  ;
-	SetRatio(0.1) ;
+	SetPhiCut(40)  ;
+	SetRatio(0.0005) ;
 
   }
 
@@ -45,7 +45,10 @@ namespace cmtool {
 	auto hits_1 = clusters.at(1)->GetParams().N_Hits ;
 	auto hits_2 = clusters.at(2)->GetParams().N_Hits ;
 
-
+	auto sumCharge0 = clusters.at(0)->GetParams().sum_charge; 
+	auto sumCharge1 = clusters.at(1)->GetParams().sum_charge; 
+	auto sumCharge2 = clusters.at(2)->GetParams().sum_charge; 
+	
 	//Calculate angles theta and phi for cluster pairs across 2 planes
 	//Theta goes from -90 to 90, phi from -180 to 180
 	double phi_01    = 0;   	
@@ -57,46 +60,12 @@ namespace cmtool {
 
 	double max_phi(0), middle_phi(0), min_phi(0);
 	double max_theta(0), middle_theta(0), min_theta(0); 
+	//When theta1, theta2, phi ratios are calcualted, find best 2
+	double max_ratio(0), middle_ratio(0), min_ratio(0);
 
 	//For ordering hits and rejecting pairs which have a large difference in hit number
 	double max_hits(0), middle_hits(0), min_hits(0) ;
-
-////////CHARGE PROFILE CALCULATION
-/*	double hitDistance_radius = 0;
-	double hitDistance_w = 0;
-	double hitDistance_t = 0;
-	int N_Bins =100 ;
-	std::vector<double> chargeProfile(N_Bins);
-
-	//Calculate distance of start point to each hit in cluster
-	//M_Bins depends on "radius/length" hit parameter.
-	//Fill corresponding M_Bin with correct charge weight
-	for(int i=0; i < 3; i++){
-		std::vector<larutil::PxHit> hitList(clusters.at(i)->GetParams().N_Hits) ;	
-
-		for(auto const & h : clusters.at(i)->GetHitVector()){
-			hitDistance_w = std::abs(clusters.at(i)->GetParams().start_point.w - h.w);
-			hitDistance_t = std::abs(clusters.at(i)->GetParams().start_point.t - h.t);
-			hitDistance_radius = sqrt(hitDistance_w * hitDistance_w + hitDistance_t * hitDistance_t ) ;
-
-			if(hitDistance_radius <= clusters.at(i)->GetParams().length){
-				int M_Bins = (N_Bins-1)* hitDistance_radius / clusters.at(i)->GetParams().length; 
-				chargeProfile[M_Bins] 
-					+= 1000*h.charge/clusters.at(i)->GetParams().sum_charge ; 
-				cProfile->Fill(chargeProfile[M_Bins]);
-				}
-		}
-			std::cout<<"Plane is: "<<clusters.at(i)->Plane()<<std::endl;
-			std::cout<<"Number of Hits:" <<clusters.at(i)->GetNHits()<<std::endl;
-			std::cout<<"Start Point: "<<clusters.at(i)->GetParams().start_point.w<<std::endl;
-			std::cout<<"End Point: "<<clusters.at(i)->GetParams().end_point.w<<std::endl;
-			std::cout<<"CHARGE PROFILE: "<<std::endl;
-
-				for(int m = 0; m < chargeProfile.size(); m++) std::cout<<chargeProfile[m]<<", ";
-
-			std::cout<<"\nMean, RMS, sigRMS are: "<<cProfile->GetMean(1)<<", "<<cProfile->GetRMS(1)<<", "<<cProfile->GetRMSError(1)<<std::endl;
-	} */
-////////////CHARGE PROFILE		
+//	double max_hits1(0), middle_hits1(0), min_hits1(0) ;
 
 	//Calculate phi and theta from first 2 planes; check if third plane is consistent
 	larutil::GeometryUtilities::GetME()->Get3DaxisN(plane_0,plane_1,angle_2d_0,angle_2d_1,phi_01,theta_01);	
@@ -116,51 +85,43 @@ namespace cmtool {
 	SetMaxMiddleMin(hits_0,hits_1,hits_2,max_hits,middle_hits,min_hits);
 
 	//Ratio for hits	
-	double ratio_max_min = 1;
-	double ratio_max_middle =1;
+	double ratio_max_min    = 1;
+	double ratio_max_middle = 1;
 
-	//Ratio for theta angle
+	//Ratio for theta angles
 	double ratio_theta1 = 1;
 	double ratio_theta2 = 1; 
-	
+
+	//Ratio for phi--only 1 ratio because 2 of the angles come from collection plane 2
+	//and are thus the same. 
+	double ratio_phi   = 1;
+
 	//Total ratio
 	double ratio 		= 1;		
 
 	//This takes into account the fact that 0 and 360 having the same relative value (for phi; 0 and 180 for theta)
-	while(min_phi + 360 < max_phi +_phi_cut && min_phi +360 > max_phi - _phi_cut)
-      {	
-		min_phi +=360 ;
-		SetMaxMiddleMin(max_phi, middle_phi, min_phi,max_phi,middle_phi,min_phi);
+	for(int i=0; i<2 ; i++){
+		while(min_phi + 360 < max_phi +_phi_cut && min_phi +360 > max_phi - _phi_cut)
+    	  {	
+			min_phi +=360 ;
+			SetMaxMiddleMin(max_phi, middle_phi, min_phi,max_phi,middle_phi,min_phi);
+		  }
 	  }
 
 	ratio_theta2 = min_theta / max_theta;
 	ratio_theta1 = middle_theta / max_theta; 
+	ratio_phi = min_phi / max_phi ;
+
+	//Get the biggest ratios for the thetas and phi
+	SetMaxMiddleMin(ratio_phi, ratio_theta1, ratio_theta2, max_ratio, middle_ratio, min_ratio);
 	
 	ratio_max_min = min_hits / max_hits ;
 	ratio_max_middle = middle_hits / max_hits ;	
 
-	ratio = ratio_theta1* ratio_theta2 ; 
+	ratio =  max_ratio * sumCharge1* sumCharge2 * sumCharge0; //*  ; //* ratio_phi ; //* ratio_max_middle ; 
 
-
-	//Want to take into account several situations with the goal of not adding hit-weight
-	//to matches which are likely correct :
-	//(1) Normal case: At least one of the theta ratios is smaller than 0.9 --weight 
-	// 	  if middle/max ratio is too small ( < 0.63) .  
-	//(2) If both theta ratios are big ( >0.92 ), but middle/max hit ratio is small, 
-	//    weight the ratio to make it smaller
-	//(3) Sometimes more than 1 set of clusters have very big theta ratios( >0.96 )--  
-	//    In these cases, look to min/max hit ratio--weight ratio if this is too small
-	if(( ratio_theta1 < 0.92 || ratio_theta2 <0.92) && ratio_max_middle < 0.63 )
-		ratio *= ratio_max_middle ;
-	
-	if( (ratio_theta1 > 0.92 && ratio_theta2 > 0.92) && ratio_max_middle < 0.63 )
-		ratio *= ratio_max_middle ;
-
-	if( (ratio_theta1 > 0.96 && ratio_theta2 > 0.96) && ratio_max_middle > 0.63 && ratio_max_min < 0.75)
-		ratio *= ratio_max_middle;
-		
 	//Test to make sure that max hits is not too much bigger than min
-	if( ratio_max_min <0.28)
+	if( ratio_max_min <0.3)
 		ratio *= ratio_max_min ;
 
 	//GeometryUtilities returns theta=-999 when 2d Angle=0--Don't know
@@ -172,10 +133,11 @@ namespace cmtool {
 	if(_debug && ratio > _ratio_cut ){
 		std::cout<<"\nNhits planes 0, 1, 2: " <<clusters.at(0)->GetParams().N_Hits<<", "<<clusters.at(1)->GetParams().N_Hits
 				 <<", "<<clusters.at(2)->GetParams().N_Hits ;
-		std::cout<<"\n\nTheta1 , Theta2 : "<<ratio_theta1<<", "<<ratio_theta2;
-		std::cout<<"\nHits ratio mid : "<<ratio_max_middle ;
-		std::cout<<"\nHits ratio min : "<<ratio_max_min ;
-		std::cout<<"\nTotal ratio is: " <<ratio<<" ***************";
+		std::cout<<"\nTheta1 , Theta2 : "<<ratio_theta1<<", "<<ratio_theta2;
+		std::cout<<"\nPhi Ratio: "<<ratio_phi;
+	//	std::cout<<"\nHits ratio mid : "<<ratio_max_middle ;
+	//	std::cout<<"\nHits ratio min : "<<ratio_max_min ;
+		std::cout<<"\nTotal is: " <<ratio<<" ***************";
 
 
 		std::cout<<"\n\n0: 2dAngle: "<<clusters.at(0)->GetParams().cluster_angle_2d<<std::endl;
@@ -197,7 +159,8 @@ namespace cmtool {
 		std::cout<<"For plane 0 and 2: "<<std::endl ;
 		std::cout<<"\tPhi : "<<phi_02<<std::endl ;
 		std::cout<<"\tTheta : "<<theta_02<<std::endl; */
-		std::cout<<"\nNEW CLUSTERS PAIRS NOW\n\n\n"<<std::endl<<std::endl;
+	//	std::cout<<"\nNEW CLUSTERS PAIRS NOW\n\n\n"<<std::endl<<std::endl;
+		std::cout<<"\n\n\n";
 	}
 	
 	return(ratio > _ratio_cut ? ratio : -1) ;
@@ -207,11 +170,13 @@ namespace cmtool {
   void CFAlgo3DAngle::FixPhiTheta(double &phi, double &theta)
  //--------------------------------	
    {
-		while(phi <= 30)
-			phi += 360 ;
-		while(phi > 720)
-			phi -= 360 ;
+	//	while(phi <= 0)
+	//		phi += 360 ;
+	//	while(phi > 720)
+	//		phi -= 360 ;
+//		if(phi <=0)
 
+		phi+=360;
 
 		if(theta != -999)
 			theta += 180 ;
