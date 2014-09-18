@@ -26,6 +26,7 @@ namespace larlight {
 
 
     hPhotondos = new TH2D("hPhotondos","Photondos",50,0,1,50,0,1);
+    hOpeningAngle = new TH2D("hPhotonOpening","PhotonAngle",50,0,180,50,0,180);
 
     hPi0MassPeakdoscut = new TH1D("hPi0MassPeakdoscut","Pi0 Mass Peak in MeV",50,0,500);
 
@@ -192,6 +193,8 @@ std::vector<float> mcs_mother_energy(mc_shower->size(),0);
     	hPi0MassPeak_TrueDetector->Fill(_mass_detectorTrue);
     	hPi0CosCM->Fill(_pi0_coscm);
     	hPhotondos->Fill(_photon_dosReco,_photon_dosTrue);
+	float recoangle = acos( mcs_Daughter_directio[0]* mcs_Daughter_directio[1] );
+    	hopeningangle->Fill(recoangle,_photon_dosTrue);
 
 	if(_photon_dosReco>0.4 && _photon_dosReco<0.8) hPi0MassPeakdoscut->Fill(3.6*_mass);
 	}
