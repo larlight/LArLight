@@ -317,7 +317,8 @@ namespace larlight {
 
 	    else { 
 	      Message::send(MSG::ERROR,__FUNCTION__,
-			    "Found a possible padding 0x8000 in an unexpected place (previous readout was even (%zu)!)...");
+			    Form("Found a padding 0x8000 in an unexpected place (previous readout was even (%zu)!)...",
+				 (*_event_data->rbegin()).size()));
 	      status = false;
 	    }
 	  }else{

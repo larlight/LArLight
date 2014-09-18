@@ -46,19 +46,20 @@ namespace larlight {
     */
     virtual bool analyze(storage_manager* storage);
 
-  /** Set Cluster Type to be read in: ClusterMerger makes Cluster
-    instead of FuzzyCluster
+    /** Set Cluster Type to be read in: ClusterMerger makes Cluster
+	instead of FuzzyCluster
     */
     void SetClusterType(DATA::DATA_TYPE type) {_cluster_type = type;}
-
 
     /** IMPLEMENT in CMatchPerformance.cc! 
         Finalize method to be called after all events processed.
     */
     virtual bool finalize();
 
+    /// Getter for CMatchManager
     ::cmtool::CMatchManager& GetManager() { return *fMgr; }
 
+    /// Getter for BackTracking algorithm
     McshowerLookback& GetBTAlgo() { return fBTAlgo; }
 
   protected:

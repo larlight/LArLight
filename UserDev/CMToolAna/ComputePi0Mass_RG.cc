@@ -1,15 +1,35 @@
-#ifndef COMPUTEPI0MASS_CC
-#define COMPUTEPI0MASS_CC
+#ifndef COMPUTEPI0MASS_RG_CC
+#define COMPUTEPI0MASS_RG_CC
 
-#include "ComputePi0Mass.hh"
+#include "ComputePi0Mass_RG.hh"
 
 namespace larlight {
   
-  ComputePi0Mass* ComputePi0Mass::me = 0;
+  ComputePi0Mass_RG* ComputePi0Mass_RG::me = 0;
 
-  bool ComputePi0Mass::initialize() {
+  bool ComputePi0Mass_RG::initialize() {
 
-    hPi0MassPeak = new TH1D("hPi0MassPeak","Pi0 Mass Peak in MeV",100,0,300);
+    _shower_type = DATA::Shower;
+    _cluster_type = DATA::RyanCluster;
+
+    hPi0MassPeak = new TH1D("hPi0MassPeak","Pi0 Mass Peak in MeV",50,0,500);
+    hPi0MassPeakPull = new TH1D("hPi0MassPeakPull","Pi0 Mass Pull in MeV",25,-250,250);
+
+    hPi0CosCM = new TH1D("hPi0CosCM","Pi0 Cos CM",22,-0.1,1.1);
+
+    hPi0MassPeak_GoodEnergy = new TH1D("hPi0MassPeakGoodEnergy","Pi0 Mass Peak in MeV",50,0,500);
+    hPi0MassPeak_GoodAngle = new TH1D("hPi0MassPeakGoodAngle","Pi0 Mass Peak in MeV",50,0,500);
+    hPi0MassPeak_GoodAnglePull = new TH1D("hPi0MassPeakGoodAnglePull","Pi0 Mass Pull GoodAngle",50,-200,200);
+
+    hPi0MassPeak_TrueDetector = new TH1D("hPi0MassPeakTrueDetector","Pi0 Mass Peak From True Detector in MeV",50,0,500);
+
+
+
+
+    hPhotondos = new TH2D("hPhotondos","Photondos",50,0,1,50,0,1);
+
+    hPi0MassPeakdoscut = new TH1D("hPi0MassPeakdoscut","Pi0 Mass Peak in MeV",50,0,500);
+
 
     hEnergyCorr_MomToDaughter = new TH1D("hEnergyCorr_MomToDaughter","Correction: hEnergyCorr_MomToDaughter",100,0.9,1.5);
 
@@ -18,12 +38,14 @@ namespace larlight {
     return true;
   }
   
-  bool ComputePi0Mass::analyze(storage_manager* storage) {
+  bool ComputePi0Mass_RG::analyze(storage_manager* storage) {
 
     _mass = -99999.;
+    _mass_goodEnergy = -99999.;
 
     // Load the Showers... need to run shower reconstruction first!
-    auto ev_shower  = (const event_shower*)(storage->get_data(_shower_type));
+    auto ev_shower = (const event_shower*)(storage->get_data(_shower_type));
+    auto mc_shower = (const event_mcshower*)(storage->get_data(DATA::MCShower));
     auto ev_cluster = (const event_cluster*)(storage->get_data(_cluster_type));
 
     if(!ev_shower ) {
@@ -82,7 +104,6 @@ namespace larlight {
     //			      * 1.302 + 50,
     //			      ev_shower->at(0).Direction(),
     //			      ev_shower->at(1).Direction());
-
     
     size_t best_cluster1 = 0;
     for(auto const& index : ev_shower->at(0).association(_cluster_type)) {
@@ -100,19 +121,116 @@ namespace larlight {
     			      ev_shower->at(1).MIPEnergy().at(best_cluster2),
     			      ev_shower->at(0).Direction(),
     			      ev_shower->at(1).Direction());
+
     
     std::cout<<"in compute thing, mass is "<<_mass<<std::endl;
-    hPi0MassPeak->Fill(_mass);
+	//double phi = -999;
+//	mc_shower->at(0).MotherAngle3D(phi,theta);
+	//double theta = -999;
+	//mc_shower->at(0).MotherAngle3D(phi,theta);
+	//double_t E1 = mc_shower->at(0).MotherMomentum();
+	//double_t E2 = mc_shower->at(1).MotherMomentum();
+	//std::cout<<" Something from MC shower \n\t E1: "<<E1<<"\n\t E2: "<<E2<<std::endl;
+	//std::cout<<" Something from MC shower \n\t Phi: "<<phi<<"\n\t Theta: "<<theta<<std::endl;
+	
+  //  hPi0MassPeak->Fill(_mass);
+    hPi0MassPeak->Fill(3.6*_mass);
+    hPi0MassPeakPull->Fill(3.6*_mass -135);
     for(int i = 0; i<2; ++i){
       hEnergyCorr_MomToDaughter->Fill(fEnergyCorr_MomToDaughter.at(i));
       hElectronCorr_DepToDet->Fill(fElectronCorr_DepToDet.at(i));
     }
+
+
+	// look at how showers reconstruct based on using energy or using angular reco
+
+/*
+std::vector<float> mcs_mother_energy(mc_shower->size(),0);
+    std::vector<TVector3> mcs_mother_direction(mc_shower->size());
+	
+    for(size_t i=0; i<mc_shower->size(); ++i) {
+      mcs_mother_energy.at(i) = mc_shower->at(i).MotherMomentum().at(3);
+		//make a tvector to fit into the mass
+      TVector3 v1;	
+      v1.SetX(mc_shower->at(i).MotherMomentum().at(0)/mc_shower->at(i).MotherMomentum().at(3));       
+      v1.SetY(mc_shower->at(i).MotherMomentum().at(1)/mc_shower->at(i).MotherMomentum().at(3));       
+      v1.SetZ(mc_shower->at(i).MotherMomentum().at(2)/mc_shower->at(i).MotherMomentum().at(3));       
+      mcs_mother_direction.at(i) = v1;
+
+	}// loop over the mc_shower
+
+	if(mcs_mother_energy.size()==2){
+	// looking at how well we do just on getting the angle correct. 
+	// here I will just use the corected values of E1 and E2
+	    _mass_goodEnergy = Pi0MassFormula3D( mcs_mother_energy[0],
+    			      mcs_mother_energy[1],
+    			      ev_shower->at(0).Direction(),
+    			      ev_shower->at(1).Direction());
+	
+        _mass_goodAngle = Pi0MassFormula3D(ev_shower->at(0).MIPEnergy().at(0),
+    			      ev_shower->at(1).MIPEnergy().at(0),
+    			      mcs_mother_direction[0],
+    			      mcs_mother_direction[1]);
+ */   
+    std::vector<float> mcs_Daughter_energy(mc_shower->size(),0);
+    std::vector<TVector3> mcs_Daughter_direction(mc_shower->size());
+	
+    for(size_t i=0; i<mc_shower->size(); ++i) {
+      mcs_Daughter_energy.at(i) = mc_shower->at(i).DaughterMomentum().at(3);
+		//make a tvector to fit into the mass
+      TVector3 v1;	
+      v1.SetX(mc_shower->at(i).DaughterMomentum().at(0)/mc_shower->at(i).DaughterMomentum().at(3));       
+      v1.SetY(mc_shower->at(i).DaughterMomentum().at(1)/mc_shower->at(i).DaughterMomentum().at(3));       
+      v1.SetZ(mc_shower->at(i).DaughterMomentum().at(2)/mc_shower->at(i).DaughterMomentum().at(3));       
+      mcs_Daughter_direction.at(i) = v1;
+
+	}// loop over the mc_shower
+
+	if(mcs_Daughter_energy.size()==2){
+	// looking at how well we do just on getting the angle correct. 
+	// here I will just use the corected values of E1 and E2
+	    _mass_goodEnergy = Pi0MassFormula3D( mcs_Daughter_energy[0],
+    			      mcs_Daughter_energy[1],
+    			      ev_shower->at(0).Direction(),
+    			      ev_shower->at(1).Direction());
+	
+        _mass_goodAngle = Pi0MassFormula3D(ev_shower->at(0).MIPEnergy().at(0),
+    			      ev_shower->at(1).MIPEnergy().at(0),
+    			      mcs_Daughter_direction[0],
+    			      mcs_Daughter_direction[1]);
+ 
+        _mass_detectorTrue = Pi0MassFormula3D( mcs_Daughter_energy[0],
+    			      mcs_Daughter_energy[1],
+    			      mcs_Daughter_direction[0],
+    			      mcs_Daughter_direction[1]);
+
+
+
+        _pi0_coscm = Pi0CosCM(ev_shower->at(0).MIPEnergy().at(0),ev_shower->at(1).MIPEnergy().at(0));
+
+        _photon_dosReco = Pi0CosCM(mcs_Daughter_energy[0],mcs_Daughter_energy[1]);
+        _photon_dosTrue = Pi0CosCM(ev_shower->at(0).MIPEnergy().at(0),ev_shower->at(1).MIPEnergy().at(0));
+	// fill the hist with the good energy one	
+    	hPi0MassPeak_GoodEnergy->Fill(_mass_goodEnergy);
+    	//hPi0MassPeak_GoodAngle->Fill(_mass_goodAngle);
+    	hPi0MassPeak_GoodAngle->Fill(_dorient_EE_calb*_mass_goodAngle);
+    	hPi0MassPeak_GoodAnglePull->Fill(_dorient_EE_calb*_mass_goodAngle-_Pi0mass);
+    	hPi0MassPeak_TrueDetector->Fill(_mass_detectorTrue);
+    	hPi0CosCM->Fill(_pi0_coscm);
+    	hPhotondos->Fill(_photon_dosReco,_photon_dosTrue);
+
+	if(_photon_dosReco>0.4 && _photon_dosReco<0.8) hPi0MassPeakdoscut->Fill(3.6*_mass);
+	}
+
+ 
+
+
      
 
     return true;
   }
 
-  void ComputePi0Mass::ComputeEnergyCorrection(storage_manager* storage)
+  void ComputePi0Mass_RG::ComputeEnergyCorrection(storage_manager* storage)
   {
     
     auto geo  = ::larutil::Geometry::GetME();
@@ -223,11 +341,23 @@ namespace larlight {
     
   }
 
-  bool ComputePi0Mass::finalize() {
+  bool ComputePi0Mass_RG::finalize() {
 
     if(_fout) { 
       _fout->cd(); 
       hPi0MassPeak->Write();
+      hPi0MassPeakPull->Write();
+      hPi0MassPeak_GoodEnergy->Write();
+      hPi0MassPeak_GoodAngle->Write();
+      hPi0MassPeak_GoodAnglePull->Write();
+      hPi0CosCM->Write();
+      hPi0MassPeak_TrueDetector->Write();
+      hPhotondos->Write();
+      hPi0MassPeakdoscut->Write();
+
+
+
+
       hEnergyCorr_MomToDaughter->Write();
       hElectronCorr_DepToDet->Write();
 
@@ -244,7 +374,7 @@ namespace larlight {
 
 
   //Get PI0 Mass from photon directions and energy
-  float ComputePi0Mass::Pi0MassFormula3D( float Energy1, float Energy2, TVector3 Direction3D_1, TVector3 Direction3D_2){
+  float ComputePi0Mass_RG::Pi0MassFormula3D( float Energy1, float Energy2, TVector3 Direction3D_1, TVector3 Direction3D_2){
     
     float angle_3D = acos( Direction3D_1 * Direction3D_2 );
 
@@ -254,5 +384,13 @@ namespace larlight {
 
   }
 
+  //Get PI0 CosCM
+  float ComputePi0Mass_RG::Pi0CosCM( float Energy1, float Energy2 ){
+	
+	float dos = fabs((Energy1 - Energy2))/(Energy1+Energy2);
+	
+	return dos;
+	}// end of function for Pi0CosCM
+ 
 }
 #endif

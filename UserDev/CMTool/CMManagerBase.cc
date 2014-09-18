@@ -47,14 +47,22 @@ namespace cmtool {
 
       if((*_in_clusters.rbegin()).SetHits(c) < 3) continue;
       (*_in_clusters.rbegin()).DisableFANN();
-      (*_in_clusters.rbegin()).FillParams(true,true,true,true,true,false);
+      //(*_in_clusters.rbegin()).FillParams(true,true,true,true,true,false);
+      (*_in_clusters.rbegin()).FillParams(false,false,false,false,false,false);
       (*_in_clusters.rbegin()).FillPolygon();
 
     }
 
-    if(_time_report) std::cout << Form("  CMManagerBase Time Report: SetClusters (CPAN computation) = %g [s]",
-				       localWatch.RealTime())
-			       << std::endl;
+    if(_time_report) {
+      std::cout << Form("  CMManagerBase Time Report: SetClusters (CPAN computation) = %g [s]",
+			localWatch.RealTime())
+		<< " ... details below." << std::endl;
+
+      for(auto const& c : _in_clusters)
+
+	c.TimeReport();
+
+    }
     
   }
 
