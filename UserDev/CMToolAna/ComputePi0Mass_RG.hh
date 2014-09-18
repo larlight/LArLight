@@ -94,7 +94,10 @@ namespace larlight {
     TH1D* hPi0MassPeak_TrueDetector;
 
     TH2D* hPhotondos;
+    TH2D* hOpeningAngle;
     TH1D* hPi0MassPeakdoscut;
+    TH1D* hPi0MassPeakanglecut;
+    TH1D* hPi0MassPeakdosanglecut;
 
 
 
