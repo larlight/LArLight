@@ -10,6 +10,7 @@ namespace larlight {
   bool ComputePi0Mass_RG::initialize() {
 
     _shower_type = DATA::Shower;
+    _cluster_type = DATA::RyanCluster;
 
     hPi0MassPeak = new TH1D("hPi0MassPeak","Pi0 Mass Peak in MeV",50,0,500);
     hPi0MassPeakPull = new TH1D("hPi0MassPeakPull","Pi0 Mass Pull in MeV",25,-250,250);
@@ -46,12 +47,27 @@ namespace larlight {
     // Load the Showers... need to run shower reconstruction first!
     auto ev_shower = (const event_shower*)(storage->get_data(_shower_type));
     auto mc_shower = (const event_mcshower*)(storage->get_data(DATA::MCShower));
-    if(!ev_shower) {
+    auto ev_cluster = (const event_cluster*)(storage->get_data(_cluster_type));
+
+    if(!ev_shower ) {
       print(MSG::ERROR,__FUNCTION__,Form("Data product \"%s\" not found...",
 					 DATA::DATA_TREE_NAME[_shower_type].c_str()));
       return false;
     }else if(ev_shower->size()<1) {
       print(MSG::ERROR,__FUNCTION__,Form("There are 0 showers in this event! Skipping......"));      
+      return false;
+    }
+    if(!ev_cluster ) {
+      print(MSG::ERROR,__FUNCTION__,Form("Data product \"%s\" not found...",
+					 DATA::DATA_TREE_NAME[_cluster_type].c_str()));
+      return false;
+    }else if(ev_cluster->size()<1) {
+      print(MSG::ERROR,__FUNCTION__,Form("There are 0 clusters in this event! Skipping......"));      
+      return false;
+    }else if(!(ev_shower->at(0).association(_cluster_type).size())){
+      print(MSG::ERROR,__FUNCTION__,Form("Association %s => %s not found! Skipping...",
+					 DATA::DATA_TREE_NAME[_cluster_type].c_str(),
+					 DATA::DATA_TREE_NAME[_shower_type].c_str()));
       return false;
     }
 
@@ -90,12 +106,22 @@ namespace larlight {
     //			      ev_shower->at(0).Direction(),
     //			      ev_shower->at(1).Direction());
     
+    size_t best_cluster1 = 0;
+    for(auto const& index : ev_shower->at(0).association(_cluster_type)) {
+      if(ev_shower->at(0).best_plane() == ev_cluster->at(index).View()) break;
+      ++best_cluster1;
+    }
 
-    _mass = Pi0MassFormula3D( ev_shower->at(0).MIPEnergy().at(0),
-    			      ev_shower->at(1).MIPEnergy().at(0),
+    size_t best_cluster2 = 0;
+    for(auto const& index : ev_shower->at(1).association(_cluster_type)) {
+      if(ev_shower->at(1).best_plane() == ev_cluster->at(index).View()) break;
+      ++best_cluster2;
+    }
+    
+    _mass = Pi0MassFormula3D( ev_shower->at(0).MIPEnergy().at(best_cluster1), 
+    			      ev_shower->at(1).MIPEnergy().at(best_cluster2),
     			      ev_shower->at(0).Direction(),
     			      ev_shower->at(1).Direction());
-    
 
     
     std::cout<<"in compute thing, mass is "<<_mass<<std::endl;
