@@ -51,6 +51,9 @@ namespace larlight {
     */
     void SetClusterType(DATA::DATA_TYPE type) {_cluster_type = type;}
 
+    /// Perform Time Report
+    void PerformTimeReport(bool on) { fMgr->ReportTimings(on); }
+
     /** IMPLEMENT in CMatchPerformance.cc! 
         Finalize method to be called after all events processed.
     */
@@ -61,6 +64,7 @@ namespace larlight {
 
     /// Getter for BackTracking algorithm
     McshowerLookback& GetBTAlgo() { return fBTAlgo; }
+
 
   protected:
 
