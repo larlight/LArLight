@@ -4,7 +4,7 @@
 {
   gSystem->Load("lib/liblar1Sens.so");
   lar1::NueAppearanceFitter n;
-  n.setFileSource("output/no_cut/");
+  n.setFileSource("/Users/cja33/lar1_data/");
   // n.setFileSource("output/nominal/");
   n.setVerbose(true);
   n.setDebug(false);
@@ -22,7 +22,7 @@
   n.setUse700m(false);
   n.setUseT600_onaxis(false);
   n.setUseT600_offaxis(false);
-  n.setUbooneScale(1.0);
+  n.setUbooneScale(0.5/6.6);
   n.setLAr1NDScale(1.0);
   // n.setLAr1NDScale(1.0/3.0);
   n.setLAr1FDScale(1.0);
@@ -34,35 +34,24 @@
   n.setUseInfiniteStatistics(false);
   n.setElectContainedDist(-999);
 
-  n.setIncludeCosmics(true);
-  n.setCosmicsFile("output/no_cut/histos_for_corey.root");
-  n.setMinDistanceToStart(0);
+  // n.setIncludeCosmics(true);
+  // n.setCosmicsFile("output/no_cut/histos_for_corey.root");
+  // n.setMinDistanceToStart(0);
 
-  std::vector<float> miniboone_bins;
-  // miniboone_bins.push_back(0.100);
-  miniboone_bins.push_back(0.200);
-  miniboone_bins.push_back(0.350);
-  miniboone_bins.push_back(0.500);
-  miniboone_bins.push_back(0.650);
-  miniboone_bins.push_back(0.800);
-  miniboone_bins.push_back(0.950);
-  miniboone_bins.push_back(1.100);
-  miniboone_bins.push_back(1.300);
-  miniboone_bins.push_back(1.500);
-  miniboone_bins.push_back(1.750);
-  miniboone_bins.push_back(2.000);
-  miniboone_bins.push_back(3.000);
-  // miniboone_bins.push_back(0.200);
-  // miniboone_bins.push_back(0.480);
-  // miniboone_bins.push_back(0.760);
-  // miniboone_bins.push_back(1.040);
-  // miniboone_bins.push_back(1.320);
-  // miniboone_bins.push_back(1.600);
-  // miniboone_bins.push_back(1.880);
-  // miniboone_bins.push_back(2.160);
-  // miniboone_bins.push_back(2.440);
-  // miniboone_bins.push_back(2.720);
-  // miniboone_bins.push_back(3.000);
+  std::vector<float> nue_bins;
+  // nue_bins.push_back(0.100);
+  nue_bins.push_back(0.200);
+  nue_bins.push_back(0.350);
+  nue_bins.push_back(0.500);
+  nue_bins.push_back(0.650);
+  nue_bins.push_back(0.800);
+  nue_bins.push_back(0.950);
+  nue_bins.push_back(1.100);
+  nue_bins.push_back(1.300);
+  nue_bins.push_back(1.500);
+  nue_bins.push_back(1.750);
+  nue_bins.push_back(2.000);
+  nue_bins.push_back(3.000);
   // 
   std::vector<float> numu_bins;
   numu_bins.push_back(.200);
@@ -85,13 +74,13 @@
   numu_bins.push_back(2.000);
   numu_bins.push_back(2.500);
   numu_bins.push_back(3.000);
-  std::cout << "Nue bins:\n";
-  for (int i = 0; i < miniboone_bins.size(); i++) std::cout << miniboone_bins[i] << "\n";
-  std::cout << "Numu bins:\n";
-  for (int i = 0; i < numu_bins.size(); i++) std::cout << numu_bins[i] << "\n";
-  std::cout << std::endl;
+  // std::cout << "Nue bins:\n";
+  // for (int i = 0; i < nue_bins.size(); i++) std::cout << nue_bins[i] << "\n";
+  // std::cout << "Numu bins:\n";
+  // for (int i = 0; i < numu_bins.size(); i++) std::cout << numu_bins[i] << "\n";
+  // std::cout << std::endl;
 
-  n.setNueBins(miniboone_bins);
+  n.setNueBins(nue_bins);
   n.setNumuBins(numu_bins);
 
   n.setInflateSystematics(false);
@@ -120,11 +109,16 @@
   n.ReadData();
   // n.BuildCovarianceMatrix();
   // n.MakeRatioPlots();
-  n.Loop();
+  // n.Loop();
   // n.MakePlots();
   // n.MakeSimplePlot();
-  // n.MakeEventRatePlots();
+  n.MakeEventRatePlots();
   // n.MakeAltSensPlot();
 
   return;
 }
+
+
+
+
+

@@ -15,12 +15,12 @@ void plot_matrices(){
   gStyle->SetPalette(56,0);
 
   // TFile *f = new TFile("matrixForDave.root");
-  TFile *f = new TFile("flux_error_matrices_100m_600m.root");
+  TFile *f = new TFile("/Users/cja33/Desktop/booster-oscillation-analyses/nue_figures/matrixFiles/nue_appearance_ecalo2_dist0_matrixFile_6_ND_100m_uB_.root");
 
   TH1D *nue_near = (TH1D*)f->Get("nueEventRates_100m");
   TH1D *numu_near = (TH1D*)f->Get("numuEventRates_100m");
-  TH1D *nue_far = (TH1D*)f->Get("nueEventRates_600m_onaxis");
-  TH1D *numu_far = (TH1D*)f->Get("numuEventRates_600m_onaxis");
+  TH1D *nue_far = (TH1D*)f->Get("nueEventRates_470m");
+  TH1D *numu_far = (TH1D*)f->Get("numuEventRates_470m");
 
   TH1D *nue_near_error = nue_near->Clone();
   TH1D *numu_near_error = numu_near->Clone();

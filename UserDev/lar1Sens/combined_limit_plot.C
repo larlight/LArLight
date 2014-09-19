@@ -111,22 +111,20 @@ void plot(std::string sens = "5s"){
   // First, want the names of all the chi2 files to read in:
   std::vector<TString> files;
 
-  files.push_back("output/nominal/nue_appearance_ecalo2_dist0_nuuB__flatStats_chi2.root");
-  files.push_back("output/no_cut/nue_appearance_ecalo2_dist0_nuuB__flatStats_chi2.root");
-  files.push_back("output/50_cut/nue_appearance_ecalo2_dist50_nuuB__flatStats_chi2.root");
-  files.push_back("output/100_cut/nue_appearance_ecalo2_dist100_nuuB__flatStats_chi2.root");
+  TString directory = "/Users/cja33/Desktop/booster-oscillation-analyses/nue_figures/chi2Files/";
 
-  // files.push_back("equalStats_chi2/nue_appearance_ecalo2_nuND_100m_T600_onaxis_covMat_shapeOnly_chi2.root");
-  // files.push_back("equalStats_chi2/nue_appearance_ecalo2_nuND_150m_T600_onaxis_covMat_shapeOnly_chi2.root");
-  // files.push_back("equalStats_chi2/nue_appearance_ecalo2_nuND_200m_T600_onaxis_covMat_shapeOnly_chi2.root");
+  files.push_back(directory+"nue_appearance_ecalo2_dist0_nuND_100m_T600_onaxis_covMat_shapeOnly_chi2.root");
+  files.push_back(directory+"nue_appearance_ecalo2_dist0_nuND_150m_T600_onaxis_covMat_shapeOnly_chi2.root");
+  files.push_back(directory+"nue_appearance_ecalo2_dist0_nuND_200m_T600_onaxis_covMat_shapeOnly_chi2.root");
 
-  // files.push_back("/uboone/data/users/cadams/reprocessed_files/nue_appearance_ecalo2_nuND_100m_T600_onaxis_covMat_shapeOnly_chi2.root");
-  // files.push_back("/uboone/data/users/cadams/reprocessed_files/nue_appearance_ecalo2_nuND_150m_T600_onaxis_covMat_shapeOnly_chi2.root");
-  // files.push_back("/uboone/data/users/cadams/reprocessed_files/nue_appearance_ecalo2_nuND_200m_T600_onaxis_covMat_shapeOnly_chi2.root");
 
-  // files.push_back("equalStats_NOFlux_chi2/nue_appearance_ecalo2_nuND_100m_T600_onaxis_flatStats_shapeOnly_chi2.root");
-  // files.push_back("equalStats_NOFlux_chi2/nue_appearance_ecalo2_nuND_150m_T600_onaxis_flatStats_shapeOnly_chi2.root");
-  // files.push_back("equalStats_NOFlux_chi2/nue_appearance_ecalo2_nuND_200m_T600_onaxis_flatStats_shapeOnly_chi2.root");
+  // files.push_back(directory+"nue_appearance_ecalo2_dist0_nuND_100m_uB__covMat_shapeOnly_chi2.root");
+  // files.push_back(directory+"nue_appearance_ecalo2_dist0_nuND_150m_uB__covMat_shapeOnly_chi2.root");
+  // files.push_back(directory+"nue_appearance_ecalo2_dist0_nuND_200m_uB__covMat_shapeOnly_chi2.root");
+
+  // files.push_back(directory+"nue_appearance_ecalo2_dist0_nuND_100m_uB_T600_onaxis_covMat_shapeOnly_chi2.root");
+  // files.push_back(directory+"nue_appearance_ecalo2_dist0_nuND_150m_uB_T600_onaxis_covMat_shapeOnly_chi2.root");
+  // files.push_back(directory+"nue_appearance_ecalo2_dist0_nuND_200m_uB_T600_onaxis_covMat_shapeOnly_chi2.root");
 
   TString referenceFile = files[0];
 
@@ -137,14 +135,21 @@ void plot(std::string sens = "5s"){
   colors.push_back(kGreen);
 
   std::vector<std::string> names;
+  names.push_back(" LAr1-ND (100m), T600 (600m)");
+  names.push_back(" LAr1-ND (150m), T600 (600m)");
+  names.push_back(" LAr1-ND (200m), T600 (600m)");
+
+  // names.push_back(" LAr1-ND (100m), #muBooNE (470m)");
+  // names.push_back(" LAr1-ND (150m), #muBooNE (470m)");
+  // names.push_back(" LAr1-ND (200m), #muBooNE (470m)");
+  // names.push_back(" LAr1-ND (100m), #muBooNE (470m), T600 (600m)");
+  // names.push_back(" LAr1-ND (150m), #muBooNE (470m), T600 (600m)");
+  // names.push_back(" LAr1-ND (200m), #muBooNE (470m), T600 (600m)");
   // names.push_back(" LAr1-ND (100m), T600 (600m)");
-  // names.push_back(" LAr1-ND (150m), T600 (600m)");
-  // names.push_back(" LAr1-ND (200m), T600 (600m)");
-  // names.push_back(" LAr1-ND (100m), T600 (600m)");
-  names.push_back(" MicroBooNE, nominal");
-  names.push_back(" MicroBooNE, no cosmics cut");
-  names.push_back(" MicroBooNE, 50cm cosmics cut");
-  names.push_back(" MicroBooNE, 100cm cosmics cut");
+  // names.push_back(" MicroBooNE, nominal");
+  // names.push_back(" MicroBooNE, no cosmics cut");
+  // names.push_back(" MicroBooNE, 50cm cosmics cut");
+  // names.push_back(" MicroBooNE, 100cm cosmics cut");
 
 
   // using "sens" to determine which curve to plot against
@@ -277,7 +282,7 @@ void plot(std::string sens = "5s"){
   // }
   // }
 
-  TLegend * leg = new TLegend(0.55,0.78,0.75,0.93,NULL,"brNDC");
+  TLegend * leg = new TLegend(0.18,0.72,0.28,0.61,NULL,"brNDC");
   leg->SetBorderSize(0);
   leg->SetTextSize(0.025);
   leg->SetTextFont(62);
@@ -317,7 +322,7 @@ void plot(std::string sens = "5s"){
   // graphsForPlotting.front() -> SetMinimum()
   // etc.
   //
-  TH2D *hr1__1 = new TH2D("hr1__1","",500,0.1,dm2max,500,1.1,10);
+  TH2D *hr1__1 = new TH2D("hr1__1","",500,0.1,dm2max,500,1.1,15);
   hr1__1->SetDirectory(0);
   hr1__1->SetStats(0);
   hr1__1->GetYaxis()->SetTitle("Coverage of nominal uB 5#sigma C.L. [#sigma]");
@@ -331,7 +336,7 @@ void plot(std::string sens = "5s"){
   hr1__1->GetYaxis()->SetTitleOffset(1.2);
 
 
-  hr1__1->GetXaxis()->SetTitle("#Deltam_{41}^{2} [eV^{2}]");
+  hr1__1->GetXaxis()->SetTitle("#Deltam#lower[0.4]{#scale[.6]{41}}#lower[-.6]{#scale[.6]{2}} [eV#lower[-.6]{#scale[.6]{2}}]");
   hr1__1->GetXaxis()->CenterTitle(true);
   hr1__1->GetXaxis()->SetLabelFont(62);
   hr1__1->GetXaxis()->SetLabelSize(0.04);

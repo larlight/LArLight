@@ -2757,6 +2757,7 @@ namespace lar1{
       std::cout << "  NueFromCosmics: ..........." << NueFromCosmics -> Integral() << "\n";
       std::cout << "  SignalNu: ................." << SignalNu -> Integral() << "\n";
 
+
       std::cout << "Backgrounds by type for first bins: " << std::endl;
       std::cout << "  NueFromNueCC_muon: ........[" 
                 << NueFromNueCC_muon->GetBinContent(1) << "]\t["
@@ -2920,6 +2921,20 @@ namespace lar1{
                 << totalEvents.at(2)<< "]\n";
       std::cout << "First bin: " << SignalNu->GetBinContent(1) <<std::endl;;
       
+      std::cout << "Integral backgrounds by type above 475 MeV: " << std::endl;
+      std::cout << "  NueFromNueCC_muon: ........" << NueFromNueCC_muon -> Integral() << "\n";
+      std::cout << "  NueFromNueCC_chargeKaon: .." << NueFromNueCC_chargeKaon -> Integral() << "\n";
+      std::cout << "  NueFromNueCC_neutKaon: ...." << NueFromNueCC_neutKaon -> Integral() << "\n";
+      std::cout << "  NueFromEScatter: .........." << NueFromEScatter -> Integral() << "\n";
+      std::cout << "  NueFromNC_pi0: ............" << NueFromNC_pi0 -> Integral() << "\n";
+      std::cout << "  NueFromNC_delta0: ........." << NueFromNC_delta0 -> Integral() << "\n";
+      std::cout << "  NueFromNumuCC: ............" << NueFromNumuCC -> Integral() << "\n";
+      std::cout << "  Dirt: ....................." << Dirt -> Integral() << "\n";
+      std::cout << "  Other: ...................." << Other -> Integral() << "\n";
+      std::cout << "  NueFromCosmics: ..........." << NueFromCosmics -> Integral() << "\n";
+      std::cout << "  SignalNu: ................." << SignalNu -> Integral() << "\n";
+
+
       
       //Now set the errors on the last hist going in:
       for (int i = 0; i < nbins_nue; ++i)

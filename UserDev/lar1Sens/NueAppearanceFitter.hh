@@ -100,11 +100,11 @@ namespace lar1{
       {
             npoints = n;
             // for LSND BF:
-            // dm2FittingPoint = 0.52*npoints;
-            // sin22thFittingPoint = 0.375*npoints;
+            dm2FittingPoint = 0.52*npoints;
+            sin22thFittingPoint = 0.375*npoints;
             // // for Kopp BF:
-            dm2FittingPoint = 0.41*npoints;
-            sin22thFittingPoint = 0.53*npoints;
+            // dm2FittingPoint = 0.41*npoints;
+            // sin22thFittingPoint = 0.53*npoints;
             // for high dm2 point:
             // dm2FittingPoint = 0.9*npoints;
             // sin22thFittingPoint = 0.375*npoints;

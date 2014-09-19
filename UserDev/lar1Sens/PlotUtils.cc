@@ -146,7 +146,7 @@ namespace lar1{
     TH2D* hr1=new TH2D("hr1","hr1",500,sin22thmin,sin22thmax,500,dm2min,dm2max);
     hr1->Reset();
     hr1->SetFillColor(0);
-    hr1->SetTitle(";sin^{2}2#theta_{#mue};#Deltam^{2}_{41} (eV^{2})");
+    hr1->SetTitle(";sin#lower[-.6]{#scale[.6]{2}}2#theta#lower[.4]{#scale[.6]{#mue}};#Deltam#lower[-.6]{#scale[.6]{2}}#lower[.4]{#scale[.6]{41}} (eV#lower[-.7]{#scale[.6]{2}})");
     hr1->GetXaxis()->SetTitleOffset(1.1);
     hr1->GetYaxis()->SetTitleOffset(1.2);
     hr1->GetXaxis()->SetTitleSize(0.05);
@@ -159,6 +159,15 @@ namespace lar1{
 
   int PlotUtils::plotGFData(TPad * c ){
     std::vector<std::vector<double> > data = readGFData();
+
+    // std::cout << "Printing out the chi2 map:\n";
+    // for (int dm2point = 0; dm2point < data.size(); dm2point ++){
+    //   for (int sin22thpoint = 0; sin22thpoint < data[0].size(); sin22thpoint ++){
+    //     std::cout << "data["<<dm2point<<"]["<<sin22thpoint<<"]: " 
+    //               << data[dm2point][sin22thpoint] << "\n";
+    //   }
+    //   std::cout << std::endl;
+    // }
 
     int npoints = 250;
 
@@ -298,25 +307,34 @@ namespace lar1{
 
     TH2D * chi2hist = new TH2D("chi2","chi2", 250, xbins, 250,ybins);
 
+
+    // for (int i = 0; i <= 40; i++){
+    //   std::cout << "data[5]["<<i<<"]: " << data[5][i] << std::endl;
+    // }
+
+
+
+
     // std::cout << "\t";
     // for (int j = 0; j <= 41; ++j) std::cout << std::fixed << (j*0.1 - 4.01) << " \t";
     // std::cout << "\n";
     for (int i = 0; i <= 56; i++){
       // std::cout << std::fixed << (i*0.05 - 1.4);
       for (int j = 0; j <= 40; ++j){
-        if (data[i][j] >= min && data[i][j] < bound90)
-        {
+        // if (data[i][j] >= min && data[i][j] < bound90)
+        // {
           double sin22th = pow(10.0,(j*0.1 - 4.01));
           double dm2 = pow(10.0,(i*0.05 - 1.4));
           chi2hist -> Fill(sin22th,dm2,data[i][j]);
           // std::cout << "Filling " << data[i][j] << " at x = " << sin22th 
           // << ", y = " << dm2 << std::endl;
-        }
+        // }
       }
       // std::cout << "\n";
     }
 
-    // std::cout << "Max of plot: " << chi2hist -> GetMaximum() << std::endl;
+    std::cout << "Max of plot: " << chi2hist -> GetMaximum() << std::endl;
+    std::cout << "Min of plot: " << chi2hist -> GetMinimum() << std::endl;
 
     // TCanvas * d = new TCanvas("dumb","dumber", 500, 500);
 
@@ -328,7 +346,7 @@ namespace lar1{
     // auto arr = chi2hist -> GetArray();
     // chi2hist -> Smooth();
     // chi2hist -> Smooth();
-    // chi2hist -> Draw("cont");
+    // chi2hist -> Draw("cont list same");
     bottom -> Draw("CF same");
     double sin22thBF[1] = {0.013};
     double dm2BF[1] = {0.42};
@@ -368,22 +386,24 @@ namespace lar1{
     legend.push_back("chi2_IH");
 
     // Setting up a container to hold the chi2 values.
-    // There are 57 dm14 points, from -1.4 to 1.4 in steps of 0.05;
-    // There are 41 sin22th points from -4.01 to -0.01 in steps of 0.1;
-    // at each point, we average over any Um4 or chi2_IH/chi2_NH
+    // There are 57 dm14 points, from -1.4 to 1.4 in steps of 0.05 inclusive;
+    // There are 41 sin22th points from -4.01 to -0.01 in steps of 0.1 inclusive;
+    // at each point, we marginalize over any Um4 or chi2_IH/chi2_NH
     std::vector< std::vector<double > > chi2map(57, std::vector<double>(41, 0.0) );
     // to get indices correct, the index of dm14 is (dm14 + 1.4)/0.05
 
     std::string line;
     while (std::getline(datafile, line))
     {
+
       if (*line.begin() == '#') continue;
+      if (*line.begin() == 'P') continue;
       // std::cout << "---------------\n";
       // std::istrinstream iss(line);
       std::vector < std::string > splitStream;
       reduce(line);
       split(splitStream, line);
-      if (splitStream.size() > 10) continue;
+      // if (splitStream.size() > 10) continue;
       // std::cout << "Length of line (split tokens): " << splitStream.size() << "\n";
       std::vector <double> data;
       for (int index = 0; index < 5; index++)
@@ -398,8 +418,8 @@ namespace lar1{
       // Now do the actual processing.
       
 
-      double dm14index = ((data[0]+ 1.4)/0.05);
-      double sin22thindex = ((data[1] + 4.01)/0.1);
+      unsigned int dm14index = ceil(((data[0]+ 1.4)/0.05));
+      unsigned int sin22thindex = ceil(((data[1] + 4.01)/0.1));
 
       double chi2 = fmin(data[3], data[4]);
       if (chi2map[dm14index][sin22thindex] == 0.0) 
