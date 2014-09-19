@@ -13,6 +13,8 @@ namespace cmtool {
     _w2cm = larutil::GeometryUtilities::GetME()->WireToCm();
     _t2cm = larutil::GeometryUtilities::GetME()->TimeToCm();
     SetVerbose(false);
+    SetDebug(false);
+    SetUseAllPlanes(false); // Any plane combination OK
   }
 
   //-----------------------------
@@ -29,7 +31,7 @@ namespace cmtool {
     // Code-block by Kazu starts
     // This ensures the algorithm works only if # clusters is > 2 (and not =2)
     // You may take out this block if you want to allow matching using clusters from only 2 planes.
-    //if(clusters.size()==2) return -1;
+    if (_UseAllPlanes) { if(clusters.size()==2) return -1; }
     // Code-block by Kazu ends
 
     //This algorithm now works for 3 planes: find 3Dstart point from first 2 planes and find
@@ -84,12 +86,15 @@ namespace cmtool {
 
     //if one of the plane's wire-range is still [9999, 0] then replace it
     //with min/max wire number from that plane
+    //similarly for time-range
     //This allows for easy 2-Plane matching: if we are ignoring one plane
     //completely by giving the wire-range for the whole plane the intersection
     //will effectively be the intersection of the other two planes
     for (size_t h=0; h < Hits.size(); h++){
       if ( StartWires.at(h) == 9999 ) { StartWires.at(h) = 1; }
       if ( EndWires.at(h) == 0 ) { EndWires.at(h) = larutil::Geometry::GetME()->Nwires(h)-1; }
+      if ( StartTimes.at(h) == 9999 ) { StartTimes.at(h) = 0; }
+      if ( EndTimes.at(h) == 0 ) { EndTimes.at(h) = 9999; }
     }
 
 
