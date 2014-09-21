@@ -3,7 +3,7 @@
 #
 
 # specific names for this package
-DICT  = CMTAlgPriority
+DICT  = CMTAlgPriorityCint
 SHLIB = libCMTAlgPriority.so
 SOURCES = $(wildcard *.cc)
 HEADERS = $(wildcard *.hh)

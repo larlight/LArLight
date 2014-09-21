@@ -16,5 +16,5 @@ rootlibmap() {
 
 ######################################################
 # CMTool
-rootlibmap libCMToolApp.rootmap libCMToolApp.so $USER_DEV_DIR/CMTool/LinkDef.h \
+rootlibmap libCMToolApp.rootmap libCMToolApp.so $USER_DEV_DIR/CMTool/CMToolApp/LinkDef.h \
     libCMTAlgPriority.so libCMTAlgMerge.so libCMTAlgMatch.so libBase.so libDataFormat.so libAnalysis.so libGpad.so
