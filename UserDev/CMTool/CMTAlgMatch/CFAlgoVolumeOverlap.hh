@@ -61,11 +61,15 @@ namespace cmtool {
     /// Function to set debug output
     void SetDebug( bool on ) { _debug = on; }
 
+    /// Function to set if _UseAllPlanes is on/off
+    void SetUseAllPlanes( bool on ) { _UseAllPlanes = on; }
+
   private:
 
     double _w2cm, _t2cm;
     bool   _verbose;
     bool   _debug;
+    bool   _UseAllPlanes; //If True matching only if clusters.size() == 3)
   };
 
 

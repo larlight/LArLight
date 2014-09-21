@@ -36,6 +36,8 @@ namespace larlight {
       _fout=0; 
       _debug=false; 
       _applyEnergyCorrection=false;
+      _shower_type = DATA::Shower;
+      _cluster_type = DATA::Cluster;
     };
 
 
@@ -57,6 +59,10 @@ namespace larlight {
     */
     virtual bool finalize();
 
+    void SetClusterType(DATA::DATA_TYPE type) {_cluster_type = type;}
+
+    void SetShowerType(DATA::DATA_TYPE type) {_shower_type = type; }
+
     void SetDebug(bool flag) { _debug = flag; }
 
     float Pi0MassFormula3D(  float Energy1, float Energy2, TVector3 Direction3D_1, TVector3 Direction3D_2);
@@ -77,7 +83,7 @@ namespace larlight {
   protected:
 
     DATA::DATA_TYPE _shower_type;
-    
+    DATA::DATA_TYPE _cluster_type;    
     TH1D* hPi0MassPeak;
     TH1D* hPi0MassPeakPull;
     TH1D* hPi0CosCM;
@@ -88,7 +94,10 @@ namespace larlight {
     TH1D* hPi0MassPeak_TrueDetector;
 
     TH2D* hPhotondos;
+    TH2D* hOpeningAngle;
     TH1D* hPi0MassPeakdoscut;
+    TH1D* hPi0MassPeakanglecut;
+    TH1D* hPi0MassPeakdosanglecut;
 
 
 
