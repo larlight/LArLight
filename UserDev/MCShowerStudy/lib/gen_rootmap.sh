@@ -15,6 +15,19 @@ rootlibmap() {
 }
 
 ######################################################
-# ClusterRecoUtil
-rootlibmap libClusterRecoUtil.rootmap libClusterRecoUtil.so $USER_DEV_DIR/ClusterRecoUtil/LinkDef.h \
-    libFANN.so libBase.so libDataFormat.so libAnalysis.so libLArUtil.so 
+# MCShowerStudy
+rootlibmap libMCShowerStudy.rootmap libMCShowerStudy.so $USER_DEV_DIR/MCShowerStudy/LinkDef.h \
+    libAnalysis.so
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -15,6 +15,19 @@ rootlibmap() {
 }
 
 ######################################################
-# ClusterRecoUtil
-rootlibmap libClusterRecoUtil.rootmap libClusterRecoUtil.so $USER_DEV_DIR/ClusterRecoUtil/LinkDef.h \
-    libFANN.so libBase.so libDataFormat.so libAnalysis.so libLArUtil.so 
+# KazuCluster
+rootlibmap libKazuCluster.rootmap libKazuCluster.so $USER_DEV_DIR/KazuCluster/LinkDef.h \
+    libAnalysis.so
+
+
+
+
+
+
+
+
+
+
+
+
+

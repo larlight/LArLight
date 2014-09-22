@@ -40,7 +40,6 @@ for l in libs:
     if os.path.isfile(target):
         #print "  INFO: %s exists ... replacing..." % l.replace(".dylib",".so")
         os.system("rm %s" % target)
-        print target
     os.system("ln -s %s %s" % (source,target))
         
 

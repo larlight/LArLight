@@ -17,4 +17,4 @@ rootlibmap() {
 ######################################################
 # CMTool
 rootlibmap libCMToolBase.rootmap libCMToolBase.so $USER_DEV_DIR/CMTool/CMToolBase/LinkDef.h \
-    libLArUtil.so libClusterRecoUtil.so
+    libClusterRecoUtil.so libLArUtil.so
