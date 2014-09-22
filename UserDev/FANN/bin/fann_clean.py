@@ -18,8 +18,10 @@ for l in libs:
     source = "%s/src/%s" % (FANN_DIR,l)
     target = "%s/lib/%s" % (os.environ['MAKE_TOP_DIR'],l.replace(".dylib",".so"))
     if os.path.isfile(target):
+        print target
         os.system("rm %s" % target)
-    os.system('make clean --directory=%s' % FANN_DIR)
+
+os.system('make clean --directory=%s' % FANN_DIR)
         
 
 

@@ -27,7 +27,6 @@ os.system(cmd)
 
 # Copy libraries
 libs = [x for x in os.listdir("%s/src" % FANN_DIR) if x.endswith(".so") or x.endswith(".dylib")]
-
 if not len(libs):
     print
     print "  ERROR: Building fann base package failed..."
@@ -41,7 +40,7 @@ for l in libs:
     if os.path.isfile(target):
         #print "  INFO: %s exists ... replacing..." % l.replace(".dylib",".so")
         os.system("rm %s" % target)
-
+        print target
     os.system("ln -s %s %s" % (source,target))
         
 
