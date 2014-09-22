@@ -36,8 +36,13 @@ CXXFLAGS +=  `root-config --cflags`
 # call the common GNUmakefile
 include $(MAKE_TOP_DIR)/Makefile/GNUmakefile.CORE
 
-fann:
+pre_build: 
+	@echo '<< building FANN-2.2.0-Source >>'
 	@python $(USER_DEV_DIR)/FANN/bin/fann_build.py
 
-clean_fann:
+pre_clean:
+	@echo '<< cleaning FANN-2.2.0-Source >>'
 	@python $(USER_DEV_DIR)/FANN/bin/fann_clean.py
+
+
+
