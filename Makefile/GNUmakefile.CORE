@@ -9,9 +9,9 @@ pre_build:
 ifndef NO_ROOTMAP
 LOCAL_ROOTMAP=lib/$(SHLIB:.so=.rootmap)
 ROOTMAP=$(LARLIGHT_LIBDIR)/$(SHLIB:.so=.rootmap)
-main_build: .depend $(ROOTMAP)
+main_build: .depend $(DICT).cc lib/$(SHLIB) $(ROOTMAP) $(LARLIGHT_LIBDIR)/$(SHLIB)
 else
-main_build: .depend $(DICT).cc lib/$(SHLIB) $(LARLIGHT_LIBDIR)/$(SHLIB)
+main_build: .depend $(DICT).cc lib/$(SHLIB)  $(LARLIGHT_LIBDIR)/$(SHLIB)
 endif
 
 # root class dictionary
@@ -34,7 +34,6 @@ lib/$(SHLIB): $(OBJECTS) $(DICT).o
 $(LARLIGHT_LIBDIR)/$(SHLIB): lib/$(SHLIB)
 	@echo '<< installing $(SHLIB) >>'
 	@ln -sf $(PWD)/lib/$(SHLIB) $(LARLIGHT_LIBDIR)
-	@echo 'hey' $(NO_ROOTMAP)
 
 # if ROOTMAP defined, define rule for making it
 ifndef NO_ROOTMAP
