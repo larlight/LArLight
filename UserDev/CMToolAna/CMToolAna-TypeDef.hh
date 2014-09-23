@@ -12,6 +12,7 @@
 #include "MCShowerEff.hh"
 #include "ComputePi0Mass.hh"
 #include "TmpPi0MassStudy.hh"
+#include "MCShowerMatchAlg.hh"
 //ADD_NEW_HEADER ... do not change this comment line
 
 // Class forward declaration here
@@ -23,10 +24,11 @@ namespace larlight {
   class CMatchPerformance;
   class ComputePi0Mass;
   class TmpPi0MassStudy;
+  class MCShowerMatchAlg;
+  class CMToolAnaException;
 //ADD_ANA_CLASS ... do not change this comment line
-
 }
-
 //ADD_EMPTY_CLASS ... do not change this comment line
 #endif
+
 

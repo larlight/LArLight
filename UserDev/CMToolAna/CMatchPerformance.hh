@@ -16,7 +16,7 @@
 #define CMATCHPERFORMANCE_HH
 
 #include "ana_base.hh"
-#include "McshowerLookback.hh"
+#include "MCShowerMatchAlg.hh"
 #include "CMatchManager.hh"
 #include "CRUHelper.hh"
 #include "TStopwatch.h"
@@ -62,10 +62,6 @@ namespace larlight {
     /// Getter for CMatchManager
     ::cmtool::CMatchManager& GetManager() { return *fMgr; }
 
-    /// Getter for BackTracking algorithm
-    McshowerLookback& GetBTAlgo() { return fBTAlgo; }
-
-
   protected:
 
     DATA::DATA_TYPE _cluster_type;
@@ -74,7 +70,7 @@ namespace larlight {
 
     ::cmtool::CMatchManager *fMgr;
 
-    McshowerLookback fBTAlgo;
+    MCShowerMatchAlg fAlg;
 
     /// Charge-based efficiency histogram: entry per matched pair
     TH1D* hMatchQEff;
@@ -82,13 +78,9 @@ namespace larlight {
     /// Charge-based efficiency histogram: entry per event
     TH1D* hMatchQEffEvent;
 
-    /// # MCShower / # matched cluster pairs (kinda efficiency)
-    TH1D* hMatchNumEff;
-
     /// Internal timer
     TStopwatch fWatch;
 
-    std::vector<UChar_t> _view_to_plane;
   };
 }
 #endif

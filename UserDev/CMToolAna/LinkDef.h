@@ -16,7 +16,10 @@
 #pragma link C++ class ::larlight::ComputePi0Mass+;
 #pragma link C++ class ::larlight::TmpPi0MassStudy+;
 #pragma link C++ class ::larlight::ComputePi0Mass_RG+;
+#pragma link C++ class ::larlight::MCShowerMatchAlg+;
+#pragma link C++ class ::larlight::CMToolAnaException+;
 //ADD_NEW_CLASS ... do not change this line
 
 #endif
+
 

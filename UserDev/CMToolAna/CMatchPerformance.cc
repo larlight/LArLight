@@ -10,7 +10,6 @@ namespace larlight {
     _name="CMatchPerformance";
     _fout=0; 
     hMatchQEff=0;
-    hMatchNumEff=0;
     hMatchQEffEvent=0;
     _cluster_type = DATA::Cluster;
     auto geom = ::larutil::Geometry::GetME();
@@ -22,20 +21,6 @@ namespace larlight {
 
     print(MSG::DEBUG,Form("CMatchPerformance::%s",__FUNCTION__),"called...");
 
-    auto geo = ::larutil::Geometry::GetME();
-    _view_to_plane.clear();
-    _view_to_plane.resize(geo->Nplanes(),DATA::INVALID_UCHAR);
-
-    for(UChar_t plane=0; plane<geo->Nplanes(); ++plane) {
-
-      UChar_t view = geo->PlaneToView(plane);
-
-      if(_view_to_plane.size() <= view) _view_to_plane.resize(view+1,DATA::INVALID_UCHAR);
-
-      _view_to_plane.at(view) = plane;
-
-    }
-
     hMatchQEff = new TH1D("hMatchChargeEff",
 			  "MC Matched Pair Efficiency; Efficiency; Num. MCShower;",
 			  101,-0.005,1.005);
@@ -43,10 +28,6 @@ namespace larlight {
     hMatchQEffEvent = new TH1D("hMatchChargeEffEvent",
 			       "MC Matched Pair Efficiency; Efficiency; Num. MCShower;",
 			       101,-0.005,1.005);
-
-    hMatchNumEff = new TH1D("hMatchNumEff",
-			    "Number of MCShower / Reco-Matched Pair; Efficiency; Events;",
-			    101,-0.005,1.005);
 
     return true;
 
@@ -61,8 +42,6 @@ namespace larlight {
       print(MSG::DEBUG,Form("CMatchPerformance::%s",__FUNCTION__),"start...");
 
     }
-
-    auto geo = ::larutil::Geometry::GetME();
 
     //
     // Run CMatchManager
@@ -135,174 +114,41 @@ namespace larlight {
     
     if(!(reco_match_v.size())) return true;
 
-    // Convert to necessary map for back-tracking
-    std::map<UInt_t,UInt_t> shower_idmap;
-
-    std::map<UShort_t, larlight::simch> simch_map;
-
-    fWatch.Start();
-
-    fBTAlgo.FillShowerMap(ev_mcshower, shower_idmap);
-
-    fBTAlgo.FillSimchMap(ev_simch, simch_map);
-
-    if(this->get_verbosity()==MSG::DEBUG)
-
-      print(MSG::DEBUG,Form("CMatchPerformance::%s",__FUNCTION__),
-	    Form("Time to prepare McshowerLookback: %g",fWatch.RealTime()));
-
-    // Preparation done
-
-    //
-    // Perform back-tracking
-    //
-    // (1) Load cluster/hit data product
-    // (2) Loop over all clusters and find charge fraction to each MCShower
-    // (3) For each MCShower, find a cluster per plane with the highest charge
-
-    // Load data products
-    auto ev_cluster = (const event_cluster*)(storage->get_data(_cluster_type));
-
-    if(!ev_cluster) {
-
-      print(MSG::ERROR,__FUNCTION__,Form("Data product \"%s\" not found...",
-					 DATA::DATA_TREE_NAME[_cluster_type].c_str()
-					 )
-	    );
-      return false;
-    }else if(ev_cluster->size()<1) return false;
-
-    const DATA::DATA_TYPE hit_type = ev_cluster->get_hit_type();
-
-    auto ev_hit = (const event_hit*)(storage->get_data(hit_type));
-
-    if(!ev_hit) {
-
-      print(MSG::ERROR,__FUNCTION__,Form("Data product \"%s\" not found...",
-					 DATA::DATA_TREE_NAME[hit_type].c_str()
-					 )
-	    );
-      return false;
-    }
-
-    // Loop over clusters & get charge fraction per MCShower
-    std::vector<std::vector<float> > qfrac_v;
-    std::vector<double> cluster_charge;
-    qfrac_v.reserve(ev_cluster->size());
-    cluster_charge.reserve(ev_cluster->size());
-    fWatch.Start();
-    for(auto const& c : *ev_cluster) {
-
-      // Create hit list
-      std::vector<const larlight::hit*> hits;
-      auto const& hit_indices = c.association(hit_type);
-      hits.reserve(hit_indices.size());
-
-      cluster_charge.push_back(0);
-      for(auto const& index : hit_indices) {
-
-	hits.push_back(&(ev_hit->at(index)));
-	(*cluster_charge.rbegin()) += ev_hit->at(index).Charge();
-	
-      }
-
-      qfrac_v.push_back(fBTAlgo.MatchHitsAll(hits, simch_map, shower_idmap));
-
-    }
-
-    if(this->get_verbosity()==MSG::DEBUG)
-
-      print(MSG::DEBUG,Form("CMatchPerformance::%s",__FUNCTION__),
-	    Form("Time to back-track all clusters: %g",fWatch.RealTime()));
-
-    //
-    // Find the best matched pair (and its charge) per MCShower
-    //
-
-    std::vector<UInt_t> mcshower_id;    // index number of MCShowers (in event_mcshower) that are taken into account 
-    fBTAlgo.UniqueShowerID(shower_idmap,mcshower_id);
-
-    std::vector<std::vector<double> > bmatch_q  (mcshower_id.size(),std::vector<double>(geo->Nplanes(),0));
-    std::vector<std::vector<size_t> > bmatch_id (mcshower_id.size(),std::vector<size_t>(geo->Nplanes(),0));
-
-    fWatch.Start();
-    for(size_t shower_index=0; shower_index < mcshower_id.size(); ++shower_index) {
-
-      for(size_t cluster_index=0; cluster_index < ev_cluster->size(); ++cluster_index) {
-
-	if((*(qfrac_v.at(cluster_index).rbegin())) < 0) continue;
-
-	auto plane = _view_to_plane.at(ev_cluster->at(cluster_index).View());
-
-	double q = qfrac_v.at(cluster_index).at(shower_index) * cluster_charge.at(cluster_index);
-
-	if( bmatch_q.at(shower_index).at(plane) < q ) {
-
-	  bmatch_q.at(shower_index).at(plane)  = q;
-	  bmatch_id.at(shower_index).at(plane) = cluster_index;
-
-	}
-	
-      }
-    }
-
-    if(this->get_verbosity()==MSG::DEBUG)
-
-      print(MSG::DEBUG,Form("CMatchPerformance::%s",__FUNCTION__),
-	    Form("Time to find best matched pair(s): %g",fWatch.RealTime()));
+    // Prepare MC<=>Reco matching algorithm
+    fAlg.Prepare(storage,_cluster_type);
 
     //
     // Evaluate efficiency
     //
-    double max_eff=0;
+    double max_correctness=0;
     fWatch.Start();
     for(auto const& match : reco_match_v) {
 
-      // Compute efficiency per MCShower
-      std::vector<double> match_eff(mcshower_id.size(),1);
-
-      for(auto const& cluster_index : match) {
-
-	for(size_t shower_index=0; shower_index < mcshower_id.size(); ++shower_index) {
-
-	  unsigned char plane = _view_to_plane.at(ev_cluster->at(cluster_index).View());
-
-	  double q = cluster_charge.at(cluster_index)* qfrac_v.at(cluster_index).at(shower_index);
-
-	  match_eff.at(shower_index) *= q / bmatch_q.at(shower_index).at(plane);
-	}
-
-      }
-
-      // Find the best qratio
-      double qratio_max = -1;
-      for(auto const& eff : match_eff)
-
-	if(qratio_max < eff) qratio_max = eff;
-
-      if(max_eff < qratio_max) max_eff = qratio_max;
+      double correctness = -1;
+      size_t best_match_mcs = 0;
+      fAlg.Match(match,best_match_mcs,correctness);
 
       if(this->get_verbosity() <= MSG::DEBUG) 
-
-	print(MSG::DEBUG,Form("CMatchPerformance::%s",__FUNCTION__),Form("Matching efficiency: %g",qratio_max));
-
-      hMatchQEff->Fill(qratio_max);
+	
+	print(MSG::DEBUG,Form("CMatchPerformance::%s",__FUNCTION__),Form("Matching efficiency: %g",correctness));
+      
+      hMatchQEff->Fill(correctness);
+      if(max_correctness < correctness) max_correctness = correctness;
     }
 
     if(this->get_verbosity()==MSG::DEBUG)
 
       print(MSG::DEBUG,Form("CMatchPerformance::%s",__FUNCTION__),
 	    Form("Time to evaluate every matched pair: %g",fWatch.RealTime()));
-
+    
     if(reco_match_v.size()) {
 
       if(this->get_verbosity() <= MSG::DEBUG) 
 
-	print(MSG::DEBUG,Form("CMatchPerformance::%s",__FUNCTION__),Form("MAX efficiency in this event: %g",max_eff));
+	print(MSG::DEBUG,Form("CMatchPerformance::%s",__FUNCTION__),Form("MAX efficiency in this event: %g",max_correctness));
 
-      hMatchQEffEvent->Fill(max_eff);
+      hMatchQEffEvent->Fill(max_correctness);
 
-      hMatchNumEff->Fill( (float)(mcshower_id.size()) / (float)(reco_match_v.size()) );
     }
 
     return true;
@@ -319,8 +165,6 @@ namespace larlight {
       _fout->cd();
       
       hMatchQEff->Write();
-
-      hMatchNumEff->Write();
 
       hMatchQEffEvent->Write();
 
