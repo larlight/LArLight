@@ -5,17 +5,19 @@ mgr = fmwk.ana_processor()
 
 mgr.set_io_mode(fmwk.storage_manager.READ)
 
-mgr.add_input_file(sys.argv[1])
+mgr.set_verbosity(fmwk.MSG.DEBUG)
 
-if len(sys.argv) > 2:
+for x in xrange(len(sys.argv)-1):
 
-    mgr.set_rootdir(sys.argv[2])
+    mgr.add_input_file(sys.argv[x+1])
+
+mgr.set_rootdir("scanner")
 
 mgr.set_ana_output_file("out_%s" % sys.argv[1])
 
 mgr.add_process(fmwk.MCShowerAna())
 
-mgr.run(0)
+mgr.run()
 
 
 
