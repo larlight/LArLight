@@ -46,6 +46,8 @@ namespace larlight {
     void Match(const std::vector<unsigned int> &cluster_indices,
 	       size_t &mcshower_index,
 	       double &correctness) const;
+
+    void MCShowerQFrac(size_t cluster_index) const { return _qfrac_v.at(cluster_index); }
     
   protected:
     
