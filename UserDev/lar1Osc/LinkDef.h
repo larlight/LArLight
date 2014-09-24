@@ -14,6 +14,7 @@
 #pragma link C++ class lar1::FluxRWnubar+;
 #pragma link C++ class lar1::Utils+;
 #pragma link C++ class lar1::NtupleReprocessing+;
+#pragma link C++ class lar1::Reprocessing+;
 #pragma link C++ class lar1Osc+;
 
 

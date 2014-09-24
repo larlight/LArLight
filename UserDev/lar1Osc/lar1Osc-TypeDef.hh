@@ -9,6 +9,7 @@
 #include "lar1Osc.hh"
 #include "LorentzVectorLight.hh"
 #include "NtupleReprocessing.hh"
+#include "Reprocessing.hh"
 #include "Utils.hh"
 #include "FluxRW.hh"
 #include "FluxRWnubar.hh"
@@ -22,6 +23,7 @@ namespace lar1{
   class Utils;
   class FluxRW;
   class FluxRWnubar;
+  class NtupleReprocessing;
   class NtupleReprocessing;
 }
   class testphots;

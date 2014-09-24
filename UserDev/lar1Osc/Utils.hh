@@ -37,18 +37,25 @@ namespace lar1{
                            Double_t l_theta, Double_t mass, 
                            Int_t mode, bool verbose = false ) const;
     Double_t NuEnergyCalo( std::vector<Int_t> *pdg, std::vector<Double_t> *energy, 
-  			               Bool_t include_neutrons = false, 
+                           Bool_t include_neutrons = false, 
                            Bool_t include_pizeros = false, 
                            Double_t prot_thresh = 0, 
                            bool verbose = false ) const;
     Double_t VertexEnergy( std::vector<Int_t> *pdg, std::vector<Double_t> *energy, 
-  			               Double_t prot_thresh = 0.0, Double_t pion_thresh = 0.0, 
+                           Double_t prot_thresh = 0.0, Double_t pion_thresh = 0.0, 
                            bool verbose = false ) const;
     Double_t TotalPhotonEnergy( Int_t idet, 
                                 std::vector<gan::LorentzVectorLight> *p1pos,
                                 std::vector<gan::LorentzVectorLight> *p1mom,
                                 std::vector<gan::LorentzVectorLight> *p2pos,
                                 std::vector<gan::LorentzVectorLight> *p2mom ) const;
+    Double_t TotalPhotonEnergy( Int_t idet, 
+                                std::vector<std::vector<float>> *p1pos,
+                                std::vector<std::vector<float>> *p1mom,
+                                std::vector<std::vector<float>> *p2pos,
+                                std::vector<std::vector<float>> *p2mom,
+                                std::vector<std::vector<float>> *miscpos,
+                                std::vector<std::vector<float>> *miscmom ) const;
 
     // bool PhotonsAreParallel(TVector3 & photon1_start, TVector3 & photon1_mom
     //                         TVector3 & photon2_start, TVector3 & photon2_mom);

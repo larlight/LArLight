@@ -586,6 +586,49 @@ namespace lar1{
 
   }
 
+  Double_t Utils::TotalPhotonEnergy(Int_t idet, 
+                                    std::vector<std::vector<float>> *p1pos,
+                                    std::vector<std::vector<float>> *p1mom,
+                                    std::vector<std::vector<float>> *p2pos,
+                                    std::vector<std::vector<float>> *p2mom,
+                                    std::vector<std::vector<float>> *miscpos,
+                                    std::vector<std::vector<float>> *miscmom) const{
+    
+    if(   p1pos->size()   != p1mom->size() 
+       || p2pos->size()   != p2mom->size() 
+       || miscpos->size() != miscmom->size() ){
+      std::cout << "photon vectors don't match!!" << std::endl;
+      exit(1);
+    }
+    Double_t energy = 0.0;
+
+    for( unsigned int i = 0; i < p1pos->size(); i++ ){
+      TVector3 photon1Pos((*p1pos).at(i).at(1), (*p1pos).at(i).at(2), (*p1pos).at(i).at(3) );
+      if( IsFiducial( idet, photon1Pos ) )
+        energy += p1mom->at(i).at(0);
+
+    }
+
+    for( unsigned int i = 0; i < p2pos->size(); i++ ){
+
+      TVector3 photon2Pos((*p2pos).at(i).at(1), (*p2pos).at(i).at(2), (*p2pos).at(i).at(3) );
+      if( IsFiducial( idet, photon2Pos ) )
+        energy += p2mom->at(i).at(0);
+
+    }
+
+    for( unsigned int i = 0; i < miscpos->size(); i++ ){
+
+      TVector3 photon2Pos((*miscpos).at(i).at(1), (*miscpos).at(i).at(2), (*miscpos).at(i).at(3) );
+      if( IsFiducial( idet, photon2Pos ) )
+        energy += miscmom->at(i).at(0);
+
+    }
+
+    return energy;
+
+
+  }
 
   //==========================================================================
   // Check if point is in some fiducial volume definition
@@ -871,11 +914,14 @@ namespace lar1{
                                     int idet) const{
 
     if (!IsActive(idet, startPoint)){
-      // std::cout << "Failed the IsActive cut!\n";
+      std::cout << "Failed the IsActive cut!\n";
       return 0;
     }
     TVector3 unitDir = startDir.Unit();
-    // startDir *= 1.0/startDir.Mag();
+    std::cout << "Unit direction is "
+              << (startDir).X() << ", "
+              << (startDir).Y() << ", "
+              << (startDir).Z() << ")\n";
     double distance = 1;
     while (IsActive(idet, startPoint + unitDir*distance)){
       // std::cout << "Current pos is (" 
