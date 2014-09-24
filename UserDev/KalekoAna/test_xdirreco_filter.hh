@@ -48,7 +48,6 @@ namespace kaleko {
     virtual bool finalize();
 
     protected:
-
   };
 }
 #endif
