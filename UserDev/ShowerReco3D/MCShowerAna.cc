@@ -129,6 +129,49 @@ namespace larlight {
     // to fill MC charge information
     for(auto const& reco_shower : *shower_v) {
       
+      /*
+      for(size_t i=0; i<3; ++i) {
+	std::cout << "Plane " << i << std::endl
+		  << "Reco-ed Q: " << recoq.at(i) << std::endl
+		  << "MC Q: " << mcq_total.at(i) << std::endl
+		  << "MC Q in this cluster: " << mcq_detected.at(i)  << std::endl
+		  << " correction factor : " << (mcq_detected.at(i)/mcq_total.at(i)) << std::endl
+		  << "corrected reco r: " << reco_en.at(i)/(mcq_detected.at(i)/mcq_total.at(i))
+		  << "corrected reco MIP r: " << reco_MIPen.at(i)/(mcq_detected.at(i)/mcq_total.at(i)) 
+		  << std::endl
+		  << std::endl;
+      }
+      */
+
+      auto const& reco_en   = reco_shower.Energy();
+      auto const& reco_MIPen   = reco_shower.MIPEnergy();
+      auto const& reco_vtx  = reco_shower.ShowerStart();
+      auto const& reco_dcos = reco_shower.Direction();
+
+      // 
+      // Fill histograms
+      //
+
+      // dEdX
+      hdEdx->Fill(reco_shower.dEdx().at(2));
+
+      // Shower start XYZ
+      hMCX->Fill(mc_vtx.at(0) - reco_vtx[0]);
+      hMCY->Fill(mc_vtx.at(1) - reco_vtx[1]);
+      hMCZ->Fill(mc_vtx.at(2) - reco_vtx[2]);
+
+      // dcos
+      hdcosX->Fill(mc_dcos.at(0) - reco_dcos[0]);
+      hdcosY->Fill(mc_dcos.at(1) - reco_dcos[1]);
+      hdcosZ->Fill(mc_dcos.at(2) - reco_dcos[2]);
+
+      // Energy
+      hEner->Fill(mc_mom.at(3) - reco_en.at(2));
+
+      // temporary till Kazu fix mcshower
+      return true;
+
+
       auto& cluster_index = reco_shower.association(DATA::Cluster);
 
       std::vector<double> recoq(3,0);        // Reconstructed charge on a given plane
@@ -153,49 +196,9 @@ namespace larlight {
 	mcq_detected.at(plane) = fBTAlg.MCShowerQ(hits).at(0) * detp->ElectronsToADC();
       }
 
-      auto const& reco_vtx  = reco_shower.ShowerStart();
-      auto const& reco_dcos = reco_shower.Direction();
-      auto const& reco_en   = reco_shower.Energy();
-      auto const& reco_MIPen   = reco_shower.MIPEnergy();
-      
-      /*
-      for(size_t i=0; i<3; ++i) {
-	std::cout << "Plane " << i << std::endl
-		  << "Reco-ed Q: " << recoq.at(i) << std::endl
-		  << "MC Q: " << mcq_total.at(i) << std::endl
-		  << "MC Q in this cluster: " << mcq_detected.at(i)  << std::endl
-		  << " correction factor : " << (mcq_detected.at(i)/mcq_total.at(i)) << std::endl
-		  << "corrected reco r: " << reco_en.at(i)/(mcq_detected.at(i)/mcq_total.at(i))
-		  << "corrected reco MIP r: " << reco_MIPen.at(i)/(mcq_detected.at(i)/mcq_total.at(i)) 
-		  << std::endl
-		  << std::endl;
-      }
-      */
-
-      // 
-      // Fill histograms
-      //
-
       // MC-based efficiency
       hMCEdepEff->Fill( mc_mom.at(3) / ((mc_mom_orig.at(3)*1.e3)) );
       hMCQEff->Fill( mcq_detected.at(2) / mcq_total.at(2) );
-
-      // dEdX
-      hdEdx->Fill(reco_shower.dEdx().at(2));
-
-      // Shower start XYZ
-      hMCX->Fill(mc_vtx.at(0) - reco_vtx[0]);
-      hMCY->Fill(mc_vtx.at(1) - reco_vtx[1]);
-      hMCZ->Fill(mc_vtx.at(2) - reco_vtx[2]);
-
-      // dcos
-      hdcosX->Fill(mc_dcos.at(0) - reco_dcos[0]);
-      hdcosY->Fill(mc_dcos.at(1) - reco_dcos[1]);
-      hdcosZ->Fill(mc_dcos.at(2) - reco_dcos[2]);
-
-      // Energy
-      hEner->Fill(mc_mom.at(3) - reco_en.at(2));
-
 
       hMIPEner->Fill(mc_mom_orig.at(3)*1e3 - reco_MIPen.at(2));
       hMIPEnerDep->Fill(mc_mom.at(3) - reco_MIPen.at(2)); 
