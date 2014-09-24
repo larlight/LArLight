@@ -29,6 +29,7 @@ namespace larlight {
     data_base::clear_data();
     fMotherPDGID   = DATA::INVALID_INT;
     fMotherTrackID = DATA::INVALID_UINT;
+    fMotherProcess = "";
     fMotherVtx.clear();
     fMotherVtx.resize(4,0);
     fMotherMomentum.clear();

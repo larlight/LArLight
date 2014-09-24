@@ -37,6 +37,7 @@ namespace larlight {
     mcshower(const mcshower& origin) : data_base(origin),
 				       fMotherPDGID(origin.fMotherPDGID),
 				       fMotherTrackID(origin.fMotherTrackID),
+				       fMotherProcess(origin.fMotherProcess),
 				       fMotherVtx(origin.fMotherVtx),
 				       fMotherMomentum(origin.fMotherMomentum),
 				       fMotherPhi(origin.fMotherPhi),
@@ -45,9 +46,10 @@ namespace larlight {
 				       fDaughterVtx(origin.fDaughterVtx),
 				       fDaughterMomentum(origin.fDaughterMomentum),
                                        fDaughterPhi(origin.fDaughterPhi),
-                                       fDaughterTheta(origin.fDaughterTheta)
+                                       fDaughterTheta(origin.fDaughterTheta),
+                                       fPlaneCharge(origin.fPlaneCharge)
     {}
-
+    
     /// Clear method
     virtual void clear_data();
 
@@ -58,6 +60,9 @@ namespace larlight {
 
     /// Shower mother's G4 track ID 
     UInt_t MotherTrackID() const { return fMotherTrackID; }
+
+    /// Mother's creation process
+    const std::string& MotherCreationProcess() const { return fMotherProcess; }
 
     /// Shower mother's start point position
     const std::vector<Double_t>& MotherPosition() const { return fMotherVtx;      }
@@ -96,6 +101,9 @@ namespace larlight {
     void SetMotherAngles(Double_t phi, Double_t theta)
     { fMotherPhi = phi; fMotherTheta = theta; }
 
+    void SetMotherProcess(const std::string& process)
+    { fMotherProcess = process; }
+
     void SetMotherPoint(const std::vector<Double_t> &vtx);
 
     void SetMotherMomentum(const std::vector<Double_t> &mom);
@@ -118,6 +126,7 @@ namespace larlight {
     //---- Mother info ----//
     Int_t  fMotherPDGID;                   ///< mother PDG code
     UInt_t fMotherTrackID;                 ///< mother G4 Track ID
+    std::string fMotherProcess;            ///< mother creation process
     std::vector<Double_t> fMotherVtx;      ///< mother position 4-vector @ generation
     std::vector<Double_t> fMotherMomentum; ///< mother momentum 4-vector @ generation
     /// mother 3D angle phi (along shower angle definition, not ordinary coord. system)
