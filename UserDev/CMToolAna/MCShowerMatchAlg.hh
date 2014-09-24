@@ -47,7 +47,7 @@ namespace larlight {
 	       size_t &mcshower_index,
 	       double &correctness) const;
 
-    void MCShowerQFrac(size_t cluster_index) const { return _qfrac_v.at(cluster_index); }
+    std::vector<float> MCShowerQFrac(size_t cluster_index) const { return _qfrac_v.at(cluster_index); }
     
   protected:
     
