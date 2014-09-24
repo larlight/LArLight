@@ -86,13 +86,21 @@ namespace larlight {
     Bool_t process_event(UInt_t index=DATA::INVALID_UINT);
     
     /// A method to append analysis class instance. Returns index number.
-    Size_t add_process(ana_base* ana){_analyzers.push_back(ana); return _analyzers.size()-1;}
+    Size_t add_process(ana_base* ana)
+    {
+      _ana_index.insert(std::make_pair(ana,_analyzers.size()));
+      _analyzers.push_back(ana); 
+      return (*_ana_index.find(ana)).second;
+    }
     
     /// A method to inquir attached analysis class instance.
     ana_base* get_process(Size_t loc){return (_analyzers.size() > loc) ? _analyzers[loc] : 0;}
     
     /// A method to inquire the process status
     PROCESS_FLAG get_process_status() {return _process;}
+
+    /// Setter to enable filtering mode
+    void enable_filter(bool doit=true) { _filter_enable = doit; }
     
   private:
     
@@ -106,7 +114,8 @@ namespace larlight {
     Bool_t finalize();
     
     std::vector<ana_base*>   _analyzers;  ///< A vector of analysis modules
-    std::map<ana_base*,Bool_t> _ana_status; ///< A map of analysis module status
+    std::vector<bool>        _ana_status; ///< A vector of analysis modules' status
+    std::map<ana_base*,size_t> _ana_index; ///< A map of analysis module status
     
     PROCESS_FLAG _process;       ///< Processing status flag
     UInt_t _nevents;           ///< Number of events being processed
@@ -114,6 +123,8 @@ namespace larlight {
     std::string _ofile_name;     ///< Output file name
     TFile*   _fout;              ///< Output file pointer
     storage_manager* _storage;   ///< Storage manager pointer
+
+    bool _filter_enable;
     
   };
 }
