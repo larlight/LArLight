@@ -3,7 +3,8 @@
  *
  * \ingroup KalekoAna
  * 
- * \brief Class def header for a class QuickMCShowerAna
+ * \brief This class will take in mcshowers to get the true 3D angle of a shower, then take in reco showers to get the reco 3D angle of a shower, then compare the two.
+ * It uses MCShowerMatchAlg for events with >1 mcshowers, to match reco shower to mcshower.
  *
  * @author davidkaleko
  */
@@ -16,6 +17,7 @@
 #define QUICMCSHOWERANA_HH
 
 #include "ana_base.hh"
+#include "MCShowerMatchAlg.hh"
 
 namespace kaleko {
   /**
@@ -27,7 +29,7 @@ namespace kaleko {
   public:
 
     /// Default constructor
-    QuickMCShowerAna(){ _name="QuickMCShowerAna"; _fout=0;};
+    QuickMCShowerAna(){ _name="QuickMCShowerAna"; _fout=0; _true_electrons_false_pi0=true;};
 
     /// Default destructor
     virtual ~QuickMCShowerAna(){};
@@ -50,6 +52,9 @@ namespace kaleko {
     //getter for the tree holding figures of merit
     TTree* GetTree() const {return _ana_tree;}
     
+    void SetElectrons(bool flag) { _true_electrons_false_pi0 = flag; }
+
+    void SetClusterType(::larlight::DATA::DATA_TYPE type) { _cluster_type = type; }
 
     protected:
 
@@ -57,10 +62,31 @@ namespace kaleko {
 
     void ClearTTreeVars();
 
+    bool _true_electrons_false_pi0;
+
+    ::larlight::DATA::DATA_TYPE _cluster_type;
+
+    ::larlight::MCShowerMatchAlg _mcshower_match_alg;
+    std::vector<unsigned int> cluster_indices;
+    size_t mcshower_index;
+    double _correctness;
+
+
     TTree* _ana_tree;
 
+    int _event_id;
     double _mom_energy;
+    double _daught_energy;
     double _reco_energy;
+    std::vector<double> _mc_shower_direction;
+    std::vector<double> _reco_shower_direction;
+    double _dot_prod;
+    double _acos_dot_prod;
+    std::vector<double> _mc_shower_start_vtx;
+    std::vector<double> _reco_shower_start_vtx;
+    double _dist;
+    
+
 
   };
 }
