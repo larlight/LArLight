@@ -79,11 +79,11 @@ namespace larlight {
     { return fDaughterTrackID; }
 
     /// (x,y,z,dE) vector as a weighted average of daughters' energy deposition points
-    const std::vector<Float_t>& DaughterPosition() const
+    const std::vector<Double_t>& DaughterPosition() const
     { return fDaughterVtx; }
 
     /// (x,y,z,dE) vector as a weighted average of daughters' energy deposition points
-    const std::vector<Float_t>& DaughterMomentum() const
+    const std::vector<Double_t>& DaughterMomentum() const
     { return fDaughterMomentum; }
 
     /// Daughters' 3D angle
@@ -108,9 +108,9 @@ namespace larlight {
 
     void SetMotherMomentum(const std::vector<Double_t> &mom);
 
-    void SetDaughterPosition(const std::vector<Float_t> &vtx);
+    void SetDaughterPosition(const std::vector<Double_t> &vtx);
 
-    void SetDaughterMomentum(const std::vector<Float_t> &mom);
+    void SetDaughterMomentum(const std::vector<Double_t> &mom);
     
     void SetDaughterTrackList(const std::vector<UInt_t> &list)
     { fDaughterTrackID = list; }
@@ -136,8 +136,8 @@ namespace larlight {
 
     //---- Daughter info ----//
     std::vector<UInt_t>  fDaughterTrackID;  ///< Daughters' track ID
-    std::vector<Float_t> fDaughterVtx;      ///< Daughters' deposit point closest to the mother vtx
-    std::vector<Float_t> fDaughterMomentum; ///< Daughters' deposit sum momentum 4-vector
+    std::vector<Double_t> fDaughterVtx;      ///< Daughters' deposit point closest to the mother vtx
+    std::vector<Double_t> fDaughterMomentum; ///< Daughters' deposit sum momentum 4-vector
     /// daughter 3D angle phi (along shower angle definition, not ordinary coord. system)
     Float_t fDaughterPhi;
     /// daughter 3D angle theta (along shower angle definition, not ordinary coord. system)

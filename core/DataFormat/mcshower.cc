@@ -62,7 +62,7 @@ namespace larlight {
     fMotherMomentum = mom;
   }
   
-  void mcshower::SetDaughterPosition(const std::vector<Float_t> &vtx)
+  void mcshower::SetDaughterPosition(const std::vector<Double_t> &vtx)
   {
     if(vtx.size()!=4) {
       Message::get()->send(MSG::ERROR,__FUNCTION__,"Input must have 4 dimension (x,y,z,t)!");
@@ -71,7 +71,7 @@ namespace larlight {
     fDaughterVtx = vtx;
   }
 
-  void mcshower::SetDaughterMomentum(const std::vector<Float_t> &mom)
+  void mcshower::SetDaughterMomentum(const std::vector<Double_t> &mom)
   {
     if(mom.size()!=4) {
       Message::get()->send(MSG::ERROR,__FUNCTION__,"Input must have 4 dimension (Px,Py,Pz,E)!");
