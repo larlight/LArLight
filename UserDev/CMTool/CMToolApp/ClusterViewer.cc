@@ -65,6 +65,8 @@ namespace larlight {
   bool ClusterViewer::analyze(storage_manager* storage)
   //################################################################
   {
+
+
     _algo.Reset();
     
     const ::larutil::Geometry* geo = ::larutil::Geometry::GetME();
@@ -199,8 +201,6 @@ namespace larlight {
       UChar_t plane = nplanes;
 
       std::vector<std::pair<double,double> > cluster_hits;
-      std::pair<double,double> cluster_start  ( cl.StartPos().at(0)*wire2cm, cl.StartPos().at(1)*time2cm );
-      std::pair<double,double> cluster_end    ( cl.EndPos().at(0)*wire2cm,   cl.EndPos().at(1)*time2cm     );
       
       for(auto const& index : cl.association(hit_type)) {
 
@@ -219,11 +219,25 @@ namespace larlight {
 
 	return true;
       }
-      if ( _showStartEnd )
+      
+      if ( _showStartEnd ){
+
+	//for start/end point, need to calculate CPAN
+       	std::vector<unsigned int> hit_index = cl.association(hit_type);
+	::cluster::ClusterParamsAlg bestclus_CPAN;
+	_cru_helper.GenerateCPAN( hit_index, ev_hit, bestclus_CPAN);
+	bestclus_CPAN.DisableFANN();
+	bestclus_CPAN.SetVerbose(false);
+	bestclus_CPAN.FillParams(true,true,true,true,true,true);
+
+	std::pair<double,double> cluster_start  ( bestclus_CPAN.GetParams().start_point.w, bestclus_CPAN.GetParams().start_point.t );
+	std::pair<double,double> cluster_end    ( bestclus_CPAN.GetParams().end_point.w,   bestclus_CPAN.GetParams().end_point.t     );
+	
 	_algo.AddCluster(plane,
 			 cluster_hits,
 			 cluster_start,
 			 cluster_end);
+      }
       else
 	_algo.AddCluster(plane,
 			 cluster_hits);

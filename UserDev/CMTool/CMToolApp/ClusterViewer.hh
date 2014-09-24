@@ -95,6 +95,8 @@ namespace larlight{
     bool _showerColor;
     bool _hits_log_z;
     bool _showStartEnd; /// decide if tho show start and end points
+
+    ::cluster::CRUHelper _cru_helper;
   };
   
 }
