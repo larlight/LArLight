@@ -1,4 +1,5 @@
 import sys
+import binascii
 from array import array
 from ROOT import *
 import ROOT
@@ -104,8 +105,8 @@ while mgr.next_event():
     # Get event_mctruth ... std::vector<larlight::mctruth>
     mctruth_v = mgr.get_data(fmwk.DATA.MCTruth)
 
-      # Get event_cluster ... std::vector<larlight::cluster>
-    cluster_v = mgr.get_data(fmwk.DATA.FuzzyCluster)
+    # Get event_cluster ... std::vector<larlight::cluster>
+    #cluster_v = mgr.get_data(fmwk.DATA.FuzzyCluster)
 
     
   #  if cluster_v.event_id() != 280 or cluster_v.subrun() != 171 :
@@ -133,7 +134,7 @@ while mgr.next_event():
         
     for plane in xrange(larutil.Geometry.GetME().Nplanes()):
 
-        if algo.LoadAllHits(mgr.get_data(larlight.DATA.FFTHit), plane) == -1 :
+        if algo.LoadAllHits(mgr.get_data(larlight.DATA.GausHit), plane) == -1 :
             continue;
 
 
@@ -164,10 +165,11 @@ while mgr.next_event():
         algo.PrintFANNVector()
         result = algo.GetParams()
 
-        print "(%g,%g) => (%g,%g), plane: %g" % (result.start_point.w,
+        print "(%g,%g) => (%g,%g), plane: %s" % (result.start_point.w,
                                                  result.start_point.t,
                                                  result.end_point.w,
-                                                 result.end_point.t,result.start_point.plane)
+                                                 result.end_point.t,
+                                                 result.start_point.plane)
 
         mc_begin=None
         if(mct_vtx):
@@ -187,16 +189,18 @@ while mgr.next_event():
             my_vec[0] = mct_vtx[0]
             my_vec[1] = mct_vtx[1]
             my_vec[2] = mct_vtx[2]
-            mcpoint=fGSer.Get2DPointProjectionCM(my_vec,result.start_point.plane)
+            mcpoint=fGSer.Get2DPointProjectionCM(my_vec,
+                                                 int(binascii.b2a_hex(result.start_point.plane)))
 
             # Example 1 & 2 should have the same return here (checked)
             # print " Start point in w,t  (%g,%g)" % (mcpoint.w,mcpoint.t)   
 
             mc_begin = TGraph(1)
-            mc_begin.SetPoint(0,mcpoint.w,mcpoint.t)
+            mc_begin.SetPoint(0, mcpoint.w, mcpoint.t)
             mc_begin.SetMarkerStyle(29)
             mc_begin.SetMarkerColor(ROOT.kRed)
             mc_begin.SetMarkerSize(3)
+
         #Add black star to mark begin point and black square to mark end point
         begin = TGraph(1)
         end = TGraph(1)
