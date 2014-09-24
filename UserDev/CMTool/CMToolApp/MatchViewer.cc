@@ -27,6 +27,7 @@ namespace larlight {
   bool MatchViewer::initialize()
   //################################################################
   {
+    _algo.Reset();
     return ClusterMatcher::initialize();
   }
   

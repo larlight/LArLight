@@ -13,6 +13,7 @@ namespace cmtool {
     _min_nhits = 0;
     _merge_till_converge = false;
     Reset();
+    _time_report=false;
   }
 
   void CMManagerBase::Reset()

@@ -26,6 +26,7 @@ namespace larlight {
   bool MergeViewer::initialize()
   //################################################################
   {
+    _algo.Reset();
     return ClusterMerger::initialize();
   }
   

@@ -58,6 +58,7 @@ namespace larlight {
   bool ClusterViewer::initialize()
   //################################################################
   {
+    _algo.Reset();
     return true;
   }
   
@@ -65,7 +66,6 @@ namespace larlight {
   bool ClusterViewer::analyze(storage_manager* storage)
   //################################################################
   {
-
 
     _algo.Reset();
     

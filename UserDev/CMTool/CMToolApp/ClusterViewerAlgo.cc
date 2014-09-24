@@ -423,32 +423,36 @@ namespace cluster {
     for(UChar_t plane=0; plane<_nplanes; ++plane) {
       
       _cAllCluster->cd((plane*2 + 1));
-      for(size_t cindex=0; cindex<_hClusterHits.at(plane).size(); ++cindex) {
 
-	if(!cindex) {
-	  _hClusterHits.at(plane).at(cindex)->Draw();
-	  if( _gClusterStart.at(plane).at(cindex)   ) _gClusterStart.at(plane).at(cindex)->Draw("P");
-	  if( _gClusterEnd.at(plane).at(cindex)     ) _gClusterEnd.at(plane).at(cindex)->Draw("P");
-	  if(_gClusterPolygon.at(plane).at(cindex))
-	    _gClusterPolygon.at(plane).at(cindex)->Draw("PL");
+      if(plane < _hClusterHits.size()) {
+
+	for(size_t cindex=0; cindex<_hClusterHits.at(plane).size(); ++cindex) {
+	  
+	  if(!cindex) {
+	    _hClusterHits.at(plane).at(cindex)->Draw();
+	    if( _gClusterStart.at(plane).at(cindex)   ) _gClusterStart.at(plane).at(cindex)->Draw("P");
+	    if( _gClusterEnd.at(plane).at(cindex)     ) _gClusterEnd.at(plane).at(cindex)->Draw("P");
+	    if(_gClusterPolygon.at(plane).at(cindex))
+	      _gClusterPolygon.at(plane).at(cindex)->Draw("PL");
 	}
-	else{
-	  _hClusterHits.at(plane).at(cindex)->Draw("sames");
-	  if( _gClusterStart.at(plane).at(cindex)   ) _gClusterStart.at(plane).at(cindex)->Draw("P");
-	  if( _gClusterEnd.at(plane).at(cindex)     ) _gClusterEnd.at(plane).at(cindex)->Draw("P");
-	  if(_gClusterPolygon.at(plane).at(cindex))
-	    _gClusterPolygon.at(plane).at(cindex)->Draw("PL");
+	  else{
+	    _hClusterHits.at(plane).at(cindex)->Draw("sames");
+	    if( _gClusterStart.at(plane).at(cindex)   ) _gClusterStart.at(plane).at(cindex)->Draw("P");
+	    if( _gClusterEnd.at(plane).at(cindex)     ) _gClusterEnd.at(plane).at(cindex)->Draw("P");
+	    if(_gClusterPolygon.at(plane).at(cindex))
+	      _gClusterPolygon.at(plane).at(cindex)->Draw("PL");
+	  }
 	}
+      }else
 	
-	
-      }
-      
+	throw ViewerException(Form("Plane %zu is invalid!",plane));
+
       _cAllCluster->cd((plane+1)*2);
       
       if(_hits_log_z)
 	gPad->SetLogz();
       
-      if ( !_showerColor )
+      if ( !_showerColor && _hAllHits.at(plane))
 	_hAllHits.at(plane)->Draw("COLZ");
 
       if ( _showerColor and  _hShowerHits.at(plane).size() ){
