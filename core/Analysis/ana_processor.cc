@@ -83,12 +83,16 @@ namespace larlight {
     
 
     Bool_t status = true;
+
+    _ana_status.resize(_analyzers.size(),false);
     
     for(size_t i=0; i<_analyzers.size(); ++i) {
       
       _analyzers[i]->set_output_file(_fout);
-      
-      if(!(_analyzers[i]->initialize())){
+
+      _ana_status[i] = _analyzers[i]->initialize();
+
+      if(!_ana_status[i]) {
 	
 	Message::send(MSG::ERROR,__PRETTY_FUNCTION__,
 		      Form("Failed to initialize: %s",_analyzers[i]->class_name().c_str()));
