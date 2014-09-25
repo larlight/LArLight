@@ -12,8 +12,8 @@
 
     @{*/
 
-#ifndef TMPPI0MASSSTUDY_HH
-#define TMPPI0MASSSTUDY_HH
+#ifndef PI0STUDYMODULE_HH
+#define PI0STUDYMODULE_HH
 
 #include "ana_base.hh"
 #include "ComputePi0Mass.hh"
