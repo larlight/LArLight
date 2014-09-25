@@ -14,7 +14,7 @@
 #pragma link C++ class ::larlight::MCShowerEff+;
 #pragma link C++ class ::larlight::CMatchPerformance+;
 #pragma link C++ class ::larlight::ComputePi0Mass+;
-#pragma link C++ class ::larlight::TmpPi0MassStudy+;
+#pragma link C++ class ::larlight::Pi0StudyModule+;
 #pragma link C++ class ::larlight::ComputePi0Mass_RG+;
 #pragma link C++ class ::larlight::MCShowerMatchAlg+;
 #pragma link C++ class ::larlight::CMToolAnaException+;
