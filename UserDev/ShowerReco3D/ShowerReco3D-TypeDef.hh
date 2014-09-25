@@ -9,6 +9,7 @@
 #include "ShowerReco3D.hh"
 #include "MCShowerAna.hh"
 #include "ShowerBackTracker.hh"
+#include "ShowerQuality.hh"
 //ADD_NEW_HEADER ... do not change this comment line
 #include "ShowerRecoAlg.hh"
 #include "Pi0ShowerRecoAlg.hh"
@@ -23,11 +24,13 @@ namespace larlight {
   class ShowerReco3D;
   class MCShowerAna;
   class ShowerBackTracker;
+  class ShowerQuality;
 //ADD_ANA_CLASS ... do not change this comment line
 }
 
 //ADD_EMPTY_CLASS ... do not change this comment line
 #endif
+
 
 
 
