@@ -186,7 +186,7 @@ namespace larutil{
 	if(fabs(slopeC+slopeI) < 0.001)
 	  phis=0;
 	else if( fabs(omegaI)>0.01 && (omegaI/fabs(omegaI) == -omegaC/fabs(omegaC) ) 
-			 && ( fabs(omegaC) < 20*TMath::Pi()/180 || fabs(omegaC) > 160*TMath::Pi()/180 ) ) // angles have 
+			 && ( fabs(omegaC) < 1*TMath::Pi()/180 || fabs(omegaC) > 179*TMath::Pi()/180 ) ) // angles have 
 	  phis = (fabs(omegaC) > TMath::Pi()/2) ? TMath::Pi() : 0;    //angles are 
 	  
 	
