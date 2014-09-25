@@ -13,6 +13,7 @@
 #include "ComputePi0Mass.hh"
 #include "TmpPi0MassStudy.hh"
 #include "MCShowerMatchAlg.hh"
+#include "TwoShower3DIntxn.hh"
 //ADD_NEW_HEADER ... do not change this comment line
 
 // Class forward declaration here
@@ -28,7 +29,11 @@ namespace larlight {
   class CMToolAnaException;
 //ADD_ANA_CLASS ... do not change this comment line
 }
+
+  class TwoShower3DIntxn;
 //ADD_EMPTY_CLASS ... do not change this comment line
 #endif
+
+
 
 
