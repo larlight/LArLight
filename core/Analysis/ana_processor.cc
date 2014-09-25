@@ -11,6 +11,7 @@ namespace larlight {
     _storage=storage_manager::get();
     _fout=0;
     reset();
+    _filter_enable = false;
   }
   
   void ana_processor::set_verbosity(MSG::Level level){
@@ -42,6 +43,7 @@ namespace larlight {
     
     _analyzers.clear();
     _ana_status.clear();
+    _ana_index.clear();
     _nevents=0;
     _index=0;
     
@@ -76,22 +78,24 @@ namespace larlight {
 		    "Analysis output file will not be created for this time...");
 
     else
-    
+      
       _fout=TFile::Open(_ofile_name.c_str(),"RECREATE");
     
 
-     Bool_t status = true;
-    
-    for(std::vector<ana_base*>::iterator iter(_analyzers.begin());
-	iter!=_analyzers.end();
-	++iter) {
+    Bool_t status = true;
 
-      (*iter)->set_output_file(_fout);
+    _ana_status.resize(_analyzers.size(),false);
+    
+    for(size_t i=0; i<_analyzers.size(); ++i) {
       
-      if(!((*iter)->initialize())){
+      _analyzers[i]->set_output_file(_fout);
+
+      _ana_status[i] = _analyzers[i]->initialize();
+
+      if(!_ana_status[i]) {
 	
 	Message::send(MSG::ERROR,__PRETTY_FUNCTION__,
-		      Form("Failed to initialize: %s",(*iter)->class_name().c_str()));
+		      Form("Failed to initialize: %s",_analyzers[i]->class_name().c_str()));
 	
 	status = false;
       }
@@ -126,16 +130,20 @@ namespace larlight {
     
     if(event_found){
 
-      for(std::vector<ana_base*>::iterator iter(_analyzers.begin());
-	  iter!=_analyzers.end();
-	  ++iter)
-	_ana_status[(*iter)]=(*iter)->analyze(_storage);
+      for(size_t i=0; i<_analyzers.size(); ++i){
+
+	_ana_status[i] = false;
+
+	_ana_status[i] = _analyzers[i]->analyze(_storage);
+
+	if(!_ana_status[i] && _filter_enable) break;
+	
+      }
       
       _index++;
       _nevents++;
       
       return true;
-      
     }
     else
       return finalize();
@@ -214,13 +222,11 @@ namespace larlight {
     
     Bool_t status=true;
 
-    for(std::vector<ana_base*>::iterator iter(_analyzers.begin());
-	iter!=_analyzers.end();
-	++iter) {
+    for(size_t i=0; i<_analyzers.size(); ++i){
       
-      _ana_status[(*iter)]= (*iter)->finalize() && _ana_status[(*iter)];
+      _ana_status[i] = _analyzers[i]->finalize() && _ana_status[i];
       
-      status = status && _ana_status[(*iter)];
+      status = status && _ana_status[i];
     }
     
     _process=FINISHED;
@@ -230,10 +236,10 @@ namespace larlight {
   
   Bool_t ana_processor::get_ana_status(ana_base* ptr) const{
     
-    std::map<ana_base*,Bool_t>::const_iterator iter(_ana_status.find(ptr));
-    if(iter==_ana_status.end()) return false;
+    std::map<ana_base*,size_t>::const_iterator iter(_ana_index.find(ptr));
+    if(iter==_ana_index.end()) return false;
     
-    else return (*iter).second;
+    else return _ana_status[(*iter).second];
     
   }
 }

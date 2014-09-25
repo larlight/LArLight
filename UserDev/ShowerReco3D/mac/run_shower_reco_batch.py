@@ -12,7 +12,8 @@ from ROOT import gSystem,TMath
 gSystem.Load("libShowerReco3D")
 gSystem.Load("libBase")
 gSystem.Load("libLArUtil")
-from ROOT import larlight as fmwk, cmtool, shower,larutil
+from ROOT import larlight as fmwk, cmtool, showerreco, larutil
+
 
 # Create ana_processor instance
 my_proc = fmwk.ana_processor()
@@ -29,7 +30,7 @@ if len(sys.argv) > 2:
     my_proc.set_input_rootdir(sys.argv[2])
 
 # Specify analysis output root file name
-my_proc.set_ana_output_file("from_test_ana_you_can_remove_me.root");
+my_proc.set_ana_output_file("");
 
 # Specify data output root file name
 my_proc.set_output_file("out.root")
@@ -38,15 +39,19 @@ my_proc.set_output_file("out.root")
 # Kazu disables to read-in shower data product from input (only speeds up)
 #
 my_proc.set_data_to_read(fmwk.DATA.Shower,False)
-
+my_proc.set_rootdir('scanner')
 # Create analysis unit
 ana_unit = fmwk.ShowerReco3D()
 
 # Attach shower reco alg
-ana_unit.SetShowerAlgo(showerreco.ShowerRecoAlg())
+sralg = showerreco.ShowerRecoAlg()
+sralg.Verbose(False)
+ana_unit.SetShowerAlgo(sralg)
 
 # Specify cluster type
-ana_unit.SetClusterType(fmwk.DATA.Cluster)
+#ana_unit.SetClusterType(fmwk.DATA.MCShowerCluster)
+ana_unit.SetClusterType(fmwk.DATA.FuzzyCluster)
+#ana_unit.SetClusterType(fmwk.DATA.Cluster)
 
 # 
 # Attach Matching algorithm
