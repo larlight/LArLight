@@ -178,7 +178,7 @@ namespace larutil{
 
 
     // Direction angles
-    if(fabs(angleC)>0.01)  // catch numeric error values 
+    if(fabs(omegaC)>0.01)  // catch numeric error values 
       {
 	//phi=atan(ln/nn);
 	phis=asin(ln/TMath::Sqrt(ln*ln+nn*nn));
