@@ -27,6 +27,7 @@ my_proc.set_ana_output_file("")
 raw_viewer   = larlight.ClusterViewer()
 match_viewer = larlight.MatchViewer()
 #mc_viewer    = larlight.MCShowerClusterViewer()
+clusterz = cluster.CRUHelper()
 
 match_viewer.SetPrintClusterInfo(True)
 #match_viewer.ShowShowers(False)

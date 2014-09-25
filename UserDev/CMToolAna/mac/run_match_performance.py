@@ -5,21 +5,23 @@ from ROOT import larlight as fmwk
 processor = fmwk.ana_processor()
 
 processor.set_io_mode(fmwk.storage_manager.READ)
+#processor.set_verbosity(fmwk.MSG.DEBUG)
+
 #Getting rid of segfaults likea boss
 ana_module = fmwk.CMatchPerformance()
 
-ana_module.SetClusterType(larlight.DATA.MCShowerCluster)
+#ana_module.SetClusterType(larlight.DATA.MCShowerCluster)
 
 priority_algo = cmtool.CPAlgoNHits()
-priority_algo.SetMinHits(24)
+priority_algo.SetMinHits(22)
 
 algo_array = cmtool.CFAlgoArray()
 #algo_array.SetMode(cmtool.CFAlgoArray.kPositiveAddition)
 algo_array.AddAlgo(cmtool.CFAlgo3DAngle())
 #algo_array.AddAlgo(cmtool.CFAlgoStartPointMatch())
-#algo_array.AddAlgo(cmtool.CFAlgoTimeOverlap())
-#algo_array.AddAlgo(cmtool.CFAlgoWireOverlap())
-#algo_array.AddAlgo(cmtool.CFAlgoVolumeOverlap())
+algo_array.AddAlgo(cmtool.CFAlgoTimeOverlap())
+algo_array.AddAlgo(cmtool.CFAlgoWireOverlap())
+algo_array.AddAlgo(cmtool.CFAlgoVolumeOverlap())
 
 #match_algo = cmtool.CFAlgoStartPointMatch()
 
