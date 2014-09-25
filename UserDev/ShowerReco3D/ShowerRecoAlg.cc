@@ -16,7 +16,7 @@ namespace showerreco {
     
     fcalodEdxlength=1000;
     fdEdxlength=2.4;
-    fUseArea=false;
+    fUseArea=true;
 
     fVerbosity = true;
   }
@@ -146,7 +146,7 @@ namespace showerreco {
 	
 	for(const auto& theHit : hitlist){
 	  
-	  double dEdx_new;
+	  double dEdx_new=0;
 	  //double Bcorr_half;
 	  //double dEdx_sub;
 	  // double dEdx_MIP;
@@ -162,28 +162,31 @@ namespace showerreco {
 	  else
 	    dEdx_new = fCaloAlg.dEdx_AREA(&theHit , newpitch ); 
 	  //
-	  if(fVerbosity && dEdx_new >1.9 && dEdx_new <2.1)
-	    std::cout << "dEdx_new " << dEdx_new << " " <<dEdx_new/theHit.charge*newpitch << " "<< theHit.charge *0.0061/newpitch << std::endl;
+	 
 	  //calculate total energy.
 	  totEnergy += dEdx_new*newpitch; 
 	  //totNewCnrg+=dEdx_MIP;
-	  if(dEdx_new < 3.5 && dEdx_new >0 )
-	    {
-	      totLowEnergy +=dEdx_new*newpitch;
-	      totMIPEnergy += dEdx_new*newpitch;
-	    }
-	  else
-	    {
-	      totHighEnergy += dEdx_new*newpitch;
+	//  if(dEdx_new < 3.5 && dEdx_new >0 )
+	//    {
+	//      totLowEnergy +=dEdx_new*newpitch;
+	//      totMIPEnergy += dEdx_new*newpitch;
+	//    }
+	//  else
+	 //   {
+	 //     totHighEnergy += dEdx_new*newpitch;
 	      int multiplier=1;
 	      if(plane < 2) multiplier =2 ;
 	      if(!fUseArea){
 		totMIPEnergy += theHit.peak *  0.0061*multiplier;
 	      }
 	      else{
-		totMIPEnergy += theHit.charge *  0.00115*multiplier;
+		totMIPEnergy += theHit.charge *  0.00336*multiplier;
 	      }
-	    }
+	  //  }
+	  
+	   if(fVerbosity && dEdx_new >1.9 && dEdx_new <2.1)
+	    std::cout << "dEdx_new " << dEdx_new << " " <<dEdx_new/theHit.charge*newpitch << " "<< theHit.charge *0.0033*multiplier/newpitch << std::endl;
+	  
 	  larutil::PxPoint OnlinePoint; 
 	  // calculate the wire,time coordinates of the hit projection on to the 2D shower axis
 	  fGSer->GetPointOnLine(fOmega2D.at(cl_index),
