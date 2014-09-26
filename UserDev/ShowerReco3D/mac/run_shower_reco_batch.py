@@ -19,15 +19,16 @@ from ROOT import larlight as fmwk, cmtool, showerreco, larutil
 my_proc = fmwk.ana_processor()
 
 # Set input root file
-my_proc.add_input_file(sys.argv[1])
+for x in xrange(len(sys.argv)-1):
+    my_proc.add_input_file(sys.argv[x+1])
 
 # Specify IO mode
 my_proc.set_io_mode(fmwk.storage_manager.BOTH)
 
 # Specify input TDirectory name if given
-if len(sys.argv) > 2:
+#if len(sys.argv) > 2:
 
-    my_proc.set_input_rootdir(sys.argv[2])
+#    my_proc.set_input_rootdir(sys.argv[2])
 
 # Specify analysis output root file name
 my_proc.set_ana_output_file("");
@@ -50,21 +51,30 @@ ana_unit.SetShowerAlgo(sralg)
 
 # Specify cluster type
 #ana_unit.SetClusterType(fmwk.DATA.MCShowerCluster)
-ana_unit.SetClusterType(fmwk.DATA.FuzzyCluster)
-#ana_unit.SetClusterType(fmwk.DATA.Cluster)
+#ana_unit.SetClusterType(fmwk.DATA.FuzzyCluster)
+#ana_unit.SetClusterType(fmwk.DATA.RyanCluster)
+ana_unit.SetClusterType(fmwk.DATA.Cluster)
 
 # 
 # Attach Matching algorithm
 #
-priority_algo = cmtool.CPAlgoNHits()
-priority_algo.SetMinHits(20)
-ana_unit.GetManager().AddPriorityAlgo(priority_algo)
+palgo_array = cmtool.CPAlgoArray()
+
+palgo1 = cmtool.CPAlgoNHits()
+palgo1.SetMinHits(25)
+
+palgo2 = cmtool.CPAlgoIgnoreTracks()
+
+palgo_array.AddAlgo(palgo1)
+palgo_array.AddAlgo(palgo2)
+ana_unit.GetManager().AddPriorityAlgo(palgo_array)
 
 #Andrzej: The algorithms below are ranked by their effectiveness-- TimeOverlap is best, 
 #then 3DAngle, then StartPoint . Right now, only TimeOverlap is called.
 algo_array = cmtool.CFAlgoArray()
 #algo_array.SetMode(cmtool.CFAlgoArray.kPositiveAddition)
 algo_array.AddAlgo(cmtool.CFAlgoTimeOverlap())
+#algo_array.AddAlgo(cmtool.CFAlgoTimeProf())
 #algo_array.AddAlgo(cmtool.CFAlgo3DAngle())
 #algo_array.AddAlgo(cmtool.CFAlgoStartPointMatch())
 
