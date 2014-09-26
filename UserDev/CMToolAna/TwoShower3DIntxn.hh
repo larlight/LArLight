@@ -20,6 +20,8 @@
 
 #include <iostream>
 #include <vector>
+#include <limits>
+#include <climits>
 #include <math.h> //for pow
 
 /**
