@@ -31,9 +31,8 @@ namespace larlight {
     { 
       _name="ShowerQuality"; 
       _fout=0; 
-      _dist_max=10; 
-      _angle_max=10;
-      _energy_containment=0.9;
+      event_clear();
+      plane_clear();
     };
 
     /// Default destructor
@@ -54,14 +53,34 @@ namespace larlight {
     */
     virtual bool finalize();
 
-    void SetQualityCut(double dist, double angle, double ec)
-    { _dist_max = dist; _angle_max = angle; _energy_containment=ec;}
-
   protected:
 
-    double _dist_max, _angle_max, _energy_containment;
-    
-    std::vector<TH1D*> vdEdX;
+    void event_clear() {
+      _dist = 0;
+      _angle_diff = -1;
+      _mc_energy = -1;
+      _energy_containment = -1;
+      _best_plane = 4;
+    }
+
+    void plane_clear() {
+      _plane = 4;
+      _dEdX = -1;
+      _energy = -1;
+      _mip_energy = -1;
+    }
+
+    double _dist;
+    double _angle_diff;
+    double _energy_containment;
+    unsigned int _plane;
+    unsigned int _best_plane;
+    double _dEdX;
+    double _energy;
+    double _mip_energy;
+    double _mc_energy;
+
+    TTree *fTree;
 
   };
 }

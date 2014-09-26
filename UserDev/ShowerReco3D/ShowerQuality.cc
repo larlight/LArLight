@@ -7,18 +7,23 @@ namespace larlight {
 
   bool ShowerQuality::initialize() {
 
-    for(size_t i=0; i<4; ++i) {
-
-      vdEdX.push_back(new TH1D(Form("hdEdX_%zu",i),
-			       Form("dE/dX for Plane %zu; dE/dX; Showers",i),
-			       100,0,10));
-
-    }
+    fTree = new TTree("tree","");
+    fTree->Branch("dist",&_dist,"dist/D");
+    fTree->Branch("angle_diff",&_angle_diff,"angle_diff/D");
+    fTree->Branch("energy_containment",&_energy_containment,"energy_containment/D");
+    fTree->Branch("mc_energy",&_mc_energy,"mc_energy/D");
+    fTree->Branch("energy",&_energy,"energy/D");
+    fTree->Branch("mip_energy",&_mip_energy,"mip_energy/D");
+    fTree->Branch("dedx",&_dEdX,"dedx/D");
+    fTree->Branch("plane",&_plane,"plane/i");
+    fTree->Branch("best_plane",&_best_plane,"best_plane/i");
     
     return true;
   }
   
   bool ShowerQuality::analyze(storage_manager* storage) {
+
+    event_clear();
 
     auto ev_mcs = (const event_mcshower*)(storage->get_data(DATA::MCShower));
     auto ev_shower = (const event_shower*)(storage->get_data(DATA::Shower));
@@ -31,8 +36,9 @@ namespace larlight {
 
     auto mc_dir = ev_mcs->at(0).DaughterMomentum();
 
-    if(ev_mcs->at(0).DaughterMomentum().at(3) / ev_mcs->at(0).MotherMomentum().at(3) < _energy_containment)
-      return false;
+    _mc_energy = ev_mcs->at(0).DaughterMomentum().at(3);
+
+    _energy_containment = ev_mcs->at(0).DaughterMomentum().at(3) / ev_mcs->at(0).MotherMomentum().at(3);
 
     mc_dir.at(0) = mc_dir.at(0)/mc_dir.at(3);
     mc_dir.at(1) = mc_dir.at(1)/mc_dir.at(3);
@@ -44,34 +50,39 @@ namespace larlight {
 
       auto reco_dir = s.Direction();
 
-      double dist = sqrt( pow(mc_vtx[0] - reco_vtx[0],2) +
-			  pow(mc_vtx[1] - reco_vtx[1],2) +
-			  pow(mc_vtx[2] - reco_vtx[2],2) );
-
+      _dist = sqrt( pow(mc_vtx[0] - reco_vtx[0],2) +
+		    pow(mc_vtx[1] - reco_vtx[1],2) +
+		    pow(mc_vtx[2] - reco_vtx[2],2) );
+      
       double dot_prod = 0;
 
       dot_prod += reco_dir[0] * mc_dir[0];
       dot_prod += reco_dir[1] * mc_dir[1];
       dot_prod += reco_dir[2] * mc_dir[2];
 
-      double angle_diff = acos(dot_prod) / 3.14*180;
+      _angle_diff = acos(dot_prod) / 3.14*180;
 
-      if(dist > _dist_max || angle_diff > _angle_max) return false;
+      _best_plane = s.best_plane();
 
-      size_t ctr=0;
-      for(auto const& index : s.association(DATA::Cluster)) {
+      auto ass_index = s.association(DATA::Cluster);
 
-	auto const& c = ev_cluster->at(index);
+      for(size_t i=0; i<ass_index.size(); ++i) {
+
+	auto const& c = ev_cluster->at(ass_index[i]);
+
+	plane_clear();
 	
-	size_t plane = c.View();
+	_plane = c.View();
 
-	vdEdX.at(plane)->Fill(s.dEdx().at(ctr));
+	_mip_energy = s.MIPEnergy().at(i);
 
-	if(plane == s.best_plane())
-	  vdEdX.at(3)->Fill(s.dEdx().at(ctr));
+	_energy = s.Energy().at(i);
 
-	ctr++;
+	_dEdX = s.dEdx().at(i);
+	
+	fTree->Fill();
       }
+
     }
   
     return true;
@@ -83,7 +94,7 @@ namespace larlight {
 
       _fout->cd();
 
-      for(auto &h : vdEdX) h->Write();
+      fTree->Write();
 
     }
   
