@@ -20,9 +20,7 @@ for x in xrange(len(sys.argv)-1):
     my_proc.add_input_file(sys.argv[x+1])
 
 # Specify IO mode
-my_proc.set_io_mode(fmwk.storage_manager.BOTH)
-
-my_proc.set_output_file("out.root")
+my_proc.set_io_mode(fmwk.storage_manager.READ)
 
 # Specify input TDirectory name if given
 my_proc.set_rootdir('scanner')

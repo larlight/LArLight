@@ -61,6 +61,7 @@ namespace larlight {
       _mc_energy = -1;
       _energy_containment = -1;
       _best_plane = 4;
+      _num_mcs = 0;
     }
 
     void plane_clear() {
@@ -75,6 +76,7 @@ namespace larlight {
     double _energy_containment;
     unsigned int _plane;
     unsigned int _best_plane;
+    unsigned int _num_mcs;
     double _dEdX;
     double _energy;
     double _mip_energy;

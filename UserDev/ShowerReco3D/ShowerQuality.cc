@@ -17,6 +17,7 @@ namespace larlight {
     fTree->Branch("dedx",&_dEdX,"dedx/D");
     fTree->Branch("plane",&_plane,"plane/i");
     fTree->Branch("best_plane",&_best_plane,"best_plane/i");
+    fTree->Branch("num_mcs",&_num_mcs,"num_mcs/i");
     
     return true;
   }
@@ -30,37 +31,49 @@ namespace larlight {
     auto ev_cluster = (const event_cluster*)(storage->get_data(DATA::Cluster));
     if(!ev_mcs || !ev_shower || !ev_cluster) return false;
 
-    if(ev_mcs->size() == 0) return false;
+    std::vector<double> mc_dir;
+    std::vector<double> mc_vtx;
 
-    auto mc_vtx = ev_mcs->at(0).DaughterPosition();
+    for(auto const& mcs : *ev_mcs)
 
-    auto mc_dir = ev_mcs->at(0).DaughterMomentum();
+      if(mcs.DaughterMomentum().at(3)>10) _num_mcs++;
 
-    _mc_energy = ev_mcs->at(0).DaughterMomentum().at(3);
+    if(ev_mcs->size()) {
+      
+      mc_vtx = ev_mcs->at(0).DaughterPosition();
+      
+      mc_dir = ev_mcs->at(0).DaughterMomentum();
+      
+      _mc_energy = ev_mcs->at(0).DaughterMomentum().at(3);
+      
+      _energy_containment = ev_mcs->at(0).DaughterMomentum().at(3) / ev_mcs->at(0).MotherMomentum().at(3);
 
-    _energy_containment = ev_mcs->at(0).DaughterMomentum().at(3) / ev_mcs->at(0).MotherMomentum().at(3);
+      mc_dir.at(0) = mc_dir.at(0)/mc_dir.at(3);
+      mc_dir.at(1) = mc_dir.at(1)/mc_dir.at(3);
+      mc_dir.at(2) = mc_dir.at(2)/mc_dir.at(3);
 
-    mc_dir.at(0) = mc_dir.at(0)/mc_dir.at(3);
-    mc_dir.at(1) = mc_dir.at(1)/mc_dir.at(3);
-    mc_dir.at(2) = mc_dir.at(2)/mc_dir.at(3);
-
+    }
+      
     for(auto const& s : *ev_shower) {
 
       auto reco_vtx = s.ShowerStart();
 
       auto reco_dir = s.Direction();
 
-      _dist = sqrt( pow(mc_vtx[0] - reco_vtx[0],2) +
-		    pow(mc_vtx[1] - reco_vtx[1],2) +
-		    pow(mc_vtx[2] - reco_vtx[2],2) );
+      if(mc_vtx.size()) 
+	_dist = sqrt( pow(mc_vtx[0] - reco_vtx[0],2) +
+		      pow(mc_vtx[1] - reco_vtx[1],2) +
+		      pow(mc_vtx[2] - reco_vtx[2],2) );
       
       double dot_prod = 0;
 
-      dot_prod += reco_dir[0] * mc_dir[0];
-      dot_prod += reco_dir[1] * mc_dir[1];
-      dot_prod += reco_dir[2] * mc_dir[2];
+      if(mc_dir.size()) {
+	dot_prod += reco_dir[0] * mc_dir[0];
+	dot_prod += reco_dir[1] * mc_dir[1];
+	dot_prod += reco_dir[2] * mc_dir[2];
 
-      _angle_diff = acos(dot_prod) / 3.14*180;
+	_angle_diff = acos(dot_prod) / 3.14*180;
+      }
 
       _best_plane = s.best_plane();
 
