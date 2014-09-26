@@ -3,19 +3,18 @@
 
 #include "TwoShower3DIntxn.hh"
 
-std::vector<double> TwoShower3DIntxn::FindIntxn(
-  std::vector<double> startp1, std::vector<double> dir1, 
-  std::vector<double> startp2, std::vector<double> dir2)
-
+std::vector<double> TwoShower3DIntxn::FindIntxn(std::vector<double> startp1, std::vector<double> dir1, 
+						std::vector<double> startp2, std::vector<double> dir2)
+  
 {
-
+  
   //Format of returned vector is (x,y,z,error)
   //where (x,y,z) are the coordinates of the best-intersection
   //(midpoint of shortest line connecting the two 3D input lines)
   //and error is the length^2 of the shortest line connecting the two
   //3D input lines (0 error means the 3D lines actually intersect)
 
-  std::vector<double> result = {-999., -999., -999., -999.};
+  std::vector<double> result(4, std::numeric_limits<double>::max());
 
   ///////////////////////////////////////////////////////
   //see http://paulbourke.net/geometry/pointlineplane

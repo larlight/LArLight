@@ -55,35 +55,33 @@ namespace larlight {
     //and runs before the Pi0StudyModule instance
     _mass = ComputePi0Mass::GetInstance()->GetMass();
 
-    std::vector<double> pi0_mc_start_vtx = {
-      ev_mctruth->at(0).GetParticles().at(pi0_particlelist_index).Trajectory().at(0).X(),
-      ev_mctruth->at(0).GetParticles().at(pi0_particlelist_index).Trajectory().at(0).Y(),
-      ev_mctruth->at(0).GetParticles().at(pi0_particlelist_index).Trajectory().at(0).Z()
-    };
+    std::vector<double> pi0_mc_start_vtx(3,0);
+    pi0_mc_start_vtx[0] = ev_mctruth->at(0).GetParticles().at(pi0_particlelist_index).Trajectory().at(0).X();
+    pi0_mc_start_vtx[1] = ev_mctruth->at(0).GetParticles().at(pi0_particlelist_index).Trajectory().at(0).Y();
+    pi0_mc_start_vtx[2] = ev_mctruth->at(0).GetParticles().at(pi0_particlelist_index).Trajectory().at(0).Z();
     
     //use TwoShower3DIntxn function
     //to find where these two showers would intersect in 3D space
 
-    std::vector<double> start1 = {
-      ev_shower->at(0).ShowerStart().X(),
-      ev_shower->at(0).ShowerStart().Y(),
-      ev_shower->at(0).ShowerStart().Z()
-    };
-    std::vector<double> start2 = {
-      ev_shower->at(1).ShowerStart().X(),
-      ev_shower->at(1).ShowerStart().Y(),
-      ev_shower->at(1).ShowerStart().Z()
-    };
-    std::vector<double> dir1 = {
-      ev_shower->at(0).Direction().X(),
-      ev_shower->at(0).Direction().Y(),
-      ev_shower->at(0).Direction().Z()
-    };
-    std::vector<double> dir2 = {
-      ev_shower->at(1).Direction().X(),
-      ev_shower->at(1).Direction().Y(),
-      ev_shower->at(1).Direction().Z()
-    };
+    std::vector<double> start1(3,0);
+    start1[0] = ev_shower->at(0).ShowerStart().X();
+    start1[1] = ev_shower->at(0).ShowerStart().Y();
+    start1[2] = ev_shower->at(0).ShowerStart().Z();
+
+    std::vector<double> start2(3,0);
+    start2[0] = ev_shower->at(1).ShowerStart().X();
+    start2[1] = ev_shower->at(1).ShowerStart().Y();
+    start2[2] = ev_shower->at(1).ShowerStart().Z();
+
+    std::vector<double> dir1(3,0);
+    dir1[0] = ev_shower->at(0).Direction().X();
+    dir1[1] = ev_shower->at(0).Direction().Y();
+    dir1[2] = ev_shower->at(0).Direction().Z();
+
+    std::vector<double> dir2(3,0);
+    dir2[0] = ev_shower->at(1).Direction().X();
+    dir2[1] = ev_shower->at(1).Direction().Y();
+    dir2[2] = ev_shower->at(1).Direction().Z();
 
     std::vector<double> pi0_reco_start_vtx_and_uncert = 
       TwoShower3DIntxn().FindIntxn(start1,dir1,start2,dir2);
