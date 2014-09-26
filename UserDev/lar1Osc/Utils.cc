@@ -918,10 +918,7 @@ namespace lar1{
       return 0;
     }
     TVector3 unitDir = startDir.Unit();
-    std::cout << "Unit direction is "
-              << (startDir).X() << ", "
-              << (startDir).Y() << ", "
-              << (startDir).Z() << ")\n";
+
     double distance = 1;
     while (IsActive(idet, startPoint + unitDir*distance)){
       // std::cout << "Current pos is (" 

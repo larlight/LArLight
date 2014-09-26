@@ -164,6 +164,7 @@ void lar1::Reprocessing::Loop(std::string signal,
     std::cout << "input file: " << InFile().Remove(InFile().Length()-5) << std::endl;
 
     TString outfile = InFile().Remove(InFile().Length()-5) + "_processed_";
+    outfile = outfile + signal + ".root";
 
     std::cout << "outfile file: " << outfile << std::endl;
     TFile *f = new TFile(outfile, "RECREATE");
@@ -929,7 +930,6 @@ void lar1::Reprocessing::Loop(std::string signal,
           contained = utils.IsActive(iDet,pos,5); //fiducial cut at 5cm
           muonPosIndex++;
         }
-        print("Finished Looping");
         // Take the data from the previous point.  It's now exiting the detector.
         // Or has stopped!
         MuonExitPos = TVector3( leptonPos->at(muonPosIndex-1).at(1), 
@@ -960,9 +960,7 @@ void lar1::Reprocessing::Loop(std::string signal,
           // Repackage the energy of the particles to get the reco energy
           std::vector<Double_t> * genieE = new std::vector<Double_t>;
           genieE->reserve(GenieMomentum->size());
-          print ("Repacking genie stuff...");
           for (auto & vec : *GenieMomentum) genieE->push_back(vec.at(0));
-          print ("Done repacking genie stuff...");
           enucalo1 = utils.NuEnergyCalo(GeniePDG, genieE, true, true );
           enucalo2 = utils.NuEnergyCalo(GeniePDG, genieE, 
                                         false, false, prot_thresh)
@@ -1125,11 +1123,13 @@ void lar1::Reprocessing::Loop(std::string signal,
           efficiency = electronIDeff;
           wgt = fluxweight*efficiency;
         
-          std::cout << "This is numu electron scattering, elep is: " << Elep;
-          exit(0);
+          CalcLepton(lepDir);
+
+          // std::cout << "This is numu electron scattering, elep is: " << Elep;
+          // exit(0);
 
           electron_cand_energy = Elep;           // !!! don't have electron energy for these events!!
-          electron_cand_angle = 0.0;               // !!! don't have electron angle, assume small
+          electron_cand_angle = ThetaLep;               // !!! don't have electron angle, assume small
           enuccqe = utils.NuEnergyCCQE( 1000*electron_cand_energy, 
                                         sqrt(pow(1000*electron_cand_energy,2) 
                                         - pow(0.511,2)), 
@@ -1184,8 +1184,15 @@ void lar1::Reprocessing::Loop(std::string signal,
         // blank for now
       }
 
+      newt->Fill();
+
     } // end loop over entries
 
+    //-- write histograms
+    nueBackgrounds->Write();
+    nueBackgroundsLepE->Write();
+    nueBackgroundsCCQE->Write();
+    nueBackgroundsCalo->Write();
 
     f->Write();
     

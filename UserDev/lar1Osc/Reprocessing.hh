@@ -341,6 +341,21 @@ void Reprocessing::CalcLepton( TVector3 & lepDir)
 
   for( unsigned long i = 0; i < GeniePDG->size(); i++ ){
     //std::cout << "GENIE PDG: " << GeniePDG->at(i) << std::endl;
+    if( abs(GeniePDG->at(i)) == 11 ||
+        abs(GeniePDG->at(i)) == 13 ){
+      
+      lepDir.SetX(GenieMomentum->at(i).at(1));
+      lepDir.SetY(GenieMomentum->at(i).at(2));
+      lepDir.SetZ(GenieMomentum->at(i).at(3));
+      ThetaLep = utils.GetTheta( lepDir.X(), lepDir.Y(), lepDir.Z() );
+      PhiLep = utils.GetPhi( lepDir.X(), lepDir.Y() );
+      Elep = GenieMomentum->at(i).at(0);
+      return;      
+    }
+  }
+
+  for( unsigned long i = 0; i < GeniePDG->size(); i++ ){
+    //std::cout << "GENIE PDG: " << GeniePDG->at(i) << std::endl;
     if( abs(GeniePDG->at(i)) == 11 || abs(GeniePDG->at(i)) == 12 ||
         abs(GeniePDG->at(i)) == 13 || abs(GeniePDG->at(i)) == 14 ){
       
