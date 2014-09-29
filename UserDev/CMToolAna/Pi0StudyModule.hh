@@ -57,8 +57,17 @@ namespace larlight {
 
     float _mass;
     float _MC_pi0_energy;
+    float _reco_pi0_energy;
     float _dist_reco3Dlineintxn_MCorigin;
     float _reco3Dlineintxn_uncert;
+    float _dist_reco3Dlineintxn_recoshow1start;
+    float _dist_reco3Dlineintxn_recoshow2start;
+    float _dist_MC_momvtx_mcshow1start;
+
+    float _mc_opening_angle;
+    float _reco_opening_angle;
+    float _mc_min_opening_angle;
+    float _reco_min_opening_angle;
     
   };
 }
