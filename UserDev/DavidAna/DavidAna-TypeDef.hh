@@ -16,6 +16,7 @@
 #include "BaselineAna.hh"
 #include "NoiseAna.hh"
 #include "FastCompress.hh"
+#include "MCgetter.hh"
 //ADD_NEW_HEADER ... do not change this comment line
 
 // Class forward declaration here
@@ -32,10 +33,12 @@ namespace larlight {
   class NoiseAna;
   class MCShowerParams;
   class FastCompress;
+  class MCgetter;
 //ADD_NEW_CLASS ... do not change this comment line
 
 }
 #endif
+
 
 
 
