@@ -1,0 +1,5 @@
+TTree * t = (TTree*) _file0->Get("ana_tree")
+t->Draw("_Econ0")
+t->Draw("_Econ1","","sames")
+t->Draw("_Econ2","","sames")
+
