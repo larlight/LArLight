@@ -11,10 +11,10 @@ namespace cmtool {
   {
     SetMinHits(20);
     SetMinModHitDens(1.4);
-    SetMinMHitWires(3);
+    SetMinMHitWires(3.5);
     //"fPrincipal" is log(1-eigenvalue_principal)
     // >-7 means EP > 0.99908
-    SetMinPrincipal(-7.);
+    SetMinPrincipal(-6.);
   }
 
   //-----------------------------

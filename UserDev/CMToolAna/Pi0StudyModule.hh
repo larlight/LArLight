@@ -1,9 +1,9 @@
 /**
- * \file TmpPi0MassStudy.hh
+ * \file Pi0StudyModule.hh
  *
  * \ingroup CMergePerformance
  * 
- * \brief Class def header for a class TmpPi0MassStudy
+ * \brief Class def header for a class Pi0StudyModule
  *
  * @author davidkaleko
  */
@@ -12,38 +12,39 @@
 
     @{*/
 
-#ifndef TMPPI0MASSSTUDY_HH
-#define TMPPI0MASSSTUDY_HH
+#ifndef PI0STUDYMODULE_HH
+#define PI0STUDYMODULE_HH
 
 #include "ana_base.hh"
 #include "ComputePi0Mass.hh"
+#include "TwoShower3DIntxn.hh"
 
 namespace larlight {
   /**
-     \class TmpPi0MassStudy
+     \class Pi0StudyModule
      User custom analysis class made by davidkaleko
    */
-  class TmpPi0MassStudy : public ana_base{
+  class Pi0StudyModule : public ana_base{
   
   public:
 
     /// Default constructor
-    TmpPi0MassStudy(){ _name="TmpPi0MassStudy"; _fout=0;};
+    Pi0StudyModule(){ _name="Pi0StudyModule"; _fout=0;};
 
     /// Default destructor
-    virtual ~TmpPi0MassStudy(){};
+    virtual ~Pi0StudyModule(){};
 
-    /** IMPLEMENT in TmpPi0MassStudy.cc!
+    /** IMPLEMENT in Pi0StudyModule.cc!
         Initialization method to be called before the analysis event loop.
     */ 
     virtual bool initialize();
 
-    /** IMPLEMENT in TmpPi0MassStudy.cc! 
+    /** IMPLEMENT in Pi0StudyModule.cc! 
         Analyze a data event-by-event  
     */
     virtual bool analyze(storage_manager* storage);
 
-    /** IMPLEMENT in TmpPi0MassStudy.cc! 
+    /** IMPLEMENT in Pi0StudyModule.cc! 
         Finalize method to be called after all events processed.
     */
     virtual bool finalize();
@@ -55,7 +56,18 @@ namespace larlight {
     TTree* ana_tree;
 
     float _mass;
-    float _MC_energy;
+    float _MC_pi0_energy;
+    float _reco_pi0_energy;
+    float _dist_reco3Dlineintxn_MCorigin;
+    float _reco3Dlineintxn_uncert;
+    float _dist_reco3Dlineintxn_recoshow1start;
+    float _dist_reco3Dlineintxn_recoshow2start;
+    float _dist_MC_momvtx_mcshow1start;
+
+    float _mc_opening_angle;
+    float _reco_opening_angle;
+    float _mc_min_opening_angle;
+    float _reco_min_opening_angle;
     
   };
 }

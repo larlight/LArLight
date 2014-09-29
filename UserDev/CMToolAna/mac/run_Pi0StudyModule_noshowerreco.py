@@ -17,9 +17,9 @@ processor.set_ana_output_file("ana.root")
 
 pi0Mass_module = fmwk.ComputePi0Mass.GetInstance()
 
-tmp_pi0massstudy_module = fmwk.TmpPi0MassStudy()
+pi0_study_module = fmwk.Pi0StudyModule()
 
 processor.add_process(pi0Mass_module)
-processor.add_process(tmp_pi0massstudy_module)
+processor.add_process(pi0_study_module)
 
-processor.run(1,10)
+processor.run()
