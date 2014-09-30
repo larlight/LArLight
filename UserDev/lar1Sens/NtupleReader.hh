@@ -52,7 +52,7 @@ namespace lar1{
     std::vector<float> GetVectorFromTree(char * branchName, char * treeName = NULL, bool osc = false) const;
 
     std::vector<std::vector< float> > GetMultiWeightData() const;
-    std::vector<std::vector<std::vector<float> > > GetMultiWeightDataOsc() const;
+
     //return 0 on successful completion.  Return >0 if failure.
     /* Error codes I'm using...
     1:  Unknown "mode", has to be a string that is "nu" or "nubar"
@@ -78,9 +78,10 @@ namespace lar1{
     void setSpecialNameTextOsc(std::string s);
     void setContainedShowers(double d = 150);
     void setMinDistanceToStart(double d = 0.0);
-    void useMultiWeights(bool b = true, bool b_signal = false, int multiWeightSource = 6);
-
+    void useMultiWeights(bool b = true, int multiWeightSource = 6);
     void setAbsolute_MWSource(bool b){absolute_MWSource = b;}
+
+    void setIncludeOsc(bool b){includeOsc = b;}
 
     std::vector<float> GetComptonBackgroundFromFile(std::string file, int cut = 0);
 
@@ -109,9 +110,8 @@ namespace lar1{
     bool absolute_MWSource;
 
     bool usingMultiWeights;
-    bool usingSignalMultiWeights;
 
-
+    bool includeOsc;
 
     std::string specialNameText;
     std::string specialNameTextOsc;
@@ -140,11 +140,8 @@ namespace lar1{
     std::vector<float> data;
     std::vector<std::vector<float> > dataOsc;
 
-    // std::vector<float> dataNumu;
 
     std::vector<std::vector< float> > multiWeightData;
-    // std::vector<std::vector< float> > multiWeightDataNumu;
-    std::vector<std::vector<std::vector<float> > > multiWeightDataOsc;
 
   };
 }

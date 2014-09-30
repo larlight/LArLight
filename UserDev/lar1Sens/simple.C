@@ -4,17 +4,17 @@
 {
   gSystem->Load("lib/liblar1Sens.so");
   lar1::NueAppearanceFitter n;
-  n.setFileSource("/Users/cja33/lar1_data/");
+  n.setFileSource("/Users/cja33/genie_RW/");
   // n.setFileSource("output/nominal/");
   n.setVerbose(true);
-  n.setDebug(false);
+  n.setDebug(true);
   n.setSpecialNameText("");
   n.setSpecialNameTextOsc("");
   n.setSpecialNameText_far("");
   n.setSpecialNameTextOsc_far("");
   n.setFlatSystematicError(0.20);
   n.setMode("nu");
-  n.setUse100m(false);
+  n.setUse100m(true);
   n.setUse150m(false);
   n.setUse200m(false);
   n.setUse100mLong(false);
@@ -22,7 +22,7 @@
   n.setUse700m(false);
   n.setUseT600_onaxis(false);
   n.setUseT600_offaxis(false);
-  n.setUbooneScale(0.5/6.6);
+  n.setUbooneScale(1.0);
   n.setLAr1NDScale(1.0);
   // n.setLAr1NDScale(1.0/3.0);
   n.setLAr1FDScale(1.0);
@@ -32,7 +32,7 @@
   n.setNearDetSystematicError(0.2);
   n.setForceRemake(false);
   n.setUseInfiniteStatistics(false);
-  n.setElectContainedDist(-999);
+  // n.setElectContainedDist(-999);
 
   // n.setIncludeCosmics(true);
   // n.setCosmicsFile("output/no_cut/histos_for_corey.root");
@@ -83,11 +83,13 @@
   n.setNueBins(nue_bins);
   n.setNumuBins(numu_bins);
 
+  n.setIncludeFosc(false);
+  n.setIncludeNumus(false);
+
   n.setInflateSystematics(false);
   n.setSystematicInflationAmount(0.00);
 
   n.setUseCovarianceMatrix(false);
-  n.setUseSignalCovarianceMatrix(false);
   // Gotta define the backgrounds:
   int kUnisim(0), kPiMinus(1), kPiPlus(2), kKaon0(3), kKMinus(4), kKPlus(5), kTotal(6);
   // n.setMultiWeightSource(kUnisim);
@@ -96,24 +98,24 @@
   // n.setMultiWeightSource(kKaon0);
   // n.setMultiWeightSource(kKMinus);
   // n.setMultiWeightSource(kKPlus);
-  n.setMultiWeightSource(kTotal);
+  n.setMultiWeightSource(1);
 
   n.setAbsolute_MWSource(false);
 
   n.setNpoints(500);
-  n.setNWeights(1000);
+  n.setNWeights(250);
 
   n.setSavePlots(true);
 
-  n.Prepare();
-  n.ReadData();
-  // n.BuildCovarianceMatrix();
-  // n.MakeRatioPlots();
-  // n.Loop();
-  // n.MakePlots();
-  // n.MakeSimplePlot();
-  n.MakeEventRatePlots();
-  // n.MakeAltSensPlot();
+  n.setBuildCovarianceMatrix(false);
+  n.setMakeRatioPlots(true);
+  n.setLoop(false);
+  n.setMakePlots(false);
+  n.setMakeSimplePlot(false);
+  n.setMakeEventRatePlots(false);
+  n.setMakeAltSensPlot(false);
+
+  n.Run();
 
   return;
 }

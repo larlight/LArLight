@@ -51,26 +51,28 @@ namespace lar1{
       /// Default destructor
       virtual ~NueAppearanceFitter(){};
 
-      int Prepare();
-      int ReadData();
-      int BuildCovarianceMatrix(int sin22thpoint = -1, int dm2point = -1);
-      int MakeRatioPlots(int sin22thpoint = -1, int dm2point = -1);
-      int Loop();
-      int MakePlots();
-      int MakeSimplePlot();
-      int MakeEventRatePlots();
-      int MakeAltSensPlot();
+      int Run();
 
+      void setBuildCovarianceMatrix(bool b){fBuildCovarianceMatrix=b;}
+      void setMakeRatioPlots(bool b){fMakeRatioPlots=b;}
+      void setLoop(bool b){fLoop = b;}
+      void setMakePlots(bool b){fMakePlots = b;}
+      void setMakeSimplePlot(bool b){fMakeSimplePlot = b;}
+      void setMakeEventRatePlots(bool b){fMakeEventRatePlots = b;}
+      void setMakeAltSensPlot(bool b){fMakeAltSensPlot = b;}
 
       // Functions to switch the general configuration variables on and off:
       void setFileSource(std::string s){ fileSource = s;}
       void setVerbose(bool v){verbose = v;}
       void setDebug(bool d){debug = d;}
+
+
       void setSpecialNameText       (std::string s){specialNameText        = s;}
       void setSpecialNameTextOsc    (std::string s){specialNameTextOsc     = s;}
       void setSpecialNameText_far   (std::string s){specialNameText_far    = s;}
       void setSpecialNameTextOsc_far(std::string s){specialNameTextOsc_far = s;}
-      void setFlatSystematicError(double d){flatSystematicError = d;}
+
+      // Configure beam and detectors:
       void setMode(std::string s){mode = s;}
       void setUse100m(bool b){use100m = b;}
       void setUse150m(bool b){use150m = b;}
@@ -80,21 +82,27 @@ namespace lar1{
       void setUse700m(bool b){use700m = b;}
       void setUseT600_onaxis(bool b){useT600_onaxis = b;}
       void setUseT600_offaxis(bool b){useT600_offaxis = b;}
+
+      // Can scale the event rates up or down
       void setUbooneScale(double d){ubooneScale = d;}
       void setLAr1NDScale(double d){LAr1NDScale = d;}
       void setLAr1FDScale(double d){LAr1FDScale = d;}
+
+      // Physics switches
       void setEnergyType(std::string s){energyType = s;}
-
-      void setForceRemake(bool b){forceRemake = b;}
-      void setNWeights(int n){nWeights = n;}
-
-      void setSavePlots(bool b){savePlots=b;}
-
       void setNueBins (std::vector<float> bins){nueBins  = bins; nbins_nue = nueBins.size()-1;}
       void setNumuBins(std::vector<float> bins){numuBins = bins; nbins_numu = numuBins.size()-1;}
-
       void setIncludeCosmics(bool b = false){includeCosmics = b;}
       void setCosmicsFile(std::string s){cosmicsFile = s;}
+      void setNWeights(int n){nWeights = n;}
+      void setElectContainedDist(double d){ElectContainedDist = d;}
+      void setMinDistanceToStart(double d){minDistanceToStart = d;}
+      void setShapeOnlyFit(bool b){shapeOnlyFit = b;}
+
+      // Runtime switches
+      void setForceRemake(bool b){forceRemake = b;}
+      void setSavePlots(bool b){savePlots=b;}
+
 
       void setNpoints(int n)
       {
@@ -110,30 +118,58 @@ namespace lar1{
             // sin22thFittingPoint = 0.375*npoints;
 
       }
+
+      // Ways to configure the errors used
       void setUseNearDetStats(bool b){useNearDetStats = b;}
       void setUseCovarianceMatrix(bool b){useCovarianceMatrix = b;}
-      void setUseSignalCovarianceMatrix(bool b){useSignalCovarianceMatrix = b;}
-
-      void setMultiWeightSource(int source){multiWeightSource = source;}
-
-      void setShapeOnlyFit(bool b){shapeOnlyFit = b;}
+      void setFlatSystematicError(double d){flatSystematicError = d;}
       void setNearDetSystematicError(double d){nearDetSystematicError = d;}
-
-      void setElectContainedDist(double d){ElectContainedDist = d;}
-      void setMinDistanceToStart(double d){minDistanceToStart = d;}
-
       void setUseInfiniteStatistics(bool b){useInfiniteStatistics = b;}
-
       void setSystematicInflationAmount(double d){systematicInflationAmount =d;}
       void setInflateSystematics(bool b){inflateSystematics = b;}
 
+      // For the multiweights, pick which to use
+      void setMultiWeightSource(int source){multiWeightSource = source;}
       void setAbsolute_MWSource(bool b){absolute_MWSource = b;}
+
+
+      void setIncludeNumus(bool b){includeNumus = b;}
+      void setIncludeFosc(bool b){includeFosc = b;}
+
 
 
     private:
 
       SensUtils utils;
       PlotUtils plotUtils;
+
+      // These variables help control which files are read in, and which functions
+      // get called.
+      bool includeNumus;
+      bool includeFosc;
+
+      // These variables handle which functions get run.
+      // Some are necessary to others and get called first.
+      bool fBuildCovarianceMatrix;
+      bool fMakeRatioPlots;
+      bool fLoop;
+      bool fMakePlots;
+      bool fMakeSimplePlot;
+      bool fMakeEventRatePlots;
+      bool fMakeAltSensPlot;
+
+      // These are the functions that actually run the code
+      // They all get called from inside run(), and aren't public.
+      int Prepare();
+      int ReadData();
+      int BuildCovarianceMatrix();
+      int MakeRatioPlots();
+      int Loop();
+      int MakePlots();
+      int MakeSimplePlot();
+      int MakeEventRatePlots();
+      int MakeAltSensPlot();
+
 
       // All of the variables below are settable.
       //Self explanatory, this is where the ntuples you want to use are located:
@@ -205,7 +241,6 @@ namespace lar1{
 
       bool   useNearDetStats;           // Only matters if the covariance matrix vector is empty.
       bool   useCovarianceMatrix;       // Use the multiweight samples to build the covariance matrix
-      bool   useSignalCovarianceMatrix;       // Use the multiweight samples to build the covariance matrix
       bool   shapeOnlyFit;              // Only matters with near detd stats = true
       double nearDetSystematicError;  // Only matters if useNearDetStats = true
       std::vector<std::string>  cov_max_name;
@@ -237,12 +272,11 @@ namespace lar1{
       std::vector<float> numuBins;
       int nbins_nue;
       int nbins_numu;
+      int nbins_null;
 
 
-      std::vector < std::vector< float> > eventsnLVec;      //has osc in it
-      std::vector < std::vector< float> > eventsnLfitVec;   //holds collapsed eventsnLVec spectrum, for fit
-      std::vector <float> eventsnLnullVec;                  //has no osc in it
-      std::vector <float> eventsnLcvVec;                    //has fullosc*flat0.3% osc prob in it
+      std::vector < std::vector< float> > oscVector;        //has osc in it
+      std::vector <float> nullBackgrounds;                  //has no osc in it
 
       bool useInfiniteStatistics;
       double systematicInflationAmount;
@@ -311,13 +345,6 @@ namespace lar1{
       // if is long enough to accomodate *all* samples (fosc, nue, numu)xnL 
       // but the fosc sample is empty.      
       std::vector<std::vector<float> >  eventsNullVecMultiWeight;
-      // This vector holds the fullosc samples 
-      // It's an extra dimension to account for dm2point, but otherwise
-      // its the same lenght as the above vector.
-      // This is so that you could do something like:
-      // eventsNull + sin22th*(dm2point signal) = total event rates
-      // Also, it allows for the later possibility of signal in the nue, numu sets
-      std::vector<std::vector<std::vector<float> > >  signalMultiWeight;
 
       TMatrix covarianceMatrix;
       TMatrix fractionalErrorMatrix;

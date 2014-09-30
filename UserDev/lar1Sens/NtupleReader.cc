@@ -20,8 +20,8 @@ namespace lar1{
 
     usingMultiWeights = false;
     absolute_MWSource = false;
-    usingSignalMultiWeights = false;
     nWeights = 1000;
+    includeOsc=true;
 
     showerContainmentDist = -999;
     minDistanceToStart = 0;
@@ -67,7 +67,6 @@ namespace lar1{
 
     usingMultiWeights = false;
     absolute_MWSource = false;
-    usingSignalMultiWeights = false;
     nWeights = 1000;
 
     std::vector<float> defaultBins;
@@ -83,21 +82,14 @@ namespace lar1{
     setBins(defaultBins);
 
   }
-  void lar1::NtupleReader::useMultiWeights(bool b, bool signal_b, int this_multiWeightSource)
+  void lar1::NtupleReader::useMultiWeights(bool b, int this_multiWeightSource)
   {
     usingMultiWeights = b;
-    usingSignalMultiWeights = signal_b;
     multiWeightSource = this_multiWeightSource;
     multiWeightData.resize(nWeights);
-    multiWeightDataOsc.resize(nWeights);
     for (int i = 0; i < nWeights; ++i)
     {
-      multiWeightData[i].resize(bins.size());
-      multiWeightDataOsc[i].resize(npoints);
-      for (int j = 0; j < npoints; ++j)
-      {
-        multiWeightDataOsc[i][j].resize(bins.size());
-      }
+      multiWeightData[i].resize(bins.size()-1);
     }
     return;
   }
@@ -143,9 +135,6 @@ namespace lar1{
 
   std::vector<std::vector< float> > NtupleReader::GetMultiWeightData() const{
     return multiWeightData;
-  }
-  std::vector<std::vector<std::vector<float> > > NtupleReader::GetMultiWeightDataOsc() const{
-    return multiWeightDataOsc;
   }
 
 
@@ -211,7 +200,7 @@ namespace lar1{
       fileNameHistsOsc += "_";
       fileNameHistsOsc += tempstring;
     }
-    if(minDistanceToStart != 0){
+    if(minDistanceToStart != -999){
       sprintf(tempstring, "dist%g",minDistanceToStart );
       fileNameHists += tempstring;
       fileNameHists += "_";
@@ -241,10 +230,7 @@ namespace lar1{
     // fileNameHistsOsc += tempstring;
     sprintf(tempstring, "_%dp_", npoints);
     fileNameHistsOsc += tempstring;
-    if (usingSignalMultiWeights){
-      sprintf(tempstring, "%dw_%d", nWeights,multiWeightSource);
-      fileNameHistsOsc += tempstring;
-    }
+
     fileNameHistsOsc += energy;
     fileNameHistsOsc += "_hists.root";
 
@@ -276,13 +262,14 @@ namespace lar1{
       std::cout << "\tIn: " << filePath << std::endl;
       exit(2);
     }
-    SourceFound = fileExists(filePath+fileNameSourceOsc);
-
-    if (! (SourceFound) ){
-      std::cout << "NtupleReader: Error: No input file found.  Searched for: " <<std::endl;
-      std::cout << "\t" << fileNameSourceOsc <<std::endl;
-      std::cout << "\tIn: " << filePath << std::endl;
-      exit(2);
+    if (includeOsc){
+      SourceFound = fileExists(filePath+fileNameSourceOsc);
+      if (! (SourceFound) ){
+        std::cout << "NtupleReader: Error: No input file found.  Searched for: " <<std::endl;
+        std::cout << "\t" << fileNameSourceOsc <<std::endl;
+        std::cout << "\tIn: " << filePath << std::endl;
+        exit(2);
+      }
     }
 
     //If the code gets to this point, there is an input!
@@ -326,20 +313,20 @@ namespace lar1{
       // Check that the hists file is newer than the source file:
       if (!UpToDate(filePath+fileNameSourceOsc,filePath+fileNameHistsOsc)){
         int val(0);
-        if (signal == "nue") val = LoopNueOsc();
+        if (signal == "nue" && includeOsc) val = LoopNueOsc();
         // if (signal == "numu") val = LoopNumuOsc();
         if (val != 0) return val;
       }
       else{ // Everything is good, just read in the files:
         int val(0);
-        if (signal == "nue") val = ReadNueOsc();
+        if (signal == "nue"&& includeOsc) val = ReadNueOsc();
         // if (signal == "numu") val = ReadNumuOsc();
         if (val != 0) return val;
       }
     }
     else { // No hists file exists, make it.
       int val(0);
-      if (signal == "nue") val = LoopNueOsc();
+      if (signal == "nue"&& includeOsc) val = LoopNueOsc();
       // if (signal == "numu") val = LoopNumuOsc();
       if (val != 0) return val;
     }
@@ -467,7 +454,7 @@ namespace lar1{
 
     std::cout<<"Input filename:\t" << dummytarget << std::endl;
     std::cout << "Number of entries at L= " << baseline << ":\t" << nentries1 << std::endl;
-    c->SetBranchAddress("energy",&fill_energy);
+    c->SetBranchAddress("enugen",&fill_energy);
     c->SetBranchAddress("inno",&inno);
     c->SetBranchAddress("nuchan", &nuchan);         // NUANCE interaction codes
     c->SetBranchAddress("mode",&mode);
@@ -894,7 +881,7 @@ namespace lar1{
 
     std::cout<<"Fosc Input filename:\t" << dummytarget << std::endl;
     std::cout<<"Number of entries L="<<baseline<<"m: "<< nentries2<< std::endl;
-    c->SetBranchAddress("energy",&fill_energy);
+    c->SetBranchAddress("enugen",&fill_energy);
     c->SetBranchAddress("inno",&inno);
     c->SetBranchAddress("mode",&mode);
     c->SetBranchAddress("nuchan", &nuchan);         // NUANCE interaction codes
@@ -911,8 +898,6 @@ namespace lar1{
 
     std::vector<std::vector<float> > *MultiWeight;
     MultiWeight = 0;
-    if (usingSignalMultiWeights)
-      c->SetBranchAddress("MultiWeight",&MultiWeight);
 
 
     d->SetBranchAddress("wgt",&checking_wgt);
@@ -920,14 +905,14 @@ namespace lar1{
 
 
       
-    TH1F **eventsnueosc = new TH1F*[npoints+1];      //fullosc weighted by Posc=1*sin2(1.27dm2L/E), at each dm2 point
-    TH1F *eventsnuefosc;          //fullosc (Posc=1)
-    TH1F *eventsSignalBestFitNu;      //Number of events expected at the best fit.
-    TH1F *eventsSignalBestFitNubar;     //Number of events expected at the best fit.
-    TH1F *eventsSignalBestFit_globNu;      //Number of events expected at the best fit.
-    TH1F *eventsSignalBestFit_globNubar;     //Number of events expected at the best fit.
-    TH1F *eventsSignalHighDmNu;      //Number of events expected at the best fit.
-    TH1F *eventsSignalHighDmNubar;     //Number of events expected at the best fit.
+    TH1F **eventsnueosc = new TH1F*[npoints+1]; //fullosc weighted by Posc=1*sin2(1.27dm2L/E), at each dm2 point
+    TH1F *eventsnuefosc;                        //fullosc (Posc=1)
+    TH1F *eventsSignalBestFitNu;                //Number of events expected at the best fit.
+    TH1F *eventsSignalBestFitNubar;             //Number of events expected at the best fit.
+    TH1F *eventsSignalBestFit_globNu;           //Number of events expected at the best fit.
+    TH1F *eventsSignalBestFit_globNubar;        //Number of events expected at the best fit.
+    TH1F *eventsSignalHighDmNu;                 //Number of events expected at the best fit.
+    TH1F *eventsSignalHighDmNubar;              //Number of events expected at the best fit.
     
     int nbins = bins.size() - 1;
     double emin = bins.front();
@@ -960,26 +945,6 @@ namespace lar1{
                                      nbins, emin, emax);
 
 
-    if (usingSignalMultiWeights){
-      std::cout << "Using Signal Multi weights." << std::endl;
-    }
-    else{
-      std::cout << "NOT using signal multi weights...." << std::endl;
-    }
-  
-    TH1F *** edistrnueoscMultiWeight;
-    if(usingSignalMultiWeights)
-    {
-      edistrnueoscMultiWeight = new TH1F**[nWeights];
-      for (int N_weight = 0; N_weight < nWeights; ++N_weight)
-      {
-        edistrnueoscMultiWeight[N_weight] = new TH1F*[npoints+1];
-        for (int point = 0; point <= npoints; ++point)
-        {
-          edistrnueoscMultiWeight[N_weight][point] = (TH1F*) edistrnueosc -> Clone();
-        }
-      }
-    }
 
     //Need vectors to save out the important information:
     std::vector<float> edistrnuefoscVec(nbins,0);
@@ -990,16 +955,7 @@ namespace lar1{
     std::vector<float> edistrnueBestFit_globNuVec(nbins,0);
     std::vector<float> edistrnueBestFit_globNubarVec(nbins,0);
     std::vector<std::vector<float> > edistrnueoscVec(npoints+1, std::vector<float>(nbins,0) );
-    
-    std::vector<std::vector<std::vector<float> > > edistrnueoscMultiWeightVec;
-    if (usingSignalMultiWeights){
-      edistrnueoscMultiWeightVec.resize(nWeights);
-      for (int N_weight = 0; N_weight < nWeights; ++N_weight)
-      {
-        edistrnueoscMultiWeightVec[N_weight] = edistrnueoscVec;
-      }
-    }
- 
+     
 
 
     dataOsc.resize(npoints+1);
@@ -1010,14 +966,14 @@ namespace lar1{
     for (int i = 0; i < nbins+1; i ++){
       binsArray[i] = bins[i];
     }
-    edistrnueosc      -> SetBins(nbins, binsArray);
-    edistrnuefosc       -> SetBins(nbins, binsArray);
-    edistrnueBestFitNu    -> SetBins(nbins, binsArray);
-    edistrnueBestFitNubar   -> SetBins(nbins, binsArray);
-    edistrnueHighDmNu    -> SetBins(nbins, binsArray);
-    edistrnueHighDmNubar   -> SetBins(nbins, binsArray);
-    edistrnueBestFit_globNu    -> SetBins(nbins, binsArray);
-    edistrnueBestFit_globNubar   -> SetBins(nbins, binsArray);
+    edistrnueosc                -> SetBins(nbins, binsArray);
+    edistrnuefosc               -> SetBins(nbins, binsArray);
+    edistrnueBestFitNu          -> SetBins(nbins, binsArray);
+    edistrnueBestFitNubar       -> SetBins(nbins, binsArray);
+    edistrnueHighDmNu           -> SetBins(nbins, binsArray);
+    edistrnueHighDmNubar        -> SetBins(nbins, binsArray);
+    edistrnueBestFit_globNu     -> SetBins(nbins, binsArray);
+    edistrnueBestFit_globNubar  -> SetBins(nbins, binsArray);
    
 
     
@@ -1030,12 +986,6 @@ namespace lar1{
       dm2Array[i] = pow(10., (TMath::Log10(dm2min)+ (i*1./npoints)*TMath::Log10(dm2max/dm2min)) );
       //While looping, may as well set up the histograms:
       eventsnueosc[i] = (TH1F*) edistrnueosc -> Clone();
-      if (usingSignalMultiWeights){
-        for (int i = 0; i < nWeights; ++i)
-        {
-          edistrnueoscMultiWeight[i][npoints] = (TH1F *) edistrnueosc -> Clone();
-        }
-      }
     }
 
     //Now loop over events in the tree and fill each histogram for dm2 at each point.
@@ -1083,14 +1033,6 @@ namespace lar1{
       for (int i=0; i<=npoints; i++){
         weight=wgt*pow((TMath::Sin(1.27*dm2Array[i]*(nuleng/100.)/(enugen*1000.))),2);
         eventsnueosc[i]->Fill(fill_energy,weight);
-        // Now do the multiweight part
-        if (usingSignalMultiWeights){
-          for (int N_weight = 0; N_weight < nWeights; ++N_weight)
-          {
-            double mutl_wgt = (*MultiWeight)[multiWeightSource][N_weight];
-            edistrnueoscMultiWeight[N_weight][i]->Fill(fill_energy,weight*mutl_wgt);
-          }
-        }
       }
 
       //Fill the scaled probability thinger:
@@ -1144,18 +1086,6 @@ namespace lar1{
         dataOsc[point][i] = eventsnueosc[point]   -> GetBinContent(i+1);
       }
     }
-    if (usingSignalMultiWeights){
-      for (int N_weight = 0; N_weight < nWeights; ++N_weight)
-      {
-        for (int point = 0; point <= npoints; ++point)
-        {
-          for (int bin = 0; bin < nbins; ++bin)
-          {
-            edistrnueoscMultiWeightVec[N_weight][point][bin] = edistrnueoscMultiWeight[N_weight][point]->GetBinContent(bin+1);
-          }
-        }
-      }
-    }
     
 
     //write to file...
@@ -1189,19 +1119,6 @@ namespace lar1{
       sprintf(name, "edistrnueoscVec_%i",point);
       t1 -> Branch(name, &(edistrnueoscVec[point]));
     }
-    if (usingSignalMultiWeights){
-      TTree *t2 = new TTree("tvecoscWgt", "Tree with multiweight Oscillation Signals");
-      for (int N_weight = 0; N_weight < nWeights; ++N_weight)
-      {
-        for (int point = 0; point <= npoints; point ++){
-          char  name[100];
-          sprintf(name, "edistrnueoscMultiWeightVec_%i_%i",N_weight,point);
-          t2 -> Branch(name, &(edistrnueoscMultiWeightVec[N_weight][point]));
-        }
-      }
-      t2 -> Fill();
-      t2 -> Write();
-    }
 
     t1 -> Fill();
     t1 -> Write();
@@ -1220,29 +1137,16 @@ namespace lar1{
   int NtupleReader::ReadNueOsc(){
 
     dataOsc.resize(npoints+1);
-    if (usingSignalMultiWeights) multiWeightDataOsc.resize(nWeights);
     // for (unsigned int i = 0; i < dataOsc.size(); i++) dataOsc[i].resize(bins.size()-1);
 
     std::vector<std::vector<float> *> dataOscReadInVector;
     dataOscReadInVector.resize(npoints+1);
-    std::vector<std::vector<std::vector<float> * > > multiWeightReadInVector;
-    if (usingSignalMultiWeights) {
-      multiWeightReadInVector.resize(nWeights);
-      for (int N_weight = 0; N_weight < nWeights; ++N_weight)
-      {
-        multiWeightReadInVector[N_weight].resize(npoints+1);
-        multiWeightDataOsc[N_weight].resize(npoints+1);
-      }
-    }
 
     TChain *c = new TChain("tvecosc");
     c -> Add(path+fileNameHistsOsc);
 
-    TChain *d;
-    if (usingSignalMultiWeights){
-      d = new TChain("tvecoscWgt");
-      d->Add(path+fileNameHistsOsc);
-    }
+
+
     
     for (int ii = 0; ii <= npoints; ii++){
       dataOscReadInVector[ii] = 0;
@@ -1251,39 +1155,16 @@ namespace lar1{
       //Set up the tree and branch each time:
       c -> SetBranchAddress(name, &dataOscReadInVector[ii]);
 
-      // if (debug){
-      //   std::cout << "Size is " << eventsnueoscVec[b_line][ii].size() << std::endl;
-      //   for (unsigned int i = 0; i < eventsnueoscVec[b_line][ii].size(); i++){
-      //     std::cout << "readInVector is " << eventsnueoscVec[b_line][ii][i] << std::endl;
-      //   }
-      // }
-      if (usingSignalMultiWeights){
-        for (int N_weight = 0; N_weight < nWeights; ++N_weight)
-        {
-          multiWeightReadInVector[N_weight][ii] = 0;
-          char  name2[100];
-          sprintf(name2, "edistrnueoscMultiWeightVec_%i_%i",N_weight,ii);
-          d->SetBranchAddress(name2,&multiWeightReadInVector[N_weight][ii]);
-        }
-      }
 
     }
     std::cout << "Reading in nue osc data, this may take a minute or two...." << std::endl;
     c -> GetEntry(0);
-    if (usingSignalMultiWeights) d -> GetEntry(0);
 
 
     for (int ii = 0; ii <= npoints; ++ii)
     {
       dataOsc[ii] = *(dataOscReadInVector[ii]);
       delete dataOscReadInVector[ii];
-      if (usingSignalMultiWeights){
-        for (int N_weight = 0; N_weight < nWeights; ++N_weight)
-        {
-          multiWeightDataOsc[N_weight][ii] = *(multiWeightReadInVector[N_weight][ii]);
-          delete multiWeightReadInVector[N_weight][ii];
-        }
-      }
     }
 
 
@@ -1329,7 +1210,7 @@ namespace lar1{
 
     std::cout<<"Input filename:\t" << dummytarget << std::endl;
     std::cout << "Number of entries at L= " << baseline << ":\t" << nentries1 << std::endl;
-    c->SetBranchAddress("energy",&fill_energy);
+    c->SetBranchAddress("enugen",&fill_energy);
     c->SetBranchAddress("inno",&inno);
     c->SetBranchAddress("mode",&mode);
     c->SetBranchAddress("isCC",&isCC);
@@ -1546,7 +1427,7 @@ namespace lar1{
 
     std::cout<<"Input filename:\t" << dummytarget << std::endl;
     std::cout<<"Number of entries L="<<baseline<<"m: "<< nentries2<< std::endl;
-    c->SetBranchAddress("energy",&fill_energy);
+    c->SetBranchAddress("enugen",&fill_energy);
     c->SetBranchAddress("inno",&inno);
     c->SetBranchAddress("mode",&mode);
     c->SetBranchAddress("isCC",&isCC);

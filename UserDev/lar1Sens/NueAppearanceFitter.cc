@@ -88,6 +88,56 @@ namespace lar1{
 
   }
 
+  int NueAppearanceFitter::Run(){
+    // This function configures all the functions and checks that boolean
+    // logic works out between all the functions
+    // 
+    
+    // Do all of the checks to make sure the functions will run
+    
+    if (fLoop) includeFosc = true;
+    if (fBuildCovarianceMatrix || fMakeRatioPlots){
+      if (!useCovarianceMatrix){
+        std::cout << " WARNING: switch useCovarianceMatrix to true"
+                  << " since it's needed in a function you requested.\n";
+       useCovarianceMatrix = true;
+      }  
+    }
+
+    Prepare();
+    ReadData();
+    if (fBuildCovarianceMatrix) {
+      int returnVal = BuildCovarianceMatrix();
+      if (returnVal != 0) return returnVal;
+    }
+    if (fMakeRatioPlots) {
+      int returnVal = MakeRatioPlots();
+      if (returnVal != 0) return returnVal;
+    }
+    if (fLoop) {
+      int returnVal = Loop();
+      if (returnVal != 0) return returnVal;
+    }
+    if (fMakePlots) {
+      int returnVal = MakePlots();
+      if (returnVal != 0) return returnVal;
+    }
+    if (fMakeSimplePlot) {
+      int returnVal = MakeSimplePlot();
+      if (returnVal != 0) return returnVal;
+    }
+    if (fMakeEventRatePlots) {
+      int returnVal = MakeEventRatePlots();
+      if (returnVal != 0) return returnVal;
+    }
+    if (fMakeAltSensPlot) {
+      int returnVal = MakeAltSensPlot();
+      if (returnVal != 0) return returnVal;
+    }
+
+    return 0;
+  }
+
   int NueAppearanceFitter::Prepare(){
 
     if (useT600_onaxis && useT600_offaxis){
@@ -145,35 +195,35 @@ namespace lar1{
       baselinesFancy.push_back("100m");
       scales.push_back(LAr1NDScale);
       names.push_back("LAr1-ND");
-      detNamesString += "ND_100m_";
+      detNamesString += "ND_100m";
     }
     if (use100mLong) {
       baselines.push_back("100m");
       baselinesFancy.push_back("100m");
       scales.push_back(LAr1NDScale);
       names.push_back("2*LAr1-ND");
-      detNamesString += "2ND_";
+      detNamesString += "2ND";
     }
     if (use150m) {
       baselines.push_back("150m");
       baselinesFancy.push_back("150m");
       scales.push_back(LAr1NDScale);
       names.push_back("LAr1-ND");
-      detNamesString += "ND_150m_";
+      detNamesString += "ND_150m";
     }
     if (use200m) {
       baselines.push_back("200m");
       baselinesFancy.push_back("200m");
       scales.push_back(LAr1NDScale);
       names.push_back("LAr1-ND");
-      detNamesString += "ND_200m_";
+      detNamesString += "ND_200m";
     }
     if (use470m) {
       baselines.push_back("470m");
       baselinesFancy.push_back("470m");
       scales.push_back(ubooneScale);
       names.push_back("MicroBooNE");
-      detNamesString += "uB_";
+      detNamesString += "uB";
     }
     if (useT600_onaxis){
       baselines.push_back("600m_onaxis");
@@ -208,141 +258,163 @@ namespace lar1{
       exit(-1);
     }
 
+
+
+    // This section of code configures the worker class to read in the data
     if (use100m){
       NtupleReader a("nue",fileSource, "100m", mode, energyType, npoints, forceRemake);
       a.setContainedShowers(ElectContainedDist);
       a.setMinDistanceToStart(minDistanceToStart);
       a.setSpecialNameText(specialNameText);
+      a.setIncludeOsc(includeFosc);
       a.setSpecialNameTextOsc(specialNameTextOsc);
       if (useCovarianceMatrix){
-        a.useMultiWeights(useCovarianceMatrix,useSignalCovarianceMatrix,multiWeightSource);
+        a.useMultiWeights(useCovarianceMatrix,multiWeightSource);
         a.setNWeights(nWeights);
         if (absolute_MWSource)
           a.setAbsolute_MWSource(absolute_MWSource);
       }
       readerNue.push_back(a);
-      a.setSignal("numu");
-      a.setSpecialNameText(specialNameText);
-      // a.setSpecialNameText(specialNameTextOsc);
-      readerNumu.push_back(a);
+      if (includeNumus){
+        a.setSignal("numu");
+        a.setSpecialNameText(specialNameText);
+        readerNumu.push_back(a);
+      }
     }
     if (use150m){
       NtupleReader a("nue",fileSource, "150m", mode, energyType, npoints, forceRemake);
       a.setContainedShowers(ElectContainedDist);
       a.setMinDistanceToStart(minDistanceToStart);
       a.setSpecialNameText(specialNameText);
+      a.setIncludeOsc(includeFosc);
       a.setSpecialNameTextOsc(specialNameTextOsc);
       if (useCovarianceMatrix){
-        a.useMultiWeights(useCovarianceMatrix,useSignalCovarianceMatrix,multiWeightSource);
+        a.useMultiWeights(useCovarianceMatrix,multiWeightSource);
         a.setNWeights(nWeights);
         if (absolute_MWSource)
           a.setAbsolute_MWSource(absolute_MWSource);
       }
       readerNue.push_back(a);
-      a.setSignal("numu");
-      a.setSpecialNameText(specialNameText);
-      // a.setSpecialNameText(specialNameTextOsc);
-      readerNumu.push_back(a);
+      if (includeNumus){
+        a.setSignal("numu");
+        a.setSpecialNameText(specialNameText);
+        readerNumu.push_back(a);
+      }
     }
     if (use200m){
       NtupleReader a("nue",fileSource, "200m", mode, energyType, npoints, forceRemake);
       a.setContainedShowers(ElectContainedDist);
       a.setMinDistanceToStart(minDistanceToStart);
       a.setSpecialNameText(specialNameText);
+      a.setIncludeOsc(includeFosc);
       a.setSpecialNameTextOsc(specialNameTextOsc);
       if (useCovarianceMatrix){
-        a.useMultiWeights(useCovarianceMatrix,useSignalCovarianceMatrix,multiWeightSource);
+        a.useMultiWeights(useCovarianceMatrix,multiWeightSource);
         a.setNWeights(nWeights);
         if (absolute_MWSource)
           a.setAbsolute_MWSource(absolute_MWSource);
       }
       readerNue.push_back(a);
-      a.setSignal("numu");
-      a.setSpecialNameText(specialNameText);
-      // a.setSpecialNameText(specialNameTextOsc);
-      readerNumu.push_back(a);
+      if (includeNumus){
+        a.setSignal("numu");
+        a.setSpecialNameText(specialNameText);
+        readerNumu.push_back(a);
+      }
     }
     if (use100mLong){
       NtupleReader a("nue",fileSource, "100m", mode, energyType, npoints, forceRemake);
       a.setContainedShowers(ElectContainedDist);
       a.setMinDistanceToStart(minDistanceToStart);
       a.setSpecialNameText("long");
+      a.setIncludeOsc(includeFosc);
       a.setSpecialNameTextOsc("long");
       if (useCovarianceMatrix){
-        a.useMultiWeights(useCovarianceMatrix,useSignalCovarianceMatrix,multiWeightSource);
+        a.useMultiWeights(useCovarianceMatrix,multiWeightSource);
         a.setNWeights(nWeights);
         if (absolute_MWSource)
           a.setAbsolute_MWSource(absolute_MWSource);
       }
       readerNue.push_back(a);
-      a.setSignal("numu");
-      // a.setSpecialNameText("");
-      a.setSpecialNameTextOsc("long");
-      // a.setSpecialNameText(specialNameTextOsc);
-      readerNumu.push_back(a);
+      if (includeNumus){
+        a.setSignal("numu");
+        a.setSpecialNameText(specialNameText);
+        readerNumu.push_back(a);
+      }
     }
     if (use470m){
       NtupleReader a("nue",fileSource, "470m", mode, energyType, npoints, forceRemake);
       a.setContainedShowers(ElectContainedDist);
       a.setMinDistanceToStart(minDistanceToStart);
       // a.setSpecialNameText(specialNameText);
+      a.setIncludeOsc(includeFosc);
       a.setSpecialNameTextOsc(specialNameTextOsc);
       if (useCovarianceMatrix){
-        a.useMultiWeights(useCovarianceMatrix,useSignalCovarianceMatrix,multiWeightSource);
+        a.useMultiWeights(useCovarianceMatrix,multiWeightSource);
         a.setNWeights(nWeights);
         if (absolute_MWSource)
           a.setAbsolute_MWSource(absolute_MWSource);
       }
       readerNue.push_back(a);
-      a.setSignal("numu");
-      // a.setSpecialNameText("");
-      a.setSpecialNameTextOsc("");
-      // a.setSpecialNameText(specialNameTextOsc);
-      readerNumu.push_back(a);
+      if (includeNumus){
+        a.setSignal("numu");
+        a.setSpecialNameText(specialNameText);
+        readerNumu.push_back(a);
+      }
     }
     if (useT600_onaxis) {
       NtupleReader a("nue",fileSource, "600m_onaxis", mode, energyType, npoints, forceRemake);
       a.setContainedShowers(ElectContainedDist);
       a.setMinDistanceToStart(minDistanceToStart);
       a.setSpecialNameText(specialNameText);
+      a.setIncludeOsc(includeFosc);
       a.setSpecialNameTextOsc(specialNameTextOsc);
       if (useCovarianceMatrix){
-        a.useMultiWeights(useCovarianceMatrix,useSignalCovarianceMatrix,multiWeightSource);
+        a.useMultiWeights(useCovarianceMatrix,multiWeightSource);
         a.setNWeights(nWeights);
         if (absolute_MWSource)
           a.setAbsolute_MWSource(absolute_MWSource);
       }
       readerNue.push_back(a);
-      a.setSignal("numu");
-      a.setSpecialNameText("");
-      a.setSpecialNameTextOsc("");
-      // a.setSpecialNameText(specialNameTextOsc);
-      readerNumu.push_back(a);
+      if (includeNumus){
+        a.setSignal("numu");
+        a.setSpecialNameText(specialNameText);
+        readerNumu.push_back(a);
+      }
     }
     if (useT600_offaxis) {
       NtupleReader a("nue",fileSource,  "600m_offaxis", mode, energyType, npoints, forceRemake);
       a.setContainedShowers(ElectContainedDist);
       a.setMinDistanceToStart(minDistanceToStart);
       a.setSpecialNameText(specialNameText);
+      a.setIncludeOsc(includeFosc);
       a.setSpecialNameTextOsc(specialNameTextOsc);
       if (useCovarianceMatrix){
-        a.useMultiWeights(useCovarianceMatrix,useSignalCovarianceMatrix,multiWeightSource);
+        a.useMultiWeights(useCovarianceMatrix,multiWeightSource);
         a.setNWeights(nWeights);
         if (absolute_MWSource)
           a.setAbsolute_MWSource(absolute_MWSource);
       }
       readerNue.push_back(a);
-      a.setSignal("numu");
-      a.setSpecialNameText("");
-      a.setSpecialNameTextOsc("");
-      // a.setSpecialNameText(specialNameTextOsc);
-      readerNumu.push_back(a);
+      if (includeNumus){
+        a.setSignal("numu");
+        a.setSpecialNameText(specialNameText);
+        readerNumu.push_back(a);
+      }
     }
 
     //This value is the number of baselines:
     nL = baselines.size();
     //total number of energy bins for side-by-side distributions:
-    nbins = 2*nbins_nue + nbins_numu;  // 2*nuebins because of fullosc
+    nbins = nbins_nue;
+    nbins_null = nbins_nue;
+    if (includeFosc) nbins += nbins_nue;
+    if (includeNumus) {
+      nbins += nbins_numu;
+      nbins_null += nbins_numu;
+    }
+    else {
+      nbins_numu = 0;
+    }
     //just in case, if the number of baselines is 1 switch off nearDetStats:
     if (nL == 1) {
         useNearDetStats=false;
@@ -409,29 +481,29 @@ namespace lar1{
     //reads the ntuples, which is read_ntuple.C and read_ntuple_fosc.C.
     //It might be easier to reprocess the histograms though.
     for (int i = 0; i < nL; i++){
-        std::string L = baselines[i];
-        Int_t returnVal;
-        returnVal = readerNue[i].processData();
-        if (returnVal) {  //only returns 0 on successful completion
-            std::cout << "Error: failed to read the ntuple at " << L << " with error " << returnVal;
-            std::cout << std::endl;
-            return 1;
-        }
-        returnVal = readerNumu[i].processData();
-        if (returnVal) {  //only returns 0 on successful completion
-            std::cout << "Error: failed to read the ntuple at " << L << " with error " << returnVal;
-            std::cout << std::endl;
-            return 1;
-        }
+      std::string L = baselines[i];
+      Int_t returnVal;
+      returnVal = readerNue[i].processData();
+      if (returnVal) {  //only returns 0 on successful completion
+          std::cout << "Error: failed to read the ntuple at " << L << " with error " << returnVal;
+          std::cout << std::endl;
+          return 1;
+      }
+      if (includeNumus) returnVal = readerNumu[i].processData();
+      if (returnVal) {  //only returns 0 on successful completion
+          std::cout << "Error: failed to read the ntuple at " << L << " with error " << returnVal;
+          std::cout << std::endl;
+          return 1;
+      }
     }
 
     //Make sure the vectors are the right size!
     eventsnueVec.resize(nL);
-    eventsnumuVec.resize(nL);
-    eventsnueoscVec.resize(nL);
-    eventsnuefoscVec.resize(nL);
-    eventsSignalBestFitNuVec.resize(nL);
-    eventsSignalBestFitNubarVec.resize(nL);
+    if (includeNumus) eventsnumuVec.resize(nL);
+    if (includeFosc) eventsnueoscVec.resize(nL);
+    if (includeFosc) eventsnuefoscVec.resize(nL);
+    if (includeFosc) eventsSignalBestFitNuVec.resize(nL);
+    if (includeFosc) eventsSignalBestFitNubarVec.resize(nL);
 
     //  Event rate background vecs
     NueFromNueCC_muonVec.resize(nL);
@@ -442,24 +514,16 @@ namespace lar1{
     NueFromNC_delta0Vec.resize(nL);
     NueFromNumuCCVec.resize(nL);
     eventsNueMCStats.resize(nL);
-    eventsNumuMCStats.resize(nL);
+    if (includeNumus) eventsNumuMCStats.resize(nL);
     DirtVec.resize(nL);
     OtherVec.resize(nL);
     NueFromCosmicsVec.resize(nL);
 
     if (useCovarianceMatrix){
       eventsNullVecMultiWeight.resize(nWeights);
-      if (useSignalCovarianceMatrix) signalMultiWeight.resize(nWeights);
       for (int N_weight = 0; N_weight < nWeights; ++N_weight)
       {
         eventsNullVecMultiWeight[N_weight].resize(nL*nbins);
-        if (useSignalCovarianceMatrix){
-          signalMultiWeight[N_weight].resize(npoints+1);
-          for (int point = 0; point <= npoints; ++point)
-          {
-            signalMultiWeight[N_weight][point].resize(nL*nbins);
-          }
-        }
       }
     }
 
@@ -481,27 +545,24 @@ namespace lar1{
       // eventsnueoscVec[b_line].resize(npoints+1); // make room for the osc vectors
 
       eventsnueVec[b_line]     = utils.rebinVector(readerNue[b_line].GetData(),nueBins);
-      eventsnumuVec[b_line]    = utils.rebinVector(readerNumu[b_line].GetData(),numuBins);
-      eventsnuefoscVec[b_line] = utils.rebinVector(readerNumu[b_line].GetData(),nueBins);
+      if (includeNumus)
+        eventsnumuVec[b_line]    = utils.rebinVector(readerNumu[b_line].GetData(),numuBins);
+      if (includeFosc){
+        eventsnuefoscVec[b_line] = utils.rebinVector(readerNue[b_line].GetData(),nueBins);
 
-      // Getting the osc vectors and rebinning them:
-      eventsnueoscVec[b_line]  = readerNue[b_line].GetDataOsc();
-      for (auto & vec : eventsnueoscVec[b_line]){
-        vec = utils.rebinVector(vec, nueBins);
+        // Getting the osc vectors and rebinning them:
+        eventsnueoscVec[b_line]  = readerNue[b_line].GetDataOsc();
+        for (auto & vec : eventsnueoscVec[b_line]){
+          vec = utils.rebinVector(vec, nueBins);
+        }
+        for (auto & bin : eventsnuefoscVec[b_line]) bin*= 0.003;
       }
-      // eventsnueoscVec[b_line][point] = utils.rebinVector(readerNue[b_line].GetDataOsc(),nueBins);
 
-
-      for (auto & bin : eventsnuefoscVec[b_line]) bin*= 0.003;
-      // std::transform( eventsnuefoscVec[b_line].begin(), eventsnuefoscVec[b_line].end(),
-      //     eventsnuefoscVec[b_line].begin(), 
-      //     std::bind2nd(std::multiplies<float>(), 0.003));
-      // That last line is getting the nue background again but it should really be getting
-      // the numu background!!
       // A lot of the items need to be grabbed a la carte:
       if (useCovarianceMatrix){
         eventsNueMCStats[b_line]         = utils.rebinVector(readerNue[b_line].GetVectorFromTree( (char*) "eventsNueMCVec"), nueBins);
-        eventsNumuMCStats[b_line]        = utils.rebinVector(readerNumu[b_line].GetVectorFromTree((char*) "eventsNumuMC"),numuBins);
+        if (includeNumus)
+          eventsNumuMCStats[b_line]      = utils.rebinVector(readerNumu[b_line].GetVectorFromTree((char*) "eventsNumuMC"),numuBins);
       }
       NueFromNueCC_muonVec[b_line]       = utils.rebinVector(readerNue[b_line].GetVectorFromTree( (char*) "NueFromNueCC_muonVec"),nueBins);
       NueFromNueCC_chargeKaonVec[b_line] = utils.rebinVector(readerNue[b_line].GetVectorFromTree( (char*) "NueFromNueCC_chargeKaonVec"),nueBins);
@@ -514,62 +575,83 @@ namespace lar1{
       OtherVec[b_line]                   = utils.rebinVector(readerNue[b_line].GetVectorFromTree( (char*) "OtherVec"),nueBins);
       // if (includeCosmics)
       NueFromCosmicsVec[b_line]          = utils.rebinVector(readerNue[b_line].GetComptonBackgroundFromFile(cosmicsFile, minDistanceToStart),nueBins);
-      
-      if (useHighDm){
-        eventsSignalBestFitNuVec[b_line]    = utils.rebinVector(readerNue[b_line].GetVectorFromTree( (char*) "edistrnueHighDmNuVec",(char*)"tvecfosc",true),nueBins);
-        eventsSignalBestFitNubarVec[b_line] = utils.rebinVector(readerNue[b_line].GetVectorFromTree( (char*) "edistrnueHighDmNubarVec",(char*)"tvecfosc",true),nueBins);
+      if (includeFosc){
+        if (useHighDm){
+          eventsSignalBestFitNuVec[b_line]    
+            = utils.rebinVector(readerNue[b_line].GetVectorFromTree( 
+                (char*) "edistrnueHighDmNuVec",
+                (char*)"tvecfosc",true),nueBins);
+          eventsSignalBestFitNubarVec[b_line] 
+            = utils.rebinVector(readerNue[b_line].GetVectorFromTree( 
+                (char*) "edistrnueHighDmNubarVec",
+                (char*)"tvecfosc",true),nueBins);
+        }
+        else if (useGlobBF){
+          eventsSignalBestFitNuVec[b_line]    
+            = utils.rebinVector(readerNue[b_line].GetVectorFromTree( 
+                (char*) "edistrnueBestFit_globNuVec",
+                (char*)"tvecfosc",true),nueBins);
+          eventsSignalBestFitNubarVec[b_line] 
+            = utils.rebinVector(readerNue[b_line].GetVectorFromTree( 
+                (char*) "edistrnueBestFit_globNubarVec",
+                (char*)"tvecfosc",true),nueBins);
+        }
+        else {
+          eventsSignalBestFitNuVec[b_line]    
+            = utils.rebinVector(readerNue[b_line].GetVectorFromTree( 
+                (char*) "edistrnueBestFitNuVec",
+                (char*)"tvecfosc",true),nueBins);
+          eventsSignalBestFitNubarVec[b_line] 
+            = utils.rebinVector(readerNue[b_line].GetVectorFromTree( 
+                (char*) "edistrnueBestFitNubarVec",
+                (char*)"tvecfosc",true),nueBins);
+        }
       }
-      else if (useGlobBF){
-        eventsSignalBestFitNuVec[b_line]    = utils.rebinVector(readerNue[b_line].GetVectorFromTree( (char*) "edistrnueBestFit_globNuVec",(char*)"tvecfosc",true),nueBins);
-        eventsSignalBestFitNubarVec[b_line] = utils.rebinVector(readerNue[b_line].GetVectorFromTree( (char*) "edistrnueBestFit_globNubarVec",(char*)"tvecfosc",true),nueBins);
-      }
-      else {
-        eventsSignalBestFitNuVec[b_line]    = utils.rebinVector(readerNue[b_line].GetVectorFromTree( (char*) "edistrnueBestFitNuVec",(char*)"tvecfosc",true),nueBins);
-        eventsSignalBestFitNubarVec[b_line] = utils.rebinVector(readerNue[b_line].GetVectorFromTree( (char*) "edistrnueBestFitNubarVec",(char*)"tvecfosc",true),nueBins);
-      }
-
-      // now deal with the multiweight BS:
+      // now deal with the multiweight stuff:
       if (useCovarianceMatrix){
         auto tempMultiWeightInfoNue    = readerNue[b_line].GetMultiWeightData();
-        auto tempMultiWeightInfoNueOsc = readerNue[b_line].GetMultiWeightDataOsc();
-        auto tempMultiWeightInfoNumu   = readerNumu[b_line].GetMultiWeightData();
+        std::vector<std::vector< float> > tempMultiWeightInfoNumu;
+        if (includeNumus)
+          tempMultiWeightInfoNumu   = readerNumu[b_line].GetMultiWeightData();
         std::vector<float> blankVectorNue(nbins_nue, 0);
         std::vector<float> blankVectorNumu(nbins_numu, 0);
-        // blankVectorNue = utils.rebinVector(blankVectorNue,nueBins);
-        // blankVectorNumu = utils.rebinVector(blankVectorNumu,nueBins);
 
-        // append the info into the proper places, then we'll scale it as we copy it into place.
+        // append the info into the proper places, 
+        // then we'll scale it as we copy it into place.
         std::vector<float> tempVector;
         tempVector.reserve(nbins);
-        std::vector<float> tempVector2;
-        tempVector2.reserve(nbins);
         for (int N_weight = 0; N_weight < nWeights; ++N_weight)
         {
-          // this is just attaching nue_osc to nue to numu into the total, combined vector
-          tempVector = utils.appendVectors(blankVectorNue,
-                       utils.rebinVector(tempMultiWeightInfoNue[N_weight],nueBins),
-                       utils.rebinVector(tempMultiWeightInfoNumu[N_weight],numuBins));
-          for (int point = 0; point <= npoints; ++point)
+          // this is just attaching nue_osc to nue to numu into the 
+          // total, combined vector
+          if (includeFosc && includeNumus){
+            tempVector = utils.appendVectors(blankVectorNue,
+                         utils.rebinVector(tempMultiWeightInfoNue[N_weight],nueBins),
+                         utils.rebinVector(tempMultiWeightInfoNumu[N_weight],numuBins));
+          }
+          else if (includeFosc){
+            tempVector = utils.appendVectors(blankVectorNue,
+                         utils.rebinVector(tempMultiWeightInfoNue[N_weight],nueBins));
+          }
+          else if (includeNumus){
+            tempVector = utils.appendVectors(
+                         utils.rebinVector(tempMultiWeightInfoNue[N_weight],nueBins),
+                         utils.rebinVector(tempMultiWeightInfoNumu[N_weight],numuBins));
+          }
+          else{
+            tempVector = utils.rebinVector(tempMultiWeightInfoNue[N_weight],nueBins);
+          }
+          for (int this_bin = 0; this_bin < nbins; this_bin++)
           {
-            if (useSignalCovarianceMatrix) 
-              tempVector2 = utils.appendVectors(
-                              utils.rebinVector(tempMultiWeightInfoNueOsc[N_weight][point],nueBins),
-                              blankVectorNue,
-                              blankVectorNumu);
-            for (int this_bin = 0; this_bin < nbins; this_bin++)
-            {
-              if (point == 0) 
-                eventsNullVecMultiWeight[N_weight][b_line*nbins + this_bin] = scales[b_line]*tempVector[this_bin];
-              if (useSignalCovarianceMatrix) 
-                signalMultiWeight[N_weight][point][b_line*nbins+this_bin] = scales[b_line]*tempVector2[this_bin];
-            }
+              eventsNullVecMultiWeight[N_weight][b_line*nbins + this_bin]
+                 = scales[b_line]*tempVector[this_bin];
           }
         }
+
       }
 
 
     }//end loop over baselines
-
 
     //Everything is read, now scale the vectors.
     //this is to correct the pot to whatever we'd like it to
@@ -577,7 +659,6 @@ namespace lar1{
     for (int b_line = 0; b_line < nL; b_line ++){
       for(int bin = 0; bin < nbins_nue; bin++){
         eventsnueVec[b_line][bin]                 *= scales[b_line];
-        eventsnuefoscVec[b_line][bin]             *= scales[b_line];
         NueFromNueCC_muonVec[b_line][bin]         *= scales[b_line];
         NueFromNueCC_chargeKaonVec[b_line][bin]   *= scales[b_line];
         NueFromNueCC_neutKaonVec[b_line][bin]     *= scales[b_line];
@@ -588,94 +669,129 @@ namespace lar1{
         NueFromCosmicsVec[b_line][bin]            *= scales[b_line];
         DirtVec[b_line][bin]                      *= scales[b_line];
         OtherVec[b_line][bin]                     *= scales[b_line];
-        eventsSignalBestFitNuVec[b_line][bin]     *= scales[b_line]*sin22thBF;
-        eventsSignalBestFitNubarVec[b_line][bin]  *= scales[b_line]*sin22thBF;
+        if (includeFosc){
+          eventsnuefoscVec[b_line][bin]             *= scales[b_line];
+          eventsSignalBestFitNuVec[b_line][bin]     *= scales[b_line]*sin22thBF;
+          eventsSignalBestFitNubarVec[b_line][bin]  *= scales[b_line]*sin22thBF;
+        }
         if (includeCosmics)
           eventsnueVec[b_line][bin] += NueFromCosmicsVec[b_line][bin];
       }
-      for(int bin = 0; bin < nbins_numu; bin++){
-        eventsnumuVec[b_line][bin] *= scales[b_line];
+      if (includeNumus){
+        for(int bin = 0; bin < nbins_numu; bin++){
+          eventsnumuVec[b_line][bin] *= scales[b_line];
+        }
       }
 
-//\todo: pick up right here with the changes
 
-      //Scale the best fit signals:
-      std::cout << "Using scale factor of " << sin22thBF << std::endl;
+      if (includeFosc){
+        //Scale the best fit signals:
+        std::cout << "Using scale factor of " << sin22thBF << std::endl;
 
-      for (int point = 0; point <= npoints; point ++){
-        for(int bin = 0; bin < nbins_nue; bin++){
-          eventsnueoscVec[b_line][point][bin] *= scales[b_line];
-        }    
-      } //loop over points
+        for (int point = 0; point <= npoints; point ++){
+          for(int bin = 0; bin < nbins_nue; bin++){
+            eventsnueoscVec[b_line][point][bin] *= scales[b_line];
+          }    
+        } //loop over points
+      }
 
     } //loop over baselines, ends scaling
 
-    eventsnLVec.resize(npoints+1);
-    eventsnLfitVec.resize(npoints+1);
+    oscVector.resize(npoints+1);
 
 
     //Stitch together the vectors into the side by side versions (over npoints):
     //loop over npoints for eventsnL and eventsnLfit
 
     //=============================================
-    //this histogram is as a blank histogram
+    //this histogram is a blank histogram
     std::vector<float> blankVector(nbins_nue, 0); 
 
+    // Need to combine the vectors. Combine each baseline first, then all
+    // baselines.  It's not quite the most efficient route but I don't
+    // think it matters.
+    std::vector< std::vector<float> > combinedByBaseline;
+    combinedByBaseline.resize(nL);
+    for (int b_line = 0; b_line < nL; ++b_line)
+    {
+      if (includeFosc && includeNumus){
+        combinedByBaseline[b_line] = utils.appendVectors( blankVector,
+                                                  eventsnueVec[b_line],
+                                                  eventsnumuVec[b_line]);
+      }
+      else if (includeNumus){
+        combinedByBaseline[b_line] = utils.appendVectors( eventsnueVec[b_line],
+                                                  eventsnumuVec[b_line]);
+      }
+      else if (includeFosc){
+        combinedByBaseline[b_line] = utils.appendVectors( blankVector,
+                                                  eventsnueVec[b_line]);
+      }
+      else{
+        combinedByBaseline[b_line] = eventsnueVec[b_line];
+      }
+    }
+
+    // Now combine into the total vectors
+    if (nL == 1) 
+      nullBackgrounds = combinedByBaseline.front();
+    if (nL == 2) 
+      nullBackgrounds = utils.appendVectors(combinedByBaseline.at(0), 
+                                            combinedByBaseline.at(1));
+    if (nL == 3) 
+      nullBackgrounds = utils.appendVectors(combinedByBaseline.at(0), 
+                                            combinedByBaseline.at(1),
+                                            combinedByBaseline.at(2));
 
     //Fill the combined vectors: 
     for (int point = 0; point <= npoints; point++){
-      //this isn't elegant but it gets the job done:
-      if (nL == 1){ //only one baseline
-        eventsnLVec[point] = utils.appendVectors(eventsnueoscVec[0][point],
-                                                 eventsnueVec[0], 
-                                                 eventsnumuVec[0]);
-        eventsnLfitVec[point] = eventsnLVec[point];
-        if (point == 0){
-          eventsnLcvVec    = utils.appendVectors(eventsSignalBestFitNuVec[0], 
-                                          eventsnueVec[0], eventsnumuVec[0]);
-          eventsnLnullVec  = utils.appendVectors(blankVector     , eventsnueVec[0], eventsnumuVec[0]);
+      for (int b_line = 0; b_line < nL; ++b_line)
+      {
+        if (includeFosc && includeNumus){
+          combinedByBaseline[b_line] = utils.appendVectors( eventsnueoscVec[b_line][point],
+                                                    eventsnueVec[b_line],
+                                                    eventsnumuVec[b_line]);
+        }
+        else if (includeNumus){
+          combinedByBaseline[b_line] = utils.appendVectors( eventsnueVec[b_line],
+                                                    eventsnumuVec[b_line]);
+        }
+        else if (includeFosc){
+          combinedByBaseline[b_line] = utils.appendVectors( eventsnueoscVec[b_line][point],
+                                                    eventsnueVec[b_line]);
+        }
+        else{
+          combinedByBaseline[b_line] = eventsnueVec[b_line];
         }
       }
-      else if (nL == 2) { //two baselines
-        //append the vectors:
-        eventsnLVec[point]    = utils.appendVectors( utils.appendVectors(eventsnueoscVec[0][point], eventsnueVec[0], eventsnumuVec[0]),
-                                                     utils.appendVectors(eventsnueoscVec[1][point], eventsnueVec[1], eventsnumuVec[1]));
-        eventsnLfitVec[point] = eventsnLVec[point];
-        if (point == 0){
-          eventsnLcvVec       = utils.appendVectors( utils.appendVectors(eventsnuefoscVec[0] , eventsnueVec[0], eventsnumuVec[0]),
-                                                     utils.appendVectors(eventsnuefoscVec[1] , eventsnueVec[1], eventsnumuVec[1]));
-          eventsnLnullVec     = utils.appendVectors( utils.appendVectors(blankVector     , eventsnueVec[0], eventsnumuVec[0]),
-                                                     utils.appendVectors(blankVector     , eventsnueVec[1], eventsnumuVec[1]));
-        }
-      }
-      else if (nL == 3) { //three baselines
-        //append the vectors:
-        eventsnLVec[point] = utils.appendVectors( utils.appendVectors(eventsnueoscVec[0][point], eventsnueVec[0], eventsnumuVec[0]),
-                                                  utils.appendVectors(eventsnueoscVec[1][point], eventsnueVec[1], eventsnumuVec[1]),
-                                                  utils.appendVectors(eventsnueoscVec[2][point], eventsnueVec[2], eventsnumuVec[2]));
-        eventsnLfitVec[point] = eventsnLVec[point];
-        if (point == 0){
-          eventsnLcvVec   = utils.appendVectors(utils.appendVectors(eventsnuefoscVec[0] , eventsnueVec[0], eventsnumuVec[0]),
-                                                  utils.appendVectors(eventsnuefoscVec[1] , eventsnueVec[1], eventsnumuVec[1]),
-                                                  utils.appendVectors(eventsnuefoscVec[2] , eventsnueVec[2], eventsnumuVec[2]));
-          eventsnLnullVec = utils.appendVectors(utils.appendVectors(blankVector     , eventsnueVec[0], eventsnumuVec[0]),
-                                                  utils.appendVectors(blankVector     , eventsnueVec[1], eventsnumuVec[1]),
-                                                  utils.appendVectors(blankVector     , eventsnueVec[2], eventsnumuVec[2]));
-        } 
-      }
-      else { //4+ baselines.  No way!
-        std::cout << "This macro doesn't handle more than 3 baselines." << std::endl;
-      }
+      // Now combine into the total vectors
+      if (nL == 1) 
+        oscVector[point] = combinedByBaseline.front();
+      if (nL == 2) 
+        oscVector[point] = utils.appendVectors(combinedByBaseline.at(0), 
+                                        combinedByBaseline.at(1));
+      if (nL == 3) 
+        oscVector[point] = utils.appendVectors(combinedByBaseline.at(0), 
+                                        combinedByBaseline.at(1),
+                                        combinedByBaseline.at(2));
     }
 
 
 
     if (verbose){
       std::cout << "\n------------------------\nPrinting out P=0.3% values and P=0.0% values:\n";
-      std::cout << "\tP=0.3%\t\tP=0\t\tosc"<<npoints/2<<"\n";
-      for (unsigned int i = 0; i < eventsnLcvVec.size(); i++){
-        std::cout << "\t"<<eventsnLcvVec[i] << "\t\t" << eventsnLnullVec[i] << "\t\t";
-        std::cout << eventsnLfitVec[0][i] << "\n";
+      std::cout << "\tP=0\t\tosc"<<npoints/2;
+      if (useCovarianceMatrix){
+        std::cout << "\t\tMW0";
+      }
+      std::cout<<"\n";
+      for (unsigned int i = 0; i < nullBackgrounds.size(); i++){
+        std::cout << "\t" << nullBackgrounds[i] << "\t\t";
+        std::cout << oscVector[0][i];
+        if (useCovarianceMatrix){
+          std::cout << "\t\t" << eventsNullVecMultiWeight.front().at(i);
+        }      
+        std::cout << "\n";
       }
       std::cout << "------------------------" << std::endl;
     }
@@ -693,7 +809,7 @@ namespace lar1{
 
     // For shape only fits, the near det stats get recalculated each time chi2 gets
     // calculate.  But we do them once out here too, for the shape+rate fit.
-    if (!useCovarianceMatrix){
+    if (!useCovarianceMatrix && nL > 1){
       //by design, the nearest detector to the source is the first in the vector
       //of baselines.
       nearDetStats.resize(nbins);
@@ -736,7 +852,7 @@ namespace lar1{
     //This vector holds the null oscillation collapsed signal (in other words,
     //it's the nue and numu appended).  It's used in the chisq calc.
     // nullVec.resize(nbins-nL*nbinsE);
-    // nullVec = utils.collapseVector(eventsnLnullVec, nbinsE, nL);
+    // nullVec = utils.collapseVector(nullBackgrounds, nbinsE, nL);
 
     
     }
@@ -745,164 +861,124 @@ namespace lar1{
     return 0;
   }
 
-  int NueAppearanceFitter::BuildCovarianceMatrix(int sin22thpoint, int dm2point){
-    // if sin22thpoint and dm2point are -1 (either of them) 
+  int NueAppearanceFitter::BuildCovarianceMatrix(){
     // if means to compute the matrix for no signal.
     fractionalErrorMatrix.Clear();
-    fractionalErrorMatrix.ResizeTo(nL*nbins,nL*nbins);
+    fractionalErrorMatrix.ResizeTo(nL*nbins_null,nL*nbins_null);
     correlationMatrix.Clear();
-    correlationMatrix.ResizeTo(nL*nbins,nL*nbins);
+    correlationMatrix.ResizeTo(nL*nbins_null,nL*nbins_null);
     covarianceMatrix.Clear();
-    covarianceMatrix.ResizeTo(nL*nbins,nL*nbins);
+    covarianceMatrix.ResizeTo(nL*nbins_null,nL*nbins_null);
 
     Shape_covarianceMatrix.Clear();
-    Shape_covarianceMatrix.ResizeTo(nL*nbins,nL*nbins);
+    Shape_covarianceMatrix.ResizeTo(nL*nbins_null,nL*nbins_null);
     fractional_Shape_covarianceMatrix.Clear();
-    fractional_Shape_covarianceMatrix.ResizeTo(nL*nbins,nL*nbins);
+    fractional_Shape_covarianceMatrix.ResizeTo(nL*nbins_null,nL*nbins_null);
     Mixed_covarianceMatrix.Clear();
-    Mixed_covarianceMatrix.ResizeTo(nL*nbins,nL*nbins);
+    Mixed_covarianceMatrix.ResizeTo(nL*nbins_null,nL*nbins_null);
     Norm_covarianceMatrix.Clear();
-    Norm_covarianceMatrix.ResizeTo(nL*nbins,nL*nbins);
+    Norm_covarianceMatrix.ResizeTo(nL*nbins_null,nL*nbins_null);
 
 
     double n_total =0.0;
 
 
-    float sin22th = 1;
-    if (sin22thpoint != -1)
-        sin22th = pow(10.,(TMath::Log10(sin22thmin)+(sin22thpoint*1./npoints)*TMath::Log10(sin22thmax/sin22thmin)));
-
     TH2D * covarianceMatrixHist 
          = new TH2D("covMatHist","Covariance Matrix",
-                    nL*nbins,0,nL*nbins-1,
-                    nL*nbins,0,nL*nbins-1);
+                    nL*nbins_null,0,nL*nbins_null-1,
+                    nL*nbins_null,0,nL*nbins_null-1);
     TH2D * fractionalMatrixHist 
          = new TH2D("fracMatHist","Fractional Error Matrix",
-                    nL*nbins,0,nL*nbins-1,
-                    nL*nbins,0,nL*nbins-1);
+                    nL*nbins_null,0,nL*nbins_null-1,
+                    nL*nbins_null,0,nL*nbins_null-1);
     TH2D * correlationMatrixHist 
          = new TH2D("corrMatHist","Correlation Matrix",
-                    nL*nbins,0,nL*nbins-1,
-                    nL*nbins,0,nL*nbins-1);
+                    nL*nbins_null,0,nL*nbins_null-1,
+                    nL*nbins_null,0,nL*nbins_null-1);
     TH2D * shapeFract_MatrixHist 
          = new TH2D("shapeMatHist","Fractional Shape Matrix",
-                    nL*nbins,0,nL*nbins-1,
-                    nL*nbins,0,nL*nbins-1);
+                    nL*nbins_null,0,nL*nbins_null-1,
+                    nL*nbins_null,0,nL*nbins_null-1);
 
-    TH2D * collapsed_covarianceMatrixHist 
-         = new TH2D("collapsed_covMatHist","Collapsed Covariance Matrix",
-                    nL*(nbins-nbins_nue),0,nL*(nbins-nbins_nue)-1,
-                    nL*(nbins-nbins_nue),0,nL*(nbins-nbins_nue)-1);
-    TH2D * collapsed_fractionalMatrixHist 
-         = new TH2D("collapsed_fracMatHist","Collapsed Fractional Error Matrix",
-                    nL*(nbins-nbins_nue),0,nL*(nbins-nbins_nue)-1,
-                    nL*(nbins-nbins_nue),0,nL*(nbins-nbins_nue)-1);
-    TH2D * collapsed_correlationMatrixHist 
-         = new TH2D("collapsed_corrMatHist","Collapsed Correlation Matrix",
-                    nL*(nbins-nbins_nue),0,nL*(nbins-nbins_nue)-1,
-                    nL*(nbins-nbins_nue),0,nL*(nbins-nbins_nue)-1);
-    TH2D * collapsed_shapeFract_MatrixHist 
-         = new TH2D("collapsed_shapeMatHist","Collapsed Fractional Shape Matrix",
-                    nL*(nbins-nbins_nue),0,nL*(nbins-nbins_nue)-1,
-                    nL*(nbins-nbins_nue),0,nL*(nbins-nbins_nue)-1);
     // Here's the method.  The nominal, no signal sample is in
-    // eventsnLnullVec.  It's a vector of length nL*nbinsE*3.  It 
+    // nullBackgrounds.  It's a vector of length nL*nbins.  It 
     // contains NO signal, and we shouldn't change that.
     // The multiweight, signalless vectors are in eventsNullVecMultiWeight
     // and each entry eventsNullVecMultiWeight[N_weight] is of the same
-    // type and length as eventsnLnullVec.
+    // type and length as nullBackgrounds.
     // 
     // Loop over each weight and compute the covariance between the nominal
     // and the multiweight vectors.
     // 
-    // I'm going to copy the eventsnLnullVec so that it isn't changed,
-    // but also because then we can add in signal to it.
-    // 
-    // If using a signal, it will come from eventsnLVec[point]
-    
-    // It's also going to be useful to copy each signal as we go through the
-    // multiweights so that signal can be added there, too.
-    // That signal will come from signalMultiWeight[N_weight][dm2point]
-    // which will have the same format and lenght as the above vectors.
-    // It will need to be modulated by sin22th.
+    // I'm going to copy the nullBackgrounds so that it isn't changed
 
     std::vector<float> events_nominal_COPY;
-    std::vector<float> signal_nominal_COPY;
 
-    events_nominal_COPY = eventsnLnullVec;
-    signal_nominal_COPY.resize(events_nominal_COPY.size());
-
-    // Don't want to include any cosmics in the matrix calculation, so:
-    if (includeCosmics){
-      for (int b_line = 0; b_line < nL; ++b_line)
-      {
-        for (int bin = 0; bin < nbins_nue; ++bin)
-        {
-          events_nominal_COPY[b_line*(nbins)+nbins_nue+bin] -= NueFromCosmicsVec[b_line][bin];
-        }
-        
-      }
-      
+    // The covariance matrix doesn't care about signal, so make sure 
+    // that the null vector doesn't have signal either
+    
+    if (!includeFosc)
+      events_nominal_COPY = nullBackgrounds;
+    else{
+      // events_nominal_COPY must be collapsed to remove the empty spaces
+      events_nominal_COPY = utils.collapseVector(nullBackgrounds,
+                                                 nbins_nue,
+                                                 nbins_numu,
+                                                 nL);
     }
 
-    if (useSignalCovarianceMatrix){
-      if(dm2point != -1 && dm2point <= npoints){
-        for (int bin = 0; bin < nbins_nue; ++bin){
-          for (int b_line =0;b_line<nL;++b_line){
-            signal_nominal_COPY[b_line*nbins + bin] = eventsnLVec[dm2point][b_line*nbins + bin];
-          } 
-        }
-      }
-    }
+    // // Don't want to include any cosmics in the matrix calculation, so:
+    // if (includeCosmics){
+    //   for (int b_line = 0; b_line < nL; ++b_line)
+    //   {
+    //     for (int bin = 0; bin < nbins_nue; ++bin)
+    //     {
+    //       events_nominal_COPY[b_line*(nbins)+nbins_nue+bin] -= NueFromCosmicsVec[b_line][bin];
+    //     }
+    //   }
+    // }
+
 
     // these vectors are to hold the multiweight versions of above 
     // for each iteration
     std::vector<float> temp_events_MW_COPY;
-    std::vector<float> temp_signal_MW_COPY;
     std::vector<float> saved_events_MW_COPY;
-    std::vector<float> saved_signal_MW_COPY;
 
     std::cout << "Computing the covariance matrix...." << std::endl;
     for (int N_weight = 0; N_weight < nWeights; ++N_weight)
     {
       temp_events_MW_COPY = eventsNullVecMultiWeight[N_weight];
-      temp_signal_MW_COPY.resize(temp_events_MW_COPY.size());
-      if (useSignalCovarianceMatrix){
-        if (dm2point != -1 && dm2point <= npoints){
-          for (int bin = 0; bin < nbins_nue; ++bin){
-            for (int b_line =0;b_line<nL;++b_line){
-              temp_signal_MW_COPY[b_line*nbins + bin] = signalMultiWeight[N_weight][dm2point][b_line*nbins + bin];
-            } 
-          }
-        }
+      if (events_nominal_COPY.size() != temp_events_MW_COPY.size()){
+        std::cerr << "Problem with vector sizes in the covariance Matrix function.\n";
+        exit(-2);
       }
-      if (N_weight == 500){
-        saved_signal_MW_COPY = temp_signal_MW_COPY;
+
+      if (N_weight == nWeights-1){
         saved_events_MW_COPY = temp_events_MW_COPY;
       }
 
-      for (int ibin = 0; ibin < nL*nbins; ++ibin)
+      for (unsigned int ibin = 0; ibin < events_nominal_COPY.size(); ++ibin)
       {
         // This is for computing the total number of events and is used in
         // factoring the covariance matrix into shape, mixed, and norm parts
-        n_total += events_nominal_COPY[ibin] + sin22th*signal_nominal_COPY[ibin];
+        n_total += events_nominal_COPY[ibin];
 
-        for (int jbin = 0; jbin < nL*nbins; ++jbin)
+        for (unsigned int jbin = 0; jbin < events_nominal_COPY.size(); ++jbin)
         {
           // if (debug && ibin == 53 && jbin == 20){
           //   std::cout << "This is the debug point!!\n";
-          //   std::cout << "  nominal, i: " << events_nominal_COPY[ibin] + signal_nominal_COPY[ibin]<<std::endl;
-          //   std::cout << "  weights, i: " << temp_events_MW_COPY[ibin] + temp_signal_MW_COPY[ibin]<<std::endl;
-          //   std::cout << "  nominal, j: " << events_nominal_COPY[jbin] + signal_nominal_COPY[jbin]<<std::endl;
-          //   std::cout << "  weights, j: " << temp_events_MW_COPY[jbin] + temp_signal_MW_COPY[jbin]<<std::endl;
+          //   std::cout << "  nominal, i: " << events_nominal_COPY[ibin]<<std::endl;
+          //   std::cout << "  weights, i: " << temp_events_MW_COPY[ibin]<<std::endl;
+          //   std::cout << "  nominal, j: " << events_nominal_COPY[jbin]<<std::endl;
+          //   std::cout << "  weights, j: " << temp_events_MW_COPY[jbin]<<std::endl;
           // }
-          float part1 = events_nominal_COPY[ibin] + sin22th*signal_nominal_COPY[ibin];
-          float part2 = events_nominal_COPY[jbin] + sin22th*signal_nominal_COPY[jbin];
-          part1 -= temp_events_MW_COPY[ibin] + sin22th*temp_signal_MW_COPY[ibin];
-          part2 -= temp_events_MW_COPY[jbin] + sin22th*temp_signal_MW_COPY[jbin];
+          float part1 = events_nominal_COPY[ibin]-temp_events_MW_COPY[ibin];
+          float part2 = events_nominal_COPY[jbin]-temp_events_MW_COPY[jbin];
           // if (ibin == 25 && jbin == 25) {
-            // std::cout << "ibin, jbin: ("<<ibin<<","<<jbin<<"), weight: " << N_weight <<std::endl;
-            // std::cout << "\tpart1: " << part1 << "\t" << "part2: " << part2 << "\n";
+            // std::cout << "ibin, jbin: ("<<ibin<<","<<jbin<<"), weight: " 
+            //           << N_weight <<std::endl;
+            // std::cout << "\tpart1: " << part1 << "\t" << "part2: " 
+            //           << part2 << "\n";
           // }
           covarianceMatrix[ibin][jbin] += (1.0/nWeights)*(part1*part2);
         }
@@ -914,8 +990,8 @@ namespace lar1{
     if (debug){
       std::cout << "Printing out the nominal and last used weight vectors:\n";
       for (int ibin = 0; ibin< nL*nbins; ++ibin){
-        std::cout << events_nominal_COPY[ibin]  << "+" << signal_nominal_COPY[ibin]  << "\t\t";
-        std::cout << saved_events_MW_COPY[ibin] << "+" << saved_signal_MW_COPY[ibin] << "\n";
+        std::cout << events_nominal_COPY[ibin]  << "\t\t";
+        std::cout << saved_events_MW_COPY[ibin] << "\n";
       }
     }
 
@@ -929,16 +1005,16 @@ namespace lar1{
 
     double covMatSum = 0.0;
 
-    for (int ibin = 0; ibin < nL*nbins; ++ibin)
+    for (unsigned int ibin = 0; ibin <events_nominal_COPY.size(); ++ibin)
     {
-      for (int jbin = 0; jbin < nL*nbins; ++jbin)
+      for (unsigned int jbin = 0; jbin <events_nominal_COPY.size(); ++jbin)
       {
         covMatSum += covarianceMatrix[ibin][jbin];
         float norm = 1;
         if (covarianceMatrix[ibin][jbin] != 0)
         {
-          norm = events_nominal_COPY[ibin] + sin22th*signal_nominal_COPY[ibin];
-          norm *= (events_nominal_COPY[jbin] + sin22th*signal_nominal_COPY[jbin]);
+          norm = events_nominal_COPY[ibin];
+          norm *= events_nominal_COPY[jbin];
           if (norm != 0)
             fractionalErrorMatrix[ibin][jbin] = covarianceMatrix[ibin][jbin]/(norm);
           else 
@@ -982,17 +1058,17 @@ namespace lar1{
     // normalization matrix
     // 
     // Need to compute a few sums first:
-    for (int ibin = 0; ibin < nbins*nL; ++ibin)
+    for (int ibin = 0; ibin < events_nominal_COPY.size(); ++ibin)
     {
-      for (int jbin = 0; jbin < nbins*nL; ++jbin)
+      for (int jbin = 0; jbin < events_nominal_COPY.size(); ++jbin)
       {
         Shape_covarianceMatrix[ibin][jbin] = covarianceMatrix[ibin][jbin];
         // std::cout << "Shape matrix entry is: " << Shape_covarianceMatrix[ibin][jbin] << "\n";
-        double temp = events_nominal_COPY[ibin] + sin22th*signal_nominal_COPY[ibin];
+        double temp = events_nominal_COPY[ibin];
         // std::cout << "temp is " << temp << " * " 
                   // << events_nominal_COPY[jbin] + sin22th*signal_nominal_COPY[jbin]
                   // << " = ";
-        temp *= events_nominal_COPY[jbin] + sin22th*signal_nominal_COPY[jbin];
+        temp *= events_nominal_COPY[jbin];
         // std::cout << temp << "\n";
         temp /= n_total*n_total;
         temp *= covMatSum;
@@ -1001,8 +1077,8 @@ namespace lar1{
                   // << " to be " << temp << "\n";
         Shape_covarianceMatrix[ibin][jbin] -= temp;
         // std::cout << "Shape matrix entry is now: " << Shape_covarianceMatrix[ibin][jbin] << "\n";
-        temp = events_nominal_COPY[ibin] + sin22th*signal_nominal_COPY[ibin];
-        temp *= events_nominal_COPY[jbin] + sin22th*signal_nominal_COPY[jbin];
+        temp = events_nominal_COPY[ibin];
+        temp *= events_nominal_COPY[jbin];
         if (temp != 0)
           fractional_Shape_covarianceMatrix[ibin][jbin] = Shape_covarianceMatrix[ibin][jbin]/temp;
         else
@@ -1021,7 +1097,7 @@ namespace lar1{
     //   std::cout << "\n";
     // }
 
-    // for (int bin = 0; bin < nbins*nL; ++bin)
+    // for (int bin = 0; bin < events_nominal_COPY.size(); ++bin)
     // {
     //   std::cout << fractional_Shape_covarianceMatrix[bin][bin] << "\t"
     //   std::cout << fractional_Shape_covarianceMatrix[bin][bin] << "\t"
@@ -1043,37 +1119,14 @@ namespace lar1{
 
       // Collapse these matrices to remove the signal region for the write up.
 
-      TMatrix collapsed_covnMat  = utils.CollapseMatrix(covarianceMatrix,nbins_nue,nbins_numu,nL);
-      TMatrix collapsed_fracMat  = utils.CollapseMatrix(fractionalErrorMatrix,nbins_nue,nbins_numu,nL);
-      TMatrix collapsed_corrMat  = utils.CollapseMatrix(correlationMatrix,nbins_nue,nbins_numu,nL);
-      TMatrix collapsed_shapeMat = utils.CollapseMatrix(fractional_Shape_covarianceMatrix,nbins_nue,nbins_numu,nL);
-
-
+      std::cout << "events nominal copy: \n";
+      for (unsigned int i = 0; i < events_nominal_COPY.size(); i++){
+        std::cout << events_nominal_COPY.at(i) << "\n";
+      }
 
       covarianceMatrix.Write();
       fractionalErrorMatrix.Write();
       correlationMatrix.Write();
-
-      collapsed_covnMat.Write();
-      collapsed_fracMat.Write();
-      collapsed_corrMat.Write();
-      collapsed_shapeMat.Write();
-
-      for (int ibin = 0; ibin < nL*(nbins_nue+nbins_numu); ++ibin)
-      {
-        for (int jbin = 0; jbin < nL*(nbins_nue+nbins_numu); ++jbin)
-        {
-          collapsed_covarianceMatrixHist  -> SetBinContent(ibin+1, jbin+1, collapsed_covnMat[ibin][jbin]);
-          collapsed_fractionalMatrixHist  -> SetBinContent(ibin+1, jbin+1, collapsed_fracMat[ibin][jbin]);
-          collapsed_correlationMatrixHist -> SetBinContent(ibin+1, jbin+1, collapsed_corrMat[ibin][jbin]);
-          collapsed_shapeFract_MatrixHist -> SetBinContent(ibin+1, jbin+1, collapsed_corrMat[ibin][jbin]);
-        }
-      }
-
-      collapsed_covarianceMatrixHist  -> Write();
-      collapsed_fractionalMatrixHist  -> Write();
-      collapsed_correlationMatrixHist -> Write();
-      collapsed_shapeFract_MatrixHist -> Write();
 
       // Dig the event rates out of the vectors and put them in the file
       // just for a cross check and to be sure what the matrices are
@@ -1081,156 +1134,37 @@ namespace lar1{
       std::vector<TH1F *>  nueEventRates;
       std::vector<TH1F *>  numuEventRates;
       nueEventRates.resize(nL);
-      numuEventRates.resize(nL);
+      if (includeNumus) numuEventRates.resize(nL);
       for (int b_line = 0; b_line < nL; ++b_line)
       {
         char temp[100];
         sprintf(temp,"nueEventRates_%s",baselines[b_line].c_str());
         nueEventRates[b_line] = new TH1F(temp,"Nue Event Rates",nbins_nue,&(nueBins[0]));
-        sprintf(temp,"numuEventRates_%s",baselines[b_line].c_str());
-        numuEventRates[b_line] = new TH1F(temp,"Numu Event Rates",nbins_numu,&(numuBins[0]));
         for (int bin = 0; bin < nbins_nue; ++bin)
         {
-          nueEventRates[b_line]  -> SetBinContent(bin+1,events_nominal_COPY[b_line*nbins+nbins_nue+bin]);
+          nueEventRates[b_line]  -> SetBinContent(bin+1,events_nominal_COPY[b_line*nbins_null+bin]);
         }
-        for (int bin = 0; bin < nbins_numu; ++bin)
-        {
-          numuEventRates[b_line] -> SetBinContent(bin+1,events_nominal_COPY[b_line*nbins+2*nbins_nue+bin]);
-        }
-
         nueEventRates[b_line] -> Write();
-        numuEventRates[b_line] -> Write();
 
+        if (includeNumus){
+          numuEventRates[b_line] = new TH1F(temp,"Numu Event Rates",nbins_numu,&(numuBins[0]));
+          sprintf(temp,"numuEventRates_%s",baselines[b_line].c_str());
+          for (int bin = 0; bin < nbins_numu; ++bin)
+          {
+            numuEventRates[b_line] -> SetBinContent(bin+1,events_nominal_COPY[b_line*nbins+2*nbins_nue+bin]);
+          }
+          numuEventRates[b_line] -> Write();
+        }
       }
 
-/*
-      std::vector<TH1F *> nue_fractionalUncertantiesHists;
-      std::vector<TH1F *> numu_fractionalUncertantiesHists;
-      nue_fractionalUncertantiesHists.resize(nL);
-      numu_fractionalUncertantiesHists.resize(nL);
-
-
-      // TCanvas * canvUncerts = new TCanvas("stupid_canv","canvas",400,400*nL);
-      // canvUncerts->Divide(1,2);
-
-
-      for (int b_line = 0; b_line < nL; b_line ++){
-        char tempstring[100];
-
-        sprintf(tempstring,"nue_fracUncert_%s",names[b_line].c_str());
-        nue_fractionalUncertantiesHists[b_line] = new TH1F(tempstring,baselinesFancy[b_line].c_str(),nbinsE,emin,emax);
-        sprintf(tempstring,"numu_fracUncert_%s",names[b_line].c_str());
-        numu_fractionalUncertantiesHists[b_line] = new TH1F(tempstring,baselinesFancy[b_line].c_str(),nbinsE,emin,emax);
-        for (int bin = 0; bin < nbinsE; ++bin)
-        {
-          double error = sqrt((*collapsed_fracMat)[b_line*2*nbinsE + bin][b_line*2*nbinsE + bin]);
-          nue_fractionalUncertantiesHists[b_line] -> SetBinContent(bin+1,error);
-          error = sqrt((*collapsed_fracMat)[b_line*2*nbinsE + nbinsE + bin][b_line*2*nbinsE + nbinsE + bin]);
-          numu_fractionalUncertantiesHists[b_line] -> SetBinContent(bin+1,error);
-        }
-
-        // canvUncerts -> cd(1);
-        nue_fractionalUncertantiesHists[b_line]->SetTitle("#nu_{e} Fractional Uncertainty [%]");
-        nue_fractionalUncertantiesHists[b_line]->GetXaxis()->SetTitle("Neutrino Energy [GeV]");
-        nue_fractionalUncertantiesHists[b_line]->GetYaxis()->SetTitleFont(62);
-        nue_fractionalUncertantiesHists[b_line]->GetXaxis()->SetTitleFont(62);
-        nue_fractionalUncertantiesHists[b_line]->GetYaxis()->SetLabelFont(62);
-        nue_fractionalUncertantiesHists[b_line]->GetXaxis()->SetLabelFont(62);
-        nue_fractionalUncertantiesHists[b_line]->GetYaxis()->CenterTitle();
-        nue_fractionalUncertantiesHists[b_line]->GetYaxis()->SetTitleSize(0.06);
-        nue_fractionalUncertantiesHists[b_line]->GetXaxis()->SetTitleSize(0.6);
-        nue_fractionalUncertantiesHists[b_line]->GetXaxis()->SetLabelSize(0.06);
-        nue_fractionalUncertantiesHists[b_line]->GetYaxis()->SetLabelSize(0.06);
-        nue_fractionalUncertantiesHists[b_line]->GetYaxis()->SetTitleOffset(0.8);
-        nue_fractionalUncertantiesHists[b_line]->GetXaxis()->SetTitleOffset(1.5);
-        nue_fractionalUncertantiesHists[b_line]->SetLineWidth(4);
-        if (b_line == 0){
-          nue_fractionalUncertantiesHists[b_line]->SetLineColor(kBlack);
-          // nue_fractionalUncertantiesHists[b_line]->Draw("h");
-        }
-        else{
-          nue_fractionalUncertantiesHists[b_line]->SetLineColor(kBlue-3);
-          // nue_fractionalUncertantiesHists[b_line]->Draw("h same");
-        }
-
-
-        // canvUncerts -> cd(2);
-        numu_fractionalUncertantiesHists[b_line]->SetTitle("#nu_{#mu} Fractional Uncertainty [%]");
-        numu_fractionalUncertantiesHists[b_line]->GetXaxis()->SetTitle("Neutrino Energy [GeV]");
-        numu_fractionalUncertantiesHists[b_line]->GetYaxis()->SetTitleFont(62);
-        numu_fractionalUncertantiesHists[b_line]->GetXaxis()->SetTitleFont(62);
-        numu_fractionalUncertantiesHists[b_line]->GetYaxis()->SetLabelFont(62);
-        numu_fractionalUncertantiesHists[b_line]->GetXaxis()->SetLabelFont(62);
-        numu_fractionalUncertantiesHists[b_line]->GetYaxis()->CenterTitle();
-        numu_fractionalUncertantiesHists[b_line]->GetYaxis()->SetTitleSize(0.06);
-        numu_fractionalUncertantiesHists[b_line]->GetXaxis()->SetTitleSize(0.6);
-        numu_fractionalUncertantiesHists[b_line]->GetXaxis()->SetLabelSize(0.06);
-        numu_fractionalUncertantiesHists[b_line]->GetYaxis()->SetLabelSize(0.06);
-        numu_fractionalUncertantiesHists[b_line]->GetYaxis()->SetTitleOffset(0.8);
-        numu_fractionalUncertantiesHists[b_line]->GetXaxis()->SetTitleOffset(1.5);
-        numu_fractionalUncertantiesHists[b_line]->SetLineWidth(4);
-        if (b_line == 0){
-          numu_fractionalUncertantiesHists[b_line]->SetLineColor(kBlack);
-          // numu_fractionalUncertantiesHists[b_line]->Draw("h");
-        }
-        else{
-          numu_fractionalUncertantiesHists[b_line]->SetLineColor(kBlue-3);
-          // numu_fractionalUncertantiesHists[b_line]->Draw("h same");
-        }
-        
-            ND_err->GetYaxis()->SetTitle("Fractional Uncertainty [%]");
-    ND_err->GetXaxis()->SetTitle("Neutrino Energy [GeV]");
-    ND_err->GetYaxis()->SetTitleFont(62);
-    ND_err->GetXaxis()->SetTitleFont(62);
-    ND_err->GetYaxis()->SetLabelFont(62);
-    ND_err->GetXaxis()->SetLabelFont(62);
-    ND_err->GetYaxis()->CenterTitle();
-    ND_err->GetYaxis()->SetTitleSize(0.06);
-    ND_err->GetXaxis()->SetTitleSize(0.6);
-    ND_err->GetXaxis()->SetLabelSize(0.06);
-    ND_err->GetYaxis()->SetLabelSize(0.06);
-    ND_err->GetYaxis()->SetTitleOffset(0.8);
-    ND_err->GetXaxis()->SetTitleOffset(1.5);
-    ND_err->SetStats(0);
-    ND_err->SetMinimum(1.1);
-    ND_err->SetMaximum(100);
-    ND_err->GetYaxis()->SetNdivisions(509);
-    ND_err->GetXaxis()->SetNdivisions(509);
-    
-    ND_err->SetLineWidth(4);
-    ND_err->SetLineColor(kBlue-3);
-    ND_err->Draw("h");
-    FD_err->SetLineWidth(3);
-    FD_err->SetLineStyle(2);
-    FD_err->SetLineColor(kRed-3);
-    FD_err->Draw("h same");
-    
-    TLegend* leg3=new TLegend(0.2,0.7,0.4,0.8);
-    leg3->SetFillStyle(0);
-    leg3->SetFillColor(0);
-    leg3->SetBorderSize(0);
-    leg3->SetTextFont(62);
-    leg3->SetTextSize(0.03);
-    leg3->AddEntry(ND_err,"LAr1-ND (200m)","L");
-    leg3->AddEntry(FD_err,"T600 (600m, on axis)","L");
-    leg3->Draw();
-
-        nue_fractionalUncertantiesHists[b_line] -> Write();
-        numu_fractionalUncertantiesHists[b_line] -> Write();
-
-      }
-*/
       fileOut -> Close();
     }
-
-    // Plot the diagonal errors for this particular fractional Uncert. MatrixL
-  std::cout << "Checkpoint 10 " << std::endl;
 
     return 0;
 
   }
 
-  int NueAppearanceFitter::MakeRatioPlots(int sin22thpoint, int dm2point){
+  int NueAppearanceFitter::MakeRatioPlots(){
 
     gStyle->SetOptStat(0000);
     gStyle->SetOptFit(0000);
@@ -1258,33 +1192,34 @@ namespace lar1{
     // I'm going to leverage this function to also compute the systematic
     // uncertainty on the event rates themselves from the multiweights
 
-    // Do all three signals (fosc,nue,numu) in separate vectors
+    // Do both signals (nue,numu) in separate vectors
     // though computed in parallel.  And bin by baseline to make it easier.
     std::vector<std::vector<float> > events_nue_nominal_COPY;
     std::vector<std::vector<float> > events_numu_nominal_COPY;
-    std::vector<std::vector<float> > signal_nominal_COPY;
     events_nue_nominal_COPY.resize(nL);
-    events_numu_nominal_COPY.resize(nL);
-    signal_nominal_COPY.resize(nL);
+    if(includeNumus) events_numu_nominal_COPY.resize(nL);
 
     for (int b_line = 0; b_line < nL; ++b_line)
     {
       events_nue_nominal_COPY[b_line].resize(nbins_nue);
-      events_numu_nominal_COPY[b_line].resize(nbins_numu);
-      signal_nominal_COPY[b_line].resize(nbins_nue);
       for (int bin = 0; bin < nbins_nue; ++bin)
       {
-        events_nue_nominal_COPY[b_line][bin]  = eventsnLnullVec[b_line*nbins + bin + nbins_nue];
-        if (dm2point != -1) 
-          signal_nominal_COPY[b_line] = eventsnueoscVec[dm2point][b_line*nbins + bin];
+        if (!includeFosc)
+          events_nue_nominal_COPY[b_line][bin] 
+            = nullBackgrounds[b_line*nbins_null+bin];
+        else
+          events_nue_nominal_COPY[b_line][bin]
+            = nullBackgrounds[b_line*nbins+nbins_nue+bin];
       }
-      for (int bin = 0; bin < nbins_numu; ++bin)
-      {
-        events_numu_nominal_COPY[b_line][bin] = eventsnLnullVec[b_line*nbins + bin + 2*nbins_nue];        
+      if(includeNumus){
+        events_numu_nominal_COPY[b_line].resize(nbins_numu);
+        for (int bin = 0; bin < nbins_numu; ++bin)
+        {
+          events_numu_nominal_COPY[b_line][bin] = nullBackgrounds[b_line*nbins + bin + 2*nbins_nue];        
+        }
       }
     }
 
-    // THIS IS WHERE TO ADD SIGNAL TO THE NUE NOMINAL BACKGROUND
 
 
     // Now compute the nominal ratio
@@ -1302,14 +1237,16 @@ namespace lar1{
     for (int b_line = 1; b_line < nL; ++b_line)
     {
       nominal_nue_Ratio[b_line-1].resize(nbins_nue);
-      nominal_numu_Ratio[b_line-1].resize(nbins_numu);
       for (int bin = 0; bin < nbins_nue; ++bin)
       {
         nominal_nue_Ratio [b_line-1][bin] = events_nue_nominal_COPY [b_line][bin]/events_nue_nominal_COPY [0][bin];
       }
-      for (int bin = 0; bin < nbins_numu; ++bin)
-      {
-        nominal_numu_Ratio[b_line-1][bin] = events_numu_nominal_COPY[b_line][bin]/events_numu_nominal_COPY[0][bin];
+      if (includeNumus){
+        nominal_numu_Ratio[b_line-1].resize(nbins_numu);
+        for (int bin = 0; bin < nbins_numu; ++bin)
+        {
+          nominal_numu_Ratio[b_line-1][bin] = events_numu_nominal_COPY[b_line][bin]/events_numu_nominal_COPY[0][bin];
+        }
       }
     }
 
@@ -1318,7 +1255,6 @@ namespace lar1{
     // for each iteration
     std::vector<std::vector<float> > temp_events_nue_MW_COPY;
     std::vector<std::vector<float> > temp_events_numu_MW_COPY;
-    std::vector<std::vector<float> > temp_signal_MW_COPY;
 
     std::vector<std::vector<float>> temp_nue_Ratio;
     std::vector<std::vector<float>> temp_numu_Ratio;
@@ -1332,17 +1268,21 @@ namespace lar1{
     std::vector<std::vector<std::vector<float> > > numu_multiWeightRatio;
 
     nue_multiWeightRatio.resize(nL-1);
-    numu_multiWeightRatio.resize(nL-1);
-
     error_events_nue_Ratio.resize(nL-1);
-    error_events_numu_Ratio.resize(nL-1);    
+
+    if (includeNumus){
+      numu_multiWeightRatio.resize(nL-1);
+      error_events_numu_Ratio.resize(nL-1);    
+    }
 
     for (int i = 0; i < nL-1; ++i)
     {
       error_events_nue_Ratio[i].resize(nbins_nue);
-      error_events_numu_Ratio[i].resize(nbins_numu);
       nue_multiWeightRatio[i].resize(nWeights);
-      numu_multiWeightRatio[i].resize(nWeights);
+      if (includeNumus){
+        error_events_numu_Ratio[i].resize(nbins_numu);
+        numu_multiWeightRatio[i].resize(nWeights);
+      }
     }
 
 
@@ -1356,64 +1296,76 @@ namespace lar1{
 
 
       temp_events_nue_MW_COPY.clear();
-      temp_events_numu_MW_COPY.clear();
-      temp_signal_MW_COPY.clear();
 
       temp_nue_Ratio.clear();
-      temp_numu_Ratio.clear();
       
       temp_nue_Ratio.resize(nL-1);
-      temp_numu_Ratio.resize(nL-1);
 
       temp_events_nue_MW_COPY.resize(nL);
-      temp_events_numu_MW_COPY.resize(nL);
-      temp_signal_MW_COPY.resize(nL);
 
+      if (includeNumus){
+        temp_events_numu_MW_COPY.clear();
+        temp_numu_Ratio.clear();
+        temp_numu_Ratio.resize(nL-1);
+        temp_events_numu_MW_COPY.resize(nL);
+      }
 
       for (int b_line = 0; b_line < nL; ++b_line)
       {
 
         temp_events_nue_MW_COPY[b_line].resize(nbins_nue);
-        temp_events_numu_MW_COPY[b_line].resize(nbins_numu);
-        temp_signal_MW_COPY[b_line].resize(nbins_nue);
         // std::cout << "eventsNullVecMultiWeight.size()" << eventsNullVecMultiWeight.size() << std::endl;
 
         for (int bin = 0; bin < nbins_nue; ++bin)
         {
-          // std::cout << "eventsNullVecMultiWeight[N_weight].size(): " 
-          //           << eventsNullVecMultiWeight[N_weight].size()
-          //           << "\neventsNullVecMultiWeight[N_weight][bin]: " 
-          //           << eventsNullVecMultiWeight[N_weight][bin]
+          // std::cout << "index is " << b_line*nbins_null + bin 
+          //           << ", value is " << eventsNullVecMultiWeight[N_weight][b_line*nbins_null + bin]
           //           << std::endl;
-          temp_events_nue_MW_COPY[b_line][bin]  = eventsNullVecMultiWeight[N_weight][b_line*nbins + bin + nbins_nue];
-          if (dm2point != -1)
-            temp_signal_MW_COPY[b_line][bin]    = signalMultiWeight[N_weight][dm2point][b_line*nbins + bin];
-        }
+          if (!includeFosc)
+            temp_events_nue_MW_COPY[b_line][bin]  
+              = eventsNullVecMultiWeight[N_weight][b_line*nbins_null + bin];
+          else
+            temp_events_nue_MW_COPY[b_line][bin]  
+              = eventsNullVecMultiWeight[N_weight][b_line*nbins+nbins_nue+bin];
 
-        for (int bin = 0; bin < nbins_numu; ++bin)
-        {
-          temp_events_numu_MW_COPY[b_line][bin] = eventsNullVecMultiWeight[N_weight][b_line*nbins + bin + 2*nbins_nue];
+        }
+ 
+
+        if (includeNumus){
+          temp_events_numu_MW_COPY[b_line].resize(nbins_numu);
+          for (int bin = 0; bin < nbins_numu; ++bin)
+          {
+            temp_events_numu_MW_COPY[b_line][bin] 
+              = eventsNullVecMultiWeight[N_weight][b_line*nbins_null + bin + nbins_nue];
+          }
         }
 
       }
-
-
+      // std::cout << "This set of event rates (N = " << N_weight <<") is:\n";
+      // for (unsigned int i =0; i < eventsNullVecMultiWeight[N_weight].size();i++)
+      // {
+      //   std::cout << "  " << temp_events_nue_MW_COPY[N_weight][i]
+      //             << " (" << eventsNullVecMultiWeight[N_weight][i] 
+      //             << ")"  << std::endl;
+      // }
 
       // Ok, got all the data, compute the ratio for this universe:
       for (int b_line = 1; b_line < nL; ++b_line)
       {
         temp_nue_Ratio[b_line-1].resize(nbins_nue);
-        temp_numu_Ratio[b_line-1].resize(nbins_numu);
         for (int bin = 0; bin < nbins_nue; ++bin)
         {
           temp_nue_Ratio[b_line-1][bin]  = temp_events_nue_MW_COPY[b_line][bin] / temp_events_nue_MW_COPY[0][bin];
         }
-        for (int bin = 0; bin < nbins_numu; ++bin)
-        {
-          temp_numu_Ratio[b_line-1][bin] = temp_events_numu_MW_COPY[b_line][bin] / temp_events_numu_MW_COPY[0][bin];
-        }
         nue_multiWeightRatio[b_line-1][N_weight] = temp_nue_Ratio[b_line-1];
-        numu_multiWeightRatio[b_line-1][N_weight] = temp_numu_Ratio[b_line-1];
+        if (includeNumus){
+          temp_numu_Ratio[b_line-1].resize(nbins_numu);
+          for (int bin = 0; bin < nbins_numu; ++bin)
+          {
+            temp_numu_Ratio[b_line-1][bin] = temp_events_numu_MW_COPY[b_line][bin] / temp_events_numu_MW_COPY[0][bin];
+          }
+          numu_multiWeightRatio[b_line-1][N_weight] = temp_numu_Ratio[b_line-1];
+        }
       }
 
       // std::cout <<"N_weight, temp_nue_Ratio ND/600 0: " << N_weight << " "
@@ -1430,12 +1382,14 @@ namespace lar1{
                *(temp_nue_Ratio[b_line][bin]  - nominal_nue_Ratio[b_line][bin])
                *(temp_nue_Ratio[b_line][bin]  - nominal_nue_Ratio[b_line][bin]);
         }
-        for (int bin = 0; bin < nbins_numu; ++bin)
-        {
-          error_events_numu_Ratio[b_line][bin] 
-            += (1.0/nWeights)
-               *(temp_numu_Ratio[b_line][bin] - nominal_numu_Ratio[b_line][bin])
-               *(temp_numu_Ratio[b_line][bin] - nominal_numu_Ratio[b_line][bin]);     
+        if (includeNumus){
+          for (int bin = 0; bin < nbins_numu; ++bin)
+          {
+            error_events_numu_Ratio[b_line][bin] 
+              += (1.0/nWeights)
+                 *(temp_numu_Ratio[b_line][bin] - nominal_numu_Ratio[b_line][bin])
+                 *(temp_numu_Ratio[b_line][bin] - nominal_numu_Ratio[b_line][bin]);     
+          }
         }
       }
 
@@ -1446,13 +1400,11 @@ namespace lar1{
       for (int b_line = 0; b_line < nL; ++b_line)
       { 
         std::cout << "------nominal-------------" << std::endl;
-        std::cout << "sig\tnue\tsig\tnue" << std::endl;
+        std::cout << "Nom\tLast" << std::endl;
         for (int bin = 0; bin < nbins_nue; ++bin)
         {
-          std::cout << signal_nominal_COPY[b_line][bin] << "\t";
           std::cout << events_nue_nominal_COPY[b_line][bin] << "\t";
-          std::cout << temp_signal_MW_COPY[b_line][bin] << "\t";
-          std::cout << temp_events_nue_MW_COPY[b_line][bin] << "\t";
+          std::cout << temp_events_nue_MW_COPY[b_line][bin] << "\n";
         }
         std::cout << std::endl;
       }
@@ -1482,13 +1434,16 @@ namespace lar1{
     leg_error->SetTextSize(0.045);
 
     nue_ratioPlots.resize(nL-1);
-    numu_ratioPlots.resize(nL-1);
     nue_errorPlots.resize(nL-1);
-    numu_errorPlots.resize(nL-1);
     nue_stat_errorPlots.resize(nL-1);
-    numu_stat_errorPlots.resize(nL-1);
     nue_MCstat_errorPlots.resize(nL-1);
-    numu_MCstat_errorPlots.resize(nL-1);
+
+    if (includeNumus){
+      numu_ratioPlots.resize(nL-1);
+      numu_errorPlots.resize(nL-1);
+      numu_stat_errorPlots.resize(nL-1);
+      numu_MCstat_errorPlots.resize(nL-1);
+    }
 
     for (int i = 0; i < nL-1; i++){
       char temp[100];
@@ -1497,7 +1452,7 @@ namespace lar1{
       sprintf(temp,"#nu_{e} Ratio of %s to %s",baselinesFancy[0].c_str(),baselinesFancy[i+1].c_str());
       nue_ratioPlots[i] -> SetTitle("");
       nue_ratioPlots[i] -> SetMinimum(0);
-      nue_ratioPlots[i] -> SetMaximum(0.5);
+      nue_ratioPlots[i] -> SetMaximum(0.3);
       // nue_ratioPlots[i] -> GetXaxis() -> CenterTitle();
       nue_ratioPlots[i] -> GetXaxis() -> SetNdivisions(506);
       nue_ratioPlots[i] -> GetXaxis() -> SetLabelSize(0.05);
@@ -1511,16 +1466,6 @@ namespace lar1{
       nue_ratioPlots[i] -> GetYaxis() -> SetTitle(temp);
       nue_ratioPlots[i] -> GetYaxis() -> SetTitleSize(.045);
       nue_ratioPlots[i] -> GetYaxis() -> SetTitleOffset(1.6);
-
-
-      sprintf(temp,"numu_ratioplot_%i",i);
-      numu_ratioPlots[i] = new TH1F(temp,"Ratio Plot",nbins_numu,&(numuBins[0]));
-      sprintf(temp,"#nu_{#mu} Ratio of %s to %s",baselines[0].c_str(),baselines[i+1].c_str());
-      numu_ratioPlots[i] -> SetTitle(temp);
-      numu_ratioPlots[i] -> SetMinimum(0);
-      numu_ratioPlots[i] -> SetMaximum(1);
-      numu_ratioPlots[i] -> GetXaxis() -> SetTitle("Reconstructed Energy (GeV)");
-      numu_ratioPlots[i] -> GetYaxis() -> SetTitle("Event Ratio");
 
       sprintf(temp,"nue_errorplot_%i",i);
       nue_errorPlots[i] = new TH1F(temp,"Error Plot",nbins_nue,&(nueBins[0]));
@@ -1540,14 +1485,6 @@ namespace lar1{
       nue_errorPlots[i] -> GetYaxis() -> SetTitleOffset(1.2);
       nue_errorPlots[i] -> SetLineWidth(2);
 
-      sprintf(temp,"numu_errorplot_%i",i);
-      numu_errorPlots[i] = new TH1F(temp,"Uncert. Plot",nbins_numu,&(numuBins[0]));
-      sprintf(temp,"#nu_{#mu} Uncert. of %s to %s",baselines[0].c_str(),baselines[i+1].c_str());
-      numu_errorPlots[i] -> SetTitle(temp);
-      numu_errorPlots[i] -> SetMinimum(0);
-      numu_errorPlots[i] -> SetMaximum(10);
-      numu_errorPlots[i] -> GetXaxis() -> SetTitle("Reconstructed Energy (GeV)");
-      numu_errorPlots[i] -> GetYaxis() -> SetTitle("Percent Uncert. [\%]");
 
       sprintf(temp,"nue_stat_errorplot_%i",i);
       nue_stat_errorPlots[i] = new TH1F(temp,"Statistical Uncert. Plot",nbins_nue,&(nueBins[0]));
@@ -1559,15 +1496,6 @@ namespace lar1{
       nue_stat_errorPlots[i] -> GetYaxis() -> SetTitle("Percent Uncert. [\%]");
       nue_stat_errorPlots[i] -> SetLineWidth(2);
 
-      sprintf(temp,"numu_stat_errorplot_%i",i);
-      numu_stat_errorPlots[i] = new TH1F(temp,"Statistical Uncert. Plot",nbins_numu,&(numuBins[0]));
-      sprintf(temp,"#nu_{#mu} Statistical Uncert. of %s to %s",baselines[0].c_str(),baselines[i+1].c_str());
-      numu_stat_errorPlots[i] -> SetTitle(temp);
-      numu_stat_errorPlots[i] -> SetMinimum(0);
-      numu_stat_errorPlots[i] -> SetMaximum(10);
-      numu_stat_errorPlots[i] -> GetXaxis() -> SetTitle("Reconstructed Energy (GeV)");
-      numu_stat_errorPlots[i] -> GetYaxis() -> SetTitle("Percent Uncert. [\%]");
-
       sprintf(temp,"nue_MCstat_errorplot_%i",i);
       nue_MCstat_errorPlots[i] = new TH1F(temp,"MC Statistical Uncert. Plot",nbins_nue,&(nueBins[0]));
       sprintf(temp,"#nu_{e} MC Statistical Uncert. of %s to %s",baselines[0].c_str(),baselines[i+1].c_str());
@@ -1577,17 +1505,7 @@ namespace lar1{
       nue_MCstat_errorPlots[i] -> SetLineColor(11);
       nue_MCstat_errorPlots[i] -> GetXaxis() -> SetTitle("Reconstructed Energy (GeV)");
       nue_MCstat_errorPlots[i] -> GetYaxis() -> SetTitle("Percent Uncert. [\%]");
-
-      sprintf(temp,"numu_MCstat_errorplot_%i",i);
-      numu_MCstat_errorPlots[i] = new TH1F(temp,"MC Statistical Uncert. Plot",nbins_numu,&(numuBins[0]));
-      sprintf(temp,"#nu_{#mu} MC Statistical Uncert. of %s to %s",baselines[0].c_str(),baselines[i+1].c_str());
-      numu_MCstat_errorPlots[i] -> SetTitle(temp);
-      numu_MCstat_errorPlots[i] -> SetMinimum(0);
-      numu_MCstat_errorPlots[i] -> SetMaximum(10);
-      numu_MCstat_errorPlots[i] -> SetLineColor(11);
-      numu_MCstat_errorPlots[i] -> GetXaxis() -> SetTitle("Reconstructed Energy (GeV)");
-      numu_MCstat_errorPlots[i] -> GetYaxis() -> SetTitle("Percent Uncert. [\%]");
-
+      
       for (int bin = 0; bin < nbins_nue; ++bin)
       {
         
@@ -1601,33 +1519,78 @@ namespace lar1{
         // std::cout << "eventsNumuMCStats[0][bin]"   << eventsNumuMCStats[0][bin]   << "\t";
         // std::cout << "eventsNumuMCStats[i+1][bin]" << eventsNumuMCStats[i+1][bin] << std::endl;
       }
-      for (int bin = 0; bin < nbins_numu; ++bin)
-      {
-        numu_ratioPlots[i] -> SetBinContent(bin+1, nominal_numu_Ratio[i][bin]);
-        numu_errorPlots[i] -> SetBinContent(bin+1, 100*sqrt(error_events_numu_Ratio[i][bin])
-                                                            /nominal_numu_Ratio[i][bin]);
-        numu_stat_errorPlots[i]   -> SetBinContent(bin+1, 100*sqrt(1.0/events_numu_nominal_COPY[0][bin]
-                                                                 + 1.0/events_numu_nominal_COPY[i+1][bin]));
-        numu_MCstat_errorPlots[i] -> SetBinContent(bin+1, 100*sqrt(1.0/eventsNumuMCStats[0][bin]
-                                                                 + 1.0/eventsNumuMCStats[i+1][bin]));
+
+      if (includeNumus){
+        sprintf(temp,"numu_ratioplot_%i",i);
+        numu_ratioPlots[i] = new TH1F(temp,"Ratio Plot",nbins_numu,&(numuBins[0]));
+        sprintf(temp,"#nu_{#mu} Ratio of %s to %s",baselines[0].c_str(),baselines[i+1].c_str());
+        numu_ratioPlots[i] -> SetTitle(temp);
+        numu_ratioPlots[i] -> SetMinimum(0);
+        numu_ratioPlots[i] -> SetMaximum(1);
+        numu_ratioPlots[i] -> GetXaxis() -> SetTitle("Reconstructed Energy (GeV)");
+        numu_ratioPlots[i] -> GetYaxis() -> SetTitle("Event Ratio");
         
+        sprintf(temp,"numu_errorplot_%i",i);
+        numu_errorPlots[i] = new TH1F(temp,"Uncert. Plot",nbins_numu,&(numuBins[0]));
+        sprintf(temp,"#nu_{#mu} Uncert. of %s to %s",baselines[0].c_str(),baselines[i+1].c_str());
+        numu_errorPlots[i] -> SetTitle(temp);
+        numu_errorPlots[i] -> SetMinimum(0);
+        numu_errorPlots[i] -> SetMaximum(10);
+        numu_errorPlots[i] -> GetXaxis() -> SetTitle("Reconstructed Energy (GeV)");
+        numu_errorPlots[i] -> GetYaxis() -> SetTitle("Percent Uncert. [\%]");
+
+        sprintf(temp,"numu_stat_errorplot_%i",i);
+        numu_stat_errorPlots[i] = new TH1F(temp,"Statistical Uncert. Plot",nbins_numu,&(numuBins[0]));
+        sprintf(temp,"#nu_{#mu} Statistical Uncert. of %s to %s",baselines[0].c_str(),baselines[i+1].c_str());
+        numu_stat_errorPlots[i] -> SetTitle(temp);
+        numu_stat_errorPlots[i] -> SetMinimum(0);
+        numu_stat_errorPlots[i] -> SetMaximum(10);
+        numu_stat_errorPlots[i] -> GetXaxis() -> SetTitle("Reconstructed Energy (GeV)");
+        numu_stat_errorPlots[i] -> GetYaxis() -> SetTitle("Percent Uncert. [\%]");
+
+        sprintf(temp,"numu_MCstat_errorplot_%i",i);
+        numu_MCstat_errorPlots[i] = new TH1F(temp,"MC Statistical Uncert. Plot",nbins_numu,&(numuBins[0]));
+        sprintf(temp,"#nu_{#mu} MC Statistical Uncert. of %s to %s",baselines[0].c_str(),baselines[i+1].c_str());
+        numu_MCstat_errorPlots[i] -> SetTitle(temp);
+        numu_MCstat_errorPlots[i] -> SetMinimum(0);
+        numu_MCstat_errorPlots[i] -> SetMaximum(10);
+        numu_MCstat_errorPlots[i] -> SetLineColor(11);
+        numu_MCstat_errorPlots[i] -> GetXaxis() -> SetTitle("Reconstructed Energy (GeV)");
+        numu_MCstat_errorPlots[i] -> GetYaxis() -> SetTitle("Percent Uncert. [\%]");
+
+
+        for (int bin = 0; bin < nbins_numu; ++bin)
+        {
+          numu_ratioPlots[i] -> SetBinContent(bin+1, nominal_numu_Ratio[i][bin]);
+          numu_errorPlots[i] -> SetBinContent(bin+1, 100*sqrt(error_events_numu_Ratio[i][bin])
+                                                              /nominal_numu_Ratio[i][bin]);
+          numu_stat_errorPlots[i]   -> SetBinContent(bin+1, 100*sqrt(1.0/events_numu_nominal_COPY[0][bin]
+                                                                   + 1.0/events_numu_nominal_COPY[i+1][bin]));
+          numu_MCstat_errorPlots[i] -> SetBinContent(bin+1, 100*sqrt(1.0/eventsNumuMCStats[0][bin]
+                                                                   + 1.0/eventsNumuMCStats[i+1][bin]));
+          
+        }
       }
 
     }
 
     gStyle->SetOptStat(0);
-    leg_ratio -> AddEntry(nue_ratioPlots[0],"Nominal #nu_{e} event ratio","l");
+    leg_ratio -> AddEntry(nue_ratioPlots[0],"Nominal  #nu_{e} event ratio","l");
     // leg_ratio -> AddEntry();
     leg_error -> AddEntry(nue_stat_errorPlots[0],"Data Statistical Uncert.","l");
-    leg_error -> AddEntry(numu_MCstat_errorPlots[0],"MC Statistical Uncert.","l");
+    leg_error -> AddEntry(nue_MCstat_errorPlots[0],"MC Statistical Uncert.","l");
     leg_error -> AddEntry(nue_errorPlots[0],"RMS for Ratio");
     leg_error -> SetTextSize(0.035);
     // TH1F *chr = stackedCanvas[j]->DrawFrame(emin-0.01,-0.01*(SignalNu->GetMaximum()),emax,1.0*max);
 
     TCanvas * canv_nue = new TCanvas("ratioplots_nue","ratioplots_nue",800,500*(nL-1));
-    TCanvas * canv_numu = new TCanvas("ratioplots_numu","ratioplots_numu",800,500*(nL-1));
     canv_nue -> Divide(2,nL-1);
-    canv_numu -> Divide(2,nL-1);
+
+    TCanvas * canv_numu;
+    if (includeNumus){
+      canv_numu = new TCanvas("ratioplots_numu","ratioplots_numu",800,500*(nL-1));
+      canv_numu -> Divide(2,nL-1);
+    }
     for (int b_line = 0; b_line < nL-1; ++b_line)
     {
       canv_nue -> cd(2*b_line + 1);
@@ -1651,25 +1614,27 @@ namespace lar1{
       nue_MCstat_errorPlots[b_line] -> Draw("H same");
       leg_error->Draw("same");
 
-      canv_numu -> cd(2*b_line + 1);
-      numu_ratioPlots[b_line] -> Draw("H");
-      for (int N_weight = 0; N_weight < nWeights; ++N_weight)
-      {
-        TH1F * temp_hist = utils.makeHistogram(numu_multiWeightRatio[b_line][N_weight],numuBins);
-        temp_hist -> SetLineColor(11);
-        temp_hist -> Draw("H same");
+      if (includeNumus){
+        canv_numu -> cd(2*b_line + 1);
+        numu_ratioPlots[b_line] -> Draw("H");
+        for (int N_weight = 0; N_weight < nWeights; ++N_weight)
+        {
+          TH1F * temp_hist = utils.makeHistogram(numu_multiWeightRatio[b_line][N_weight],numuBins);
+          temp_hist -> SetLineColor(11);
+          temp_hist -> Draw("H same");
+        }
+        numu_ratioPlots[b_line] -> Draw("H same");
+
+        leg_ratio->Draw("same");
+
+        canv_numu -> cd(2*b_line + 2);
+        numu_errorPlots[b_line] -> Draw("H");
+        numu_stat_errorPlots[b_line] -> SetLineStyle(2);
+        numu_stat_errorPlots[b_line] -> Draw("H same");
+        numu_MCstat_errorPlots[b_line] -> SetLineStyle(2);
+        numu_MCstat_errorPlots[b_line] -> Draw("H same");
+        leg_error->Draw("same");
       }
-      numu_ratioPlots[b_line] -> Draw("H same");
-
-      leg_ratio->Draw("same");
-
-      canv_numu -> cd(2*b_line + 2);
-      numu_errorPlots[b_line] -> Draw("H");
-      numu_stat_errorPlots[b_line] -> SetLineStyle(2);
-      numu_stat_errorPlots[b_line] -> Draw("H same");
-      numu_MCstat_errorPlots[b_line] -> SetLineStyle(2);
-      numu_MCstat_errorPlots[b_line] -> Draw("H same");
-      leg_error->Draw("same");
 
     }
 
@@ -1739,7 +1704,7 @@ namespace lar1{
         // for high dm2 signal affecting the "null" background
         
         //before collapsing the prediction, need to scale the oscillated signal prediction:
-        std::vector<float> eventsFitVecTemp = eventsnLfitVec[dm2point]; //don't want to overwrite...
+        std::vector<float> eventsFitVecTemp = oscVector[dm2point]; //don't want to overwrite...
         for (int i = 0; i < nL; i ++){
             std::transform( eventsFitVecTemp.begin() + i*nbins, //start here
                             eventsFitVecTemp.begin() + i*nbins + nbins_nue, //end here
@@ -1760,9 +1725,9 @@ namespace lar1{
         // In the case of the shape only fit,
         // Copy the unscaled vector that will be used to build error matrix
         // Probably need to scale it as well
-        // std::vector< float > eventsnLVecTemp = eventsnLVec[dm2point];
+        // std::vector< float > oscVectorTemp = oscVector[dm2point];
 
-        nullVec = utils.collapseVector(eventsnLnullVec,
+        nullVec = utils.collapseVector(nullBackgrounds,
                                        nbins_nue,
                                        nbins_numu,
                                        nL);
@@ -1915,8 +1880,7 @@ namespace lar1{
           // Only once if otherwise
 
           // if (dm2point == 0 && sin22thpoint == 0) BuildCovarianceMatrix();
-          if (useSignalCovarianceMatrix)
-            BuildCovarianceMatrix(sin22thpoint, dm2point);
+
           // else if (sin22thpoint == 0 && dm2point == 0)
           
           if (shapeOnlyFit)
@@ -2031,8 +1995,8 @@ namespace lar1{
         //Checking collapsing:
         if (debug){
           std::cout << "Pre\t\tPost\n";
-          for (unsigned int i = 0; i < eventsnLfitVec[dm2point].size(); i++){
-            std::cout << eventsnLfitVec[dm2point][i] << "\t\t";
+          for (unsigned int i = 0; i < oscVector[dm2point].size(); i++){
+            std::cout << oscVector[dm2point][i] << "\t\t";
             if (i < predictionVec.size())  std::cout << predictionVec[i];
             std::cout << "\n";
           }
@@ -2710,10 +2674,14 @@ namespace lar1{
       TH1F * Other = utils.makeHistogram(OtherVec[j],nueBins);
       TH1F * NueFromCosmics = utils.makeHistogram(NueFromCosmicsVec[j],nueBins);
 
-      TH1F * SignalNu = utils.makeHistogram(eventsSignalBestFitNuVec[j],nueBins);
-      TH1F * SignalNubar = utils.makeHistogram(eventsSignalBestFitNubarVec[j],nueBins);
+      TH1F * SignalNu;
+      TH1F * SignalNubar;
+      if (includeFosc){
+        SignalNu = utils.makeHistogram(eventsSignalBestFitNuVec[j],nueBins);
+        SignalNubar = utils.makeHistogram(eventsSignalBestFitNubarVec[j],nueBins);
       // TH1F* SignalNu = new TH1F("signal","signal",nbins_nue,&(nueBins[0]));
-      SignalNu -> Add(SignalNubar);
+        SignalNu -> Add(SignalNubar);
+      }
       // SignalNu->SetBinContent(1,77.47);
       // SignalNu->SetBinContent(2,22.65);
       // SignalNu->SetBinContent(3,3.57);
@@ -2726,7 +2694,6 @@ namespace lar1{
       // SignalNu->SetBinContent(10,0.0);
 
 
-      std::cout << "First bin: " << SignalNu->GetBinContent(1) <<std::endl;
 
       NueFromNueCC_muon       -> SetFillColor(kGreen+3);
       NueFromNueCC_chargeKaon -> SetFillColor(kGreen+2);
@@ -2755,54 +2722,55 @@ namespace lar1{
       std::cout << "  Dirt: ....................." << Dirt -> Integral() << "\n";
       std::cout << "  Other: ...................." << Other -> Integral() << "\n";
       std::cout << "  NueFromCosmics: ..........." << NueFromCosmics -> Integral() << "\n";
+      if (includeFosc){
       std::cout << "  SignalNu: ................." << SignalNu -> Integral() << "\n";
+      }
 
-
-      std::cout << "Backgrounds by type for first bins: " << std::endl;
-      std::cout << "  NueFromNueCC_muon: ........[" 
-                << NueFromNueCC_muon->GetBinContent(1) << "]\t["
-                << NueFromNueCC_muon->GetBinContent(2) << "]\t[" 
-                << NueFromNueCC_muon->GetBinContent(3)<< "]\n";
-      std::cout << "  NueFromNueCC_chargeKaon: ..[" 
-                << NueFromNueCC_chargeKaon->GetBinContent(1) << "]\t["
-                << NueFromNueCC_chargeKaon->GetBinContent(2) << "]\t[" 
-                << NueFromNueCC_chargeKaon->GetBinContent(3)<< "]\n";
-      std::cout << "  NueFromNueCC_neutKaon: ....[" 
-                << NueFromNueCC_neutKaon->GetBinContent(1) << "]\t["
-                << NueFromNueCC_neutKaon->GetBinContent(2) << "]\t[" 
-                << NueFromNueCC_neutKaon->GetBinContent(3)<< "]\n";
-      std::cout << "  NueFromEScatter: ..........[" 
-                << NueFromEScatter->GetBinContent(1) << "]\t["
-                << NueFromEScatter->GetBinContent(2) << "]\t[" 
-                << NueFromEScatter->GetBinContent(3)<< "]\n";
-      std::cout << "  NueFromNC_pi0: ............[" 
-                << NueFromNC_pi0->GetBinContent(1) << "]\t["
-                << NueFromNC_pi0->GetBinContent(2) << "]\t[" 
-                << NueFromNC_pi0->GetBinContent(3)<< "]\n";
-      std::cout << "  NueFromNC_delta0: .........[" 
-                << NueFromNC_delta0->GetBinContent(1) << "]\t["
-                << NueFromNC_delta0->GetBinContent(2) << "]\t[" 
-                << NueFromNC_delta0->GetBinContent(3)<< "]\n";
-      std::cout << "  NueFromNumuCC: ............[" 
-                << NueFromNumuCC->GetBinContent(1) << "]\t["
-                << NueFromNumuCC->GetBinContent(2) << "]\t[" 
-                << NueFromNumuCC->GetBinContent(3)<< "]\n";
-      std::cout << "  Dirt: .....................[" 
-                << Dirt->GetBinContent(1) << "]\t["
-                << Dirt->GetBinContent(2) << "]\t[" 
-                << Dirt->GetBinContent(3)<< "]\n";
-      std::cout << "  Other: ....................[" 
-                << Other->GetBinContent(1) << "]\t["
-                << Other->GetBinContent(2) << "]\t[" 
-                << Other->GetBinContent(3)<< "]\n";
-      std::cout << "  NueFromCosmics: ...........[" 
-                << NueFromCosmics->GetBinContent(1) << "]\t["
-                << NueFromCosmics->GetBinContent(2) << "]\t[" 
-                << NueFromCosmics->GetBinContent(3)<< "]\n";
-      std::cout << "  SignalNu: .................[" 
-                << SignalNu->GetBinContent(1) << "]\t["
-                << SignalNu->GetBinContent(2) << "]\t[" 
-                << SignalNu->GetBinContent(3)<< "]\n";
+      // std::cout << "Backgrounds by type for first bins: " << std::endl;
+      // std::cout << "  NueFromNueCC_muon: ........[" 
+      //           << NueFromNueCC_muon->GetBinContent(1) << "]\t["
+      //           << NueFromNueCC_muon->GetBinContent(2) << "]\t[" 
+      //           << NueFromNueCC_muon->GetBinContent(3)<< "]\n";
+      // std::cout << "  NueFromNueCC_chargeKaon: ..[" 
+      //           << NueFromNueCC_chargeKaon->GetBinContent(1) << "]\t["
+      //           << NueFromNueCC_chargeKaon->GetBinContent(2) << "]\t[" 
+      //           << NueFromNueCC_chargeKaon->GetBinContent(3)<< "]\n";
+      // std::cout << "  NueFromNueCC_neutKaon: ....[" 
+      //           << NueFromNueCC_neutKaon->GetBinContent(1) << "]\t["
+      //           << NueFromNueCC_neutKaon->GetBinContent(2) << "]\t[" 
+      //           << NueFromNueCC_neutKaon->GetBinContent(3)<< "]\n";
+      // std::cout << "  NueFromEScatter: ..........[" 
+      //           << NueFromEScatter->GetBinContent(1) << "]\t["
+      //           << NueFromEScatter->GetBinContent(2) << "]\t[" 
+      //           << NueFromEScatter->GetBinContent(3)<< "]\n";
+      // std::cout << "  NueFromNC_pi0: ............[" 
+      //           << NueFromNC_pi0->GetBinContent(1) << "]\t["
+      //           << NueFromNC_pi0->GetBinContent(2) << "]\t[" 
+      //           << NueFromNC_pi0->GetBinContent(3)<< "]\n";
+      // std::cout << "  NueFromNC_delta0: .........[" 
+      //           << NueFromNC_delta0->GetBinContent(1) << "]\t["
+      //           << NueFromNC_delta0->GetBinContent(2) << "]\t[" 
+      //           << NueFromNC_delta0->GetBinContent(3)<< "]\n";
+      // std::cout << "  NueFromNumuCC: ............[" 
+      //           << NueFromNumuCC->GetBinContent(1) << "]\t["
+      //           << NueFromNumuCC->GetBinContent(2) << "]\t[" 
+      //           << NueFromNumuCC->GetBinContent(3)<< "]\n";
+      // std::cout << "  Dirt: .....................[" 
+      //           << Dirt->GetBinContent(1) << "]\t["
+      //           << Dirt->GetBinContent(2) << "]\t[" 
+      //           << Dirt->GetBinContent(3)<< "]\n";
+      // std::cout << "  Other: ....................[" 
+      //           << Other->GetBinContent(1) << "]\t["
+      //           << Other->GetBinContent(2) << "]\t[" 
+      //           << Other->GetBinContent(3)<< "]\n";
+      // std::cout << "  NueFromCosmics: ...........[" 
+      //           << NueFromCosmics->GetBinContent(1) << "]\t["
+      //           << NueFromCosmics->GetBinContent(2) << "]\t[" 
+      //           << NueFromCosmics->GetBinContent(3)<< "]\n";
+      // std::cout << "  SignalNu: .................[" 
+      //           << SignalNu->GetBinContent(1) << "]\t["
+      //           << SignalNu->GetBinContent(2) << "]\t[" 
+      //           << SignalNu->GetBinContent(3)<< "]\n";
 
 
       for(int bin = 0; bin < nbins_nue; bin++)
@@ -2834,12 +2802,16 @@ namespace lar1{
         Other                   -> SetBinContent(bin+1,
                                       Other->GetBinContent(bin+1)
                                       /Other->GetBinWidth(bin+1));
-        SignalNu                -> SetBinContent(bin+1,
+        if (includeFosc){
+          SignalNu              -> SetBinContent(bin+1,
                                       SignalNu->GetBinContent(bin+1)
                                       /SignalNu->GetBinWidth(bin+1));
-        NueFromCosmics          -> SetBinContent(bin+1,
+        }
+        if (includeCosmics){
+          NueFromCosmics        -> SetBinContent(bin+1,
                                       NueFromCosmics->GetBinContent(bin+1)
                                       /NueFromCosmics->GetBinWidth(bin+1));
+        }
       }
 
       // Set the bin errors to zero except for the very last bin:
@@ -2867,75 +2839,76 @@ namespace lar1{
         NueFromCosmics      -> SetBinError(i+1, 0.0);
         if (includeCosmics)
           totalEvents[i]      += NueFromCosmics -> GetBinContent(i+1);
-        signalEvents[i]     = SignalNu -> GetBinContent(i+1);
+        if (includeFosc)
+          signalEvents[i]     = SignalNu -> GetBinContent(i+1);
       }
 
-      std::cout << "Backgrounds by type for first bins AFTER scaling: " << std::endl;
-      std::cout << "  NueFromNueCC_muon: ........[" 
-                << NueFromNueCC_muon->GetBinContent(1) << "]\t["
-                << NueFromNueCC_muon->GetBinContent(2) << "]\t[" 
-                << NueFromNueCC_muon->GetBinContent(3)<< "]\n";
-      std::cout << "  NueFromNueCC_chargeKaon: ..[" 
-                << NueFromNueCC_chargeKaon->GetBinContent(1) << "]\t["
-                << NueFromNueCC_chargeKaon->GetBinContent(2) << "]\t[" 
-                << NueFromNueCC_chargeKaon->GetBinContent(3)<< "]\n";
-      std::cout << "  NueFromNueCC_neutKaon: ....[" 
-                << NueFromNueCC_neutKaon->GetBinContent(1) << "]\t["
-                << NueFromNueCC_neutKaon->GetBinContent(2) << "]\t[" 
-                << NueFromNueCC_neutKaon->GetBinContent(3)<< "]\n";
-      std::cout << "  NueFromEScatter: ..........[" 
-                << NueFromEScatter->GetBinContent(1) << "]\t["
-                << NueFromEScatter->GetBinContent(2) << "]\t[" 
-                << NueFromEScatter->GetBinContent(3)<< "]\n";
-      std::cout << "  NueFromNC_pi0: ............[" 
-                << NueFromNC_pi0->GetBinContent(1) << "]\t["
-                << NueFromNC_pi0->GetBinContent(2) << "]\t[" 
-                << NueFromNC_pi0->GetBinContent(3)<< "]\n";
-      std::cout << "  NueFromNC_delta0: .........[" 
-                << NueFromNC_delta0->GetBinContent(1) << "]\t["
-                << NueFromNC_delta0->GetBinContent(2) << "]\t[" 
-                << NueFromNC_delta0->GetBinContent(3)<< "]\n";
-      std::cout << "  NueFromNumuCC: ............[" 
-                << NueFromNumuCC->GetBinContent(1) << "]\t["
-                << NueFromNumuCC->GetBinContent(2) << "]\t[" 
-                << NueFromNumuCC->GetBinContent(3)<< "]\n";
-      std::cout << "  Dirt: .....................[" 
-                << Dirt->GetBinContent(1) << "]\t["
-                << Dirt->GetBinContent(2) << "]\t[" 
-                << Dirt->GetBinContent(3)<< "]\n";
-      std::cout << "  Other: ....................[" 
-                << Other->GetBinContent(1) << "]\t["
-                << Other->GetBinContent(2) << "]\t[" 
-                << Other->GetBinContent(3)<< "]\n";
-      std::cout << "  NueFromCosmics: ...........[" 
-                << NueFromCosmics->GetBinContent(1) << "]\t["
-                << NueFromCosmics->GetBinContent(2) << "]\t[" 
-                << NueFromCosmics->GetBinContent(3)<< "]\n";
-      std::cout << "  SignalNu: .................[" 
-                << SignalNu->GetBinContent(1) << "]\t["
-                << SignalNu->GetBinContent(2) << "]\t[" 
-                << SignalNu->GetBinContent(3)<< "]\n";
-      std::cout << "  Total Background: .........[" 
-                << totalEvents.at(0) << "]\t["
-                << totalEvents.at(1) << "]\t[" 
-                << totalEvents.at(2)<< "]\n";
-      std::cout << "First bin: " << SignalNu->GetBinContent(1) <<std::endl;;
+      // std::cout << "Backgrounds by type for first bins AFTER scaling: " << std::endl;
+      // std::cout << "  NueFromNueCC_muon: ........[" 
+      //           << NueFromNueCC_muon->GetBinContent(1) << "]\t["
+      //           << NueFromNueCC_muon->GetBinContent(2) << "]\t[" 
+      //           << NueFromNueCC_muon->GetBinContent(3)<< "]\n";
+      // std::cout << "  NueFromNueCC_chargeKaon: ..[" 
+      //           << NueFromNueCC_chargeKaon->GetBinContent(1) << "]\t["
+      //           << NueFromNueCC_chargeKaon->GetBinContent(2) << "]\t[" 
+      //           << NueFromNueCC_chargeKaon->GetBinContent(3)<< "]\n";
+      // std::cout << "  NueFromNueCC_neutKaon: ....[" 
+      //           << NueFromNueCC_neutKaon->GetBinContent(1) << "]\t["
+      //           << NueFromNueCC_neutKaon->GetBinContent(2) << "]\t[" 
+      //           << NueFromNueCC_neutKaon->GetBinContent(3)<< "]\n";
+      // std::cout << "  NueFromEScatter: ..........[" 
+      //           << NueFromEScatter->GetBinContent(1) << "]\t["
+      //           << NueFromEScatter->GetBinContent(2) << "]\t[" 
+      //           << NueFromEScatter->GetBinContent(3)<< "]\n";
+      // std::cout << "  NueFromNC_pi0: ............[" 
+      //           << NueFromNC_pi0->GetBinContent(1) << "]\t["
+      //           << NueFromNC_pi0->GetBinContent(2) << "]\t[" 
+      //           << NueFromNC_pi0->GetBinContent(3)<< "]\n";
+      // std::cout << "  NueFromNC_delta0: .........[" 
+      //           << NueFromNC_delta0->GetBinContent(1) << "]\t["
+      //           << NueFromNC_delta0->GetBinContent(2) << "]\t[" 
+      //           << NueFromNC_delta0->GetBinContent(3)<< "]\n";
+      // std::cout << "  NueFromNumuCC: ............[" 
+      //           << NueFromNumuCC->GetBinContent(1) << "]\t["
+      //           << NueFromNumuCC->GetBinContent(2) << "]\t[" 
+      //           << NueFromNumuCC->GetBinContent(3)<< "]\n";
+      // std::cout << "  Dirt: .....................[" 
+      //           << Dirt->GetBinContent(1) << "]\t["
+      //           << Dirt->GetBinContent(2) << "]\t[" 
+      //           << Dirt->GetBinContent(3)<< "]\n";
+      // std::cout << "  Other: ....................[" 
+      //           << Other->GetBinContent(1) << "]\t["
+      //           << Other->GetBinContent(2) << "]\t[" 
+      //           << Other->GetBinContent(3)<< "]\n";
+      // std::cout << "  NueFromCosmics: ...........[" 
+      //           << NueFromCosmics->GetBinContent(1) << "]\t["
+      //           << NueFromCosmics->GetBinContent(2) << "]\t[" 
+      //           << NueFromCosmics->GetBinContent(3)<< "]\n";
+      // std::cout << "  SignalNu: .................[" 
+      //           << SignalNu->GetBinContent(1) << "]\t["
+      //           << SignalNu->GetBinContent(2) << "]\t[" 
+      //           << SignalNu->GetBinContent(3)<< "]\n";
+      // std::cout << "  Total Background: .........[" 
+      //           << totalEvents.at(0) << "]\t["
+      //           << totalEvents.at(1) << "]\t[" 
+      //           << totalEvents.at(2)<< "]\n";
+      // std::cout << "First bin: " << SignalNu->GetBinContent(1) <<std::endl;;
       
-      std::cout << "Integral backgrounds by type above 475 MeV: " << std::endl;
-      std::cout << "  NueFromNueCC_muon: ........" << NueFromNueCC_muon -> Integral() << "\n";
-      std::cout << "  NueFromNueCC_chargeKaon: .." << NueFromNueCC_chargeKaon -> Integral() << "\n";
-      std::cout << "  NueFromNueCC_neutKaon: ...." << NueFromNueCC_neutKaon -> Integral() << "\n";
-      std::cout << "  NueFromEScatter: .........." << NueFromEScatter -> Integral() << "\n";
-      std::cout << "  NueFromNC_pi0: ............" << NueFromNC_pi0 -> Integral() << "\n";
-      std::cout << "  NueFromNC_delta0: ........." << NueFromNC_delta0 -> Integral() << "\n";
-      std::cout << "  NueFromNumuCC: ............" << NueFromNumuCC -> Integral() << "\n";
-      std::cout << "  Dirt: ....................." << Dirt -> Integral() << "\n";
-      std::cout << "  Other: ...................." << Other -> Integral() << "\n";
-      std::cout << "  NueFromCosmics: ..........." << NueFromCosmics -> Integral() << "\n";
-      std::cout << "  SignalNu: ................." << SignalNu -> Integral() << "\n";
+      // std::cout << "Integral backgrounds by type above 475 MeV: " << std::endl;
+      // std::cout << "  NueFromNueCC_muon: ........" << NueFromNueCC_muon -> Integral() << "\n";
+      // std::cout << "  NueFromNueCC_chargeKaon: .." << NueFromNueCC_chargeKaon -> Integral() << "\n";
+      // std::cout << "  NueFromNueCC_neutKaon: ...." << NueFromNueCC_neutKaon -> Integral() << "\n";
+      // std::cout << "  NueFromEScatter: .........." << NueFromEScatter -> Integral() << "\n";
+      // std::cout << "  NueFromNC_pi0: ............" << NueFromNC_pi0 -> Integral() << "\n";
+      // std::cout << "  NueFromNC_delta0: ........." << NueFromNC_delta0 -> Integral() << "\n";
+      // std::cout << "  NueFromNumuCC: ............" << NueFromNumuCC -> Integral() << "\n";
+      // std::cout << "  Dirt: ....................." << Dirt -> Integral() << "\n";
+      // std::cout << "  Other: ...................." << Other -> Integral() << "\n";
+      // std::cout << "  NueFromCosmics: ..........." << NueFromCosmics -> Integral() << "\n";
+      // std::cout << "  SignalNu: ................." << SignalNu -> Integral() << "\n";
 
 
-      
+      std::cout << "Number of bins is " << nbins_nue << std::endl;
       //Now set the errors on the last hist going in:
       for (int i = 0; i < nbins_nue; ++i)
       {
@@ -2945,11 +2918,12 @@ namespace lar1{
         if (includeCosmics) NueFromCosmics -> SetBinError(i+1,error);
         else
           NueFromNumuCC -> SetBinError(i+1, error);
-        SignalNu->SetBinContent(i+1, totalEvents[i]+signalEvents[i]);
-        SignalNu->SetBinError(i+1, sqrt(signalEvents[i]/ (nueBins[i+1] - nueBins[i])));
+        if (includeFosc){
+          SignalNu->SetBinContent(i+1, totalEvents[i]+signalEvents[i]);
+          SignalNu->SetBinError(i+1, sqrt(signalEvents[i]/ (nueBins[i+1] - nueBins[i])));
+        }
       }
-      std::cout << "First bin: " << SignalNu->GetBinContent(1) <<std::endl;;
-      
+
       
       stack -> Add(NueFromNueCC_muon);
       stack -> Add(NueFromNueCC_chargeKaon);
@@ -2963,9 +2937,11 @@ namespace lar1{
       // stack ->Add(MBPhotExcess);
       if (includeCosmics) stack -> Add(NueFromCosmics);
 
-      SignalNu -> SetLineStyle(0);
-      SignalNu -> SetLineColor(1);
-      SignalNu -> SetLineWidth(2);
+      if (includeFosc){
+        SignalNu -> SetLineStyle(0);
+        SignalNu -> SetLineColor(1);
+        SignalNu -> SetLineWidth(2);
+      }
 
       double integral = 0;
       integral += NueFromNueCC_muon->Integral();
@@ -2993,7 +2969,8 @@ namespace lar1{
       if (includeCosmics) leg->AddEntry(NueFromCosmics, "Cosmics");
       // leg->AddEntry(Dirt, "Dirt");
       // leg->AddEntry(Other, "Other");
-      leg->AddEntry(SignalNu,"Signal");
+      if (includeFosc)
+        leg->AddEntry(SignalNu,"Signal");
 
 
       leg -> SetTextSize(0.04);
@@ -3036,8 +3013,8 @@ namespace lar1{
 
 
       TH1F *chr = stackedCanvas[j]->DrawFrame(emin-0.01,
-                                  // 0.0,emax,1.4*max);
-                                  0.0,emax,1500);
+                                  0.0,emax,1.4*max);
+                                  // 0.0,emax,1500);
       
       //chr->GetYaxis()->SetLabelOffset(999);
 
@@ -3085,19 +3062,22 @@ namespace lar1{
       
 
       plotUtils.add_plot_label( name , 0.2, 0.87, 0.05, 1,62,12);
-      if (useHighDm) 
-        plotUtils.add_plot_label( (char*)"Signal: (#Deltam^{2} = 50 eV^{2}, sin^{2}2#theta_{#mue} = 0.003)", 0.2, 0.81, 0.04, 1,62,12);
-      else if (useGlobBF)
-        plotUtils.add_plot_label( (char*)"Signal: (#Deltam^{2} = 0.43 eV^{2}, sin^{2}2#theta_{#mue} = 0.013)", 0.2, 0.81, 0.04, 1,62,12);
-        // plotUtils.add_plot_label( (char*)"Signal: MiniBooNE Excess", 0.2, 0.81, 0.04, 1,62,12);
-      else  plotUtils.add_plot_label( (char*)"Signal: (#Deltam^{2} = 1.2 eV^{2}, sin^{2}2#theta_{#mue} = 0.003)", 0.2, 0.81, 0.04, 1,62,12);
-
+      if(includeFosc){
+        if (useHighDm) 
+          plotUtils.add_plot_label( (char*)"Signal: (#Deltam^{2} = 50 eV^{2}, sin^{2}2#theta_{#mue} = 0.003)", 0.2, 0.81, 0.04, 1,62,12);
+        else if (useGlobBF)
+          plotUtils.add_plot_label( (char*)"Signal: (#Deltam^{2} = 0.43 eV^{2}, sin^{2}2#theta_{#mue} = 0.013)", 0.2, 0.81, 0.04, 1,62,12);
+          // plotUtils.add_plot_label( (char*)"Signal: MiniBooNE Excess", 0.2, 0.81, 0.04, 1,62,12);
+        else  plotUtils.add_plot_label( (char*)"Signal: (#Deltam^{2} = 1.2 eV^{2}, sin^{2}2#theta_{#mue} = 0.003)", 0.2, 0.81, 0.04, 1,62,12);
+      }
       plotUtils.add_plot_label((char*)"Statistical Uncertainty Only",0.2,0.76, 0.04,1,62,12);
       plotUtils.add_plot_label((char*)"PRELIMINARY",0.2,0.71, 0.04, kRed-3,62,12);
 
       stack -> Draw("E0 hist same");
-      SignalNu -> Draw("E0 hist same");
-      SignalNu -> Draw("E0 same");
+      if (includeFosc){
+        SignalNu -> Draw("E0 hist same");
+        SignalNu -> Draw("E0 same");
+      }
       stack -> Draw("E0 hist  same");
       stack -> Draw("E0 same ");
       chr   -> Draw("same");

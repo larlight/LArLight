@@ -66,10 +66,6 @@ namespace lar1
 
   std::vector<float> SensUtils::rebinVector(std::vector<float> inputVector,
                                             std::vector<float> bins){
-  
-  // std::cout << "\ninputVector.size() " << inputVector.size() << std::endl;
-  // std::cout << "default_bins.size() " << default_bins.size() << std::endl;
-  // std::cout << "bins.size() " << bins.size() << std::endl;
 
     if (bins.size() < 2 || inputVector.size()+1 != default_bins.size()){
       std::cerr << "Error in the input bins for rebinVector!" << std::endl;
