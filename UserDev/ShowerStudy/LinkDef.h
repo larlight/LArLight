@@ -13,8 +13,10 @@
 #pragma link C++ class showerana::ShowerContainmentCut+;
 #pragma link C++ class showerana::ShowerAnaException+;
 #pragma link C++ class larlight::PDGSelection+;
+#pragma link C++ class larlight::ShowerDistanceStudy+;
 //ADD_NEW_CLASS ... do not change this line
 
 #endif
+
 
 
