@@ -10,7 +10,7 @@
 namespace lar1{
   Utils::Utils(){
 
-    mc_generation = 2;
+    mc_generation = 4;
     std::cout <<"Initializing Utils with mc_generation =" << mc_generation<<std::endl;
 
     PotNormNubar  = 10e20;
@@ -48,7 +48,7 @@ namespace lar1{
     // Other option, shorter
 
     // iDet = 1
-    if (mc_generation == 3){
+    if (mc_generation == 3 || mc_generation == 4){
       ub_xmin =  -128.0;
       ub_xmax =  128.0;
       ub_ymin = -116.5;
@@ -196,10 +196,12 @@ namespace lar1{
         switch (iflux)
         {
           case kNu:
+            if (mc_generation == 4) POT_Sim = 7.858E+19;
             if (mc_generation == 3) POT_Sim = 7.879E+19;
             if (mc_generation == 2) POT_Sim = 1.74e20;
             break;
           case kNu_Fosc:
+            if (mc_generation == 4) POT_Sim = 7.637E+19;
             if (mc_generation == 3) POT_Sim = 7.637E+19;
             if (mc_generation == 2) POT_Sim = 1.79e20;
             break;
@@ -273,10 +275,12 @@ namespace lar1{
         switch (iflux)
         {
           case kNu:
+            if (mc_generation == 4) POT_Sim = 6.087E+21;
             if (mc_generation == 3) POT_Sim = 6.053E+21;
             if (mc_generation == 2) POT_Sim = 5.57E+21;
             break;
           case kNu_Fosc:
+            if (mc_generation == 4) POT_Sim = 2.592E+21;
             if (mc_generation == 3) POT_Sim = 2.592E+21;
             if (mc_generation == 2) POT_Sim = 5.37E+21;
             break;
@@ -290,17 +294,19 @@ namespace lar1{
         }
         break;
       case k600m_onaxis:
-        if (mc_generation != 3){
+        if (mc_generation < 3){
           std::cerr << "ERROR: the mc version selected is invalid for this detector\n.";
           exit(-1);
         }
         switch (iflux)
         {
           case kNu:
-            POT_Sim = 5.434E+20;
+            if (mc_generation == 4) POT_Sim = 5.4163E+20;
+            if (mc_generation == 3) POT_Sim = 5.434E+20;
             break;
           case kNu_Fosc:
-            POT_Sim = 6.507E+20;
+            if (mc_generation == 4) POT_Sim = 6.507E+20;
+            if (mc_generation == 3) POT_Sim = 6.507E+20;
             // POT_Sim = 2.766e20;
             break;
           case kNubar:
