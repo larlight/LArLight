@@ -12,7 +12,9 @@
 #pragma link C++ namespace showerana+;
 #pragma link C++ class showerana::ShowerContainmentCut+;
 #pragma link C++ class showerana::ShowerAnaException+;
+#pragma link C++ class larlight::PDGSelection+;
 //ADD_NEW_CLASS ... do not change this line
 
 #endif
+
 

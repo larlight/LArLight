@@ -29,7 +29,9 @@ if len(sys.argv) > 2:
 my_proc.set_ana_output_file("from_test_ana_you_can_remove_me.root");
 
 # Attach a template process
-my_proc.add_process(fmwk.ShowerStudy());
+ana_unit_0 = fmwk.PDGSelection()
+ana_unit_0.Select(111,ana_unit_0.kPRIMARY)
+my_proc.add_process(ana_unit_0)
 
 print
 print  "Finished configuring ana_processor. Start event loop!"

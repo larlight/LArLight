@@ -18,6 +18,7 @@
 #include <sstream>
 #include <iostream>
 #include <vector>
+#include <cmath>
 
 namespace showerana {
 
@@ -33,6 +34,11 @@ namespace showerana {
     /// Default constructor
     ShowerContainmentCut();
 
+    /// Alternative constructor
+    ShowerContainmentCut(double const x_min, double const x_max,
+			 double const y_min, double const y_max,
+			 double const z_min, double const z_max);
+
     /// Default destructor
     virtual ~ShowerContainmentCut(){};
 
@@ -40,32 +46,35 @@ namespace showerana {
     void Reset();
 
     /// Setter for maximum coordinate value (if you want to change)
-    void SetMax(double const x, double const y, double const z) 
+    void SetXYZMax(double const x, double const y, double const z) 
     { 
-      _coord_max[0] = x; 
-      _coord_max[1] = y; 
-      _coord_max[2] = z; 
+      _xyz_max[0] = x; 
+      _xyz_max[1] = y; 
+      _xyz_max[2] = z; 
     }
 
-    /// Setter for the origin coordinate (default = 0,0,0)
-    void SetOrigin(double const x, double const y, double const z)
-    {
-      _origin_vtx[0] = x; 
-      _origin_vtx[1] = y; 
-      _origin_vtx[2] = z; 
+    /// Setter for minimum coordinate value (if you want to change)
+    void SetXYZMin(double const x, double const y, double const z) 
+    { 
+      _xyz_min[0] = x; 
+      _xyz_min[1] = y; 
+      _xyz_min[2] = z; 
     }
 
     /// Getter for a distance from a point to the box boundary
+    double DistanceToWall(std::vector<double> const& point) const;
+
+    /// Getter for a distance from a point to the box boundary along a direction
     double DistanceToWall(std::vector<double> const& point,
-			  std::vector<double> const& dir) const ;
+			  std::vector<double> dir) const ;
 
   protected:
 
-    /// "rectangular box" origin vtx in 3D
-    std::vector<double> _origin_vtx;
+    /// "rectangular box" xyz minimum coordinate values
+    std::vector<double> _xyz_min;
 
-    /// "rectangular box" dimension (x, y, z)
-    std::vector<double> _coord_max;
+    /// "rectangular box" xyz maximum coordinate values
+    std::vector<double> _xyz_max;
 
   };
 }
