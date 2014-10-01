@@ -13,6 +13,7 @@
 #include "ComputePi0Mass.hh"
 #include "Pi0StudyModule.hh"
 #include "MCShowerMatchAlg.hh"
+#include "HitBackTracker.hh"
 #include "TwoShower3DIntxn.hh"
 //ADD_NEW_HEADER ... do not change this comment line
 
@@ -27,6 +28,7 @@ namespace larlight {
   class Pi0StudyModule;
   class MCShowerMatchAlg;
   class CMToolAnaException;
+  class HitBackTracker;
 //ADD_ANA_CLASS ... do not change this comment line
 }
 

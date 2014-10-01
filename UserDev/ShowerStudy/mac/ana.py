@@ -31,6 +31,9 @@ length_ec = [0 for x in length_cuts]
 # Calculate error bars for efficiency
 fid_eff_error 	 = [0 for x in fid_cuts]
 length_eff_error = [0 for x in length_cuts]
+hEC_Fid_vs_Length = TH2D("hEC_Fid_vs_Length",
+                         "Energy Containment vs. Fid. vs. Length; Fid. Volume; Length Along Trunk",
+                         30,0,60,50,0,100)
 
 hTempEC = TH1D("hTempEC","Temporary EC histogram",100,0,1)
 c=TCanvas("c","",600,500)
@@ -51,6 +54,23 @@ for x in xrange(len(length_cuts)):
     ch.Draw("_daughter1_Energy / _motherEnergy >> hTempEC","_dist1_AlongTraj>=%g" % length_cuts[x])
     length_ec[x] = hTempEC.GetMean()
 
+for x in xrange(len(length_cuts)):
+
+    my_length_cut = length_cuts[x]
+
+    for y in xrange(len(fid_cuts)):
+
+        my_fid_cut = fid_cuts[y]
+
+        my_eff = float(ch.GetEntries("_dist1_AlongTraj>=%g && _dist1_ToWall>=%g" % (my_length_cut,my_fid_cut)))
+        my_eff /= ch.GetEntries()
+
+        hTempEC.Reset()
+        ch.Draw("_daughter1_Energy / _motherEnergy >> hTempEC",
+                "_dist1_AlongTraj>=%g && _dist1_ToWall>=%g" % (my_length_cut,my_fid_cut))
+        my_ec = hTempEC.GetMean()
+
+        hEC_Fid_vs_Length.SetBinContent(y,x,my_ec*my_eff)
 
 for x in xrange(len(fid_cuts)):
 
@@ -121,3 +141,7 @@ length_conv_graph.Draw("P")
 c.Update()
 sys.stdin.readline()
 
+hEC_Fid_vs_Length.Draw("COLZ")
+c.Update()
+c.SaveAs("c.C")
+sys.stdin.readline()

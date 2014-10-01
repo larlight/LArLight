@@ -15,22 +15,20 @@ from ROOT import larlight as fmwk
 my_proc = fmwk.ana_processor()
 
 # Set input root file
-my_proc.add_input_file(sys.argv[1])
+for x in xrange(len(sys.argv)-1):
+    my_proc.add_input_file(sys.argv[x+1])
 
 # Specify IO mode
 my_proc.set_io_mode(fmwk.storage_manager.READ)
 
-# Specify input TDirectory name if given
-if len(sys.argv) > 2:
-
-    my_proc.set_input_rootdir(sys.argv[2])
+my_proc.set_rootdir('scanner')
 
 # Specify output root file name
 my_proc.set_ana_output_file("from_test_ana_you_can_remove_me.root");
 
 # Attach a template process
 ana_unit_0 = fmwk.PDGSelection()
-ana_unit_0.Select(111,ana_unit_0.kPRIMARY)
+ana_unit_0.Select(111,ana_unit_0.kGENERATOR,1)
 my_proc.add_process(ana_unit_0)
 
 print

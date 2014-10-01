@@ -5,7 +5,9 @@
 
 namespace larlight {
 
-  PDGSelection::PDGSelection() : _pdg_list(PDGSelection::kPARTICLE_GROUP_MAX,std::set<int>())
+  PDGSelection::PDGSelection() : 
+    _request_list(PDGSelection::kPARTICLE_GROUP_MAX,std::map<int,int>()),
+    _found_list(PDGSelection::kPARTICLE_GROUP_MAX,std::map<int,int>())
   { 
     _name="PDGSelection"; 
     _fout=0;
@@ -15,7 +17,8 @@ namespace larlight {
   void PDGSelection::Reset()
   {
 
-    for(auto& list : _pdg_list) list.clear();
+    for(auto& list : _request_list) list.clear();
+    for(auto& list : _found_list) list.clear();
 
     _nevent_analyzed = 0;
     _nevent_selected = 0;
@@ -23,7 +26,8 @@ namespace larlight {
   }
 
   void PDGSelection::Select(int const pdg_code, 
-			    PDGSelection::PARTICLE_GROUP const part_type)
+			    PDGSelection::PARTICLE_GROUP part_type,
+			    int count)
   {
     if(part_type == PDGSelection::kPARTICLE_GROUP_MAX) 
       
@@ -32,7 +36,7 @@ namespace larlight {
 						 part_type)
 					    );
 
-    _pdg_list.at(part_type).insert(pdg_code);
+    _request_list.at(part_type).insert(std::make_pair(pdg_code,count));
 
   }
 
@@ -42,27 +46,22 @@ namespace larlight {
 
     _nevent_selected = 0;
 
-    // Append kANY to kPRIMARY and kSECONDARY
-    for(auto const& id : _pdg_list.at(kANY)) {
-
-      _pdg_list.at(kPRIMARY).insert(id);
-      _pdg_list.at(kSECONDARY).insert(id);
-
-    }
-
     return true;
   }
   
   bool PDGSelection::analyze(storage_manager* storage) {
 
+    // Clear found list
+    for(auto& list : _found_list) list.clear();
+
     // Log # of analyze() function calls
     ++_nevent_analyzed;
 
     // Process if a user specified to look into a primary particle list
-    if(_pdg_list.at(kPRIMARY).size()) {
+    if(_request_list.at(kGENERATOR).size()) {
 
-      // Save typing by making a local reference to the subject list of PDG code
-      auto const& pdg_list = _pdg_list.at(kPRIMARY);
+      // Pull out a particle list to which we store particle count
+      auto& gen_list = _found_list.at(kGENERATOR);
 
       // Pull out larlight::event_mctruth data product
       auto ev_mct = (const event_mctruth*)(storage->get_data(DATA::MCTruth));
@@ -80,23 +79,21 @@ namespace larlight {
 	// Loop over a vector of larlight::mcpart that is contained in this larlight::mctruth
 	for(auto const& mcp : mct.GetParticles()) {
 
-	  // Check if this particle's PDG code is in the list for selection candidates
-	  if( pdg_list.find(mcp.PdgCode()) != pdg_list.end() ) {
-
-	    // If so, increment the selection counter & return true
-	    ++_nevent_selected;
-	    return true;
-	    
-	  }
+	  // Record the count of this PDG code
+	  auto iter = gen_list.find(mcp.PdgCode());
+	  if(iter != gen_list.end()) (*iter).second += 1;
+	  else gen_list.insert(std::make_pair(mcp.PdgCode(),1));
+	  
 	}
       }
-    }  
+    }
 
     // Process if a user specified to look into a secondary particle list
-    if(_pdg_list.at(kSECONDARY).size()) {
+    if(_request_list.at(kG4PRIMARY).size() || _request_list.at(kG4SECONDARY).size()) {
 
       // Save typing by making a local reference to the subject list of PDG code
-      auto const& pdg_list = _pdg_list.at(kSECONDARY);
+      auto& primary_list = _found_list.at(kG4PRIMARY);
+      auto& secondary_list = _found_list.at(kG4SECONDARY);
 
       // Pull out larlight::event_mcpart data product
       auto ev_mcp = (const event_mcpart*)(storage->get_data(DATA::MCParticle));
@@ -109,21 +106,55 @@ namespace larlight {
 					      );
 
       // Loop over a vector of larlight::mcpart data proudct
-      for(auto const& mcp : *ev_mcp) 
+      for(auto const& mcp : *ev_mcp) {
 
-	// Check if this is a non-primary particle && PDG code is in the list for selection candidates
-	if( mcp.Mother() && pdg_list.find(mcp.PdgCode()) != pdg_list.end() ) {
+	// Record the count of this PDG code
+	if( mcp.Mother() ) {
 
-	  // If so, increment the selection counter & return true
-	  ++_nevent_selected;
-	  return true;
+	  auto iter = primary_list.find(mcp.PdgCode());
+	  if(iter != primary_list.end()) (*iter).second +=1;
+	  else primary_list.insert(std::make_pair(mcp.PdgCode(),1));
+
+	}else{
+
+	  auto iter = secondary_list.find(mcp.PdgCode());
+	  if(iter != secondary_list.end()) (*iter).second +=1;
+	  else secondary_list.insert(std::make_pair(mcp.PdgCode(),1));
 
 	}
-
+      }
     }
 
-    // Reaching this point means this event did not pass a selection criteria. Return false.
-    return false;
+    // Check if this event should be selected or not
+    bool status = true;
+    for(size_t index=0; index< _request_list.size(); ++index) {
+
+      if(!_request_list[index].size()) continue;
+
+      auto const& request_list = _request_list.at(index);
+      auto const& found_list   = _found_list.at(index);
+
+      for(auto const& pdg_ctr_pair : request_list) {
+
+	auto const& pdg = pdg_ctr_pair.first;
+	auto const& ctr = pdg_ctr_pair.second;
+
+	if(ctr) {
+	  auto const& iter = found_list.find(pdg);
+	  if(iter == found_list.end()) status = false;
+	  else if(ctr>0 && (*iter).second != ctr) status = false;	  
+	}
+	else if(found_list.find(pdg) != found_list.end()) {
+	  status = false;
+	}
+	if(!status) break;
+      }
+      if(!status) break;
+    }
+
+    if(status) _nevent_selected++;
+
+    return status;
   }
 
   bool PDGSelection::finalize() {
