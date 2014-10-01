@@ -20,13 +20,17 @@ ch.AddFile(sys.argv[1])
 fid_cuts    = [ x*2   for x in xrange(30) ] # 5cm steps, spans from 0=>60 cm
 length_cuts = [ x*2 for x in xrange(50)   ] # 5cm steps, spans from 0=>100 cm
 
-# Efficiency arrays
+# Efficiency arrays for first daughter
 fid_eff    = [0 for x in fid_cuts]
 length_eff = [0 for x in length_cuts]
 
-# Energy containment arrays
+# Energy containment arrays for first daughter
 fid_ec    = [0 for x in fid_cuts]
 length_ec = [0 for x in length_cuts]
+
+# Calculate error bars for efficiency
+fid_eff_error 	 = [0 for x in fid_cuts]
+length_eff_error = [0 for x in length_cuts]
 
 hTempEC = TH1D("hTempEC","Temporary EC histogram",100,0,1)
 c=TCanvas("c","",600,500)
@@ -37,6 +41,8 @@ for x in xrange(len(fid_cuts)):
     fid_eff[x] = float(ch.GetEntries("_dist1_ToWall>=%g" % fid_cuts[x])) / ch.GetEntries()
     ch.Draw("_daughter1_Energy / _motherEnergy >> hTempEC","_dist1_ToWall>=%g" % fid_cuts[x])
     fid_ec[x]  = hTempEC.GetMean()
+    #fid_eff_error[x] = sqrt( ch.GetEntries() * fid_eff[x] * (1-fid_eff[x])) 
+    fid_eff_error[x] = fid_eff[x] * (1-fid_eff[x]) 
 
 for x in xrange(len(length_cuts)):
 
@@ -45,9 +51,11 @@ for x in xrange(len(length_cuts)):
     ch.Draw("_daughter1_Energy / _motherEnergy >> hTempEC","_dist1_AlongTraj>=%g" % length_cuts[x])
     length_ec[x] = hTempEC.GetMean()
 
+
 for x in xrange(len(fid_cuts)):
 
     print fid_cuts[x], fid_eff[x], fid_ec[x],'...',fid_eff[x]*fid_ec[x]
+    print fid_eff_error[x]
 
 print
 
@@ -57,6 +65,7 @@ fid_ec_graph = TGraph(len(fid_cuts), fid_ec_xvalues, fid_ec_yvalues)
 fid_ec_graph.SetMarkerStyle(20)
 fid_ec_graph.SetMarkerColor(kRed)
 
+  
 fid_eff_xvalues = array.array('d', fid_cuts)
 fid_eff_yvalues = array.array('d', fid_eff)
 fid_eff_graph = TGraph(len(fid_cuts), fid_eff_xvalues, fid_eff_yvalues)
