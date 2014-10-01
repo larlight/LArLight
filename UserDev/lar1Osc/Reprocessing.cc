@@ -310,29 +310,29 @@ void lar1::Reprocessing::Loop(std::string signal,
     // Can have CC, NC, or other type events
 
     // Can further distinguish:
-    // iChan = 1000 //NC with 0 charged pions, 0 protons, 0 neutrons
-    // iChan = 1001 //NC with 0 charged pions, 0 protons, 1 or more neutrons
-    // iChan = 1010 //NC with 0 charged pions, 1 proton,  0 neutrons
-    // iChan = 1011 //NC with 0 charged pions, 1 proton,  1 or more neutrons
-    // iChan = 1020 //NC with 0 charged pions, 2 protons, 0 neutrons
-    // iChan = 1021 //NC with 0 charged pions, 2 protons, 1 or more neutrons
-    // iChan = 1030 //NC with 0 charged pions, 3+ protons, 0 neutrons
-    // iChan = 1031 //NC with 0 charged pions, 3+ protons, 1 or more neutrons
+    // iChan = 1000 //CC with 0 charged pions, 0 protons, 0 neutrons
+    // iChan = 1001 //CC with 0 charged pions, 0 protons, 1 or more neutrons
+    // iChan = 1010 //CC with 0 charged pions, 1 proton,  0 neutrons
+    // iChan = 1011 //CC with 0 charged pions, 1 proton,  1 or more neutrons
+    // iChan = 1020 //CC with 0 charged pions, 2 protons, 0 neutrons
+    // iChan = 1021 //CC with 0 charged pions, 2 protons, 1 or more neutrons
+    // iChan = 1030 //CC with 0 charged pions, 3+ protons, 0 neutrons
+    // iChan = 1031 //CC with 0 charged pions, 3+ protons, 1 or more neutrons
     // 
     // 
-    // iChan = 1100 //NC with 1 charged pions, 0 protons, 0 neutrons
-    // iChan = 1101 //NC with 1 charged pions, 0 protons, 1 or more neutrons
-    // iChan = 1110 //NC with 1 charged pions, 1 proton,  0 neutrons
-    // iChan = 1111 //NC with 1 charged pions, 1 proton,  1 or more neutrons
-    // iChan = 1120 //NC with 1 charged pions, 2+ protons, 0 neutrons
-    // iChan = 1121 //NC with 1 charged pions, 2+ protons, 1 or more neutrons
+    // iChan = 1100 //CC with 1 charged pions, 0 protons, 0 neutrons
+    // iChan = 1101 //CC with 1 charged pions, 0 protons, 1 or more neutrons
+    // iChan = 1110 //CC with 1 charged pions, 1 proton,  0 neutrons
+    // iChan = 1111 //CC with 1 charged pions, 1 proton,  1 or more neutrons
+    // iChan = 1120 //CC with 1 charged pions, 2+ protons, 0 neutrons
+    // iChan = 1121 //CC with 1 charged pions, 2+ protons, 1 or more neutrons
     // 
-    // iChan = 1200 //NC with 2+ charged pions, 0 protons, 0 neutrons
-    // iChan = 1201 //NC with 2+ charged pions, 0 protons, 1 or more neutrons
-    // iChan = 1210 //NC with 2+ charged pions, 1 proton,  0 neutrons
-    // iChan = 1211 //NC with 2+ charged pions, 1 proton,  1 or more neutrons
-    // iChan = 1220 //NC with 2+ charged pions, 2+ protons, 0 neutrons
-    // iChan = 1221 //NC with 2+ charged pions, 2+ protons, 1 or more neutrons
+    // iChan = 1200 //CC with 2+ charged pions, 0 protons, 0 neutrons
+    // iChan = 1201 //CC with 2+ charged pions, 0 protons, 1 or more neutrons
+    // iChan = 1210 //CC with 2+ charged pions, 1 proton,  0 neutrons
+    // iChan = 1211 //CC with 2+ charged pions, 1 proton,  1 or more neutrons
+    // iChan = 1220 //CC with 2+ charged pions, 2+ protons, 0 neutrons
+    // iChan = 1221 //CC with 2+ charged pions, 2+ protons, 1 or more neutrons
     // 
     // 
     // Enumerate NC events:
