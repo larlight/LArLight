@@ -36,29 +36,45 @@ namespace larlight {
 
     virtual bool initialize();
 
-    /** IMPLEMENT in ShowerDistanceStudy.cc! 
-        Analyze a data event-by-event  
-    */
     virtual bool analyze(storage_manager* storage);
 
-    /** IMPLEMENT in ShowerDistanceStudy.cc! 
-        Finalize method to be called after all events processed.
-    */
     virtual bool finalize();
 
     protected:
 
 	TTree * _ana_tree ;
 
-	double _motherEnergy ;
+	double _mother1Energy ;
+	double _mother2Energy ;
 	double _daughter1_Energy ;
 	double _daughter2_Energy ;
+
+	double _motherMomentumX ;	
+	double _motherMomentumY ;	
+	double _motherMomentumZ ;	
 
 	double _dist1_ToWall ;
 	double _dist1_AlongTraj ;
 	
 	double _dist2_ToWall ;
 	double _dist2_AlongTraj ;
+
+	double _reco_daughter1_Energy ;
+
+	std::vector<double> _reco_start1 ;
+	std::vector<double> _direction1 ;
+
+	std::vector<double> _reco_start2 ;
+	std::vector<double> _direction2 ;
+
+	double _reco_dist1_ToWall ;
+	double _reco_dist2_ToWall ;
+	double _reco_dist1_AlongTraj ;
+	double _reco_dist2_AlongTraj ;
+
+
+	double _pi0_mass ;
+
 
   };
 }

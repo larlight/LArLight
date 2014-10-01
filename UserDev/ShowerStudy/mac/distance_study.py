@@ -15,7 +15,11 @@ from ROOT import larlight as fmwk
 my_proc = fmwk.ana_processor()
 
 # Set input root file
-my_proc.add_input_file(sys.argv[1])
+#my_proc.add_input_file(sys.argv[1])
+
+for x in xrange(len(sys.argv)-1):
+	my_proc.add_input_file(sys.argv[x+1])
+
 
 # Specify IO mode
 my_proc.set_io_mode(fmwk.storage_manager.READ)
@@ -23,9 +27,9 @@ my_proc.set_io_mode(fmwk.storage_manager.READ)
 my_proc.set_rootdir("scanner")
 
 # Specify input TDirectory name if given
-if len(sys.argv) > 2:
+#if len(sys.argv) > 2:
 
-    my_proc.set_input_rootdir(sys.argv[2])
+ #   my_proc.set_input_rootdir(sys.argv[2])
 
 # Specify output root file name
 my_proc.set_ana_output_file("distance.root");
