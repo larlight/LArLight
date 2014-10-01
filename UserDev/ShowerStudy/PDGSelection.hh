@@ -28,9 +28,9 @@ namespace larlight {
   public:
 
     enum PARTICLE_GROUP {
-      kANY,
-      kPRIMARY,
-      kSECONDARY,
+      kGENERATOR,
+      kG4PRIMARY,
+      kG4SECONDARY,
       kPARTICLE_GROUP_MAX
     };
 
@@ -56,7 +56,9 @@ namespace larlight {
     virtual bool finalize();
 
     /// Setter for what kind of particle to pass the event filter
-    void Select(int const pdg_code, PDGSelection::PARTICLE_GROUP const part_type);
+    void Select(int const pdg_code, 
+		PDGSelection::PARTICLE_GROUP part_type=kG4PRIMARY,
+		int count=-1);
     
     /// Method to reset internal variables + user defined variables
     void Reset();
@@ -67,7 +69,9 @@ namespace larlight {
 
     size_t _nevent_selected;
 
-    std::vector<std::set<int> > _pdg_list;
+    std::vector<std::map<int,int> > _request_list;
+
+    std::vector<std::map<int,int> > _found_list;
 
   };
 }
