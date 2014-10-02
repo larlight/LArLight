@@ -1,0 +1,450 @@
+#ifndef NCFILTER_CC
+#define NCFILTER_CC
+
+#include "NCfilter.hh"
+#include "ClusterParamsAlg.hh"
+#include "LArUtilBase.hh"
+
+
+namespace larlight {
+
+  bool NCfilter::initialize() {
+
+    //
+    // This function is called in the beggining of event loop
+    // Do all variable initialization you wish to do here.
+    // If you have a histogram to fill in the event loop, for example,
+    // here is a good place to create one on the heap (i.e. "new TH1D"). 
+    //
+
+    return true;
+  }
+  
+  bool NCfilter::analyze(storage_manager* storage) {
+    
+    
+    // grab the incoming clusters. 
+    // these should be clusters that are very primative. like DB or hough
+    auto Incoming_cluster = (const event_cluster*)(storage->get_data(DATA::DBCluster));
+    auto const& hit_type = Incoming_cluster->get_hit_type();
+    auto hits = (const event_hit*)(storage->get_data(hit_type));
+    
+    if(!hits || !Incoming_cluster) {
+      print(MSG::ERROR,__FUNCTION__,"No DBCluster or associated hits found!");
+      return false;
+    }
+    if(!(Incoming_cluster->size())){
+      print(MSG::WARNING,__FUNCTION__,Form("Event %d has no DBCluster...",Incoming_cluster->event_id()));
+      return true;
+    }
+    else if(!(hits->size())){
+      print(MSG::ERROR,__FUNCTION__,Form("Event %d has no hits (but there's DBCluster!!!)",Incoming_cluster->event_id()));
+      return false;
+    }
+    // make the output cluster
+    auto Output_cluster = (event_cluster*)(storage->get_data(DATA::RyanCluster));
+    
+    // set event variables
+    if(Output_cluster->size())
+      print(MSG::WARNING,__FUNCTION__,"DATA::RyanCluster is not empty. Clearing it...");
+    Output_cluster->clear_data();
+    Output_cluster->set_event_id(Incoming_cluster->event_id());
+    Output_cluster->set_run(Incoming_cluster->run());
+    Output_cluster->set_subrun(Incoming_cluster->subrun());
+    
+
+
+	// Need some bool to check about the quality of the protoclusters
+        // need some flags to see which planes to pursue  clustering in
+    	unsigned int nplanes = larutil::Geometry::GetME()->Nplanes();
+    	std::vector<std::pair<double,double>> AvgPairSI(nplanes);	
+	std::vector<std::pair<std::vector<unsigned int>,std::vector<unsigned int>>> BestClusters(nplanes);
+        //std::vector<bool> flagplanes(nplanes,false);
+        std::vector<bool> FlagGoodPlanes(nplanes,false);
+
+
+
+//============Starting with  first pass alg============
+
+// make a vector of clusters
+	std::vector<larlight::cluster> clustervect;
+    for(auto const& c : *Incoming_cluster) {
+	clustervect.push_back(c);
+	}
+	std::vector<larlight::hit> hitsvect;
+    for(auto const& h : *hits) {
+	hitsvect.push_back(h);
+	}
+	AvgPairSI = fDivReg.SplitLineC(clustervect, hitsvect);
+
+//====================Ending with alg===================
+
+	
+//=======================
+//=== make the regions===
+//=======================
+   std::vector<std::pair<std::vector<unsigned int>,std::vector<unsigned int>>>  FirstRegions = fForceRegions.ForceTwoRegions(hitsvect, AvgPairSI);
+    std::cout<< "\033[94m lets see what things do  "<< FirstRegions[0].first.size()<<"  , \033[00m"<<FirstRegions[0].second.size()<<std::endl;
+    std::cout<< "\033[95m lets see what things do  "<< FirstRegions[1].first.size()<<"  , \033[00m"<<FirstRegions[1].second.size()<<std::endl;
+    std::cout<< "\033[96m lets see what things do  "<< FirstRegions[2].first.size()<<"  , \033[00m"<<FirstRegions[2].second.size()<<std::endl;
+//=======================
+
+
+//=============================
+//=== Try to clean up region===
+//=============================
+
+//$$$$ need to impliment a look back function
+
+//=======================
+
+
+
+
+
+//=======================
+//=== Check Bools========
+//=======================
+// do the time prof test...
+	double QlevelLo = 0.1;
+	double QlevelHi = 0.99;
+	double QlevelVert = 0.8;
+	bool Q01 = false;
+	bool Q02 = false;
+	bool Q12 = false;
+std::vector<std::pair<std::vector<larutil::PxHit>,std::vector<larutil::PxHit>>> firstreg(nplanes);
+	    std::vector<larutil::PxHit> pxfa_v0;
+	    std::vector<larutil::PxHit> pxfb_v0;
+	    std::vector<larutil::PxHit> pxfa_v1;
+	    std::vector<larutil::PxHit> pxfb_v1;
+	    std::vector<larutil::PxHit> pxfa_v2;
+	    std::vector<larutil::PxHit> pxfb_v2;
+	//hit index, all the hits, and the vector of pxf
+	if(FirstRegions[0].first.size() > 15 && FirstRegions[0].second.size()>15){
+	    fCRUHelper.GeneratePxHit(FirstRegions[0].first, hits, pxfa_v0);
+    	    fCRUHelper.GeneratePxHit(FirstRegions[0].second, hits, pxfb_v0);
+		if(FirstRegions[1].first.size() > 15 && FirstRegions[1].second.size()>15){
+		    fCRUHelper.GeneratePxHit(FirstRegions[1].first, hits, pxfa_v1);
+		    fCRUHelper.GeneratePxHit(FirstRegions[1].second, hits, pxfb_v1);
+		std::cout<< "\t \033[97m  Plane 01:"<<std::endl;
+		double aa = fQuality.TimeProf(pxfa_v0,pxfa_v1);
+		double ab = fQuality.TimeProf(pxfa_v0,pxfb_v1);
+		double ba = fQuality.TimeProf(pxfb_v0,pxfa_v1);
+		double bb = fQuality.TimeProf(pxfb_v0,pxfb_v1);
+			if(aa>QlevelHi && bb>QlevelHi && ab<QlevelLo && ba<QlevelLo) Q01 = true;	
+			if(aa<QlevelLo && bb<QlevelLo && ab>QlevelHi && ba>QlevelHi) Q01 = true;	
+			if(aa>QlevelVert && bb>QlevelVert && ab>QlevelVert && ba>QlevelVert) Q01 = false;// need a switch... vertical showers	
+					}//plane 1
+		if(FirstRegions[2].first.size() > 15 && FirstRegions[2].second.size()>15){
+		    fCRUHelper.GeneratePxHit(FirstRegions[2].first, hits, pxfa_v2);
+		    fCRUHelper.GeneratePxHit(FirstRegions[2].second, hits, pxfb_v2);
+		std::cout<< "\t \033[97m Plane 02:"<<std::endl;
+		double aa = fQuality.TimeProf(pxfa_v0,pxfa_v2);
+		double ab = fQuality.TimeProf(pxfa_v0,pxfb_v2);
+		double ba = fQuality.TimeProf(pxfb_v0,pxfa_v2);
+		double bb = fQuality.TimeProf(pxfb_v0,pxfb_v2); 
+			if(aa>QlevelHi && bb>QlevelHi && ab<QlevelLo && ba<QlevelLo) Q02 = true;	
+			if(aa<QlevelLo && bb<QlevelLo && ab>QlevelHi && ba>QlevelHi) Q02 = true;	
+			if(aa>QlevelVert && bb>QlevelVert && ab>QlevelVert && ba>QlevelVert) Q02 = false;// need a switch... vertical showers
+					}//plane 2
+				}//if plane 0 
+
+	if(FirstRegions[1].first.size() > 15 && FirstRegions[1].second.size()>15){
+		    fCRUHelper.GeneratePxHit(FirstRegions[1].first, hits, pxfa_v1);
+		    fCRUHelper.GeneratePxHit(FirstRegions[1].second, hits, pxfb_v1);
+		if(FirstRegions[2].first.size() > 15 && FirstRegions[2].second.size()>15){
+		    fCRUHelper.GeneratePxHit(FirstRegions[2].first, hits, pxfa_v2);
+		    fCRUHelper.GeneratePxHit(FirstRegions[2].second, hits, pxfb_v2);
+		std::cout<< "\t \033[97m  Plane 12:"<<std::endl;
+		double aa = fQuality.TimeProf(pxfa_v1,pxfa_v2);
+		double ab = fQuality.TimeProf(pxfa_v1,pxfb_v2);
+		double ba = fQuality.TimeProf(pxfb_v1,pxfa_v2);
+		double bb = fQuality.TimeProf(pxfb_v1,pxfb_v2);
+			if(aa>QlevelHi && bb>QlevelHi && ab<QlevelLo && ba<QlevelLo) Q12 = true;	
+			if(aa<QlevelLo && bb<QlevelLo && ab>QlevelHi && ba>QlevelHi) Q12 = true;	
+			if(aa>QlevelVert && bb>QlevelVert && ab>QlevelVert && ba>QlevelVert) Q12 = false;// need a switch... vertical showers
+					}// if plane 2
+				}//plane 1
+
+
+//---------------------------------------------------------------------------------
+// Check to see what we need to do next. Should we try another alg or keep theses? 
+//---------------------------------------------------------------------------------
+		std::vector<bool> flip(3,false);
+		if(Q01==true && Q02==false) flip[2]=true;
+		if(Q01==false && Q02==true) flip[1]=true;
+		if(Q01==true && Q12==false) flip[2]=true;
+		//if(Q01==false && Q12==true) flip[0]=true;
+		if(Q01==false && Q12==true) flip[1]=true;
+		if(Q02==true && Q12==false) flip[1]=true;
+		if(Q02==false && Q12==true) flip[0]=true;
+		if(Q01==false &&Q02==false &&Q12==false){ flip[0]=true; flip[1]=true; flip[2]=true;}
+	//for(unsigned int a = 0 ;a < nplanes;a++) if(flip[a]==false) flagplanes[a]= true;
+	for(unsigned int a = 0 ;a < nplanes;a++) if(flip[a]==false) FlagGoodPlanes[a]= true;
+		
+//---------------------------------------------------------------------------------
+		std::cout<<"\t Status of Plane Bools after first pass : "<<FlagGoodPlanes[0]<<FlagGoodPlanes[1]<<FlagGoodPlanes[2]<<std::endl;
+		std::cout<<"\t Status of Flip Bools after first pass : "<<flip[0]<<flip[1]<<flip[2]<<std::endl;
+//---------------------------------------------------------------------------------
+
+
+//---------- If the plane bools are true then fill into the final cluster----------
+	for(unsigned int b = 0 ;b < nplanes;b++) if(FlagGoodPlanes[b]) BestClusters[b]= FirstRegions[b];
+//---------------------------------------------------------------------------------
+
+
+
+
+
+//====================================================
+//============Starting with  flip pass alg============
+//====================================================
+// if not all the plane bools are true then do some more work
+for( unsigned int i = 0 ; i<flip.size();i++)
+{
+	//if the the flip bool is true do the flip
+	// This is not that efficient... I am doing the loop a few time... RG Come back and clean up
+	if(flip[i]){
+	std::vector<std::pair<double, double> > FlipAvgPairSI = fDivReg.FlipLineC(clustervect, hitsvect);
+   	std::vector<std::pair<std::vector<unsigned int>,std::vector<unsigned int>>>  FlipRegions = fForceRegions.ForceTwoFlipRegions(hitsvect, FlipAvgPairSI);
+	// This being in the if will prevent overwriting the stuff that is already good.
+		BestClusters[i] = FlipRegions[i];
+	}// end of if flip[i]
+}// for loop over all the flip stuff
+//====================Ending with alg===================
+
+
+
+//=======================
+//=== Check Bools========
+//=======================
+// do the time prof test...
+	double QFliplevelLo = 0.1;
+	double QFliplevelHi = 0.99;
+	double QFliplevelVert = 0.8;
+	bool QFlip01 = false;
+	bool QFlip02 = false;
+	bool QFlip12 = false;
+//std::vector<std::pair<std::vector<larutil::PxHit>,std::vector<larutil::PxHit>>> BestFlipClusters(nplanes);
+	    std::vector<larutil::PxHit> pxa_v0;
+	    std::vector<larutil::PxHit> pxb_v0;
+	    std::vector<larutil::PxHit> pxa_v1;
+	    std::vector<larutil::PxHit> pxb_v1;
+	    std::vector<larutil::PxHit> pxa_v2;
+	    std::vector<larutil::PxHit> pxb_v2;
+	//hit index, all the hits, and the vector of px
+	//if(BestFlipClusters[0].first.size() > 15 && BestFlipClusters[0].second.size()>15){
+	if(BestClusters[0].first.size() > 15 && BestClusters[0].second.size()>15){
+	    fCRUHelper.GeneratePxHit(BestClusters[0].first, hits, pxa_v0);
+    	    fCRUHelper.GeneratePxHit(BestClusters[0].second, hits, pxb_v0);
+		if(BestClusters[1].first.size() > 15 && BestClusters[1].second.size()>15){
+		    fCRUHelper.GeneratePxHit(BestClusters[1].first, hits, pxa_v1);
+		    fCRUHelper.GeneratePxHit(BestClusters[1].second, hits, pxb_v1);
+		std::cout<< "\t \033[97m  Plane 01:"<<std::endl;
+		double aa = fQuality.TimeProf(pxa_v0,pxa_v1);
+		double ab = fQuality.TimeProf(pxa_v0,pxb_v1);
+		double ba = fQuality.TimeProf(pxb_v0,pxa_v1);
+		double bb = fQuality.TimeProf(pxb_v0,pxb_v1);
+			if(aa>QFliplevelHi && bb>QFliplevelHi && ab<QFliplevelLo && ba<QFliplevelLo) QFlip01 = true;	
+			if(aa<QFliplevelLo && bb<QFliplevelLo && ab>QFliplevelHi && ba>QFliplevelHi) QFlip01 = true;	
+			if(aa>QFliplevelVert && bb>QFliplevelVert && ab>QFliplevelVert && ba>QFliplevelVert) QFlip01 = false;// need a switch... vertical showers	
+					}//plane 1
+		if(BestClusters[2].first.size() > 15 && BestClusters[2].second.size()>15){
+		    fCRUHelper.GeneratePxHit(BestClusters[2].first, hits, pxa_v2);
+		    fCRUHelper.GeneratePxHit(BestClusters[2].second, hits, pxb_v2);
+		std::cout<< "\t \033[97m Plane 02:"<<std::endl;
+		double aa = fQuality.TimeProf(pxa_v0,pxa_v2);
+		double ab = fQuality.TimeProf(pxa_v0,pxb_v2);
+		double ba = fQuality.TimeProf(pxb_v0,pxa_v2);
+		double bb = fQuality.TimeProf(pxb_v0,pxb_v2); 
+			if(aa>QFliplevelHi && bb>QFliplevelHi && ab<QFliplevelLo && ba<QFliplevelLo) QFlip02 = true;	
+			if(aa<QFliplevelLo && bb<QFliplevelLo && ab>QFliplevelHi && ba>QFliplevelHi) QFlip02 = true;	
+			if(aa>QFliplevelVert && bb>QFliplevelVert && ab>QFliplevelVert && ba>QFliplevelVert) QFlip02 = false;// need a switch... vertical showers
+					}//plane 2
+				}//if plane 0 
+
+	if(BestClusters[1].first.size() > 15 && BestClusters[1].second.size()>15){
+		    fCRUHelper.GeneratePxHit(BestClusters[1].first, hits, pxa_v1);
+		    fCRUHelper.GeneratePxHit(BestClusters[1].second, hits, pxb_v1);
+		if(BestClusters[2].first.size() > 15 && BestClusters[2].second.size()>15){
+		    fCRUHelper.GeneratePxHit(BestClusters[2].first, hits, pxa_v2);
+		    fCRUHelper.GeneratePxHit(BestClusters[2].second, hits, pxb_v2);
+		std::cout<< "\t \033[97m  Plane 12:"<<std::endl;
+		double aa = fQuality.TimeProf(pxa_v1,pxa_v2);
+		double ab = fQuality.TimeProf(pxa_v1,pxb_v2);
+		double ba = fQuality.TimeProf(pxb_v1,pxa_v2);
+		double bb = fQuality.TimeProf(pxb_v1,pxb_v2);
+			if(aa>QFliplevelHi && bb>QFliplevelHi && ab<QFliplevelLo && ba<QFliplevelLo) QFlip12 = true;	
+			if(aa<QFliplevelLo && bb<QFliplevelLo && ab>QFliplevelHi && ba>QFliplevelHi) QFlip12 = true;	
+			if(aa>QFliplevelVert && bb>QFliplevelVert && ab>QFliplevelVert && ba>QFliplevelVert) QFlip12 = false;// need a switch...vertical showers
+					}// if plane 2
+				}//plane 1
+//---------------------------------------------------------------------------------
+// Check to see what we need to do next after the flip. Should we try another alg or keep theses? 
+//---------------------------------------------------------------------------------
+		std::vector<bool> NextAlg(3,false);
+        std::vector<bool> flagflipplanes(nplanes,false);
+		if(QFlip01==true && QFlip02==false) NextAlg[2]=true;
+		if(QFlip01==false && QFlip02==true) NextAlg[1]=true;
+		if(QFlip01==true && QFlip12==false) NextAlg[2]=true;
+		if(QFlip01==false && QFlip12==true) NextAlg[0]=true;
+		if(QFlip02==true && QFlip12==false) NextAlg[1]=true;
+		if(QFlip02==false && QFlip12==true) NextAlg[0]=true;
+		if(QFlip01==false &&QFlip02==false &&QFlip12==false){ NextAlg[0]=true; NextAlg[1]=true; NextAlg[2]=true;}
+	for(unsigned int a = 0 ;a < nplanes;a++) if(NextAlg[a]==false) flagflipplanes[a]= true;
+
+
+	// now set the good planes: if NextAlg is false then we have a good plane
+	for(unsigned int a = 0 ;a < nplanes;a++) if(NextAlg[a]==false) FlagGoodPlanes[a]= true;
+	
+	//
+	// TATTOO
+	//if(flagflipplanes&& !flagplanes) 
+	
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+//---------------------------------------------------------------------------------
+		std::cout<<"\t Status of Good Planes at End : "<<FlagGoodPlanes[0]<<FlagGoodPlanes[1]<<FlagGoodPlanes[2]<<std::endl;
+	// if we just have one plane..... take the next best thing... This will have to be the last step
+	//if
+//---------------------------------------------------------------------------------
+
+
+
+
+
+    // Lets fill these hits out into clusters. 
+    
+    for( unsigned int a=0 ; a<BestClusters.size();a++){
+
+	// need a check to see if we did well or not
+	if(FlagGoodPlanes[a]){
+      ::larlight::cluster lite_cluster;
+      std::vector<unsigned int> hit_ass;
+
+      // Skip if there's no hit
+      if(!(BestClusters[a].first.size()) || !(BestClusters[a].second.size())) continue;
+
+      //
+      // Save clusters
+      //
+
+      // Clear data products
+      hit_ass.clear();
+      hit_ass.reserve(BestClusters[a].first.size());
+      lite_cluster.clear_data();
+
+      // Make association
+      for( auto const& hit : BestClusters[a].first) hit_ass.push_back(hit);
+
+      // Add association
+      lite_cluster.add_association(hit_type,hit_ass);
+
+      // Add a cluster to the output
+      Output_cluster->push_back(lite_cluster);
+
+      // Clear data products
+      hit_ass.clear();
+      hit_ass.reserve(BestClusters[a].second.size());
+      lite_cluster.clear_data();
+
+      // Make association
+      for( auto const& hit : BestClusters[a].second) hit_ass.push_back(hit);
+
+      // Add association
+      lite_cluster.add_association(hit_type,hit_ass);
+
+      // Add a cluster to the output
+      Output_cluster->push_back(lite_cluster);
+
+	}// if FLagGoodPlanes[a]
+    }// loop over Best Clusters
+
+    return true;
+  }
+
+  bool NCfilter::finalize() {
+
+    // This function is called at the end of event loop.
+    // Do all variable finalization you wish to do here.
+    // If you need, you can store your ROOT class instance in the output
+    // file. You have an access to the output file through "_fout" pointer.
+    //
+    // Say you made a histogram pointer h1 to store. You can do this:
+    //
+    // if(_fout) { _fout->cd(); h1->Write(); }
+    //
+    // else 
+    //   print(MSG::ERROR,__FUNCTION__,"Did not find an output file pointer!!! File not opened?");
+    //
+  
+    return true;
+  }
+
+//---------------------
+// Adding some fuctions 
+//---------------------
+
+  //---------------------------------------------------------------------------------------------
+
+/*
+std::vector<std::pair<std::vector<unsigned int>,std::vector<unsigned int>>>  NCfilter::CheckQuality(larlight::event_hit *const hits,std::vector<std::pair<std::vector<unsigned int>,std::vector<unsigned int>>> protocluster, std::vector<bool> Flags){
+
+
+        // First Check based on bool.... if there is already a bool? Might not need this in here... Should do it in the code to fill clusters
+	fucnflag0= false;
+	fucnflag1= false;
+	fucnflag2= false;
+	
+	
+
+        // Checking the time profile
+        for( unsigned int a=0 ; a<protocluster.size();a++){
+
+
+                for(unsigned int k =0 ; k<protocluster[a].first.size(); k++){
+
+
+                                }// protocluster for loop over a first cluster  
+
+                }// for loop over protocluster
+
+
+	}// End of Check Quality Func
+
+*/
+
+
+
+
+
+
+
+
+}
+#endif

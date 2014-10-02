@@ -105,7 +105,7 @@ namespace cluster {
     else{
       std::pair<double,double> n2(-999,-999);
       AvgPairSI[2] = n2;}
-    std::cout<<" Size of avg pairs from First Pass"<<AvgPairSI.size()<<std::endl;
+ //   std::cout<<" Size of avg pairs from First Pass"<<AvgPairSI.size()<<std::endl;
 
 
 
@@ -207,7 +207,7 @@ namespace cluster {
 	      std::pair<double,double> n2(-999,-999);
 	      AvgPairSI[2] = n2;}
 	
-    std::cout<<" Size of avg pairs from First Pass"<<AvgPairSI.size()<<std::endl;
+    ///std::cout<<" Size of avg pairs from First Pass"<<AvgPairSI.size()<<std::endl;
 	// return the info
     return AvgPairSI;
   }
@@ -302,7 +302,7 @@ namespace cluster {
 	      std::pair<double,double> n2(-999,-999);
 	      AvgPairSI[2] = n2;}
 	
-    std::cout<<" Size of avg pairs from flip"<<AvgPairSI.size()<<std::endl;
+    //std::cout<<" Size of avg pairs from flip"<<AvgPairSI.size()<<std::endl;
 	// return the info
     return AvgPairSI;
   }
@@ -430,7 +430,7 @@ namespace cluster {
 	      std::pair<double,double> n2(-999,-999);
 	      AvgPairSI[2] = n2;}
 	
-    std::cout<<" Size of avg pairs From Rot"<<AvgPairSI.size()<<std::endl;
+   // std::cout<<" Size of avg pairs From Rot"<<AvgPairSI.size()<<std::endl;
 	// return the info
     return AvgPairSI;
   }

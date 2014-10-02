@@ -38,7 +38,8 @@ namespace showerreco {
     virtual void Reset() = 0;
 
     /// Function to reconstruct a shower
-    virtual ::larlight::shower Reconstruct(const std::vector< ::cluster::ClusterParamsAlg>& ) = 0;
+    //virtual ::larlight::shower Reconstruct(const std::vector< ::cluster::ClusterParamsAlg>& ) = 0;
+    virtual ::larlight::shower ReconstructPi0(const std::vector< ::cluster::ClusterParamsAlg>& , std::vector<std::pair<double,double>>  ) = 0;
     
     /// Verbosity switch
     virtual void Verbose(bool on=true) { fVerbosity=on; }

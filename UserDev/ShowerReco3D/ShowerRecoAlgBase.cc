@@ -7,7 +7,8 @@ namespace showerreco {
   
   ShowerRecoAlgBase::ShowerRecoAlgBase()
   {
-    fVerbosity = false;
+    //fVerbosity = false;
+    fVerbosity = true;
   }
 
 

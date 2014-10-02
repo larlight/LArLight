@@ -19,15 +19,9 @@ namespace larlight {
 
 	// lets make some histograms looking at some potential cuts 
 
-    hClusterSize0 = new TH1D("hClusterSize0","clustsize",20,0,1);
-    hClusterSize1 = new TH1D("hClusterSize1","clustsize",20,0,1);
-    hClusterSize2 = new TH1D("hClusterSize2","clustsize",20,0,1);
-    hPVTime01 = new TH1D("hPVTime01","PV",20,0,100);
-    hPVTime02 = new TH1D("hPVTime02","PV",20,0,100);
-    hPVTime12 = new TH1D("hPVTime12","PV",20,0,100);
-    hTime0 = new TH1D("hTime0","PV",400,-1000,1000);
-    hTime1 = new TH1D("hTime1","PV",400,-1000,1000);
-    hTime2 = new TH1D("hTime2","PV",400,-1000,1000);
+    hClusterSize0 = new TH1D("hClusterSize0","clustsize",10,0,1);
+    hClusterSize1 = new TH1D("hClusterSize1","clustsize",10,0,1);
+    hClusterSize2 = new TH1D("hClusterSize2","clustsize",10,0,1);
 
 
     return true;
@@ -272,18 +266,29 @@ for( unsigned int i = 0 ; i<RotateAlg.size();i++){
 
 
 
-	FinalProtoVertex = fQuality.ProtoVertexCW(BestClusters,hits);;
-        for(unsigned int k = 0 ; k<nplanes;k++){
-	 if(FlagGoodPlanes[k]){
-	std::cout<<"This is the FinalProtoVertex Plane["<< k << "] :\t " <<FinalProtoVertex[k].first<<" , "<<FinalProtoVertex[k].second<<std::endl;
-	}// if plane is good 
-	}// loop over all planes
 
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+	//for(unsigned int k = 0 ; k<nplanes;k++)std::cout<< "This is the final ProtoVertex :\t " <<FinalProtoVertex[k].first<<" , "<<FinalProtoVertex[k].second<<std::endl;
 
 	
+	FinalProtoVertex = fQuality.ProtoVertexCW(BestClusters,hits);;
 
 //---------------------------------------------------------------------------------
 //------- look to see which way the showers are going -----------------------------
@@ -379,48 +384,20 @@ for( unsigned int i = 0 ; i<RotateAlg.size();i++){
       if(!(BestClusters[a].first.size()) || !(BestClusters[a].second.size())) continue;
 	
 	// if 
+	double clustsizeratio = -999;
 	
-	double clusterhitratio = -999;
-	double FirstClust  = BestClusters[a].first.size();
-	double SecondClust = BestClusters[a].second.size();
-	if(BestClusters[a].first.size()> BestClusters[a].second.size()) clusterhitratio = SecondClust/FirstClust;
-	if(BestClusters[a].first.size()< BestClusters[a].second.size()) clusterhitratio =FirstClust/SecondClust;
-	if(BestClusters[a].first.size()==BestClusters[a].second.size()) clusterhitratio =FirstClust/SecondClust;
+	if( BestClusters[a].first.size()> BestClusters[a].second.size()) clustsizeratio = BestClusters[a].second.size()/BestClusters[a].first.size();
+	if( BestClusters[a].first.size()< BestClusters[a].second.size()) clustsizeratio = BestClusters[a].first.size()/BestClusters[a].second.size();
+	if( BestClusters[a].first.size() == BestClusters[a].second.size()) clustsizeratio = BestClusters[a].first.size()/BestClusters[a].second.size();
 
-	if(a==0) hClusterSize0->Fill(clusterhitratio);
-	if(a==1) hClusterSize1->Fill(clusterhitratio);
-	if(a==2) hClusterSize2->Fill(clusterhitratio);
+	// now lets fill things out. 
+	if(a == 0 ) hClusterSize0->Fill(clustsizeratio);
+	if(a == 1 ) hClusterSize1->Fill(clustsizeratio);
+	if(a == 2 ) hClusterSize2->Fill(clustsizeratio);
 
+	}// if good plane 
+	}// for loop over clusters pairs
 
-
-	}// if both are good 
-	}// for loop over clusters
-
-
-	if(FinalProtoVertex.size()>0){
-		if(FlagGoodPlanes[0] && FlagGoodPlanes[1]){
-		double abstime = fabs(FinalProtoVertex[0].second - FinalProtoVertex[1].second);
- 		hPVTime01->Fill(abstime);
-		}// if 01
-		if(FlagGoodPlanes[0] && FlagGoodPlanes[2]){
-		double abstime = fabs(FinalProtoVertex[0].second - FinalProtoVertex[2].second);
- 		hPVTime02->Fill(abstime);
-		}
-		if(FlagGoodPlanes[1] && FlagGoodPlanes[2]){
-		double abstime = fabs(FinalProtoVertex[1].second - FinalProtoVertex[2].second);
- 		hPVTime12->Fill(abstime);
-		}
-		
-		// look for the worst abs time in each plane
-		if(FlagGoodPlanes[0]){
- 		hTime0->Fill(FinalProtoVertex[0].second);}
-		if(FlagGoodPlanes[1]){
- 		hTime1->Fill(FinalProtoVertex[1].second);}
-		if(FlagGoodPlanes[2]){
- 		hTime2->Fill(FinalProtoVertex[2].second);}
-		
-
-		}// if protovertex size 
 
 
 
@@ -441,23 +418,11 @@ for( unsigned int i = 0 ; i<RotateAlg.size();i++){
     //
     // Say you made a histogram pointer h1 to store. You can do this:
     //
-     if(_fout){ _fout->cd(); 
-	hClusterSize0->Write(); 
-	hClusterSize1->Write(); 
-	hClusterSize2->Write(); 
-	hPVTime01->Write(); 
-	hPVTime02->Write(); 
-	hPVTime12->Write(); 
-	hTime0->Write(); 
-	hTime1->Write(); 
-	hTime2->Write(); 
-	}// close the if fout
+    // if(_fout) { _fout->cd(); h1->Write(); }
     //
-     else 
-       print(MSG::ERROR,__FUNCTION__,"Did not find an output file pointer!!! File not opened?");
+    // else 
+    //   print(MSG::ERROR,__FUNCTION__,"Did not find an output file pointer!!! File not opened?");
     //
-	
-	
   
     return true;
   }

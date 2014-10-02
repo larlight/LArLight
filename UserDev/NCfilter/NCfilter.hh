@@ -36,7 +36,8 @@ namespace larlight {
   public:
 
     /// Default constructor
-    NCfilter() : ana_base() { _name="NCfilter"; }
+    NCfilter() : ana_base() { _name="NCfilter";
+	_fout = 0; }
 
     /// Default destructor
     virtual ~NCfilter(){};
@@ -57,6 +58,19 @@ namespace larlight {
     virtual bool finalize();
 
     protected:
+ 
+
+	// some hists that we would like to look at 
+    TH1D* hClusterSize0;
+    TH1D* hClusterSize1;
+    TH1D* hClusterSize2;
+    TH1D* hPVTime01;
+    TH1D* hPVTime02;
+    TH1D* hPVTime12;
+    TH1D* hTime0;
+    TH1D* hTime1;
+    TH1D* hTime2;
+
 
 	::cluster::DivReg fDivReg;
         ::cluster::CRUHelper fCRUHelper;

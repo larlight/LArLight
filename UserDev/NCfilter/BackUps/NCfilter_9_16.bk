@@ -17,18 +17,6 @@ namespace larlight {
     // here is a good place to create one on the heap (i.e. "new TH1D"). 
     //
 
-	// lets make some histograms looking at some potential cuts 
-
-    hClusterSize0 = new TH1D("hClusterSize0","clustsize",20,0,1);
-    hClusterSize1 = new TH1D("hClusterSize1","clustsize",20,0,1);
-    hClusterSize2 = new TH1D("hClusterSize2","clustsize",20,0,1);
-    hPVTime01 = new TH1D("hPVTime01","PV",20,0,100);
-    hPVTime02 = new TH1D("hPVTime02","PV",20,0,100);
-    hPVTime12 = new TH1D("hPVTime12","PV",20,0,100);
-    hTime0 = new TH1D("hTime0","PV",400,-1000,1000);
-    hTime1 = new TH1D("hTime1","PV",400,-1000,1000);
-    hTime2 = new TH1D("hTime2","PV",400,-1000,1000);
-
 
     return true;
   }
@@ -50,8 +38,6 @@ namespace larlight {
     // First of all create an output
     // make the output cluster
     auto Output_cluster = (event_cluster*)(storage->get_data(DATA::RyanCluster));
-	// create endpoint2d to store the protovertex info
-//    auto Output_endpt2d = (event_endpoint2d*)(storage->get_data(DATA::EndPoint2D));
     
     // set event variables
     if(Output_cluster->size())
@@ -175,9 +161,9 @@ for( unsigned int i = 0 ; i<flip.size();i++){
         	for(unsigned int a = 0 ;a < nplanes;a++) if(!FlagGoodPlanes[a]) RotateAlg[a]= true;
 		//std::cout<<"Status: Go to Rotate alg? : "<<RotateAlg[0]<<RotateAlg[1]<<RotateAlg[2]<<std::endl;
 	std::vector<std::pair<double,double>> RoughFlipVertex =fQuality.ProtoVertexCW(BestClusters,hits);
-        FinalProtoVertex = RoughFlipVertex;
 //	for(unsigned int k = 0 ; k<nplanes;k++)std::cout<< "This is the ProtoFlipVertex :\t " <<RoughFlipVertex[k].first<<" , "<<RoughFlipVertex[k].second<<std::endl;
 //-----------------------------------------------------------------------------------------------------------------------------------
+
 
 
 
@@ -191,19 +177,7 @@ for( unsigned int i = 0 ; i<flip.size();i++){
 //while( !RotateAlg[0] && !RotateAlg[1] && !RotateAlg[2]){
 
 
-
-
-
-/*
-
-
-
-
-
-
-
-
-for(double a = 20; a< 1080; a = a +20){
+for(double a = 10; a< 1080; a = a +10){
 //====================================================
 //@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 //============Starting with  Rotate alg===============
@@ -214,24 +188,7 @@ for( unsigned int i = 0 ; i<RotateAlg.size();i++){
 	std::vector<std::pair<double, double> > RotateAvgPairSI = fDivReg.RotateLineC(clustervect, hitsvect);
    	std::vector<std::pair<std::vector<unsigned int>,std::vector<unsigned int>>>  RotateRegions = fForceRegions.ForceTwoRotateRegions(a, hitsvect, RotateAvgPairSI);
 		BestClusters[i] = RotateRegions[i];
-
 	}// end of if Rotate[i]
-//=======================
-//=== Check Bools========
-//=======================
-// do the time prof test...
-	std::vector<bool> QualFlip = fPlaneCheckMatch.PlaneCheck(BestClusters, hits);
-///---------------------------------------------------------------------------------
-// Check to see what we need to do next after the Rotate. Should we try another alg or keep theses? 
-//---------------------------------------------------------------------------------
-		std::vector<bool> RotateAlg(3,false);
-                if(QualFlip[0]) {FlagGoodPlanes[0] = true; FlagGoodPlanes[1] = true;}
-                if(QualFlip[1]) {FlagGoodPlanes[0] = true; FlagGoodPlanes[2] = true;}
-                if(QualFlip[2]) {FlagGoodPlanes[1] = true; FlagGoodPlanes[2] = true;}
-        	for(unsigned int a = 0 ;a < nplanes;a++) if(!FlagGoodPlanes[a]) RotateAlg[a]= true;
-	
-	if(FlagGoodPlane[0]&&FlagGoodPlane[1] && FlagGoodPlane[2]) break;
-
 }// for loop over all the Rotate stuff
 //====================Ending with alg===================
 
@@ -263,7 +220,6 @@ for( unsigned int i = 0 ; i<RotateAlg.size();i++){
 
 
 
-*/
 
 
 
@@ -272,23 +228,21 @@ for( unsigned int i = 0 ; i<RotateAlg.size();i++){
 
 
 
-	FinalProtoVertex = fQuality.ProtoVertexCW(BestClusters,hits);;
-        for(unsigned int k = 0 ; k<nplanes;k++){
-	 if(FlagGoodPlanes[k]){
-	std::cout<<"This is the FinalProtoVertex Plane["<< k << "] :\t " <<FinalProtoVertex[k].first<<" , "<<FinalProtoVertex[k].second<<std::endl;
-	}// if plane is good 
-	}// loop over all planes
 
 
 
 
 
-	
+
+
+
+	//for(unsigned int k = 0 ; k<nplanes;k++)std::cout<< "This is the final ProtoVertex :\t " <<FinalProtoVertex[k].first<<" , "<<FinalProtoVertex[k].second<<std::endl;
+
 
 //---------------------------------------------------------------------------------
 //------- look to see which way the showers are going -----------------------------
 //---------------------------------------------------------------------------------
-/*
+
 	if(BestClusters[0].first.size()>0 &&BestClusters[0].second.size()>0){
 	fShowerTools.ClusterAngle2D(BestClusters[0].first,hits,FinalProtoVertex[0]);
 	fShowerTools.ClusterAngle2D(BestClusters[0].second,hits,FinalProtoVertex[0]);
@@ -301,7 +255,7 @@ for( unsigned int i = 0 ; i<RotateAlg.size();i++){
 	fShowerTools.ClusterAngle2D(BestClusters[2].first,hits,FinalProtoVertex[2]);
 	fShowerTools.ClusterAngle2D(BestClusters[2].second,hits,FinalProtoVertex[2]);
 	}
-*/
+
 //===================================================================
 //====== THIS IS THE END OF ALL THE ALGS ============================
 //===================================================================
@@ -316,7 +270,6 @@ for( unsigned int i = 0 ; i<RotateAlg.size();i++){
 	// need a check to see if we did well or not
 	if(FlagGoodPlanes[a]){
       ::larlight::cluster lite_cluster;
-      ::larlight::endpoint2d lite_endpoint2d;
       std::vector<unsigned int> hit_ass;
       // Skip if there's no hit
       if(!(BestClusters[a].first.size()) || !(BestClusters[a].second.size())) continue;
@@ -327,10 +280,9 @@ for( unsigned int i = 0 ; i<RotateAlg.size();i++){
       hit_ass.clear();
       hit_ass.reserve(BestClusters[a].first.size());
       lite_cluster.clear_data();
-   //   lite_endpoint2d.clear_data();
 
       // Make association
-      for(auto const& hit : BestClusters[a].first) hit_ass.push_back(hit);
+      for( auto const& hit : BestClusters[a].first) hit_ass.push_back(hit);
 
       // Add association
       lite_cluster.add_association(hit_type,hit_ass);
@@ -343,17 +295,8 @@ for( unsigned int i = 0 ; i<RotateAlg.size();i++){
       hit_ass.reserve(BestClusters[a].second.size());
       lite_cluster.clear_data();
 
-      // make a the end point 2d
-  //    lite_endpoint2d.set_time(FinalProtoVertex[a].second);
- //     lite_endpoint2d.set_wire(FinalProtoVertex[a].first);
-      //lite_endpoint2d.set_view(a);
-      
-      //endpoint2d(FinalProtoVertex[a].second,0,FinalProtoVertex[a].first,-999,a,-999,DATA::EndPoint2D);
-	
-//      lite_cluster.add_association(DATA::EndPoint2D,lite_endpoint2d);
-
       // Make association
-      for(auto const& hit : BestClusters[a].second) hit_ass.push_back(hit);
+      for( auto const& hit : BestClusters[a].second) hit_ass.push_back(hit);
 
       // Add association
       lite_cluster.add_association(hit_type,hit_ass);
@@ -363,71 +306,6 @@ for( unsigned int i = 0 ; i<RotateAlg.size();i++){
 
 	}// if FLagGoodPlanes[a]
     }// loop over Best Clusters
-
-
-
-//=========================================================================
-//==================== Finalize the hists =================================
-//=========================================================================
-
-
-	// calculate the ratio of hits for each cluster plane
-	    for( unsigned int a=0 ; a<BestClusters.size();a++){
-	// need a check to see if we did well or not
-	if(FlagGoodPlanes[a]){
-      // Skip if there's no hit
-      if(!(BestClusters[a].first.size()) || !(BestClusters[a].second.size())) continue;
-	
-	// if 
-	
-	double clusterhitratio = -999;
-	double FirstClust  = BestClusters[a].first.size();
-	double SecondClust = BestClusters[a].second.size();
-	if(BestClusters[a].first.size()> BestClusters[a].second.size()) clusterhitratio = SecondClust/FirstClust;
-	if(BestClusters[a].first.size()< BestClusters[a].second.size()) clusterhitratio =FirstClust/SecondClust;
-	if(BestClusters[a].first.size()==BestClusters[a].second.size()) clusterhitratio =FirstClust/SecondClust;
-
-	if(a==0) hClusterSize0->Fill(clusterhitratio);
-	if(a==1) hClusterSize1->Fill(clusterhitratio);
-	if(a==2) hClusterSize2->Fill(clusterhitratio);
-
-
-
-	}// if both are good 
-	}// for loop over clusters
-
-
-	if(FinalProtoVertex.size()>0){
-		if(FlagGoodPlanes[0] && FlagGoodPlanes[1]){
-		double abstime = fabs(FinalProtoVertex[0].second - FinalProtoVertex[1].second);
- 		hPVTime01->Fill(abstime);
-		}// if 01
-		if(FlagGoodPlanes[0] && FlagGoodPlanes[2]){
-		double abstime = fabs(FinalProtoVertex[0].second - FinalProtoVertex[2].second);
- 		hPVTime02->Fill(abstime);
-		}
-		if(FlagGoodPlanes[1] && FlagGoodPlanes[2]){
-		double abstime = fabs(FinalProtoVertex[1].second - FinalProtoVertex[2].second);
- 		hPVTime12->Fill(abstime);
-		}
-		
-		// look for the worst abs time in each plane
-		if(FlagGoodPlanes[0]){
- 		hTime0->Fill(FinalProtoVertex[0].second);}
-		if(FlagGoodPlanes[1]){
- 		hTime1->Fill(FinalProtoVertex[1].second);}
-		if(FlagGoodPlanes[2]){
- 		hTime2->Fill(FinalProtoVertex[2].second);}
-		
-
-		}// if protovertex size 
-
-
-
-
-//=========================================================================
-//==================== End of   the hists =================================
-//=========================================================================
 
     return true;
   }
@@ -441,23 +319,11 @@ for( unsigned int i = 0 ; i<RotateAlg.size();i++){
     //
     // Say you made a histogram pointer h1 to store. You can do this:
     //
-     if(_fout){ _fout->cd(); 
-	hClusterSize0->Write(); 
-	hClusterSize1->Write(); 
-	hClusterSize2->Write(); 
-	hPVTime01->Write(); 
-	hPVTime02->Write(); 
-	hPVTime12->Write(); 
-	hTime0->Write(); 
-	hTime1->Write(); 
-	hTime2->Write(); 
-	}// close the if fout
+    // if(_fout) { _fout->cd(); h1->Write(); }
     //
-     else 
-       print(MSG::ERROR,__FUNCTION__,"Did not find an output file pointer!!! File not opened?");
+    // else 
+    //   print(MSG::ERROR,__FUNCTION__,"Did not find an output file pointer!!! File not opened?");
     //
-	
-	
   
     return true;
   }

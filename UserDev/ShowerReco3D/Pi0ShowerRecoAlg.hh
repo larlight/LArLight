@@ -37,7 +37,9 @@ namespace showerreco {
     virtual void Reset(){}
 
     /// Function to reconstruct a shower
-    virtual ::larlight::shower Reconstruct(const std::vector< ::cluster::ClusterParamsAlg>& );
+    //virtual ::larlight::shower Reconstruct(const std::vector< ::cluster::ClusterParamsAlg>& );
+	// pass along the PV info
+    virtual ::larlight::shower ReconstructPi0(const std::vector< ::cluster::ClusterParamsAlg>& , std::vector<std::pair<double,double>> );
 
   protected:
 

@@ -18,11 +18,13 @@ namespace showerreco {
     fdEdxlength=2.4;
     fUseArea=false;
 
-    fVerbosity = true;
+    //fVerbosity = true;
+    fVerbosity = false;
   }
 
 
-  ::larlight::shower Pi0ShowerRecoAlg::Reconstruct(const std::vector< ::cluster::ClusterParamsAlg>& clusters)
+//  ::larlight::shower Pi0ShowerRecoAlg::Reconstruct(const std::vector< ::cluster::ClusterParamsAlg>& clusters)
+  ::larlight::shower Pi0ShowerRecoAlg::ReconstructPi0(const std::vector< ::cluster::ClusterParamsAlg>& clusters, std::vector<std::pair<double,double>> ProtoVertex2D )
   {
     
     ::larlight::shower result;
@@ -37,12 +39,119 @@ namespace showerreco {
     fMIPEnergy.clear();
     fdEdx.clear();
     
+/*
+	// THIS IS GOING TO BE UGLY FOR NOW>>> WILL TAKE CARE LATER
+	// first get the protovertex again 
+	// first Just take the projected lines of the two clusters per each plane 
+	// This can come from using the clusterparams algs start and end poing to get the protovertex in each plane
+	std::vector<std::pair<double,double>> ProtoVertex(3);
+	std::vector<std::vector<std::pair<std::pair<double,double>,std::pair<double,double>>>>  Hemlines(3);
+	//^^^^^^^HAHAHAHAHA this need to go _RG
+	// sort the clusters into the two planes
+	// only do this on active planes 
+	std::vector<bool> activeplane(3,false);
+    for(auto const & cl : clusters)
+	{
+	// this is still ugly... clean up later ... RG	
+	std::pair<double,double> tempwta(cl.GetParams().start_point.w,cl.GetParams().start_point.t);
+	std::pair<double,double> tempwtb(cl.GetParams().end_point.w,cl.GetParams().end_point.t);
+	std::pair<std::pair<double,double>,std::pair<double,double>> tempabline(tempwta,tempwtb);	
+	std::cout<< " THIS IS THE PLANE" <<cl.Plane()<<std::endl;
+	Hemlines[cl.Plane()].push_back(tempabline);
+	//SOOO UGLY!!!	
+	activeplane[cl.Plane()] = true;
+	}
+	// now we have a mess 
+	// keep calm
+	std::vector<std::vector<std::pair<double,double>>>  slopeceptsbyplane(3);
+	for( unsigned int k =0; k<3; k++){
+	if(activeplane[k]){
+		for(unsigned int z= 0; z<2 ; z++){
+	double slope = 0;
+	double cept = 0;
+	double deltaw = Hemlines[k][z].first.first -Hemlines[k][z].second.first;
+	double deltat = Hemlines[k][z].first.second -Hemlines[k][z].second.second;
+	std::cout<< " This is the Z value  " << z <<std::endl;
+	std::cout<< " SIZE OF THINGS : should be 2 "<< Hemlines[k].size()<<std::endl;
+	std::cout<< "Delta Wire"<<Hemlines[k][z].first.first<<"  -  " <<Hemlines[k][z].second.first<<std::endl;
+	std::cout<< "Delta Time"<<Hemlines[k][z].first.second<<"  -  " <<Hemlines[k][z].second.second<<std::endl;
+	// will need to avoid inf slopes
+	slope = deltat/deltaw;
+	cept = Hemlines[k][z].first.second - (slope * Hemlines[k][z].first.first) ; 
+	std::pair<double,double> TempSC(slope,cept);
+	slopeceptsbyplane[k].push_back(TempSC);
+		}// looping over the lines in each plane
+	}// if active plane
+	}//	
+
+	// now we should have a vector of planes.... each with a vector of pairs of slope and cepts ..... NEED TO BE NICER
+	std::pair<double,double> BlankPair(-999,-999);
+	std::vector<std::pair<double,double>> ProtoVertex2D(3,BlankPair);
+	
+	for(unsigned int z=0; z< 3; z++){
+		// the pair format is pair<slope,cept>
+		// need to find out when to skip/.... when we skip fill with -999
+		if(activeplane[z]){
+		double PVwire = -999;
+		double PVtime = -999;
+		PVwire = (slopeceptsbyplane[z][0].second-slopeceptsbyplane[z][1].second)/(slopeceptsbyplane[z][1].first-slopeceptsbyplane[z][0].first);
+		std::cout<< " SSSSSSSSSSSSSSSSSSSSSSSSSSSSs "<< PVwire<<std::endl;
+		std::cout<< " SLope0 "<<slopeceptsbyplane[z][0].first<<std::endl;
+		std::cout<< " cept0 "<<slopeceptsbyplane[z][0].second<<std::endl;
+		std::cout<< " SLope1 "<<slopeceptsbyplane[z][1].first<<std::endl;
+		std::cout<< " cept1 "<<slopeceptsbyplane[z][1].second<<std::endl;
+		PVtime = slopeceptsbyplane[z][0].first * PVwire + slopeceptsbyplane[z][0].second;
+		std::cout<< "TIME TIME TIME TIME TIME  "<< PVtime<<std::endl;
+		std::pair<double,double> TempPV(PVwire,PVtime);
+		ProtoVertex2D[z] = TempPV;
+		}// if active plane
+		}// for loop over the protovertex2d
+		
+std::cout<<"\t THESE ARE THE PROTOVERTEX : \n\t\t" << ProtoVertex2D[0].first<<" , "<<  ProtoVertex2D[0].second
+					<<"\n\t\t" << ProtoVertex2D[1].first<<" , "<<  ProtoVertex2D[1].second
+					<<"\n\t\t" << ProtoVertex2D[2].first<<" , "<<  ProtoVertex2D[2].second
+					<<std::endl;	
+	
+
+
+*/
+
+
+//===============================================================================
+//===============================================================================
+	
     // First Get Start Points
     for(auto const & cl : clusters)
       {
+	// need to look if start point is good of not
+                double SPDistFromPV = -999;
+                double EPDistFromPV = -999;
+                SPDistFromPV =sqrt( pow((ProtoVertex2D[cl.Plane()].first-cl.GetParams().start_point.w),2)+pow((ProtoVertex2D[cl.Plane()].second-cl.GetParams().start_point.t),2));
+                EPDistFromPV =sqrt( pow((ProtoVertex2D[cl.Plane()].first-cl.GetParams().end_point.w),2)+pow((ProtoVertex2D[cl.Plane()].second-cl.GetParams().end_point.t),2) );
+		std::cout<< " PLANE : "<<cl.Plane()<<std::endl;
+                std::cout<<" THIS IS THE PROTO VERTEX "<< ProtoVertex2D[cl.Plane()].first<<" , "<<ProtoVertex2D[cl.Plane()].second<<std::endl;
+                std::cout<<"Start Point "<<cl.GetParams().start_point.w << "  ,  " <<cl.GetParams().start_point.t<<" The Distance(cm) is : "<<SPDistFromPV<<std::endl;
+                std::cout<<"End Point "<<cl.GetParams().end_point.w << "  ,  " <<cl.GetParams().end_point.t<<" The Distance(cm) is : "<<EPDistFromPV<<std::endl;
+ 
+	std::cout<< "+++++++++++++++++++++ SP VALUE "<< SPDistFromPV<< "  :  EP VALUE  "<< EPDistFromPV<<std::endl;
+// commenting out to check things
+                if(SPDistFromPV>EPDistFromPV){
+		std::cout<<" SWITCHING SOME START POINTS " <<std::endl;
+		fStartPoint.push_back(cl.GetParams().end_point);    // for each plane
+		fEndPoint.push_back(cl.GetParams().start_point);    // for each plane
+        	double flipangle = (cl.GetParams().angle_2d*TMath::Pi()/180.) + TMath::Pi()/2.0;   
+		double flipback = flipangle * 180/TMath::Pi();
+        	fOmega2D.push_back(flipback);     
+		}// if we need the flip
+//
+            //if(SPDistFromPV<EPDistFromPV){
+		else{
+		std::cout<<"KEEPING  POINTS " <<std::endl;
         fStartPoint.push_back(cl.GetParams().start_point);    // for each plane
 	fEndPoint.push_back(cl.GetParams().end_point);    // for each plane
         fOmega2D.push_back(cl.GetParams().angle_2d);     
+	}
+	// does this need to get flipped too? 
 	fPlaneID.push_back(cl.Plane());
 	if(fVerbosity) {
 	  std::cout << " planes : " <<   (int)cl.GetParams().start_point.plane 
@@ -102,7 +211,7 @@ namespace showerreco {
 		      xphi,
 		      xtheta);
     
-    if(fVerbosity)
+// RG ALWAYS WANT TO LOOK AT THIS FOR COMPARING     if(fVerbosity)
       std::cout << " new angles: " << xphi << " " << xtheta << std::endl; 
     
     
