@@ -3,7 +3,7 @@
  *
  * \ingroup ShowerStudy
  * 
- * \brief Class def header for a class ShowerDistanceStudy
+ * \Efficiency and energy containment study for mcshower 
  *
  * @author arianaHackenburg 
  */
@@ -16,6 +16,7 @@
 #define SHOWERDISTANCESTUDY_HH
 
 #include "ana_base.hh"
+#include <vector>
 
 namespace larlight {
   /**
@@ -34,6 +35,10 @@ namespace larlight {
 
 	void PrepareTTree() ;
 
+	void Clear() ;
+
+	void Reset() ;	
+
     virtual bool initialize();
 
     virtual bool analyze(storage_manager* storage);
@@ -44,34 +49,13 @@ namespace larlight {
 
 	TTree * _ana_tree ;
 
-	double _mother1Energy ;
-	double _mother2Energy ;
-	double _daughter1_Energy ;
-	double _daughter2_Energy ;
+	double _motherEnergy ;
+	double _daughterEnergy ;
 
-	double _motherMomentumX ;	
-	double _motherMomentumY ;	
-	double _motherMomentumZ ;	
-
-	double _dist1_ToWall ;
-	double _dist1_AlongTraj ;
+	double _dist_ToWall ;
+	double _dist_AlongTraj ;
 	
-	double _dist2_ToWall ;
-	double _dist2_AlongTraj ;
-
-	double _reco_daughter1_Energy ;
-
-	std::vector<double> _reco_start1 ;
-	std::vector<double> _direction1 ;
-
-	std::vector<double> _reco_start2 ;
-	std::vector<double> _direction2 ;
-
-	double _reco_dist1_ToWall ;
-	double _reco_dist2_ToWall ;
-	double _reco_dist1_AlongTraj ;
-	double _reco_dist2_AlongTraj ;
-
+	std::vector<double> _kid_momentum ;
 
 	double _pi0_mass ;
 

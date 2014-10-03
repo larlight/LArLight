@@ -14,9 +14,6 @@ from ROOT import larlight as fmwk
 # Create ana_processor instance
 my_proc = fmwk.ana_processor()
 
-# Set input root file
-#my_proc.add_input_file(sys.argv[1])
-
 for x in xrange(len(sys.argv)-1):
 	my_proc.add_input_file(sys.argv[x+1])
 
@@ -36,6 +33,9 @@ my_proc.set_ana_output_file("distance.root");
 
 # Attach a template process
 ana_unit_0 = fmwk.ShowerDistanceStudy()
+ana_unit_1 = fmwk.PDGSelection()
+ana_unit_1.Select(111,ana_unit_1.kGENERATOR,1)
+my_proc.add_process(ana_unit_1)
 my_proc.add_process(ana_unit_0)
 
 print

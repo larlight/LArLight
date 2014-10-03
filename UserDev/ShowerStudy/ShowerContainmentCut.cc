@@ -35,7 +35,7 @@ namespace showerana {
   double ShowerContainmentCut::DistanceToWall(std::vector<double> const& point) const
   {
 
-    if( point.size() != 3) {
+    if( point.size() < 3) {
 
       std::ostringstream msg;
       msg 
@@ -102,7 +102,7 @@ namespace showerana {
 					      std::vector<double> dir) const
   {
     
-    if( point.size() != 3 || dir.size() !=3) {
+    if( point.size() < 3 || dir.size() <3) {
 
       std::ostringstream msg;
       msg 
