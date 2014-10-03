@@ -109,7 +109,8 @@ namespace larlight {
     
     float _mass;
     float _Pi0mass = 134.98;// in MeV
-    float _dorient_EE_calb = 1.95;// in MeV
+//RG FOR SINGLE     float _dorient_EE_calb = 1.95;// in MeV
+    float _dorient_EE_calb = 1.78;// in MeV// for BNB
     float _mass_goodEnergy;
     float _mass_goodAngle;
     float _mass_detectorTrue;
