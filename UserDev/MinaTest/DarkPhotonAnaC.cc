@@ -10,6 +10,33 @@ struct PhotonPair{
   double dist;
 };
 
+double DarkPhotonAnaC::RunPOTLoop(TTree* tree)
+{
+  std::cout << "In POT loop" << std::endl;
+  
+  //Check whether pot branch exists
+  if(!(tree->GetBranch("Toy_POT_branch"))) {
+
+    std::cerr
+      << "\033[93m" 
+      << "Input TTree has no branch called \"Toy_POT_branch\"!" 
+      << "\033[00m" << std::endl;
+    return 0.;
+  }
+
+  double* pot = new double;
+  tree->SetBranchAddress("Toy_POT_branch",&pot);
+  
+  double TotalPOT = 0.;
+
+   for(size_t i=0; i<tree->GetEntries(); ++i) {
+     tree->GetEntry(i);
+
+     TotalPOT += *pot;
+     
+   }
+   return TotalPOT;
+}
 //struct PhotonGroup : std::vector<MinaTestParticle> {};
 
 void DarkPhotonAnaC::RunEventLoop(TTree* tree)

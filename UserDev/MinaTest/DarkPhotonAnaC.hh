@@ -38,6 +38,7 @@ public:
   virtual ~DarkPhotonAnaC(){};
 
   void RunEventLoop(TTree* tree);
+  double RunPOTLoop(TTree* tree);
   //double lineDist(const MinaTestParticle& part1, const MinaTestParticle& part2);
 
 };
