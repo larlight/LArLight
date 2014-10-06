@@ -18,7 +18,7 @@
 #include <string>
 #include <limits>
 #include <climits>
-#include <Rtypes.h>
+#include <TROOT.h>
 
 /// Namespace of everything in this framework
 namespace larlight{
