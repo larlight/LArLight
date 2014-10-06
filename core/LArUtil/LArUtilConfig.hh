@@ -16,7 +16,7 @@
 
 #include <iostream>
 #include "Base-TypeDef.hh"
-
+#include "TString.h"
 namespace larutil {
   /**
      \class LArUtilConfig
