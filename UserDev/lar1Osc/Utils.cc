@@ -517,13 +517,85 @@ namespace lar1{
     return total_energy;
     
   }
+  Double_t Utils::NuEnergyCalo(std::vector<Int_t> *pdg, std::vector<TLorentzVector> *momentum,
+                               Bool_t include_neutrons, Bool_t include_pizeros,
+                               Double_t prot_thresh, bool verbose ) const{
+
+    if ( verbose ) std::cout << "Determining calorimetric energy" << std::endl;
+
+    Double_t M_n = .939565;    // GeV/c2
+    Double_t M_p = .938272;    // GeV/c2
+
+    Double_t total_energy = 0;
+
+    for( unsigned int i = 0; i < pdg->size(); ++i ){
+     
+      //std::cout << " part: " << pdg->at(i) << ", energy: " << momentum->at(i).E() << std::endl;
+
+      if( abs(pdg->at(i)) > 5000 ) continue;                           // ignore nuclear fragments
+      if( abs(pdg->at(i)) == 12 || abs(pdg->at(i)) == 14 ) continue;   // ignore neutrinos
+
+      if( !include_neutrons && abs(pdg->at(i)) == 2112 ) continue;                // neutrons
+      if( !include_pizeros  && abs(pdg->at(i)) == 111  ) continue;                // pizeros
+      if( abs(pdg->at(i)) == 2212 && momentum->at(i).E()-M_p < prot_thresh ) continue;  // proton threshold
+
+      total_energy += momentum->at(i).E();
+
+      if( abs(pdg->at(i)) == 2212 ) total_energy -= M_p;
+      if( abs(pdg->at(i)) == 2112 ) total_energy -= M_n;
+    }
+
+    if ( verbose ) std::cout << " Total Energy = " << total_energy << " GeV" << std::endl;
+    
+    return total_energy;
+    
+  }
 
 
   //=================================================================================
   // Get the visible energy near the interaction vertex
   //=================================================================================
-  Double_t Utils::VertexEnergy( std::vector<Int_t> *pdg, std::vector<Double_t> *energy, 
-                                Double_t prot_thresh, Double_t pion_thresh, bool verbose  ) const{
+  Double_t Utils::VertexEnergy( std::vector<Int_t> *pdg, 
+                                std::vector<TLorentzVector> *momentum, 
+                                Double_t prot_thresh, 
+                                Double_t pion_thresh, 
+                                bool verbose  ) const{
+
+    if ( verbose ) std::cout << "Determining kinetic energy near vertex" << std::endl;
+
+    Double_t M_p  = .938272;    // GeV/c2
+    Double_t M_pi = .139570;    // GeV/c2
+
+    Double_t total_energy = 0;
+    
+    for( unsigned int i = 0; i < pdg->size(); ++i ){
+     
+      if ( verbose ) std::cout << " part: " << pdg->at(i) << ", energy: " << momentum->at(i).E() << std::endl;
+      
+      //if( abs(pdg->at(i)) > 5000 ) continue;                           // ignore nuclear fragments
+      //if( abs(pdg->at(i)) == 12 || abs(pdg->at(i)) == 14 ) continue;   // ignore neutrinos
+      //if( abs(pdg->at(i)) == 2112 ) continue;                          // neutrons
+      //if( abs(pdg->at(i)) == 111  ) continue;                          // pizeros
+     
+      if( abs(pdg->at(i)) == 2212 && momentum->at(i).E()-M_p > prot_thresh ){  // proton threshold
+        total_energy += (momentum->at(i).E() - M_p);
+      }
+      if( abs(pdg->at(i)) == 211  && momentum->at(i).E()-M_pi > pion_thresh ){  // pion threshold
+        total_energy += (momentum->at(i).E() - M_pi);
+      }
+     
+    }
+    
+    if ( verbose ) std::cout << " Total Kinetic Energy = " << total_energy << " GeV" << std::endl;
+    
+    return total_energy;
+    
+  }
+  Double_t Utils::VertexEnergy( std::vector<Int_t> *pdg, 
+                                std::vector<Double_t> *energy, 
+                                Double_t prot_thresh, 
+                                Double_t pion_thresh, 
+                                bool verbose  ) const{
 
     if ( verbose ) std::cout << "Determining kinetic energy near vertex" << std::endl;
 
@@ -593,12 +665,12 @@ namespace lar1{
   }
 
   Double_t Utils::TotalPhotonEnergy(Int_t idet, 
-                                    std::vector<std::vector<float>> *p1pos,
-                                    std::vector<std::vector<float>> *p1mom,
-                                    std::vector<std::vector<float>> *p2pos,
-                                    std::vector<std::vector<float>> *p2mom,
-                                    std::vector<std::vector<float>> *miscpos,
-                                    std::vector<std::vector<float>> *miscmom) const{
+                                    std::vector<TLorentzVector> *p1pos,
+                                    std::vector<TLorentzVector> *p1mom,
+                                    std::vector<TLorentzVector> *p2pos,
+                                    std::vector<TLorentzVector> *p2mom,
+                                    std::vector<TLorentzVector> *miscpos,
+                                    std::vector<TLorentzVector> *miscmom) const{
     
     if(   p1pos->size()   != p1mom->size() 
        || p2pos->size()   != p2mom->size() 
@@ -609,25 +681,25 @@ namespace lar1{
     Double_t energy = 0.0;
 
     for( unsigned int i = 0; i < p1pos->size(); i++ ){
-      TVector3 photon1Pos((*p1pos).at(i).at(1), (*p1pos).at(i).at(2), (*p1pos).at(i).at(3) );
+      TVector3 photon1Pos((*p1pos).at(i).X(), (*p1pos).at(i).Y(), (*p1pos).at(i).Z() );
       if( IsFiducial( idet, photon1Pos ) )
-        energy += p1mom->at(i).at(0);
+        energy += p1mom->at(i).E();
 
     }
 
     for( unsigned int i = 0; i < p2pos->size(); i++ ){
 
-      TVector3 photon2Pos((*p2pos).at(i).at(1), (*p2pos).at(i).at(2), (*p2pos).at(i).at(3) );
+      TVector3 photon2Pos((*p2pos).at(i).X(), (*p2pos).at(i).Y(), (*p2pos).at(i).Z() );
       if( IsFiducial( idet, photon2Pos ) )
-        energy += p2mom->at(i).at(0);
+        energy += p2mom->at(i).E();
 
     }
 
     for( unsigned int i = 0; i < miscpos->size(); i++ ){
 
-      TVector3 photon2Pos((*miscpos).at(i).at(1), (*miscpos).at(i).at(2), (*miscpos).at(i).at(3) );
+      TVector3 photon2Pos((*miscpos).at(i).X(), (*miscpos).at(i).Y(), (*miscpos).at(i).Z() );
       if( IsFiducial( idet, photon2Pos ) )
-        energy += miscmom->at(i).at(0);
+        energy += miscmom->at(i).E();
 
     }
 

@@ -6,6 +6,7 @@
 #include "Rtypes.h"
 #include "TVector3.h"
 #include "LorentzVectorLight.hh"
+#include "TLorentzVector.h"
 #include <vector>
 #include "TDecompLU.h"
 
@@ -41,21 +42,30 @@ namespace lar1{
                            Bool_t include_pizeros = false, 
                            Double_t prot_thresh = 0, 
                            bool verbose = false ) const;
+    Double_t NuEnergyCalo( std::vector<Int_t> *pdg, std::vector<TLorentzVector> *energy, 
+                           Bool_t include_neutrons = false, 
+                           Bool_t include_pizeros = false, 
+                           Double_t prot_thresh = 0, 
+                           bool verbose = false ) const;   
     Double_t VertexEnergy( std::vector<Int_t> *pdg, std::vector<Double_t> *energy, 
                            Double_t prot_thresh = 0.0, Double_t pion_thresh = 0.0, 
+                           bool verbose = false ) const;    
+    Double_t VertexEnergy( std::vector<Int_t> *pdg, std::vector<TLorentzVector> *energy, 
+                           Double_t prot_thresh = 0.0, Double_t pion_thresh = 0.0, 
                            bool verbose = false ) const;
+
     Double_t TotalPhotonEnergy( Int_t idet, 
                                 std::vector<gan::LorentzVectorLight> *p1pos,
                                 std::vector<gan::LorentzVectorLight> *p1mom,
                                 std::vector<gan::LorentzVectorLight> *p2pos,
                                 std::vector<gan::LorentzVectorLight> *p2mom ) const;
     Double_t TotalPhotonEnergy( Int_t idet, 
-                                std::vector<std::vector<float>> *p1pos,
-                                std::vector<std::vector<float>> *p1mom,
-                                std::vector<std::vector<float>> *p2pos,
-                                std::vector<std::vector<float>> *p2mom,
-                                std::vector<std::vector<float>> *miscpos,
-                                std::vector<std::vector<float>> *miscmom ) const;
+                                std::vector<TLorentzVector> *p1pos,
+                                std::vector<TLorentzVector> *p1mom,
+                                std::vector<TLorentzVector> *p2pos,
+                                std::vector<TLorentzVector> *p2mom,
+                                std::vector<TLorentzVector> *miscpos,
+                                std::vector<TLorentzVector> *miscmom ) const;
 
     // bool PhotonsAreParallel(TVector3 & photon1_start, TVector3 & photon1_mom
     //                         TVector3 & photon2_start, TVector3 & photon2_mom);

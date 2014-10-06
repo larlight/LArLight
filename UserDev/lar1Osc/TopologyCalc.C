@@ -55,48 +55,43 @@ void TopologyCalc(TString target){
   c->SetBranchAddress("NPi0FinalState", &NPi0);
 
   std::vector<std::vector<float> > *MultiWeight=0;
-  unsigned int nWeights = 250;
+  unsigned int nWeights;
 
   if (useMultiWeights)
     c->SetBranchAddress("MultiWeight",&MultiWeight);
 
-  std::map < int, double> eventRatesMap;
+  std::map < int, double> eventRatesNumuMap;
+  std::map < int, double> eventRatesNueMap;
   std::map < int, double> showerMap;
-  std::map < int, double> nuchanMap;
+  std::map < int, double> nuchanNueMap;
+  std::map < int, double> nuchanNumuMap;
   std::map < int, double> pi0Map;
   double nue_CC = 0;
   double nue_NC = 0;
 
-  std::vector< std::map < int, double> > eventRatesMapMultiWeight;
+  std::vector< std::map < int, double> > eventRatesNumuMapMultiWeight;
+  std::vector< std::map < int, double> > eventRatesNueMapMultiWeight;
   std::vector< std::map < int, double> > showerMapMultiWeight;
-  std::vector< std::map < int, double> > nuchanMapMultiWeight;
+  std::vector< std::map < int, double> > nuchanMapNumuMultiWeight;
+  std::vector< std::map < int, double> > nuchanMapNueMultiWeight;
   std::vector< std::map < int, double> > pi0MapMultiWeight;
-  std::vector<double> nue_CC_MultiWeight;
-  std::vector<double> nue_NC_MultiWeight;
 
-  if (useMultiWeights){
-    eventRatesMapMultiWeight.resize(nWeights);
-    showerMapMultiWeight.resize(nWeights);
-    nuchanMapMultiWeight.resize(nWeights);
-    pi0MapMultiWeight.resize(nWeights);
-    nue_CC_MultiWeight.resize(nWeights);
-    nue_NC_MultiWeight.resize(nWeights);
-  }
+
 
   std::map < int, std::string> legendMap;
   std::map < int, std::string> nuchanLegendMap;
   std::map < int, std::string> pi0LegendMap;
 
-  legendMap[0] = "Events with 0 EM Showers";
-  legendMap[1] = "Events with 1 EM Showers";
-  legendMap[2] = "Events with 2 EM Showers";
-  legendMap[3] = "Events with 3 EM Showers";
-  legendMap[4] = "Events with 4 EM Showers";
-  legendMap[5] = "Events with 5 EM Showers";
-  legendMap[6] = "Events with 6 EM Showers";
-  legendMap[7] = "Events with 7 EM Showers";
-  legendMap[8] = "Events with 8 EM Showers";
-  legendMap[9] = "Events with 9 EM Showers";
+  legendMap[0]  = "Events with 0 EM Showers";
+  legendMap[1]  = "Events with 1 EM Showers";
+  legendMap[2]  = "Events with 2 EM Showers";
+  legendMap[3]  = "Events with 3 EM Showers";
+  legendMap[4]  = "Events with 4 EM Showers";
+  legendMap[5]  = "Events with 5 EM Showers";
+  legendMap[6]  = "Events with 6 EM Showers";
+  legendMap[7]  = "Events with 7 EM Showers";
+  legendMap[8]  = "Events with 8 EM Showers";
+  legendMap[9]  = "Events with 9 EM Showers";
   legendMap[10] = "Events with 10 EM Showers";
   legendMap[11] = "Events with 11 EM Showers";
 
@@ -112,17 +107,23 @@ void TopologyCalc(TString target){
   legendMap[10000] = "NC with 0 pions, any number of protons";
   legendMap[10001] = "CC Inclusive";
   legendMap[10002] = "NC Inclusive";
-  legendMap[10003] = "CC 0 pi 0 p";
-  legendMap[10004] = "CC 0 pi 1 p";
-  legendMap[10005] = "CC 0 pi 2 p";
-  legendMap[10006] = "CC 0 pi 3+ p";
-  legendMap[10007] = "CC 1 pi+";
-  legendMap[10008] = "CC 2+ pi+";
-  legendMap[10009] = "CC 1+ pi0";
-  legendMap[10010] = "NC 1 pi+";
-  legendMap[10011] = "NC 2+ pi+";
-  legendMap[10012] = "NC 1+ pi0";
-
+  legendMap[10003] = "CC 0 pi inclusive";
+  legendMap[10004] = "CC 0 pi 0 p";
+  legendMap[10005] = "CC 0 pi 1 p";
+  legendMap[10006] = "CC 0 pi 2 p";
+  legendMap[10007] = "CC 0 pi 3+ p";
+  legendMap[10008] = "CC 1 pi+";
+  legendMap[10009] = "CC 2+ pi+";
+  legendMap[10010] = "CC 1+ pi0";
+  legendMap[10011] = "NC 1 pi+";
+  legendMap[10012] = "NC 2+ pi+";
+  legendMap[10013] = "NC 1+ pi0";
+  legendMap[10014] = "nu - e scattering";
+  legendMap[10015] = ">= 1 charged Kaon";
+  legendMap[10016] = "CCQE";
+  legendMap[10017] = "CCRes";
+  legendMap[10018] = "CCDIS";
+  legendMap[10019] = "CCCoh";
 
 
   legendMap[1000] = "CC with 0 charged pions, 0 protons, 0 neutrons";
@@ -247,225 +248,372 @@ void TopologyCalc(TString target){
   {
     ientry = c->LoadTree(ievt); if (ientry < 0) break; nb = c->GetEntry(ievt); nbytes += nb;
     evtcounter++;
+    if (ievt == 0){
+      if (useMultiWeights) nWeights = MultiWeight->back().size();
+      else nWeights = 1;
+      eventRatesNumuMapMultiWeight.resize(nWeights);
+      eventRatesNueMapMultiWeight.resize(nWeights);
+      showerMapMultiWeight.resize(nWeights);
+      nuchanMapNumuMultiWeight.resize(nWeights);
+      nuchanMapNueMultiWeight.resize(nWeights);
+      pi0MapMultiWeight.resize(nWeights);
+    }
 
-    if (ievt % 100000 == 0) 
+    if (ievt % 100000 == 0){ 
       std::cout << "On event " << ievt << " of " << nentries1 <<"\n";
-
-    //Really simple to do this with maps, it takes care of everything!
-    if (isFid){
-      //get the numu cc events:
-      if (abs(inno) == 14 ) {
-        eventRatesMap[iChan] += fluxweight;
-        if (useMultiWeights){
-          for (unsigned int N_weight = 0; N_weight < nWeights; N_weight ++){
-            eventRatesMapMultiWeight[N_weight][iChan] += fluxweight*MultiWeight->back().at(N_weight);
-          } 
-        }
-        //get the 0 pion break down (no neutral or charged pions)
-        if (iChan < 1100 && iChan >= 1000) { //this is the zero charged pion category
-          if (NPi0 == 0) { // make sure there are no neutral pions either.
-            int tempChan = 100 + (iChan % 1000);
-            eventRatesMap[tempChan] += fluxweight;
-            if (useMultiWeights){
-              for (unsigned int N_weight = 0; N_weight < nWeights; N_weight ++){
-                eventRatesMapMultiWeight[N_weight][tempChan] += fluxweight*MultiWeight->back().at(N_weight);
-              }
-            }
-          }
-        }
-      }
-      //get the EM showers:
-      showerMap[iTop] += fluxweight;
-
-      if (abs(inno) == 14 ) nuchanMap[nuchan] += fluxweight;
-      if (isCC && abs(inno) == 14 ) pi0Map[NPi0] += fluxweight;
-      else if (!isCC && abs(inno) == 14) {
-        pi0Map[NPi0 + NCoffset] += fluxweight;
-        if (useMultiWeights){
-          for (unsigned int N_weight = 0; N_weight < nWeights; N_weight ++){
-            pi0MapMultiWeight[N_weight][NPi0 + NCoffset] += fluxweight*MultiWeight->back().at(N_weight);
-          }         
-        }
-        if (NPi0 == 0){
-          if (iChan >= 2000 && iChan < 2100){
-            //have NC with no pions of anytype:
-            eventRatesMap[10000] += fluxweight;
-            if (useMultiWeights){
-              for (unsigned int N_weight = 0; N_weight < nWeights; N_weight ++){
-                eventRatesMapMultiWeight[N_weight][10000] += fluxweight*MultiWeight->back().at(N_weight);
-              }
-            }
-          }
-        }
-      }
-
-      if (abs(inno) == 12 && isCC) nue_CC += fluxweight;
-      if (abs(inno) == 12 && !isCC) nue_NC += fluxweight;
-
-
-      if (useMultiWeights){
-        for (unsigned int N_weight = 0; N_weight < nWeights; N_weight ++){
-          showerMapMultiWeight[N_weight][iTop] 
-            += fluxweight*MultiWeight->back().at(N_weight);
-          if (abs(inno) == 12 && isCC){
-            nue_CC_MultiWeight[N_weight] 
-              += fluxweight*MultiWeight->back().at(N_weight);
-          }
-          if (abs(inno) == 12 && !isCC) 
-            nue_NC_MultiWeight[N_weight] 
-              += fluxweight*MultiWeight->back().at(N_weight);
-          if (abs(inno) == 14 ) 
-            nuchanMapMultiWeight[N_weight][nuchan] 
-              += fluxweight*MultiWeight->back().at(N_weight);
-          if (isCC && abs(inno) == 14 ) 
-            pi0MapMultiWeight[N_weight][NPi0] 
-              += fluxweight*MultiWeight->back().at(N_weight);
-        }
-      }
-
-      // Get the final state topologies that go into the table with errors
-  // legendMap[10000] = "NC with 0 pions, any number of protons";
-  // legendMap[10001] = "CC Inclusive"
-  // legendMap[10002] = "NC Inclusive"
-  // legendMap[10003] = "CC 0 pi 0 p"
-  // legendMap[10004] = "CC 0 pi 1 p"
-  // legendMap[10005] = "CC 0 pi 2 p"
-  // legendMap[10006] = "CC 0 pi 3+ p"
-  // legendMap[10007] = "CC 1 pi+"
-  // legendMap[10008] = "CC 2+ pi+"
-  // legendMap[10009] = "CC 1+ pi0"
-  // legendMap[10010] = "NC 1 pi+"
-  // legendMap[10011] = "NC 2+ pi+"
-  // legendMap[10012] = "NC 1+ pi0"  
-
-
-      if (iChan >= 1000 && iChan < 2000){
-        eventRatesMap[10001] += fluxweight;
-        if (iChan == 1000 || iChan == 1001){
-          eventRatesMap[10003] += fluxweight;
-        }
-        else if (iChan == 1010 || iChan == 1011){
-          eventRatesMap[10004] += fluxweight;
-        }
-        else if (iChan == 1020 || iChan == 1021){
-          eventRatesMap[10005] += fluxweight;
-        }
-        else if (iChan == 1030 || iChan == 1031){
-          eventRatesMap[10006] += fluxweight;
-        }
-        else if (iChan >= 1100 && iChan < 1200){
-          eventRatesMap[10007] += fluxweight;
-        }
-        else if (iChan >= 1200 && iChan < 1300){
-          eventRatesMap[10008] += fluxweight;
-        }
-        if (NPi0 >= 1){
-          eventRatesMap[10009] += fluxweight;
-        }
-      }
-      else{
-        eventRatesMap[10002] += fluxweight;
-        if (iChan >= 2100 && iChan < 2200){
-          eventRatesMap[10010] += fluxweight;
-        }
-        if (iChan >= 2200 && iChan < 2300){
-          eventRatesMap[10011] += fluxweight;
-        }
-        if (NPi0 >= 1){
-          eventRatesMap[10012] += fluxweight;
-        }
-      }
-
-      if (useMultiWeights){
-        for (unsigned int N_weight = 0; N_weight < nWeights; N_weight ++){
-          if (iChan >= 1000 && iChan < 2000){
-            eventRatesMapMultiWeight[N_weight][10001] 
-              += fluxweight*MultiWeight->back().at(N_weight);
-            if (iChan == 1000 || iChan == 1001){
-              eventRatesMapMultiWeight[N_weight][10003] 
-                += fluxweight*MultiWeight->back().at(N_weight);
-            }
-            else if (iChan == 1010 || iChan == 1011){
-              eventRatesMapMultiWeight[N_weight][10004] 
-                += fluxweight*MultiWeight->back().at(N_weight);
-            }
-            else if (iChan == 1020 || iChan == 1021){
-              eventRatesMapMultiWeight[N_weight][10005] 
-                += fluxweight*MultiWeight->back().at(N_weight);
-            }
-            else if (iChan == 1030 || iChan == 1031){
-              eventRatesMapMultiWeight[N_weight][10006] 
-                += fluxweight*MultiWeight->back().at(N_weight);
-            }
-            else if (iChan >= 1100 && iChan < 1200){
-              eventRatesMapMultiWeight[N_weight][10007] 
-                += fluxweight*MultiWeight->back().at(N_weight);
-            }
-            else if (iChan >= 1200 && iChan < 1300){
-              eventRatesMapMultiWeight[N_weight][10008] 
-                += fluxweight*MultiWeight->back().at(N_weight);
-            }
-            if (NPi0 >= 1){
-              eventRatesMapMultiWeight[N_weight][10009] 
-                += fluxweight*MultiWeight->back().at(N_weight);
-            }
-          }
-          else{
-            eventRatesMapMultiWeight[N_weight][10002] 
-              += fluxweight*MultiWeight->back().at(N_weight);
-            if (iChan >= 2100 && iChan < 2200){
-              eventRatesMapMultiWeight[N_weight][10010] 
-                += fluxweight*MultiWeight->back().at(N_weight);
-            }
-            if (iChan >= 2200 && iChan < 2300){
-              eventRatesMapMultiWeight[N_weight][10011] 
-                += fluxweight*MultiWeight->back().at(N_weight);
-            }
-            if (NPi0 >= 1){
-              eventRatesMapMultiWeight[N_weight][10012] 
-                += fluxweight*MultiWeight->back().at(N_weight);
-            }
-          }
-        }
-      }
-
-
 
     }
 
+
+    //Really simple to do this with maps
+    if (isFid){
+      // if (useMultiWeights){
+      //   std::cout << "  Printing out the multiweights for this event ...\n";
+      //   for (unsigned i = 0; i < MultiWeight->back().size();i++){
+      //     std::cout << "Weight " << i << " of " << nWeights 
+      //               << ": " << MultiWeight->back().at(i) << std::endl; 
+      //   }
+      // }
+      // fluxweight *= 0.333333;  
+      for (unsigned int N_weight = 0; N_weight < nWeights; N_weight ++){
+        double multiWeight = 0.0;
+        if (useMultiWeights){
+          multiWeight = fluxweight*MultiWeight->back().at(N_weight);
+        } 
+  // legendMap[10016] = "CCQE";
+  // legendMap[10017] = "CCRes";
+  // legendMap[10018] = "CCDIS";
+  // legendMap[10019] = "CCCoh";
+  // legendMap[10014] = "nu - e scattering";
+
+        //get the numu cc events:
+        if (abs(inno) == 14 ) {
+          if (N_weight==0){ 
+            eventRatesNumuMap[iChan] += fluxweight;
+            nuchanNumuMap[nuchan] += fluxweight;
+            // 10001 is CC inclusive, 10002 is NC inclusive
+            if (isCC) eventRatesNumuMap[10001] += fluxweight;
+            if (!isCC) eventRatesNumuMap[10002] += fluxweight;
+            if (nuchan == 98) eventRatesNumuMap[10014] += fluxweight;
+            if (nuchan == 1 ) eventRatesNumuMap[10016] += fluxweight;
+            if (nuchan == 3 || nuchan == 4 || nuchan == 5) 
+                              eventRatesNumuMap[10017] += fluxweight;
+            if (nuchan == 91) eventRatesNumuMap[10018] += fluxweight;
+            if (nuchan == 97) eventRatesNumuMap[10019] += fluxweight;
+
+          }
+          eventRatesNumuMapMultiWeight[N_weight][iChan] += multiWeight;
+          nuchanMapNumuMultiWeight[N_weight][nuchan] += multiWeight;
+          if (isCC) eventRatesNumuMapMultiWeight[N_weight][10001] += multiWeight;
+          if (!isCC) eventRatesNumuMapMultiWeight[N_weight][10002] += multiWeight;
+          if (nuchan == 98) eventRatesNumuMapMultiWeight[N_weight][10014] += multiWeight;
+          if (nuchan == 1 ) eventRatesNumuMapMultiWeight[N_weight][10016] += multiWeight;
+          if (nuchan == 3 || nuchan == 4 || nuchan == 5) 
+                            eventRatesNumuMapMultiWeight[N_weight][10017] += multiWeight;
+          if (nuchan == 91) eventRatesNumuMapMultiWeight[N_weight][10018] += multiWeight;
+          if (nuchan == 97) eventRatesNumuMapMultiWeight[N_weight][10019] += multiWeight;
+        }
+        // and the nue cc events
+        else if (abs(inno) == 12 ) {
+          if (N_weight==0){
+            eventRatesNueMap[iChan] += fluxweight;
+            nuchanNueMap[nuchan] += fluxweight;
+            if (isCC) eventRatesNueMap[10001]  += fluxweight;
+            if (!isCC) eventRatesNueMap[10002] += fluxweight;
+            if (nuchan == 98) eventRatesNueMap[10014] += fluxweight;
+            if (nuchan == 1 ) eventRatesNueMap[10016] += fluxweight;
+            if (nuchan == 3 || nuchan == 4 || nuchan == 5) 
+                              eventRatesNueMap[10017] += fluxweight;
+            if (nuchan == 91) eventRatesNueMap[10018] += fluxweight;
+            if (nuchan == 97) eventRatesNueMap[10019] += fluxweight;          }
+          eventRatesNueMapMultiWeight[N_weight][iChan] += multiWeight;
+          nuchanMapNueMultiWeight[N_weight][nuchan]    += multiWeight;
+          if (isCC) eventRatesNueMapMultiWeight[N_weight][10001]  += multiWeight;
+          if (!isCC) eventRatesNueMapMultiWeight[N_weight][10002] += multiWeight;
+          if (nuchan == 98) eventRatesNueMapMultiWeight[N_weight][10014] += multiWeight;
+          if (nuchan == 1 ) eventRatesNueMapMultiWeight[N_weight][10016] += multiWeight;
+          if (nuchan == 3 || nuchan == 4 || nuchan == 5) 
+                            eventRatesNueMapMultiWeight[N_weight][10017] += multiWeight;
+          if (nuchan == 91) eventRatesNueMapMultiWeight[N_weight][10018] += multiWeight;
+          if (nuchan == 97) eventRatesNueMapMultiWeight[N_weight][10019] += multiWeight;
+        }
+
+        //this is the zero charged pion category
+        if (iChan < 1100 && iChan >= 1000) { 
+          if (NPi0 == 0) { // make sure there are no neutral pions either.
+
+            int tempChan = 100 + (iChan % 1000);
+            if (abs(inno) == 14){
+              if (N_weight == 0){
+                eventRatesNumuMap[tempChan] += fluxweight;
+                eventRatesNumuMap[10003]    += fluxweight;
+              }
+              eventRatesNumuMapMultiWeight[N_weight][tempChan] += multiWeight;
+              eventRatesNumuMapMultiWeight[N_weight][10003]    += multiWeight;
+            }
+            if (abs(inno) == 12){
+              if (N_weight == 0){
+                eventRatesNueMap[tempChan] += fluxweight;
+                eventRatesNueMap[10003]    += fluxweight;
+              }
+              eventRatesNueMapMultiWeight[N_weight][tempChan] += multiWeight;
+              eventRatesNueMapMultiWeight[N_weight][10003]    += multiWeight;
+            }
+
+            // Break these events down by number of protons
+            if (iChan == 1000 || iChan == 1001){
+              if (abs(inno) == 14){ 
+                if (N_weight == 0){
+                  eventRatesNumuMap[10004] += fluxweight;
+                }
+                eventRatesNumuMapMultiWeight[N_weight][10004] += multiWeight;
+              }
+              if (abs(inno) == 12){ 
+                if (N_weight == 0){
+                  eventRatesNueMap[10004] += fluxweight;
+                }
+                eventRatesNueMapMultiWeight[N_weight][10004] += multiWeight;
+              }
+            }
+            if (iChan == 1010 || iChan == 1011){
+              if (abs(inno) == 14){ 
+                if (N_weight == 0){
+                  eventRatesNumuMap[10005] += fluxweight;
+                }
+                eventRatesNumuMapMultiWeight[N_weight][10005] += multiWeight;
+              }
+              if (abs(inno) == 12){ 
+                if (N_weight == 0){
+                  eventRatesNueMap[10005] += fluxweight;
+                }
+                eventRatesNueMapMultiWeight[N_weight][10005] += multiWeight;
+              }
+            }
+            if (iChan == 1020 || iChan == 1021){
+              if (abs(inno) == 14){ 
+                if (N_weight == 0){
+                  eventRatesNumuMap[10006] += fluxweight;
+                }
+                eventRatesNumuMapMultiWeight[N_weight][10006] += multiWeight;
+              }
+              if (abs(inno) == 12){ 
+                if (N_weight == 0){
+                  eventRatesNueMap[10006] += fluxweight;
+                }
+                eventRatesNueMapMultiWeight[N_weight][10006] += multiWeight;
+              }
+            }
+            if (iChan == 1030 || iChan == 1031){
+              if (abs(inno) == 14){ 
+                if (N_weight == 0){
+                  eventRatesNumuMap[10007] += fluxweight;
+                }
+                eventRatesNumuMapMultiWeight[N_weight][10007] += multiWeight;
+              }
+              if (abs(inno) == 12){ 
+                if (N_weight == 0){
+                  eventRatesNueMap[10007] += fluxweight;
+                }
+                eventRatesNueMapMultiWeight[N_weight][10007] += multiWeight;
+              }
+            }
+
+          } // if NPi0 == 0
+
+        } // ichan < 1100 && ichan > 1000
+
+        if (NPi0 > 0){
+          if (isCC){
+            if (abs(inno) == 14){ 
+              if (N_weight == 0){
+                eventRatesNumuMap[10010] += fluxweight;
+              }
+              eventRatesNumuMapMultiWeight[N_weight][10010] += multiWeight;
+            }
+            if (abs(inno) == 12){ 
+              if (N_weight == 0){
+                eventRatesNueMap[10010] += fluxweight;
+              }
+              eventRatesNueMapMultiWeight[N_weight][10010] += multiWeight;
+            }
+          }
+          else{
+            if (abs(inno) == 14){ 
+              if (N_weight == 0){
+                eventRatesNumuMap[10013] += fluxweight;
+              }
+              eventRatesNumuMapMultiWeight[N_weight][10013] += multiWeight;
+            }
+            if (abs(inno) == 12){ 
+              if (N_weight == 0){
+                eventRatesNueMap[10013] += fluxweight;
+              }
+              eventRatesNueMapMultiWeight[N_weight][10013] += multiWeight;
+            }
+          }
+        } // end NPi0 > 0
+
+         // These are the NC events with no pions:
+         if (iChan >= 2000 && iChan < 2100 && NPi0 == 0){
+           //have NC with no pions of anytype:
+           if (abs(inno) == 14){
+             if (N_weight == 0){
+               eventRatesNumuMap[10000] += fluxweight;
+             }
+             eventRatesNumuMapMultiWeight[N_weight][10000] += multiWeight;
+           }
+           if (abs(inno) == 12){
+             if (N_weight == 0){
+               eventRatesNueMap[10000] += fluxweight;
+             }
+             eventRatesNueMapMultiWeight[N_weight][10000] += multiWeight;
+           }
+         }
+        // Fill out the rest of the CC entries
+
+        // if (NPi0 >= 1){
+        //   eventRatesNumuMap[10009] += fluxweight;
+        // }
+  
+
+        // CC 1 pi+
+        if (iChan >= 1100 && iChan < 1200){
+          if (abs(inno) == 14){ 
+            if (N_weight == 0){
+              eventRatesNumuMap[10008] += fluxweight;
+            }
+            eventRatesNumuMapMultiWeight[N_weight][10008] += multiWeight;
+          }
+          if (abs(inno) == 12){ 
+            if (N_weight == 0){
+              eventRatesNueMap[10008] += fluxweight;
+            }
+            eventRatesNueMapMultiWeight[N_weight][10008] += multiWeight;
+          }
+        }
+        // CC 2+ pi+
+        if (iChan >= 1200 && iChan < 1300){
+          if (abs(inno) == 14){ 
+            if (N_weight == 0){
+              eventRatesNumuMap[10009] += fluxweight;
+            }
+            eventRatesNumuMapMultiWeight[N_weight][10009] += multiWeight;
+          }
+          if (abs(inno) == 12){ 
+            if (N_weight == 0){
+              eventRatesNueMap[10009] += fluxweight;
+            }
+            eventRatesNueMapMultiWeight[N_weight][10009] += multiWeight;
+          }
+        }        
+        if (iChan >= 2100 && iChan < 2200){
+          if (abs(inno) == 14){ 
+            if (N_weight == 0){
+              eventRatesNumuMap[10011] += fluxweight;
+            }
+            eventRatesNumuMapMultiWeight[N_weight][10011] += multiWeight;
+          }
+          if (abs(inno) == 12){ 
+            if (N_weight == 0){
+              eventRatesNueMap[10011] += fluxweight;
+            }
+            eventRatesNueMapMultiWeight[N_weight][10011] += multiWeight;
+          }
+        }
+        if (iChan >= 2200 && iChan < 2300){
+          if (abs(inno) == 14){ 
+            if (N_weight == 0){
+              eventRatesNumuMap[10012] += fluxweight;
+            }
+            eventRatesNumuMapMultiWeight[N_weight][10012] += multiWeight;
+          }
+          if (abs(inno) == 12){ 
+            if (N_weight == 0){
+              eventRatesNueMap[10012] += fluxweight;
+            }
+            eventRatesNueMapMultiWeight[N_weight][10012] += multiWeight;
+          }
+        }
+
+        // This block sorts events purely by the number of EM showers
+        if (N_weight == 0){
+          showerMap[iTop] += fluxweight;
+        }
+        showerMapMultiWeight[N_weight][iTop] 
+          += multiWeight;
+
+        // This section figures out the number of NC pi0 
+        if (!isCC){
+          if (N_weight == 0){
+            pi0Map[NPi0 + NCoffset] += fluxweight;
+          }
+          pi0MapMultiWeight[N_weight][NPi0 + NCoffset] += multiWeight;
+        }
+        else{
+          if (N_weight == 0){
+            pi0Map[NPi0] += fluxweight;
+          }
+          pi0MapMultiWeight[N_weight][NPi0] += multiWeight;
+        }    
+
+
+      } // end loop over weights
+      
+
+
+
+    } // end (isFid)
+
   }
 
-  std::map < int, double> eventRatesMapSystematicUncert;
+  std::map < int, double> eventRatesNumuMapSystematicUncert;
+  std::map < int, double> eventRatesNueMapSystematicUncert;
   std::map < int, double> showerMapSystematicUncert;
-  std::map < int, double> nuchanMapSystematicUncert;
+  std::map < int, double> nuchanMapNumuSystematicUncert;
+  std::map < int, double> nuchanMapNueSystematicUncert;
   std::map < int, double> pi0MapSystematicUncert;
 
-  std::map < int, double> eventRatesMapStatisticalUncert;
+  std::map < int, double> eventRatesNumuMapStatisticalUncert;
+  std::map < int, double> eventRatesNueMapStatisticalUncert;
   std::map < int, double> showerMapStatisticalUncert;
-  std::map < int, double> nuchanMapStatisticalUncert;
+  std::map < int, double> nuchanMapNumuStatisticalUncert;
+  std::map < int, double> nuchanMapNueStatisticalUncert;
   std::map < int, double> pi0MapStatisticalUncert;
 
-  double nue_CC_SystematicUncert;
-  double nue_CC_StatisticalUncert;
-  double nue_NC_SystematicUncert;
-  double nue_NC_StatisticalUncert;
 
   // Compute the errors on the rates
   if (useMultiWeights){
     // Total event rates:
-    for ( auto centralValuePair = eventRatesMap.begin();
-          centralValuePair != eventRatesMap.end(); centralValuePair ++)
+    for ( auto centralValuePair = eventRatesNumuMap.begin();
+          centralValuePair != eventRatesNumuMap.end(); centralValuePair ++)
     {
       int key = centralValuePair->first;
       double tempRMS = 0;
       for (unsigned int N_weight = 0; N_weight < nWeights; N_weight ++){
-        tempRMS += pow((centralValuePair->second - eventRatesMapMultiWeight[N_weight][key]),2);
+        if (key == 10001){
+          std::cout << "centralValuePair->second - eventRatesNumuMapMultiWeight[N_weight][key]:"
+                    << centralValuePair->second <<  " - " << eventRatesNumuMapMultiWeight[N_weight][key]
+                    << " = " << centralValuePair->second - eventRatesNumuMapMultiWeight[N_weight][key]
+                    << std::endl;
+        }
+        tempRMS += pow((centralValuePair->second - eventRatesNumuMapMultiWeight[N_weight][key]),2);
       }
       tempRMS = sqrt(tempRMS/nWeights);
-      eventRatesMapSystematicUncert[key] = tempRMS;
-      eventRatesMapStatisticalUncert[key] = sqrt(centralValuePair->second);
+      eventRatesNumuMapSystematicUncert[key] = tempRMS;
+      eventRatesNumuMapStatisticalUncert[key] = sqrt(centralValuePair->second);
     }
-
+    for ( auto centralValuePair = eventRatesNueMap.begin();
+          centralValuePair != eventRatesNueMap.end(); centralValuePair ++)
+    {
+      int key = centralValuePair->first;
+      double tempRMS = 0;
+      for (unsigned int N_weight = 0; N_weight < nWeights; N_weight ++){
+        tempRMS += pow((centralValuePair->second - eventRatesNueMapMultiWeight[N_weight][key]),2);
+      }
+      tempRMS = sqrt(tempRMS/nWeights);
+      eventRatesNueMapSystematicUncert[key] = tempRMS;
+      eventRatesNueMapStatisticalUncert[key] = sqrt(centralValuePair->second);
+    }
     for ( auto centralValuePair = showerMap.begin();
           centralValuePair != showerMap.end(); centralValuePair ++)
     {
@@ -478,17 +626,29 @@ void TopologyCalc(TString target){
       showerMapSystematicUncert[key] = tempRMS;
       showerMapStatisticalUncert[key] = sqrt(centralValuePair->second);
     }
-    for ( auto centralValuePair = nuchanMap.begin();
-          centralValuePair != nuchanMap.end(); centralValuePair ++)
+    for ( auto centralValuePair = nuchanNumuMap.begin();
+          centralValuePair != nuchanNumuMap.end(); centralValuePair ++)
     {
       int key = centralValuePair->first;
       double tempRMS = 0;
       for (unsigned int N_weight = 0; N_weight < nWeights; N_weight ++){
-        tempRMS += pow((centralValuePair->second - nuchanMapMultiWeight[N_weight][key]),2);
+        tempRMS += pow((centralValuePair->second - nuchanMapNumuMultiWeight[N_weight][key]),2);
       }
       tempRMS = sqrt(tempRMS/nWeights);
-      nuchanMapSystematicUncert[key] = tempRMS;
-      nuchanMapStatisticalUncert[key] = sqrt(centralValuePair->second);
+      nuchanMapNumuSystematicUncert[key] = tempRMS;
+      nuchanMapNumuStatisticalUncert[key] = sqrt(centralValuePair->second);
+    }
+    for ( auto centralValuePair = nuchanNueMap.begin();
+          centralValuePair != nuchanNueMap.end(); centralValuePair ++)
+    {
+      int key = centralValuePair->first;
+      double tempRMS = 0;
+      for (unsigned int N_weight = 0; N_weight < nWeights; N_weight ++){
+        tempRMS += pow((centralValuePair->second - nuchanMapNueMultiWeight[N_weight][key]),2);
+      }
+      tempRMS = sqrt(tempRMS/nWeights);
+      nuchanMapNueSystematicUncert[key] = tempRMS;
+      nuchanMapNueStatisticalUncert[key] = sqrt(centralValuePair->second);
     }
     for ( auto centralValuePair = pi0Map.begin();
           centralValuePair != pi0Map.end(); centralValuePair ++)
@@ -502,34 +662,47 @@ void TopologyCalc(TString target){
       pi0MapSystematicUncert[key] = tempRMS;
       pi0MapStatisticalUncert[key] = sqrt(centralValuePair->second);
     }
-
-    for (unsigned int N_weight = 0; N_weight < nWeights; N_weight ++){
-      std::cout << "nue_CC - nue_CC_MultiWeight[N_weight] :"
-                << nue_CC << " - " << nue_CC_MultiWeight[N_weight]
-                << " = " << nue_CC - nue_CC_MultiWeight[N_weight] << std::endl;
-      nue_CC_SystematicUncert += pow(nue_CC - nue_CC_MultiWeight[N_weight],2);
-      nue_NC_SystematicUncert += pow(nue_NC - nue_NC_MultiWeight[N_weight],2);
-    }
-    std::cout << "nue_CC_SystematicUncert is " << nue_CC_SystematicUncert << std::endl;
-    nue_CC_SystematicUncert = sqrt(nue_CC_SystematicUncert/nWeights);
-    nue_NC_SystematicUncert = sqrt(nue_NC_SystematicUncert/nWeights);
-    nue_CC_StatisticalUncert = sqrt(nue_CC);
-    nue_NC_StatisticalUncert = sqrt(nue_NC);
   }
 
 
 
   // print out the results:
-
-  for (std::map<int, double>::iterator i = eventRatesMap.begin(); i != eventRatesMap.end(); ++i)
+  std::cout << "\nNumu Results:\n\n";
+  for (std::map<int, double>::iterator i = eventRatesNumuMap.begin(); i != eventRatesNumuMap.end(); ++i)
   {
     int key = i->first;
-    std::cout << legendMap[i->first] << ": \t" << i->second 
-              << "\t" << eventRatesMapSystematicUncert[i->first]
-              << "\t" << eventRatesMapStatisticalUncert[i->first]
+    std::cout << legendMap[key] << ": \t" << i->second 
+              << "\t" << eventRatesNumuMapSystematicUncert[key]
+              << "\t" << eventRatesNumuMapStatisticalUncert[key]
               << std::endl;
   }
-  
+  std::cout << "\n Nuchan interaction Results:\n";
+  for (std::map<int, double>::iterator i = nuchanNumuMap.begin(); i != nuchanNumuMap.end(); ++i)
+  {
+    std::cout << nuchanLegendMap[i->first] << ": \t" << i->second 
+              << "\t" << nuchanMapNumuSystematicUncert[i->first]
+              << "\t" << nuchanMapNumuStatisticalUncert[i->first]
+              << std::endl;
+  }  
+
+  std::cout << "\nNue Results:\n\n";
+  for (std::map<int, double>::iterator i = eventRatesNueMap.begin(); i != eventRatesNueMap.end(); ++i)
+  {
+    int key = i->first;
+    std::cout << legendMap[key] << ": \t" << i->second 
+              << "\t" << eventRatesNueMapSystematicUncert[key]
+              << "\t" << eventRatesNueMapStatisticalUncert[key]
+              << std::endl;
+  }
+  for (std::map<int, double>::iterator i = nuchanNueMap.begin(); i != nuchanNueMap.end(); ++i)
+  {
+    std::cout << nuchanLegendMap[i->first] << ": \t" << i->second 
+              << "\t" << nuchanMapNueSystematicUncert[i->first]
+              << "\t" << nuchanMapNueStatisticalUncert[i->first]
+              << std::endl;
+  }  
+
+  std::cout << "\nNumber of Showers Results:\n\n";
   for (std::map<int, double>::iterator i = showerMap.begin(); i != showerMap.end(); ++i)
   {
     std::cout << legendMap[i->first] << ": \t" << i->second 
@@ -538,14 +711,10 @@ void TopologyCalc(TString target){
               << std::endl;
   }
 
-  for (std::map<int, double>::iterator i = nuchanMap.begin(); i != nuchanMap.end(); ++i)
-  {
-    std::cout << nuchanLegendMap[i->first] << ": \t" << i->second 
-              << "\t" << nuchanMapSystematicUncert[i->first]
-              << "\t" << nuchanMapStatisticalUncert[i->first]
-              << std::endl;
-  }  
+
+
   
+  std::cout << "\nNumber of pi0 Results:\n\n";
   for (std::map<int, double>::iterator i = pi0Map.begin(); i != pi0Map.end(); ++i)
   {
     std::cout << pi0LegendMap[i->first] << ": \t" << i->second 
@@ -554,14 +723,6 @@ void TopologyCalc(TString target){
               << std::endl;
   }  
 
-  std::cout << "Nue CC events:\t" << nue_CC 
-            << "\t" << nue_CC_SystematicUncert
-            << "\t" << nue_CC_StatisticalUncert
-            << std::endl;
-  std::cout << "Nue NC events:\t" << nue_NC
-            << "\t" << nue_NC_SystematicUncert
-            << "\t" << nue_NC_StatisticalUncert
-            << std::endl;
 }
 
 
