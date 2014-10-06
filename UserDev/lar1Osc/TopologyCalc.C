@@ -55,7 +55,7 @@ void TopologyCalc(TString target){
   c->SetBranchAddress("NPi0FinalState", &NPi0);
 
   std::vector<std::vector<float> > *MultiWeight=0;
-  unsigned int nWeights;
+  unsigned int nWeights = 0;
 
   if (useMultiWeights)
     c->SetBranchAddress("MultiWeight",&MultiWeight);
@@ -66,8 +66,6 @@ void TopologyCalc(TString target){
   std::map < int, double> nuchanNueMap;
   std::map < int, double> nuchanNumuMap;
   std::map < int, double> pi0Map;
-  double nue_CC = 0;
-  double nue_NC = 0;
 
   std::vector< std::map < int, double> > eventRatesNumuMapMultiWeight;
   std::vector< std::map < int, double> > eventRatesNueMapMultiWeight;
@@ -590,12 +588,12 @@ void TopologyCalc(TString target){
       int key = centralValuePair->first;
       double tempRMS = 0;
       for (unsigned int N_weight = 0; N_weight < nWeights; N_weight ++){
-        if (key == 10001){
-          std::cout << "centralValuePair->second - eventRatesNumuMapMultiWeight[N_weight][key]:"
-                    << centralValuePair->second <<  " - " << eventRatesNumuMapMultiWeight[N_weight][key]
-                    << " = " << centralValuePair->second - eventRatesNumuMapMultiWeight[N_weight][key]
-                    << std::endl;
-        }
+        // if (key == 10001){
+        //   std::cout << "centralValuePair->second - eventRatesNumuMapMultiWeight[N_weight][key]:"
+        //             << centralValuePair->second <<  " - " << eventRatesNumuMapMultiWeight[N_weight][key]
+        //             << " = " << centralValuePair->second - eventRatesNumuMapMultiWeight[N_weight][key]
+        //             << std::endl;
+        // }
         tempRMS += pow((centralValuePair->second - eventRatesNumuMapMultiWeight[N_weight][key]),2);
       }
       tempRMS = sqrt(tempRMS/nWeights);
