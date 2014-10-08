@@ -17,10 +17,12 @@
 //ADD_NEW_CLASS ... do not change this line
 #pragma link C++ class showerreco::ShowerRecoException+;
 #pragma link C++ class showerreco::ShowerRecoAlgBase+;
+#pragma link C++ class showerreco::ShowerCalo+;
 #pragma link C++ class showerreco::ShowerRecoAlg+;
 #pragma link C++ class showerreco::Pi0ShowerRecoAlg+;
 //ADD_NEW_ALG_CLASS ... do not change this line
 #endif
+
 
 
 

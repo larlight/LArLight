@@ -38,6 +38,9 @@ namespace showerreco {
 
   std::vector< ::larlight::shower> ShowerRecoAlgBase::Reconstruct()
   {
+
+    ProcessInputClusters();
+
     std::vector< ::larlight::shower> output;
 
     output.reserve(fInputClusters.size());

@@ -63,6 +63,10 @@ namespace showerreco {
 
   protected:
 
+    /// Function to reorganize input cluster information
+    virtual void ProcessInputClusters()
+    { return; }
+
     /// Function to reconstruct one shower
     virtual ::larlight::shower RecoOneShower(const std::vector< ::showerreco::ShowerCluster_t>& clusters) = 0;
     
