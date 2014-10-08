@@ -1,5 +1,5 @@
 
-export USER_MODULE="FANN ClusterRecoUtil CMTool AnalysisAlg ShowerReco3D McshowerLookback CMToolAna"
+export USER_MODULE="FANN ClusterRecoUtil CMTool AnalysisAlg ShowerReco3D McshowerLookback GeoAlgo CMToolAna"
 # Find the location of this script:
 me="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 # Find the directory one above.
