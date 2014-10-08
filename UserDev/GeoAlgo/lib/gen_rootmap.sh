@@ -15,19 +15,5 @@ rootlibmap() {
 }
 
 ######################################################
-# ShowerStudy
-rootlibmap libShowerStudy.rootmap libShowerStudy.so $USER_DEV_DIR/ShowerStudy/LinkDef.h \
-    libAnalysis.so libGeoAlgo.so
-
-
-
-
-
-
-
-
-
-
-
-
-
+# GeoAlgo
+rootlibmap libGeoAlgo.rootmap libGeoAlgo.so $USER_DEV_DIR/GeoAlgo/LinkDef.h 

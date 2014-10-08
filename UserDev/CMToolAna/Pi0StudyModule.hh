@@ -17,7 +17,7 @@
 
 #include "ana_base.hh"
 #include "ComputePi0Mass.hh"
-#include "TwoShower3DIntxn.hh"
+#include "TwoLineIntersection.hh"
 
 namespace larlight {
   /**

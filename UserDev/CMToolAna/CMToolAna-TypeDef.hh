@@ -13,7 +13,7 @@
 #include "Pi0StudyModule.hh"
 #include "MCShowerMatchAlg.hh"
 #include "HitBackTracker.hh"
-#include "TwoShower3DIntxn.hh"
+
 //ADD_NEW_HEADER ... do not change this comment line
 
 // Class forward declaration here
@@ -29,8 +29,6 @@ namespace larlight {
   class HitBackTracker;
 //ADD_ANA_CLASS ... do not change this comment line
 }
-
-  class TwoShower3DIntxn;
 //ADD_EMPTY_CLASS ... do not change this comment line
 #endif
 
