@@ -15,11 +15,9 @@ rootlibmap() {
 }
 
 ######################################################
-# KalekoAna gSystem->Load("KalekoAna") loads ALL OF THESE THINGS
-rootlibmap libKalekoAna.rootmap libKalekoAna.so $USER_DEV_DIR/KalekoAna/LinkDef.h \
-    libCMToolAna.so libCMToolBase.so
-
-
+# LEEEventSelection
+rootlibmap libLEEEventSelection.rootmap libLEEEventSelection.so $USER_DEV_DIR/LEEEventSelection/LinkDef.h \
+    libAnalysis.so libDataHandle.so
 
 
 
