@@ -3,8 +3,8 @@
 #
 
 # specific names for this package
-DICT  = CMToolAnaCint
-SHLIB = libCMToolAna.so
+DICT  = LEEEventSelectionCint
+SHLIB = libLEEEventSelection.so
 SOURCES = $(wildcard *.cc)
 HEADERS = $(wildcard *.hh)
 OBJECTS = $(SOURCES:.cc=.o)
@@ -14,19 +14,8 @@ INCFLAGS = -I.                       #Include itself
 INCFLAGS += -I$(LARLIGHT_CORE_DIR)/Base
 INCFLAGS += -I$(LARLIGHT_CORE_DIR)/DataFormat
 INCFLAGS += -I$(LARLIGHT_CORE_DIR)/Analysis
-INCFLAGS += -I$(LARLIGHT_CORE_DIR)/LArUtil
-INCFLAGS += -I$(USER_DEV_DIR)/ClusterRecoUtil
-INCFLAGS += -I$(USER_DEV_DIR)/FANN
-INCFLAGS += -I$(USER_DEV_DIR)/FANN/include
-INCFLAGS += -I$(USER_DEV_DIR)/McshowerLookback
-INCFLAGS += -I$(USER_DEV_DIR)/CMTool/CMToolBase
-INCFLAGS += -I$(USER_DEV_DIR)/CMTool/CMTAlgPriority
-INCFLAGS += -I$(USER_DEV_DIR)/CMTool/CMTAlgMerge
-INCFLAGS += -I$(USER_DEV_DIR)/CMTool/CMTAlgMatch
-INCFLAGS += -I$(USER_DEV_DIR)/CMTool/CMToolApp
-INCFLAGS += -I$(USER_DEV_DIR)/ShowerReco3D
-INCFLAGS += -I$(USER_DEV_DIR)/AnalysisAlg
-INCFLAGS += -I$(USER_DEV_DIR)/GeoAlgo
+INCFLAGS += -I$(LITE_FMWK_COREDIR)/DataHandle
+INCFLAGS += -I$(LITE_FMWK_COREDIR)/Constants
 
 # platform-specific options
 OSNAME          = $(shell uname -s)
@@ -38,7 +27,6 @@ include $(MAKE_TOP_DIR)/Makefile/Makefile.${OSNAME}
 # set compiler options for ROOT
 CXXFLAGS +=  `root-config --cflags`
 
-CINTFLAGS += "-p"
 # call the common GNUmakefile
 include $(MAKE_TOP_DIR)/Makefile/GNUmakefile.CORE
 

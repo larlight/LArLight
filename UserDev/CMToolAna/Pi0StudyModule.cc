@@ -75,7 +75,7 @@ namespace larlight {
     pi0_mc_start_vtx[1] = ev_mctruth->at(0).GetParticles().at(pi0_particlelist_index).Trajectory().at(0).Y();
     pi0_mc_start_vtx[2] = ev_mctruth->at(0).GetParticles().at(pi0_particlelist_index).Trajectory().at(0).Z();
     
-    //use TwoShower3DIntxn function
+    //use TwoLineIntersection function
     //to find where these two showers would intersect in 3D space
     std::vector<double> start1(3,0);
     start1[0] = ev_shower->at(0).ShowerStart().X();
@@ -98,7 +98,7 @@ namespace larlight {
     reco_dir2[2] = ev_shower->at(1).Direction().Z();
 
     std::vector<double> pi0_reco_start_vtx_and_uncert = 
-      TwoShower3DIntxn().FindIntxn(start1,reco_dir1,start2,reco_dir2);
+      ::geoalgo::TwoLineIntersection().Intersection3D(start1,reco_dir1,start2,reco_dir2);
 
     double mc_show1_magnitude = 
       pow(

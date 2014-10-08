@@ -15,9 +15,9 @@ rootlibmap() {
 }
 
 ######################################################
-# ShowerStudy
-rootlibmap libShowerStudy.rootmap libShowerStudy.so $USER_DEV_DIR/ShowerStudy/LinkDef.h \
-    libAnalysis.so libGeoAlgo.so
+# LEEEventSelection
+rootlibmap libLEEEventSelection.rootmap libLEEEventSelection.so $USER_DEV_DIR/LEEEventSelection/LinkDef.h \
+    libAnalysis.so libDataHandle.so
 
 
 
