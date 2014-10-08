@@ -11,12 +11,14 @@
 #include "ShowerBackTracker.hh"
 #include "ShowerQuality.hh"
 //ADD_NEW_HEADER ... do not change this comment line
-#include "ShowerRecoAlg.hh"
-#include "Pi0ShowerRecoAlg.hh"
+#include "ShowerRecoAlgBase.hh"
+//#include "ShowerRecoAlg.hh"
+//#include "Pi0ShowerRecoAlg.hh"
 //ADD_NEW_ALG_HEADER
 namespace showerreco {
-  class ShowerRecoAlg;
-  class Pi0ShowerRecoAlg;
+  class ShowerReclAlgBase;
+  //class ShowerRecoAlg;
+  //class Pi0ShowerRecoAlg;
   //ADD_NEW_ALG_CLASS
 }
 

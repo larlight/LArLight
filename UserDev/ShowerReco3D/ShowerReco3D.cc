@@ -5,7 +5,7 @@
 
 namespace larlight {
 
-  ShowerReco3D::ShowerReco3D() : ana_base(), fMatchMgr(nullptr), fShowerAlgo(nullptr)
+  ShowerReco3D::ShowerReco3D() : ana_base(), fShowerAlgo(nullptr), fMatchMgr(nullptr)
   {
     _name="ShowerReco3D";
     fClusterType = DATA::Cluster;
@@ -79,12 +79,10 @@ namespace larlight {
     // Loop over matched pairs
     for(auto const& pair : matched_pairs) {
       
-      // Create a vector of clusters to be passed onto the algorithm
-      std::vector< ::cluster::ClusterParamsAlg> clusters;
-      clusters.reserve(pair.size());
+      // Create an input data holder
+      std::vector< ::showerreco::ShowerRecoInput_t>  clusters;
+      clusters.reserve(pair.size());      
 
-      
-            
       // Create an association vector
       std::vector<unsigned int> ass_index;
       ass_index.reserve(pair.size());
@@ -93,7 +91,15 @@ namespace larlight {
 
 	ass_index.push_back(cluster_index);
 	
-	clusters.push_back( fMatchMgr->GetInputClusters().at(cluster_index) );
+	auto const& cpan = fMatchMgr->GetInputClusters().at(cluster_index);
+
+	clusters.push_back(::showerreco::ShowerRecoInput_t());
+
+	(*clusters.rbegin()).start_point = cpan.GetParams().start_point;
+	(*clusters.rbegin()).end_point   = cpan.GetParams().end_point;
+	(*clusters.rbegin()).angle_2d    = cpan.GetParams().angle_2d;
+	(*clusters.rbegin()).plane_id    = cpan.Plane();
+	(*clusters.rbegin()).hit_vector  = cpan.GetHitVector();
 	
       }
 

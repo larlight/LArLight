@@ -37,7 +37,7 @@ namespace showerreco {
     virtual void Reset(){}
 
     /// Function to reconstruct a shower
-    virtual ::larlight::shower Reconstruct(const std::vector< ::cluster::ClusterParamsAlg>& );
+    virtual ::larlight::shower Reconstruct(const std::vector< ::showerreco::ShowerRecoInput_t>& );
 
   protected:
 

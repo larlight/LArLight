@@ -22,7 +22,7 @@ namespace showerreco {
   }
 
 
-  ::larlight::shower Pi0ShowerRecoAlg::Reconstruct(const std::vector< ::cluster::ClusterParamsAlg>& clusters)
+  ::larlight::shower Pi0ShowerRecoAlg::Reconstruct(const std::vector< ::showerreco::ShowerRecoInput_t>& clusters)
   {
     
     ::larlight::shower result;
@@ -36,24 +36,25 @@ namespace showerreco {
     fEnergy.clear();
     fMIPEnergy.clear();
     fdEdx.clear();
-    
+
     // First Get Start Points
     for(auto const & cl : clusters)
       {
-        fStartPoint.push_back(cl.GetParams().start_point);    // for each plane
-	fEndPoint.push_back(cl.GetParams().end_point);    // for each plane
-        fOmega2D.push_back(cl.GetParams().angle_2d);     
-	fPlaneID.push_back(cl.Plane());
+        fStartPoint.push_back(cl.start_point);    // for each plane
+	fEndPoint.push_back(cl.end_point);    // for each plane
+        fOmega2D.push_back(cl.angle_2d);
+	fPlaneID.push_back(cl.plane_id);
 	if(fVerbosity) {
-	  std::cout << " planes : " <<   (int)cl.GetParams().start_point.plane 
-		    << " " << cl.GetParams().end_point.plane 
-		    << " " << cl.GetParams().end_point.w 
-		    <<" angle2d "<<  cl.GetParams().angle_2d  
+	  std::cout << " planes : " << cl.plane_id
+		    << " " << cl.start_point.t 
+		    << " " << cl.start_point.w 
+		    << " " << cl.end_point.t 
+		    << " " << cl.end_point.w 
+		    <<" angle2d "<<  cl.angle_2d  
 		    << std::endl;   
 	}
       }
-    
-    
+
     //decide best two planes. for now, using length in wires - flatter is better.
     
     int worst_plane=-1,best_plane=-1;
@@ -140,9 +141,9 @@ namespace showerreco {
 	if(fabs(fOmega2D.at(cl_index)) < 90)
           direction=1;
 	
-	std::vector<larutil::PxHit> hitlist = clusters.at(cl_index).GetHitVector(); 
+	auto const& hitlist = clusters.at(cl_index).hit_vector;
 	std::vector<larutil::PxHit> local_hitlist;
-	local_hitlist.clear();
+	local_hitlist.reserve(hitlist.size());
 	
 	for(const auto& theHit : hitlist){
 	  

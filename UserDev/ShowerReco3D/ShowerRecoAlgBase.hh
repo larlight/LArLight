@@ -17,7 +17,22 @@
 #include <iostream>
 #include "shower.hh"
 #include "ClusterParamsAlg.hh"
+#include <limits>
+#include <climits>
 namespace showerreco {
+
+  struct ShowerRecoInput_t {
+
+    ::larutil::PxPoint start_point;
+    ::larutil::PxPoint end_point;
+    double             angle_2d;
+    unsigned short     plane_id;
+    std::vector<larutil::PxHit> hit_vector;
+
+    ShowerRecoInput_t() : hit_vector()
+    {}
+
+  };
   
   /**
      \class ShowerRecoAlgBase
@@ -38,7 +53,7 @@ namespace showerreco {
     virtual void Reset() = 0;
 
     /// Function to reconstruct a shower
-    virtual ::larlight::shower Reconstruct(const std::vector< ::cluster::ClusterParamsAlg>& ) = 0;
+    virtual ::larlight::shower Reconstruct(const std::vector< ::showerreco::ShowerRecoInput_t>& clusters) = 0;
     
     /// Verbosity switch
     virtual void Verbose(bool on=true) { fVerbosity=on; }
