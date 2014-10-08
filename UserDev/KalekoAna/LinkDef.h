@@ -19,8 +19,12 @@
 #pragma link C++ class kaleko::QuickMCShowerAna+;
 #pragma link C++ class kaleko::quick_pi0_mean+;
 #pragma link C++ class kaleko::test_xdirreco_filter+;
+#pragma link C++ class kaleko::LEEDataFiller+;
+
+
 //ADD_NEW_CLASS
 #endif
+
 
 
 

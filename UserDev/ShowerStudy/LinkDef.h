@@ -15,14 +15,9 @@
 #pragma link C++ class showerana::Pi0ProfileCut+;
 #pragma link C++ class larlight::PDGSelection+;
 #pragma link C++ class larlight::ShowerDistanceStudy+;
-#pragma link C++ class larlight::KazuAna+;
 #pragma link C++ class larlight::Pi0Selection+;
+#pragma link C++ class larlight::RecoShowerStudy+;
 //ADD_NEW_CLASS ... do not change this line
 
 #endif
-
-
-
-
-
 

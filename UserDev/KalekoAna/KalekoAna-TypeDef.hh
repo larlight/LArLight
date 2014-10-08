@@ -14,6 +14,7 @@
 #include "QuickMCShowerAna.hh"
 #include "quick_pi0_mean.hh"
 #include "test_xdirreco_filter.hh"
+#include "LEEDataFiller.hh"
 //ADD_NEW_HEADER
 
 // Class forward declaration here
@@ -25,6 +26,7 @@ namespace kaleko {
   class QuickMCShowerAna;
   class quick_pi0_mean;
   class test_xdirreco_filter;
+  class LEEDataFiller;
   //ADD_ANA_CLASS
 }
 
@@ -34,6 +36,7 @@ namespace larlight {
 
 //ADD_EMPTY_CLASS
 #endif
+
 
 
 

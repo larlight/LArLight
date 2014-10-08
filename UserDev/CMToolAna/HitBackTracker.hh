@@ -33,7 +33,12 @@ namespace larlight {
     virtual ~HitBackTracker(){ _verbosity=false; };
 
     /// Function to Find MC electrons associated with hit
-    double FindElectrons( larlight::hit h );
+    /// Second arg (optional): look for e- n-sigma away from PeakTime 
+    double FindElectrons( larlight::hit h, double sigma = 1 );
+
+    /// Function to Find MC IDEs associated with hit
+    /// Second arg (optional): look for e- n-sigma away from PeakTime 
+    std::vector<larlight::ide> FindIDEs( larlight::hit h, double sigma = 1 );
 
     /// Make SimchMap
     void MakeSimchMap( larlight::event_simch *evt_simch );
