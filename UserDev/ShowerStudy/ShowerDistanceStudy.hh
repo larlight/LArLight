@@ -55,8 +55,6 @@ namespace larlight {
 	double _dist_ToWall ;
 	double _dist_AlongTraj ;
 	
-	std::vector<double> _kid_momentum ;
-
 	double _pi0_mass ;
 
 
