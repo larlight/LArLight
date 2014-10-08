@@ -28,11 +28,11 @@ fid_ec    = [0 for x in fid_cuts]
 length_ec = [0 for x in length_cuts]
 
 # Calculate error bars for efficiency
-fid_eff_error 	 = [0 for x in fid_cuts]
+fid_eff_error 	 	     = [0 for x in fid_cuts]
 fid_eff_error_empty 	 = [0 for x in fid_cuts]
-
-length_eff_error = [0 for x in length_cuts]
-length_eff_error_empty = [0 for x in length_cuts]
+ 
+length_eff_error 		 = [0 for x in length_cuts]
+length_eff_error_empty   = [0 for x in length_cuts]
 
 hEC_Fid_vs_Length = TH2D("hEC_Fid_vs_Length",
                          "Energy Containment*Eff vs. Fid. vs. Length; Fid. Volume; Length Along Trunk",
@@ -47,7 +47,7 @@ for x in xrange(len(fid_cuts)):
     fid_eff[x] = float(ch.GetEntries("_dist_ToWall>=%g" % fid_cuts[x])) / ch.GetEntries()
     ch.Draw("_daughterEnergy / _motherEnergy >> hTempEC","_dist_ToWall>=%g" % fid_cuts[x])
     fid_ec[x]  = hTempEC.GetMean()
-    fid_eff_error[x] = sqrt( fid_eff[x] * (1-fid_eff[x]) / ch.GetEntries()) 
+    fid_eff_error[x] = sqrt( float(fid_eff[x] * (1-fid_eff[x])) / len(fid_cuts)) 
 
 for x in xrange(len(length_cuts)):
 
@@ -55,7 +55,7 @@ for x in xrange(len(length_cuts)):
     length_eff[x] = float(ch.GetEntries("_dist_AlongTraj>=%g" % length_cuts[x])) / ch.GetEntries()
     ch.Draw("_daughterEnergy / _motherEnergy >> hTempEC","_dist_AlongTraj>=%g" % length_cuts[x])
     length_ec[x] = hTempEC.GetMean()
-    length_eff_error[x] = sqrt( length_eff[x] * (1 - length_eff[x]) /ch.GetEntries())
+    length_eff_error[x] = sqrt(float(length_eff[x] * (1 - length_eff[x]) ) /len(length_cuts))
 
 for x in xrange(len(length_cuts)):
 
@@ -91,8 +91,8 @@ fid_ec_graph.SetMarkerColor(kRed)
   
 fid_eff_xvalues = array.array('d', fid_cuts)
 fid_eff_yvalues = array.array('d', fid_eff)
-fid_eff_yerrors = array.array('d', fid_eff_error)
 fid_eff_xerrors = array.array('d', fid_eff_error_empty)
+fid_eff_yerrors = array.array('d', fid_eff_error)
 fid_eff_graph = TGraphErrors(len(fid_cuts), fid_eff_xvalues, fid_eff_yvalues,fid_eff_xerrors,fid_eff_yerrors)
 fid_eff_graph.SetMarkerStyle(20)
 fid_eff_graph.SetMarkerColor(kBlue)
@@ -127,8 +127,8 @@ length_ec_graph.SetMarkerColor(kRed)
 
 length_eff_xvalues = array.array('d', length_cuts)
 length_eff_yvalues = array.array('d', length_eff)
-length_eff_xerrors = array.array('d',length_eff_error_empty)
-length_eff_yerrors = array.array('d',length_eff_error)
+length_eff_xerrors = array.array('d', length_eff_error_empty)
+length_eff_yerrors = array.array('d', length_eff_error)
 length_eff_graph = TGraphErrors(len(length_cuts), length_eff_xvalues, length_eff_yvalues,length_eff_xerrors,length_eff_yerrors)
 length_eff_graph.SetMarkerStyle(20)
 length_eff_graph.SetMarkerColor(kBlue)

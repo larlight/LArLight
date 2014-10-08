@@ -10,6 +10,7 @@
 #include "ShowerContainmentCut.hh"
 #include "PDGSelection.hh"
 #include "ShowerDistanceStudy.hh"
+#include "RecoShowerStudy.hh"
 //ADD_NEW_HEADER ... do not change this comment line
 
 // Class forward declaration here
@@ -17,6 +18,7 @@ namespace larlight {
 
   class PDGSelection;
   class ShowerDistanceStudy;
+  class RecoShowerStudy;
 //ADD_ANA_CLASS ... do not change this comment line
 
 }
@@ -29,6 +31,7 @@ namespace showerana {
 }
 //ADD_EMPTY_CLASS ... do not change this comment line
 #endif
+
 
 
 
