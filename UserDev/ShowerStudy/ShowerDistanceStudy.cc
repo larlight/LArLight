@@ -16,20 +16,23 @@ namespace larlight {
   
   bool ShowerDistanceStudy::analyze(storage_manager* storage) {
 
-//	Clear(); 
+	Clear(); 
 
 	auto my_mcshower = (const event_mcshower*)(storage->get_data(DATA::MCShower)) ; 
 
+//	if(my_mcshower->size() > 0 ) 
+//	std::cout<<"How many mc showers in each event? : "<<my_mcshower->size() <<std::endl;
+
+	if(my_mcshower->size() > 0 ){
 	for( auto const & mcs : *my_mcshower) {
 
 		/// Define vectors to fill for distance alg
 		auto _kid_vtx 		= mcs.DaughterPosition(); 
-		_kid_momentum  = mcs.DaughterMomentum() ;
+		auto _kid_momentum  = mcs.DaughterMomentum() ;
 		auto _mom_momentum  = mcs.MotherMomentum();
 
-		_motherEnergy = _mom_momentum.at(3) ;		
+		_motherEnergy = _mom_momentum.at(3) ; 
 		_daughterEnergy = _kid_momentum.at(3) ;
-
 
 		showerana::ShowerContainmentCut showerObject ;
 	
@@ -38,8 +41,7 @@ namespace larlight {
 	if(_ana_tree)
 		_ana_tree->Fill();
 	}
-
-
+}
  
     return true;
   }
@@ -51,7 +53,7 @@ void ShowerDistanceStudy::PrepareTTree() {
 
 	  _ana_tree->Branch("_pi0_mass",&_pi0_mass,"_pi0_mass/D");
 	  _ana_tree->Branch("_motherEnergy",&_motherEnergy,"_motherEnergy/D");
-	  _ana_tree->Branch("_daughterEnergy",&_daughterEnergy,"daughterEnergy/D");
+	  _ana_tree->Branch("_daughterEnergy",&_daughterEnergy,"_daughterEnergy/D");
 
 	  _ana_tree->Branch("_dist_ToWall",&_dist_ToWall,"dist_ToWall/D");
 	  _ana_tree->Branch("_dist_AlongTraj",&_dist_AlongTraj,"dist_AlongTraj/D");
@@ -61,13 +63,11 @@ void ShowerDistanceStudy::PrepareTTree() {
     }
  }
 
-/*void ShowerDistanceStudy::Clear() {
+void ShowerDistanceStudy::Clear() {
 
-	_direction1.clear() ;
-	_direction2.clear() ;
 
   }	
-*/
+
  void Reset(){
 
  }
