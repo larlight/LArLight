@@ -26,6 +26,7 @@ INCFLAGS += -I$(USER_DEV_DIR)/CMTool/CMTAlgMatch
 INCFLAGS += -I$(USER_DEV_DIR)/CMTool/CMToolApp
 INCFLAGS += -I$(USER_DEV_DIR)/ShowerReco3D
 INCFLAGS += -I$(USER_DEV_DIR)/AnalysisAlg
+INCFLAGS += -I$(USER_DEV_DIR)/GeoAlgo
 
 # platform-specific options
 OSNAME          = $(shell uname -s)
