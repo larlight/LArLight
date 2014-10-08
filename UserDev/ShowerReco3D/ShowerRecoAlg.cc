@@ -8,47 +8,45 @@ namespace showerreco {
   ShowerRecoAlg::ShowerRecoAlg() : ShowerRecoAlgBase(), fGSer(nullptr)
   {
     
-    fPlaneID.clear();
-    fStartPoint.clear();
-    fEndPoint.clear();
-    fOmega2D.clear();
     if(!fGSer) fGSer = (larutil::GeometryUtilities*)(larutil::GeometryUtilities::GetME());
     
     fcalodEdxlength=1000;
     fdEdxlength=2.4;
     fUseArea=true;
-
     fVerbosity = true;
   }
 
 
-  ::larlight::shower ShowerRecoAlg::Reconstruct(const std::vector< ::cluster::ClusterParamsAlg>& clusters)
+  ::larlight::shower ShowerRecoAlg::RecoOneShower(const std::vector< ::showerreco::ShowerCluster_t>& clusters)
   {
     
     ::larlight::shower result;
     //
     // Reconstruct and store
     //
-    fPlaneID.clear();
-    fStartPoint.clear();
-    fEndPoint.clear();
-    fOmega2D.clear();
-    fEnergy.clear();
-    fMIPEnergy.clear();
-    fdEdx.clear();
+    std::vector < larutil::PxPoint > fStartPoint;    // for each plane
+    std::vector < larutil::PxPoint > fEndPoint;    // for each plane
+    std::vector < double > fOmega2D;    // for each plane
+    
+    std::vector < double > fEnergy;    // for each plane
+    std::vector < double > fMIPEnergy;    // for each plane
+    std::vector < double > fdEdx;      
+    std::vector <unsigned char> fPlaneID;
     
     // First Get Start Points
     for(auto const & cl : clusters)
       {
-        fStartPoint.push_back(cl.GetParams().start_point);    // for each plane
-	fEndPoint.push_back(cl.GetParams().end_point);    // for each plane
-        fOmega2D.push_back(cl.GetParams().angle_2d);
-	fPlaneID.push_back(cl.Plane());
+        fStartPoint.push_back(cl.start_point);    // for each plane
+	fEndPoint.push_back(cl.end_point);    // for each plane
+        fOmega2D.push_back(cl.angle_2d);
+	fPlaneID.push_back(cl.plane_id);
 	if(fVerbosity) {
-	  std::cout << " planes : " <<   (int)cl.GetParams().start_point.plane 
-		    << " " << cl.GetParams().end_point.plane 
-		    << " " << cl.GetParams().end_point.w 
-		    <<" angle2d "<<  cl.GetParams().angle_2d  
+	  std::cout << " planes : " << cl.plane_id
+		    << " " << cl.start_point.t 
+		    << " " << cl.start_point.w 
+		    << " " << cl.end_point.t 
+		    << " " << cl.end_point.w 
+		    <<" angle2d "<<  cl.angle_2d  
 		    << std::endl;   
 	}
       }
@@ -140,13 +138,14 @@ namespace showerreco {
 	if(fabs(fOmega2D.at(cl_index)) < 90)
           direction=1;
 	
-	std::vector<larutil::PxHit> hitlist = clusters.at(cl_index).GetHitVector(); 
+	auto const& hitlist = clusters.at(cl_index).hit_vector;
 	std::vector<larutil::PxHit> local_hitlist;
-	local_hitlist.clear();
-	
+	local_hitlist.reserve(hitlist.size());
+
 	for(const auto& theHit : hitlist){
 	  
 	  double dEdx_new=0;
+	  double hitElectrons = 0;
 	  //double Bcorr_half;
 	  //double dEdx_sub;
 	  // double dEdx_MIP;
@@ -158,13 +157,20 @@ namespace showerreco {
 	  if(!fUseArea)
 	    {
 	      dEdx_new = fCaloAlg.dEdx_AMP(&theHit , newpitch ); 
+	      hitElectrons = fCaloAlg.ElectronsFromADCPeak(theHit.peak, plane);
 	    }
 	  else
-	    dEdx_new = fCaloAlg.dEdx_AREA(&theHit , newpitch ); 
-	  //
-	 
-	  //calculate total energy.
-	  totEnergy += dEdx_new*newpitch; 
+	    {
+	      dEdx_new = fCaloAlg.dEdx_AREA(&theHit , newpitch ); 
+	      hitElectrons = fCaloAlg.ElectronsFromADCArea(theHit.charge, plane);
+	    }
+
+	  hitElectrons *= fCaloAlg.LifetimeCorrection(theHit.t);
+
+	  totEnergy += hitElectrons * 1.e3 / (::larutil::kGeVToElectrons);
+	  
+
+
 	  //totNewCnrg+=dEdx_MIP;
 	//  if(dEdx_new < 3.5 && dEdx_new >0 )
 	//    {

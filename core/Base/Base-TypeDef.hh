@@ -6,7 +6,6 @@
 #define BASE_TYPEDEF_HH
 
 // Header files included here
-#include "types.hh"
 #include "FrameworkConstants.hh"
 #include "MCConstants.hh"
 #include "GeoConstants.hh"

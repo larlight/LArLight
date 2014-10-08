@@ -34,10 +34,10 @@ namespace showerreco {
     virtual ~Pi0ShowerRecoAlg(){}
 
     /// Function to reset algorithm, to be called @ beginning of each event
-    virtual void Reset(){}
+    virtual void Reset(){ ShowerRecoAlgBase::Reset(); }
 
     /// Function to reconstruct a shower
-    virtual ::larlight::shower Reconstruct(const std::vector< ::cluster::ClusterParamsAlg>& );
+    virtual ::larlight::shower RecoOneShower(const std::vector< ::showerreco::ShowerCluster_t>& );
 
   protected:
 
@@ -47,15 +47,6 @@ namespace showerreco {
    
   private:
     
-   std::vector < larutil::PxPoint > fStartPoint;    // for each plane
-   std::vector < larutil::PxPoint > fEndPoint;    // for each plane
-   std::vector < double > fOmega2D;    // for each plane
-   
-   std::vector < double > fEnergy;    // for each plane
-   std::vector < double > fMIPEnergy;    // for each plane
-   std::vector < double > fdEdx;      
-   std::vector <unsigned char> fPlaneID;
-   
    double fcalodEdxlength;
    double fdEdxlength;
    bool fUseArea;

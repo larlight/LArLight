@@ -7,7 +7,6 @@
 
 // Header files included here
 #include "CMergePerformance.hh"
-#include "ShowerCalo.hh"
 #include "CMatchPerformance.hh"
 #include "MCShowerEff.hh"
 #include "ComputePi0Mass.hh"
@@ -20,7 +19,6 @@
 // Class forward declaration here
 namespace larlight {
 
-  class ShowerCalo;
   class CMergePerformance;
   class MCShowerEff;
   class CMatchPerformance;
