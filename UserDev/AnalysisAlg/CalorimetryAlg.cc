@@ -127,11 +127,7 @@ namespace calo{
   // ----------------------------------------------------------------------------------//
   double CalorimetryAlg::dEdx_AMP(double dQdx,double time, unsigned int plane) const
   {
-    double fADCtoEl=1.;
-    
-    fADCtoEl = fCalAmpConstants[plane];
-    
-    double dQdx_e = dQdx/fADCtoEl;  // Conversion from ADC/cm to e/cm
+    double dQdx_e = ElectronsFromADCPeak(dQdx,plane);  // Conversion from ADC/cm to e/cm
     return dEdx_from_dQdx_e(dQdx_e,time);
   }
   
@@ -169,11 +165,7 @@ namespace calo{
   // ----------------------------------------------------------------------------------//  
   double CalorimetryAlg::dEdx_AREA(double dQdx,double time, unsigned int plane) const
   {
-    double fADCtoEl=1.;
-    
-    fADCtoEl = fCalAreaConstants[plane];
-    
-    double dQdx_e = dQdx/fADCtoEl;  // Conversion from ADC/cm to e/cm
+    double dQdx_e = ElectronsFromADCArea(dQdx,plane);  // Conversion from ADC/cm to e/cm
     return dEdx_from_dQdx_e(dQdx_e, time);
   }
     
