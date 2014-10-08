@@ -7,11 +7,6 @@ namespace showerreco {
   
   Pi0ShowerRecoAlg::Pi0ShowerRecoAlg() : ShowerRecoAlgBase(), fGSer(nullptr)
   {
-    
-    fPlaneID.clear();
-    fStartPoint.clear();
-    fEndPoint.clear();
-    fOmega2D.clear();
     if(!fGSer) fGSer = (larutil::GeometryUtilities*)(larutil::GeometryUtilities::GetME());
     
     fcalodEdxlength=1000;
@@ -22,20 +17,23 @@ namespace showerreco {
   }
 
 
-  ::larlight::shower Pi0ShowerRecoAlg::Reconstruct(const std::vector< ::showerreco::ShowerRecoInput_t>& clusters)
+  ::larlight::shower Pi0ShowerRecoAlg::RecoOneShower(const std::vector< ::showerreco::ShowerCluster_t>& clusters)
   {
     
     ::larlight::shower result;
+
+    std::vector < larutil::PxPoint > fStartPoint;    // for each plane
+    std::vector < larutil::PxPoint > fEndPoint;    // for each plane
+    std::vector < double > fOmega2D;    // for each plane
+    
+    std::vector < double > fEnergy;    // for each plane
+    std::vector < double > fMIPEnergy;    // for each plane
+    std::vector < double > fdEdx;      
+    std::vector <unsigned char> fPlaneID;
+
     //
     // Reconstruct and store
     //
-    fPlaneID.clear();
-    fStartPoint.clear();
-    fEndPoint.clear();
-    fOmega2D.clear();
-    fEnergy.clear();
-    fMIPEnergy.clear();
-    fdEdx.clear();
 
     // First Get Start Points
     for(auto const & cl : clusters)

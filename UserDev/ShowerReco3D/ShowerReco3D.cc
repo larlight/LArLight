@@ -75,12 +75,16 @@ namespace larlight {
     shower_v->set_event_id(storage->get_data(fClusterType)->event_id());
     shower_v->set_run(storage->get_data(fClusterType)->run());
     shower_v->set_subrun(storage->get_data(fClusterType)->subrun());
+
+    // Create association holder
+    std::vector<std::vector<unsigned int> > ass_index_v;
+    ass_index_v.reserve(matched_pairs.size());
     
     // Loop over matched pairs
     for(auto const& pair : matched_pairs) {
       
       // Create an input data holder
-      std::vector< ::showerreco::ShowerRecoInput_t>  clusters;
+      std::vector< ::cluster::ClusterParamsAlg> clusters;
       clusters.reserve(pair.size());      
 
       // Create an association vector
@@ -91,23 +95,33 @@ namespace larlight {
 
 	ass_index.push_back(cluster_index);
 	
-	auto const& cpan = fMatchMgr->GetInputClusters().at(cluster_index);
-
-	clusters.push_back(::showerreco::ShowerRecoInput_t());
-
-	(*clusters.rbegin()).start_point = cpan.GetParams().start_point;
-	(*clusters.rbegin()).end_point   = cpan.GetParams().end_point;
-	(*clusters.rbegin()).angle_2d    = cpan.GetParams().angle_2d;
-	(*clusters.rbegin()).plane_id    = cpan.Plane();
-	(*clusters.rbegin()).hit_vector  = cpan.GetHitVector();
+	clusters.push_back(fMatchMgr->GetInputClusters().at(cluster_index));
 	
       }
 
-      // Run algorithm
-      larlight::shower result = fShowerAlgo->Reconstruct(clusters);
+      // Temporarily store association
+      ass_index_v.push_back(ass_index);
+
+      // Append input to shower reco algorithm
+      fShowerAlgo->AppendInputClusters(clusters);
+
+    }
+
+    // Run shower reco
+    auto result_v = fShowerAlgo->Reconstruct();
+
+    // Make sure result has the same size 
+    if(result_v.size() != ass_index_v.size())
+      throw ::showerreco::ShowerRecoException("Mismatch in # of showers from algorithm's return!");
+
+    for(size_t index = 0; index < result_v.size(); ++index) {
+
+      auto& result = result_v.at(index);
+
+      auto const& ass = ass_index_v.at(index);
 
       // Add association
-      result.add_association(fClusterType,ass_index);
+      result.add_association(fClusterType,ass);
 
       // Set ID
       result.set_id(shower_v->size());

@@ -21,15 +21,15 @@
 #include <climits>
 namespace showerreco {
 
-  struct ShowerRecoInput_t {
+  struct ShowerCluster_t {
 
     ::larutil::PxPoint start_point;
     ::larutil::PxPoint end_point;
     double             angle_2d;
     unsigned short     plane_id;
-    std::vector<larutil::PxHit> hit_vector;
+    std::vector< ::larutil::PxHit> hit_vector;
 
-    ShowerRecoInput_t() : hit_vector()
+    ShowerCluster_t() : hit_vector()
     {}
 
   };
@@ -52,17 +52,27 @@ namespace showerreco {
     /// Function to reset algorithm, to be called @ beginning of each event
     virtual void Reset() = 0;
 
-    /// Function to reconstruct a shower
-    virtual ::larlight::shower Reconstruct(const std::vector< ::showerreco::ShowerRecoInput_t>& clusters) = 0;
-    
+    /// Setter for a matched combination of clusters
+    virtual void AppendInputClusters(const std::vector< ::cluster::ClusterParamsAlg>& cpan_v);
+
+    /// Execute reconstruction
+    std::vector< ::larlight::shower> Reconstruct();
+
     /// Verbosity switch
     virtual void Verbose(bool on=true) { fVerbosity=on; }
+
+  protected:
+
+    /// Function to reconstruct one shower
+    virtual ::larlight::shower RecoOneShower(const std::vector< ::showerreco::ShowerCluster_t>& clusters) = 0;
     
   protected:
     
     /// Verbosity flag
     bool fVerbosity;
-    
+
+    /// Input clusters
+    std::vector<std::vector< ::showerreco::ShowerCluster_t> > fInputClusters;
   };
 }
 
