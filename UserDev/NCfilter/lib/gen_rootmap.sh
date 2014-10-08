@@ -17,7 +17,8 @@ rootlibmap() {
 ######################################################
 # NCfilter
 rootlibmap libNCfilter.rootmap libNCfilter.so $USER_DEV_DIR/NCfilter/LinkDef.h \
-    libAnalysis.so libLArUtil.so
+    libClusterRecoUtil.so libAnalysis.so 
+#libLArUtil.so
 
 
 

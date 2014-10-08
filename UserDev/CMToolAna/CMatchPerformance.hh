@@ -16,9 +16,10 @@
 #define CMATCHPERFORMANCE_HH
 
 #include "ana_base.hh"
-#include "McshowerLookback.hh"
+#include "MCShowerMatchAlg.hh"
 #include "CMatchManager.hh"
 #include "CRUHelper.hh"
+#include "TStopwatch.h"
 
 namespace larlight {
   /**
@@ -37,7 +38,7 @@ namespace larlight {
 
     /** IMPLEMENT in CMatchPerformance.cc!
         Initialization method to be called before the analysis event loop.
-    */ 
+    )*/ 
     virtual bool initialize();
 
     /** IMPLEMENT in CMatchPerformance.cc! 
@@ -45,14 +46,21 @@ namespace larlight {
     */
     virtual bool analyze(storage_manager* storage);
 
+    /** Set Cluster Type to be read in: ClusterMerger makes Cluster
+	instead of FuzzyCluster
+    */
+    void SetClusterType(DATA::DATA_TYPE type) {_cluster_type = type;}
+
+    /// Perform Time Report
+    void PerformTimeReport(bool on) { fMgr->ReportTimings(on); }
+
     /** IMPLEMENT in CMatchPerformance.cc! 
         Finalize method to be called after all events processed.
     */
     virtual bool finalize();
 
+    /// Getter for CMatchManager
     ::cmtool::CMatchManager& GetManager() { return *fMgr; }
-
-    McshowerLookback& GetBTAlgo() { return fBTAlgo; }
 
   protected:
 
@@ -62,7 +70,7 @@ namespace larlight {
 
     ::cmtool::CMatchManager *fMgr;
 
-    McshowerLookback fBTAlgo;
+    MCShowerMatchAlg fAlg;
 
     /// Charge-based efficiency histogram: entry per matched pair
     TH1D* hMatchQEff;
@@ -70,10 +78,9 @@ namespace larlight {
     /// Charge-based efficiency histogram: entry per event
     TH1D* hMatchQEffEvent;
 
-    /// # MCShower / # matched cluster pairs (kinda efficiency)
-    TH1D* hMatchNumEff;
+    /// Internal timer
+    TStopwatch fWatch;
 
-    std::vector<UChar_t> _view_to_plane;
   };
 }
 #endif

@@ -24,11 +24,13 @@
 #include "FANNService.hh"
 
 #include <vector>
+#include <map>
 
 #include "DataFormat-TypeDef.hh"
 #include "LArUtil-TypeDef.hh"
 //#include "HoughBaseAlg.hh"
 #include "TPrincipal.h"
+#include "TStopwatch.h"
 
 namespace cluster {
    
@@ -66,6 +68,8 @@ namespace cluster {
     void SetArgoneutGeometry();
 
     void Report();
+
+    void TimeReport() const;
 
     /**
      * This function returns a feature vector suitable for a neural net
@@ -257,6 +261,9 @@ namespace cluster {
     cluster::cluster_params fParams;
 
     std::string fNeuralNetPath;
+
+    std::vector<std::string> fTimeRecord_ProcName;
+    std::vector<double> fTimeRecord_ProcTime;
 
   }; //class ClusterParamsAlg
   

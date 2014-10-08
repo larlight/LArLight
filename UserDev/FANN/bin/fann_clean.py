@@ -20,6 +20,7 @@ for l in libs:
     if os.path.isfile(target):
         os.system("rm %s" % target)
 
+os.system('make clean --directory=%s' % FANN_DIR)
         
 
 

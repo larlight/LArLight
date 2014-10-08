@@ -17,7 +17,7 @@ rootlibmap() {
 ######################################################
 # CMToolAna
 rootlibmap libCMToolAna.rootmap libCMToolAna.so $USER_DEV_DIR/CMToolAna/LinkDef.h \
-    libAnalysis.so libClusterRecoUtil.so libFANN.so libCMTool.so libMcshowerLookback.so libShowerReco3D.so
+    libAnalysis.so libClusterRecoUtil.so libFANN.so libCMToolApp.so libMcshowerLookback.so libShowerReco3D.so
 
 
 

@@ -17,6 +17,7 @@
 
 #include "ana_base.hh"
 #include "DataFormat-TypeDef.hh"
+#include "ShowerRecoException.hh"
 #include "ShowerRecoAlgBase.hh"
 #include "CRUHelper.hh"
 #include "CMatchManager.hh"

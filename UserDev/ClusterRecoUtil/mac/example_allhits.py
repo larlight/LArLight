@@ -1,4 +1,5 @@
 import sys
+import binascii
 from array import array
 from ROOT import *
 import ROOT
@@ -102,10 +103,10 @@ while mgr.next_event():
    
 
     # Get event_mctruth ... std::vector<larlight::mctruth>
-    mctruth_v = mgr.get_data(fmwk.DATA.MCTruth)
+    mcshower_v = mgr.get_data(fmwk.DATA.MCShower)
 
-      # Get event_cluster ... std::vector<larlight::cluster>
-    cluster_v = mgr.get_data(fmwk.DATA.FuzzyCluster)
+    # Get event_cluster ... std::vector<larlight::cluster>
+    #cluster_v = mgr.get_data(fmwk.DATA.FuzzyCluster)
 
     
   #  if cluster_v.event_id() != 280 or cluster_v.subrun() != 171 :
@@ -113,18 +114,21 @@ while mgr.next_event():
     
     # Get the primary particl generator vtx position
     mct_vtx=None
-    if mctruth_v and mctruth_v.size():
-        if mctruth_v.size()>1:
+    mct_mom=None
+    if mcshower_v and mcshower_v.size():
+        if mcshower_v.size()>1:
             print "Found more than 1 MCTruth. Only use the 1st one... \n \n"
-        if mctruth_v.at(0).GetParticles().at(0).PdgCode() == 11:      ## electron    
-            mct_vtx = mctruth_v.at(0).GetParticles().at(0).Trajectory().at(0).Position()
+        if mcshower_v.at(0).MotherPDGID() == 11:      ## electron    
+            mct_vtx = mcshower_v.at(0).MotherPosition()
+            mct_mom = mcshower_v.at(0).DaughterMomentum()
             print "\n electron \n"
-        elif mctruth_v.at(0).GetParticles().at(0).PdgCode() == 22:    
-            trajsize= mctruth_v.at(0).GetParticles().at(0).Trajectory().size()
-            mct_vtx = mctruth_v.at(0).GetParticles().at(0).Trajectory().at(trajsize-1).Position()
+        elif mcshower_v.at(0).MotherPDGID() == 22:    
+            mct_vtx = mcshower_v.at(0).MotherPosition()
+            mct_mom = mcshower_v.at(0).DaughterMomentum()
             print "\n gamma \n"
-        if mctruth_v.at(0).GetParticles().at(0).PdgCode() == 13:      ## muon    
-            mct_vtx = mctruth_v.at(0).GetParticles().at(0).Trajectory().at(0).Position()
+        if mcshower_v.at(0).MotherPDGID() == 13:      ## muon    
+            mct_vtx = mcshower_v.at(0).MotherPosition()
+            mct_mom = mcshower_v.at(0).DaughterMomentum()
             print "\n muon \n"
     #PdgCode
 
@@ -133,7 +137,7 @@ while mgr.next_event():
         
     for plane in xrange(larutil.Geometry.GetME().Nplanes()):
 
-        if algo.LoadAllHits(mgr.get_data(larlight.DATA.FFTHit), plane) == -1 :
+        if algo.LoadAllHits(mgr.get_data(larlight.DATA.GausHit), plane) == -1 :
             continue;
 
 
@@ -160,16 +164,18 @@ while mgr.next_event():
         algo.FillPolygon()
         algo.GetFinalSlope(True)
         algo.TrackShowerSeparation(True)
-        algo.Report()
-        algo.PrintFANNVector()
+        #algo.Report()
+        #algo.PrintFANNVector()
         result = algo.GetParams()
 
-        print "(%g,%g) => (%g,%g), plane: %g" % (result.start_point.w,
+        print "(%g,%g) => (%g,%g), plane: %s" % (result.start_point.w,
                                                  result.start_point.t,
                                                  result.end_point.w,
-                                                 result.end_point.t,result.start_point.plane)
+                                                 result.end_point.t,
+                                                 result.start_point.plane)
 
         mc_begin=None
+        mcangle=None
         if(mct_vtx):
             print "MC Particle Start Point: (%g,%g,%g)" % (mct_vtx[0],mct_vtx[1],mct_vtx[2])
 
@@ -187,16 +193,38 @@ while mgr.next_event():
             my_vec[0] = mct_vtx[0]
             my_vec[1] = mct_vtx[1]
             my_vec[2] = mct_vtx[2]
-            mcpoint=fGSer.Get2DPointProjectionCM(my_vec,result.start_point.plane)
+            mcpoint=fGSer.Get2DPointProjectionCM(my_vec,
+                                                 int(binascii.b2a_hex(result.start_point.plane)))
 
             # Example 1 & 2 should have the same return here (checked)
             # print " Start point in w,t  (%g,%g)" % (mcpoint.w,mcpoint.t)   
 
-            mc_begin = TGraph(1)
-            mc_begin.SetPoint(0,mcpoint.w,mcpoint.t)
+            mc_begin = TGraph(2)
+            mc_begin.SetPoint(0, mcpoint.w, mcpoint.t)
             mc_begin.SetMarkerStyle(29)
             mc_begin.SetMarkerColor(ROOT.kRed)
+            mc_begin.SetLineWidth(1)
+            mc_begin.SetLineColor(ROOT.kRed)
             mc_begin.SetMarkerSize(3)
+
+            mct_mom = TVector3(mct_mom[0]/sqrt(pow(mct_mom[0],2) + pow(mct_mom[1],2) + pow(mct_mom[2],2)),
+                               mct_mom[1]/sqrt(pow(mct_mom[0],2) + pow(mct_mom[1],2) + pow(mct_mom[2],2)),
+                               mct_mom[2]/sqrt(pow(mct_mom[0],2) + pow(mct_mom[1],2) + pow(mct_mom[2],2)))
+
+            mc_angle = fGSer.Get2DangleFrom3D(int(binascii.b2a_hex(result.start_point.plane)), mct_mom)
+            print 
+            print 'mom:',mct_mom[0],mct_mom[1],mct_mom[2]
+            print 'plane:', int(binascii.b2a_hex(result.start_point.plane))
+            print '2D angle: MC = %g ... Reco = %g' % (mc_angle / TMath.Pi() * 180, result.angle_2d)
+            print '2D angle diff:', mc_angle / TMath.Pi() * 180 - result.angle_2d
+            print
+            mc_begin.SetPoint(1, 9999. * TMath.Cos(mc_angle), 9999. * TMath.Sin(mc_angle))
+
+        if mc_begin:
+            dist = sqrt( pow(mcpoint.w - result.start_point.w,2) + pow(mcpoint.t - result.start_point.t,2))
+            print "Distant:",dist
+            #if dist > 10: continue
+
         #Add black star to mark begin point and black square to mark end point
         begin = TGraph(1)
         end = TGraph(1)
@@ -218,9 +246,11 @@ while mgr.next_event():
         func.SetParameter(0,algo.RoughIntercept());     
         func.SetParameter(1,algo.RoughSlope());   
         func.SetLineWidth(1);   
+        func.SetLineColor(kBlue)
+
         if result.start_point.w > result.end_point.w:
             func.SetRange(result.end_point.w-50,result.start_point.w+50);
-     
+            
         dwire=30;
         dtime=30*TMath.Tan(result.angle_2d*TMath.Pi()/180);
         if result.angle_2d > -90 and  result.angle_2d <0 :
@@ -232,7 +262,6 @@ while mgr.next_event():
         elif result.angle_2d > 90. and  result.angle_2d < 180 :
             dwire=-30;
             dtime=30*TMath.Tan(-1*result.angle_2d*TMath.Pi()/180);     
-         
          
         angleline=TLine(result.start_point.w,result.start_point.t,result.start_point.w+dwire,result.start_point.t+dtime);
         angleline.SetLineColor(kBlack);
@@ -258,6 +287,7 @@ while mgr.next_event():
 
         # Draw Hit 2D View & points
         chit.cd()
+        chit.SetLogz()
         hHits = algo.GetHitView()
         hHits.Draw("COLZ")
         begin.Draw("P same")
@@ -273,9 +303,9 @@ while mgr.next_event():
 
         if(mc_begin):
             leg.AddEntry(mc_begin, "Start Point (mc)","P")
-            mc_begin.Draw("P same")
-        if(gPolygon):
-            gPolygon.Draw("PL same")
+            mc_begin.Draw("PL same")
+        #if(gPolygon):
+        #    gPolygon.Draw("PL same")
         leg.Draw("same")
         # Update canvas
         chit.Update()

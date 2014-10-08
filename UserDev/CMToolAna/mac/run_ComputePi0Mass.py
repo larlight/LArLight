@@ -7,7 +7,7 @@ processor = fmwk.ana_processor()
 #need to use BOTH so output from first module is used as input to second
 processor.set_io_mode(fmwk.storage_manager.BOTH)
 
-processor.set_rootdir('scanner')
+#processor.set_rootdir('scanner')
 
 for x in xrange(len(sys.argv)):
 
@@ -23,6 +23,7 @@ shower_module = fmwk.ShowerReco3D()
 
 pi0Mass_module = fmwk.ComputePi0Mass()
 pi0Mass_module.SetDebug(True)
+pi0Mass_module.SetApplyEnergyCorrection(False)
 
 #
 # Attach Matching algorithm

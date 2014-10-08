@@ -19,7 +19,11 @@ INCFLAGS += -I$(USER_DEV_DIR)/ClusterRecoUtil
 INCFLAGS += -I$(USER_DEV_DIR)/McshowerLookback
 INCFLAGS += -I$(USER_DEV_DIR)/FANN
 INCFLAGS += -I$(USER_DEV_DIR)/FANN/include
-INCFLAGS += -I$(USER_DEV_DIR)/CMTool
+INCFLAGS += -I$(USER_DEV_DIR)/CMTool/CMToolBase
+INCFLAGS += -I$(USER_DEV_DIR)/CMTool/CMTAlgPriority
+INCFLAGS += -I$(USER_DEV_DIR)/CMTool/CMTAlgMerge
+INCFLAGS += -I$(USER_DEV_DIR)/CMTool/CMTAlgMatch
+INCFLAGS += -I$(USER_DEV_DIR)/CMTool/CMToolApp
 INCFLAGS += -I$(USER_DEV_DIR)/AnalysisAlg
 
 # platform-specific options

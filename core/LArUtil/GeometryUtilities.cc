@@ -31,7 +31,8 @@ namespace larutil{
     vertangle.resize(fNPlanes);
     for(UInt_t ip=0;ip<fNPlanes;ip++)
       vertangle[ip]=geom->WireAngleToVertical(geom->PlaneToView(ip)) - TMath::Pi()/2; // wire angle
-        
+	    
+   
     fWirePitch = geom->WirePitch(0,1,0);
     fTimeTick=detp->SamplingRate()/1000.; 
     fDriftVelocity=larp->DriftVelocity(larp->Efield(),larp->Temperature());
@@ -49,8 +50,8 @@ namespace larutil{
   
 
   //-----------------------------------------------------------------------------
-  // omega0 and omega1 are calculated as:
-  //  angle based on distances in wires and time - rescaled to cm.
+  // omega0 and omega1 (calculated by CPAN in degrees):
+  // angle based on distances in wires and time - rescaled to cm.
   // tan(angle)*fMean_wire_pitch/(fTimeTick*fDriftVelocity);
   // as those calculated with Get2Dangle
   // writes phi and theta in degrees.
@@ -62,33 +63,37 @@ namespace larutil{
 				      Double_t &phi,
 				      Double_t &theta) const
   {
- 
-  //  Double_t l(0),m(0),n(0);
+
+  	//Double_t l(0),m(0),n(0);
+    //Double_t phin(0);//,phis(0),thetan(0);
+
+	// y, z, x coordinates
     Double_t ln(0),mn(0),nn(0);
     Double_t phis(0),thetan(0);
-    //Double_t phin(0);//,phis(0),thetan(0);
-    // pretend collection and induction planes. 
+
+    // Pretend collection and induction planes. 
     // "Collection" is the plane with the vertical angle equal to zero. 
-    // If both are non zero collection is the one with the negative angle. 
+    // If both are non-zero, collection is the one with the negative angle. 
     UInt_t Cplane=0,Iplane=1;   
-    //then angleC and angleI are the respective angles to vertical in these planes and slopeC, slopeI are the tangents of the track.
+
+    // angleC and angleI are the respective angles to vertical in C/I 
+	// planes and slopeC, slopeI are the tangents of the track.
     Double_t angleC,angleI,slopeC,slopeI,omegaC,omegaI;
     omegaC = larlight::DATA::INVALID_DOUBLE;
     omegaI = larlight::DATA::INVALID_DOUBLE;
-    // don't know how to reconstruct these yet, so exit with error.
-    
+
+    // Don't know how to reconstruct these yet, so exit with error.
+	// In     
     if(omega0==0 || omega1==0){
       phi=0;
       theta=-999;
       return -1;
     }
     
-    
-    //////////insert check for existence of planes.
-    
+    //////insert check for existence of planes.
+ 
     //check if backwards going track
     Double_t backwards=0;
-    
     Double_t alt_backwards=0;
     
     ///// or?
@@ -100,106 +105,98 @@ namespace larutil{
       alt_backwards=1;
     }
     
-    
-    
-    
+   
+	 
     if(vertangle[iplane0] == 0){   
       // first plane is at 0 degrees
       Cplane=iplane0;
       Iplane=iplane1;
       omegaC=omega0;
       omegaI=omega1;
-    }
+      }
     else if(vertangle[iplane1] == 0){  
       // second plane is at 0 degrees
       Cplane = iplane1;
       Iplane = iplane0;
       omegaC=omega1;
       omegaI=omega0;
-    }
+      }
     else if(vertangle[iplane0] != 0 && vertangle[iplane1] != 0){
       //both planes are at non zero degree - find the one with deg<0
       if(vertangle[iplane1] < vertangle[iplane0]){
-	Cplane = iplane1;
-	Iplane = iplane0;
-	omegaC=omega1;
-	omegaI=omega0;
-      }
+		Cplane = iplane1;
+		Iplane = iplane0;
+		omegaC=omega1;
+		omegaI=omega0;
+       }
       else if(vertangle[iplane1] > vertangle[iplane0]){
-	Cplane = iplane0;
-	Iplane = iplane1;
-	omegaC=omega0;
-	omegaI=omega1;
-      }
+		Cplane = iplane0;
+		Iplane = iplane1;
+		omegaC=omega0;
+		omegaI=omega1;
+        }
       else{
-	//throw error - same plane.
-	return -1;
-      }	
+		//throw error - same plane.
+		return -1;
+        }	
       
-    }
-    
+      }
     
     slopeC=tan(omegaC);
     slopeI=tan(omegaI);
-    //omega0=tan(omega0);
-    //omega1=tan(omega1);
     angleC=vertangle[Cplane];
     angleI=vertangle[Iplane];
-    
+
+
+	//    l = 1;
+	//    m = (1/(2*sin(angleI)))*((cos(angleI)/(slopeC*cos(angleC)))-(1/slopeI) 
+	//			     +nfact*(  cos(angleI)/slopeC-1/slopeI  )     );
+	//    n = (1/(2*cos(angleC)))*((1/slopeC)+(1/slopeI) +nfact*((1/slopeC)-(1/slopeI)));
+
+
     //0 -1 factor depending on if one of the planes is vertical.
     bool nfact = !(vertangle[Cplane]);
-    
-    
-    
+
+	//ln represents y, omega is 2d angle -- in first 2 quadrants y is positive.
     if(omegaC < TMath::Pi() && omegaC > 0 )
       ln=1;
     else
       ln=-1;
-    
-//     std::cout << " slopes, C:"<< slopeC << " " << (omegaC) << " I:" << slopeI << " " << omegaI <<std::endl;
-//     slopeI=tan(omegaI);
-//     
-//     std::cout << "omegaC, angleC " << omegaC << " " << angleC << "cond: " << omegaC-angleC << " ln: " << ln << std::endl;
-//     
-//     std::cout << " inverse slopes: " << (cos(angleI)/(slopeC*cos(angleC))) << " " << 1/slopeC << " 2: "<< 1/slopeI << std::endl;
-//     
-  //  l = 1;
-    
-    
-   // m = (1/(2*sin(angleI)))*((cos(angleI)/(slopeC*cos(angleC)))-(1/slopeI) 
-//			     +nfact*(  cos(angleI)/slopeC-1/slopeI  )     );
-    
-//    n = (1/(2*cos(angleC)))*((1/slopeC)+(1/slopeI) +nfact*((1/slopeC)-(1/slopeI)));
-    
+   
+	//calculate x and z using y ( ln )
     mn = (ln/(2*sin(angleI)))*((cos(angleI)/(slopeC*cos(angleC)))-(1/slopeI) 
 			       +nfact*(  cos(angleI)/(cos(angleC)*slopeC)-1/slopeI  )     );
     
     nn = (ln/(2*cos(angleC)))*((1/slopeC)+(1/slopeI) +nfact*((1/slopeC)-(1/slopeI)));
+
+	// std::cout << " slopes, C:"<< slopeC << " " << (omegaC) << " I:" << slopeI << " " << omegaI <<std::endl;
+	// std::cout << "omegaC, angleC " << omegaC << " " << angleC << "cond: " << omegaC-angleC << " ln: " << ln << std::endl;
+	// std::cout << " inverse slopes: " << (cos(angleI)/(slopeC*cos(angleC))) << " " << 1/slopeC << " 2: "<< 1/slopeI << std::endl;
     
-    
-//    float Phi;
-//    float alt_Phi;
+	// float Phi;
+	// float alt_Phi;
+
+
     // Direction angles
-    if(fabs(angleC)>0.01)  // catch numeric error values 
+    if(fabs(omegaC)>0.01)  // catch numeric error values 
       {
-	
 	//phi=atan(ln/nn);
 	phis=asin(ln/TMath::Sqrt(ln*ln+nn*nn));
         
 	if(fabs(slopeC+slopeI) < 0.001)
 	  phis=0;
-	else if(fabs(omegaI)>0.01 && (omegaI/fabs(omegaI) == -omegaC/fabs(omegaC) ) && ( fabs(omegaC) < 20*TMath::Pi()/180 || fabs(omegaC) > 160*TMath::Pi()/180   ) ) // angles have 
-	  {phis = (fabs(omegaC) > TMath::Pi()/2) ? TMath::Pi() : 0;    //angles are 
-	    
-	  }
-	
-	
+	else if( fabs(omegaI)>0.01 && (omegaI/fabs(omegaI) == -omegaC/fabs(omegaC) ) 
+			 && ( fabs(omegaC) < 1*TMath::Pi()/180 || fabs(omegaC) > 179*TMath::Pi()/180 ) ) // angles have 
+	  phis = (fabs(omegaC) > TMath::Pi()/2) ? TMath::Pi() : 0;    //angles are 
+	  
 	
 	if(nn<0 && phis>0 && !(!alt_backwards && fabs(phis)<TMath::Pi()/4 ) )   // do not go back if track looks forward and phi is forward
 	  phis=(TMath::Pi())-phis;
 	else if(nn<0 && phis<0 && !(!alt_backwards && fabs(phis)<TMath::Pi()/4 ) )
 	  phis=(-TMath::Pi())-phis;
 	
+    
+	phi=phis*180/TMath::Pi();
 	
 	// solve the ambiguities due to tangent periodicity
 // 	Phi = phi > 0. ? (TMath::Pi()/2)-phi : fabs(phi)-(TMath::Pi()/2) ; 
@@ -217,40 +214,38 @@ namespace larutil{
 // 	  if(alt_Phi<0){alt_Phi=alt_Phi+TMath::Pi();}
 // 	  else if(alt_Phi>0){alt_Phi=alt_Phi-TMath::Pi();}
 // 	}
-	
+
       }
-    else  // if plane is collection than Phi = omega
-      {//phi=omegaC;
-	//Phi=omegaC;
-	phis=omegaC;
-	//alt_Phi=omegaC;
+	//If plane2 (collection), phi = 2d angle (omegaC in this case) 
+    else  
+      {
+		phis = omegaC;
+		phi = omegaC; 
       }
     
+	thetan = -asin ( mn / (sqrt(pow(ln,2)+pow(mn,2)+pow(nn,2)) ) ) ;
+    theta=thetan*180/TMath::Pi();
     
-    //theta = acos( mn / (sqrt(pow(ln,2)+pow(mn,2)+pow(nn,2)) ) ) ;
-    thetan = -asin ( mn / (sqrt(pow(ln,2)+pow(mn,2)+pow(nn,2)) ) ) ;
-    //Double_t thetah = acos( mn / (sqrt(pow(l,2)+pow(mn,2)+pow(nn,2)) ) ) ;
+//     theta = acos( mn / (sqrt(pow(ln,2)+pow(mn,2)+pow(nn,2)) ) ) ;
+//     Double_t thetah = acos( mn / (sqrt(pow(l,2)+pow(mn,2)+pow(nn,2)) ) ) ;
 //     float Theta;
 //     float alt_Theta = 0.;
     
-//    std::cout << " thetan " << mn << " " <<  (sqrt(pow(ln,2)+pow(mn,2)+pow(nn,2)) ) << " " << mn / (sqrt(pow(ln,2)+pow(mn,2)+pow(nn,2)) ) << std::endl;
-    
-    
+//     std::cout << " thetan " << mn << " " <<  (sqrt(pow(ln,2)+pow(mn,2)+pow(nn,2)) ) << " " << mn / (sqrt(pow(ln,2)+pow(mn,2)+pow(nn,2)) ) << std::endl;
 //     if(Phi < 0)Theta = (TMath::Pi()/2)-theta;
 //     if(Phi > 0)Theta = theta-(TMath::Pi()/2);
-//     
 //     if(alt_Phi < 0)alt_Theta = (TMath::Pi()/2)-theta;
 //     if(alt_Phi > 0)alt_Theta = theta-(TMath::Pi()/2);
     
-  /*  std::cout << "++++++++ GeomUtil old " << Phi*180/TMath::Pi() << " " << Theta*180/TMath::Pi() << std::endl;
+  /*
+	std::cout << "++++++++ GeomUtil old " << Phi*180/TMath::Pi() << " " << Theta*180/TMath::Pi() << std::endl;
     std::cout << "++++++++ GeomUtil_angles ALT: Phi: " << alt_Phi*180/TMath::Pi() << " Theta: " << alt_Theta*180/TMath::Pi() << std::endl;
     std::cout << "++++++++ GeomUtil_new_angles Sine: Phi: " << phis*180/TMath::Pi() << " Theta: " << thetan*180/TMath::Pi() << std::endl;
   */  
-    phi=phis*180/TMath::Pi();
-    theta=thetan*180/TMath::Pi();
     
-    
-    return 0;   }
+    return 0;   
+
+}
   
   //////////////////////////////
   //Calculate theta in case phi~0

@@ -5,13 +5,13 @@
 
 namespace larlight {
 
-  ShowerReco3D::ShowerReco3D() : ana_base(), fMatchMgr(nullptr), fShowerAlgo(nullptr)
+  ShowerReco3D::ShowerReco3D() : ana_base(), fShowerAlgo(nullptr), fMatchMgr(nullptr)
   {
     _name="ShowerReco3D";
     fClusterType = DATA::Cluster;
 
     auto geom = ::larutil::Geometry::GetME();
-    fMatchMgr = new ::cmtool::CMatchManager(geom->Nplanes());
+    if(!fMatchMgr) fMatchMgr = new ::cmtool::CMatchManager(geom->Nplanes());
   }
   
   bool ShowerReco3D::initialize() {
@@ -75,16 +75,18 @@ namespace larlight {
     shower_v->set_event_id(storage->get_data(fClusterType)->event_id());
     shower_v->set_run(storage->get_data(fClusterType)->run());
     shower_v->set_subrun(storage->get_data(fClusterType)->subrun());
+
+    // Create association holder
+    std::vector<std::vector<unsigned int> > ass_index_v;
+    ass_index_v.reserve(matched_pairs.size());
     
     // Loop over matched pairs
     for(auto const& pair : matched_pairs) {
       
-      // Create a vector of clusters to be passed onto the algorithm
+      // Create an input data holder
       std::vector< ::cluster::ClusterParamsAlg> clusters;
-      clusters.reserve(pair.size());
+      clusters.reserve(pair.size());      
 
-      
-            
       // Create an association vector
       std::vector<unsigned int> ass_index;
       ass_index.reserve(pair.size());
@@ -93,28 +95,33 @@ namespace larlight {
 
 	ass_index.push_back(cluster_index);
 	
-	clusters.push_back( fMatchMgr->GetInputClusters().at(cluster_index) );
+	clusters.push_back(fMatchMgr->GetInputClusters().at(cluster_index));
 	
       }
 
-      
-      int check=0;
-      for(auto const & iter : clusters)
-      {
-	if(iter.GetNHits() > 20)
-	  check++;
-      }
-	
-	std::cout << " clusters " <<  clusters.size() << " check " << check << std::endl;
-	
-	if(check<=2)
-	  continue;
-	
-      // Run algorithm
-      larlight::shower result = fShowerAlgo->Reconstruct(clusters);
+      // Temporarily store association
+      ass_index_v.push_back(ass_index);
+
+      // Append input to shower reco algorithm
+      fShowerAlgo->AppendInputClusters(clusters);
+
+    }
+
+    // Run shower reco
+    auto result_v = fShowerAlgo->Reconstruct();
+
+    // Make sure result has the same size 
+    if(result_v.size() != ass_index_v.size())
+      throw ::showerreco::ShowerRecoException("Mismatch in # of showers from algorithm's return!");
+
+    for(size_t index = 0; index < result_v.size(); ++index) {
+
+      auto& result = result_v.at(index);
+
+      auto const& ass = ass_index_v.at(index);
 
       // Add association
-      result.add_association(fClusterType,ass_index);
+      result.add_association(fClusterType,ass);
 
       // Set ID
       result.set_id(shower_v->size());

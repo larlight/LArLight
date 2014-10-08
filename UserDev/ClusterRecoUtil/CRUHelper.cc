@@ -99,6 +99,8 @@ namespace cluster {
 			      )
 			 );
 
+    if(!(ev_cluster->size())) return;
+
     const ::larlight::DATA::DATA_TYPE hit_type = ev_cluster->get_hit_type();
     
     auto ev_hits = (const ::larlight::event_hit*)(storage->get_data(hit_type));

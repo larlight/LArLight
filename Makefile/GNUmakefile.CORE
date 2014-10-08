@@ -1,20 +1,18 @@
 ###################################################
 
 # default target list
-all: .depend $(DICT).cc lib/$(SHLIB)  $(LARLIGHT_LIBDIR)/$(SHLIB) 
 
-# define ROOTMAP and add it to the default target list, unless NO_ROOTMAP set
+all: pre_build main_build 
+
+pre_build:
+
 ifndef NO_ROOTMAP
 LOCAL_ROOTMAP=lib/$(SHLIB:.so=.rootmap)
 ROOTMAP=$(LARLIGHT_LIBDIR)/$(SHLIB:.so=.rootmap)
-all: $(ROOTMAP)
-
+main_build: .depend $(DICT).cc lib/$(SHLIB) $(ROOTMAP) $(LARLIGHT_LIBDIR)/$(SHLIB)
+else
+main_build: .depend $(DICT).cc lib/$(SHLIB)  $(LARLIGHT_LIBDIR)/$(SHLIB)
 endif
-
-# DCcmpat lib support
-#CFLAGS   += -D_$(OSNAME)_
-#CXXFLAGS += -D_$(OSNAME)_
-
 
 # root class dictionary
 $(DICT).cc: $(HEADERS) LinkDef.h
@@ -38,7 +36,8 @@ $(LARLIGHT_LIBDIR)/$(SHLIB): lib/$(SHLIB)
 	@ln -sf $(PWD)/lib/$(SHLIB) $(LARLIGHT_LIBDIR)
 
 # if ROOTMAP defined, define rule for making it
-ifdef ROOTMAP
+ifndef NO_ROOTMAP
+#ERROR_MESSAGE := $(error Executed)
 $(ROOTMAP): $(LOCAL_ROOTMAP)
 	@echo "<< installing rootmap >>"
 	@ln -sf $(PWD)/lib/$(SHLIB:.so=.rootmap) $(LARLIGHT_LIBDIR)
@@ -50,10 +49,13 @@ $(LOCAL_ROOTMAP): lib/$(SHLIB)
 endif
 
 ###################################################
+
 # "make clean" target
-clean:
+clean: pre_clean
 	@echo '<< cleaning all >>'
 	@rm -f $(DICT).* *.o lib*.so *~ .depend ./lib/*.o lib/lib*.so lib/lib*.rootmap $(LARLIGHT_LIBDIR)/$(SHLIB) $(LARLIGHT_LIBDIR)/$(SHLIB:.so=.rootmap)
+
+pre_clean: 
 
 ###################################################
 libclean:

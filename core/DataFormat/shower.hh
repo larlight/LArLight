@@ -52,19 +52,19 @@ namespace larlight{
     virtual void clear_data();
     
     // Set methods
-    void set_id                (Int_t id)                      { fID = id;                 }
-    void set_total_energy      (std::vector< Double_t >& q)    { fTotalEnergy = q;         }
-    void set_total_energy_err  (std::vector< Double_t >& q)    { fSigmaTotalEnergy = q;    }
-    void set_total_MIPenergy   (std::vector< Double_t >& q)    { fTotalMIPEnergy = q;      }
-    void set_total_MIPenergy_err  (std::vector< Double_t >& q) { fSigmaTotalMIPEnergy = q; }
-    void set_total_best_plane  (int q)                         { fBestPlane = q;        }
+    void set_id                (const Int_t id)                      { fID = id;                 }
+    void set_total_energy      (const std::vector< Double_t >& q)    { fTotalEnergy = q;         }
+    void set_total_energy_err  (const std::vector< Double_t >& q)    { fSigmaTotalEnergy = q;    }
+    void set_total_MIPenergy   (const std::vector< Double_t >& q)    { fTotalMIPEnergy = q;      }
+    void set_total_MIPenergy_err  (const std::vector< Double_t >& q) { fSigmaTotalMIPEnergy = q; }
+    void set_total_best_plane  (const int q)                         { fBestPlane = q;        }
     
-    void set_direction       (TVector3& dir)        { fDCosStart = dir;        }
-    void set_direction_err   (TVector3& dir_e)      { fSigmaDCosStart = dir_e; }
-    void set_start_point     (TVector3& xyz)        { fXYZstart = xyz;        }
-    void set_start_point_err (TVector3& xyz_e)      { fSigmaXYZstart = xyz_e; }
-    void set_dedx      (std::vector< Double_t >& q) { fdEdx = q;        }
-    void set_dedx_err  (std::vector< Double_t >& q) { fSigmadEdx = q;        }
+    void set_direction       (const TVector3& dir)        { fDCosStart = dir;        }
+    void set_direction_err   (const TVector3& dir_e)      { fSigmaDCosStart = dir_e; }
+    void set_start_point     (const TVector3& xyz)        { fXYZstart = xyz;        }
+    void set_start_point_err (const TVector3& xyz_e)      { fSigmaXYZstart = xyz_e; }
+    void set_dedx      (const std::vector< Double_t >& q) { fdEdx = q;        }
+    void set_dedx_err  (const std::vector< Double_t >& q) { fSigmadEdx = q;        }
    
     
 //     void set_max_width     (Double_t x, Double_t y) 

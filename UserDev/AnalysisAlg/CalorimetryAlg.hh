@@ -47,7 +47,13 @@ namespace calo{
     double dEdx_AREA(double dQdx,double time, unsigned int plane) const;
     
     double LifetimeCorrection(double time) const;
-    
+
+    double ElectronsFromADCPeak(double adc, unsigned short plane) const
+    { return adc / fCalAmpConstants[plane]; }
+
+    double ElectronsFromADCArea(double area, unsigned short plane) const
+    { return area / fCalAreaConstants[plane]; }
+
   private:
     
     //art::ServiceHandle<geo::Geometry> geom; 
