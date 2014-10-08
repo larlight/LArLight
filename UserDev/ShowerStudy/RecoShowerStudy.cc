@@ -11,7 +11,6 @@ namespace larlight {
     PrepareTTree();
 	_count0 = 0;
 	_count1 = 0;
-	_count2 = 0;
 
     return true;
   }
@@ -23,20 +22,19 @@ namespace larlight {
 
 //	std::cout<<"Number of reco showers: "<<my_recoshower->size()<<std::endl;
 
-	if(my_recoshower->size() ==2 || my_recoshower->size()==1 || my_recoshower->size()==3 ) _count0 ++ ; 
-
-	if(my_recoshower->size() ==0 ) _count2++ ; 
+	if(my_recoshower->size() ==2 ) _count0 ++ ; 
+	if(my_recoshower->size() ==0 ) _count1++ ; 
 
 
 		for(auto const & mrs : *my_recoshower ){
 			Clear();
 	
-	_count1++; 
+
 		 	auto bestPlane = mrs.best_plane() ;
 	   		_reco_energy.push_back(mrs.Energy().at(bestPlane)) ;
 					
 			for(size_t i = 0 ; i < my_recoshower->size(); i++)
-				_total_energy += _reco_energy[i] ;  
+		//		_total_energy += _reco_energy[i] ;  
 	
 			_direction.push_back(mrs.Direction().X());
 			_direction.push_back(mrs.Direction().Y());
@@ -100,7 +98,6 @@ void RecoShowerStudy::Clear(){
       delete _reco_tree;
 
 	std::cout<<"\nNumber of 1,2,3 shower events is: "<<_count0<<std::endl;
-	std::cout<<"Events with no reconstructed showers :" <<_count2 <<std::endl;
 	std::cout<<"All events: "<<_count1<<std::endl;
   
     return true;
