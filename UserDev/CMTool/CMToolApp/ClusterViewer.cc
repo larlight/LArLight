@@ -40,6 +40,7 @@ namespace larlight {
   //#######################################
   {
     if( type != DATA::Cluster &&
+	type != DATA::DBCluster &&
 	type != DATA::MCShowerCluster &&
 	type != DATA::FuzzyCluster &&
 	type != DATA::CrawlerCluster &&
@@ -47,10 +48,11 @@ namespace larlight {
 	type != DATA::HoughCluster &&
 	type != DATA::RyanCluster )
 
-      print(MSG::ERROR,__FUNCTION__,Form("Not a valid cluster type: %s",DATA::DATA_TREE_NAME[type].c_str()));
-    
-    else
-      cluster_type=type;
+      throw ::cluster::ViewerException(Form("Not a valid cluster type: %s",
+					    DATA::DATA_TREE_NAME[cluster_type].c_str())
+				       );
+
+    cluster_type=type;
 
   }
   
