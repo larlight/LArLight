@@ -24,8 +24,6 @@ namespace larlight {
     
     if(my_recoshower->size() ==2 || my_recoshower->size()==1 || my_recoshower->size()==3 ) _count0 ++ ; 
     
-    if(my_recoshower->size() ==0 ) _count2++ ; 
-    
     
     for(auto const & mrs : *my_recoshower ){
       Clear();
@@ -35,7 +33,7 @@ namespace larlight {
       _reco_energy.push_back(mrs.Energy().at(bestPlane)) ;
       
       for(size_t i = 0 ; i < my_recoshower->size(); i++)
-//	_total_energy[i] += _reco_energy[i] ;  
+// 	  _total_energy[i] += _reco_energy[i] ;  
       
       _direction.push_back(mrs.Direction().X());
       _direction.push_back(mrs.Direction().Y());
