@@ -3,7 +3,11 @@
  *
  * \ingroup LEEEventSelection
  * 
- * \brief Class def header for a class LEEEventSelection
+ * \brief This class loops over larlight events, picks out candidate events
+ * for a low energy excess study, fills a data container (defined in the
+ * UBSensitivity code) with relevant parameters, uses UBSens code to write
+ * those data to an output file. This output file is later read in and turned
+ * into scaled histograms by UBSensivity code.
  *
  * @author davidkaleko
  */
@@ -16,7 +20,6 @@
 #define LEEEVENTSELECTION_HH
 
 #include "ana_base.hh"
-//#include "/Users/davidkaleko/UBSensitivity/core/DataHandle/DataManager.hh"
 #include "DataManager.hh"
 
 namespace larlight {
@@ -29,7 +32,10 @@ namespace larlight {
   public:
     
     /// Default constructor
-    LEEEventSelection() : ana_base() { _name="LEEEventSelection"; }
+    LEEEventSelection() : ana_base() { 
+      _name="LEEEventSelection"; 
+      _include_reco_showers = false;
+    }
     
     /// Default destructor
     virtual ~LEEEventSelection(){};
@@ -49,9 +55,20 @@ namespace larlight {
     */
     virtual bool finalize();
     
+    /// Setter to include reconstructed showers... if set to false,
+    /// then only MCShower parameters are used for analysis
+    void SetIncludeRecoShowers(bool flag) { _include_reco_showers = flag; }
+
   protected:
     
+    bool _include_reco_showers;
+
     ::ubsens::data::DataManager _mgr;
+
+    ::ubsens::data::TruthShower _truthshower;
+
+    ::ubsens::data::RecoShower _recoshower;
+
     
   };
 }

@@ -29,7 +29,9 @@ if len(sys.argv) > 2:
 my_proc.set_ana_output_file("from_test_ana_you_can_remove_me.root");
 
 # Attach a template process
-my_proc.add_process(fmwk.LEEEventSelection());
+lee = fmwk.LEEEventSelection()
+lee.SetIncludeRecoShowers(False)
+my_proc.add_process(lee)
 
 print
 print  "Finished configuring ana_processor. Start event loop!"

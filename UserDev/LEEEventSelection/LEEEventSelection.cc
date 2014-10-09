@@ -7,53 +7,83 @@ namespace larlight {
 
   bool LEEEventSelection::initialize() {
 
-    //
-    // This function is called in the beggining of event loop
-    // Do all variable initialization you wish to do here.
-    // If you have a histogram to fill in the event loop, for example,
-    // here is a good place to create one on the heap (i.e. "new TH1D"). 
-    //
     _mgr = ::ubsens::data::DataManager();
-
+    
+    _truthshower = ::ubsens::data::TruthShower();
+    _recoshower = ::ubsens::data::RecoShower();
+    
+    _mgr.SetIOMode(::ubsens::data::DataManager::WRITE);
+    _mgr.SetOutputFilename("aho.root");
+    _mgr.Open();
+    
     return true;
   }
   
   bool LEEEventSelection::analyze(storage_manager* storage) {
-  
-    //
-    // Do your event-by-event analysis here. This function is called for 
-    // each event in the loop. You have "storage" pointer which contains 
-    // event-wise data. To see what is available, check the "Manual.pdf":
-    //
-    // http://microboone-docdb.fnal.gov:8080/cgi-bin/ShowDocument?docid=3183
-    // 
-    // Or you can refer to Base/DataFormatConstants.hh for available data type
-    // enum values. Here is one example of getting PMT waveform collection.
-    //
-    // event_fifo* my_pmtfifo_v = (event_fifo*)(storage->get_data(DATA::PMFIFO));
-    //
-    // if( event_fifo )
-    //
-    //   std::cout << "Event ID: " << my_pmtfifo_v->event_id() << std::endl;
-    //
-  
+
+    /*
+    //grab the MC showers
+    larlight::event_mcshower* ev_mcshower = (larlight::event_mcshower*)storage->get_data(larlight::DATA::MCShower);
+    if(!ev_mcshower) {
+      print(larlight::MSG::ERROR,__FUNCTION__,Form("Did not find specified data product, MCShower!"));
+      return false;
+    }
+    
+    //grab the reconstructed showers, but don't quit if they DNE
+    larlight::event_shower* ev_shower = (larlight::event_shower*)storage->get_data(larlight::DATA::Shower);
+    if(!ev_shower && _include_reco_showers)  {
+      print(larlight::MSG::WARNING,__FUNCTION__,Form("Did not find specified data product, Shower! AND you wanted to use them! Consider using SetIncludeRecoShowers(False)."));
+    }
+
+    
+
+    //here decide if event passes event selection cut (in fid volume, IE)
+    //NO! WRITE A FILTER THAT RUNS BEFORE THIS! USE FILTER MODE!
+
+    //here code some stuff following kazu's ubsens example.py
+    //including writing to an output file
+    
+    
+    //loop over mcshowers, save into ubsens dataholder
+    for (auto imcs: *ev_mcshower){
+      _truthshower.Reset();
+
+      _truthshower.MotherPDGID     ( imcs.MotherPDGID()      );
+      _truthshower.MotherVtx       ( imcs.MotherPosition()   );
+      _truthshower.MotherMomentum  ( imcs.MotherMomentum()   );
+      _truthshower.DaughterVtx     ( imcs.DaughterPosition() );
+      _truthshower.DaughterMomentum( imcs.DaughterMomentum() );
+
+      _mgr.GetWriteableData().AppendTruthShower(_truthshower);
+    }
+
+
+    //if using reco showers, loop over showers, save into ubsens dataholder
+    if( _include_reco_showers ){
+      
+      for (auto ish: *ev_shower){
+	_recoshower.Reset();
+	
+	Int_t bp = ish.best_plane();
+	_recoshower.DCosStart(   ish.Direction(),     ish.DirectionErr()     );
+	_recoshower.XYZStart(    ish.ShowerStart(),   ish.ShowerStartErr()   );
+	_recoshower.TotalEnergy( ish.Energy().at(bp), ish.EnergyErr().at(bp) );
+	_recoshower.dEdx(        ish.dEdx().at(bp),   ish.dEdxErr().at(bp)   );
+	
+	_mgr.GetWriteableData().AppendRecoShower(_recoshower);
+      }
+     
+    }
+    */
+    _mgr.SaveEntry();
+    
+
     return true;
   }
 
   bool LEEEventSelection::finalize() {
-
-    // This function is called at the end of event loop.
-    // Do all variable finalization you wish to do here.
-    // If you need, you can store your ROOT class instance in the output
-    // file. You have an access to the output file through "_fout" pointer.
-    //
-    // Say you made a histogram pointer h1 to store. You can do this:
-    //
-    // if(_fout) { _fout->cd(); h1->Write(); }
-    //
-    // else 
-    //   print(MSG::ERROR,__FUNCTION__,"Did not find an output file pointer!!! File not opened?");
-    //
+    
+    _mgr.Close();
   
     return true;
   }
