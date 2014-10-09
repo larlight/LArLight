@@ -63,7 +63,7 @@ namespace larlight {
     _MC_pi0_energy = ev_mctruth->at(0).GetParticles().at(pi0_particlelist_index).Trajectory().at(0).E() * 1000;
 
     //should probably do "best plane" stuff here. Already in MeV
-    _reco_pi0_energy = ev_shower->at(0).MIPEnergy().at(2)+ev_shower->at(1).MIPEnergy().at(2);
+    _reco_pi0_energy = fSECaloAlg.ShowerEnergy(ev_shower->at(0).Energy().at(2)).first + fSECaloAlg.ShowerEnergy(ev_shower->at(1).MIPEnergy().at(2)).first;
 
 
     //this works only if ComputePi0Mass module is added to ana_processor
