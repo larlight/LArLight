@@ -14,7 +14,7 @@ INCFLAGS = -I.                       #Include itself
 INCFLAGS += -I$(LARLIGHT_CORE_DIR)/Base
 INCFLAGS += -I$(LARLIGHT_CORE_DIR)/DataFormat
 INCFLAGS += -I$(LARLIGHT_CORE_DIR)/Analysis
-INCFLAGS += -I$(MAKE_TOP_DIR)/UserDev/GeoAlgo
+INCFLAGS += -I$(USER_DEV_DIR)/GeoAlgo
 
 # platform-specific options
 OSNAME          = $(shell uname -s)
