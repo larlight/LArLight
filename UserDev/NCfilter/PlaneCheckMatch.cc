@@ -32,7 +32,7 @@ namespace cluster {
         bool Q01 = false;
         bool Q02 = false;
         bool Q12 = false;
-	std::vector<bool>  returnvect(false,nplanes);
+	std::vector<bool>  returnvect(nplanes,false);
 
 	// first make the vectors for the pxhits
             std::vector<larutil::PxHit> pxfa_v0;
@@ -91,12 +91,9 @@ namespace cluster {
 
 
 
-		returnvect[0]= Q01;
-		returnvect[1]= Q02;
-		returnvect[2]= Q12;
-
-
-
+	returnvect[0]= Q01;
+	returnvect[1]= Q02;
+	returnvect[2]= Q12;
 
 	return returnvect;
 	}//plane check function
