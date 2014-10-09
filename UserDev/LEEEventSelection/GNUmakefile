@@ -3,8 +3,8 @@
 #
 
 # specific names for this package
-DICT  = ShowerStudyCint
-SHLIB = libShowerStudy.so
+DICT  = LEEEventSelectionCint
+SHLIB = libLEEEventSelection.so
 SOURCES = $(wildcard *.cc)
 HEADERS = $(wildcard *.hh)
 OBJECTS = $(SOURCES:.cc=.o)
@@ -14,7 +14,8 @@ INCFLAGS = -I.                       #Include itself
 INCFLAGS += -I$(LARLIGHT_CORE_DIR)/Base
 INCFLAGS += -I$(LARLIGHT_CORE_DIR)/DataFormat
 INCFLAGS += -I$(LARLIGHT_CORE_DIR)/Analysis
-INCFLAGS += -I$(MAKE_TOP_DIR)/UserDev/GeoAlgo
+INCFLAGS += -I$(LITE_FMWK_COREDIR)/DataHandle
+INCFLAGS += -I$(LITE_FMWK_COREDIR)/Constants
 
 # platform-specific options
 OSNAME          = $(shell uname -s)

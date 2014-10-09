@@ -22,7 +22,6 @@ INCFLAGS += -I$(USER_DEV_DIR)/CMTool
 INCFLAGS += -I$(USER_DEV_DIR)/CMTool/CMToolBase
 INCFLAGS += -I$(USER_DEV_DIR)/CMToolAna
 INCFLAGS += -I$(USER_DEV_DIR)/McshowerLookback
-INCFLAGS += -I$(LITE_FMWK_CORE_DIR)/DataHandle
 
 # platform-specific options
 OSNAME          = $(shell uname -s)
