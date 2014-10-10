@@ -211,9 +211,9 @@ namespace showerana {
 
     //
     // This function computes the distance from a point to the closest wall of the box
-    // along the specified direction (both taken from input arguments). The box is
+    // *BACKWARDS* along the specified direction (both taken from input arguments). The box is
     // pre-defined by _xyz_min and _xyz_max values. 
-    // The function only works only if the point is inside the box for now because
+    // The function only works if the point is inside the box for now because
     // otherwise it adds a complication to the problem.
     // 
     // The function proceeds in the following steps of computation:
