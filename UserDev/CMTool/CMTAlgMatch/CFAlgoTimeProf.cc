@@ -53,14 +53,13 @@ namespace cmtool {
 	// loop over the clusters
         for(auto const& c : clusters)
 	{
-	std::cout<<"Size of the xluster vector"<<clusters.size()<<std::endl;
-	//first lets print out some information about the clusters
-	auto Plane = c->Plane();
-	auto StartPoint = c->GetParams().start_point.t;
-	auto EndPoint = c->GetParams().end_point.t;
-	std::cout<<"\t RG Cluster info:\n \t plane: "<<Plane<<std::endl;
-        std::cout<<"\tStart point: "<<StartPoint<<std::endl;
-        std::cout<<"\tEnd Point: "<<EndPoint <<std::endl;
+//	std::cout<<"Size of the xluster vector"<<clusters.size()<<std::endl;
+//	auto Plane = c->Plane();
+//	auto StartPoint = c->GetParams().start_point.t;
+//	auto EndPoint = c->GetParams().end_point.t;
+//	std::cout<<"\t RG Cluster info:\n \t plane: "<<Plane<<std::endl;
+//      std::cout<<"\tStart point: "<<StartPoint<<std::endl;
+//        std::cout<<"\tEnd Point: "<<EndPoint <<std::endl;
 
 	// Get assosiations for this cluster
         if(c->Plane() ==0) hits0 = c->GetHitVector();
@@ -69,7 +68,7 @@ namespace cmtool {
 
 	}// for over the clusters
 
-	std::cout<<"Looking for the hits vector size"<<hits0.size()<<","<<hits1.size()<<","<<hits2.size()<<std::endl;
+//	std::cout<<"Looking for the hits vector size"<<hits0.size()<<","<<hits1.size()<<","<<hits2.size()<<std::endl;
 //        std::cout<<"############# End of loop############# "<<std::endl;
 	// make an integrale over the cluster
 	bool pl0 = false;
@@ -110,14 +109,14 @@ namespace cmtool {
 	
 	//	std::cout<< " \t summary of timeprof Planes that are accepted :" <<pl0<<" | " <<pl1<<" | " <<pl2<<" |"<<std::endl;
 	std::vector<float> tprofmatches;	
-	std::cout<< " \t                  Value of timeprof(01,02,12) :" <<tprof01<<" | " <<tprof02<<" | " <<tprof12<<" |"<<std::endl;
+//	std::cout<< " \t                  Value of timeprof(01,02,12) :" <<tprof01<<" | " <<tprof02<<" | " <<tprof12<<" |"<<std::endl;
 	tprofmatches.push_back(tprof01);
 	tprofmatches.push_back(tprof02);
 	tprofmatches.push_back(tprof12);
 	
 	float matchscore=0;
 	float avgcounter=0;
-	std::cout<<"SIZE of trpfmoatch"<< tprofmatches.size()<<std::endl;
+//	std::cout<<"SIZE of trpfmoatch"<< tprofmatches.size()<<std::endl;
 	for( unsigned int a=0;a<tprofmatches.size();a++)
 	{
 	if(tprofmatches[a]==-1) continue;	
@@ -127,13 +126,13 @@ namespace cmtool {
 		}// end of else
 	}//for over the tprofmatchs
 		if(avgcounter!=0){
-		std::cout << " Match Score pree "<< matchscore<<std::endl;		
-		std::cout<< " Counter "<< avgcounter;
+//		std::cout << " Match Score pree "<< matchscore<<std::endl;		
+//		std::cout<< " Counter "<< avgcounter;
 		matchscore /= avgcounter;
-		std::cout << " Match Score "<< matchscore<<std::endl;		
+//		std::cout << " Match Score "<< matchscore<<std::endl;		
 		}
 		else{
-		std::cout << " Match Score "<< -1<<std::endl;		
+//		std::cout << " Match Score "<< -1<<std::endl;		
 		 return -1;
 		}
 		return matchscore;
@@ -148,7 +147,7 @@ namespace cmtool {
 // Making a function to do the profile test
  float CFAlgoTimeProf::TProfCompare(std::vector<larutil::PxHit> hita ,std::vector<larutil::PxHit> hitb)
  {
-   int nts = larutil::DetectorProperties::GetME()->NumberTimeSamples()*larutil::GeometryUtilities::GetME()->TimeToCm();
+//   int nts = larutil::DetectorProperties::GetME()->NumberTimeSamples()*larutil::GeometryUtilities::GetME()->TimeToCm();
    // Where is this?
    //int nplanes = geom->Nplanes();
    int nplanes = 3;
@@ -201,12 +200,14 @@ namespace cmtool {
      }
    }
 
+/*
    std::cout 
      << "siga: "<< histo_a.GetEntries() << std::endl
      << "sigb: "<< histo_b.GetEntries() << std::endl
      << "siginta: "<<histo_inta.GetEntries() << std::endl
      << "sigintb: "<<histo_intb.GetEntries() << std::endl
      << std::endl;
+*/
 
    if (histo_intb.Integral()) histo_intb.Scale(1./histo_intb.GetBinContent(histo_intb.GetNbinsX()));
    ks = histo_inta.KolmogorovTest(&histo_intb);
