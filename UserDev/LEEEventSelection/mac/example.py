@@ -8,7 +8,10 @@ if len(sys.argv) < 2:
     sys.exit(1)
 
 from ROOT import gSystem
-gSystem.Load("libLEEEventSelection")
+#gSystem.Load("libFMWKBase")
+#gSystem.Load("libConstants")
+#gSystem.Load("libDataHandle")
+#gSystem.Load("libLEEEventSelection")
 from ROOT import larlight as fmwk
 
 # Create ana_processor instance
