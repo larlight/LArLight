@@ -88,12 +88,9 @@ namespace cluster {
 
 
 
-		returnvect[0]= Q01;
-		returnvect[1]= Q02;
-		returnvect[2]= Q12;
-
-
-
+	returnvect[0]= Q01;
+	returnvect[1]= Q02;
+	returnvect[2]= Q12;
 
 	return returnvect;
 	}//plane check function
