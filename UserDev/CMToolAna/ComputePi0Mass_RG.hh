@@ -20,7 +20,7 @@
 #include "CRUHelper.hh"
 #include "ShowerRecoAlg.hh"
 #include "ShowerBackTracker.hh"
-
+#include "ShowerReco3D/ShowerCalo.hh"
 namespace larlight {
   /**
      \class ComputePi0Mass_RG
@@ -109,7 +109,7 @@ namespace larlight {
     
     float _mass;
     float _Pi0mass = 134.98;// in MeV
-    float _dorient_EE_calb = 2.95;// in MeV
+    float _dorient_EE_calb = 1.92;// in MeV
     float _mass_goodEnergy;
     float _mass_goodAngle;
     float _mass_detectorTrue;

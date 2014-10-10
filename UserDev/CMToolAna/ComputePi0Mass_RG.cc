@@ -159,8 +159,8 @@ namespace larlight {
 	//std::cout<<" Something from MC shower \n\t Phi: "<<phi<<"\n\t Theta: "<<theta<<std::endl;
 	
   //  hPi0MassPeak->Fill(_mass);
-    hPi0MassPeak->Fill(3.6*_mass);
-    hPi0MassPeakPull->Fill(3.6*_mass -135);
+    hPi0MassPeak->Fill(_dorient_EE_calb*_mass);
+    hPi0MassPeakPull->Fill(_dorient_EE_calb*_mass -135);
     for(int i = 0; i<2; ++i){
       hEnergyCorr_MomToDaughter->Fill(fEnergyCorr_MomToDaughter.at(i));
       hElectronCorr_DepToDet->Fill(fElectronCorr_DepToDet.at(i));
@@ -247,9 +247,11 @@ std::vector<float> mcs_mother_energy(mc_shower->size(),0);
 	float recoangle  = acos(ev_shower->at(0).Direction()*ev_shower->at(1).Direction());
     	hOpeningAngle->Fill(recoangle,truthangle);
 
-	if(_photon_dosReco>0.3 && _photon_dosReco<0.8) hPi0MassPeakdoscut->Fill(3.6*_mass);
-	if(recoangle>0 && recoangle<1.4) hPi0MassPeakanglecut->Fill(3.6*_mass);
-	if(recoangle>0 && recoangle<1.4&&_photon_dosReco>0.3 && _photon_dosReco<0.8) hPi0MassPeakdosanglecut->Fill(3.6*_mass);
+	if(_photon_dosReco>0 && _photon_dosReco<0.8) hPi0MassPeakdoscut->Fill(_dorient_EE_calb*_mass);
+	//if(recoangle>0.3 && recoangle<1.4) hPi0MassPeakanglecut->Fill(_dorient_EE_calb*_mass);
+	//if(recoangle>0.3 && recoangle<1.4&&_photon_dosReco>0 && _photon_dosReco<0.8) hPi0MassPeakdosanglecut->Fill(_dorient_EE_calb*_mass);
+	if(recoangle>0.4 && recoangle<1.0) hPi0MassPeakanglecut->Fill(_dorient_EE_calb*_mass);
+	if(recoangle>0.4 && recoangle<1.0&&_photon_dosReco>0 && _photon_dosReco<0.8) hPi0MassPeakdosanglecut->Fill(_dorient_EE_calb*_mass);
 	}
 
  
@@ -427,3 +429,4 @@ std::vector<float> mcs_mother_energy(mc_shower->size(),0);
  
 }
 #endif
+
