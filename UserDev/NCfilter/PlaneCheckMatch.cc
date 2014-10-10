@@ -49,7 +49,6 @@ namespace cluster {
                 if(Regions[1].first.size() > 15 && Regions[1].second.size()>15){
                     fCRUHelper.GeneratePxHit(Regions[1].first, hits, pxfa_v1);
                     fCRUHelper.GeneratePxHit(Regions[1].second, hits, pxfb_v1);
-                std::cout<< "\t \033[97m  Plane 01:"<<std::endl;
                 double aa = fQuality.TimeProf(pxfa_v0,pxfa_v1);
                 double ab = fQuality.TimeProf(pxfa_v0,pxfb_v1);
                 double ba = fQuality.TimeProf(pxfb_v0,pxfa_v1);
@@ -62,7 +61,6 @@ namespace cluster {
                 if(Regions[2].first.size() > 15 && Regions[2].second.size()>15){
                     fCRUHelper.GeneratePxHit(Regions[2].first, hits, pxfa_v2);
                     fCRUHelper.GeneratePxHit(Regions[2].second, hits, pxfb_v2);
-                std::cout<< "\t \033[97m Plane 02:"<<std::endl;
                 double aa = fQuality.TimeProf(pxfa_v0,pxfa_v2);
                 double ab = fQuality.TimeProf(pxfa_v0,pxfb_v2);
                 double ba = fQuality.TimeProf(pxfb_v0,pxfa_v2);
@@ -78,7 +76,6 @@ namespace cluster {
                 if(Regions[2].first.size() > 15 && Regions[2].second.size()>15){
                     fCRUHelper.GeneratePxHit(Regions[2].first, hits, pxfa_v2);
                     fCRUHelper.GeneratePxHit(Regions[2].second, hits, pxfb_v2);
-                std::cout<< "\t \033[97m  Plane 12:"<<std::endl;
                 double aa = fQuality.TimeProf(pxfa_v1,pxfa_v2);
                 double ab = fQuality.TimeProf(pxfa_v1,pxfb_v2);
                 double ba = fQuality.TimeProf(pxfb_v1,pxfa_v2);
