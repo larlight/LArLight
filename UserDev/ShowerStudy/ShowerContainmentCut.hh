@@ -65,14 +65,12 @@ namespace showerana {
     /// Getter for a distance from a point to the box boundary
     double DistanceToWall(std::vector<double> const& point) const;
 
-    /// Getter for a distance from a point to the box boundary along a direction
+    /// Getter for a distance from a point to the box boundary along a direction (or backwards)
+	/// Specify 0 for backwards, 1 for forwards
     double DistanceToWall(std::vector<double> const& point,
-			  std::vector<double> dir) const ;
-
-	/// Getter for a distance backwards to box boundaries along trajectory
-	double DistanceBackwardsToWall(std::vector<double> const& point,
-			  std::vector<double> dir) const ;
-
+			  std::vector<double> dir,
+			  bool BackOrForward ) const ;
+	
   protected:
 
     /// "rectangular box" xyz minimum coordinate values
