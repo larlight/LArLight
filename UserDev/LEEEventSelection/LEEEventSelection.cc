@@ -7,8 +7,6 @@ namespace larlight {
 
   bool LEEEventSelection::initialize() {
 
-    _mgr = ::ubsens::data::DataManager();
-    
     _truthshower = ::ubsens::data::TruthShower();
     _recoshower = ::ubsens::data::RecoShower();
     
@@ -21,7 +19,7 @@ namespace larlight {
   
   bool LEEEventSelection::analyze(storage_manager* storage) {
 
-    /*
+
     //grab the MC showers
     larlight::event_mcshower* ev_mcshower = (larlight::event_mcshower*)storage->get_data(larlight::DATA::MCShower);
     if(!ev_mcshower) {
@@ -74,7 +72,7 @@ namespace larlight {
       }
      
     }
-    */
+
     _mgr.SaveEntry();
     
 
@@ -84,7 +82,7 @@ namespace larlight {
   bool LEEEventSelection::finalize() {
     
     _mgr.Close();
-  
+    
     return true;
   }
 }

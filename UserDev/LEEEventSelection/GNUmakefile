@@ -14,8 +14,7 @@ INCFLAGS = -I.                       #Include itself
 INCFLAGS += -I$(LARLIGHT_CORE_DIR)/Base
 INCFLAGS += -I$(LARLIGHT_CORE_DIR)/DataFormat
 INCFLAGS += -I$(LARLIGHT_CORE_DIR)/Analysis
-INCFLAGS += -I$(LITE_FMWK_COREDIR)/DataHandle
-INCFLAGS += -I$(LITE_FMWK_COREDIR)/Constants
+INCFLAGS += -I$(LITE_FMWK_COREDIR)
 
 # platform-specific options
 OSNAME          = $(shell uname -s)
