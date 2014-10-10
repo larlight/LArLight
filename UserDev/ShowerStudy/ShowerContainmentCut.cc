@@ -203,6 +203,50 @@ namespace showerana {
     return dist;
   }
 
+double ShowerContainmentCut::DistanceToWallFromOut(std::vector<double> const &point) const{
+
+    //
+    // This function computes the distance from a point outside the box 
+    // to the nearest wall of the box.
+    // 
+    // The function proceeds in the following steps of computation:
+    //
+    // (1) Check if a point is within the box. If so, return -99.
+    // (2) Compute shortest distance from point to whichever boundary the point exceeded 
+	// (3) Thas all.
+	//
+
+	// (1) Check if point is inside box--if it is, return -99
+
+    if( (point[0] > _xyz_min[0] && _xyz_max[0] > point[0]) && // point is inside X boundaries OR
+	(point[1] > _xyz_min[1] && _xyz_max[1] > point[1]) && // point is inside Y boundaries OR
+	(point[2] > _xyz_min[2] && _xyz_max[2] > point[2]) )  // point is inside Z boundaries 
+
+	      return -99;
+		
+	// (2) Compute shortest distance.
+	double x_dist_min = abs(point[0] - _xyz_min[0]) ;
+	double y_dist_min = abs(point[1] - _xyz_min[1]) ;
+	double z_dist_min = abs(point[2] - _xyz_min[2]) ;
+
+	double x_dist_max = abs(point[0] - _xyz_max[0]) ;
+	double y_dist_max = abs(point[1] - _xyz_max[1]) ;
+	double z_dist_max = abs(point[2] - _xyz_max[2]) ;
+
+	if( point[0] > _xyz_max[0] || point[0] < _xyz_min[0] )
+		
+		return ( x_dist_min < x_dist_max ? x_dist_min : x_dist_max ) ;	
+		
+	else if( point[1] > _xyz_max[1] || point[1] < _xyz_min[1]) 
+
+		return ( y_dist_min < y_dist_max ? y_dist_min : y_dist_max ) ;	
+		
+	else 
+
+		return ( z_dist_min < z_dist_max ? z_dist_min : z_dist_max ) ;	
+
+	}
+
 
 }
 

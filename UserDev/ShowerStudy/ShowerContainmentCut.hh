@@ -69,7 +69,10 @@ namespace showerana {
 	/// Specify 0 for backwards, 1 for forwards
     double DistanceToWall(std::vector<double> const& point,
 			  std::vector<double> dir,
-			  bool BackOrForward ) const ;
+			  bool ForwardOrBack ) const; 
+
+	/// Getter for distance from point to box (when point is outside box)
+	double DistanceToWallFromOut(std::vector<double> const& point) const;
 	
   protected:
 
