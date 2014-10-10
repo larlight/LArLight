@@ -19,6 +19,8 @@ namespace larlight {
     
     ///Get info out of 3D reconstructed file
     auto my_recoshower = (const event_shower*)(storage->get_data(DATA::Shower)) ; 
+//	std::vector<double> test(3,0) ;
+//	std::vector<double> dir(3,0) ;	
     
     //	std::cout<<"Number of reco showers: "<<my_recoshower->size()<<std::endl;
     
@@ -31,9 +33,8 @@ namespace larlight {
       _count1++; 
       auto bestPlane = mrs.best_plane() ;
       _reco_energy.push_back(mrs.Energy().at(bestPlane)) ;
-      
+
       for(size_t i = 0 ; i < my_recoshower->size(); i++)
-// 	  _total_energy[i] += _reco_energy[i] ;  
       
       _direction.push_back(mrs.Direction().X());
       _direction.push_back(mrs.Direction().Y());
@@ -47,7 +48,27 @@ namespace larlight {
       
       _dist_to_wall = showerObject.DistanceToWall(_shower_start) ;
       _dist_along_traj = showerObject.DistanceToWall(_shower_start,_direction);
-      
+
+/*	test[0] = 255;
+	test[1] = -115; 
+	test[2] = 1 ;
+
+	dir[0] = -1; 
+	dir[1] = 1 ;
+	dir[2] = 1 ;
+
+	_dist_to_wall = showerObject.DistanceToWall(test) ;
+	_dist_along_traj = showerObject.DistanceToWall(test,dir) ;	  
+	_dist_backwards_to_wall = showerObject.DistanceBackwardsToWall( test, dir) ; 
+*/
+	  _dist_backwards_to_wall = showerObject.DistanceBackwardsToWall( _shower_start, _direction) ; 
+
+ //	double add = _dist_along_traj + _dist_backwards_to_wall ; 
+	
+/*	  std::cout<<" "<<_shower_start[0]<<", "<<_shower_start[1]<<" , "<<_shower_start[2]<<std::endl;
+	  std::cout<<" " <<_dist_along_traj<<", "<<_dist_backwards_to_wall <<std::endl;
+	  std::cout<<" " <<  add <<std::endl;
+  */    
       if(_reco_tree)
 	_reco_tree->Fill();
       
@@ -68,6 +89,7 @@ namespace larlight {
       _reco_tree->Branch("_dist_to_wall",&_dist_to_wall,"_dist_to_wall/D");
       _reco_tree->Branch("_dist_along_traj",&_dist_along_traj,"_dist_along_traj/D");
     
+      _reco_tree->Branch("_dist_backwards_to_wall",&_dist_backwards_to_wall,"_dist_backwards_to_wall/D");
 
     }   
  }
@@ -78,7 +100,6 @@ void RecoShowerStudy::Clear(){
 	_shower_start.clear();
 	_reco_energy.clear();
 
-	//_total_energy.clear() ;
 
 }
 

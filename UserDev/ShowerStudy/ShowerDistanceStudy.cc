@@ -38,6 +38,8 @@ namespace larlight {
 	
 		_dist_ToWall = showerObject.DistanceToWall(_kid_vtx) ;
 		_dist_AlongTraj = showerObject.DistanceToWall(_kid_vtx,_kid_momentum);
+		_dist_BackAlongTraj = showerObject.DistanceBackwardsToWall(_kid_vtx,_kid_momentum) ;
+
 	if(_ana_tree)
 		_ana_tree->Fill();
 	}
@@ -57,6 +59,7 @@ void ShowerDistanceStudy::PrepareTTree() {
 
 	  _ana_tree->Branch("_dist_ToWall",&_dist_ToWall,"dist_ToWall/D");
 	  _ana_tree->Branch("_dist_AlongTraj",&_dist_AlongTraj,"dist_AlongTraj/D");
+	  _ana_tree->Branch("_dist_BackAlongTraj",&_dist_BackAlongTraj,"dist_BackAlongTraj/D");
 
 	  
 
