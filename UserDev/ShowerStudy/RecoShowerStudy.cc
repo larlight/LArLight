@@ -47,7 +47,7 @@ namespace larlight {
       showerana::ShowerContainmentCut showerObject ;
       
       _dist_to_wall = showerObject.DistanceToWall(_shower_start) ;
-      _dist_along_traj = showerObject.DistanceToWall(_shower_start,_direction);
+      _dist_along_traj = showerObject.DistanceToWall(_shower_start,_direction,1);
 
 /*	test[0] = 255;
 	test[1] = -115; 
@@ -61,8 +61,6 @@ namespace larlight {
 	_dist_along_traj = showerObject.DistanceToWall(test,dir) ;	  
 	_dist_backwards_to_wall = showerObject.DistanceBackwardsToWall( test, dir) ; 
 */
-	  _dist_backwards_to_wall = showerObject.DistanceBackwardsToWall( _shower_start, _direction) ; 
-
  //	double add = _dist_along_traj + _dist_backwards_to_wall ; 
 	
 /*	  std::cout<<" "<<_shower_start[0]<<", "<<_shower_start[1]<<" , "<<_shower_start[2]<<std::endl;

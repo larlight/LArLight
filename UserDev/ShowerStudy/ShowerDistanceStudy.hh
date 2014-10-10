@@ -55,6 +55,8 @@ namespace larlight {
 	double _dist_ToWall ;
 	double _dist_AlongTraj ;
 	double _dist_BackAlongTraj ;
+
+	double _dist_ToZ0 ;
 	
 	double _pi0_mass ;
 
