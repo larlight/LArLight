@@ -59,6 +59,8 @@ namespace larlight {
 	
 	double _dist_to_wall ;
 	double _dist_along_traj ;
+
+	double _dist_backwards_to_wall ; 
 	
   };
 }
