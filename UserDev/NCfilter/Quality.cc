@@ -87,7 +87,7 @@ double time_diff = ( larutil::DetectorProperties::GetME()->GetXTicksOffset(hita.
    if (histo_intb.Integral()) histo_intb.Scale(1./histo_intb.GetBinContent(histo_intb.GetNbinsX()));
    ks = histo_inta.KolmogorovTest(&histo_intb);
 
-   std::cout<<"\033[91m This is the Quality Check :: (0,1) "<<ks<<std::endl;
+//   std::cout<<"\033[91m This is the Quality Check :: (0,1) "<<ks<<std::endl;
 //<<"\033[99m"<<std::endl;
    return ks;
 	}
@@ -120,8 +120,9 @@ double time_diff = ( larutil::DetectorProperties::GetME()->GetXTicksOffset(hita.
 	// clusters are comming in as Pxhit so we are already in CM 
         double aroughslope;
         double aroughcept;
-        double broughslope;
-        double broughcept;
+		// Why is this a problem ? ? ? RG
+        double broughslope = -987654321;
+        double broughcept = -987654321;
 	// first calculate the slopes and cepts of each cluster( Region ) 
 		// cluster a
 	double atotcharge  = 0;

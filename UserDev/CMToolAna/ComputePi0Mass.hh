@@ -20,6 +20,7 @@
 #include "CRUHelper.hh"
 #include "ShowerRecoAlg.hh"
 #include "ShowerBackTracker.hh"
+#include "ShowerReco3D/ShowerCalo.hh"
 
 namespace larlight {
   /**
@@ -79,6 +80,8 @@ namespace larlight {
     float GetMass(){ return _mass; };
 
   protected:
+
+    ::showerreco::ShowerCalo fSECaloAlg;
 
     DATA::DATA_TYPE _shower_type;
     DATA::DATA_TYPE _cluster_type;

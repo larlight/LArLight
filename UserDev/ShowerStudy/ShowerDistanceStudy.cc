@@ -34,10 +34,14 @@ namespace larlight {
 		_motherEnergy = _mom_momentum.at(3) ; 
 		_daughterEnergy = _kid_momentum.at(3) ;
 
+		_dist_ToZ0 = _kid_vtx.at(2) ;
+
 		showerana::ShowerContainmentCut showerObject ;
 	
 		_dist_ToWall = showerObject.DistanceToWall(_kid_vtx) ;
-		_dist_AlongTraj = showerObject.DistanceToWall(_kid_vtx,_kid_momentum);
+		_dist_AlongTraj = showerObject.DistanceToWall(_kid_vtx,_kid_momentum,1);
+		_dist_BackAlongTraj = showerObject.DistanceToWall(_kid_vtx,_kid_momentum,0);
+
 	if(_ana_tree)
 		_ana_tree->Fill();
 	}
@@ -57,7 +61,8 @@ void ShowerDistanceStudy::PrepareTTree() {
 
 	  _ana_tree->Branch("_dist_ToWall",&_dist_ToWall,"dist_ToWall/D");
 	  _ana_tree->Branch("_dist_AlongTraj",&_dist_AlongTraj,"dist_AlongTraj/D");
-
+	  _ana_tree->Branch("_dist_BackAlongTraj",&_dist_BackAlongTraj,"dist_BackAlongTraj/D");
+	  _ana_tree->Branch("_dist_ToZ0",&_dist_ToZ0,"_dist_ToZ0/D");
 	  
 
     }

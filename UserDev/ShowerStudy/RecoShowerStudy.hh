@@ -56,10 +56,11 @@ namespace larlight {
 
 	int _count0  ;
 	int _count1  ;
-	int _count2 ; 
 	
 	double _dist_to_wall ;
 	double _dist_along_traj ;
+
+	double _dist_backwards_to_wall ; 
 	
   };
 }

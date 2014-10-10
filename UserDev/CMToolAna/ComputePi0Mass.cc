@@ -96,8 +96,8 @@ namespace larlight {
       ++best_cluster2;
     }
     
-    _mass = Pi0MassFormula3D( ev_shower->at(0).MIPEnergy().at(best_cluster1), 
-    			      ev_shower->at(1).MIPEnergy().at(best_cluster2),
+    _mass = Pi0MassFormula3D( fSECaloAlg.ShowerEnergy(ev_shower->at(0).Energy().at(best_cluster1),::showerreco::energy::kDEFAULT).first,
+			      fSECaloAlg.ShowerEnergy(ev_shower->at(1).Energy().at(best_cluster2)).first,
     			      ev_shower->at(0).Direction(),
     			      ev_shower->at(1).Direction());
     

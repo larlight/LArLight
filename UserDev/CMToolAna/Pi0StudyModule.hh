@@ -17,8 +17,8 @@
 
 #include "ana_base.hh"
 #include "ComputePi0Mass.hh"
-#include "TwoShower3DIntxn.hh"
-
+#include "TwoLineIntersection.hh"
+#include "ShowerReco3D/ShowerCalo.hh"
 namespace larlight {
   /**
      \class Pi0StudyModule
@@ -54,6 +54,8 @@ namespace larlight {
     void PrepareAnaTree();
 
     TTree* ana_tree;
+
+    ::showerreco::ShowerCalo fSECaloAlg;
 
     float _mass;
     float _MC_pi0_energy;

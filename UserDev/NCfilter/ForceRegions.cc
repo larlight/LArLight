@@ -23,7 +23,8 @@ namespace cluster {
     for(unsigned int a=0;  a < hits.size();a++) {
       //which plane?
       int cplane= hits[a].View();
-      if(APP[cplane].first==-999||APP[cplane].second==-999){ std::cout<<" \033[98m GOT A -999"; continue;}
+      //if(APP[cplane].first==-999||APP[cplane].second==-999){ std::cout<<" \033[98m GOT A -999"; continue;}
+      if(APP[cplane].first==-999||APP[cplane].second==-999) continue;
       double regionval= (-APP[cplane].first * hits[a].Wire()*W2CM+ hits[a].PeakTime()*T2CM - APP[cplane].second) / sqrt(APP[cplane].first*APP[cplane].first +1);
       // sort into proper places using viewPP
 	      if(regionval>0.0000) vectplanepair[cplane].first.push_back(a);
@@ -44,7 +45,8 @@ namespace cluster {
     for(unsigned int a=0;  a < hits.size();a++) {
       //which plane?
       int cplane= hits[a].View();
-      if(APP[cplane].first==-999||APP[cplane].second==-999){ std::cout<<" \033[98m GOT A -999"; continue;}
+      //if(APP[cplane].first==-999||APP[cplane].second==-999){ std::cout<<" \033[98m GOT A -999"; continue;}
+      if(APP[cplane].first==-999||APP[cplane].second==-999) continue;
 //      double regionval= (-APP[cplane].first * hits[a].Wire()*W2CM+ hits[a].PeakTime()*T2CM - APP[cplane].second) / sqrt(APP[cplane].first*APP[cplane].first +1);
       double regionval= (-APP[cplane].first * hits[a].PeakTime()*T2CM+ hits[a].Wire()*W2CM - APP[cplane].second) / sqrt(APP[cplane].first*APP[cplane].first +1);
       // sort into proper places using viewPP
@@ -55,7 +57,7 @@ namespace cluster {
 	}
 //--------------------------------------------------------------------------------------------------------------------------------------
 
-  std::vector<std::pair<std::vector<unsigned int>,std::vector<unsigned int>>>  ForceRegions::ForceTwoRotateRegions(const std::vector<larlight::hit>& hits, std::vector<std::pair<double,double>> APP) {
+  std::vector<std::pair<std::vector<unsigned int>,std::vector<unsigned int>>>  ForceRegions::ForceTwoRotateRegions(const std::vector<larlight::hit>& hits, std::vector<std::pair<double,double>> APP, double angle) {
     double T2CM = larutil::GeometryUtilities::GetME()->TimeToCm();
     double W2CM = larutil::GeometryUtilities::GetME()->WireToCm();
     int nplanes = larutil::Geometry::GetME()->Nplanes();
@@ -94,7 +96,7 @@ namespace cluster {
         //#################################
 
         //double HowMuch = -60;// this is in degrees
-        double HowMuch = 60;// this is in degrees
+        double HowMuch = angle;// this is in degrees
         // This needs to figured out... Dang Magic Numbers!!!!!
         double C = cos(HowMuch * PI / 180);
         double S = sin(HowMuch * PI / 180);
@@ -106,7 +108,8 @@ namespace cluster {
     for(unsigned int a=0;  a < hits.size();a++) {
       //which plane?
       int currentplane= hits[a].View();
-      if(APP[currentplane].first==-999||APP[currentplane].second==-999){ std::cout<<" \033[98m GOT A -999"; continue;}
+      //if(APP[currentplane].first==-999||APP[currentplane].second==-999){ std::cout<<" \033[98m GOT A -999"; continue;}
+      if(APP[currentplane].first==-999||APP[currentplane].second==-999) continue;
       double regionval= (-APP[currentplane].first *( (hits[a].Wire()* W2CM - CenterChargeWire[currentplane])*C -(hits[a].PeakTime()* T2CM - CenterChargeTime[currentplane])*S + CenterChargeWire[currentplane]    )     +    ((hits[a].Wire()* W2CM - CenterChargeWire[currentplane])*S + (hits[a].PeakTime()* T2CM - CenterChargeTime[currentplane])*C + CenterChargeTime[currentplane]) - APP[currentplane].second) / sqrt(APP[currentplane].first*APP[currentplane].first +1);
 //      double regionval= (-APP[cplane].first * hits[a].PeakTime()*T2CM+ hits[a].Wire()*W2CM - APP[cplane].second) / sqrt(APP[cplane].first*APP[cplane].first +1);
       // sort into proper places using viewPP

@@ -15,6 +15,7 @@ INCFLAGS += -I$(LARLIGHT_CORE_DIR)/Base
 INCFLAGS += -I$(LARLIGHT_CORE_DIR)/DataFormat
 INCFLAGS += -I$(LARLIGHT_CORE_DIR)/Analysis
 INCFLAGS += -I$(LARLIGHT_CORE_DIR)/LArUtil
+INCFLAGS += -I$(USER_DEV_DIR)
 INCFLAGS += -I$(USER_DEV_DIR)/ClusterRecoUtil
 INCFLAGS += -I$(USER_DEV_DIR)/FANN
 INCFLAGS += -I$(USER_DEV_DIR)/FANN/include
@@ -26,6 +27,7 @@ INCFLAGS += -I$(USER_DEV_DIR)/CMTool/CMTAlgMatch
 INCFLAGS += -I$(USER_DEV_DIR)/CMTool/CMToolApp
 INCFLAGS += -I$(USER_DEV_DIR)/ShowerReco3D
 INCFLAGS += -I$(USER_DEV_DIR)/AnalysisAlg
+INCFLAGS += -I$(USER_DEV_DIR)/GeoAlgo
 
 # platform-specific options
 OSNAME          = $(shell uname -s)

@@ -20,6 +20,7 @@ namespace showerreco {
 
       result = ::showerreco::energy::DEFAULT_ECorr * energy + 10;
       result_err = ::showerreco::energy::DEFAULT_ECorrError * result;
+      break;
 
     default:
 

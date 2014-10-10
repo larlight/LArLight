@@ -51,7 +51,7 @@ namespace showerreco {
     virtual ~ShowerCalo(){};
 
     std::pair<double,double> ShowerEnergy(double energy, 
-					  ::showerreco::energy::RecoType_t kDEFAULT, 
+					  ::showerreco::energy::RecoType_t type=energy::kDEFAULT, 
 					  bool mc=true);
 
   };

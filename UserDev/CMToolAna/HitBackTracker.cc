@@ -6,8 +6,8 @@
 namespace larlight {
 
 
-  double HitBackTracker::FindElectrons( larlight::hit h ){
-
+  double HitBackTracker::FindElectrons( larlight::hit h, double sigma ){
+    
     //if simchannelMap not filled then return -1
     if ( _simch_map.size() == 0 )
       return -1;
@@ -20,24 +20,46 @@ namespace larlight {
     if (_verbosity) { std::cout << "Hit time boundaries: [" << h.StartTime() << ", " << h.EndTime() << "]" << std::endl; }
     
     //Find IDEs on this simch
-      double sigmaTime = h.PeakTime() - h.StartTime();
-      std::vector<larlight::ide> matchedIDEs((*simch_iter).second.TrackIDsAndEnergies(h.PeakTime()-sigmaTime*2,h.PeakTime()+sigmaTime*2));
-      
-      //if matchedIDEs is empty no IDEs in the time-range of the hit on that channel
-      if ( matchedIDEs.size() == 0 ){
-	std::cerr << "Hit with no associated IDEs..." << std::endl;
-	return 0;
-      }
-      
-      //else loop through found IDEs and and add charge in them      
-      double numElectrons = 0;
-      for ( auto const &IDE : matchedIDEs )
-	numElectrons += IDE.numElectrons;
-
-      return numElectrons;
-      
+    double sigmaTime = sigma*(h.PeakTime() - h.StartTime());
+    std::vector<larlight::ide> matchedIDEs((*simch_iter).second.TrackIDsAndEnergies(h.PeakTime()-sigmaTime,h.PeakTime()+sigmaTime));
+    
+    //if matchedIDEs is empty no IDEs in the time-range of the hit on that channel
+    if ( matchedIDEs.size() == 0 ){
+      std::cerr << "Hit with no associated IDEs..." << std::endl;
+      return 0;
+    }
+    
+    //else loop through found IDEs and and add charge in them      
+    double numElectrons = 0;
+    for ( auto const &IDE : matchedIDEs )
+      numElectrons += IDE.numElectrons;
+    
+    return numElectrons;
   }
 
+
+  std::vector<larlight::ide> HitBackTracker::FindIDEs( larlight::hit h, double sigma ){
+
+    std::vector<larlight::ide> returnIDEs;
+    //if simchannelMap not filled then return -1
+    if ( _simch_map.size() == 0 )
+      return returnIDEs;
+
+    //Find the simchannels on the hit's channel number
+    auto simch_iter = _simch_map.find( h.Channel() );
+    if( simch_iter == _simch_map.end() ) 
+      std::cerr<<"Hit has no matched simchannel!!"<<std::endl;
+    
+    if (_verbosity) { std::cout << "Hit time boundaries: [" << h.StartTime() << ", " << h.EndTime() << "]" << std::endl; }
+    
+    //Find IDEs on this simch
+    double sigmaTime = sigma*(h.PeakTime() - h.StartTime());
+    std::vector<larlight::ide> matchedIDEs((*simch_iter).second.TrackIDsAndEnergies(h.PeakTime()-sigmaTime,h.PeakTime()+sigmaTime));
+
+    return matchedIDEs;
+  }
+  
+  
   void HitBackTracker::MakeSimchMap( larlight::event_simch *evt_simch ){
     
     //Make a map for the simchannels and the LAr Chs

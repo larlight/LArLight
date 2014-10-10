@@ -18,7 +18,6 @@
 #pragma link C++ class ::larlight::MCShowerMatchAlg+;
 #pragma link C++ class ::larlight::CMToolAnaException+;
 #pragma link C++ class ::larlight::HitBackTracker+;
-#pragma link C++ class TwoShower3DIntxn+;
 
 //ADD_NEW_CLASS ... do not change this line
 
