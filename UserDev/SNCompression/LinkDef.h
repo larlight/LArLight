@@ -11,6 +11,8 @@
 
 #pragma link C++ class larlight::ExecuteCompression+;
 #pragma link C++ class larlight::ViewCompression+;
+#pragma link C++ class larlight::HitMaker+;
+#pragma link C++ class larlight::HitViewer+;
 //ADD_NEW_CLASS ... do not change this line
 
 #pragma link C++ namespace compress+;

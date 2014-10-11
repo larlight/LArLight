@@ -86,6 +86,15 @@ namespace larlight {
     
     for (size_t n=0; n < ADCwaveform.size(); n++)
       _hInWF->SetBinContent(n+1, ADCwaveform.at(n));
+
+    //measure a baseline to place a temporary holder in output histogram
+    double baseline = 0.;
+    for (int tick=0; tick < 10; tick++)
+      baseline += ADCwaveform.at(tick);
+    baseline /= 10.;
+    int base = int(baseline);
+    for (size_t m=0; m < ADCwaveform.size(); m++)
+      _hOutWF->SetBinContent(m+1, base);
     
     for (size_t j=0; j < compressOutput.size(); j++){
       for (size_t k=0; k < compressOutput.at(j).size(); k++){

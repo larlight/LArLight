@@ -13,6 +13,7 @@
 #define COMPRESSIONALGOTHRESH_HH
 
 #include "CompressionAlgoBase.hh"
+#include <math.h>
 
 namespace compress {
 

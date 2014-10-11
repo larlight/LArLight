@@ -28,7 +28,7 @@ namespace compress {
 	std::cout << "Active? " << active << std::endl;
 	std::cout << "tmpWF size: " << _tmpWF.size() << std::endl;
       }
-      if ( (_InWF.at(i) - _Baseline) > _Threshold ){
+      if ( fabs((_InWF.at(i) - _Baseline)) > _Threshold ){
 	if (!active) { startTick = i; } 
 	active = true;
 	_tmpWF.push_back(_InWF.at(i));

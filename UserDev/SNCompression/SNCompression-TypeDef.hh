@@ -10,13 +10,17 @@
 #include "CompressionAlgoThresh.hh"
 #include "ExecuteCompression.hh"
 #include "ViewCompression.hh"
+#include "HitMaker.hh"
+#include "HitViewer.hh"
 //ADD_NEW_HEADER ... do not change this comment line
 
 // Class forward declaration here
 namespace larlight {
 
-  class ExecuteCompression;
-  class ViewCompression;
+class ExecuteCompression;
+class ViewCompression;
+class HitMaker;
+class HitViewer;
 
 //ADD_ANA_CLASS ... do not change this comment line
 
