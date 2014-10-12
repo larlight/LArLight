@@ -38,11 +38,12 @@ my_proc.add_input_file(infilename)
 
 # Specify ROOT TDirectory in the file if such structure is present (which is the case for DataScanner output)
 my_proc.set_input_rootdir("scanner")
+my_proc.set_output_rootdir("scanner")
 
 # Set output root file: this is a separate root file in which your
 # analysis module can store anything such as histograms, your own TTree, etc.
 my_proc.set_ana_output_file("")
-my_proc.set_output_file("out.root")
+my_proc.set_output_file("compressedWFs.root")
 
 #my_proc.set_output_rootdir("scanner")
 # Create analysis class instance. For this example, ana_base.
@@ -55,6 +56,7 @@ compAna=fmwk.ExecuteCompression()
 compAlgo = compress.CompressionAlgoThresh()
 compAlgo.SetVerbose(False)
 compAlgo.SetDebug(False)
+compAlgo.SetThreshold(15)
 compAna.SetCompressAlgo(compAlgo)
 
 # Add analysis modules to the processor
@@ -63,6 +65,6 @@ my_proc.add_process(compAna)
 
 # Let's run it.
 
-my_proc.run(0,10)
+my_proc.run(0,50)
 
 # done!

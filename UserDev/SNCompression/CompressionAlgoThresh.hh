@@ -34,10 +34,13 @@ namespace compress {
     void SetInWF(std::vector<unsigned short> waveform) { _InWF = waveform; }
 
     /// Function to be run at beginning of compression algo
-    void PrepareAlgo() { _InWF.clear(); _OutWF.clear(); _tmpWF.clear(); _OutWFStartTick.clear(); _Threshold=5;}
+    void PrepareAlgo() { _InWF.clear(); _OutWF.clear(); _tmpWF.clear(); _OutWFStartTick.clear(); }
 
     // Function to find WF baseline...
     void FindBaseline();
+
+    /// Function to set Threshold
+    void SetThreshold( int thr) { _Threshold = thr; }
 
   protected:
 

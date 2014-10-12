@@ -17,6 +17,7 @@
 
 #include "ana_base.hh"
 #include "GeometryUtilities.hh"
+#include <math.h>
 #include <TH2I.h>
 #include <TGraph.h>
 #include <TCanvas.h>
@@ -75,6 +76,9 @@ std::cout<<"*******************you screwed something up. view should be 0 1 or 2
     };
     
   protected:
+
+    /// Event Number
+    int _evtNum;
 
     /// Main canvas
     TCanvas* _c1;

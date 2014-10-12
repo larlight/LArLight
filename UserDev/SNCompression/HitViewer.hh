@@ -17,10 +17,11 @@
 
 #include "ana_base.hh"
 #include "GeometryUtilities.hh"
-#include <TH2D.h>
+#include <TH2I.h>
 #include <TGraph.h>
 #include <TCanvas.h>
 #include <TPad.h>
+#include <string.h>
 
 namespace larlight {
   /**
@@ -53,14 +54,14 @@ namespace larlight {
     virtual bool finalize();
 
     /// A utility function to (re)create Th3D histogram of a specified boundary & name
-    TH2D* Prepare2DHisto(std::string name, 
+    TH2I* Prepare2DHisto(std::string name, 
 			 double wiremin, double wiremax,
 			 double timemin, double timemax);
     
     TGraph* PrepareGraph();
     
-    /// Getter for hit TH2D histo, weighted by charge
-    const TH2D*  GetHisto_Hits (int view) const {
+    /// Getter for hit TH2I histo, weighted by charge
+    const TH2I*  GetHisto_Hits (int view) const {
       if(view==0)
 	return _hHits_U;
       else if(view==1)
@@ -75,15 +76,19 @@ std::cout<<"*******************you screwed something up. view should be 0 1 or 2
     };
     
   protected:
+
+    /// Counter for event Number
+    int _evtNum;
+
     /// Main canvas
     TCanvas* _c1;
     /// Main pad
     TPad*    _p1;
     
     /// Hit histograms to sit next to cluster ones,
-    TH2D* _hHits_U;   
-    TH2D* _hHits_V;    
-    TH2D* _hHits_Y;
+    TH2I* _hHits_U;   
+    TH2I* _hHits_V;    
+    TH2I* _hHits_Y;
     
     GEO::View_t iview;
     std::vector<hit> ihit_v;

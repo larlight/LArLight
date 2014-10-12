@@ -19,6 +19,8 @@ namespace larlight {
 
     _w2cm = larutil::GeometryUtilities::GetME()->WireToCm();
     _t2cm = larutil::GeometryUtilities::GetME()->TimeToCm();
+
+    _evtNum = 0;
     
   }
 
@@ -43,9 +45,12 @@ namespace larlight {
 
 
     //if all ok, plot wire vs. time for hits
-    _hHits_U = Prepare2DHisto("WF ADCs U-Plane", 0, larutil::Geometry::GetME()->Nwires(0)*_w2cm, 0, 3200*_t2cm);
-    _hHits_V = Prepare2DHisto("WF ADCs V-Plane", 0, larutil::Geometry::GetME()->Nwires(1)*_w2cm, 0, 3200*_t2cm);
-    _hHits_Y = Prepare2DHisto("WF ADCs Y-Plane", 0, larutil::Geometry::GetME()->Nwires(2)*_w2cm, 0, 3200*_t2cm);
+    _hHits_U = Prepare2DHisto(Form("Event %i - WF ADCs U-Plane",_evtNum),
+			      0, larutil::Geometry::GetME()->Nwires(0)*_w2cm, 0, 3200*_t2cm);
+    _hHits_V = Prepare2DHisto(Form("Event %i - WF ADCs V-Plane",_evtNum),
+			      0, larutil::Geometry::GetME()->Nwires(1)*_w2cm, 0, 3200*_t2cm);
+    _hHits_Y = Prepare2DHisto(Form("Event %i - WF ADCs Y-Plane",_evtNum),
+			      0, larutil::Geometry::GetME()->Nwires(2)*_w2cm, 0, 3200*_t2cm);
 
     
     //read waveforms from event
@@ -81,18 +86,20 @@ namespace larlight {
 
       if ( larlight::GEO::kU == tpc_data->plane() ){
 	for (size_t u=0; u < tpc_data->size(); u++)
-	  _hHits_U->Fill( larutil::Geometry::GetME()->ChannelToWire(chan)*_w2cm, (time+u)*_t2cm, tpc_data->at(u)-_baseline );
+	  _hHits_U->Fill( larutil::Geometry::GetME()->ChannelToWire(chan)*_w2cm, (time+u)*_t2cm, abs(tpc_data->at(u)-_baseline) );
       }
       if ( larlight::GEO::kV == tpc_data->plane() ){
 	for (size_t v=0; v < tpc_data->size(); v++)
-	  _hHits_V->Fill( larutil::Geometry::GetME()->ChannelToWire(chan)*_w2cm, (time+v)*_t2cm, tpc_data->at(v)-_baseline );
+	  _hHits_V->Fill( larutil::Geometry::GetME()->ChannelToWire(chan)*_w2cm, (time+v)*_t2cm, abs(tpc_data->at(v)-_baseline) );
       }
       if ( larlight::GEO::kZ == tpc_data->plane() ){
 	for (size_t y=0; y < tpc_data->size(); y++)
-	  _hHits_Y->Fill( larutil::Geometry::GetME()->ChannelToWire(chan)*_w2cm, (time+y)*_t2cm, tpc_data->at(y)-_baseline );
+	  _hHits_Y->Fill( larutil::Geometry::GetME()->ChannelToWire(chan)*_w2cm, (time+y)*_t2cm, abs(tpc_data->at(y)-_baseline) );
       }
 
     }//loop over all waveforms
+
+    _evtNum += 1;
     
     return true;
   }
@@ -107,13 +114,13 @@ namespace larlight {
     TH2I* h=0;
     if(h) delete h;
     
-    int wirewidth = 50;//(int)(mywiremax-mywiremin)/12;
-    int timewidth = 50;//(int)(mytimemax-mytimemin)/12; 
+    h = new TH2I("2DViewer",name.c_str(),
+		 int(wiremax/2),  wiremin, wiremax,
+		 int(timemax/2),  timemin, timemax);
 
-    h = new TH2I(name.c_str(),"2D Viewer; Wire  [cm]; Time [cm];",
-		 wiremax-wiremin,  wiremin, wiremax,
-		 timemax-timemin,  timemin, timemax);
-    
+    h->SetXTitle("Wire [cm]        ");
+    h->SetYTitle("Time [cm]");
+        
     return h;
   }
 

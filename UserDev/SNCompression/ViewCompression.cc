@@ -7,6 +7,8 @@ namespace larlight {
 
   bool ViewCompression::initialize() {
 
+    _evtNum = 0;
+
     return true;
   }
   
@@ -32,6 +34,8 @@ namespace larlight {
     _numWFs = event_wf->size();
 
     _current_event_wf = event_wf;
+
+    _evtNum += 1;
     
     return true;
   }
@@ -81,8 +85,10 @@ namespace larlight {
   void ViewCompression::FillHistograms(std::vector<unsigned short> ADCwaveform, std::vector<std::vector<unsigned short> >compressOutput,
 				       std::vector<int> outputTimes){
     
-    _hInWF = new TH1I("hInWF", "Input Waveform; ADCs", ADCwaveform.size(), 0, ADCwaveform.size());
-    _hOutWF = new TH1I("hOutWF", "Output Waveform; ADCs", ADCwaveform.size(), 0, ADCwaveform.size());
+    _hInWF = new TH1I("hInWF", Form("Event %i - Input Waveform; Time Tick                  ; ADCs",_evtNum),
+		      ADCwaveform.size(), 0, ADCwaveform.size());
+    _hOutWF = new TH1I("hOutWF", Form("Event %i - Output Waveform; Time Tick                  ; ADCs",_evtNum),
+		       ADCwaveform.size(), 0, ADCwaveform.size());
     
     for (size_t n=0; n < ADCwaveform.size(); n++)
       _hInWF->SetBinContent(n+1, ADCwaveform.at(n));

@@ -21,19 +21,16 @@ namespace larlight {
   bool HitMaker::initialize() {
 
     _threshold = 6; //ADCs
-    _event_num = 0;
+    _evtNum = 0;
     return true;
   }
   
   bool HitMaker::analyze(storage_manager* storage) {
 
-    _event_num += 1;
-    std::cout << "Event Number: " << _event_num << std::endl;
-
     //make vector to hold new hits
     larlight::event_hit *hits = (event_hit*)(storage->get_data(DATA::FFTHit));
     hits->clear();
-    hits->set_event_id(_event_num);
+    hits->set_event_id(_evtNum);
     
     //read waveforms from event
     larlight::event_tpcfifo *event_wf = (event_tpcfifo*)(storage->get_data(DATA::TPCFIFO));
@@ -113,6 +110,8 @@ namespace larlight {
     
     //eliminate waveform
     event_wf->clear();
+
+    _evtNum += 1;
     
     return true;
   }

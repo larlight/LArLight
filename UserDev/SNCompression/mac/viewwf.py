@@ -19,7 +19,7 @@ my_proc.set_io_mode(larlight.storage_manager.READ)
 
 my_proc.add_input_file(filename)
 
-#larlight.storage_manager.get().set_in_rootdir("scanner")
+larlight.storage_manager.get().set_in_rootdir("scanner")
 larlight.storage_manager.get().set_data_to_read(larlight.DATA.FFTHit)
 larlight.storage_manager.get().set_data_to_read(larlight.DATA.UserInfo,False)
 
@@ -32,10 +32,18 @@ my_proc.add_process(my_ana)
 
 
 gStyle.SetOptStat(0)
+gStyle.SetTitleFontSize(0.1)
+gStyle.SetTitleOffset(0.4,"X")
+gStyle.SetTitleSize(0.08,"X")
+gStyle.SetTitleOffset(0.4,"Y")
+gStyle.SetTitleSize(0.08,"Y")
+gStyle.SetLabelSize(0.08,"X")
+gStyle.SetLabelSize(0.08,"Y")
+gStyle.SetLabelSize(0.08,"Z")
+gStyle.SetOptLogz(1)
 
 c=TCanvas("c","Wire v. Time Hit Viewer",900,700)
 c.Divide(1,3)
-
 while my_proc.process_event():
 
     currentview = 0;

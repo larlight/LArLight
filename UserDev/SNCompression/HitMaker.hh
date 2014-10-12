@@ -49,7 +49,7 @@ namespace larlight {
     virtual bool finalize();
 
     protected:
-    int    _event_num;
+    int    _evtNum;
     int    _baseline;
     int    _threshold;
     larlight::hit _Hit;
