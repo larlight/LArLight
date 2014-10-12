@@ -12,5 +12,7 @@
 #pragma link C++ namespace geoalgo+;
 #pragma link C++ class geoalgo::TwoLineIntersection+;
 
+#pragma link C++ class TrajectoryInVolume+;
 //ADD_NEW_CLASS ... do not change this line
 #endif
+
