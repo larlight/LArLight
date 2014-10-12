@@ -1,9 +1,9 @@
 /**
- * \file HitViewer.hh
+ * \File WFViewer.hh
  *
  * \ingroup Analysis
  * 
- * \brief Class def header for a class HitViewer
+ * \brief Class def header for a class WFViewer
  *
  * @author David Caratelli
  */
@@ -12,55 +12,55 @@
 
     @{*/
 
-#ifndef HITVIEWER_HH
-#define HITVIEWER_HH
+#ifndef WFVIEWER_HH
+#define WFVIEWER_HH
 
 #include "ana_base.hh"
 #include "GeometryUtilities.hh"
-#include <TH2D.h>
+#include <TH2I.h>
 #include <TGraph.h>
 #include <TCanvas.h>
 #include <TPad.h>
 
 namespace larlight {
   /**
-     \class HitViewer
+     \class WFViewer
      User custom analysis class made by SHELL_USER_NAME
   */
-  class HitViewer : public ana_base{
+  class WFViewer : public ana_base{
 
   public:
     
     /// Default constructor
-    HitViewer();
+    WFViewer();
     
     /// Default destructor
-    virtual ~HitViewer(){};
+    virtual ~WFViewer(){};
 
-    /** IMPLEMENT in HitViewer.cc!
+    /** IMPLEMENT in WFViewer.cc!
         Initialization method to be called before the analysis event loop.
     */ 
     virtual bool initialize();
 
-    /** IMPLEMENT in HitViewer.cc! 
+    /** IMPLEMENT in WFViewer.cc! 
         Analyze a data event-by-event  
     */
     virtual bool analyze(storage_manager* storage);
 
-    /** IMPLEMENT in HitViewer.cc! 
+    /** IMPLEMENT in WFViewer.cc! 
         Finalize method to be called after all events processed.
     */
     virtual bool finalize();
 
     /// A utility function to (re)create Th3D histogram of a specified boundary & name
-    TH2D* Prepare2DHisto(std::string name, 
+    TH2I* Prepare2DHisto(std::string name, 
 			 double wiremin, double wiremax,
 			 double timemin, double timemax);
     
     TGraph* PrepareGraph();
     
     /// Getter for hit TH2D histo, weighted by charge
-    const TH2D*  GetHisto_Hits (int view) const {
+    const TH2I*  GetHisto_Hits (int view) const {
       if(view==0)
 	return _hHits_U;
       else if(view==1)
@@ -75,21 +75,24 @@ std::cout<<"*******************you screwed something up. view should be 0 1 or 2
     };
     
   protected:
+
     /// Main canvas
     TCanvas* _c1;
     /// Main pad
     TPad*    _p1;
     
     /// Hit histograms to sit next to cluster ones,
-    TH2D* _hHits_U;   
-    TH2D* _hHits_V;    
-    TH2D* _hHits_Y;
+    TH2I* _hHits_U;   
+    TH2I* _hHits_V;    
+    TH2I* _hHits_Y;
     
     GEO::View_t iview;
     std::vector<hit> ihit_v;
     
     double _w2cm;
     double _t2cm;
+
+    int _baseline;
 
   };
 }

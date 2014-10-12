@@ -56,7 +56,8 @@ namespace larlight {
     std::vector<unsigned short> getADCs(larlight::tpcfifo* tpc_data);
 
     /// Now filll output WFs information into larlight data product so that we can write to output
-    void SwapData(larlight::tpcfifo* tpc_data, std::vector<std::vector<unsigned short> > outputWFs);
+    void SwapData(larlight::tpcfifo* tpc_data, std::vector<std::vector<unsigned short> > outputWFs,
+		  std::vector<int> outTimes);
 
     /// Calculate compression: keep holders for number of ticks in original waveform and number of ticks in compressed waveforms
     void CalculateCompression(std::vector<unsigned short> beforeADCs, std::vector<std::vector<unsigned short> > afterADCs);

@@ -16,6 +16,9 @@ namespace larlight {
     _hHits_U = 0;
     _hHits_V = 0;
     _hHits_Y = 0;
+
+    _w2cm = larutil::GeometryUtilities::GetME()->WireToCm();
+    _t2cm = larutil::GeometryUtilities::GetME()->TimeToCm();
     
   }
 
@@ -62,9 +65,9 @@ namespace larlight {
       }
     
     //if all ok, plot wire vs. time for hits
-    _hHits_U = Prepare2DHisto("HitHistU", wiremin[0], wiremax[0], timemin[0], timemax[0]);
-    _hHits_V = Prepare2DHisto("HitHistV", wiremin[1], wiremax[1], timemin[1], timemax[1]);
-    _hHits_Y = Prepare2DHisto("HitHistZ", wiremin[2], wiremax[2], timemin[2], timemax[2]);
+    _hHits_U = Prepare2DHisto("HitHistU", wiremin[0]*_w2cm, wiremax[0]*_w2cm, timemin[0]*_t2cm, timemax[0]*_t2cm);
+    _hHits_V = Prepare2DHisto("HitHistV", wiremin[1]*_w2cm, wiremax[1]*_w2cm, timemin[1]*_t2cm, timemax[1]*_t2cm);
+    _hHits_Y = Prepare2DHisto("HitHistZ", wiremin[2]*_w2cm, wiremax[2]*_w2cm, timemin[2]*_t2cm, timemax[2]*_t2cm);
     
     //loop over hits
     for (size_t i=0; i<hits->size(); i++)
@@ -72,11 +75,11 @@ namespace larlight {
 	const hit *this_hit = (&(hits->at(i)));
 	//place in right plane
 	if ( this_hit->View()==0 )
-	  _hHits_U->Fill( this_hit->Wire(), this_hit->PeakTime(), this_hit->Charge() );
+	  _hHits_U->Fill( this_hit->Wire()*_w2cm, this_hit->PeakTime()*_t2cm, this_hit->Charge() );
 	if ( this_hit->View()==1 )
-	  _hHits_V->Fill( this_hit->Wire(), this_hit->PeakTime(), this_hit->Charge() );
+	  _hHits_V->Fill( this_hit->Wire()*_w2cm, this_hit->PeakTime()*_t2cm, this_hit->Charge() );
 	if ( this_hit->View()==2 )
-	  _hHits_Y->Fill( this_hit->Wire(), this_hit->PeakTime(), this_hit->Charge() );
+	  _hHits_Y->Fill( this_hit->Wire()*_w2cm, this_hit->PeakTime()*_t2cm, this_hit->Charge() );
 	
       }//end loop over hits
     
@@ -94,17 +97,12 @@ namespace larlight {
     TH2D* h=0;
     if(h) delete h;
     
-    double mywiremin=wiremin;
-    double mywiremax=wiremax;
-    double mytimemin=timemin;
-    double mytimemax=timemax;
-
     int wirewidth = 50;//(int)(mywiremax-mywiremin)/12;
     int timewidth = 50;//(int)(mytimemax-mytimemin)/12; 
 
-    h = new TH2D(name.c_str(),"2D Viewer; Wire; Time;",
-		 200,  mywiremin, mywiremax,
-		 200,  mytimemin, mytimemax);
+    h = new TH2D(name.c_str(),"2D Viewer; Wire  [cm]; Time [cm];",
+		 100,  wiremin-10, wiremax+10,
+		 100,  timemin-10, timemax+10);
     
     return h;
   }
