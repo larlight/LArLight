@@ -57,6 +57,11 @@ namespace larlight {
     /** IMPLEMENT in ComputePi0Mass_RG.cc! 
         Finalize method to be called after all events processed.
     */
+
+
+    void MakeTTree();
+
+
     virtual bool finalize();
 
     void SetClusterType(DATA::DATA_TYPE type) {_cluster_type = type;}
@@ -68,7 +73,7 @@ namespace larlight {
     float Pi0MassFormula3D(  float Energy1, float Energy2, TVector3 Direction3D_1, TVector3 Direction3D_2);
     float Pi0CosCM(  float Energy1, float Energy2);
 
-    void ComputeEnergyCorrection(storage_manager* storage);
+//    void ComputeEnergyCorrection(storage_manager* storage);
 
     void SetApplyEnergyCorrection(bool flag){ _applyEnergyCorrection = flag; };
 
@@ -104,6 +109,21 @@ namespace larlight {
 
     TH1D* hEnergyCorr_MomToDaughter;
     TH1D* hElectronCorr_DepToDet;
+
+	// Layout of the TTree
+        TTree* _ana_tree;
+	double E_1;
+	double E_2;
+	double E1E2DotProd;
+	double mother1_E;
+        double theta_d1, phi_d1 ;
+        double theta_d2, phi_d2 ;
+	double MC_E_1, MC_E_2;
+	double MC_Mother_E_1, MC_Mother_E_2;
+	double MC_E1E2DotProd;
+	double MC_Mother_E1E2DotProd;
+
+
 
     bool _debug;
     
