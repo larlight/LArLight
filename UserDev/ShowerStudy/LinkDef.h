@@ -10,7 +10,6 @@
 #pragma link off all functions;
 
 #pragma link C++ namespace showerana+;
-#pragma link C++ class showerana::ShowerContainmentCut+;
 #pragma link C++ class showerana::ShowerAnaException+;
 #pragma link C++ class showerana::Pi0ProfileCut+;
 #pragma link C++ class larlight::PDGSelection+;

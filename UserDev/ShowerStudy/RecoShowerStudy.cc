@@ -44,7 +44,7 @@ namespace larlight {
       _shower_start.push_back(mrs.ShowerStart().Y());
       _shower_start.push_back(mrs.ShowerStart().Z());
       
-      showerana::ShowerContainmentCut showerObject ;
+      geoalgo::DistToBoxWall showerObject ;
       
       _dist_to_wall = showerObject.DistanceToWall(_shower_start) ;
       _dist_along_traj = showerObject.DistanceToWall(_shower_start,_direction,1);

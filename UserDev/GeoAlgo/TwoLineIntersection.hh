@@ -26,7 +26,7 @@
 
 namespace geoalgo {
   /**
-     \class TwoShower3DIntxn
+     \class TwoLineIntersection
      User defined class TwoLineIntersection ... these comments are used to generate
      doxygen documentation!
   */
