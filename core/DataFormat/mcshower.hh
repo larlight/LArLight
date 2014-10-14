@@ -118,8 +118,10 @@ namespace larlight {
     void SetDaughterAngles(Double_t phi, Double_t theta)
     { fDaughterPhi = phi; fDaughterTheta = theta; }
 
-    void SetPlaneCharge(const std::vector<Float_t>& q)
+    void SetPlaneCharge(const std::vector<float>& q)
     { fPlaneCharge = q; }
+
+    void SetPlaneCharge(const std::vector<double>& q);
 
   private:
 
@@ -144,7 +146,7 @@ namespace larlight {
     Float_t fDaughterTheta;
 
     //---- Charge per plane ----//
-    std::vector<Float_t> fPlaneCharge; ///< Charge deposit per plane
+    std::vector<float> fPlaneCharge; ///< Charge deposit per plane
 
     ////////////////////////
     ClassDef(mcshower,3)

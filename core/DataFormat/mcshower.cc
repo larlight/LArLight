@@ -80,6 +80,12 @@ namespace larlight {
     fDaughterMomentum = mom;
   }
 
+  void mcshower::SetPlaneCharge(const std::vector<double>& q)
+  {
+    fPlaneCharge.resize(q.size(),0);
+    for(size_t i=0; i<q.size(); ++i) fPlaneCharge[i]=q[i];
+  }
+
   //----------------------------------------------------
   Float_t mcshower::Charge(const size_t plane) const
   //----------------------------------------------------
