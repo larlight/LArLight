@@ -72,7 +72,7 @@ namespace showerana {
 			  bool ForwardOrBack ) const; 
 
 	/// Getter for distance from point to box (when point is outside box)
-	double DistanceToWallFromOut(std::vector<double> const& point) const;
+	double DistanceToWallFromOut(std::vector<double> const &point) const;
 	
   protected:
 

@@ -46,8 +46,9 @@ namespace larlight {
       
       showerana::ShowerContainmentCut showerObject ;
       
-      _dist_to_wall = showerObject.DistanceToWall(_shower_start) ;
-      _dist_along_traj = showerObject.DistanceToWall(_shower_start,_direction,1);
+      _dist_to_wall 	  	  = showerObject.DistanceToWall(_shower_start) ;
+      _dist_along_traj	      = showerObject.DistanceToWall(_shower_start,_direction,1);
+	  _dist_back_along_traj   = showerObject.DistanceToWall(_shower_start,_direction,0);
 
 /*	test[0] = 255;
 	test[1] = -115; 
@@ -60,10 +61,10 @@ namespace larlight {
 	_dist_to_wall = showerObject.DistanceToWall(test) ;
 	_dist_along_traj = showerObject.DistanceToWall(test,dir) ;	  
 	_dist_backwards_to_wall = showerObject.DistanceBackwardsToWall( test, dir) ; 
-*/
- //	double add = _dist_along_traj + _dist_backwards_to_wall ; 
+
+ 	double add = _dist_along_traj + _dist_backwards_to_wall ; 
 	
-/*	  std::cout<<" "<<_shower_start[0]<<", "<<_shower_start[1]<<" , "<<_shower_start[2]<<std::endl;
+	  std::cout<<" "<<_shower_start[0]<<", "<<_shower_start[1]<<" , "<<_shower_start[2]<<std::endl;
 	  std::cout<<" " <<_dist_along_traj<<", "<<_dist_backwards_to_wall <<std::endl;
 	  std::cout<<" " <<  add <<std::endl;
   */    
@@ -87,7 +88,7 @@ namespace larlight {
       _reco_tree->Branch("_dist_to_wall",&_dist_to_wall,"_dist_to_wall/D");
       _reco_tree->Branch("_dist_along_traj",&_dist_along_traj,"_dist_along_traj/D");
     
-      _reco_tree->Branch("_dist_backwards_to_wall",&_dist_backwards_to_wall,"_dist_backwards_to_wall/D");
+	  _reco_tree->Branch("_dist_back_along_traj",&_dist_back_along_traj,"_dist_back_along_traj/D");
 
     }   
  }
