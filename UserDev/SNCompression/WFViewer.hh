@@ -1,9 +1,9 @@
 /**
- * \file HitViewer.hh
+ * \File WFViewer.hh
  *
  * \ingroup Analysis
  * 
- * \brief Class def header for a class HitViewer
+ * \brief Class def header for a class WFViewer
  *
  * @author David Caratelli
  */
@@ -12,43 +12,43 @@
 
     @{*/
 
-#ifndef HITVIEWER_HH
-#define HITVIEWER_HH
+#ifndef WFVIEWER_HH
+#define WFVIEWER_HH
 
 #include "ana_base.hh"
 #include "GeometryUtilities.hh"
+#include <math.h>
 #include <TH2I.h>
 #include <TGraph.h>
 #include <TCanvas.h>
 #include <TPad.h>
-#include <string.h>
 
 namespace larlight {
   /**
-     \class HitViewer
+     \class WFViewer
      User custom analysis class made by SHELL_USER_NAME
   */
-  class HitViewer : public ana_base{
+  class WFViewer : public ana_base{
 
   public:
     
     /// Default constructor
-    HitViewer();
+    WFViewer();
     
     /// Default destructor
-    virtual ~HitViewer(){};
+    virtual ~WFViewer(){};
 
-    /** IMPLEMENT in HitViewer.cc!
+    /** IMPLEMENT in WFViewer.cc!
         Initialization method to be called before the analysis event loop.
     */ 
     virtual bool initialize();
 
-    /** IMPLEMENT in HitViewer.cc! 
+    /** IMPLEMENT in WFViewer.cc! 
         Analyze a data event-by-event  
     */
     virtual bool analyze(storage_manager* storage);
 
-    /** IMPLEMENT in HitViewer.cc! 
+    /** IMPLEMENT in WFViewer.cc! 
         Finalize method to be called after all events processed.
     */
     virtual bool finalize();
@@ -60,7 +60,7 @@ namespace larlight {
     
     TGraph* PrepareGraph();
     
-    /// Getter for hit TH2I histo, weighted by charge
+    /// Getter for hit TH2D histo, weighted by charge
     const TH2I*  GetHisto_Hits (int view) const {
       if(view==0)
 	return _hHits_U;
@@ -77,7 +77,7 @@ std::cout<<"*******************you screwed something up. view should be 0 1 or 2
     
   protected:
 
-    /// Counter for event Number
+    /// Event Number
     int _evtNum;
 
     /// Main canvas
@@ -95,6 +95,8 @@ std::cout<<"*******************you screwed something up. view should be 0 1 or 2
     
     double _w2cm;
     double _t2cm;
+
+    int _baseline;
 
   };
 }

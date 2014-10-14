@@ -16,7 +16,7 @@
 #define RECOSHOWERSTUDY_HH
 
 #include "ana_base.hh"
-#include "ShowerContainmentCut.hh"
+#include "DistToBoxWall.hh"
 #include <vector>
 
 namespace larlight {

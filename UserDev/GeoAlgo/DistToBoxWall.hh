@@ -1,51 +1,51 @@
 /**
- * \file ShowerContainmentCut.hh
+ * \file DistToBoxWall.hh
  *
- * \ingroup ShowerStudy
+ * \ingroup GeoAlgo
  * 
- * \brief Class def header for a class ShowerContainmentCut
+ * \brief Class def header for a class DistToBoxWall
  *
  * @author kazuhiro
  */
 
-/** \addtogroup ShowerStudy
-
+/** \addtogroup GeoAlgo
+    
     @{*/
-#ifndef SHOWERCONTAINMENTCUT_HH
-#define SHOWERCONTAINMENTCUT_HH
+#ifndef DISTTOBOXWALL_HH
+#define DISTTOBOXWALL_HH
 
-#include "ShowerAnaException.hh"
+#include "GeoAlgoException.hh"
 #include <sstream>
 #include <iostream>
 #include <vector>
 #include <cmath>
 #include <TVector3.h>
 
-namespace showerana {
-
+namespace geoalgo {
+  
   /**
-     \class ShowerContainmentCut
-     User defined class ShowerContainmentCut ... these comments are used to generate
+     \class DistToBoxWall
+     User defined class DistToBoxWall ... these comments are used to generate
      doxygen documentation!
   */
-  class ShowerContainmentCut{
+  class DistToBoxWall{
     
   public:
     
     /// Default constructor
-    ShowerContainmentCut();
-
+    DistToBoxWall();
+    
     /// Alternative constructor
-    ShowerContainmentCut(double const x_min, double const x_max,
-			 double const y_min, double const y_max,
-			 double const z_min, double const z_max);
-
+    DistToBoxWall(double const x_min, double const x_max,
+		  double const y_min, double const y_max,
+		  double const z_min, double const z_max);
+    
     /// Default destructor
-    virtual ~ShowerContainmentCut(){};
-
+    virtual ~DistToBoxWall(){};
+    
     /// Reset function to get default values
     void Reset();
-
+    
     /// Setter for maximum coordinate value (if you want to change)
     void SetXYZMax(double const x, double const y, double const z) 
     { 
@@ -53,7 +53,7 @@ namespace showerana {
       _xyz_max[1] = y; 
       _xyz_max[2] = z; 
     }
-
+    
     /// Setter for minimum coordinate value (if you want to change)
     void SetXYZMin(double const x, double const y, double const z) 
     { 
@@ -61,27 +61,27 @@ namespace showerana {
       _xyz_min[1] = y; 
       _xyz_min[2] = z; 
     }
-
+    
     /// Getter for a distance from a point to the box boundary
     double DistanceToWall(std::vector<double> const& point) const;
-
+    
     /// Getter for a distance from a point to the box boundary along a direction (or backwards)
-	/// Specify 0 for backwards, 1 for forwards
+    /// Specify 0 for backwards, 1 for forwards
     double DistanceToWall(std::vector<double> const& point,
 			  std::vector<double> dir,
 			  bool ForwardOrBack ) const; 
 
 	/// Getter for distance from point to box (when point is outside box)
 	double DistanceToWallFromOut(std::vector<double> const &point) const;
-	
-  protected:
 
+  protected:
+    
     /// "rectangular box" xyz minimum coordinate values
     std::vector<double> _xyz_min;
-
+    
     /// "rectangular box" xyz maximum coordinate values
     std::vector<double> _xyz_max;
-
+    
   };
 }
 

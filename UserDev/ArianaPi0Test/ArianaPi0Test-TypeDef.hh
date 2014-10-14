@@ -9,7 +9,6 @@
 #include "ArianaPi0Test.hh"
 #include "vertex_test.hh"
 #include "radiation_test.hh"
-#include "radiation_information.hh"
 //ADD_NEW_HEADER ... do not change this comment line
 
 // Class forward declaration here
@@ -23,7 +22,6 @@ namespace larlight {
 
 }
 
-class radiation_information;
 //ADD_EMPTY_CLASS ... do not change this comment line
 #endif
 

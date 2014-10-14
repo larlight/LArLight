@@ -26,7 +26,7 @@ larlight.storage_manager.get().set_data_to_read(larlight.DATA.UserInfo,False)
 #is there a way to disable ana_proc from creating an output file at all?
 my_proc.set_ana_output_file("")
 
-my_ana = larlight.HitViewer()
+my_ana = larlight.WFViewer()
 
 my_proc.add_process(my_ana)
 
@@ -42,9 +42,8 @@ gStyle.SetLabelSize(0.08,"Y")
 gStyle.SetLabelSize(0.08,"Z")
 gStyle.SetOptLogz(1)
 
-c=TCanvas("c","Wire v. Time Hit Viewer",900,600)
+c=TCanvas("c","Wire v. Time Hit Viewer",900,700)
 c.Divide(1,3)
-
 while my_proc.process_event():
 
     currentview = 0;
@@ -52,10 +51,7 @@ while my_proc.process_event():
     for pad in xrange(1,4,1):
         
         c.cd(pad)
-        h = my_ana.GetHisto_Hits(int(currentview))
-        h.SetTitleFont(62,'X')
-        h.SetTitleFont(62,'Y')
-        h.Draw("COLZ")
+        my_ana.GetHisto_Hits(int(currentview)).Draw("COLZ")
     
         currentview = currentview + 1
         c.Update()

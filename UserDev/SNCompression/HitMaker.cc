@@ -21,21 +21,18 @@ namespace larlight {
   bool HitMaker::initialize() {
 
     _threshold = 6; //ADCs
-    _event_num = 0;
+    _evtNum = 0;
     return true;
   }
   
   bool HitMaker::analyze(storage_manager* storage) {
 
-    _event_num += 1;
-    std::cout << "Event Number: " << _event_num << std::endl;
-
     //make vector to hold new hits
     larlight::event_hit *hits = (event_hit*)(storage->get_data(DATA::FFTHit));
     hits->clear();
-    hits->set_event_id(_event_num);
+    hits->set_event_id(_evtNum);
     
-      //read waveforms from event
+    //read waveforms from event
     larlight::event_tpcfifo *event_wf = (event_tpcfifo*)(storage->get_data(DATA::TPCFIFO));
     //make sure not empty...if so report
     if(!event_wf) {
@@ -54,11 +51,11 @@ namespace larlight {
 	Message::send(MSG::ERROR,__FUNCTION__,
 		      Form("Found 0-length waveform: Event %d ... Ch. %d",event_wf->event_number(),tpc_data->channel_number()));
 	continue;
-	}
+      }
       UInt_t chan = tpc_data->channel_number();		
       //determine baseline based on plane-type
       if ( larutil::Geometry::GetME()->SignalType(chan) == larlight::GEO::kCollection )
-	  _baseline = 400;
+	_baseline = 400;
       else if ( larutil::Geometry::GetME()->SignalType(chan) == larlight::GEO::kInduction )
 	_baseline = 2048;
       
@@ -72,18 +69,18 @@ namespace larlight {
       for (UShort_t adc_index=0; adc_index<tpc_data->size(); adc_index++){
 	int adcs = tpc_data->at(adc_index);
 	if ( ((adcs-_baseline) >= _threshold) ) {
-	  if (!active) { startT = tpc_data->readout_sample_number_RAW()+adc_index; }
+	  if (!active) { startT = tpc_data->readout_sample_number_RAW()+1+adc_index; }
 	  active = true;
 	  Qarea   += (adcs-_baseline);
 	  //find if pulse peak
 	  if ( (adcs-_baseline) > Qpeak ){
-	    peakT = tpc_data->readout_sample_number_RAW()+adc_index;
+	    peakT = tpc_data->readout_sample_number_RAW()+1+adc_index;
 	    Qpeak = (adcs-_baseline);
 	  }
 	}
 	else {//below threshold
 	  if (active){//if we were in the middle of a hit, set end time & reset
-	    endT = tpc_data->readout_sample_number_RAW()+adc_index;
+	    endT = tpc_data->readout_sample_number_RAW()+1+adc_index;
 	    //fill hit information
 	    if ( Qarea > 0 ){
 	      _Hit.set_view(tpc_data->plane());
@@ -113,6 +110,8 @@ namespace larlight {
     
     //eliminate waveform
     event_wf->clear();
+
+    _evtNum += 1;
     
     return true;
   }

@@ -95,6 +95,9 @@ namespace larlight {
 
     protected:
 
+    /// Event Number
+    int _evtNum;
+
     /// Compression Algorithm Object...performs compression
     compress::CompressionAlgoBase* _compress_algo;
 

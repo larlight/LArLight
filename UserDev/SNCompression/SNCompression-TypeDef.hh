@@ -12,6 +12,7 @@
 #include "ViewCompression.hh"
 #include "HitMaker.hh"
 #include "HitViewer.hh"
+#include "WFViewer.hh"
 //ADD_NEW_HEADER ... do not change this comment line
 
 // Class forward declaration here
@@ -21,6 +22,7 @@ class ExecuteCompression;
 class ViewCompression;
 class HitMaker;
 class HitViewer;
+class WFViewer;
 
 //ADD_ANA_CLASS ... do not change this comment line
 
