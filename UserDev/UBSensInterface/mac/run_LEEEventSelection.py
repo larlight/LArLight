@@ -25,12 +25,20 @@ my_proc.set_io_mode(fmwk.storage_manager.READ)
 my_proc.set_input_rootdir("scanner")
 
 # Specify output root file name
-my_proc.set_ana_output_file("");
+my_proc.set_ana_output_file("")
 
-# Attach a template process
-lee = fmwk.LEEEventSelection()
-lee.SetIncludeRecoShowers(False)
-my_proc.add_process(lee)
+# Enable filter mode for ana_processor
+my_proc.enable_filter(True)
+
+# Attach filters to do event selection
+lee_filter = fmwk.LEEEventSelection()
+lee_filter.SetFiducialCutDistance(17.)
+my_proc.add_process(lee_filter)
+
+# Attach my process that converts larlight data into ubsens LEE data holder
+lee_ds = fmwk.LEEDataScanner()
+lee_ds.SetIncludeRecoShowers(False)
+my_proc.add_process(lee_ds)
 
 print
 print  "Finished configuring ana_processor. Start event loop!"

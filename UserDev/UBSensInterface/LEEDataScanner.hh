@@ -1,56 +1,57 @@
 /**
- * \file LEEEventSelection.hh
+ * \file LEEDataScanner.hh
  *
- * \ingroup LEEEventSelection
+ * \ingroup LEEDataScanner
  * 
- * \brief This class loops over larlight events, picks out candidate events
- * for a low energy excess study, fills a data container (defined in the
+ * \brief This class loops over larlight events, fills a data container (defined in the
  * UBSensitivity code) with relevant parameters, uses UBSens code to write
  * those data to an output file. This output file is later read in and turned
  * into scaled histograms by UBSensivity code.
+ * Note event selection should be done by separate filter modules attached
+ * to ana_processor before the LEEDataScanner module.
  *
  * @author davidkaleko
  */
 
-/** \addtogroup LEEEventSelection
+/** \addtogroup LEEDataScanner
     
     @{*/
 
-#ifndef LEEEVENTSELECTION_HH
-#define LEEEVENTSELECTION_HH
+#ifndef LEEDATASCANNER_HH
+#define LEEDATASCANNER_HH
 
 #include "ana_base.hh"
 #include "DataHandle/DataManager.hh"
 
 namespace larlight {
   /**
-     \class LEEEventSelection
+     \class LEEDataScanner
      User custom analysis class made by davidkaleko
   */
-  class LEEEventSelection : public ana_base{
+  class LEEDataScanner : public ana_base{
     
   public:
     
     /// Default constructor
-    LEEEventSelection() : ana_base() { 
-      _name="LEEEventSelection"; 
+    LEEDataScanner() : ana_base() { 
+      _name="LEEDataScanner"; 
       _include_reco_showers = false;
     }
     
     /// Default destructor
-    virtual ~LEEEventSelection(){};
+    virtual ~LEEDataScanner(){};
     
-    /** IMPLEMENT in LEEEventSelection.cc!
+    /** IMPLEMENT in LEEDataScanner.cc!
         Initialization method to be called before the analysis event loop.
     */ 
     virtual bool initialize();
     
-    /** IMPLEMENT in LEEEventSelection.cc! 
+    /** IMPLEMENT in LEEDataScanner.cc! 
         Analyze a data event-by-event  
     */
     virtual bool analyze(storage_manager* storage);
     
-    /** IMPLEMENT in LEEEventSelection.cc! 
+    /** IMPLEMENT in LEEDataScanner.cc! 
         Finalize method to be called after all events processed.
     */
     virtual bool finalize();

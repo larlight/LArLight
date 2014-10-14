@@ -3,8 +3,8 @@
 #
 
 # specific names for this package
-DICT  = LEEEventSelectionCint
-SHLIB = libLEEEventSelection.so
+DICT  = UBSensInterfaceCint
+SHLIB = libUBSensInterface.so
 SOURCES = $(wildcard *.cc)
 HEADERS = $(wildcard *.hh)
 OBJECTS = $(SOURCES:.cc=.o)
@@ -14,6 +14,7 @@ INCFLAGS = -I.                       #Include itself
 INCFLAGS += -I$(LARLIGHT_CORE_DIR)/Base
 INCFLAGS += -I$(LARLIGHT_CORE_DIR)/DataFormat
 INCFLAGS += -I$(LARLIGHT_CORE_DIR)/Analysis
+INCFLAGS += -I$(USER_DEV_DIR)/GeoAlgo
 INCFLAGS += -I$(LITE_FMWK_COREDIR)
 
 # platform-specific options
