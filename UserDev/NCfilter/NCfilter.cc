@@ -261,6 +261,12 @@ for( unsigned int i = 0 ; i<RotateAlg.size();i++)
       // Add association
       lite_cluster.add_association(hit_type,hit_ass);
 
+      // Set cluster ID
+      lite_cluster.set_id(Output_cluster->size());
+
+      // Set cluster view
+      lite_cluster.set_view(hits->at(hit_ass.at(0)).View());
+
       // Add a cluster to the output
       Output_cluster->push_back(lite_cluster);
 
@@ -274,6 +280,12 @@ for( unsigned int i = 0 ; i<RotateAlg.size();i++)
 
       // Add association
       lite_cluster.add_association(hit_type,hit_ass);
+
+      // Set cluster ID
+      lite_cluster.set_id(Output_cluster->size());
+
+      // Set cluster view
+      lite_cluster.set_view(hits->at(hit_ass.at(0)).View());
 
       // Add a cluster to the output
       Output_cluster->push_back(lite_cluster);
