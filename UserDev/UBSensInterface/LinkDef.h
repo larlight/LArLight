@@ -9,7 +9,9 @@
 #pragma link off all classes;
 #pragma link off all functions;
 
+#pragma link C++ class larlight::LEEDataScanner+;
 #pragma link C++ class larlight::LEEEventSelection+;
 //ADD_NEW_CLASS ... do not change this line
 
 #endif
+

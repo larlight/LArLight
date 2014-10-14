@@ -1,7 +1,7 @@
 ##############################
 # SETUP LARLIGHT STUFF
 ##############################
-export USER_MODULE="LEEEventSelection"
+export USER_MODULE="UBSensInterface"
 export MAKE_TOP_DIR="/Users/davidkaleko/LArLight"
 source $MAKE_TOP_DIR/config/setup.sh
 

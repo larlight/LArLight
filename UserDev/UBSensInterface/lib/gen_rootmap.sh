@@ -15,9 +15,9 @@ rootlibmap() {
 }
 
 ######################################################
-# LEEEventSelection
-rootlibmap libLEEEventSelection.rootmap libLEEEventSelection.so $USER_DEV_DIR/LEEEventSelection/LinkDef.h \
-    libAnalysis.so libDataHandle.so
+# UBSensInterface
+rootlibmap libUBSensInterface.rootmap libUBSensInterface.so $USER_DEV_DIR/UBSensInterface/LinkDef.h \
+    libAnalysis.so libGeoAlgo.so libDataHandle.so 
 
 
 

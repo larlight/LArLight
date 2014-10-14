@@ -2,11 +2,11 @@
 CXXFLAGS += -I$(LARLIGHT_CORE_DIR)/Base 
 CXXFLAGS += -I$(LARLIGHT_CORE_DIR)/DataFormat
 CXXFLAGS += -I$(LARLIGHT_CORE_DIR)/Analysis
-CXXFLAGS += -I$(USER_DEV_DIR)/LEEEventSelection
+CXXFLAGS += -I$(USER_DEV_DIR)/UBSensInterface
 CXXFLAGS += -I. $(shell root-config --cflags) -g
 
 # Include your shared object lib location
-LDFLAGS += -L$(LARLIGHT_LIBDIR) -lLEEEventSelection -lAnalysis -lDataFormat -lBase 
+LDFLAGS += -L$(LARLIGHT_LIBDIR) -lUBSensInterface -lAnalysis -lDataFormat -lBase 
 LDFLAGS += $(shell root-config --libs) -lPhysics -lMatrix -g
 
 # platform-specific options

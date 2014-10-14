@@ -1,9 +1,9 @@
 //
-// Example C++ routine to run your analysis module, LEEEventSelection.
+// Example C++ routine to run your analysis module, UBSensInterface.
 //
 
 #include "Analysis-TypeDef.hh"
-#include "LEEEventSelection-TypeDef.hh"
+#include "UBSensInterface-TypeDef.hh"
 
 int main(int argc, char** argv){
 
@@ -40,7 +40,7 @@ int main(int argc, char** argv){
   my_proc.set_ana_output_file("from_test_ana_you_can_remove_me.root");
 
   // Attach a template process
-  my_proc.add_process(new larlight::LEEEventSelection);
+  my_proc.add_process(new larlight::UBSensInterface);
 
   std::cout
     << std::endl
