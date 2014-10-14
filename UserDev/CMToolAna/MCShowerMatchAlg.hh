@@ -37,16 +37,16 @@ namespace larlight {
     /// Default destructor
     virtual ~MCShowerMatchAlg(){};
     
-    /** Set Cluster Type to be read in: ClusterMerger makes Cluster
-	instead of FuzzyCluster
-    */
+    /// Constructs needed information for Shower=>MCShower matching
     bool Prepare(::larlight::storage_manager* storage,
 		 const DATA::DATA_TYPE &cluster_type);
 
+    /// Run Shower=>MCShower matching
     void Match(const std::vector<unsigned int> &cluster_indices,
 	       size_t &mcshower_index,
 	       double &correctness) const;
 
+    /// Given a cluster, computes fractional charge from each MCShower
     std::vector<float> MCShowerQFrac(size_t cluster_index) const { return _qfrac_v.at(cluster_index); }
     
   protected:
