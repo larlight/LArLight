@@ -2,7 +2,7 @@
 #define SHOWERDISTANCESTUDY_CC
 
 #include "ShowerDistanceStudy.hh"
-#include "ShowerContainmentCut.hh"
+#include "DistToBoxWall.hh"
 
 namespace larlight {
 
@@ -36,7 +36,7 @@ namespace larlight {
 
 		_dist_ToZ0 = _kid_vtx.at(2) ;
 
-		showerana::ShowerContainmentCut showerObject ;
+		geoalgo::DistToBoxWall showerObject ;
 	
 		_dist_ToWall = showerObject.DistanceToWall(_kid_vtx) ;
 		_dist_AlongTraj = showerObject.DistanceToWall(_kid_vtx,_kid_momentum,1);

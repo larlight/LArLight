@@ -7,7 +7,6 @@
 
 // Header files included here
 #include "ShowerAnaException.hh"
-#include "ShowerContainmentCut.hh"
 #include "PDGSelection.hh"
 #include "ShowerDistanceStudy.hh"
 #include "Pi0ProfileCut.hh"
@@ -29,7 +28,6 @@ namespace larlight {
 namespace showerana {
 
   class ShowerAnaException;
-  class ShowerContainmentCut;
   class Pi0ProfileCut;
 
 }
