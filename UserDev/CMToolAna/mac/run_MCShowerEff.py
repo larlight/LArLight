@@ -25,7 +25,7 @@ my_proc.set_io_mode(larlight.storage_manager.READ)
 my_proc.set_input_rootdir("scanner")
 
 # Specify output root file name
-my_proc.set_ana_output_file("MCShowerErr.root");
+my_proc.set_ana_output_file("MCShowerEff.root");
 
 #attach the CMergePerformance process
 my_unit = larlight.MCShowerEff()
