@@ -35,7 +35,9 @@
 #include "pulse.hh"
 #include "vertex.hh"
 #include "endpoint2d.hh"
-
+#include "cosmictag.hh"
+#include "opflash.hh"
+#include "ophit.hh"
 namespace larlight {
   /**
      \class storage_manager
