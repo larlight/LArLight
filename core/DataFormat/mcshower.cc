@@ -92,7 +92,7 @@ namespace larlight {
   {
     if(plane > fPlaneCharge.size()) {
 
-      Message::get()->send(MSG::ERROR,__FUNCTION__,Form("No charge stored for plane: %d",plane));
+      Message::get()->send(MSG::ERROR,__FUNCTION__,Form("No charge stored for plane: %zu",plane));
       return -1;
 
     }

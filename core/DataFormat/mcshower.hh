@@ -149,7 +149,7 @@ namespace larlight {
     std::vector<float> fPlaneCharge; ///< Charge deposit per plane
 
     ////////////////////////
-    ClassDef(mcshower,3)
+    ClassDef(mcshower,4)
     ////////////////////////
       
   };
