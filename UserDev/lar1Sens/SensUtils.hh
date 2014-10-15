@@ -43,8 +43,9 @@ namespace lar1{
     std::vector<float> appendVectors(std::vector<float> , std::vector<float> );
     std::vector<float> appendVectors(std::vector<float> , std::vector<float> ,
                                      std::vector<float>);
-    int buildCovarianceMatrix(std::vector<std::vector<float> > &,
-                              std::vector<std::string> & , int );
+    
+    TString GetMatrixFileName(TString, TString, bool,bool,bool,int,bool);
+
     
     TH1F* makeHistogram(std::vector<float> & input, 
                         double lowbin, double highbin);

@@ -672,4 +672,316 @@ std::vector<float> PlotUtils::Bin_LSND_Data( int npoints,
 
 }
 
+void PlotUtils::plot_Matrix( TString matrixFileName,
+                             TString matrixName)
+{
+
+  // Open the file, get the matrix.
+  // Pass it to the real function]
+  TFile * f = new TFile(matrixFileName);
+  TH2D * matrix = (TH2D*) f -> Get(matrixName);
+
+  bool use100m = matrixFileName.Contains("ND");
+  bool use470m = matrixFileName.Contains("uB");
+  bool use600m = matrixFileName.Contains("T600");
+
+
+  // Get the nue rates to get the num bins:
+  std::vector<TH1F *> nueEventRates;
+  if (use100m) nueEventRates.push_back( (TH1F*) f-> Get("nueEventRates_100m") -> Clone());
+std::cout << "Got here ... \n";
+  if (use470m) nueEventRates.push_back( (TH1F*) f-> Get("nueEventRates_470m")-> Clone());
+std::cout << "Got here ... \n";
+  if (use600m) nueEventRates.push_back( (TH1F*) f-> Get("nueEventRates_600m_onaxis")-> Clone());
+std::cout << "Got here ... \n";
+  if (!use100m && !use470m && !use600m) {
+    std::cerr << "You seem to be providing a file that " 
+              << "doesn't conform to standard format.\n";
+    exit (-1);
+  }
+
+  int nBins_nue = nueEventRates.front() -> GetNbinsX();
+  int nBins_numu = 0;
+
+  // Find out if there are numu bins:
+  // Get the nue rates to get the num bins:
+  std::vector<TH1F *> numuEventRates;
+  if (use100m) {
+    TH1F* tempHist = (TH1F*) f-> Get("numuEventRates_100m");
+    if (tempHist != 0)
+      numuEventRates.push_back( (TH1F*) tempHist-> Clone());
+  }
+  if (use470m) {
+    TH1F* tempHist = (TH1F*) f-> Get("numuEventRates_470m");
+    if (tempHist != 0)
+      numuEventRates.push_back( (TH1F*) tempHist-> Clone());
+  }
+  if (use600m) {
+    TH1F* tempHist = (TH1F*) f-> Get("numuEventRates_600m_onaxis");
+    if (tempHist != 0)
+      numuEventRates.push_back( (TH1F*) tempHist-> Clone());
+  }
+
+  if (numuEventRates.size() != 0){
+    nBins_numu = numuEventRates.front() -> GetNbinsX();
+  }
+
+
+
+
+  TCanvas * canv = plot_Matrix( matrix, matrixName, 
+                                use100m, use470m, use600m, 
+                                nBins_nue, nBins_numu);
+  // for the name of the pdf file to print:
+  matrixFileName.Remove(matrixFileName.Length()-5); // chop off ".root"
+  matrixFileName += "_" + matrixName + ".pdf";
+  canv -> Print(matrixFileName,"pdf");
+
+  if (matrixName == "fracMatHist"){
+    std::vector<TCanvas*> canvases = plotRatesWithErrors(matrix,
+                                                         nueEventRates,
+                                                         numuEventRates);
+  }
+
+
+  return;
+
+}
+
+std::vector<TCanvas *> PlotUtils::plotRatesWithErrors(TH2D * matrix,
+                                                      std::vector<TH1F*> nueRates,
+                                                      std::vector<TH1F*> numuRates)
+{
+  std::vector <TCanvas *> canvases;
+  int curr_bin = 1;
+
+  for (unsigned int iDet = 0; iDet < nueRates.size(); iDet ++)
+  {
+    canvases.push_back(new TCanvas(Form("canv_nue_%u",iDet),"", 500,400));
+    canvases.back() -> cd();
+
+    // TH1F * tempHist = (TH1F*) nueRates.at(iDet) -> Clone();
+
+    // Set the bin errors to be systematic uncertainties
+    for (int iBin = 1; iBin <= nueRates.at(iDet)->GetNbinsX(); iBin ++){
+      nueRates.at(iDet)->SetBinContent(iBin, nueRates.at(iDet)->GetBinContent(iBin) 
+                                           / nueRates.at(iDet)->GetBinWidth(iBin) );
+      nueRates.at(iDet)->SetBinError(iBin, matrix->GetBinContent(curr_bin,curr_bin)
+                                         * nueRates.at(iDet)->GetBinContent(iBin));
+      // tempHist -> SetBinContent(iBin, matrix->GetBinContent(curr_bin,curr_bin));
+      curr_bin ++;
+    }
+
+    nueRates.at(iDet) -> Draw("e hist");
+    // nueUncerts -> cd();
+
+
+    if (numuRates.size() != 0){
+      canvases.push_back(new TCanvas("canv_nue_100m","", 400,300));
+      canvases.back() -> cd();
+      // Set the bin errors to be systematic uncertainties
+      for (int iBin = 1; iBin <= numuRates.at(iDet)->GetNbinsX(); iBin ++){
+        numuRates.at(iDet)->SetBinContent(iBin, nueRates.at(iDet)->GetBinContent(iBin) 
+                                              / nueRates.at(iDet)->GetBinWidth(iBin) );
+        numuRates.at(iDet)->SetBinError(iBin, matrix->GetBinContent(curr_bin,curr_bin)
+                                              * numuRates.at(iDet)->GetBinContent(iBin));
+        curr_bin ++;
+      }
+    
+
+      numuRates.at(iDet) -> Draw("e hist");
+    }
+  }
+
+  // Now fill in the errors in their own plot
+  curr_bin = 1;
+  TCanvas * nueUncerts = new TCanvas("nue_uncert", "", 600, 500);
+  // TH1F * nueFracUncertainties = nueRates.front() -> Clone();
+  // TH1F * numuFracUncertainties;
+  // if (numuRates.size() != 0) numuFracUncertainties = numuRates.front() -> Clone();
+  for (unsigned int iDet = 0; iDet < nueRates.size(); iDet ++)
+  {
+    TH1F * tempHist = (TH1F*) nueRates.at(iDet) -> Clone();
+    for (int iBin = 1; iBin <= nueRates.at(iDet)->GetNbinsX(); iBin ++){
+      tempHist -> SetBinContent(iBin, matrix->GetBinContent(curr_bin,curr_bin));
+      tempHist -> SetBinError(iBin, 0);
+      curr_bin ++;
+    }
+    tempHist -> Draw("same");
+  }
+  return canvases;
+}
+
+TCanvas *  PlotUtils::plot_Matrix(TH2D * matrix, TString matrixName,
+                                  bool use100m, bool use470m, bool use600m, 
+                                  int nBins_nue,
+                                  int nBins_numu)
+{
+
+
+  set_plot_style();
+
+  static int nCanvas = 0;
+  nCanvas ++;
+
+  TString title;
+  if (matrixName == "corrMatHist") title = "Correlation Matrix";
+  else if (matrixName == "covMatHist") title = "Covariance Matrix";
+  else if (matrixName == "fracMatHist") title = "Fractional Covariance Matrix";
+  else title = matrixName;
+
+  char name[100];
+  sprintf(name,"canvas_%d", nCanvas);
+
+  TCanvas * canv = new TCanvas(name, title, 750,750);
+  canv -> cd();
+  TPad *pad1 = new TPad("pad1","",0,0,1,1);
+  // TPad *pad2 = new TPad("pad1","",0,0,1,1);
+  // pad2->SetFillStyle(4000); // make this second pad transparent
+  
+  pad1 -> Draw();
+  pad1 -> cd();
+
+  int total_bins = 0;
+  if (use100m) total_bins += nBins_nue + nBins_numu;
+  if (use470m) total_bins += nBins_nue + nBins_numu;
+  if (use600m) total_bins += nBins_nue + nBins_numu;
+
+  TH2D * blankHist = new TH2D("blank","",2*total_bins,0,2*total_bins-1,2*total_bins,0,2*total_bins-1);
+  blankHist -> GetYaxis() -> SetBinLabel(1,"");
+  // use a counter to keep track of which bin has been labeled:
+  int curr_bin = 1;
+
+  if (use100m) {
+    matrix -> GetXaxis() -> SetBinLabel(curr_bin + nBins_nue/2, "ND #nu_{e}");
+    matrix -> GetYaxis() -> SetBinLabel(curr_bin + nBins_nue/2, "ND #nu_{e}");
+    blankHist -> GetXaxis() -> SetBinLabel(2*curr_bin, "200 MeV");
+    blankHist -> GetXaxis() -> SetBinLabel(2*(curr_bin + nBins_nue)-3, "3 GeV");
+    curr_bin += nBins_nue;
+    if (nBins_numu != 0) {
+      matrix -> GetXaxis() -> SetBinLabel(curr_bin + nBins_numu/2, "ND #nu_{#mu}");
+      matrix -> GetYaxis() -> SetBinLabel(curr_bin + nBins_numu/2, "ND #nu_{#mu}");
+      blankHist -> GetXaxis() -> SetBinLabel(2*curr_bin, "200 MeV");
+      blankHist -> GetXaxis() -> SetBinLabel(2*(curr_bin + nBins_numu)-3, "3 GeV");
+      curr_bin += nBins_numu;
+    }
+  }
+  if (use470m) {
+    matrix -> GetXaxis() -> SetBinLabel(curr_bin + nBins_nue/2, "uB #nu_{e}");
+    matrix -> GetYaxis() -> SetBinLabel(curr_bin + nBins_nue/2, "uB #nu_{e}");
+    blankHist -> GetXaxis() -> SetBinLabel(2*curr_bin, "200 MeV");
+    blankHist -> GetXaxis() -> SetBinLabel(2*(curr_bin + nBins_nue)-3, "3 GeV");
+    curr_bin += nBins_nue;    
+    if (nBins_numu != 0) {
+      matrix -> GetXaxis() -> SetBinLabel(curr_bin + nBins_numu/2, "uB #nu_{#mu}");
+      matrix -> GetYaxis() -> SetBinLabel(curr_bin + nBins_numu/2, "uB #nu_{#mu}");
+      blankHist -> GetXaxis() -> SetBinLabel(2*curr_bin, "200 MeV");
+      blankHist -> GetXaxis() -> SetBinLabel(2*(curr_bin + nBins_numu)-3, "3 GeV");
+      curr_bin += nBins_numu;
+    }
+  }
+  if (use600m) {
+    matrix -> GetXaxis() -> SetBinLabel(curr_bin + nBins_nue/2, "T600 #nu_{e}");
+    matrix -> GetYaxis() -> SetBinLabel(curr_bin + nBins_nue/2, "T600 #nu_{e}");
+    blankHist -> GetXaxis() -> SetBinLabel(2*curr_bin, "200 MeV");
+    blankHist -> GetXaxis() -> SetBinLabel(2*(curr_bin + nBins_nue)-3, "3 GeV");
+    curr_bin += nBins_nue;    
+    if (nBins_numu != 0) {
+      matrix -> GetXaxis() -> SetBinLabel(curr_bin + nBins_numu/2, "T600 #nu_{#mu}");
+      matrix -> GetYaxis() -> SetBinLabel(curr_bin + nBins_numu/2, "T600 #nu_{#mu}");
+      blankHist -> GetXaxis() -> SetBinLabel(2*curr_bin, "200 MeV");
+      blankHist -> GetXaxis() -> SetBinLabel(2*(curr_bin + nBins_numu)-3, "3 GeV");
+      curr_bin += nBins_numu;
+    }
+  }
+
+  // Toggle the labels on the xaxis to draw horizontally:
+  matrix -> GetXaxis() -> LabelsOption("h");
+  matrix -> GetYaxis() -> SetLabelSize(0.055);
+  matrix -> GetXaxis() -> SetLabelSize(0.055);
+
+  // Remove the tick marks:
+  matrix -> GetXaxis() -> SetTickSize(0);
+  matrix -> GetYaxis() -> SetTickSize(0);
+  blankHist -> GetXaxis() -> SetTickSize(0);
+  blankHist -> GetYaxis() -> SetTickSize(0);
+
+
+
+  // pad2 ->cd();
+  // matrix -> Draw("colz");
+  // blankHist -> Draw("same");
+  matrix -> Draw("colz");
+  TPad *overlay = new TPad("overlay","",0,0,1,1);
+  overlay->SetFillStyle(0);
+  overlay->SetFillColor(0);
+  overlay->SetFrameFillStyle(0);
+  overlay->Draw("FA");
+  overlay->cd();
+
+  blankHist -> LabelsOption("v");
+  blankHist -> Draw("same x");
+
+
+  // Draw some lines to separate the detectors:
+  std::vector <TLine *> Lines;
+  curr_bin = nBins_nue;
+  if (use100m) {
+    Lines.push_back(new TLine(2*curr_bin,0,2*curr_bin,2*total_bins-1));
+    Lines.push_back(new TLine(0,2*curr_bin,2*total_bins-1,2*curr_bin));
+    if (nBins_numu != 0){
+      curr_bin += nBins_numu;
+      Lines.push_back(new TLine(2*curr_bin,0,2*curr_bin,2*total_bins-1));
+      Lines.push_back(new TLine(0,2*curr_bin,2*total_bins-1,2*curr_bin));
+    }
+    curr_bin += nBins_nue;
+  }
+  if (use470m){
+    Lines.push_back(new TLine(2*curr_bin,0,2*curr_bin,2*total_bins-1));
+    Lines.push_back(new TLine(0,2*curr_bin,2*total_bins-1,2*curr_bin));
+    if (nBins_numu != 0){
+      curr_bin += nBins_numu;
+      Lines.push_back(new TLine(2*curr_bin,0,2*curr_bin,2*total_bins-1));
+      Lines.push_back(new TLine(0,2*curr_bin,2*total_bins-1,2*curr_bin));
+    }
+    curr_bin += nBins_nue;
+  }
+  if (use600m){
+    Lines.push_back(new TLine(2*curr_bin,0,2*curr_bin,2*total_bins-1));
+    Lines.push_back(new TLine(0,2*curr_bin,2*total_bins-1,2*curr_bin));
+    if (nBins_numu != 0){
+      curr_bin += nBins_numu;
+      Lines.push_back(new TLine(2*curr_bin,0,2*curr_bin,2*total_bins-1));
+      Lines.push_back(new TLine(0,2*curr_bin,2*total_bins-1,2*curr_bin));
+    }
+    curr_bin += nBins_nue;
+  }
+
+  for (auto & line : Lines){
+    if (line == *(Lines.end() - 2) || line == *(Lines.end() -1)) break;
+    line->SetLineWidth(3);
+    line->SetLineStyle(2);
+    line->Draw("same");
+  }
+
+  // return the canvas so that it can be saved
+  return canv;
+
+}
+
+void PlotUtils::set_plot_style()
+{
+  const Int_t NRGBs = 5;
+  const Int_t NCont = 255;
+
+  Double_t stops[NRGBs] = { 0.00, 0.34, 0.61, 0.84, 1.00 };
+  Double_t red[NRGBs]   = { 0.00, 0.00, 0.87, 1.00, 0.51 };
+  Double_t green[NRGBs] = { 0.00, 0.81, 1.00, 0.20, 0.00 };
+  Double_t blue[NRGBs]  = { 0.51, 1.00, 0.12, 0.00, 0.00 };
+  TColor::CreateGradientColorTable(NRGBs, stops, red, green, blue, NCont);
+  gStyle->SetNumberContours(NCont);
+  gStyle->SetOptStat(0);
+}
+
+
 }

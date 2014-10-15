@@ -4,10 +4,10 @@
 {
   gSystem->Load("lib/liblar1Sens.so");
   lar1::NueAppearanceFitter n;
+  // n.setFileSource("/Users/cja33/lar1_data/");
   n.setFileSource("/Users/cja33/genie_RW/");
-  // n.setFileSource("output/nominal/");
   n.setVerbose(true);
-  n.setDebug(true);
+  n.setDebug(false);
   n.setSpecialNameText("");
   n.setSpecialNameTextOsc("");
   n.setSpecialNameText_far("");
@@ -20,7 +20,7 @@
   n.setUse100mLong(false);
   n.setUse470m(true);
   n.setUse700m(false);
-  n.setUseT600_onaxis(false);
+  n.setUseT600_onaxis(true);
   n.setUseT600_offaxis(false);
   n.setUbooneScale(1.0);
   n.setLAr1NDScale(1.0);
@@ -91,24 +91,28 @@
 
   n.setUseCovarianceMatrix(false);
   // Gotta define the backgrounds:
-  int kUnisim(0), kPiMinus(1), kPiPlus(2), kKaon0(3), kKMinus(4), kKPlus(5), kTotal(6);
+  int kUnisim(0), kPiMinus(1), kPiPlus(2), kKaon0(3), kKMinus(4), kKPlus(5), kTotal_flux(6);
+  int kCCQE(0), kTotal_xsec(1);
   // n.setMultiWeightSource(kUnisim);
   // n.setMultiWeightSource(kPiMinus);
   // n.setMultiWeightSource(kPiPlus);
   // n.setMultiWeightSource(kKaon0);
   // n.setMultiWeightSource(kKMinus);
-  // n.setMultiWeightSource(kKPlus);
-  n.setMultiWeightSource(1);
+  // n.setMultiWeightSource(kKPlus);  
+  n.setMultiWeightSource(kTotal_xsec);
 
   n.setAbsolute_MWSource(false);
+
+  n.setUseXSecWeights(true);
+  n.setUseFluxWeights(false);
 
   n.setNpoints(500);
   n.setNWeights(250);
 
   n.setSavePlots(true);
 
-  n.setBuildCovarianceMatrix(false);
-  n.setMakeRatioPlots(true);
+  n.setBuildCovarianceMatrix(true);
+  n.setMakeRatioPlots(false);
   n.setLoop(false);
   n.setMakePlots(false);
   n.setMakeSimplePlot(false);

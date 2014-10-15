@@ -94,7 +94,6 @@ namespace lar1{
       void setNumuBins(std::vector<float> bins){numuBins = bins; nbins_numu = numuBins.size()-1;}
       void setIncludeCosmics(bool b = false){includeCosmics = b;}
       void setCosmicsFile(std::string s){cosmicsFile = s;}
-      void setNWeights(int n){nWeights = n;}
       void setElectContainedDist(double d){ElectContainedDist = d;}
       void setMinDistanceToStart(double d){minDistanceToStart = d;}
       void setShapeOnlyFit(bool b){shapeOnlyFit = b;}
@@ -131,7 +130,9 @@ namespace lar1{
       // For the multiweights, pick which to use
       void setMultiWeightSource(int source){multiWeightSource = source;}
       void setAbsolute_MWSource(bool b){absolute_MWSource = b;}
-
+      void setNWeights(int n){nWeights = n;}
+      void setUseXSecWeights(bool b){useXSecWeights = b;}
+      void setUseFluxWeights(bool b){useFluxWeights = b;}
 
       void setIncludeNumus(bool b){includeNumus = b;}
       void setIncludeFosc(bool b){includeFosc = b;}
@@ -194,7 +195,9 @@ namespace lar1{
 
       int multiWeightSource;
       bool absolute_MWSource;
-
+      bool useXSecWeights;
+      bool useFluxWeights;
+      
       double flatSystematicError;  // Only used if nearDetStats = false.
 
       std::string mode;  //beam mode to run in

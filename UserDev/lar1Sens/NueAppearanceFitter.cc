@@ -96,7 +96,8 @@ namespace lar1{
     // Do all of the checks to make sure the functions will run
     
     if (fLoop) includeFosc = true;
-    if (fBuildCovarianceMatrix || fMakeRatioPlots){
+    if ( fBuildCovarianceMatrix || fMakeRatioPlots ||
+         useFluxWeights         || useXSecWeights){
       if (!useCovarianceMatrix){
         std::cout << " WARNING: switch useCovarianceMatrix to true"
                   << " since it's needed in a function you requested.\n";
@@ -104,9 +105,17 @@ namespace lar1{
       }  
     }
 
+
+
     Prepare();
     ReadData();
     if (fBuildCovarianceMatrix) {
+      if (useFluxWeights && useXSecWeights){
+        std::cerr << "ERROR: You have requested to build a covariance"
+                  << " matrix but only one uncertainty is available to build"
+                  << " at a time.  Please run the uncertainties separately.\n";
+        return -1;
+      }
       int returnVal = BuildCovarianceMatrix();
       if (returnVal != 0) return returnVal;
     }
@@ -195,49 +204,49 @@ namespace lar1{
       baselinesFancy.push_back("100m");
       scales.push_back(LAr1NDScale);
       names.push_back("LAr1-ND");
-      detNamesString += "ND_100m";
+      detNamesString += "ND_100m_";
     }
     if (use100mLong) {
       baselines.push_back("100m");
       baselinesFancy.push_back("100m");
       scales.push_back(LAr1NDScale);
       names.push_back("2*LAr1-ND");
-      detNamesString += "2ND";
+      detNamesString += "2ND_";
     }
     if (use150m) {
       baselines.push_back("150m");
       baselinesFancy.push_back("150m");
       scales.push_back(LAr1NDScale);
       names.push_back("LAr1-ND");
-      detNamesString += "ND_150m";
+      detNamesString += "ND_150m_";
     }
     if (use200m) {
       baselines.push_back("200m");
       baselinesFancy.push_back("200m");
       scales.push_back(LAr1NDScale);
       names.push_back("LAr1-ND");
-      detNamesString += "ND_200m";
+      detNamesString += "ND_200m_";
     }
     if (use470m) {
       baselines.push_back("470m");
       baselinesFancy.push_back("470m");
       scales.push_back(ubooneScale);
       names.push_back("MicroBooNE");
-      detNamesString += "uB";
+      detNamesString += "uB_";
     }
     if (useT600_onaxis){
       baselines.push_back("600m_onaxis");
       baselinesFancy.push_back("600m, on axis");
       scales.push_back(LAr1FDScale);
       names.push_back("T600");
-      detNamesString += "T600_onaxis";
+      detNamesString += "T600_onaxis_";
     }
     if (useT600_offaxis) {
       baselines.push_back("600m_offaxis");
       baselinesFancy.push_back("600m, off axis");
       scales.push_back(LAr1FDScale);
       names.push_back("T600");
-      detNamesString += "T600_offaxis";
+      detNamesString += "T600_offaxis_";
     }
 
     if (ElectContainedDist != -999) {
@@ -452,8 +461,7 @@ namespace lar1{
 
     //The following section is purely informational, to let the user see what's happening...
 
-    for (int i = 0; i < 10; i++) std::cout << "\n";
-    std::cout << "Beginning sensitivity analysis...\n";
+    std::cout << "\nBeginning sensitivity analysis...\n";
     std::cout << "Running in " << mode << " mode with the following detectors:\n";
     for (int i = 0; i < nL; i++){
         std::cout << "\t" << names[i] << " at " << baselines[i] << "m with " << 6.6e20*scales[i] << " POT.\n";
@@ -856,7 +864,6 @@ namespace lar1{
 
     
     }
-    std::cout << "finishing up... " << std::endl;
 
     return 0;
   }
@@ -1107,10 +1114,15 @@ namespace lar1{
 
     if (savePlots){
       // Need to get the name of the matrix right:
-      int systematicInt = multiWeightSource;
-      TString matrixFileName = fileNameRoot + "matrixFile_";
-      if (absolute_MWSource) matrixFileName += "abs_";
-      matrixFileName += std::to_string(systematicInt) + "_" + detNamesString + ".root";
+      
+      TString matrixFileName = utils.GetMatrixFileName( fileSource,
+                                                        detNamesString,
+                                                        includeNumus,
+                                                        useXSecWeights,
+                                                        useFluxWeights,
+                                                        multiWeightSource,
+                                                        absolute_MWSource);
+
       TFile * fileOut = new TFile(matrixFileName,"RECREATE");
       covarianceMatrixHist  -> Write();
       fractionalMatrixHist  -> Write();
@@ -1119,10 +1131,10 @@ namespace lar1{
 
       // Collapse these matrices to remove the signal region for the write up.
 
-      std::cout << "events nominal copy: \n";
-      for (unsigned int i = 0; i < events_nominal_COPY.size(); i++){
-        std::cout << events_nominal_COPY.at(i) << "\n";
-      }
+      // std::cout << "events nominal copy: \n";
+      // for (unsigned int i = 0; i < events_nominal_COPY.size(); i++){
+      //   std::cout << events_nominal_COPY.at(i) << "\n";
+      // }
 
       covarianceMatrix.Write();
       fractionalErrorMatrix.Write();
@@ -1147,8 +1159,8 @@ namespace lar1{
         nueEventRates[b_line] -> Write();
 
         if (includeNumus){
-          numuEventRates[b_line] = new TH1F(temp,"Numu Event Rates",nbins_numu,&(numuBins[0]));
           sprintf(temp,"numuEventRates_%s",baselines[b_line].c_str());
+          numuEventRates[b_line] = new TH1F(temp,"Numu Event Rates",nbins_numu,&(numuBins[0]));
           for (int bin = 0; bin < nbins_numu; ++bin)
           {
             numuEventRates[b_line] -> SetBinContent(bin+1,events_nominal_COPY[b_line*nbins+2*nbins_nue+bin]);
@@ -1651,8 +1663,8 @@ namespace lar1{
     x3s = new double[npoints+1]; y3s = new double[npoints+1];
     x5s = new double[npoints+1]; y5s = new double[npoints+1];
 
-    if (useCovarianceMatrix)
-      BuildCovarianceMatrix();
+    // if (useCovarianceMatrix)
+      // utils.GetCovarianceMatrix(useFluxWeights,useXSecWeights);
 
     fittingSignal.resize(nL);
     fittingBackgr.resize(nL);

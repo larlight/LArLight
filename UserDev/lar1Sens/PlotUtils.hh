@@ -15,6 +15,9 @@
 #include "TLegend.h"
 #include "TMarker.h"
 #include "TPad.h"
+#include "TColor.h"
+#include "TFile.h"
+#include "TGaxis.h"
 
 namespace lar1{
 
@@ -41,6 +44,8 @@ namespace lar1{
     void add_plot_label(char* label, double x, double y,
                         double size = 0.05, int color = 1,
                         int font = 72, int align = 22 );
+
+    void set_plot_style();
     
     //fields will contain the elements of the string s, split by the delimiter "delim"
     void split(std::vector<std::string> &fields, std::string s, char delim = ' ') ;
@@ -67,6 +72,21 @@ namespace lar1{
                                      std::vector<float> dm2points,
                                      std::vector<float> sin22thpoints);
 
+    // This function reads in the appropriate TH2D and then calls the plotting 
+    // function
+    void plot_Matrix( TString matrixFileName,
+                      TString matrixName);
+
+    // This function makes a plot of a matrix but requires the TH2D histogram
+    // to do it.
+    TCanvas * plot_Matrix( TH2D * matrix, TString matrixName,
+                      bool use100m, bool use470m, bool use600m, 
+                      int nBins_nue,
+                      int nBins_numu = 0);
+
+    std::vector<TCanvas *> plotRatesWithErrors(TH2D * matrix,
+                                               std::vector<TH1F*> nueRates,
+                                               std::vector<TH1F*> numuRates);
 
   protected:
     
