@@ -115,6 +115,18 @@
 #pragma link C++ class std::vector<larlight::endpoint2d>+;
 #pragma link C++ class larlight::event_endpoint2d+;
 
+#pragma link C++ class larlight::cosmictag+;
+#pragma link C++ class std::vector<larlight::cosmictag>+;
+#pragma link C++ class larlight::event_cosmictag+;
+
+#pragma link C++ class larlight::opflash+;
+#pragma link C++ class std::vector<larlight::opflash>+;
+#pragma link C++ class larlight::event_opflash+;
+
+#pragma link C++ class larlight::ophit+;
+#pragma link C++ class std::vector<larlight::ophit>+;
+#pragma link C++ class larlight::event_ophit+;
+
 #pragma link C++ class larlight::storage_manager+;
 
 #endif

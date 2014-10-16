@@ -19,7 +19,7 @@
 #include "CMatchManager.hh"
 #include "CRUHelper.hh"
 #include "ShowerRecoAlg.hh"
-#include "ShowerBackTracker.hh"
+#include "MCShowerMatchAlg.hh"
 #include "ShowerReco3D/ShowerCalo.hh"
 
 namespace larlight {
@@ -36,7 +36,6 @@ namespace larlight {
       _name="ComputePi0Mass"; 
       _fout=0; 
       _debug=false; 
-      _applyEnergyCorrection=false;
       _shower_type = DATA::Shower;
       _cluster_type = DATA::Cluster;
     };
@@ -67,11 +66,6 @@ namespace larlight {
 
     float Pi0MassFormula3D(  float Energy1, float Energy2, TVector3 Direction3D_1, TVector3 Direction3D_2);
 
-    void ComputeEnergyCorrection(storage_manager* storage);
-
-    void SetApplyEnergyCorrection(bool flag){ _applyEnergyCorrection = flag; };
-
-    
     static ComputePi0Mass* GetInstance() { 
       if(!me) me = new ComputePi0Mass;
       return me; 
@@ -83,25 +77,20 @@ namespace larlight {
 
     ::showerreco::ShowerCalo fSECaloAlg;
 
+    ::larlight::MCShowerMatchAlg fBTAlg;
+
     DATA::DATA_TYPE _shower_type;
     DATA::DATA_TYPE _cluster_type;
     
     TH1D* hPi0MassPeak;
-
-    TH1D* hEnergyCorr_MomToDaughter;
-    TH1D* hElectronCorr_DepToDet;
+    TH1D* hDaughterCorrectness;
+    TH1D* hDaughterVtxDist;
+    TH1D* hDaughterAngleDiff;
 
     bool _debug;
     
     float _mass;
 
-    std::vector<double> fEnergyCorr_MomToDaughter;
-    std::vector<double> fElectronCorr_DepToDet;
-    std::vector<double> fChargeCorr_DetToPeak;
-    ShowerBackTracker fBTAlg;
-    bool _applyEnergyCorrection;
-
-    
   private:
     
     static ComputePi0Mass *me; // attempt at a shared object instance ptr

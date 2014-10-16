@@ -1,11 +1,11 @@
-#ifndef LEEEVENTSELECTION_CC
-#define LEEEVENTSELECTION_CC
+#ifndef LEEDATASCANNER_CC
+#define LEEDATASCANNER_CC
 
-#include "LEEEventSelection.hh"
+#include "LEEDataScanner.hh"
 
 namespace larlight {
 
-  bool LEEEventSelection::initialize() {
+  bool LEEDataScanner::initialize() {
 
     _truthshower = ::ubsens::data::TruthShower();
     _recoshower = ::ubsens::data::RecoShower();
@@ -17,7 +17,7 @@ namespace larlight {
     return true;
   }
   
-  bool LEEEventSelection::analyze(storage_manager* storage) {
+  bool LEEDataScanner::analyze(storage_manager* storage) {
 
 
     //grab the MC showers
@@ -32,16 +32,10 @@ namespace larlight {
     if(!ev_shower && _include_reco_showers)  {
       print(larlight::MSG::WARNING,__FUNCTION__,Form("Did not find specified data product, Shower! AND you wanted to use them! Consider using SetIncludeRecoShowers(False)."));
     }
-
     
-
     //here decide if event passes event selection cut (in fid volume, IE)
     //NO! WRITE A FILTER THAT RUNS BEFORE THIS! USE FILTER MODE!
 
-    //here code some stuff following kazu's ubsens example.py
-    //including writing to an output file
-    
-    
     //loop over mcshowers, save into ubsens dataholder
     for (auto imcs: *ev_mcshower){
       _truthshower.Reset();
@@ -79,7 +73,7 @@ namespace larlight {
     return true;
   }
 
-  bool LEEEventSelection::finalize() {
+  bool LEEDataScanner::finalize() {
     
     _mgr.Close();
     

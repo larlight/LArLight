@@ -15,17 +15,7 @@ void TrajectoryInVolume::AddTrajectoryPoint(std::vector<float> point){
   return;
 }
 
-void TrajectoryInVolume::SetToyTraj(){
-
-  _traj.clear();
-  std::vector<float> p1 = {0,0,0};
-  std::vector<float> p2 = {1,1,1};
-  _traj.push_back(p1);
-  _traj.push_back(p2);
-
-}
-
-bool TrajectoryInVolume::InVolume(){
+bool TrajectoryInVolume::IsInVolume(){
 
   for (size_t n=0; n < (_traj.size()-1); n++){
     if ( LineInVolume(_traj.at(n),_traj.at(n+1)) )
@@ -33,6 +23,18 @@ bool TrajectoryInVolume::InVolume(){
   }
   return false;
 }
+
+bool TrajectoryInVolume::IsInVolume(std::vector<std::vector<float> > traj){
+
+  _traj = traj;
+  
+  for (size_t n=0; n < (_traj.size()-1); n++){
+    if ( LineInVolume(_traj.at(n),_traj.at(n+1)) )
+      return true;
+  }
+  return false;
+}
+
 
 bool TrajectoryInVolume::LineInVolume(std::vector<float> point1, std::vector<float> point2){
 

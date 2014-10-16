@@ -38,9 +38,6 @@ public:
   void SetVolume(float xMin, float xMax, float yMin, float yMax, float zMin, float zMax)
   { _xMin = xMin; _xMax = xMax; _yMin = yMin; _yMax = yMax; _zMin = zMin; _zMax = zMax; }
 
-  /// Set Toy Trajectory Points -- Only for debugging really
-  void SetToyTraj();
-
   /// Set Trajectory Points
   void SetTrajectory(std::vector<std::vector<float> > traj) { _traj = traj; }
 
@@ -48,7 +45,10 @@ public:
   void AddTrajectoryPoint(std::vector<float> point);
 
   /// See if a list of trajectory points intersects the volume
-  bool InVolume();
+  bool IsInVolume();
+
+  /// See if a list of trajectory points intersects the volume
+  bool IsInVolume(std::vector<std::vector<float> > traj);
 
   /// See if Line intersects volume
   bool LineInVolume(std::vector<float> point1, std::vector<float> point2);

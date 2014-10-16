@@ -27,6 +27,9 @@
 #include "shower.hh"
 #include "calorimetry.hh"
 #include "vertex.hh"
+#include "cosmictag.hh"
+#include "opflash.hh"
+#include "ophit.hh"
 #include "storage_manager.hh"
 // Class forward declaration here
 
@@ -93,7 +96,12 @@ namespace larlight{
 
   class vertex;
   class event_vertex;
-  
+
+  class cosmictag;
+
+  class ophit;
+  class opflash;
+
   class storage_manager;
 }
 #endif

@@ -473,6 +473,15 @@ namespace larlight {
       print(MSG::ERROR,__FUNCTION__,Form("MCTrajectory is stored within MCParticle! Retrieve MCParticle instead."));
       break;
     case DATA::Seed:
+    case DATA::CosmicTag:
+      _ptr_data_array[type]=(event_base*)(new event_cosmictag());
+      break;
+    case DATA::OpFlash:
+      _ptr_data_array[type]=(event_base*)(new event_opflash());
+      break;
+    case DATA::OpHit:
+      _ptr_data_array[type]=(event_base*)(new event_ophit());
+      break;
     case DATA::DATA_TYPE_MAX:
       print(MSG::ERROR,__FUNCTION__,Form("Data identifier not supported: %d",(int)type));
       break;
