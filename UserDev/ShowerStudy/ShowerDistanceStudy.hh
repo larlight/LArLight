@@ -52,6 +52,11 @@ namespace larlight {
 	double _motherEnergy ;
 	double _daughterEnergy ;
 
+	double _elecEnergy ;
+	double _elec_VtxX ;
+	double _elec_VtxY ;
+	double _elec_VtxZ ;
+
 	double _dist_ToWall ;
 	double _dist_AlongTraj ;
 	double _dist_BackAlongTraj ;
@@ -59,6 +64,9 @@ namespace larlight {
 	double _dist_ToWallFromOut ; 
 	
 	double _pi0_mass ;
+
+	int _count0 ;
+	int _count1 ;
 
 
   };
