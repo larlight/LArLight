@@ -9,7 +9,9 @@ namespace compress {
 
     //Algorithm Computation starts here!
     PrepareAlgo();
+    //assign the waveform vector for this specific instance of the algorithm
     SetInWF(waveform);
+    //calculate the baseline from the firxt X samples
     FindBaseline();
     //loop over wf...if a segment moves above threshold -> add to output vector
     //keep track on whether already triggered or not
@@ -28,15 +30,17 @@ namespace compress {
 	std::cout << "Active? " << active << std::endl;
 	std::cout << "tmpWF size: " << _tmpWF.size() << std::endl;
       }
+      // if the baseline-subtracted ADC tick is greater than
+      // the threshold in absolute value -> fire compression!
       if ( fabs((_InWF.at(i) - _Baseline)) > _Threshold ){
-	if (!active) { startTick = i; } 
+	if (!active) { startTick = i; } // if it is the first Tick above baseline -> start a new waveform
 	active = true;
 	_tmpWF.push_back(_InWF.at(i));
       }
       else{
 	if ( (active) and (_tmpWF.size() > 0) ){
 	  _OutWF.push_back(_tmpWF);
-	  _OutWFStartTick.push_back(startTick);
+	  _OutWFStartTick.push_back(startTick); // if we just exited an above-threshold region -> save waveform and reset
 	  _tmpWF.clear();
 	  active = false;
 	}
