@@ -22,3 +22,4 @@
 #pragma link C++ class compress::CompressionAlgoThresh+;
 
 #endif
+

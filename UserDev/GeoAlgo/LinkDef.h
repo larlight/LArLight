@@ -15,6 +15,8 @@
 
 #pragma link C++ class TrajectoryInVolume+;
 #pragma link C++ class geoalgo::DistToBoxWall+;
+#pragma link C++ class PointToLineDist+;
 //ADD_NEW_CLASS ... do not change this line
 #endif
+
 
