@@ -24,7 +24,7 @@ namespace larlight {
     for( auto const & mcs : *ev_mcshower) {
       
       auto _daughtpos = mcs.DaughterPosition();
-
+      
       //DistToBoxWall uses units of cm, but mcshower stuff is in mm
       for(size_t i = 0; i < _daughtpos.size(); ++i)
 	_daughtpos.at(i) = _daughtpos.at(i)/10.;
