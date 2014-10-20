@@ -28,7 +28,7 @@ class PointToLineDist{
 public:
 
   /// Default constructor
-  PointToLineDist(){ _point.clear(); _segmentStart.clear(); _segmentEnd.clear(); };
+  PointToLineDist(){ _point.clear(); _segmentStart.clear(); _segmentEnd.clear(); _debug=false; };
 
   /// Default destructor
   virtual ~PointToLineDist(){};
@@ -37,15 +37,21 @@ public:
 
   double Distance(std::vector<float> point,
 		  std::vector<float> segmentStart,
-		  std::vector<float> segmentEnd);
+		  std::vector<float> segmentEnd) { _point = point; _segmentStart = segmentStart; _segmentEnd = segmentEnd; return Distance(); }
 
   double DotProduct(std::vector<float> A, std::vector<float> B);
+
+  void TestDist();
+
+  void SetDebug(bool on) { _debug = on; }
 
 private:
 
   std::vector<float>  _point;
   std::vector<float>  _segmentStart;
   std::vector<float> _segmentEnd;
+
+  bool _debug;
 
 };
 
