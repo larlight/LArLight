@@ -62,7 +62,9 @@ namespace larlight {
     //clear histograms
     ClearHistograms();
     //now fill histograms
-    FillHistograms(ADCwaveform, compressOutput, outTimes);
+    UShort_t ch = tpc_data->channel_number();
+    UChar_t pl  = larutil::Geometry::GetME()->ChannelToPlane(ch);
+    FillHistograms(ADCwaveform, compressOutput, outTimes, ch, pl);
 
     _currentWF += 1;
     
@@ -82,13 +84,20 @@ namespace larlight {
   }
 
 
-  void ViewCompression::FillHistograms(std::vector<unsigned short> ADCwaveform, std::vector<std::vector<unsigned short> >compressOutput,
-				       std::vector<int> outputTimes){
+  void ViewCompression::FillHistograms(std::vector<unsigned short> ADCwaveform,
+				       std::vector<std::vector<unsigned short> >compressOutput,
+				       std::vector<int> outputTimes,
+				       UShort_t ch,
+				       UChar_t pl){
     
-    _hInWF = new TH1I("hInWF", Form("Event %i - Input Waveform; Time Tick                  ; ADCs",_evtNum),
+    _hInWF = new TH1I("hInWF", Form("Event %i - Pl %i - Ch %i - Input WF; Time Tick; ADCs",_evtNum, pl, ch),
 		      ADCwaveform.size(), 0, ADCwaveform.size());
-    _hOutWF = new TH1I("hOutWF", Form("Event %i - Output Waveform; Time Tick                  ; ADCs",_evtNum),
+
+    _hOutWF = new TH1I("hOutWF", Form("Event %i - Pl %i - Ch %i - Output WF; Time Tick; ADCs",_evtNum, pl, ch),
 		       ADCwaveform.size(), 0, ADCwaveform.size());
+
+    _hInWF->SetTitleOffset(0.8,"X");
+    _hOutWF->SetTitleOffset(0.8,"X");
     
     for (size_t n=0; n < ADCwaveform.size(); n++)
       _hInWF->SetBinContent(n+1, ADCwaveform.at(n));

@@ -17,6 +17,7 @@
 
 #include "ana_base.hh"
 #include "CompressionAlgoBase.hh"
+#include "Geometry.hh"
 #include <TH1I.h>
 #include <TCanvas.h>
 #include <TPad.h>
@@ -78,7 +79,9 @@ namespace larlight {
     /// Fill Histograms with new and old waveforms
     void FillHistograms(std::vector<unsigned short> ADCwaveform,
 			std::vector<std::vector<unsigned short> > compressOutput,
-			std::vector<int> outputTimes);
+			std::vector<int> outputTimes,
+			UShort_t ch,
+			UChar_t pl);
 
     /// Get Histograms for python script
     const TH1I* GetHistos(int which) const {
