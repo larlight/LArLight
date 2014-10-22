@@ -560,6 +560,7 @@ void lar1::Reprocessing::Loop(std::string signal,
     TH1D *ncpi0bkgX              = new TH1D("ncpi0bkgX","ncpi0bkgX;X",50,xmin,xmax);
     TH1D *ncpi0bkgY              = new TH1D("ncpi0bkgY","ncpi0bkgY;Y",50,ymin,ymax);
     TH1D *ncpi0bkgZ              = new TH1D("ncpi0bkgZ","ncpi0bkgZ;Z",50,zmin,zmax);
+    TH2D* singlePhotonNCEnuVsPhotE = new TH2D("singlePhotonNCEnuVsPhotE", "Single photon NC Events;Single Photon Energy;Generated Neutrino Energy (GeV)",100,0,3,100,0,3);
 
     TH1D * vertexX               = new TH1D("vertexX","vertexX",100, xmin*1.5,xmax*1.5);
     TH1D * vertexY               = new TH1D("vertexY","vertexY",100, ymin*1.5,ymax*1.5);
@@ -698,7 +699,8 @@ void lar1::Reprocessing::Loop(std::string signal,
                                   p2PhotonConversionPos,  p2PhotonConversionMom,
                                   miscPhotonConversionPos,miscPhotonConversionMom);
 
-      vertexEnergy = 1000*utils.VertexEnergy( GeniePDG, GenieMomentum );
+      if (utils.IsFiducial( iDet, (*vertex) ,5);)
+        vertexEnergy = 1000*utils.VertexEnergy( GeniePDG, GenieMomentum );
 
 
       if ( verbose )
@@ -931,6 +933,8 @@ void lar1::Reprocessing::Loop(std::string signal,
           }
         }
       }
+      if(totalGammas == 1 && !isCC)
+        singlePhotonNCEnuVsPhotE->Fill(photonE,enugen);
 
 
       //----------------------------------------------
