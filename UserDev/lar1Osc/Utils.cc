@@ -179,7 +179,7 @@ namespace lar1{
         switch (iflux)
         {
           case kNu:
-            if (mc_generation == 5) POT_Sim = 0.0;
+            if (mc_generation == 5) POT_Sim = 7.86E+19;
             if (mc_generation == 4) POT_Sim = 7.858E+19;
             if (mc_generation == 3) POT_Sim = 7.879E+19;
             if (mc_generation == 2) POT_Sim = 1.74e20;
@@ -288,10 +288,12 @@ namespace lar1{
         switch (iflux)
         {
           case kNu:
+            if (mc_generation == 5) POT_Sim = 5.42E+20;
             if (mc_generation == 4) POT_Sim = 5.4163E+20;
             if (mc_generation == 3) POT_Sim = 5.434E+20;
             break;
           case kNu_Fosc:
+            if (mc_generation == 5) POT_Sim = 0.0;
             if (mc_generation == 4) POT_Sim = 6.507E+20;
             if (mc_generation == 3) POT_Sim = 6.507E+20;
             // POT_Sim = 2.766e20;

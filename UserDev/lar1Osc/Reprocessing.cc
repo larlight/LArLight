@@ -699,7 +699,7 @@ void lar1::Reprocessing::Loop(std::string signal,
                                   p2PhotonConversionPos,  p2PhotonConversionMom,
                                   miscPhotonConversionPos,miscPhotonConversionMom);
 
-      if (utils.IsFiducial( iDet, (*vertex) ,5);)
+      if (utils.IsFiducial( iDet, (*vertex) ,5))
         vertexEnergy = 1000*utils.VertexEnergy( GeniePDG, GenieMomentum );
 
 
