@@ -27,7 +27,7 @@ void TopologyCalc(TString target){
   bool isFid= false;
   Int_t NPi0;
 
-  bool useMultiWeights = true;
+  bool useMultiWeights = false;
 
 
   c->Reset();
@@ -278,11 +278,6 @@ void TopologyCalc(TString target){
         if (useMultiWeights){
           multiWeight = fluxweight*MultiWeight->back().at(N_weight);
         } 
-  // legendMap[10016] = "CCQE";
-  // legendMap[10017] = "CCRes";
-  // legendMap[10018] = "CCDIS";
-  // legendMap[10019] = "CCCoh";
-  // legendMap[10014] = "nu - e scattering";
 
         //get the numu cc events:
         if (abs(inno) == 14 ) {

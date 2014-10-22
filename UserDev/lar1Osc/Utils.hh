@@ -25,6 +25,9 @@ namespace lar1{
     
     Utils();
     ~Utils();
+
+    void setMC_Generation(int g);
+    void reconfigure();
     
     Double_t GetFluxWeight( Double_t energy, Int_t iflux, Int_t inno, Int_t ndecay );
     Double_t GetTheta( const TVector3 & mom, 
@@ -83,7 +86,7 @@ namespace lar1{
                              Double_t &zmin, Double_t &zmax ) const; 
     
     Double_t GetPOTNorm( Int_t iflux, Int_t iLoc ) const;
-    Double_t GetPOTNormNuMI( Int_t iflux, Int_t iDet ) const;
+    Double_t GetPOTNormNuMI( Int_t iflux, Int_t iLoc ) const;
 
     double   GetContainedLength(const TVector3 & startPoint, 
                                 const TVector3 & startDir, int idet) const;

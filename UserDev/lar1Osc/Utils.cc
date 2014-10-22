@@ -9,9 +9,18 @@
 
 namespace lar1{
   Utils::Utils(){
+    mc_generation = 5;
+    reconfigure();
+  }
 
-    mc_generation = 4;
-    std::cout <<"Initializing Utils with mc_generation =" << mc_generation<<std::endl;
+  void Utils::setMC_Generation(int g){
+    mc_generation = g; 
+    reconfigure();
+    return;
+  }
+
+  void Utils::reconfigure(){
+    std::cout <<"Reconfiguring Utils with mc_generation =" << mc_generation<<std::endl;
 
     PotNormNubar  = 10e20;
     PotNormNu     = 6.6e20;
@@ -48,22 +57,12 @@ namespace lar1{
     // Other option, shorter
 
     // iDet = 1
-    if (mc_generation == 3 || mc_generation == 4){
-      ub_xmin =  -128.0;
-      ub_xmax =  128.0;
-      ub_ymin = -116.5;
-      ub_ymax =  116.5;
-      ub_zmin =  0.0;
-      ub_zmax =  1036.0;
-    }
-    else if (mc_generation == 2){
-      ub_xmin =  0.0;
-      ub_xmax =  2*128.0;
-      ub_ymin = -116.5;
-      ub_ymax =  116.5;
-      ub_zmin =  0.0;
-      ub_zmax =  1036.0;
-    }
+    ub_xmin =  0.0;
+    ub_xmax =  2*128.0;
+    ub_ymin = -116.5;
+    ub_ymax =  116.5;
+    ub_zmin =  0.0;
+    ub_zmax =  1036.0;
     // make FD 8.4m on a side to get to the MB equivalent FV (in size, not tonage)
     // fd_xmin =  -420.0;
     // fd_xmax =  420.0;
@@ -102,7 +101,7 @@ namespace lar1{
     kMB_radius = 600;
     kMB_fidcut = 100;
 
-
+    return;
   }
 
   Utils::~Utils(){
@@ -125,52 +124,36 @@ namespace lar1{
     return;
   }
 
-  Double_t Utils::GetPOTNormNuMI(Int_t iflux, Int_t iDet) const{
-/*
+  Double_t Utils::GetPOTNormNuMI( Int_t iflux, Int_t iLoc) const{
+
     Double_t POT_Sim = 1;
     Double_t POTnorm = 1;
-    if (iflux == kNu_Fosc)
+
+    if (iflux == kNu || iflux == kNu_Fosc)
+      POTnorm = 1.0e20;
+    if (iflux == kNubar || iflux == kNubar_Fosc)
+      POTnorm = 1.0e20;
+
+   switch (iLoc)
     {
-      POTnorm = 9e20;
-      if (iDet == kND){//Near Det
-        POT_Sim = 1;
-      }
-      else if (iDet == kUB){ //uboone
-        POT_Sim = 3.113e22;
-      }
-      else if (iDet == kFD || iDet == kIC){ //LAr1-FD
-        POT_Sim = 9.57e20;
-      }
-      else{ //unknown detector
-        POT_Sim = 1;
-      }
-    }
-    else if (iflux == kNubar_Fosc)
-    {
-      POTnorm = 9e20;
-      if (iDet == kND){//Near Det
-        POT_Sim = 1;
-      }
-      else if (iDet == kUB){ //uboone
-        POT_Sim = 3.448e22;
-      }
-      else if (iDet == kFD || iDet == kIC){ //LAr1-FD
-        POT_Sim = 1.08e21;
-      }
-      else{ //unknown detector
-        POT_Sim = 1;
-      }
-    }
-    else
-    {
-      POT_Sim = -1; //unknown baseline
+      case k100m:
+        POT_Sim = -1;
+        break;
+      case k470m:
+        if (mc_generation == 2) POT_Sim = 1.228e20;
+          break;
+      default:
+        std::cout << "No detector location selected, or invalid selection.  Error.\n";
+        return -999;
     }
 
+
+ 
     POTnorm /= POT_Sim;
 
     if (POTnorm > 1e-5) return POTnorm;
     else return 1.0;
-    */
+
    return 1;
   }
 
@@ -196,11 +179,13 @@ namespace lar1{
         switch (iflux)
         {
           case kNu:
+            if (mc_generation == 5) POT_Sim = 0.0;
             if (mc_generation == 4) POT_Sim = 7.858E+19;
             if (mc_generation == 3) POT_Sim = 7.879E+19;
             if (mc_generation == 2) POT_Sim = 1.74e20;
             break;
           case kNu_Fosc:
+            if (mc_generation == 5) POT_Sim = 0.0;
             if (mc_generation == 4) POT_Sim = 7.637E+19;
             if (mc_generation == 3) POT_Sim = 7.637E+19;
             if (mc_generation == 2) POT_Sim = 1.79e20;
@@ -275,11 +260,13 @@ namespace lar1{
         switch (iflux)
         {
           case kNu:
+            if (mc_generation == 5) POT_Sim = 5.25E+21;
             if (mc_generation == 4) POT_Sim = 6.087E+21;
             if (mc_generation == 3) POT_Sim = 6.053E+21;
             if (mc_generation == 2) POT_Sim = 5.57E+21;
             break;
           case kNu_Fosc:
+            if (mc_generation == 5) POT_Sim = 0.0;
             if (mc_generation == 4) POT_Sim = 2.592E+21;
             if (mc_generation == 3) POT_Sim = 2.592E+21;
             if (mc_generation == 2) POT_Sim = 5.37E+21;

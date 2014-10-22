@@ -41,6 +41,9 @@ void lar1::Reprocessing::Loop(std::string signal,
       return;
     }
 
+    if (signal == "numi"){
+      utils.setMC_Generation(2);
+    }
 
     //---------------------------------------------
     // some things to be configured by the user:
@@ -177,9 +180,9 @@ void lar1::Reprocessing::Loop(std::string signal,
     double xmin, xmax, ymin, ymax, zmin, zmax;
     utils.GetDetBoundary(iDet, xmin, xmax, ymin, ymax, zmin, zmax);
 
-    double ElectContainedDist = 0;
-    double ElectDistToStart = 0;
-    double ElectDistToStartYZ = 0;
+    double ShowerContainedDistance = 0;
+    double ShowerDistanceToStart = 0;
+    double ShowerDistanceToStartYZ = 0;
 
     double ncpi0en=0;
     TLorentzVector shower1P, shower2P;
@@ -196,8 +199,12 @@ void lar1::Reprocessing::Loop(std::string signal,
     double enucalo2 = 0.0;
     std::vector<double> ConversionDist;
     bool isFid, isActive;
+    double vertexEnergy;
+    double showerGap;
     int iChan = 0, iTop = 0;
     int ibkg = 0;
+    int NChargedKaon = 0;
+    int NNeutralKaon = 0;
 
     double wgt;
 
@@ -205,10 +212,11 @@ void lar1::Reprocessing::Loop(std::string signal,
 
     //Get the POT weight.  Need to get iflux
     b_iflux->GetEntry(0); //iflux should now be filled
-    double potweight;
-    if (signal == "numi") potweight = utils.GetPOTNormNuMI( iflux, iDet );
-    else potweight = utils.GetPOTNorm( iflux, iLoc );
-    std::cout << "POT weight = " << potweight << std::endl;
+    double potweight = 1.0;
+    if (signal != "numi"){
+      potweight = utils.GetPOTNorm( iflux, iLoc );
+      std::cout << "POT weight = " << potweight << std::endl;
+    }
 
     // Create the output TTree
     TTree *newt = new TTree("EventsTot", "Event info for ALL types");
@@ -219,6 +227,8 @@ void lar1::Reprocessing::Loop(std::string signal,
     // If you make additions, let me know so I can update the 
     // sensitivity code accordingly. (Corey A.)
 
+    // double Vx, Vy, Vz;
+
     //--------------------------------------------------
     // These are variables already in the input ntuple
     //
@@ -228,7 +238,6 @@ void lar1::Reprocessing::Loop(std::string signal,
     newt->Branch("nuchan", &nuchan, "nuchan/I");         // NUANCE interaction codes
     newt->Branch("inno", &inno, "inno/I");               // Neutrino type +-12,+-14,
     newt->Branch("enugen", &enugen, "enugen/D");         // Neutrino energy
-    // newt->Branch("energy", &energy, "energy/D");         // Reconstructed neutrino energy
     newt->Branch("nuleng", &nuleng, "nuleng/D");         // True neutrino length
     newt->Branch("tptype", &tptype, "tptype/I");            // Neutrino parent ID
     newt->Branch("ndecay",&ndecay,"ndecay/I");           
@@ -268,14 +277,14 @@ void lar1::Reprocessing::Loop(std::string signal,
     newt->Branch("LepPhiSmeared", &PhiLepSmeared, "LepPhiSmeared/D");
     newt->Branch("LepE", &Elep, "LepE/D");
     newt->Branch("LepESmeared", &ElepSmeared, "LepESmeared/D");
-    newt->Branch("ElectContainedDist",&ElectContainedDist,"ElectContainedDist/D");
-    newt->Branch("ElectDistToStart",  &ElectDistToStart,  "ElectDistToStart/D");
-    newt->Branch("ElectDistToStartYZ",&ElectDistToStartYZ,"ElectDistToStartYZ/D");
+    newt->Branch("ShowerContainedDistance",&ShowerContainedDistance,"ShowerContainedDistance/D");
+    newt->Branch("ShowerDistanceToStart",  &ShowerDistanceToStart,  "ShowerDistanceToStart/D");
+    newt->Branch("ShowerDistanceToStartYZ",&ShowerDistanceToStartYZ,"ShowerDistanceToStartYZ/D");
   
     newt->Branch("Eff", &efficiency, "Efficiency/D");                                // Reconstruction efficiency
     newt->Branch("FluxWgt", &fluxweight, "FluxWeight/D");                            // Flux reweight
     newt->Branch("Potweight",&potweight, "Potweight/D");
-    newt->Branch("ConversionDist", "ConversionDist", &ConversionDist, 32000, 0);     // Photon conversion distance in pizero events
+    // newt->Branch("ConversionDist", "ConversionDist", &ConversionDist, 32000, 0);     // Photon conversion distance in pizero events
     // newt->Branch("LepPx",&LepPx,"LepPx/D");                                          // lepton kinematics
     // newt->Branch("LepPy",&LepPy,"LepPy/D");
     // newt->Branch("LepPz",&LepPz,"LepPz/D");
@@ -286,11 +295,14 @@ void lar1::Reprocessing::Loop(std::string signal,
     newt->Branch("Ecalo1",&enucalo1,"Ecalo1/D");                                     // Neutrino energy using calorimetric reconstruction
     newt->Branch("Ecalo2",&enucalo2,"Ecalo2/D");
     newt->Branch("NCpi0En",&ncpi0en,"NCpi0En/D");                                     // pi0energy
+    newt->Branch("VertexEnergy",&vertexEnergy);
+    newt->Branch("showerGap",&showerGap);
     newt->Branch("Pi0Shower1P",&shower1P);
     newt->Branch("Pi0Shower2P",&shower2P);
     newt->Branch("Pi0Shower1X",&shower1X);
     newt->Branch("Pi0Shower2X",&shower2X);
-
+    newt->Branch("NChargedKaon", &NChargedKaon,"NChargedKaon/I");
+    newt->Branch("NNeutralKaon", &NNeutralKaon,"NNeutralKaon/I");
 
     newt->Branch("Topology",&iTop,"Topology/I");
     newt->Branch("Channel",&iChan,"Channel/I");
@@ -388,6 +400,7 @@ void lar1::Reprocessing::Loop(std::string signal,
     double NCpizeroForNCDis = 0;
 
     double emin = 0.0, emax = 3.0;
+    if (signal == "numi") emax = 6.0;
     int ebins = 120;
 
     // These histograms contain the background plots for all of the analysis produced
@@ -532,28 +545,34 @@ void lar1::Reprocessing::Loop(std::string signal,
                                         "ElectronAngleVsEnergy;Electron Energy (GeV);Angle (Deg)",
                                         ebins,emin,emax,30,0,180);
 
-    TH1D  * ElectDistToStartHist =new TH1D("ElectDistToStart","ElectDistToStart",150,0,1100);
-    TH1D  * ElectDistToStartYZHist =new TH1D("ElectDistToStartYZ","ElectDistToStartYZ",150,0,1100);
+    TH1D  * ElectDistToStartHist   =new TH1D("ShowerDistanceToStart","ShowerDistanceToStart",150,0,1100);
+    TH1D  * ElectDistToStartYZHist =new TH1D("ShowerDistanceToStartYZ","ShowerDistanceToStartYZ",150,0,1100);
     
-    TH2D *photonCCQE = new TH2D("PhotonCCQE","PhotonCCQE;CCQE Energy (GeV);Photon Energy (GeV)",ebins,emin,emax,20*ebins,emin,emax);
-    TH2D *CcqeVsTrueE = new TH2D("CcqeVsTrueE","CcqeVsTrueE;Generated Neutrino Energy (GeV);CCQE Energy (GeV)",30,0,3,30,0,3);
-    TH2D *Calo1VsTrueE = new TH2D("Calo1VsTrueE","Calo1VsTrueE;Generated Neutrino Energy (GeV);Calorimetric Energy - all (GeV)",30,0,3,30,0,3);
-    TH2D *Calo2VsTrueE = new TH2D("Calo2VsTrueE","Calo2VsTrueE;Generated Neutrino Energy (GeV);Calorimetric Energy - no neutrals (GeV)",30,0,3,30,0,3);
-    TH3D *photonConv = new TH3D("PhotonConv","PhotonConv;X;Y;Z",50,xmin,xmax,50,ymin,ymax,100,zmin,zmax);
-    TH1D *photonConvX = new TH1D("PhotonConvX","PhotonConvX;X",50,xmin, xmax);
-    TH1D *photonConvY = new TH1D("PhotonConvY","PhotonConvY;Y",50,ymin, ymax);
-    TH1D *photonConvZ = new TH1D("PhotonConvZ","PhotonConvY;Z",50,zmin, zmax);
-    TH3D *ncpi0bkgV = new TH3D("ncpi0bkgV","ncpi0bkgV;X;Y;Z",50,xmin,xmax,50,ymin,ymax,100,zmin,zmax);
-    TH1D *ncpi0bkgX = new TH1D("ncpi0bkgX","ncpi0bkgX;X",50,xmin,xmax);
-    TH1D *ncpi0bkgY = new TH1D("ncpi0bkgY","ncpi0bkgY;Y",50,ymin,ymax);
-    TH1D *ncpi0bkgZ = new TH1D("ncpi0bkgZ","ncpi0bkgZ;Z",50,zmin,zmax);
+    TH2D *photonCCQE             = new TH2D("PhotonCCQE","PhotonCCQE;CCQE Energy (GeV);Photon Energy (GeV)",ebins,emin,emax,20*ebins,emin,emax);
+    TH2D *CcqeVsTrueE            = new TH2D("CcqeVsTrueE","CcqeVsTrueE;Generated Neutrino Energy (GeV);CCQE Energy (GeV)",30,0,3,30,0,3);
+    TH2D *Calo1VsTrueE           = new TH2D("Calo1VsTrueE","Calo1VsTrueE;Generated Neutrino Energy (GeV);Calorimetric Energy - all (GeV)",30,0,3,30,0,3);
+    TH2D *Calo2VsTrueE           = new TH2D("Calo2VsTrueE","Calo2VsTrueE;Generated Neutrino Energy (GeV);Calorimetric Energy - no neutrals (GeV)",30,0,3,30,0,3);
+    TH3D *photonConv             = new TH3D("PhotonConv","PhotonConv;X;Y;Z",50,xmin,xmax,50,ymin,ymax,100,zmin,zmax);
+    TH1D *photonConvX            = new TH1D("PhotonConvX","PhotonConvX;X",50,xmin, xmax);
+    TH1D *photonConvY            = new TH1D("PhotonConvY","PhotonConvY;Y",50,ymin, ymax);
+    TH1D *photonConvZ            = new TH1D("PhotonConvZ","PhotonConvY;Z",50,zmin, zmax);
+    TH3D *ncpi0bkgV              = new TH3D("ncpi0bkgV","ncpi0bkgV;X;Y;Z",50,xmin,xmax,50,ymin,ymax,100,zmin,zmax);
+    TH1D *ncpi0bkgX              = new TH1D("ncpi0bkgX","ncpi0bkgX;X",50,xmin,xmax);
+    TH1D *ncpi0bkgY              = new TH1D("ncpi0bkgY","ncpi0bkgY;Y",50,ymin,ymax);
+    TH1D *ncpi0bkgZ              = new TH1D("ncpi0bkgZ","ncpi0bkgZ;Z",50,zmin,zmax);
 
-    TH1D * vertexX = new TH1D("vertexX","vertexX",100, xmin*1.5,xmax*1.5);
-    TH1D * vertexY = new TH1D("vertexY","vertexY",100, ymin*1.5,ymax*1.5);
-    TH1D * vertexZ = new TH1D("vertexZ","vertexZ",100, zmin*1.5,zmax*1.5);
+    TH1D * vertexX               = new TH1D("vertexX","vertexX",100, xmin*1.5,xmax*1.5);
+    TH1D * vertexY               = new TH1D("vertexY","vertexY",100, ymin*1.5,ymax*1.5);
+    TH1D * vertexZ               = new TH1D("vertexZ","vertexZ",100, zmin*1.5,zmax*1.5);
+    
+    // These are commented out but please don't delete them.
+    // Theyre very useful for debugging numi files.
+    // TH1D * neutVertexInWindowX   = new TH1D("neutVertexInWindowX","neutVertexInWindowX",100, -5,5);
+    // TH1D * neutVertexInWindowY   = new TH1D("neutVertexInWindowY","neutVertexInWindowY",100, -5,5);
+    // TH1D * neutVertexInWindowZ   = new TH1D("neutVertexInWindowZ","neutVertexInWindowZ",100, -5,12);
+    // TH3D * neutVertexInWindow3D  = new TH3D("neutVertexInWindow3D","neutVertexInWindow3D",100,-5,5,100,-5,5,100,-5,12);
 
-
-    // Ints to keep track of continue bails
+    // Ints to keep track of continue/bails
     int N_continue_CC_muon        = 0;
     int N_continue_Pi0mismatch    = 0;
     int N_continue_Gamma_mismatch = 0;
@@ -576,7 +595,8 @@ void lar1::Reprocessing::Loop(std::string signal,
       nb = GetEntry(jentry);   nbytes += nb;
       iTop = 0;
       iChan = 0;
-
+      NChargedKaon = 0;
+      NNeutralKaon = 0;
 
       if (verbose || jentry % 50000 == 0) 
         std::cout << "========== Event " << ientry << " of " 
@@ -618,11 +638,13 @@ void lar1::Reprocessing::Loop(std::string signal,
       if( isFid && verbose) std::cout << "Fiducial event!" << std::endl;
 
 
-      vertexX -> Fill(vertex->X());
-      vertexY -> Fill(vertex->Y());
-      vertexZ -> Fill(vertex->Z());
+      if (NPi0FinalState != p1PhotonConversionMom->size()){
+        std::cout << "Found a case when they are not equal: \n"
+                  << "NPi0FinalState: " << NPi0FinalState << "\n"
+                  << "p1PhotonConversionMom->size(): " << p1PhotonConversionMom->size()
+                  << std::endl;
+      }
 
-      if( !isActive ) continue;
       // Clear ntuple variables
       ConversionDist.clear();
       efficiency = 0.0;
@@ -632,41 +654,40 @@ void lar1::Reprocessing::Loop(std::string signal,
       enuccqe = 0.0;
       enucalo1 = 0.0;
       enucalo2 = 0.0;
-      ElectContainedDist = -1;
-      ElectDistToStart = -1;
-      ElectDistToStartYZ = -1;
+      ShowerContainedDistance = -1;
+      ShowerDistanceToStart = -1;
+      ShowerDistanceToStartYZ = -1;
+      vertexEnergy = 0;
+      showerGap = 0;
+
 
       // Calculate the FS lepton's 4-vector and return neutrino path length
       // nuleng = CalcLepton( detect_dist );
 
       // Get flux weight from FluxRW utilities
-      if ( signal != "numi" ) 
+      if ( signal != "numi" ) {
         fluxweight = utils.GetFluxWeight(enugen, iflux, inno, ndecay );
-      else fluxweight = 1.0;
+      }
+      else{ 
+        fluxweight = 1.0;
+      }
+      if( !isActive ) continue;
+
+
+
+      // if (!(neutVertexInWindow->Y() > -2.001 && neutVertexInWindow->Y() < -1.999)) continue;
 
       // Lump in the Pot weight to flux weight so it isn't lost:
       fluxweight *= potweight;
 
+      vertexX               -> Fill(vertex->X(),fluxweight);
+      vertexY               -> Fill(vertex->Y(),fluxweight);
+      vertexZ               -> Fill(vertex->Z(),fluxweight);
 
-      // Is the interaction in the fiducial volume?
-      // std::cout << "LeptonMom.size is: " << leptonMom->size() << std::endl;
-      // for (int i = 0; i < leptonMom->size();i++ ){
-      //   std::cout << "leptonMom " << i << " is ("
-      //             << leptonMom->at(i).X() << ", "
-      //             << leptonMom->at(i).Y() << ", "
-      //             << leptonMom->at(i).Z() << ")\n";
-      // }
+
       TVector3 lepDir(1,1,1);
       CalcLepton(lepDir);
-      // if (isCC){
-      //   if (leptonMom->size() != 0){
-      //     lepDir.SetX(leptonMom->front().X());
-      //     lepDir.SetY(leptonMom->front().Y()); 
-      //     lepDir.SetZ(leptonMom->front().Z());
-      //   }
-      //   else
-      //     CalcLepton(lepDir);
-      // }
+
 
 
       beamSpot -> Fill(vertex->X(),vertex->Y(),fluxweight);
@@ -677,10 +698,14 @@ void lar1::Reprocessing::Loop(std::string signal,
                                   p2PhotonConversionPos,  p2PhotonConversionMom,
                                   miscPhotonConversionPos,miscPhotonConversionMom);
 
+      vertexEnergy = 1000*utils.VertexEnergy( GeniePDG, GenieMomentum );
+
+
       if ( verbose )
         std::cout << "total secondary photon energy: " 
                   << photon_energy << " GeV" << std::endl;
       
+
 
 
 
@@ -697,7 +722,6 @@ void lar1::Reprocessing::Loop(std::string signal,
       int neutralPion = 0;
       double protonMass = 0.9382; // GeV
       // double pionMass = 0.1395; // GeV
-      std::vector<double> protonP (0,0);
 
       if (verbose){
         std::cout << "Genie vector sizes: \n"
@@ -736,7 +760,14 @@ void lar1::Reprocessing::Loop(std::string signal,
         if (GeniePDG->at(i) == 2112){ //neutrons
           neutron ++;
         }
+        if (abs(GeniePDG->at(i)) == 311 ){
+          NChargedKaon ++;
+        }
+        if (GeniePDG->at(i) == 310 || GeniePDG->at(i) == 130){
+          NNeutralKaon ++;
+        }
       }
+
 
        //Now set the channel:
       if (isCC) iChan = 1000;
@@ -778,22 +809,6 @@ void lar1::Reprocessing::Loop(std::string signal,
           N_continue_foundPhotons++;
           continue;
         }
-        // if (NPi0FinalState > NPi0) {
-        //   N_continue_Pi0mismatch++;
-        //   continue;
-        // }
-        // if (p1PhotonConversionPos -> size() != NPi0FinalState){
-        //   std::cout << "p1PhotonConversionPos -> size(): "<< p1PhotonConversionPos -> size() << "\n"
-        //             << "NPi0 :" << NPi0 << "\n"
-        //             << "NPi0FinalState : "<< NPi0FinalState << std::endl;
-        // }
-        // //   continue;
-        // if (p2PhotonConversionPos -> size() != NPi0FinalState){
-        //   std::cout << "p2PhotonConversionPos -> size(): "<< p2PhotonConversionPos -> size() << "\n"
-        //             << "NPi0 :" << NPi0 << "\n"
-        //             << "NPi0FinalState : "<< NPi0FinalState << std::endl;
-        // }
-        // //   continue;
 
         // Loop over the final state pi0 and get the conversion info of the photons
         for( int i = 0; i < NPi0FinalState; ++i ){
@@ -824,7 +839,7 @@ void lar1::Reprocessing::Loop(std::string signal,
 
           TVector3 photon2Pos( p2PhotonConversionPos->at(i).Vect() );
           TVector3 photon2Mom( p2PhotonConversionMom->at(i).Vect() );
-          
+            
           TVector3 dist2 = photon2Pos - (*vertex);
 
           if ( verbose ) {
@@ -852,6 +867,7 @@ void lar1::Reprocessing::Loop(std::string signal,
             photonConvDist = dist1.Mag();
             photonPos = photon1Pos;
             photonMom = photon1Mom;
+            showerGap = dist1.Mag();
             nfound ++;
           }
           if(   utils.IsFiducial( iDet, photon2Pos ) 
@@ -864,6 +880,7 @@ void lar1::Reprocessing::Loop(std::string signal,
             photonConvDist = dist2.Mag();
             photonPos = photon2Pos;
             photonMom = photon2Mom;
+            showerGap = dist2.Mag();
             nfound++;
           }
               
@@ -876,17 +893,14 @@ void lar1::Reprocessing::Loop(std::string signal,
       }
       iTop += totalGammas;
 
+
       // Loop over any misc gammas and get them too
-      if (NGamma > 0){
+      if (NGamma > 0 && signal != "fosc" && signal != "numi"){
         for (int i_gamma = 0; i_gamma < NGamma; i_gamma ++){
 
           // Find the position and distance from the vertex for photon conversion:
-          TVector3 photon1Pos( miscPhotonConversionPos->at(i_gamma).X(), 
-                               miscPhotonConversionPos->at(i_gamma).Y(), 
-                               miscPhotonConversionPos->at(i_gamma).Z() );
-          TVector3 photon1Mom( miscPhotonConversionMom->at(i_gamma).X(), 
-                               miscPhotonConversionMom->at(i_gamma).Y(), 
-                               miscPhotonConversionMom->at(i_gamma).Z() );
+          TVector3 photon1Pos( miscPhotonConversionPos->at(i_gamma).Vect() );
+          TVector3 photon1Mom( miscPhotonConversionMom->at(i_gamma).Vect() );
           
           TVector3 dist1 = photon1Pos - (*vertex);
 
@@ -913,9 +927,11 @@ void lar1::Reprocessing::Loop(std::string signal,
             photonConvDist = dist1.Mag();
             photonPos = photon1Pos;
             photonMom = photon1Mom;
+            showerGap = dist1.Mag();
           }
         }
       }
+
 
       //----------------------------------------------
       // Track the muon till it exits the detector:
@@ -927,24 +943,19 @@ void lar1::Reprocessing::Loop(std::string signal,
       MuonExitMom *= 0.0;
       if (signal != "fosc" && signal != "numi" && isCC && abs(inno) == 14)  {
         while ( contained && muonPosIndex < leptonPos->size() ){
-          TVector3 pos( leptonPos->at(muonPosIndex).X(), 
-                        leptonPos->at(muonPosIndex).Y(), 
-                        leptonPos->at(muonPosIndex).Z());
-          contained = utils.IsActive(iDet,pos,5); //fiducial cut at 5cm
+          //fiducial cut at 5cm
+          contained = utils.IsActive(iDet,leptonPos->at(muonPosIndex).Vect(),5);
           muonPosIndex++;
         }
         // Take the data from the previous point.  It's now exiting the detector.
         // Or has stopped!
-        MuonExitPos = TVector3( leptonPos->at(muonPosIndex-1).X(), 
-                                leptonPos->at(muonPosIndex-1).Y(), 
-                                leptonPos->at(muonPosIndex-1).Z());
-        MuonExitMom = TVector3( leptonMom->at(muonPosIndex-1).X(), 
-                                leptonMom->at(muonPosIndex-1).Y(), 
-                                leptonMom->at(muonPosIndex-1).Z());
+        MuonExitPos = TVector3( leptonPos->at(muonPosIndex-1).Vect());
+        MuonExitMom = TVector3( leptonMom->at(muonPosIndex-1).Vect());
       }
 
+
       // Now actually start sorting out events
-      // But do it by the category they are in
+      // But do it by the category they are in (nue, numu, etc)
       
       // Broken up like this I intend to do them all in one pass eventually
 
@@ -961,10 +972,7 @@ void lar1::Reprocessing::Loop(std::string signal,
           enuccqe = utils.NuEnergyCCQE( 1000*electron_cand_energy, 
                     sqrt(pow(1000*electron_cand_energy,2) - pow(0.511,2)), 
                     electron_cand_angle, 0.511, iflux )/1000.0;
-          // Repackage the energy of the particles to get the reco energy
-          // std::vector<Double_t> * genieE = new std::vector<Double_t>;
-          // genieE->reserve(GenieMomentum->size());
-          // for (auto & vec : *GenieMomentum) genieE->push_back(vec.E());
+
           enucalo1 = utils.NuEnergyCalo(GeniePDG, GenieMomentum, true, true );
           enucalo2 = utils.NuEnergyCalo(GeniePDG, GenieMomentum, 
                                         false, false, prot_thresh)
@@ -994,9 +1002,9 @@ void lar1::Reprocessing::Loop(std::string signal,
             nueFromMuonDecayCalo->Fill( enucalo2, wgt );
             if( enucalo2 > 0.2 && enucalo2 < 0.475 ) NnueFromMuonDecay_LE += wgt;
           }
-          ElectContainedDist = utils.GetContainedLength(*vertex, lepDir, iDet);
-          ElectDistToStart   = utils.GetLengthToStart(  *vertex, lepDir, iDet);
-          ElectDistToStartYZ = utils.GetYZLengthToStart(*vertex, lepDir, iDet);
+          ShowerContainedDistance = utils.GetContainedLength(*vertex, lepDir, iDet);
+          ShowerDistanceToStart   = utils.GetLengthToStart(  *vertex, lepDir, iDet);
+          ShowerDistanceToStartYZ = utils.GetYZLengthToStart(*vertex, lepDir, iDet);
 
           if (wgt != 0.0){
             if (verbose){
@@ -1022,9 +1030,9 @@ void lar1::Reprocessing::Loop(std::string signal,
           if (leptonMom->at(0).E() < egammaThreshold ){
             continue;
           }
-          ElectContainedDist = utils.GetContainedLength(*vertex, lepDir, iDet);
-          ElectDistToStart   = utils.GetLengthToStart(  *vertex, lepDir, iDet);
-          ElectDistToStartYZ = utils.GetYZLengthToStart(*vertex, lepDir, iDet);
+          ShowerContainedDistance = utils.GetContainedLength(*vertex, lepDir, iDet);
+          ShowerDistanceToStart   = utils.GetLengthToStart(  *vertex, lepDir, iDet);
+          ShowerDistanceToStartYZ = utils.GetYZLengthToStart(*vertex, lepDir, iDet);
 
           ibkg = 7;
           efficiency = muonCCMisID;
@@ -1032,10 +1040,7 @@ void lar1::Reprocessing::Loop(std::string signal,
           
           electron_cand_energy = leptonMom->at(0).E();
           electron_cand_angle = ThetaLep;
-          // Repackage the energy of the particles to get the reco energy
-          // std::vector<Double_t> * genieE = new std::vector<Double_t>;
-          // genieE->reserve(GenieMomentum->size());
-          // for (auto & vec : *GenieMomentum) genieE->push_back(vec.E());
+
 
           enuccqe = utils.NuEnergyCCQE( 1000*electron_cand_energy, 
                                         sqrt(pow(1000*electron_cand_energy,2) 
@@ -1063,16 +1068,13 @@ void lar1::Reprocessing::Loop(std::string signal,
 
 
 
-          ElectContainedDist = utils.GetContainedLength(photonPos, photonMom, iDet);
-          ElectDistToStart   = utils.GetLengthToStart(  photonPos, photonMom, iDet);
-          ElectDistToStartYZ = utils.GetYZLengthToStart(photonPos, photonMom, iDet);
+          ShowerContainedDistance = utils.GetContainedLength(photonPos, photonMom, iDet);
+          ShowerDistanceToStart   = utils.GetLengthToStart(  photonPos, photonMom, iDet);
+          ShowerDistanceToStartYZ = utils.GetYZLengthToStart(photonPos, photonMom, iDet);
           electron_cand_energy = photonE;
           electron_cand_angle = photonTheta;
           
-          // Repackage the energy of the particles to get the reco energy
-          // std::vector<Double_t> * genieE = new std::vector<Double_t>;
-          // genieE->reserve(GenieMomentum->size());
-          // for (auto & vec : *GenieMomentum) genieE->push_back(vec.E());
+
 
           enuccqe = utils.NuEnergyCCQE( 1000*electron_cand_energy, 
                                         sqrt(pow(1000*electron_cand_energy,2) 
@@ -1083,7 +1085,6 @@ void lar1::Reprocessing::Loop(std::string signal,
                                          prot_thresh ) + photon_energy;
           Elep = electron_cand_energy;
 
-          double vertexEnergy = 1000*utils.VertexEnergy( GeniePDG, GenieMomentum );
 
           // In principle, can reject photons with a gap.
           // So, reject photons with vertex energy above the cut
@@ -1119,7 +1120,11 @@ void lar1::Reprocessing::Loop(std::string signal,
           }
           else if (NGamma > 0){
             ibkg = 6;
-
+            
+            singlePhotonNC -> Fill(enugen, wgt);
+            singlePhotonNCPhoE -> Fill(photonE, wgt);
+            singlePhotonNCCalo -> Fill(enucalo2, wgt);
+            singlePhotonNCCCQE -> Fill(enuccqe, wgt);
             NCsinglePhoton += wgt;
             if( enucalo2 > 0.2 && enucalo2 < 0.475 ) NsinglePhotonNC_LE += wgt;
           }
@@ -1157,10 +1162,7 @@ void lar1::Reprocessing::Loop(std::string signal,
                                         sqrt(pow(1000*electron_cand_energy,2) 
                                         - pow(0.511,2)), 
                                         electron_cand_angle, 0.511, iflux )/1000.0;
-          // Repackage the energy of the particles to get the reco energy
-          // std::vector<Double_t> * genieE = new std::vector<Double_t>;
-          // genieE->reserve(GenieMomentum->size());
-          // for (auto & vec : *GenieMomentum) genieE->push_back(vec.E());
+
           enucalo1 = utils.NuEnergyCalo( GeniePDG, GenieMomentum, true, true );
           enucalo2 = utils.NuEnergyCalo( GeniePDG, GenieMomentum, false, false, 
                                          prot_thresh ) + photon_energy;
@@ -1172,17 +1174,17 @@ void lar1::Reprocessing::Loop(std::string signal,
           if( enucalo2 > 0.2 && enucalo2 < 0.475 ) 
             NnumuElec_LE += wgt;
 
-          ElectContainedDist = utils.GetContainedLength(*vertex, lepDir, iDet);
-          ElectDistToStart   = utils.GetLengthToStart(  *vertex, lepDir, iDet);
-          ElectDistToStartYZ = utils.GetYZLengthToStart(*vertex, lepDir, iDet);
+          ShowerContainedDistance = utils.GetContainedLength(*vertex, lepDir, iDet);
+          ShowerDistanceToStart   = utils.GetLengthToStart(  *vertex, lepDir, iDet);
+          ShowerDistanceToStartYZ = utils.GetYZLengthToStart(*vertex, lepDir, iDet);
 
         } 
 
 
         if (wgt != 0.0){
           elecAngleVsEnergy      -> Fill( Elep, ThetaLep, wgt);
-          ElectDistToStartHist   -> Fill( ElectDistToStart,wgt);
-          ElectDistToStartYZHist -> Fill( ElectDistToStartYZ,wgt);
+          ElectDistToStartHist   -> Fill( ShowerDistanceToStart,wgt);
+          ElectDistToStartYZHist -> Fill( ShowerDistanceToStartYZ,wgt);
           CcqeVsTrueE            -> Fill( enugen, enuccqe, wgt );
           Calo1VsTrueE           -> Fill( enugen, enucalo1, wgt );
           Calo2VsTrueE           -> Fill( enugen, enucalo2, wgt );
@@ -1191,6 +1193,7 @@ void lar1::Reprocessing::Loop(std::string signal,
         }
 
       } // end of signal == nue
+
 
       if (signal == "numu"){
 
@@ -1227,13 +1230,144 @@ void lar1::Reprocessing::Loop(std::string signal,
       }
 
       if (signal == "phot"){
-        // blank for now
+        if (!isCC && totalGammas == 1 && photonE > egammaThreshold){
+
+          ShowerContainedDistance = utils.GetContainedLength(photonPos, photonMom, iDet);
+          ShowerDistanceToStart   = utils.GetLengthToStart(  photonPos, photonMom, iDet);
+          ShowerDistanceToStartYZ = utils.GetYZLengthToStart(photonPos, photonMom, iDet);
+          electron_cand_energy = photonE;
+          electron_cand_angle = photonTheta;
+
+          Elep = electron_cand_energy;
+
+
+          // In principle, can reject photons with a gap.
+          // So, reject photons with vertex energy above the cut
+          // AND a gap longer than the cut
+          if ( photonConvDist > convDistCut && vertexEnergy > vtxEcut){
+            std::cout << "Continuing because of cuts.....\n\n\n";
+            std::cout << "  photonConvDist is " << photonConvDist << "\n"
+                      << "  vertexEnergy is " << vertexEnergy << "\n";
+            continue;
+
+          }
+
+          efficiency = electronIDeff;
+          wgt = fluxweight*efficiency;
+
+          if(NPi0FinalState > 0 ){
+            ibkg = 5;
+            if (isFid){
+              NCpizeroVtxKE->Fill( vertexEnergy, wgt );
+              NCpizeroConvD->Fill( photonConvDist, wgt );
+              NCpizeroVtxKEConvD->Fill( vertexEnergy, photonConvDist, wgt );
+              if( enucalo2 > 0.2 && enucalo2 < 0.475 )   // analyze LE region
+                NsinglePhotonPi0_LE += wgt;
+              ncpi0bkgV->Fill( vertex->X(), vertex->Y(), vertex->Z(), wgt );
+              ncpi0bkgX->Fill( vertex->X(), wgt );
+              ncpi0bkgY->Fill( vertex->Y(), wgt );
+              ncpi0bkgZ->Fill( vertex->Z(), wgt );
+              singlePhotonPi0->Fill( enugen, wgt ); 
+              singlePhotonPi0PhoE->Fill( photonE, wgt );
+            }
+          }
+          else if (NGamma > 0){
+            singlePhotonNC -> Fill(enugen, wgt);
+            singlePhotonNCPhoE -> Fill(photonE, wgt);
+          }
+
+          photonConv->Fill( photonPos.X(), photonPos.Y(), photonPos.Z() );
+          photonConvX->Fill( photonPos.X() );
+          photonConvY->Fill( photonPos.Y() );
+          photonConvZ->Fill( photonPos.Z() );
+          photonCCQE->Fill( enuccqe, photonE, wgt );
+
+          // NCsinglePhoton += wgt;
+          // singlePhotonE.push_back( photonE );
+          // singlePhotonTheta.push_back( photonTheta );
+        }        
       }
 
       if (signal == "numi")
       {
-        // blank for now
+        if (isCC && abs(inno) == 12 && isFid && Elep > egammaThreshold){
+          efficiency = electronIDeff;
+          wgt = fluxweight*efficiency;
+          electron_cand_energy = Elep;
+          electron_cand_angle = ThetaLep;
+          enuccqe = utils.NuEnergyCCQE( 1000*electron_cand_energy, 
+                    sqrt(pow(1000*electron_cand_energy,2) - pow(0.511,2)), 
+                    electron_cand_angle, 0.511, iflux )/1000.0;
+
+          enucalo1 = utils.NuEnergyCalo(GeniePDG, GenieMomentum, true, true );
+          enucalo2 = utils.NuEnergyCalo(GeniePDG, GenieMomentum, 
+                                        false, false, prot_thresh)
+                                      + photon_energy;
+
+          if (ndecay < 5 && ndecay > 0){  // K0
+            ibkg = 3;
+            nueFromK0Decay->Fill( enugen, wgt );
+            nueFromK0DecayLepE->Fill( Elep, wgt );
+            nueFromK0DecayCCQE->Fill( enuccqe, wgt );
+            nueFromK0DecayCalo->Fill( enucalo2, wgt );
+            if( enucalo2 > 0.2 && enucalo2 < 0.475 ) NnueFromK0Decay_LE += wgt;
+          }
+          else if (ndecay > 4 && ndecay < 11){  // K+
+            ibkg = 2;
+            nueFromKPlusDecay->Fill( enugen, wgt );
+            nueFromKPlusDecayLepE->Fill( Elep, wgt );
+            nueFromKPlusDecayCCQE->Fill( enuccqe, wgt );
+            nueFromKPlusDecayCalo->Fill( enucalo2, wgt );
+            if( enucalo2 > 0.2 && enucalo2 < 0.475 ) NnueFromKPlusDecay_LE += wgt;
+          }
+          else if (ndecay == 11 || ndecay == 12){  // mu
+            ibkg = 1;
+            nueFromMuonDecay->Fill( enugen, wgt ); 
+            nueFromMuonDecayLepE->Fill( Elep, wgt ); 
+            nueFromMuonDecayCCQE->Fill( enuccqe, wgt );
+            nueFromMuonDecayCalo->Fill( enucalo2, wgt );
+            if( enucalo2 > 0.2 && enucalo2 < 0.475 ) NnueFromMuonDecay_LE += wgt;
+          }
+          ShowerContainedDistance = utils.GetContainedLength(*vertex, lepDir, iDet);
+          ShowerDistanceToStart   = utils.GetLengthToStart(  *vertex, lepDir, iDet);
+          ShowerDistanceToStartYZ = utils.GetYZLengthToStart(*vertex, lepDir, iDet);
+        }
+
+        if ( isFid && isCC && abs(inno) == 14 && 
+             Elep > egammaThreshold ){
+
+          efficiency = muonIDeff;
+          wgt = fluxweight*efficiency;
+
+          electron_cand_energy = Elep;
+          electron_cand_angle = ThetaLep;
+
+          enuccqe = utils.NuEnergyCCQE( 1000*electron_cand_energy,
+                                        sqrt(pow(1000*electron_cand_energy,2)
+                                           - pow(105.7,2)),
+                                        electron_cand_angle,
+                                        105.7,
+                                        iflux )/1000.0;
+          enucalo1 = utils.NuEnergyCalo( GeniePDG,
+                                         GenieMomentum,
+                                         true,
+                                         true );
+          enucalo2 = utils.NuEnergyCalo( GeniePDG,
+                                         GenieMomentum,
+                                         false,
+                                         false,
+                                         prot_thresh ) + photon_energy;
+          numuCC->Fill(enugen, wgt);
+          numuCCLepE->Fill( Elep, wgt );
+        }
       }
+        
+      if (wgt != 0){
+        CcqeVsTrueE            -> Fill( enugen, enuccqe, wgt );
+        Calo1VsTrueE           -> Fill( enugen, enucalo1, wgt );
+        Calo2VsTrueE           -> Fill( enugen, enucalo2, wgt );
+        nueTotal               -> Fill( enugen,wgt);
+      }      
 
       newt->Fill();
 

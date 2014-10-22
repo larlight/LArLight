@@ -36,6 +36,7 @@ class Reprocessing {
     Int_t           fCurrent; //!current Tree number in a TChain
 
     // Declaration of leaf types
+    Double_t        POT;
     Int_t           iflux;
     Int_t           nuchan;
     Int_t           inno;
@@ -54,6 +55,7 @@ class Reprocessing {
     Int_t           ptype;
     Int_t           tptype;
     Int_t           ndecay;
+    std::vector<float>   *neutVertexInWindow_temp;
     std::vector<float>   *ParentVertex_temp;
     std::vector<float>   *nuParentMomAtDecay_temp;
     std::vector<float>   *nuParentMomAtProd_temp;
@@ -85,6 +87,7 @@ class Reprocessing {
     TLorentzVector                            * neutMom;
     TVector3                                  * vertex;
     std::vector<TLorentzVector>               * GenieMomentum;
+    TVector3                                  * neutVertexInWindow;
     TVector3                                  * ParentVertex;
     TVector3                                  * nuParentMomAtDecay;
     TVector3                                  * nuParentMomAtProd;
@@ -103,6 +106,7 @@ class Reprocessing {
     std::vector<std::vector<TLorentzVector> > * ChargedPionMom;
 
     // List of branches
+    TBranch        *b_POT;   //!
     TBranch        *b_iflux;   //!
     TBranch        *b_nuchan;   //!
     TBranch        *b_inno;   //!
@@ -121,6 +125,7 @@ class Reprocessing {
     TBranch        *b_ptype;   //!
     TBranch        *b_tptype;   //!
     TBranch        *b_ndecay;   //!
+    TBranch        *b_neutVertexInWindow;   //!
     TBranch        *b_ParentVertex;   //!
     TBranch        *b_nuParentMomAtDecay;   //!
     TBranch        *b_nuParentMomAtProd;   //!
@@ -207,6 +212,7 @@ namespace lar1{
     neutMom                 = new TLorentzVector(0,0,0,0);
     vertex                  = new TVector3(0,0,0);
     GenieMomentum           = new std::vector<TLorentzVector>;
+    neutVertexInWindow      = new TVector3(0,0,0);
     ParentVertex            = new TVector3(0,0,0);
     nuParentMomAtDecay      = new TVector3(0,0,0);
     nuParentMomAtProd       = new TVector3(0,0,0);
@@ -233,6 +239,7 @@ Reprocessing::~Reprocessing()
     delete vertex;
     delete GenieMomentum;
     delete ParentVertex;
+    delete neutVertexInWindow;
     delete nuParentMomAtDecay;
     delete nuParentMomAtProd;
     delete nuParentMomTargetExit;
@@ -286,7 +293,11 @@ Int_t Reprocessing::GetEntry(Long64_t entry)
     for (auto & p : *GenieMomentum_temp){
       GenieMomentum -> push_back(TLorentzVector(p.at(1),p.at(2),p.at(3),p.at(0)));
     }
-
+    // if (neutVertexInWindow_temp != 0)
+    //   neutVertexInWindow          
+    //       -> SetXYZ(  neutVertexInWindow_temp->at(0),
+    //                   neutVertexInWindow_temp->at(1),
+    //                   neutVertexInWindow_temp->at(2));
     ParentVertex          
           -> SetXYZ(  ParentVertex_temp->at(0),
                       ParentVertex_temp->at(1),
@@ -429,6 +440,7 @@ void Reprocessing::Init(TTree *tree)
    GeniePDG = 0;
    GenieMomentum_temp = 0;
    GenieProc = 0;
+   neutVertexInWindow_temp = 0;
    ParentVertex_temp = 0;
    nuParentMomAtDecay_temp = 0;
    nuParentMomAtProd_temp = 0;
@@ -453,6 +465,7 @@ void Reprocessing::Init(TTree *tree)
    fCurrent = -1;
    fChain->SetMakeClass(1);
 
+   fChain->SetBranchAddress("POT", &POT, &b_POT);
    fChain->SetBranchAddress("iflux", &iflux, &b_iflux);
    fChain->SetBranchAddress("nuchan", &nuchan, &b_nuchan);
    fChain->SetBranchAddress("inno", &inno, &b_inno);
@@ -471,6 +484,7 @@ void Reprocessing::Init(TTree *tree)
    fChain->SetBranchAddress("ptype", &ptype, &b_ptype);
    fChain->SetBranchAddress("tptype", &tptype, &b_tptype);
    fChain->SetBranchAddress("ndecay", &ndecay, &b_ndecay);
+   fChain->SetBranchAddress("neutVertexInWindow", &neutVertexInWindow_temp, &b_neutVertexInWindow);
    fChain->SetBranchAddress("ParentVertex", &ParentVertex_temp, &b_ParentVertex);
    fChain->SetBranchAddress("nuParentMomAtDecay", &nuParentMomAtDecay_temp, &b_nuParentMomAtDecay);
    fChain->SetBranchAddress("nuParentMomAtProd", &nuParentMomAtProd_temp, &b_nuParentMomAtProd);
