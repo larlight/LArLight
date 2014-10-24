@@ -3,7 +3,7 @@
   gSystem->Load("liblar1Osc.so");
 
 
-  TString directory = "~/genie_RW/";
+  TString directory = "~/nominal_ntuples/";
 
   //LAr1-ND @ 100 meters
   // lar1::Reprocessing ntuple_100m_nu              (directory + "combined_ntuple_100m_nu.root");           
@@ -29,8 +29,8 @@
   // MicroBooNE @ 470m
   lar1::Reprocessing ntuple_470m_nu              (directory + "combined_ntuple_470m_nu.root");           
   // lar1::Reprocessing ntuple_470m_nu_fosc         (directory + "combined_ntuple_470m_nu_fosc.root");
-  // ntuple_470m_nu.Loop("nue",1,4);
-  ntuple_470m_nu.Loop("numu",1,4);
+  ntuple_470m_nu.Loop("nue",1,4);
+  // ntuple_470m_nu.Loop("numu",1,4);
   // ntuple_470m_nu_fosc.Loop("fosc",1,4);
 
   //T600 @ 600m on axis

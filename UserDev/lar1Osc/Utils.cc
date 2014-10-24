@@ -25,15 +25,15 @@ namespace lar1{
     PotNormNubar  = 10e20;
     PotNormNu     = 6.6e20;
 
-    // fidCut_x = 17.0;
-    // fidCut_y = 17.0;
-    // fidCut_zUp = 5.0;
-    // fidCut_zDown = 100.0;
+    fidCut_x = 25.0;
+    fidCut_y = 25.0;
+    fidCut_zUp = 5.0;
+    fidCut_zDown = 100.0;
 
-    fidCut_x = 17;
-    fidCut_y = 17;
-    fidCut_zUp = 17;
-    fidCut_zDown = 17;
+    // fidCut_x = 17;
+    // fidCut_y = 17;
+    // fidCut_zUp = 17;
+    // fidCut_zDown = 17;
 
     // For reference, the monte carlo for ND spans 7m in x and is centered at 130cm
     // These coordinates try to represent the actual beam center.
@@ -546,14 +546,16 @@ namespace lar1{
   //=================================================================================
   Double_t Utils::VertexEnergy( std::vector<Int_t> *pdg, 
                                 std::vector<TLorentzVector> *momentum, 
+                                bool verbose,
                                 Double_t prot_thresh, 
-                                Double_t pion_thresh, 
-                                bool verbose  ) const{
+                                Double_t pion_thresh,
+                                Double_t kaon_thresh  ) const{
 
-    if ( verbose ) std::cout << "Determining kinetic energy near vertex" << std::endl;
+    if ( verbose ) std::cout << "Determining hadronic kinetic energy near vertex" << std::endl;
 
     Double_t M_p  = .938272;    // GeV/c2
     Double_t M_pi = .139570;    // GeV/c2
+    Double_t M_k = .493667;    // GeV/c2
 
     Double_t total_energy = 0;
     
@@ -566,16 +568,19 @@ namespace lar1{
       //if( abs(pdg->at(i)) == 2112 ) continue;                          // neutrons
       //if( abs(pdg->at(i)) == 111  ) continue;                          // pizeros
      
-      if( abs(pdg->at(i)) == 2212 && momentum->at(i).E()-M_p > prot_thresh ){  // proton threshold
+      if( abs(pdg->at(i)) == 2212 && momentum->at(i).E()-M_p  > prot_thresh ){  // proton threshold
         total_energy += (momentum->at(i).E() - M_p);
       }
       if( abs(pdg->at(i)) == 211  && momentum->at(i).E()-M_pi > pion_thresh ){  // pion threshold
         total_energy += (momentum->at(i).E() - M_pi);
       }
-     
+      if( abs(pdg->at(i)) == 321  && momentum->at(i).E()-M_pi > kaon_thresh ){  // pion threshold
+        total_energy += (momentum->at(i).E() - M_k);
+      }
+
     }
     
-    if ( verbose ) std::cout << " Total Kinetic Energy = " << total_energy << " GeV" << std::endl;
+    if ( verbose ) std::cout << " Total Hadronic Kinetic Energy = " << total_energy << " GeV" << std::endl;
     
     return total_energy;
     
@@ -584,7 +589,7 @@ namespace lar1{
                                 std::vector<Double_t> *energy, 
                                 Double_t prot_thresh, 
                                 Double_t pion_thresh, 
-                                bool verbose  ) const{
+                                bool verbose ) const{
 
     if ( verbose ) std::cout << "Determining kinetic energy near vertex" << std::endl;
 

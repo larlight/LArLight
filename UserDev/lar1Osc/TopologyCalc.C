@@ -3,9 +3,11 @@
 #include <map>
 #include "TChain.h"
 #include "TString.h"
+#include "TSystem.h"
 
 void TopologyCalc(TString target){
 
+  gSystem->Load("liblar1Osc.so");
 
   Int_t nbytes = 0,nb = 0;
   Int_t evtcounter =0;
@@ -27,7 +29,7 @@ void TopologyCalc(TString target){
   bool isFid= false;
   Int_t NPi0;
 
-  bool useMultiWeights = false;
+  bool useMultiWeights = true;
 
 
   c->Reset();

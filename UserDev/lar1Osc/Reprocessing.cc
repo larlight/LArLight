@@ -197,7 +197,6 @@ void lar1::Reprocessing::Loop(std::string signal,
     double enuccqe = 0.0;
     double enucalo1 = 0.0;
     double enucalo2 = 0.0;
-    std::vector<double> ConversionDist;
     bool isFid, isActive;
     double vertexEnergy;
     double showerGap;
@@ -284,7 +283,6 @@ void lar1::Reprocessing::Loop(std::string signal,
     newt->Branch("Eff", &efficiency, "Efficiency/D");                                // Reconstruction efficiency
     newt->Branch("FluxWgt", &fluxweight, "FluxWeight/D");                            // Flux reweight
     newt->Branch("Potweight",&potweight, "Potweight/D");
-    // newt->Branch("ConversionDist", "ConversionDist", &ConversionDist, 32000, 0);     // Photon conversion distance in pizero events
     // newt->Branch("LepPx",&LepPx,"LepPx/D");                                          // lepton kinematics
     // newt->Branch("LepPy",&LepPy,"LepPy/D");
     // newt->Branch("LepPz",&LepPz,"LepPz/D");
@@ -560,7 +558,35 @@ void lar1::Reprocessing::Loop(std::string signal,
     TH1D *ncpi0bkgX              = new TH1D("ncpi0bkgX","ncpi0bkgX;X",50,xmin,xmax);
     TH1D *ncpi0bkgY              = new TH1D("ncpi0bkgY","ncpi0bkgY;Y",50,ymin,ymax);
     TH1D *ncpi0bkgZ              = new TH1D("ncpi0bkgZ","ncpi0bkgZ;Z",50,zmin,zmax);
-    TH2D* singlePhotonNCEnuVsPhotE = new TH2D("singlePhotonNCEnuVsPhotE", "Single photon NC Events;Single Photon Energy;Generated Neutrino Energy (GeV)",100,0,3,100,0,3);
+    TH2D *singlePhotonNCEnuVsPhotE 
+      = new TH2D("singlePhotonNCEnuVsPhotE",
+                 "Single photon NC Events;Single Photon Energy;Generated Neutrino Energy (GeV)"
+                 ,100,0,3,100,0,3);
+
+    TH2D *singlePhotonGapVsVertexE     
+      = new TH2D("singlePhotonGapVsVertexE", 
+        "Single Photon Events;Single Photon Conversion Distance;Vertex Energy (GeV)",
+        100,0,5,100,0,1);
+    TH2D *allPhotonGapVsVertexE     
+      = new TH2D("allPhotonGapVsVertexE", 
+        "All Photon Events;Photon Conversion Distance;Vertex Energy (GeV)",
+        100,0,5,100,0,1);
+    TH2D *vertexEvsGenereratedE  
+      = new TH2D("vertexEvsGenereratedE", 
+        "All Events;Vertex Energy;Generated Neutrino Energy (GeV)",
+        100,0,1,100,0,3);
+    TH2D *vertexEvsGenereratedEPi0  
+      = new TH2D("vertexEvsGenereratedEPi0", 
+        "Single photon NC Events;Vertex Energy;Generated Neutrino Energy (GeV)",
+        100,0,1,100,0,3);
+    TH1D *VertexEnergyPhot       
+      = new TH1D("VertexEnergyPhot",
+                 "Vertex Energy of Single Photons;Vertex Energy (GeV)",
+                 50,0,1);
+    TH1D *ConversionDistPhot       
+      = new TH1D("ConversionDistPhot",
+                 "Conversion Distance of Single Photons;Conversion Distance (cm)",
+                 50,0,50);
 
     TH1D * vertexX               = new TH1D("vertexX","vertexX",100, xmin*1.5,xmax*1.5);
     TH1D * vertexY               = new TH1D("vertexY","vertexY",100, ymin*1.5,ymax*1.5);
@@ -647,7 +673,6 @@ void lar1::Reprocessing::Loop(std::string signal,
       }
 
       // Clear ntuple variables
-      ConversionDist.clear();
       efficiency = 0.0;
       wgt = 0.0;
       electron_cand_energy = 0.0;
@@ -700,8 +725,9 @@ void lar1::Reprocessing::Loop(std::string signal,
                                   miscPhotonConversionPos,miscPhotonConversionMom);
 
       if (utils.IsFiducial( iDet, (*vertex) ,5))
-        vertexEnergy = 1000*utils.VertexEnergy( GeniePDG, GenieMomentum );
-
+        vertexEnergy = utils.VertexEnergy( GeniePDG, GenieMomentum, verbose);
+      else
+        vertexEnergy = -999;
 
       if ( verbose )
         std::cout << "total secondary photon energy: " 
@@ -816,7 +842,7 @@ void lar1::Reprocessing::Loop(std::string signal,
         for( int i = 0; i < NPi0FinalState; ++i ){
         
           if ( verbose ) std::cout << "pizero: " << i << std::endl;
-          if( !isCC ) NCpizero += fluxweight;
+          if( !isCC ) NCpizero ++;
 
 
           // Find the position and distance from the vertex for photon conversion:
@@ -862,7 +888,6 @@ void lar1::Reprocessing::Loop(std::string signal,
           if(   utils.IsFiducial( iDet, photon1Pos )
              && p1PhotonConversionMom->at(i).E() > egammaThreshold )
           { 
-            ConversionDist.push_back( dist1.Mag() ); 
             totalGammas++; 
             photonE = p1PhotonConversionMom->at(i).E() ;
             photonTheta = utils.GetTheta( photon1Mom );
@@ -871,11 +896,11 @@ void lar1::Reprocessing::Loop(std::string signal,
             photonMom = photon1Mom;
             showerGap = dist1.Mag();
             nfound ++;
+            allPhotonGapVsVertexE -> Fill(showerGap,vertexEnergy);
           }
           if(   utils.IsFiducial( iDet, photon2Pos ) 
              && p2PhotonConversionMom->at(i).E() > egammaThreshold )
           {  
-            ConversionDist.push_back( dist2.Mag() );
             totalGammas++;
             photonE = p2PhotonConversionMom->at(i).E(); 
             photonTheta = utils.GetTheta( photon2Mom );
@@ -884,12 +909,13 @@ void lar1::Reprocessing::Loop(std::string signal,
             photonMom = photon2Mom;
             showerGap = dist2.Mag();
             nfound++;
+            allPhotonGapVsVertexE -> Fill(showerGap,vertexEnergy);
           }
               
           if( !isCC ){
-            if( nfound == 2 ) foundBothPhotons+=fluxweight;
-            if( nfound == 1 ) foundOnePhoton+=fluxweight;
-            if( nfound == 0 ) foundNoPhotons+=fluxweight;
+            if( nfound == 2 ) foundBothPhotons++;
+            if( nfound == 1 ) foundOnePhoton++;
+            if( nfound == 0 ) foundNoPhotons++;
           }
         }
       }
@@ -922,7 +948,6 @@ void lar1::Reprocessing::Loop(std::string signal,
           if(   utils.IsFiducial( iDet, photon1Pos )
              && miscPhotonConversionMom->at(i_gamma).E() > egammaThreshold )
           { 
-            ConversionDist.push_back( dist1.Mag() ); 
             totalGammas++; 
             photonE = miscPhotonConversionMom->at(i_gamma).E() ;
             photonTheta = utils.GetTheta( photon1Mom );
@@ -930,12 +955,19 @@ void lar1::Reprocessing::Loop(std::string signal,
             photonPos = photon1Pos;
             photonMom = photon1Mom;
             showerGap = dist1.Mag();
+            allPhotonGapVsVertexE -> Fill(showerGap,vertexEnergy);
           }
         }
       }
-      if(totalGammas == 1 && !isCC)
+      if(totalGammas == 1 && !isCC){
         singlePhotonNCEnuVsPhotE->Fill(photonE,enugen);
+        singlePhotonGapVsVertexE -> Fill(showerGap,vertexEnergy);
+        vertexEvsGenereratedEPi0 -> Fill(vertexEnergy, enugen);
+        VertexEnergyPhot -> Fill(vertexEnergy);
+        ConversionDistPhot -> Fill(showerGap);
+      }
 
+      vertexEvsGenereratedE -> Fill(vertexEnergy, enugen);
 
       //----------------------------------------------
       // Track the muon till it exits the detector:

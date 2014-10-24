@@ -62,7 +62,6 @@ class Reprocessing {
     std::vector<float>   *nuParentMomTargetExit_temp;
     std::vector<std::vector<float> > *leptonPos_temp;
     std::vector<std::vector<float> > *leptonMom_temp;
-    Int_t           NPi0;
     Int_t           NPi0FinalState;
     Int_t           NGamma;
     Char_t          FoundPhotons;
@@ -132,7 +131,6 @@ class Reprocessing {
     TBranch        *b_nuParentMomTargetExit;   //!
     TBranch        *b_leptonPos;   //!
     TBranch        *b_leptonMom;   //!
-    TBranch        *b_NPi0;   //!
     TBranch        *b_NPi0FinalState;   //!
     TBranch        *b_NGamma;   //!
     TBranch        *b_FoundAllPhotons;   //!
@@ -159,7 +157,7 @@ class Reprocessing {
                            int iDet = 1,
                            int iLoc = 4,
                            Long64_t max_entry = -1,
-                           bool skipMultiWeights = false,
+                           bool skipMultiWeights = true,
                            bool verbose = false, 
                            double scale = 1);
     virtual Bool_t   Notify();
@@ -491,7 +489,6 @@ void Reprocessing::Init(TTree *tree)
    fChain->SetBranchAddress("nuParentMomTargetExit", &nuParentMomTargetExit_temp, &b_nuParentMomTargetExit);
    fChain->SetBranchAddress("leptonPos", &leptonPos_temp, &b_leptonPos);
    fChain->SetBranchAddress("leptonMom", &leptonMom_temp, &b_leptonMom);
-   fChain->SetBranchAddress("NPi0", &NPi0, &b_NPi0);
    fChain->SetBranchAddress("NPi0FinalState", &NPi0FinalState, &b_NPi0FinalState);
    fChain->SetBranchAddress("NGamma", &NGamma, &b_NGamma);
    fChain->SetBranchAddress("FoundPhotons", &FoundPhotons, &b_FoundAllPhotons);

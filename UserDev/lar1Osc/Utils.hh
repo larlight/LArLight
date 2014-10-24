@@ -54,8 +54,8 @@ namespace lar1{
                            Double_t prot_thresh = 0.0, Double_t pion_thresh = 0.0, 
                            bool verbose = false ) const;    
     Double_t VertexEnergy( std::vector<Int_t> *pdg, std::vector<TLorentzVector> *energy, 
-                           Double_t prot_thresh = 0.0, Double_t pion_thresh = 0.0, 
-                           bool verbose = false ) const;
+                           bool verbose = false, Double_t prot_thresh = 0.0, 
+                           Double_t pion_thresh = 0.0, Double_t kaon_threshold = 0.0) const;
 
     Double_t TotalPhotonEnergy( Int_t idet, 
                                 std::vector<gan::LorentzVectorLight> *p1pos,
