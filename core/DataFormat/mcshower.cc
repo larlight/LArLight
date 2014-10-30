@@ -94,8 +94,8 @@ namespace larlight {
   void mcshower::SetEdepVtx(const std::vector<std::vector<Float_t> >& vtx)
   {
 
-    for(auto const point : vtx) {
-      if(point.size()!=4) {
+    for(size_t i=0; i<vtx.size(); ++i) {
+      if(vtx[i].size()!=4) {
 	Message::get()->send(MSG::ERROR,__FUNCTION__,"Input must have 4 dimension (x,y,z,E)!");
 	return;
       }     
