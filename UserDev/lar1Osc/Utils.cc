@@ -10,6 +10,7 @@
 namespace lar1{
   Utils::Utils(){
     mc_generation = 5;
+    randService.SetSeed(time(0));
     reconfigure();
   }
 
@@ -25,10 +26,15 @@ namespace lar1{
     PotNormNubar  = 10e20;
     PotNormNu     = 6.6e20;
 
-    fidCut_x = 25.0;
-    fidCut_y = 25.0;
-    fidCut_zUp = 5.0;
-    fidCut_zDown = 100.0;
+    nue_fidCut_x = 25.0;
+    nue_fidCut_y = 25.0;
+    nue_fidCut_zUp = 5.0;
+    nue_fidCut_zDown = 100.0;
+
+    numu_fidCut_x = 15.0;
+    numu_fidCut_y = 15.0;
+    numu_fidCut_zUp = 15.0;
+    numu_fidCut_zDown = 80.0;
 
     // fidCut_x = 17;
     // fidCut_y = 17;
@@ -107,22 +113,7 @@ namespace lar1{
   Utils::~Utils(){
   }
 
-  void Utils::ScaleFarDet(double scaleFactor){
 
-    fd_xmin *= scaleFactor;
-    fd_xmax *= scaleFactor;
-    fd_ymin *= scaleFactor;
-    fd_ymax *= scaleFactor;
-    // zmin is always zero
-    fd_zmax *= scaleFactor;
-
-    std::cout << "X: " << (fd_xmax - fd_xmin) << std::endl;
-    std::cout << "Y: " << (fd_ymax - fd_ymin) << std::endl;
-    std::cout << "Z: " << (fd_zmax - fd_zmin) << std::endl;
-
-
-    return;
-  }
 
   Double_t Utils::GetPOTNormNuMI( Int_t iflux, Int_t iLoc) const{
 
@@ -432,8 +423,9 @@ namespace lar1{
   //=================================================================================
   // CCQE neutrino energy
   //=================================================================================
-  Double_t Utils::NuEnergyCCQE( Double_t l_energy, Double_t l_p, Double_t l_theta,
-                                Double_t mass, Int_t mode, bool verbose ) const{
+  Double_t Utils::NuEnergyCCQE( Double_t lep_energy, Double_t lep_p, Double_t lep_theta,
+                                Double_t mass, Int_t mode, bool verbose ) const
+  {
     
     Double_t M_n = 939.565;    // MeV/c2
     Double_t M_p = 938.272;    // MeV/c2
@@ -441,22 +433,22 @@ namespace lar1{
 
     if ( verbose ) std::cout << "NuEnergyCCQE w/ binding E = " << bindingE << " and mass = " << mass << std::endl;
     if ( verbose ) std::cout << "flux mode = " << mode << std::endl;
-    if ( verbose ) std::cout << "l_energy = " << l_energy << "; l_p = " << l_p << "; l_theta = " << l_theta << std::endl;
+    if ( verbose ) std::cout << "lep_energy = " << lep_energy << "; lep_p = " << lep_p << "; lep_theta = " << lep_theta << std::endl;
     
     Double_t nu_energy = -1000;
     
     if( mode == 0 || mode == 1 ) {
       Double_t nu_energy_num = pow(M_n,2) - pow(M_p - bindingE,2)
-        - pow(mass,2) + 2.0*(M_p - bindingE)*l_energy;
-      Double_t nu_energy_den = 2.0*(M_p - bindingE - l_energy + l_p*cos(l_theta));
+        - pow(mass,2) + 2.0*(M_p - bindingE)*lep_energy;
+      Double_t nu_energy_den = 2.0*(M_p - bindingE - lep_energy + lep_p*cos(lep_theta));
       if ( verbose ) std::cout << " Nu E numerator   = " << nu_energy_num << std::endl;
       if ( verbose )std::cout << " Nu E denominator = " << nu_energy_den << std::endl;
       if( nu_energy_den ) nu_energy = nu_energy_num / nu_energy_den;
    
     } else if ( mode == 2 || mode == 3 ) {
       Double_t nu_energy_num = pow(M_p,2) - pow(M_n - bindingE,2)
-        - pow(mass,2) + 2.0*(M_n - bindingE)*l_energy;
-      Double_t nu_energy_den = 2.0*(M_n - bindingE - l_energy + l_p*cos(l_theta));
+        - pow(mass,2) + 2.0*(M_n - bindingE)*lep_energy;
+      Double_t nu_energy_den = 2.0*(M_n - bindingE - lep_energy + lep_p*cos(lep_theta));
       if ( verbose ) std::cout << " Nu E numerator   = " << nu_energy_num << std::endl;
       if ( verbose ) std::cout << " Nu E denominator = " << nu_energy_den << std::endl;
       if( nu_energy_den ) nu_energy = nu_energy_num / nu_energy_den;
@@ -470,68 +462,50 @@ namespace lar1{
   }
 
 
-  //=================================================================================
-  // Calorimetric energy reconstruction
-  //=================================================================================
-  Double_t Utils::NuEnergyCalo(std::vector<Int_t> *pdg, std::vector<Double_t> *energy,
+
+  Double_t Utils::NuEnergyCalo(std::vector<Int_t> *pdg, 
+                               std::vector<TLorentzVector> *momentum,
+                               double lepEnergy,
+                               bool smearing,
                                Bool_t include_neutrons, Bool_t include_pizeros,
-                               Double_t prot_thresh, bool verbose ) const{
+                               Double_t prot_thresh, Double_t pion_thresh, 
+                               Double_t kaon_thresh,
+                               bool verbose ) 
+  {
 
     if ( verbose ) std::cout << "Determining calorimetric energy" << std::endl;
 
     Double_t M_n = .939565;    // GeV/c2
-    Double_t M_p = .938272;    // GeV/c2
 
-    Double_t total_energy = 0;
+    // Take the lepton energy
+    Double_t total_energy = lepEnergy;
 
-    for( unsigned int i = 0; i < pdg->size(); ++i ){
-     
-      //std::cout << " part: " << pdg->at(i) << ", energy: " << energy->at(i) << std::endl;
+    // Add in any charged vertex activity
+    // total_energy += VertexEnergy(pdg, momentum, smearing, 
+    //                              prot_thresh, pion_thresh,kaon_thresh,
+    //                              verbose);
 
-      if( abs(pdg->at(i)) > 5000 ) continue;                           // ignore nuclear fragments
-      if( abs(pdg->at(i)) == 12 || abs(pdg->at(i)) == 14 ) continue;   // ignore neutrinos
-
-      if( !include_neutrons && abs(pdg->at(i)) == 2112 ) continue;                // neutrons
-      if( !include_pizeros  && abs(pdg->at(i)) == 111  ) continue;                // pizeros
-      if( abs(pdg->at(i)) == 2212 && energy->at(i)-M_p < prot_thresh ) continue;  // proton threshold
-
-      total_energy += energy->at(i);
-
-      if( abs(pdg->at(i)) == 2212 ) total_energy -= M_p;
-      if( abs(pdg->at(i)) == 2112 ) total_energy -= M_n;
-    }
-
-    if ( verbose ) std::cout << " Total Energy = " << total_energy << " GeV" << std::endl;
-    
-    return total_energy;
-    
-  }
-  Double_t Utils::NuEnergyCalo(std::vector<Int_t> *pdg, std::vector<TLorentzVector> *momentum,
-                               Bool_t include_neutrons, Bool_t include_pizeros,
-                               Double_t prot_thresh, bool verbose ) const{
-
-    if ( verbose ) std::cout << "Determining calorimetric energy" << std::endl;
-
-    Double_t M_n = .939565;    // GeV/c2
-    Double_t M_p = .938272;    // GeV/c2
-
-    Double_t total_energy = 0;
-
+    // Now, if we want to include neutrons or pions, get them:
     for( unsigned int i = 0; i < pdg->size(); ++i ){
      
       //std::cout << " part: " << pdg->at(i) << ", energy: " << momentum->at(i).E() << std::endl;
 
+      // First check if particles are visible and over threshold
+      // Then, assign a smeared energy.
+
       if( abs(pdg->at(i)) > 5000 ) continue;                           // ignore nuclear fragments
       if( abs(pdg->at(i)) == 12 || abs(pdg->at(i)) == 14 ) continue;   // ignore neutrinos
+      if( abs(pdg->at(i)) == 11 || abs(pdg->at(i)) == 13 ) continue;   // ignore leptons
 
       if( !include_neutrons && abs(pdg->at(i)) == 2112 ) continue;                // neutrons
       if( !include_pizeros  && abs(pdg->at(i)) == 111  ) continue;                // pizeros
-      if( abs(pdg->at(i)) == 2212 && momentum->at(i).E()-M_p < prot_thresh ) continue;  // proton threshold
+      if( abs(pdg->at(i)) == 2212 ) continue;  // skip protons because they're accounted for
+      if( abs(pdg->at(i)) == 211 ) continue;  // skip pions because they're accounted for
+      if( abs(pdg->at(i)) == 321 ) continue;  // skip kaons because they're accounted for
 
       total_energy += momentum->at(i).E();
+      if (abs(pdg->at(i)) == 2112) total_energy -= M_n;
 
-      if( abs(pdg->at(i)) == 2212 ) total_energy -= M_p;
-      if( abs(pdg->at(i)) == 2112 ) total_energy -= M_n;
     }
 
     if ( verbose ) std::cout << " Total Energy = " << total_energy << " GeV" << std::endl;
@@ -540,25 +514,56 @@ namespace lar1{
     
   }
 
+  Double_t Utils::GetLeptonEnergy(Double_t energy,
+                                  bool smearing,
+                                  int PDG, bool contained,
+                                  double containedLength) 
+  {
+    double res;
+
+    if (abs(PDG) == 13 ){ // muon
+      if (contained){
+        res = 0.02;
+        // std::cout << "  Resolution is: " << res << std::endl;
+        return randService.Gaus(energy, res*energy);
+      }
+      else{
+        res = -0.102*log(0.000612*containedLength);
+        // std::cout << "  Resolution is: " << res << std::endl;
+        return randService.Gaus(energy, 5*res*energy);
+      }
+    }
+    else if (abs(PDG) == 11){ // electron
+      // electrons have 15%sqrt(e/1Gev) resolution.  Maybe.
+      res = 0.15 / sqrt(energy);
+      // std::cout << "  Resolution is: " << res << std::endl;
+      return randService.Gaus(energy, res*energy);
+    }
+    else
+      return 0.0;
+  }
 
   //=================================================================================
   // Get the visible energy near the interaction vertex
   //=================================================================================
   Double_t Utils::VertexEnergy( std::vector<Int_t> *pdg, 
-                                std::vector<TLorentzVector> *momentum, 
-                                bool verbose,
+                                std::vector<TLorentzVector> *momentum,
+                                bool smearing,
                                 Double_t prot_thresh, 
                                 Double_t pion_thresh,
-                                Double_t kaon_thresh  ) const{
+                                Double_t kaon_thresh,
+                                bool verbose  ) {
 
     if ( verbose ) std::cout << "Determining hadronic kinetic energy near vertex" << std::endl;
 
     Double_t M_p  = .938272;    // GeV/c2
     Double_t M_pi = .139570;    // GeV/c2
     Double_t M_k = .493667;    // GeV/c2
+    // Double_t M_n = .939565;    // GeV/c2
 
     Double_t total_energy = 0;
-    
+    Double_t HadronicResolution = 0.05;
+    if (!smearing) HadronicResolution = 0.00;
     for( unsigned int i = 0; i < pdg->size(); ++i ){
      
       if ( verbose ) std::cout << " part: " << pdg->at(i) << ", energy: " << momentum->at(i).E() << std::endl;
@@ -569,13 +574,19 @@ namespace lar1{
       //if( abs(pdg->at(i)) == 111  ) continue;                          // pizeros
      
       if( abs(pdg->at(i)) == 2212 && momentum->at(i).E()-M_p  > prot_thresh ){  // proton threshold
-        total_energy += (momentum->at(i).E() - M_p);
+        total_energy 
+          += randService.Gaus(momentum->at(i).E() - M_p, 
+                              HadronicResolution*(momentum->at(i).E() - M_p));
       }
       if( abs(pdg->at(i)) == 211  && momentum->at(i).E()-M_pi > pion_thresh ){  // pion threshold
-        total_energy += (momentum->at(i).E() - M_pi);
+        total_energy 
+          += randService.Gaus(momentum->at(i).E() - M_pi, 
+                              HadronicResolution*(momentum->at(i).E() ));      
       }
-      if( abs(pdg->at(i)) == 321  && momentum->at(i).E()-M_pi > kaon_thresh ){  // pion threshold
-        total_energy += (momentum->at(i).E() - M_k);
+      if( abs(pdg->at(i)) == 321  && momentum->at(i).E()-M_k > kaon_thresh ){  // pion threshold
+        total_energy 
+          += randService.Gaus(momentum->at(i).E(), 
+                              HadronicResolution*(momentum->at(i).E() ));
       }
 
     }
@@ -585,78 +596,7 @@ namespace lar1{
     return total_energy;
     
   }
-  Double_t Utils::VertexEnergy( std::vector<Int_t> *pdg, 
-                                std::vector<Double_t> *energy, 
-                                Double_t prot_thresh, 
-                                Double_t pion_thresh, 
-                                bool verbose ) const{
 
-    if ( verbose ) std::cout << "Determining kinetic energy near vertex" << std::endl;
-
-    Double_t M_p  = .938272;    // GeV/c2
-    Double_t M_pi = .139570;    // GeV/c2
-
-    Double_t total_energy = 0;
-    
-    for( unsigned int i = 0; i < pdg->size(); ++i ){
-     
-      if ( verbose ) std::cout << " part: " << pdg->at(i) << ", energy: " << energy->at(i) << std::endl;
-      
-      //if( abs(pdg->at(i)) > 5000 ) continue;                           // ignore nuclear fragments
-      //if( abs(pdg->at(i)) == 12 || abs(pdg->at(i)) == 14 ) continue;   // ignore neutrinos
-      //if( abs(pdg->at(i)) == 2112 ) continue;                          // neutrons
-      //if( abs(pdg->at(i)) == 111  ) continue;                          // pizeros
-     
-      if( abs(pdg->at(i)) == 2212 && energy->at(i)-M_p > prot_thresh ){  // proton threshold
-        total_energy += (energy->at(i) - M_p);
-      }
-      if( abs(pdg->at(i)) == 211  && energy->at(i)-M_pi > pion_thresh ){  // pion threshold
-        total_energy += (energy->at(i) - M_pi);
-      }
-     
-    }
-    
-    if ( verbose ) std::cout << " Total Kinetic Energy = " << total_energy << " GeV" << std::endl;
-    
-    return total_energy;
-    
-  }
-
-
-  //=========================================================================================
-  // Get total photon energies in fiducial volume
-  //=========================================================================================
-  Double_t Utils::TotalPhotonEnergy(Int_t idet, 
-                                    std::vector<gan::LorentzVectorLight> *p1pos,
-                                    std::vector<gan::LorentzVectorLight> *p1mom,
-                                    std::vector<gan::LorentzVectorLight> *p2pos,
-                                    std::vector<gan::LorentzVectorLight> *p2mom ) const{
-    
-    if( p1pos->size() != p1mom->size() || p2pos->size() != p2mom->size() ){
-      std::cout << "photon vectors don't match!!" << std::endl;
-      exit(1);
-    }
-    
-    Double_t energy = 0.0;
-
-    for( unsigned int i = 0; i < p1pos->size(); i++ ){
-
-      TVector3 photon1Pos((*p1pos).at(i).X(), (*p1pos).at(i).Y(), (*p1pos).at(i).Z() );
-      if( IsFiducial( idet, photon1Pos ) )
-        energy += p1mom->at(i).E();
-
-    }
-    for( unsigned int i = 0; i < p2pos->size(); i++ ){
-
-      TVector3 photon2Pos((*p2pos).at(i).X(), (*p2pos).at(i).Y(), (*p2pos).at(i).Z() );
-      if( IsFiducial( idet, photon2Pos ) )
-        energy += p2mom->at(i).E();
-
-    }
-
-    return energy;
-
-  }
 
   Double_t Utils::TotalPhotonEnergy(Int_t idet, 
                                     std::vector<TLorentzVector> *p1pos,
@@ -772,24 +712,45 @@ namespace lar1{
   //=========================================================================================
   // Check if point is in some fiducial volume definition
   //==========================================================================================
-  Bool_t Utils::IsFiducial( Int_t idet, const TVector3 & vtx, Double_t fidCut) const{
+  Bool_t Utils::IsFiducial( Int_t idet, const TVector3 & vtx, std::string signal) const{
     
-    if (idet == kMB) return IsFiducialMB(idet, vtx, fidCut);
 
     Double_t xmin(0.0), xmax(0.0), ymin(0.0), ymax(0.0), zmin(0.0), zmax(0.0);
 
     GetDetBoundary( idet, xmin, xmax, ymin, ymax, zmin, zmax );
 
+    double fidCut_x = 0;
+
     // fidCut_x = fidCut;
     // fidCut_y = fidCut;
     // fidCut_z = fidCut;
+    if (signal == "numu"){
+      xmin += numu_fidCut_x;
+      xmax -= numu_fidCut_x;
+      ymin += numu_fidCut_y;
+      ymax -= numu_fidCut_y;
+      zmin += numu_fidCut_zUp; 
+      zmax -= numu_fidCut_zDown;
+      fidCut_x = numu_fidCut_x;
+    }
+    else if (signal == "nue"){
+      xmin += nue_fidCut_x;
+      xmax -= nue_fidCut_x;
+      ymin += nue_fidCut_y;
+      ymax -= nue_fidCut_y;
+      zmin += nue_fidCut_zUp; 
+      zmax -= nue_fidCut_zDown;
+      fidCut_x = nue_fidCut_x;
+    }
+    else{
+      xmin += 17;
+      xmax -= 17;
+      ymin += 17;
+      ymax -= 17;
+      zmin += 17; 
+      zmax -= 17;
+    }
 
-    xmin += fidCut_x;
-    xmax -= fidCut_x;
-    ymin += fidCut_y;
-    ymax -= fidCut_y;
-    zmin += fidCut_zUp; 
-    zmax -= fidCut_zDown;
 
     if( idet == kIC ){  // Cut out volume around each side of the center of x:
        
@@ -831,9 +792,12 @@ namespace lar1{
       // gets the center.  If the cuts above on x aren't symmetric, this is wrong.
       Double_t xcenter = (ic_xmax + ic_xmin)/2; 
       //cut around the center APA
-      if ( vtx.X() < (xcenter + 50 + cut) && vtx.X() > (xcenter - 50 - cut) ) return false; 
+      if ( vtx.X() < (xcenter + 50 + cut) && 
+           vtx.X() > (xcenter - 50 - cut) ) return false; 
     }
-    if( vtx.X() > xmin+cut && vtx.X() < xmax-cut && vtx.Y() > ymin+cut && vtx.Y() < ymax-cut && vtx.Z() > zmin+cut && vtx.Z() < zmax-cut )
+    if( vtx.X() > xmin+cut && vtx.X() < xmax-cut && 
+        vtx.Y() > ymin+cut && vtx.Y() < ymax-cut && 
+        vtx.Z() > zmin+cut && vtx.Z() < zmax-cut )
       return true;
     else
       return false;
@@ -843,7 +807,7 @@ namespace lar1{
   //=========================================================================================
   // Calculate fiducial mass
   //=========================================================================================
-  Double_t Utils::GetFidMass( Int_t idet ) const{
+  Double_t Utils::GetFidMass( Int_t idet, std::string signal ) const{
     
     Double_t xmin(0.0), xmax(0.0), ymin(0.0), ymax(0.0), zmin(0.0), zmax(0.0);
 
@@ -851,18 +815,38 @@ namespace lar1{
 
     if (idet == kMB) return 1.4*3.14159*(4.0/3.0)*pow((xmin-kMB_fidcut)/100.0,3);
 
-    xmin += fidCut_x;
-    xmax -= fidCut_x;
-    ymin += fidCut_y;
-    ymax -= fidCut_y;
-    zmin += fidCut_zUp; 
-    zmax -= fidCut_zDown;
-
+    double fidCut_x = 0;
+    if (signal == "numu"){
+      xmin += numu_fidCut_x;
+      xmax -= numu_fidCut_x;
+      ymin += numu_fidCut_y;
+      ymax -= numu_fidCut_y;
+      zmin += numu_fidCut_zUp; 
+      zmax -= numu_fidCut_zDown;
+      fidCut_x = numu_fidCut_x;
+    }
+    else if (signal == "nue"){
+      xmin += nue_fidCut_x;
+      xmax -= nue_fidCut_x;
+      ymin += nue_fidCut_y;
+      ymax -= nue_fidCut_y;
+      zmin += nue_fidCut_zUp; 
+      zmax -= nue_fidCut_zDown;
+      fidCut_x = nue_fidCut_x;
+    }
+    else{
+      xmin += 17;
+      xmax -= 17;
+      ymin += 17;
+      ymax -= 17;
+      zmin += 17; 
+      zmax -= 17;
+    }
     Double_t rho = 1.4;  // g/cm^3 = tons/m^3
 
     Double_t total_vol = (xmax-xmin)*(ymax-ymin)*(zmax-zmin)/pow(100.0,3) * rho;
     if (idet == kIC) 
-      total_vol = (xmax-xmin-100-34)*(ymax-ymin)*(zmax-zmin)/pow(100.0,3) * rho;
+      total_vol = (xmax-xmin-100-2*fidCut_x)*(ymax-ymin)*(zmax-zmin)/pow(100.0,3) * rho;
     // if( idet == kND ){  // Cut out volume around each side of the center of x:
     //   Double_t xcenter = (nd_xmax + nd_xmin)/2;  // gets the center.  If the cuts above on x aren't symmetric, this is wrong.
     //   total_vol -= ((xcenter + fidCut_x) - (xcenter - fidCut_x))*(ymax-ymin)*(zmax-zmin)/pow(100.0,3) * rho;
@@ -983,7 +967,8 @@ namespace lar1{
 
   double  Utils::GetContainedLength(const TVector3 & startPoint, 
                                     const TVector3 & startDir, 
-                                    int idet) const{
+                                    int idet,
+                                    double precision) const{
 
     if (!IsActive(idet, startPoint)){
       std::cout << "Failed the IsActive cut!\n";
@@ -991,15 +976,60 @@ namespace lar1{
     }
     TVector3 unitDir = startDir.Unit();
 
-    double distance = 1;
-    while (IsActive(idet, startPoint + unitDir*distance)){
+    double alpha = 10;
+    double alpha_prev = 0;
+    bool finished = false;
+
+    while (!finished){
+
       // std::cout << "Current pos is (" 
-      //           << (startPoint + startDir*distance).X() << ", "
-      //           << (startPoint + startDir*distance).Y() << ", "
-      //           << (startPoint + startDir*distance).Z() << ")\n";
-      distance ++;
+      //           << (startPoint + unitDir*alpha).X() << ", "
+      //           << (startPoint + unitDir*alpha).Y() << ", "
+      //           << (startPoint + unitDir*alpha).Z() << ")\n";
+
+      // done when the steps are less than precision:
+      if (fabs(alpha - alpha_prev) < precision){
+        finished = true;
+        break;
+      }
+
+      if (alpha > alpha_prev){
+        // if the point at alpha is active, take another step of the same length
+        if (IsActive(idet, startPoint + unitDir*alpha)){
+          double step = alpha - alpha_prev;
+          alpha_prev = alpha;
+          alpha += step;
+          continue;
+        }
+        // if it's not active, step backwards half a step
+        else{
+          double step = 0.5*(alpha - alpha_prev);
+          alpha_prev = alpha;
+          alpha -= step;
+          continue;
+        }
+      }
+      else{
+        // this means that we've gone too far and are stepping backwards.
+        // if the point at alpha is not active, take another step of the same length
+        if (!IsActive(idet, startPoint + unitDir*alpha)){
+          double step = alpha_prev - alpha;
+          alpha_prev = alpha;
+          alpha -= step;
+          continue;
+        }
+        else{
+          // else we're moving backwards but have crossed the boundary again.
+          double step = 0.5*(alpha_prev - alpha);
+          alpha_prev = alpha;
+          alpha += step;
+          continue;
+        }
+      }
+
     }
-    return distance;
+
+    return alpha;
 
   }
 

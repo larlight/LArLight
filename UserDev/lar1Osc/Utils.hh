@@ -5,10 +5,10 @@
 #include "FluxRWnubar/FluxRWnubar.hh"
 #include "Rtypes.h"
 #include "TVector3.h"
-#include "LorentzVectorLight.hh"
 #include "TLorentzVector.h"
 #include <vector>
 #include "TDecompLU.h"
+#include "TRandom.h"
 
 class TH1D;
 
@@ -30,38 +30,37 @@ namespace lar1{
     void reconfigure();
     
     Double_t GetFluxWeight( Double_t energy, Int_t iflux, Int_t inno, Int_t ndecay );
+
     Double_t GetTheta( const TVector3 & mom, 
                        const TVector3 & ref = TVector3(0,0,1) ) const;
     Double_t GetTheta( Double_t px, Double_t py, 
                        Double_t pz, const TVector3 & ref = TVector3(0,0,1) ) const;
-    Double_t GetPhi( TVector3 mom, 
-                     TVector3 ref = TVector3(0,0,1) ) const;
-    Double_t GetPhi( Double_t px, Double_t py ) const;
-    Double_t NuEnergyCCQE( Double_t l_energy, Double_t l_p, 
-                           Double_t l_theta, Double_t mass, 
-                           Int_t mode, bool verbose = false ) const;
-    Double_t NuEnergyCalo( std::vector<Int_t> *pdg, std::vector<Double_t> *energy, 
-                           Bool_t include_neutrons = false, 
-                           Bool_t include_pizeros = false, 
-                           Double_t prot_thresh = 0, 
-                           bool verbose = false ) const;
-    Double_t NuEnergyCalo( std::vector<Int_t> *pdg, std::vector<TLorentzVector> *energy, 
-                           Bool_t include_neutrons = false, 
-                           Bool_t include_pizeros = false, 
-                           Double_t prot_thresh = 0, 
-                           bool verbose = false ) const;   
-    Double_t VertexEnergy( std::vector<Int_t> *pdg, std::vector<Double_t> *energy, 
-                           Double_t prot_thresh = 0.0, Double_t pion_thresh = 0.0, 
-                           bool verbose = false ) const;    
-    Double_t VertexEnergy( std::vector<Int_t> *pdg, std::vector<TLorentzVector> *energy, 
-                           bool verbose = false, Double_t prot_thresh = 0.0, 
-                           Double_t pion_thresh = 0.0, Double_t kaon_threshold = 0.0) const;
+    Double_t GetPhi(   TVector3 mom, 
+                       TVector3 ref = TVector3(0,0,1) ) const;
+    Double_t GetPhi(   Double_t px, Double_t py ) const;
 
-    Double_t TotalPhotonEnergy( Int_t idet, 
-                                std::vector<gan::LorentzVectorLight> *p1pos,
-                                std::vector<gan::LorentzVectorLight> *p1mom,
-                                std::vector<gan::LorentzVectorLight> *p2pos,
-                                std::vector<gan::LorentzVectorLight> *p2mom ) const;
+    Double_t NuEnergyCCQE( Double_t lep_energy, Double_t lep_p, 
+                           Double_t lep_theta, Double_t mass, 
+                           Int_t mode, bool verbose = false ) const;
+
+    Double_t NuEnergyCalo( std::vector<Int_t> *pdg, std::vector<TLorentzVector> *energy, 
+                           double lepEnergy,
+                           bool smearing = true,
+                           Bool_t include_neutrons = false, 
+                           Bool_t include_pizeros = false, 
+                           Double_t prot_thresh = 0.02, 
+                           Double_t pion_thresh = 0.0, 
+                           Double_t kaon_thresh = 0.0,
+                           bool verbose = false );   
+
+   
+    Double_t VertexEnergy( std::vector<Int_t> *pdg, std::vector<TLorentzVector> *energy, 
+                           bool smearing = true,
+                           Double_t prot_thresh = 0.02, 
+                           Double_t pion_thresh = 0.0, 
+                           Double_t kaon_threshold = 0.0,
+                           bool verbose = false);
+
     Double_t TotalPhotonEnergy( Int_t idet, 
                                 std::vector<TLorentzVector> *p1pos,
                                 std::vector<TLorentzVector> *p1mom,
@@ -70,31 +69,35 @@ namespace lar1{
                                 std::vector<TLorentzVector> *miscpos,
                                 std::vector<TLorentzVector> *miscmom ) const;
 
-    // bool PhotonsAreParallel(TVector3 & photon1_start, TVector3 & photon1_mom
-    //                         TVector3 & photon2_start, TVector3 & photon2_mom);
+    Double_t GetLeptonEnergy(   Double_t energy,
+                                bool smearing,
+                                int PDG, bool contained=true,
+                                double containedLength=0);
+
 
     // Detector property functions:
-    Bool_t   IsFiducial( Int_t idet, const TVector3 & vtx,
-                         Double_t fidCut = 17.0 ) const;
-    Bool_t   IsActive( Int_t idet, TVector3 vtx, double cut = 0 ) const;
-    Bool_t   IsFiducialMB( Int_t idet, TVector3 vtx, 
-                           Double_t fidCut = 17.0 ) const;
-    Double_t GetFidMass( Int_t idet ) const;
-    Double_t GetActiveMass( Int_t idet ) const;
+    Bool_t   IsFiducial(     Int_t idet, const TVector3 & vtx,
+                             std::string signal = "" ) const;
+    Bool_t   IsActive(       Int_t idet, TVector3 vtx, double cut = 0 ) const;
+    Bool_t   IsFiducialMB(   Int_t idet, TVector3 vtx, 
+                             Double_t fidCut = 17.0 ) const;
+    Double_t GetFidMass(     Int_t idet, std::string signal = "" ) const;
+    Double_t GetActiveMass(  Int_t idet ) const;
     void     GetDetBoundary( Int_t idet, Double_t &xmin, Double_t &xmax, 
-  			                 Double_t &ymin, Double_t &ymax, 
+  			                     Double_t &ymin, Double_t &ymax, 
                              Double_t &zmin, Double_t &zmax ) const; 
     
-    Double_t GetPOTNorm( Int_t iflux, Int_t iLoc ) const;
+    Double_t GetPOTNorm(     Int_t iflux, Int_t iLoc ) const;
     Double_t GetPOTNormNuMI( Int_t iflux, Int_t iLoc ) const;
 
     double   GetContainedLength(const TVector3 & startPoint, 
-                                const TVector3 & startDir, int idet) const;
+                                const TVector3 & startDir, int idet,
+                                double precision = 0.01) const;
     double   GetLengthToStart(  const TVector3 & startPoint, 
                                 const TVector3 & startDir, int idet) const;
     double   GetYZLengthToStart(const TVector3 & startPoint, 
                                 const TVector3 & startDir, int idet) const;
-    void ScaleFarDet(double scaleFactor=1);
+
 
     //This function returns true if the line along direction startDir that starts at startPos
     //intersects the parallelogram defined by the 3 points given.
@@ -135,8 +138,10 @@ namespace lar1{
 
     int mc_generation;
     
+    TRandom randService;
 
-    double fidCut_x, fidCut_y, fidCut_zUp, fidCut_zDown;
+    double nue_fidCut_x,  nue_fidCut_y,  nue_fidCut_zUp,  nue_fidCut_zDown;
+    double numu_fidCut_x, numu_fidCut_y, numu_fidCut_zUp, numu_fidCut_zDown;
     double nd_xmin, nd_xmax, nd_ymin, nd_ymax, nd_zmin, nd_zmax;
     double nd_long_xmin, nd_long_xmax, nd_long_ymin, 
            nd_long_ymax, nd_long_zmin, nd_long_zmax;
