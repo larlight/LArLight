@@ -49,16 +49,16 @@ namespace lar1{
                            Bool_t include_neutrons = false, 
                            Bool_t include_pizeros = false, 
                            Double_t prot_thresh = 0.02, 
-                           Double_t pion_thresh = 0.0, 
-                           Double_t kaon_thresh = 0.0,
+                           Double_t pion_thresh = 0.02, 
+                           Double_t kaon_thresh = 0.02,
                            bool verbose = false );   
 
    
     Double_t VertexEnergy( std::vector<Int_t> *pdg, std::vector<TLorentzVector> *energy, 
                            bool smearing = true,
                            Double_t prot_thresh = 0.02, 
-                           Double_t pion_thresh = 0.0, 
-                           Double_t kaon_threshold = 0.0,
+                           Double_t pion_thresh = 0.02, 
+                           Double_t kaon_threshold = 0.02,
                            bool verbose = false);
 
     Double_t TotalPhotonEnergy( Int_t idet, 

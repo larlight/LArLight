@@ -536,7 +536,7 @@ void lar1::Reprocessing::Loop(std::string signal,
     TH2D *NCpizeroVtxKEConvD = new TH2D("NCpizeroVtxKEConvD","NCpizeroVtxKEConvD;Vtx Kinetic Energy (GeV);Photon Conv. Dist. (cm)",50,0,500,100,0,100);
 
     // True Pion, Muon energy
-    TH1D *ChargedPionEnergy = new TH1D("ChargedPionEnergy", "ChargedPionEnergy; Pion Energy (GeV);Events", 60, 0.0, 3);
+    TH1D *ChargedPionEnergy = new TH1D("ChargedPionEnergy", "ChargedPionEnergy; Pion Energy (GeV);Events", 180, 0.0, 1.5);
     TH1D *MuonEnergy = new TH1D("MuonEnergy", "MuonEnergy; Muon Kinetic Energy (GeV);Events", 60, 0.0, 3);
     ChargedPionEnergy -> SetFillColor(29);
     MuonEnergy -> SetFillColor(32);
@@ -766,7 +766,7 @@ void lar1::Reprocessing::Loop(std::string signal,
       int neutron = 0;
       int neutralPion = 0;
       double protonMass = 0.9382; // GeV
-      // double pionMass = 0.1395; // GeV
+      double pionMass = 0.1395; // GeV
 
       if (verbose){
         std::cout << "Genie vector sizes: \n"
@@ -785,7 +785,7 @@ void lar1::Reprocessing::Loop(std::string signal,
                       + GenieMomentum->at(i).Z()*GenieMomentum->at(i).Z() );
                  
         if (GeniePDG->at(i) == 211 || GeniePDG->at(i) == -211){
-          if (!isCC) ChargedPionEnergy -> Fill(e, fluxweight);
+          if (!isCC) ChargedPionEnergy -> Fill(e-pionMass, fluxweight);
           chargedPion ++;
         }
         if (GeniePDG->at(i) == 111 ){
