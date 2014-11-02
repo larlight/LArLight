@@ -35,11 +35,17 @@ public:
 
   double Distance();
 
-  double Distance(std::vector<float> point,
-		  std::vector<float> segmentStart,
-		  std::vector<float> segmentEnd) { _point = point; _segmentStart = segmentStart; _segmentEnd = segmentEnd; return Distance(); }
+  double Distance(std::vector<double> point,
+		  std::vector<double> segmentStart,
+		  std::vector<double> segmentEnd) { _point = point; _segmentStart = segmentStart; _segmentEnd = segmentEnd; return Distance(); }
 
-  double DotProduct(std::vector<float> A, std::vector<float> B);
+  double DistanceToTrack(std::vector<double> p, std::vector<std::vector<double> > track);
+
+  double DistanceToListOfTracks(std::vector<double> p, std::vector<std::vector<std::vector<double> > > *trackList);
+
+  double DistanceToTrack(std::vector<double> p, std::vector<std::vector<double> > track, double bufferDist);
+
+  double DotProduct(std::vector<double> A, std::vector<double> B);
 
   void TestDist();
 
@@ -47,9 +53,9 @@ public:
 
 private:
 
-  std::vector<float>  _point;
-  std::vector<float>  _segmentStart;
-  std::vector<float> _segmentEnd;
+  std::vector<double>  _point;
+  std::vector<double>  _segmentStart;
+  std::vector<double> _segmentEnd;
 
   bool _debug;
 

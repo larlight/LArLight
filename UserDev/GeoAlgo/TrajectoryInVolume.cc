@@ -4,7 +4,7 @@
 #include "TrajectoryInVolume.hh"
 
 
-void TrajectoryInVolume::AddTrajectoryPoint(std::vector<float> point){
+void TrajectoryInVolume::AddTrajectoryPoint(std::vector<double> point){
  
   if (point.size() != 3)//allow only for 3D stuff
     std::cout << "Warning: Point added to trajectory does not have 3 coordinates. Point not added..." << std::endl;
@@ -24,7 +24,7 @@ bool TrajectoryInVolume::IsInVolume(){
   return false;
 }
 
-bool TrajectoryInVolume::IsInVolume(std::vector<std::vector<float> > traj){
+bool TrajectoryInVolume::IsInVolume(std::vector<std::vector<double> > traj){
 
   _traj = traj;
   
@@ -36,7 +36,7 @@ bool TrajectoryInVolume::IsInVolume(std::vector<std::vector<float> > traj){
 }
 
 
-bool TrajectoryInVolume::LineInVolume(std::vector<float> point1, std::vector<float> point2){
+bool TrajectoryInVolume::LineInVolume(std::vector<double> point1, std::vector<double> point2){
 
   //first make sure neither point is inside volume. If so then trajectory is in volume!
   if ( PointInVolume(point1) or PointInVolume(point2) )
@@ -61,8 +61,8 @@ bool TrajectoryInVolume::LineInVolume(std::vector<float> point1, std::vector<flo
 	//                      z(t) = z1 + (z2-z1)*t
 	// t parameter keeps track of a point on the line
 	// find t-point for interesection with volume boundaries for all coordinates
-	float t1 = (_xMin-point1.at(i))/(point2.at(i)-point1.at(i));
-	float t2 = (_xMax-point1.at(i))/(point2.at(i)-point1.at(i));
+	double t1 = (_xMin-point1.at(i))/(point2.at(i)-point1.at(i));
+	double t2 = (_xMax-point1.at(i))/(point2.at(i)-point1.at(i));
 	// make t1 intersection with near plane, t2 intersection with far plane
 	// i.e. don't care about line's orientation
 	if ( t1 > t2 ) { double tmp = t1; t1 = t2; t2 = tmp; }
@@ -84,7 +84,7 @@ bool TrajectoryInVolume::LineInVolume(std::vector<float> point1, std::vector<flo
   return true;
 }
 
-bool TrajectoryInVolume::PointInVolume(std::vector<float> point){
+bool TrajectoryInVolume::PointInVolume(std::vector<double> point){
 
   if ( (point.at(0) > _xMin) and (point.at(0) < _xMax) and
        (point.at(1) > _yMin) and (point.at(1) < _yMax) and
@@ -94,7 +94,7 @@ bool TrajectoryInVolume::PointInVolume(std::vector<float> point){
   return false;
 }
 
-double TrajectoryInVolume::Distance(std::vector<float> point1, std::vector<float> point2){
+double TrajectoryInVolume::Distance(std::vector<double> point1, std::vector<double> point2){
   
   double dist = sqrt( (point1.at(0)-point2.at(0))*(point1.at(0)-point2.at(0)) +
 		      (point1.at(1)-point2.at(1))*(point1.at(1)-point2.at(1)) +

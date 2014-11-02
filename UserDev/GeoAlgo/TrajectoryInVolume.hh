@@ -35,29 +35,29 @@ public:
   virtual ~TrajectoryInVolume(){};
 
   /// Set Volume
-  void SetVolume(float xMin, float xMax, float yMin, float yMax, float zMin, float zMax)
+  void SetVolume(double xMin, double xMax, double yMin, double yMax, double zMin, double zMax)
   { _xMin = xMin; _xMax = xMax; _yMin = yMin; _yMax = yMax; _zMin = zMin; _zMax = zMax; }
 
   /// Set Trajectory Points
-  void SetTrajectory(std::vector<std::vector<float> > traj) { _traj = traj; }
+  void SetTrajectory(std::vector<std::vector<double> > traj) { _traj = traj; }
 
   /// Add Trajectory point
-  void AddTrajectoryPoint(std::vector<float> point);
+  void AddTrajectoryPoint(std::vector<double> point);
 
   /// See if a list of trajectory points intersects the volume
   bool IsInVolume();
 
   /// See if a list of trajectory points intersects the volume
-  bool IsInVolume(std::vector<std::vector<float> > traj);
+  bool IsInVolume(std::vector<std::vector<double> > traj);
 
   /// See if Line intersects volume
-  bool LineInVolume(std::vector<float> point1, std::vector<float> point2);
+  bool LineInVolume(std::vector<double> point1, std::vector<double> point2);
 
   /// See if point in volume
-  bool PointInVolume(std::vector<float> point);
+  bool PointInVolume(std::vector<double> point);
 
   /// Measure distance between two points
-  double Distance(std::vector<float> point1, std::vector<float> point2);
+  double Distance(std::vector<double> point1, std::vector<double> point2);
   
 private:
 
@@ -66,10 +66,10 @@ private:
   double _epsilon;
   
   /// Volume boundaries:
-  float _xMin, _xMax, _yMin, _yMax, _zMin, _zMax;
+  double _xMin, _xMax, _yMin, _yMax, _zMin, _zMax;
 
   /// Trajectory vector of 3-entry vectors (in x,y,z order)
-  std::vector<std::vector<float> > _traj;
+  std::vector<std::vector<double> > _traj;
 
 };
 
