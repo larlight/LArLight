@@ -68,6 +68,8 @@ namespace lar1{
 
     ElectContainedDist = -999;
     minDistanceToStart = -999;
+    minShowerGap = 10000;
+    minVertexEnergy = 10000;
 
     systematicInflationAmount = 0.0;
     inflateSystematics = false;
@@ -115,6 +117,11 @@ namespace lar1{
                   << " matrix but only one uncertainty is available to build"
                   << " at a time.  Please run the uncertainties separately.\n";
         return -1;
+      }
+      if( !useFluxWeights && !useXSecWeights){
+        std::cerr << "ERROR: You have requested to build a covariance"
+                  << " matrix but have not selected an uncertainty to use.\n";
+        return -1;        
       }
       int returnVal = BuildCovarianceMatrix();
       if (returnVal != 0) return returnVal;
@@ -268,12 +275,13 @@ namespace lar1{
     }
 
 
+    for (auto name : baselines){
+      NtupleReader a("nue",fileSource, name, mode, 
+                     energyType, npoints, forceRemake);
 
-    // This section of code configures the worker class to read in the data
-    if (use100m){
-      NtupleReader a("nue",fileSource, "100m", mode, energyType, npoints, forceRemake);
       a.setContainedShowers(ElectContainedDist);
       a.setMinDistanceToStart(minDistanceToStart);
+      a.setTopologyCut(minVertexEnergy,minShowerGap);
       a.setSpecialNameText(specialNameText);
       a.setIncludeOsc(includeFosc);
       a.setSpecialNameTextOsc(specialNameTextOsc);
@@ -288,128 +296,151 @@ namespace lar1{
         a.setSignal("numu");
         a.setSpecialNameText(specialNameText);
         readerNumu.push_back(a);
-      }
+      }      
     }
-    if (use150m){
-      NtupleReader a("nue",fileSource, "150m", mode, energyType, npoints, forceRemake);
-      a.setContainedShowers(ElectContainedDist);
-      a.setMinDistanceToStart(minDistanceToStart);
-      a.setSpecialNameText(specialNameText);
-      a.setIncludeOsc(includeFosc);
-      a.setSpecialNameTextOsc(specialNameTextOsc);
-      if (useCovarianceMatrix){
-        a.useMultiWeights(useCovarianceMatrix,multiWeightSource);
-        a.setNWeights(nWeights);
-        if (absolute_MWSource)
-          a.setAbsolute_MWSource(absolute_MWSource);
-      }
-      readerNue.push_back(a);
-      if (includeNumus){
-        a.setSignal("numu");
-        a.setSpecialNameText(specialNameText);
-        readerNumu.push_back(a);
-      }
-    }
-    if (use200m){
-      NtupleReader a("nue",fileSource, "200m", mode, energyType, npoints, forceRemake);
-      a.setContainedShowers(ElectContainedDist);
-      a.setMinDistanceToStart(minDistanceToStart);
-      a.setSpecialNameText(specialNameText);
-      a.setIncludeOsc(includeFosc);
-      a.setSpecialNameTextOsc(specialNameTextOsc);
-      if (useCovarianceMatrix){
-        a.useMultiWeights(useCovarianceMatrix,multiWeightSource);
-        a.setNWeights(nWeights);
-        if (absolute_MWSource)
-          a.setAbsolute_MWSource(absolute_MWSource);
-      }
-      readerNue.push_back(a);
-      if (includeNumus){
-        a.setSignal("numu");
-        a.setSpecialNameText(specialNameText);
-        readerNumu.push_back(a);
-      }
-    }
-    if (use100mLong){
-      NtupleReader a("nue",fileSource, "100m", mode, energyType, npoints, forceRemake);
-      a.setContainedShowers(ElectContainedDist);
-      a.setMinDistanceToStart(minDistanceToStart);
-      a.setSpecialNameText("long");
-      a.setIncludeOsc(includeFosc);
-      a.setSpecialNameTextOsc("long");
-      if (useCovarianceMatrix){
-        a.useMultiWeights(useCovarianceMatrix,multiWeightSource);
-        a.setNWeights(nWeights);
-        if (absolute_MWSource)
-          a.setAbsolute_MWSource(absolute_MWSource);
-      }
-      readerNue.push_back(a);
-      if (includeNumus){
-        a.setSignal("numu");
-        a.setSpecialNameText(specialNameText);
-        readerNumu.push_back(a);
-      }
-    }
-    if (use470m){
-      NtupleReader a("nue",fileSource, "470m", mode, energyType, npoints, forceRemake);
-      a.setContainedShowers(ElectContainedDist);
-      a.setMinDistanceToStart(minDistanceToStart);
-      // a.setSpecialNameText(specialNameText);
-      a.setIncludeOsc(includeFosc);
-      a.setSpecialNameTextOsc(specialNameTextOsc);
-      if (useCovarianceMatrix){
-        a.useMultiWeights(useCovarianceMatrix,multiWeightSource);
-        a.setNWeights(nWeights);
-        if (absolute_MWSource)
-          a.setAbsolute_MWSource(absolute_MWSource);
-      }
-      readerNue.push_back(a);
-      if (includeNumus){
-        a.setSignal("numu");
-        a.setSpecialNameText(specialNameText);
-        readerNumu.push_back(a);
-      }
-    }
-    if (useT600_onaxis) {
-      NtupleReader a("nue",fileSource, "600m_onaxis", mode, energyType, npoints, forceRemake);
-      a.setContainedShowers(ElectContainedDist);
-      a.setMinDistanceToStart(minDistanceToStart);
-      a.setSpecialNameText(specialNameText);
-      a.setIncludeOsc(includeFosc);
-      a.setSpecialNameTextOsc(specialNameTextOsc);
-      if (useCovarianceMatrix){
-        a.useMultiWeights(useCovarianceMatrix,multiWeightSource);
-        a.setNWeights(nWeights);
-        if (absolute_MWSource)
-          a.setAbsolute_MWSource(absolute_MWSource);
-      }
-      readerNue.push_back(a);
-      if (includeNumus){
-        a.setSignal("numu");
-        a.setSpecialNameText(specialNameText);
-        readerNumu.push_back(a);
-      }
-    }
-    if (useT600_offaxis) {
-      NtupleReader a("nue",fileSource,  "600m_offaxis", mode, energyType, npoints, forceRemake);
-      a.setContainedShowers(ElectContainedDist);
-      a.setMinDistanceToStart(minDistanceToStart);
-      a.setSpecialNameText(specialNameText);
-      a.setIncludeOsc(includeFosc);
-      a.setSpecialNameTextOsc(specialNameTextOsc);
-      if (useCovarianceMatrix){
-        a.useMultiWeights(useCovarianceMatrix,multiWeightSource);
-        a.setNWeights(nWeights);
-        if (absolute_MWSource)
-          a.setAbsolute_MWSource(absolute_MWSource);
-      }
-      readerNue.push_back(a);
-      if (includeNumus){
-        a.setSignal("numu");
-        a.setSpecialNameText(specialNameText);
-        readerNumu.push_back(a);
-      }
-    }
+
+
+    // // This section of code configures the worker class to read in the data
+    // if (use100m){
+    //   NtupleReader a("nue",fileSource, "100m", mode, energyType, npoints, forceRemake);
+    //   a.setContainedShowers(ElectContainedDist);
+    //   a.setMinDistanceToStart(minDistanceToStart);
+    //   a.setSpecialNameText(specialNameText);
+    //   a.setIncludeOsc(includeFosc);
+    //   a.setSpecialNameTextOsc(specialNameTextOsc);
+    //   if (useCovarianceMatrix){
+    //     a.useMultiWeights(useCovarianceMatrix,multiWeightSource);
+    //     a.setNWeights(nWeights);
+    //     if (absolute_MWSource)
+    //       a.setAbsolute_MWSource(absolute_MWSource);
+    //   }
+    //   readerNue.push_back(a);
+    //   if (includeNumus){
+    //     a.setSignal("numu");
+    //     a.setSpecialNameText(specialNameText);
+    //     readerNumu.push_back(a);
+    //   }
+    // }
+    // if (use150m){
+    //   NtupleReader a("nue",fileSource, "150m", mode, energyType, npoints, forceRemake);
+    //   a.setContainedShowers(ElectContainedDist);
+    //   a.setMinDistanceToStart(minDistanceToStart);
+    //   a.setSpecialNameText(specialNameText);
+    //   a.setIncludeOsc(includeFosc);
+    //   a.setSpecialNameTextOsc(specialNameTextOsc);
+    //   if (useCovarianceMatrix){
+    //     a.useMultiWeights(useCovarianceMatrix,multiWeightSource);
+    //     a.setNWeights(nWeights);
+    //     if (absolute_MWSource)
+    //       a.setAbsolute_MWSource(absolute_MWSource);
+    //   }
+    //   readerNue.push_back(a);
+    //   if (includeNumus){
+    //     a.setSignal("numu");
+    //     a.setSpecialNameText(specialNameText);
+    //     readerNumu.push_back(a);
+    //   }
+    // }
+    // if (use200m){
+    //   NtupleReader a("nue",fileSource, "200m", mode, energyType, npoints, forceRemake);
+    //   a.setContainedShowers(ElectContainedDist);
+    //   a.setMinDistanceToStart(minDistanceToStart);
+    //   a.setSpecialNameText(specialNameText);
+    //   a.setIncludeOsc(includeFosc);
+    //   a.setSpecialNameTextOsc(specialNameTextOsc);
+    //   if (useCovarianceMatrix){
+    //     a.useMultiWeights(useCovarianceMatrix,multiWeightSource);
+    //     a.setNWeights(nWeights);
+    //     if (absolute_MWSource)
+    //       a.setAbsolute_MWSource(absolute_MWSource);
+    //   }
+    //   readerNue.push_back(a);
+    //   if (includeNumus){
+    //     a.setSignal("numu");
+    //     a.setSpecialNameText(specialNameText);
+    //     readerNumu.push_back(a);
+    //   }
+    // }
+    // if (use100mLong){
+    //   NtupleReader a("nue",fileSource, "100m", mode, energyType, npoints, forceRemake);
+    //   a.setContainedShowers(ElectContainedDist);
+    //   a.setMinDistanceToStart(minDistanceToStart);
+    //   a.setSpecialNameText("long");
+    //   a.setIncludeOsc(includeFosc);
+    //   a.setSpecialNameTextOsc("long");
+    //   if (useCovarianceMatrix){
+    //     a.useMultiWeights(useCovarianceMatrix,multiWeightSource);
+    //     a.setNWeights(nWeights);
+    //     if (absolute_MWSource)
+    //       a.setAbsolute_MWSource(absolute_MWSource);
+    //   }
+    //   readerNue.push_back(a);
+    //   if (includeNumus){
+    //     a.setSignal("numu");
+    //     a.setSpecialNameText(specialNameText);
+    //     readerNumu.push_back(a);
+    //   }
+    // }
+    // if (use470m){
+    //   NtupleReader a("nue",fileSource, "470m", mode, energyType, npoints, forceRemake);
+    //   a.setContainedShowers(ElectContainedDist);
+    //   a.setMinDistanceToStart(minDistanceToStart);
+    //   // a.setSpecialNameText(specialNameText);
+    //   a.setIncludeOsc(includeFosc);
+    //   a.setSpecialNameTextOsc(specialNameTextOsc);
+    //   if (useCovarianceMatrix){
+    //     a.useMultiWeights(useCovarianceMatrix,multiWeightSource);
+    //     a.setNWeights(nWeights);
+    //     if (absolute_MWSource)
+    //       a.setAbsolute_MWSource(absolute_MWSource);
+    //   }
+    //   readerNue.push_back(a);
+    //   if (includeNumus){
+    //     a.setSignal("numu");
+    //     a.setSpecialNameText(specialNameText);
+    //     readerNumu.push_back(a);
+    //   }
+    // }
+    // if (useT600_onaxis) {
+    //   NtupleReader a("nue",fileSource, "600m_onaxis", mode, energyType, npoints, forceRemake);
+    //   a.setContainedShowers(ElectContainedDist);
+    //   a.setMinDistanceToStart(minDistanceToStart);
+    //   a.setSpecialNameText(specialNameText);
+    //   a.setIncludeOsc(includeFosc);
+    //   a.setSpecialNameTextOsc(specialNameTextOsc);
+    //   if (useCovarianceMatrix){
+    //     a.useMultiWeights(useCovarianceMatrix,multiWeightSource);
+    //     a.setNWeights(nWeights);
+    //     if (absolute_MWSource)
+    //       a.setAbsolute_MWSource(absolute_MWSource);
+    //   }
+    //   readerNue.push_back(a);
+    //   if (includeNumus){
+    //     a.setSignal("numu");
+    //     a.setSpecialNameText(specialNameText);
+    //     readerNumu.push_back(a);
+    //   }
+    // }
+    // if (useT600_offaxis) {
+    //   NtupleReader a("nue",fileSource,  "600m_offaxis", mode, energyType, npoints, forceRemake);
+    //   a.setContainedShowers(ElectContainedDist);
+    //   a.setMinDistanceToStart(minDistanceToStart);
+    //   a.setSpecialNameText(specialNameText);
+    //   a.setIncludeOsc(includeFosc);
+    //   a.setSpecialNameTextOsc(specialNameTextOsc);
+    //   if (useCovarianceMatrix){
+    //     a.useMultiWeights(useCovarianceMatrix,multiWeightSource);
+    //     a.setNWeights(nWeights);
+    //     if (absolute_MWSource)
+    //       a.setAbsolute_MWSource(absolute_MWSource);
+    //   }
+    //   readerNue.push_back(a);
+    //   if (includeNumus){
+    //     a.setSignal("numu");
+    //     a.setSpecialNameText(specialNameText);
+    //     readerNumu.push_back(a);
+    //   }
+    // }
 
     //This value is the number of baselines:
     nL = baselines.size();
@@ -490,7 +521,7 @@ namespace lar1{
     //It might be easier to reprocess the histograms though.
     for (int i = 0; i < nL; i++){
       std::string L = baselines[i];
-      Int_t returnVal;
+      Int_t returnVal(-1);
       returnVal = readerNue[i].processData();
       if (returnVal) {  //only returns 0 on successful completion
           std::cout << "Error: failed to read the ntuple at " << L << " with error " << returnVal;
@@ -790,7 +821,7 @@ namespace lar1{
       std::cout << "\n------------------------\nPrinting out P=0.3% values and P=0.0% values:\n";
       std::cout << "\tP=0\t\tosc"<<npoints/2;
       if (useCovarianceMatrix){
-        std::cout << "\t\tMW0";
+        std::cout << "\t\tMWF\t\tMXB";
       }
       std::cout<<"\n";
       for (unsigned int i = 0; i < nullBackgrounds.size(); i++){
@@ -798,6 +829,7 @@ namespace lar1{
         std::cout << oscVector[0][i];
         if (useCovarianceMatrix){
           std::cout << "\t\t" << eventsNullVecMultiWeight.front().at(i);
+          std::cout << "\t\t" << eventsNullVecMultiWeight.back().at(i);
         }      
         std::cout << "\n";
       }
@@ -972,22 +1004,23 @@ namespace lar1{
 
         for (unsigned int jbin = 0; jbin < events_nominal_COPY.size(); ++jbin)
         {
-          // if (debug && ibin == 53 && jbin == 20){
-          //   std::cout << "This is the debug point!!\n";
-          //   std::cout << "  nominal, i: " << events_nominal_COPY[ibin]<<std::endl;
-          //   std::cout << "  weights, i: " << temp_events_MW_COPY[ibin]<<std::endl;
-          //   std::cout << "  nominal, j: " << events_nominal_COPY[jbin]<<std::endl;
-          //   std::cout << "  weights, j: " << temp_events_MW_COPY[jbin]<<std::endl;
-          // }
+
           float part1 = events_nominal_COPY[ibin]-temp_events_MW_COPY[ibin];
           float part2 = events_nominal_COPY[jbin]-temp_events_MW_COPY[jbin];
-          // if (ibin == 25 && jbin == 25) {
-            // std::cout << "ibin, jbin: ("<<ibin<<","<<jbin<<"), weight: " 
-            //           << N_weight <<std::endl;
-            // std::cout << "\tpart1: " << part1 << "\t" << "part2: " 
-            //           << part2 << "\n";
-          // }
           covarianceMatrix[ibin][jbin] += (1.0/nWeights)*(part1*part2);
+          if (debug && 
+              ibin == 0 && 
+              jbin == 0)
+              // ibin == events_nominal_COPY.size()/2 && 
+              // jbin == events_nominal_COPY.size()/2)
+          {
+            std::cout << "This is the debug point!!\n";
+            std::cout << "  nominal, i: " << events_nominal_COPY[ibin]<<std::endl;
+            std::cout << "  weights, i: " << temp_events_MW_COPY[ibin]<<std::endl;
+            std::cout << "  nominal, j: " << events_nominal_COPY[jbin]<<std::endl;
+            std::cout << "  weights, j: " << temp_events_MW_COPY[jbin]<<std::endl;
+            std::cout << "Adding " << (1.0/nWeights)*(part1*part2) << std::endl; 
+          }
         }
       }
 
@@ -1048,6 +1081,13 @@ namespace lar1{
 
     }
 
+
+    // std::cout << "Printing out the fractional uncertainties along the diagonal:\n";
+    // for (unsigned int ibin = 0; ibin <events_nominal_COPY.size(); ++ibin)
+    // {
+    //   std::cout << "Bin " << ibin << ": " 
+    //             << covarianceMatrix[ibin][ibin] << std::endl;
+    // }
 
     // std::cout << "Printing out fractional covariance matrix:"<<std::endl;
     // for (int ibin = 0; ibin < nL*nbins; ++ibin){
@@ -1227,7 +1267,12 @@ namespace lar1{
         events_numu_nominal_COPY[b_line].resize(nbins_numu);
         for (int bin = 0; bin < nbins_numu; ++bin)
         {
-          events_numu_nominal_COPY[b_line][bin] = nullBackgrounds[b_line*nbins + bin + 2*nbins_nue];        
+        if (!includeFosc)
+          events_numu_nominal_COPY[b_line][bin] 
+            = nullBackgrounds[b_line*nbins_null+bin + nbins_nue];
+        else
+          events_numu_nominal_COPY[b_line][bin]
+            = nullBackgrounds[b_line*nbins+nbins_nue+bin];        
         }
       }
     }
@@ -1241,6 +1286,24 @@ namespace lar1{
     nominal_nue_Ratio.resize(nL-1);
     nominal_numu_Ratio.resize(nL-1);
 
+    if (debug){
+      std::cout << "Printing nominal values:\n";
+      for (int b_line = 0; b_line < nL; b_line ++){
+        std::cout << "  Baseline: " << baselinesFancy[b_line] << std::endl;
+        std::cout << "    nue   \tnumu" << std::endl;
+        for (int entry = 0; entry < events_numu_nominal_COPY.at(b_line).size(); entry ++)
+        {
+          if (entry < events_nue_nominal_COPY.at(b_line).size()){
+            std::cout << "    " << events_nue_nominal_COPY.at(b_line).at(entry);
+          }
+          else{
+            std::cout << "      -    ";
+          }
+            std::cout << "\t" << events_numu_nominal_COPY.at(b_line).at(entry) << std::endl;
+        }
+        std::cout << std::endl;
+      }
+    }
 
 
 
@@ -1296,7 +1359,6 @@ namespace lar1{
         numu_multiWeightRatio[i].resize(nWeights);
       }
     }
-
 
 
     std::cout << "Computing the ratio errors...." << std::endl;
@@ -1464,7 +1526,7 @@ namespace lar1{
       sprintf(temp,"#nu_{e} Ratio of %s to %s",baselinesFancy[0].c_str(),baselinesFancy[i+1].c_str());
       nue_ratioPlots[i] -> SetTitle("");
       nue_ratioPlots[i] -> SetMinimum(0);
-      nue_ratioPlots[i] -> SetMaximum(0.3);
+      nue_ratioPlots[i] -> SetMaximum(0.5);
       // nue_ratioPlots[i] -> GetXaxis() -> CenterTitle();
       nue_ratioPlots[i] -> GetXaxis() -> SetNdivisions(506);
       nue_ratioPlots[i] -> GetXaxis() -> SetLabelSize(0.05);
@@ -2686,6 +2748,9 @@ namespace lar1{
       TH1F * Other = utils.makeHistogram(OtherVec[j],nueBins);
       TH1F * NueFromCosmics = utils.makeHistogram(NueFromCosmicsVec[j],nueBins);
 
+      // pi0 and gamma are combined:
+      NueFromNC_pi0 -> Add(NueFromNC_delta0);
+
       TH1F * SignalNu;
       TH1F * SignalNubar;
       if (includeFosc){
@@ -2975,7 +3040,7 @@ namespace lar1{
       leg->AddEntry(NueFromNueCC_chargeKaon, "K^{+} #rightarrow #nu_{e}");
       leg->AddEntry(NueFromNueCC_neutKaon, "K^{0} #rightarrow #nu_{e}");
       // leg->AddEntry(NueFromEScatter, "#nu - e^{-}");
-      leg->AddEntry(NueFromNC_pi0, "NC #pi^{0}");
+      leg->AddEntry(NueFromNC_pi0, "NC Single  #gamma");
       // leg->AddEntry(NueFromNC_delta0, "#Delta #rightarrow N#gamma");
       leg->AddEntry(NueFromNumuCC, "#nu_{#mu} CC");
       if (includeCosmics) leg->AddEntry(NueFromCosmics, "Cosmics");
@@ -3114,11 +3179,11 @@ namespace lar1{
       else sprintf(fileName, "%s%s_%s.pdf", fileNameRoot.Data(), baselines[i].c_str(), mode.c_str());
       if (savePlots) stackedCanvas[i] -> Print(fileName, "pdf");
       if (useHighDm) 
-        sprintf(fileName, "%s%s_%s_highdm2.eps", fileNameRoot.Data(), baselines[i].c_str(), mode.c_str());
+        sprintf(fileName, "%s%s_%s_highdm2.png", fileNameRoot.Data(), baselines[i].c_str(), mode.c_str());
       else if (useGlobBF) 
-        sprintf(fileName, "%s%s_%s_globBF.eps", fileNameRoot.Data(), baselines[i].c_str(), mode.c_str());
-      else sprintf(fileName, "%s%s_%s.eps", fileNameRoot.Data(), baselines[i].c_str(), mode.c_str());
-      if (savePlots) stackedCanvas[i] -> Print(fileName, "eps");
+        sprintf(fileName, "%s%s_%s_globBF.png", fileNameRoot.Data(), baselines[i].c_str(), mode.c_str());
+      else sprintf(fileName, "%s%s_%s.png", fileNameRoot.Data(), baselines[i].c_str(), mode.c_str());
+      if (savePlots) stackedCanvas[i] -> Print(fileName, "png");
       // stackedCanvas[i] -> Print(fileName, "eps");
     }
    

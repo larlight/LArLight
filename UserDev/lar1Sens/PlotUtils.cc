@@ -689,11 +689,8 @@ void PlotUtils::plot_Matrix( TString matrixFileName,
   // Get the nue rates to get the num bins:
   std::vector<TH1F *> nueEventRates;
   if (use100m) nueEventRates.push_back( (TH1F*) f-> Get("nueEventRates_100m") -> Clone());
-std::cout << "Got here ... \n";
   if (use470m) nueEventRates.push_back( (TH1F*) f-> Get("nueEventRates_470m")-> Clone());
-std::cout << "Got here ... \n";
   if (use600m) nueEventRates.push_back( (TH1F*) f-> Get("nueEventRates_600m_onaxis")-> Clone());
-std::cout << "Got here ... \n";
   if (!use100m && !use470m && !use600m) {
     std::cerr << "You seem to be providing a file that " 
               << "doesn't conform to standard format.\n";
@@ -734,19 +731,185 @@ std::cout << "Got here ... \n";
                                 nBins_nue, nBins_numu);
   // for the name of the pdf file to print:
   matrixFileName.Remove(matrixFileName.Length()-5); // chop off ".root"
-  matrixFileName += "_" + matrixName + ".pdf";
-  canv -> Print(matrixFileName,"pdf");
+  TString outName = matrixFileName;
+  outName += "_" + matrixName + ".pdf";
+  canv -> Print(outName,"pdf");
 
   if (matrixName == "fracMatHist"){
-    std::vector<TCanvas*> canvases = plotRatesWithErrors(matrix,
-                                                         nueEventRates,
-                                                         numuEventRates);
+    // std::vector<TCanvas*> canvases = plotRatesWithErrors(matrix,
+    //                                                      nueEventRates,
+    //                                                      numuEventRates);
+    std::vector<TCanvas *> Uncerts = plotFractionalUncerts(matrix, 
+                                                 nueEventRates,
+                                                 numuEventRates,
+                                                 matrixFileName);
+
+    Uncerts.front() -> Print(matrixFileName+"_nue_uncerts.pdf","pdf");
+    if (numuEventRates.size() != 0)
+      Uncerts.back() -> Print(matrixFileName+"_numu_uncerts.pdf","pdf"); 
+
   }
 
 
   return;
 
 }
+
+std::vector<TCanvas *> PlotUtils::plotFractionalUncerts(TH2D * matrix,
+                                          std::vector<TH1F*> nueRates,
+                                          std::vector<TH1F*> numuRates,
+                                          TString matrixFileName){
+
+  // Set up the canvas and a background histogram to control the appearance
+
+  std::vector<TCanvas *> uncerts;
+  uncerts.push_back(new TCanvas("nueUncerts","",800,600));
+
+  if (numuRates.size() != 0)
+    uncerts.push_back(new TCanvas("numuUncerts","",800,600));
+
+  
+  std::vector<TH1F *> background;
+  background.reserve(2);
+  background.front() = (TH1F*) nueRates.front() -> Clone();
+
+  for (int i = 1; i <= background.front()->GetNbinsX();i++) 
+    background.front() -> SetBinContent(i,0);
+  
+
+  background.front() -> SetMinimum(0.0);
+  background.front() -> SetMaximum(25);
+  background.front() -> GetXaxis() -> SetTitle("Reconstructed Neutrino Energy [GeV]");
+  background.front() -> GetYaxis() -> SetTitle("Uncert [\%]");
+  background.front() -> GetXaxis() -> SetLabelSize(0.05);
+  background.front() -> GetYaxis() -> SetLabelSize(0.05);
+  background.front() -> GetXaxis() -> CenterTitle();
+  background.front() -> GetXaxis() -> SetTitleSize(.05);
+  background.front() -> GetYaxis() -> SetTitleSize(.045);
+  background.front() -> GetYaxis() -> SetTitleOffset(1.6);
+  
+  background.back() = (TH1F*) background.front() -> Clone();
+
+  if (matrixFileName.Contains("xsec")){
+    background.front() -> SetTitle("#nu_{e} Cross Section Fractional Uncertaintes");
+    background.back()  -> SetTitle("#nu_{#mu} Cross Section Fractional Uncertaintes");
+  }
+  else if (matrixFileName.Contains("flux")){
+    background.front() -> SetTitle("#nu_{e} Flux Fractional Uncertaintes");
+    background.back()  -> SetTitle("#nu_{#mu} Flux Fractional Uncertaintes");
+  }
+  else{
+    background.front() -> SetTitle("#nu_{e} Fractional Uncertaintes");
+    background.back()  -> SetTitle("#nu_{#mu} Fractional Uncertaintes");
+  }  
+
+  uncerts.front() -> cd();
+  background.front() -> Draw();
+  if (numuRates.size() != 0){
+    uncerts.back() ->cd();
+    background.back() -> Draw();
+  }
+
+
+  TLegend * leg = new TLegend(0.6,0.65,0.95,0.8);
+  leg -> SetFillStyle(0);
+  leg -> SetFillColor(0);
+  leg -> SetBorderSize(0);
+  leg -> SetTextSize(0.05);
+  int curr_bin = 1;
+  for (unsigned int iDet = 0; iDet < nueRates.size(); iDet ++)
+  {
+
+    // do nue first
+    uncerts.front()->cd();
+
+    TH1F * tempHist = (TH1F*) nueRates.at(iDet) -> Clone();
+    // Set up the plot to look nice...
+    for (int iBin = 1; iBin <= nueRates.at(iDet)->GetNbinsX(); iBin ++){
+      tempHist -> SetBinContent(iBin, 100*sqrt(matrix->GetBinContent(curr_bin,curr_bin)));
+      tempHist -> SetBinError(iBin, 0);
+      curr_bin ++;
+    }
+
+    TString thisName = nueRates.at(iDet) -> GetName();
+    if (thisName.Contains("100m")){
+      // temphist -> SetLineWidth("#nu_{e} Rates at LAr1-ND");
+      tempHist -> SetLineWidth(1);
+      tempHist -> SetLineStyle(2);
+      // tempHist -> SetMarkerStyle(8);
+      // tempHist -> SetMarkerColor(1);
+      tempHist -> Draw("same");
+      leg -> AddEntry(tempHist,"LAr1-ND");
+    }
+    if (thisName.Contains("470m")){
+      tempHist -> SetLineWidth(0);
+      tempHist -> SetMarkerStyle(3);
+      tempHist -> SetMarkerColor(2);
+      // rates.at(iDet) -> SetTitle("#nu_{e} Rates at MicroBooNE");
+      tempHist -> Draw("P same");
+      leg -> AddEntry(tempHist,"uBooNE");
+    }
+    if (thisName.Contains("600m")) {
+      tempHist -> SetLineWidth(0);
+      tempHist -> SetMarkerStyle(5);
+      tempHist -> SetMarkerColor(4);
+      // rates.at(iDet) -> SetTitle("#nu_{e} Rates at T600");
+      tempHist -> Draw("P same");
+      leg -> AddEntry(tempHist,"T600");
+    }
+
+    leg -> Draw();
+
+    // do numu if it exists:
+    if (numuRates.size() != 0){
+      uncerts.back()->cd();
+
+      TH1F * tempHist = (TH1F*) numuRates.at(iDet) -> Clone();
+      
+      for (int iBin = 1; iBin <= numuRates.at(iDet)->GetNbinsX(); iBin ++){
+        tempHist -> SetBinContent(iBin, 100*sqrt(matrix->GetBinContent(curr_bin,curr_bin)));
+        tempHist -> SetBinError(iBin, 0);
+        curr_bin ++;
+      }
+      
+      // Set up the plot to look nice...
+      TString thisName = numuRates.at(iDet) -> GetName();
+      if (thisName.Contains("100m")){
+        // temphist -> SetLineWidth("#nu_{e} Rates at LAr1-ND");
+        tempHist -> SetLineWidth(1);
+        tempHist -> SetLineStyle(2);
+        // tempHist -> SetMarkerStyle(8);
+        // tempHist -> SetMarkerColor(1);
+        tempHist -> Draw("same");
+        // leg -> AddEntry(tempHist,"LAr1-ND");
+      }
+      if (thisName.Contains("470m")){
+        tempHist -> SetLineWidth(0);
+        tempHist -> SetMarkerStyle(3);
+        tempHist -> SetMarkerColor(2);
+        // rates.at(iDet) -> SetTitle("#nu_{e} Rates at MicroBooNE");
+        tempHist -> Draw("P same");
+        // leg -> AddEntry(tempHist,"uBooNE");
+      }
+      if (thisName.Contains("600m")) {
+        tempHist -> SetLineWidth(0);
+        tempHist -> SetMarkerStyle(5);
+        tempHist -> SetMarkerColor(4);
+        // rates.at(iDet) -> SetTitle("#nu_{e} Rates at T600");
+        tempHist -> Draw("P same");
+        // leg -> AddEntry(tempHist,"T600");
+      }
+
+      leg -> Draw();
+    }
+
+  }
+
+
+  return uncerts;
+
+}
+                                          
 
 std::vector<TCanvas *> PlotUtils::plotRatesWithErrors(TH2D * matrix,
                                                       std::vector<TH1F*> nueRates,
@@ -766,11 +929,17 @@ std::vector<TCanvas *> PlotUtils::plotRatesWithErrors(TH2D * matrix,
     for (int iBin = 1; iBin <= nueRates.at(iDet)->GetNbinsX(); iBin ++){
       nueRates.at(iDet)->SetBinContent(iBin, nueRates.at(iDet)->GetBinContent(iBin) 
                                            / nueRates.at(iDet)->GetBinWidth(iBin) );
-      nueRates.at(iDet)->SetBinError(iBin, matrix->GetBinContent(curr_bin,curr_bin)
+      nueRates.at(iDet)->SetBinError(iBin, sqrt(matrix->GetBinContent(curr_bin,curr_bin))
                                          * nueRates.at(iDet)->GetBinContent(iBin));
       // tempHist -> SetBinContent(iBin, matrix->GetBinContent(curr_bin,curr_bin));
       curr_bin ++;
     }
+
+    // Set up the plot to look nice...
+    TString thisName = nueRates.at(iDet) -> GetName();
+    if (thisName.Contains("100m")) nueRates.at(iDet) -> SetTitle("#nu_{e} Rates at LAr1-ND");
+    if (thisName.Contains("470m")) nueRates.at(iDet) -> SetTitle("#nu_{e} Rates at MicroBooNE");
+    if (thisName.Contains("600m")) nueRates.at(iDet) -> SetTitle("#nu_{e} Rates at T600");
 
     nueRates.at(iDet) -> Draw("e hist");
     // nueUncerts -> cd();
@@ -781,34 +950,24 @@ std::vector<TCanvas *> PlotUtils::plotRatesWithErrors(TH2D * matrix,
       canvases.back() -> cd();
       // Set the bin errors to be systematic uncertainties
       for (int iBin = 1; iBin <= numuRates.at(iDet)->GetNbinsX(); iBin ++){
-        numuRates.at(iDet)->SetBinContent(iBin, nueRates.at(iDet)->GetBinContent(iBin) 
-                                              / nueRates.at(iDet)->GetBinWidth(iBin) );
-        numuRates.at(iDet)->SetBinError(iBin, matrix->GetBinContent(curr_bin,curr_bin)
+        numuRates.at(iDet)->SetBinContent(iBin, numuRates.at(iDet)->GetBinContent(iBin) 
+                                              / numuRates.at(iDet)->GetBinWidth(iBin) );
+        numuRates.at(iDet)->SetBinError(iBin, sqrt(matrix->GetBinContent(curr_bin,curr_bin))
                                               * numuRates.at(iDet)->GetBinContent(iBin));
         curr_bin ++;
       }
-    
+        
+      thisName = numuRates.at(iDet) -> GetName();
+      if (thisName.Contains("100m")) numuRates.at(iDet) -> SetTitle("#nu_{#mu} Rates at LAr1-ND");
+      if (thisName.Contains("470m")) numuRates.at(iDet) -> SetTitle("#nu_{#mu} Rates at MicroBooNE");
+      if (thisName.Contains("600m")) numuRates.at(iDet) -> SetTitle("#nu_{#mu} Rates at T600");
+
 
       numuRates.at(iDet) -> Draw("e hist");
     }
   }
 
-  // Now fill in the errors in their own plot
-  curr_bin = 1;
-  TCanvas * nueUncerts = new TCanvas("nue_uncert", "", 600, 500);
-  // TH1F * nueFracUncertainties = nueRates.front() -> Clone();
-  // TH1F * numuFracUncertainties;
-  // if (numuRates.size() != 0) numuFracUncertainties = numuRates.front() -> Clone();
-  for (unsigned int iDet = 0; iDet < nueRates.size(); iDet ++)
-  {
-    TH1F * tempHist = (TH1F*) nueRates.at(iDet) -> Clone();
-    for (int iBin = 1; iBin <= nueRates.at(iDet)->GetNbinsX(); iBin ++){
-      tempHist -> SetBinContent(iBin, matrix->GetBinContent(curr_bin,curr_bin));
-      tempHist -> SetBinError(iBin, 0);
-      curr_bin ++;
-    }
-    tempHist -> Draw("same");
-  }
+
   return canvases;
 }
 
@@ -836,8 +995,6 @@ TCanvas *  PlotUtils::plot_Matrix(TH2D * matrix, TString matrixName,
   TCanvas * canv = new TCanvas(name, title, 750,750);
   canv -> cd();
   TPad *pad1 = new TPad("pad1","",0,0,1,1);
-  // TPad *pad2 = new TPad("pad1","",0,0,1,1);
-  // pad2->SetFillStyle(4000); // make this second pad transparent
   
   pad1 -> Draw();
   pad1 -> cd();
@@ -896,7 +1053,7 @@ TCanvas *  PlotUtils::plot_Matrix(TH2D * matrix, TString matrixName,
   }
 
   // Toggle the labels on the xaxis to draw horizontally:
-  matrix -> GetXaxis() -> LabelsOption("h");
+  matrix -> GetXaxis() -> LabelsOption("v");
   matrix -> GetYaxis() -> SetLabelSize(0.055);
   matrix -> GetXaxis() -> SetLabelSize(0.055);
 
@@ -981,6 +1138,10 @@ void PlotUtils::set_plot_style()
   TColor::CreateGradientColorTable(NRGBs, stops, red, green, blue, NCont);
   gStyle->SetNumberContours(NCont);
   gStyle->SetOptStat(0);
+  gStyle->SetPadRightMargin(0.15);
+  gStyle->SetPadLeftMargin(0.15);
+  gStyle->SetPadTopMargin(0.15);
+  gStyle->SetPadBottomMargin(0.15);
 }
 
 

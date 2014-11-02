@@ -88,6 +88,11 @@ namespace lar1{
                                                std::vector<TH1F*> nueRates,
                                                std::vector<TH1F*> numuRates);
 
+    std::vector<TCanvas *> plotFractionalUncerts(TH2D * matrix,
+                                                 std::vector<TH1F*> nueRates,
+                                                 std::vector<TH1F*> numuRates,
+                                                 TString matrixFileName);
+
   protected:
     
 

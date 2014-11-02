@@ -4,8 +4,8 @@
 {
   gSystem->Load("lib/liblar1Sens.so");
   lar1::NueAppearanceFitter n;
-  // n.setFileSource("/Users/cja33/lar1_data/");
   n.setFileSource("/Users/cja33/genie_RW/");
+  // n.setFileSource("/Users/cja33/nominal_ntuples/");
   n.setVerbose(true);
   n.setDebug(false);
   n.setSpecialNameText("");
@@ -15,16 +15,11 @@
   n.setFlatSystematicError(0.20);
   n.setMode("nu");
   n.setUse100m(true);
-  n.setUse150m(false);
-  n.setUse200m(false);
-  n.setUse100mLong(false);
   n.setUse470m(true);
-  n.setUse700m(false);
-  n.setUseT600_onaxis(true);
-  n.setUseT600_offaxis(false);
+  n.setUseT600_onaxis(false);
   n.setUbooneScale(1.0);
+  // n.setLAr1NDScale(1.0);
   n.setLAr1NDScale(1.0);
-  // n.setLAr1NDScale(1.0/3.0);
   n.setLAr1FDScale(1.0);
   n.setEnergyType("ecalo2");
   n.setUseNearDetStats(false);
@@ -32,7 +27,9 @@
   n.setNearDetSystematicError(0.2);
   n.setForceRemake(false);
   n.setUseInfiniteStatistics(false);
-  // n.setElectContainedDist(-999);
+  // n.setElectContainedDist(100);
+
+  n.setTopologyCut(0.15,1.5);
 
   // n.setIncludeCosmics(true);
   // n.setCosmicsFile("output/no_cut/histos_for_corey.root");
@@ -89,10 +86,10 @@
   n.setInflateSystematics(false);
   n.setSystematicInflationAmount(0.00);
 
-  n.setUseCovarianceMatrix(false);
+  n.setUseCovarianceMatrix(true);
   // Gotta define the backgrounds:
   int kUnisim(0), kPiMinus(1), kPiPlus(2), kKaon0(3), kKMinus(4), kKPlus(5), kTotal_flux(6);
-  int kCCQE(0), kTotal_xsec(1);
+  int kTotal_xsec(0);
   // n.setMultiWeightSource(kUnisim);
   // n.setMultiWeightSource(kPiMinus);
   // n.setMultiWeightSource(kPiPlus);
@@ -112,11 +109,11 @@
   n.setSavePlots(true);
 
   n.setBuildCovarianceMatrix(true);
-  n.setMakeRatioPlots(false);
+  n.setMakeRatioPlots(true);
   n.setLoop(false);
   n.setMakePlots(false);
   n.setMakeSimplePlot(false);
-  n.setMakeEventRatePlots(false);
+  n.setMakeEventRatePlots(true);
   n.setMakeAltSensPlot(false);
 
   n.Run();

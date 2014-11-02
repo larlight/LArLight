@@ -97,6 +97,10 @@ namespace lar1{
       void setElectContainedDist(double d){ElectContainedDist = d;}
       void setMinDistanceToStart(double d){minDistanceToStart = d;}
       void setShapeOnlyFit(bool b){shapeOnlyFit = b;}
+      void setTopologyCut(double MinVertexEnergy= 0.05, double MinShowerGap=1.5){
+            minVertexEnergy = MinVertexEnergy;
+            minShowerGap = MinShowerGap;
+      }
 
       // Runtime switches
       void setForceRemake(bool b){forceRemake = b;}
@@ -363,6 +367,8 @@ namespace lar1{
 
       double ElectContainedDist;
       double minDistanceToStart;
+      double minShowerGap;
+      double minVertexEnergy;
 
   };
 

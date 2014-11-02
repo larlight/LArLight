@@ -25,6 +25,8 @@ namespace lar1{
 
     showerContainmentDist = -999;
     minDistanceToStart = 0;
+    minVertexEnergy=10000;
+    minShowerGap=10000;
 
     std::vector<float> defaultBins;
 
@@ -68,6 +70,12 @@ namespace lar1{
     usingMultiWeights = false;
     absolute_MWSource = false;
     nWeights = 1000;
+    includeOsc=true;
+
+    showerContainmentDist = -999;
+    minDistanceToStart = 0;
+    minVertexEnergy=10000;
+    minShowerGap=10000;
 
     std::vector<float> defaultBins;
     // Default to 10 equal length bins from 0.2 GeV to 3 GeV:
@@ -111,6 +119,11 @@ namespace lar1{
   }
   void NtupleReader::setMinDistanceToStart(double d){
     minDistanceToStart = d;
+  }
+
+  void NtupleReader::setTopologyCut(double MinVertexEnergy, double MinShowerGap){
+    minVertexEnergy = MinVertexEnergy;
+    minShowerGap = MinShowerGap;
   }
 
   //Not passing references here, since it's small and called infrequently
@@ -202,6 +215,20 @@ namespace lar1{
     }
     if(minDistanceToStart != -999){
       sprintf(tempstring, "dist%g",minDistanceToStart );
+      fileNameHists += tempstring;
+      fileNameHists += "_";
+      fileNameHistsOsc += "_";
+      fileNameHistsOsc += tempstring;
+    }
+    if (minVertexEnergy != 10000){
+      sprintf(tempstring, "ve%g",minVertexEnergy );
+      fileNameHists += tempstring;
+      fileNameHists += "_";
+      fileNameHistsOsc += "_";
+      fileNameHistsOsc += tempstring;
+    }
+    if (minShowerGap != 10000){
+      sprintf(tempstring, "sg%g",minShowerGap );
       fileNameHists += tempstring;
       fileNameHists += "_";
       fileNameHistsOsc += "_";
@@ -428,8 +455,10 @@ namespace lar1{
     Double_t ElecCandEnergy;
     Double_t Eccqe;
     Double_t ecalo1, ecalo2;
-    Double_t ElectContainedDist;
-    Double_t ElectDistToStart;
+    Double_t ShowerContainedDist;
+    Double_t ShowerDistToStart;
+    Double_t showerGap;
+    Double_t vertexEnergy;
     int nuchan;
 
 
@@ -466,8 +495,10 @@ namespace lar1{
     c->SetBranchAddress("Eccqe", &Eccqe);
     c->SetBranchAddress("Ecalo1", &ecalo1);
     c->SetBranchAddress("Ecalo2", &ecalo2);
-    c->SetBranchAddress("ElectContainedDist",&ElectContainedDist);
-    c->SetBranchAddress("ElectDistToStart"  ,&ElectDistToStart);
+    c->SetBranchAddress("ShowerContainedDistance",&ShowerContainedDist);
+    c->SetBranchAddress("ShowerDistanceToStart"  ,&ShowerDistToStart);
+    c->SetBranchAddress("VertexEnergy"  ,&vertexEnergy);
+    c->SetBranchAddress("showerGap"  ,&showerGap);
 
 
     std::vector<std::vector<float> > *MultiWeight;
@@ -612,7 +643,7 @@ namespace lar1{
       // }
 
       if (wgt == 0) continue;
-      if ( (ievt%10000) == 0) {
+      if ( (ievt%100000) == 0) {
         std::cout << "On event " << ievt << " of " << nentries1 << std::endl;
       }
 
@@ -631,14 +662,7 @@ namespace lar1{
         if (inno == 12 || inno == -12)
           continue;
       }
-      // if ( (ibkg == kNueFromNueCC_muon       || 
-      //       ibkg == kNueFromNueCC_chargeKaon || 
-      //       ibkg == kNueFromNueCC_neutKaon)
-      //     && nuchan != 1)
-      // {
-      //   if (inno == 12 || inno == -12)
-      //     continue;
-      // }
+
       if (ibkg == kNueFromNueCC_muon       || 
           ibkg == kNueFromNueCC_chargeKaon || 
           ibkg == kNueFromNueCC_neutKaon   || 
@@ -646,19 +670,26 @@ namespace lar1{
           ibkg == kNueFromNC_pi0           || 
           ibkg == kNueFromNC_delta0        
          ){
-        if(ElectContainedDist < showerContainmentDist){
+        if(ShowerContainedDist < showerContainmentDist){
           continue;
         }
-
       }
-      if(ElectDistToStart < minDistanceToStart){
+      if(ShowerDistToStart < minDistanceToStart){
           continue;
       }  
+      if(showerGap > minShowerGap && vertexEnergy > minVertexEnergy){
+        continue;
+      }
+
+      // // Reject all events with less than a certain amount of vertex activity:
+      // if (vertexEnergy < minVertexEnergy){
+      //   continue;
+      // }
+
       //use all the events because the weight, eff is already calculated
       weight=wgt; 
       // if (!absolute_MWSource) edistrnue->Fill(fill_energy,weight);
       if (inno == 12 || inno == -12) eventsNueMC->Fill(fill_energy);
-
 
 
       // Now do the multiweight part
@@ -1283,7 +1314,7 @@ namespace lar1{
 
       ientry = c->LoadTree(ievt); if (ientry < 0) break; nb = c->GetEntry(ievt); nbytes += nb;
       
-      if ( (ievt%10000) == 0) {
+      if ( (ievt%100000) == 0) {
         std::cout << "On event " << ievt << " of " << nentries1 << std::endl;
       }
 
