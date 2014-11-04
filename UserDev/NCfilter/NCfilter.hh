@@ -15,13 +15,17 @@
 #ifndef NCFILTER_HH
 #define NCFILTER_HH
 
+#define PI 3.14159265
+
 #include "ana_base.hh"
 #include "DivReg.hh"
 #include "ForceRegions.hh"
 #include "Quality.hh"
 #include "CRUHelper.hh"
 #include "PlaneCheckMatch.hh"
+#include "LookBack.hh"
 #include "LArUtilBase.hh"
+#include<algorithm> // For sort()
 
 
 
@@ -63,13 +67,18 @@ namespace larlight {
         ::cluster::ForceRegions fForceRegions;
         ::cluster::Quality fQuality;
         ::cluster::PlaneCheckMatch fPlaneCheckMatch;
+        ::cluster::LookBack fLookBack;
 
+	double radius_of_interest = 2.0;
 
 
     private: 
 	std::pair<double,double> HighQSlope(std::vector<unsigned int> hitindex ,larlight::event_hit const* hits);
 	std::vector<std::pair<std::vector<unsigned int>,std::vector<unsigned int>>> CheckQuality(larlight::event_hit *const hits,std::vector<std::pair<std::vector<unsigned int>,std::vector<unsigned int>>> protocluster, std::vector<bool> Flags);
   };
+
+
+
 }
 #endif
 

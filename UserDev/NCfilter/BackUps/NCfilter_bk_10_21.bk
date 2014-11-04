@@ -259,7 +259,6 @@ for( unsigned int i = 0 ; i<RotateAlg.size();i++)
 
 //==================================
 //=== Try to unmerge some things ===
-//==================================
 	for(unsigned int a = 0 ; a< 3 ; a++){
 		// if this is a good plane there are clusters in it
 		if(FlagGoodPlanes[a]){
@@ -274,28 +273,11 @@ for( unsigned int i = 0 ; i<RotateAlg.size();i++)
 // RG Can do another time prof or time overlap check here!
 
 
-
-//==================================
-//====== Try Refining the Angle ====
-//==================================
-
-
-
-	// First sort out the Crawler Clusters based on which which hits belong to which cluster. 
-
-	
-
-
-
-
-
-
-
 /*
-	std::cout<<"protovertex:"<<std::endl;
-     std::vector<std::pair<double,double>> pv = fquality.protovertexcw(bestclusters,hits);
+	std::cout<<"ProtoVertex:"<<std::endl;
+     std::vector<std::pair<double,double>> PV = fQuality.ProtoVertexCW(BestClusters,hits);
 	for( int i =0 ;i<3;i++){
-	std::cout<< "\t\t "<< pv[i].first<<" , "<<pv[i].second<<std::endl;}
+	std::cout<< "\t\t "<< PV[i].first<<" , "<<PV[i].second<<std::endl;}
 */	
 	
 //$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$

@@ -1,0 +1,6529 @@
+
+Finished configuring ana_processor. Start event loop!
+
+[95m    [NORMAL]  [0m[95m<open> [0mOpening a file in READ mode: ../../../MCFiles/pdg_111/MCData/all_Cluster.root
+[95m    [NORMAL]  [0m[95m<open> [0mOpening a file in WRITE mode: out.root
+[95m    [NORMAL]  [0m[95m<run> [0mProcessing 10000 events from entry 0...
+[95m    [NORMAL]  [0m[95m<LoadData> [0mLoading data for Geometry...
+     file=/home/ryan/LArLight/core/LArUtil/dat/larutil_microboone.root 
+[93m   [WARNING]  [0m[95m<get_data> [0mRequested tree ryancluster_tree which does not exists yet. Created a new one.
+[95m    [NORMAL]  [0m[95m<LoadData> [0mLoading data for DetectorProperties...
+     file=/home/ryan/LArLight/core/LArUtil/dat/larutil_microboone.root 
+[95m    [NORMAL]  [0m[95m<LoadData> [0mLoading data for LArProperties...
+     file=/home/ryan/LArLight/core/LArUtil/dat/larutil_microboone.root 
+Size of all the best clusters49 , 12618 , 13329 , 151
+ProtoVertex:
+		 -999 , -999
+		 555.97 , 231.683
+		 989.892 , 67.319
+ 
+
+
+
+Size of all the best clusters119 , 4872 , 42166 , 22
+ProtoVertex:
+		 486.908 , 212.615
+		 335.633 , 173.667
+		 671.281 , 222.803
+ 
+
+
+
+Size of all the best clusters42 , 4427 , 8937 , 57
+ProtoVertex:
+		 -999 , -999
+		 646.585 , 200.566
+		 936.248 , 198.028
+ 
+
+
+
+Size of all the best clusters151 , 114180 , 66236 , 109
+ProtoVertex:
+		 -999 , -999
+		 -999 , -999
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters5 , 16297 , 12383 , 155
+ This is the angle of the transfer cluster : 9.52821
+ This is the angle of the inspecting cluster : 21.7162
+ This is the angle of the looping cluster : -24.8886
+ This is the angle of the transfer cluster : 23.3122
+ This is the angle of the inspecting cluster : 16.5412
+ This is the angle of the looping cluster : 27.9967
+ SWITCH RESTART
+ProtoVertex:
+		 -999 , -999
+		 380.005 , 85.5
+		 570.338 , 132.822
+ 
+
+
+
+Size of all the best clusters158 , 84170 , 75225 , 69
+ This is the angle of the transfer cluster : -59.3135
+ This is the angle of the inspecting cluster : -30.6013
+ This is the angle of the looping cluster : -41.2562
+ SWITCH RESTART
+ProtoVertex:
+		 1305.12 , -1396.38
+		 326.872 , 83.2224
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters123 , 379357 , 167126 , 484
+ This is the angle of the transfer cluster : -62.7456
+ This is the angle of the inspecting cluster : -68.0969
+ This is the angle of the looping cluster : -73.6683
+ProtoVertex:
+		 200.477 , 160.701
+		 -999 , -999
+		 -169.194 , 489.012
+ 
+
+
+
+Size of all the best clusters84 , 80110 , 3595 , 47
+ProtoVertex:
+		 754.149 , 222.373
+		 481.225 , 205.402
+		 978.569 , 198.733
+ 
+
+
+
+Size of all the best clusters442 , 1545 , 334210 , 134
+ProtoVertex:
+		 -999 , -999
+		 -999 , -999
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters118 , 145254 , 274265 , 331
+ProtoVertex:
+		 -999 , -999
+		 -999 , -999
+		 81.1183 , 114.322
+ 
+
+
+
+Size of all the best clusters111 , 9774 , 18151 , 240
+ProtoVertex:
+		 -999 , -999
+		 549.362 , 168.677
+		 790.092 , 169.899
+ 
+
+
+
+Size of all the best clusters57 , 7772 , 4697 , 53
+ This is the angle of the transfer cluster : 6.67355
+ This is the angle of the inspecting cluster : -51.4112
+ This is the angle of the looping cluster : 1.66079
+ SWITCH RESTART
+ProtoVertex:
+		 399.616 , 227.36
+		 309.516 , 161.263
+		 597.371 , 232.149
+ 
+
+
+
+Size of all the best clusters250 , 122133 , 153216 , 252
+ProtoVertex:
+		 -999 , -999
+		 -999 , -999
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters97 , 10188 , 130146 , 143
+ProtoVertex:
+		 471.746 , 61.606
+		 310.235 , 61.759
+		 582.369 , 61.8189
+ 
+
+
+
+Size of all the best clusters112 , 5168 , 11374 , 126
+ProtoVertex:
+		 -999 , -999
+		 -999 , -999
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters128 , 6696 , 5562 , 44
+ProtoVertex:
+		 -999 , -999
+		 -999 , -999
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters145 , 17069 , 145124 , 224
+ProtoVertex:
+		 264.038 , 214.959
+		 182.053 , 211.901
+		 331.913 , 215.486
+ 
+
+
+
+Size of all the best clusters10 , 1526 , 1812 , 26
+ProtoVertex:
+		 -999 , -999
+		 -999 , -999
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters56 , 10088 , 9496 , 128
+ProtoVertex:
+		 -367.868 , 831.446
+		 327.584 , 100.945
+		 567.095 , 99.6767
+ 
+
+
+
+Size of all the best clusters204 , 124110 , 236287 , 188
+ This is the angle of the transfer cluster : -12.3952
+ This is the angle of the inspecting cluster : -10.2655
+ This is the angle of the looping cluster : 36.8593
+ This is the angle of the transfer cluster : -4.63578
+ This is the angle of the inspecting cluster : -17.1494
+ This is the angle of the looping cluster : -9.00602
+ SWITCH RESTART
+ProtoVertex:
+		 183.039 , 63.9787
+		 -999 , -999
+		 150.161 , 75.0376
+ 
+
+
+
+Size of all the best clusters113 , 63181 , 9188 , 38
+ProtoVertex:
+		 -999 , -999
+		 -999 , -999
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters122 , 8104 , 0158 , 0
+ProtoVertex:
+		 -999 , -999
+		 -999 , -999
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters75 , 8066 , 94103 , 94
+ProtoVertex:
+		 490.972 , 31.4492
+		 556.394 , 29.4025
+		 951.662 , 30.2565
+ 
+
+
+
+Size of all the best clusters165 , 51140 , 0150 , 115
+ProtoVertex:
+		 125.952 , 198.861
+		 152.302 , 199.611
+		 76.4989 , 200.855
+ 
+
+
+
+Size of all the best clusters155 , 251119 , 378147 , 509
+ProtoVertex:
+		 -999 , -999
+		 -999 , -999
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters102 , 19157 , 279148 , 100
+ProtoVertex:
+		 -999 , -999
+		 -999 , -999
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters55 , 322201 , 7928 , 199
+ProtoVertex:
+		 -999 , -999
+		 -999 , -999
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters101 , 25952 , 17754 , 214
+ This is the angle of the transfer cluster : -36.3267
+ This is the angle of the inspecting cluster : -43.1371
+ This is the angle of the looping cluster : -34.8842
+ SWITCH RESTART
+ This is the angle of the transfer cluster : 61.9002
+ This is the angle of the inspecting cluster : 62.9237
+ This is the angle of the looping cluster : 54.0476
+ This is the angle of the transfer cluster : -46.0734
+ This is the angle of the inspecting cluster : -55.5059
+ This is the angle of the looping cluster : -32.9784
+ProtoVertex:
+		 508.593 , 76.014
+		 455.599 , 36.3021
+		 833.732 , 7.90713
+ 
+
+
+
+Size of all the best clusters28 , 19340 , 27141 , 203
+ProtoVertex:
+		 254.16 , 199.316
+		 264.653 , 211.887
+		 326.188 , 211.479
+ 
+
+
+
+Size of all the best clusters129 , 6388 , 68166 , 31
+ProtoVertex:
+		 318.887 , 173.303
+		 449.849 , 172.441
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters243 , 6852 , 14665 , 210
+ProtoVertex:
+		 -999 , -999
+		 -999 , -999
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters37 , 210120 , 66147 , 179
+ProtoVertex:
+		 -999 , -999
+		 -999 , -999
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters96 , 2230 , 11555 , 46
+ProtoVertex:
+		 -999 , -999
+		 -999 , -999
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters178 , 194119 , 106200 , 296
+ProtoVertex:
+		 -999 , -999
+		 -999 , -999
+		 164.062 , 231.978
+ 
+
+
+
+Size of all the best clusters156 , 149105 , 165183 , 225
+ProtoVertex:
+		 204.358 , -4.26446
+		 -391.24 , 233.567
+		 257.761 , 22.3143
+ 
+
+
+
+Size of all the best clusters122 , 128118 , 8095 , 93
+ProtoVertex:
+		 -999 , -999
+		 -999 , -999
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters114 , 7093 , 8176 , 112
+ProtoVertex:
+		 -999 , -999
+		 -999 , -999
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters285 , 8577 , 80258 , 141
+ This is the angle of the transfer cluster : -34.5058
+ This is the angle of the inspecting cluster : -8.57543
+ This is the angle of the looping cluster : -54.2391
+ SWITCH RESTART
+ProtoVertex:
+		 224.726 , 33.2056
+		 82.3747 , 63.0062
+		 141.499 , 33.9234
+ 
+
+
+
+Size of all the best clusters55 , 243 , 13561 , 102
+ProtoVertex:
+		 -999 , -999
+		 -999 , -999
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters108 , 3157 , 25108 , 33
+ProtoVertex:
+		 -999 , -999
+		 -999 , -999
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters57 , 5253 , 4037 , 46
+ProtoVertex:
+		 153.476 , 166.625
+		 276.239 , 145.649
+		 239.194 , 158.212
+ 
+
+
+
+Size of all the best clusters56 , 16456 , 7276 , 136
+ProtoVertex:
+		 -999 , -999
+		 -999 , -999
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters124 , 11590 , 130170 , 112
+ProtoVertex:
+		 -999 , -999
+		 277.835 , 238.063
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters35 , 19759 , 23446 , 183
+ProtoVertex:
+		 -999 , -999
+		 404.793 , 9.21519
+		 583.202 , 28.8163
+ 
+
+
+
+Size of all the best clusters126 , 17764 , 142203 , 38
+ProtoVertex:
+		 -999 , -999
+		 -999 , -999
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters127 , 14286 , 389131 , 296
+ProtoVertex:
+		 327.08 , 165.775
+		 -999 , -999
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters77 , 17895 , 225104 , 175
+ProtoVertex:
+		 462.603 , 173.629
+		 363.606 , 178.119
+		 616.237 , 181.888
+ 
+
+
+
+Size of all the best clusters142 , 61197 , 89284 , 31
+ This is the angle of the transfer cluster : 67.3471
+ This is the angle of the inspecting cluster : 70.3717
+ This is the angle of the looping cluster : 21.9318
+ This is the angle of the transfer cluster : 29.8124
+ This is the angle of the inspecting cluster : 26.6996
+ This is the angle of the looping cluster : -2.78865
+ProtoVertex:
+		 312.98 , 205.924
+		 215.763 , 205.176
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters95 , 6566 , 11244 , 87
+ This is the angle of the transfer cluster : -63.9484
+ This is the angle of the inspecting cluster : -65.3628
+ This is the angle of the looping cluster : -64.5843
+ SWITCH RESTART
+ProtoVertex:
+		 48.353 , 28.484
+		 -999 , -999
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters125 , 107250 , 128115 , 159
+ This is the angle of the transfer cluster : -57.2999
+ This is the angle of the inspecting cluster : 27.3551
+ This is the angle of the looping cluster : -29.6942
+ SWITCH RESTART
+ProtoVertex:
+		 -31.1388 , 124.72
+		 162.224 , 186.227
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters184 , 10949 , 140187 , 98
+ This is the angle of the transfer cluster : -47.6488
+ This is the angle of the inspecting cluster : -53.9635
+ This is the angle of the looping cluster : -49.0008
+ SWITCH RESTART
+ProtoVertex:
+		 401.892 , 163.179
+		 238.758 , 170.181
+		 434.477 , 168.327
+ 
+
+
+
+Size of all the best clusters140 , 66110 , 81196 , 87
+ProtoVertex:
+		 -999 , -999
+		 -999 , -999
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters103 , 132104 , 30163 , 75
+ This is the angle of the transfer cluster : -61.164
+ This is the angle of the inspecting cluster : -36.0623
+ This is the angle of the looping cluster : -2.42599
+ This is the angle of the transfer cluster : -37.1297
+ This is the angle of the inspecting cluster : -32.7441
+ This is the angle of the looping cluster : 4.81803
+ProtoVertex:
+		 321.885 , 11.6462
+		 -999 , -999
+		 221.751 , 17.0281
+ 
+
+
+
+Size of all the best clusters26 , 14110 , 15124 , 175
+ProtoVertex:
+		 464.706 , 28.7699
+		 -999 , -999
+		 605.456 , -56.2051
+ 
+
+
+
+Size of all the best clusters179 , 17159 , 90216 , 106
+ProtoVertex:
+		 -999 , -999
+		 117.883 , 147.135
+		 174.247 , 148.323
+ 
+
+
+
+Size of all the best clusters159 , 3658 , 136226 , 41
+ProtoVertex:
+		 -999 , -999
+		 -999 , -999
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters61 , 12357 , 14555 , 144
+ProtoVertex:
+		 -999 , -999
+		 408.47 , 141.807
+		 729.337 , 145.687
+ 
+
+
+
+Size of all the best clusters393 , 156229 , 138270 , 182
+ This is the angle of the transfer cluster : 42.5959
+ This is the angle of the inspecting cluster : 26.2139
+ This is the angle of the looping cluster : 69.7338
+ This is the angle of the transfer cluster : -66.848
+ This is the angle of the inspecting cluster : -43.7098
+ This is the angle of the looping cluster : -47.3401
+ SWITCH RESTART
+ProtoVertex:
+		 470.256 , 39.9548
+		 292.197 , 80.1849
+		 533.533 , 68.3836
+ 
+
+
+
+Size of all the best clusters80 , 7768 , 7919 , 32
+ProtoVertex:
+		 -999 , -999
+		 -999 , -999
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters119 , 268178 , 360324 , 251
+ProtoVertex:
+		 446.497 , 26.0796
+		 -999 , -999
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters65 , 12675 , 16594 , 128
+ProtoVertex:
+		 -999 , -999
+		 -999 , -999
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters115 , 67140 , 17132 , 86
+ProtoVertex:
+		 181.35 , 85.5357
+		 -999 , -999
+		 266.617 , 86.5347
+ 
+
+
+
+Size of all the best clusters51 , 25251 , 17557 , 333
+ProtoVertex:
+		 402.639 , 115.259
+		 597.837 , -49.4309
+		 728.017 , 115.252
+ 
+
+
+
+Size of all the best clusters197 , 85128 , 29211 , 44
+ProtoVertex:
+		 -999 , -999
+		 -999 , -999
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters101 , 3833 , 53109 , 0
+ProtoVertex:
+		 250.69 , 200.572
+		 149.922 , 208.248
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters54 , 421181 , 135105 , 310
+ProtoVertex:
+		 -999 , -999
+		 -999 , -999
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters454 , 61147 , 199345 , 244
+ProtoVertex:
+		 -999 , -999
+		 -999 , -999
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters43 , 20461 , 12854 , 266
+ProtoVertex:
+		 22.9966 , 41.7492
+		 -999 , -999
+		 76.6204 , 47.7396
+ 
+
+
+
+Size of all the best clusters102 , 3948 , 119182 , 44
+ProtoVertex:
+		 385.662 , 194.75
+		 -999 , -999
+		 442.946 , 203.312
+ 
+
+
+
+Size of all the best clusters59 , 203191 , 5679 , 268
+ProtoVertex:
+		 -999 , -999
+		 -999 , -999
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters78 , 17856 , 13998 , 265
+ProtoVertex:
+		 -999 , -999
+		 -999 , -999
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters131 , 4673 , 19125 , 44
+ProtoVertex:
+		 271.73 , 197.257
+		 409.383 , 194.772
+		 478.903 , 198.195
+ 
+
+
+
+Size of all the best clusters120 , 57208 , 52267 , 71
+ProtoVertex:
+		 341.625 , 153.232
+		 404.706 , 174.449
+		 543.266 , 171.247
+ 
+
+
+
+Size of all the best clusters22 , 104139 , 034 , 89
+ProtoVertex:
+		 401.495 , 174.353
+		 -999 , -999
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters75 , 277341 , 119339 , 219
+ProtoVertex:
+		 -999 , -999
+		 -999 , -999
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters48 , 326325 , 90285 , 106
+ This is the angle of the transfer cluster : 49.4169
+ This is the angle of the inspecting cluster : 27.0141
+ This is the angle of the looping cluster : 27.424
+ SWITCH RESTART
+ProtoVertex:
+		 -999 , -999
+		 311.412 , 63.4546
+		 966.158 , 324.422
+ 
+
+
+
+Size of all the best clusters97 , 31594 , 323215 , 456
+ProtoVertex:
+		 -999 , -999
+		 -999 , -999
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters150 , 32222 , 9193 , 127
+ProtoVertex:
+		 -999 , -999
+		 -999 , -999
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters138 , 7219 , 20413 , 220
+ProtoVertex:
+		 -999 , -999
+		 -999 , -999
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters78 , 7369 , 71102 , 71
+ProtoVertex:
+		 -999 , -999
+		 -999 , -999
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters190 , 7131 , 268128 , 188
+ProtoVertex:
+		 -999 , -999
+		 -999 , -999
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters114 , 141110 , 65171 , 129
+ProtoVertex:
+		 309.402 , 129.492
+		 -999 , -999
+		 377.282 , 131.198
+ 
+
+
+
+Size of all the best clusters457 , 094 , 152417 , 21
+ProtoVertex:
+		 -999 , -999
+		 -999 , -999
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters93 , 8393 , 1939 , 144
+ProtoVertex:
+		 -999 , -999
+		 -999 , -999
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters265 , 2610 , 178244 , 53
+ProtoVertex:
+		 -999 , -999
+		 -999 , -999
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters48 , 12641 , 867 , 197
+ProtoVertex:
+		 -999 , -999
+		 -999 , -999
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters139 , 45160 , 34218 , 38
+ProtoVertex:
+		 502.718 , 146.273
+		 437.676 , 167.942
+		 739.797 , 154.898
+ 
+
+
+
+Size of all the best clusters79 , 6530 , 7778 , 103
+ProtoVertex:
+		 -999 , -999
+		 -999 , -999
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters131 , 120147 , 5457 , 215
+ProtoVertex:
+		 -999 , -999
+		 477.683 , 145.492
+		 912.057 , 159.521
+ 
+
+
+
+Size of all the best clusters153 , 5987 , 2489 , 38
+ProtoVertex:
+		 -99.7231 , 15.519
+		 476.643 , 28.9916
+		 615.279 , 29.8243
+ 
+
+
+
+Size of all the best clusters197 , 293306 , 62297 , 129
+ProtoVertex:
+		 151.507 , 80.7917
+		 260.197 , 150.349
+		 241.158 , 144.202
+ 
+
+
+
+Size of all the best clusters161 , 128174 , 531159 , 485
+ProtoVertex:
+		 -999 , -999
+		 -999 , -999
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters261 , 485170 , 186234 , 509
+ProtoVertex:
+		 265.536 , 48.4662
+		 416.825 , 92.774
+		 488.972 , 54.0398
+ 
+
+
+
+Size of all the best clusters50 , 5577 , 4459 , 32
+ This is the angle of the transfer cluster : -2.7067
+ This is the angle of the inspecting cluster : 35.852
+ This is the angle of the looping cluster : -14.4782
+ SWITCH RESTART
+ProtoVertex:
+		 505.268 , 166.511
+		 583.132 , 168.067
+		 905.439 , 168.359
+ 
+
+
+
+Size of all the best clusters174 , 17572 , 121134 , 215
+ This is the angle of the transfer cluster : -63.9353
+ This is the angle of the inspecting cluster : 10.8191
+ This is the angle of the looping cluster : -45.7991
+ SWITCH RESTART
+ProtoVertex:
+		 419.442 , 135.761
+		 265.065 , 132.832
+		 498.893 , 129.947
+ 
+
+
+
+Size of all the best clusters107 , 96104 , 9490 , 112
+ProtoVertex:
+		 615.532 , 120.978
+		 -999 , -999
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters61 , 165170 , 48150 , 37
+ This is the angle of the transfer cluster : 47.9449
+ This is the angle of the inspecting cluster : 46.2039
+ This is the angle of the looping cluster : 56.9244
+ This is the angle of the transfer cluster : -26.1738
+ This is the angle of the inspecting cluster : -31.1772
+ This is the angle of the looping cluster : -70.4778
+ProtoVertex:
+		 472.585 , 214.331
+		 607.163 , 193.962
+		 859.274 , 193.104
+ 
+
+
+
+Size of all the best clusters70 , 11438 , 10777 , 112
+ This is the angle of the transfer cluster : 65.9802
+ This is the angle of the inspecting cluster : 46.3381
+ This is the angle of the looping cluster : 55.0869
+ SWITCH RESTART
+ProtoVertex:
+		 390.948 , -4.09844
+		 419.169 , 26.0774
+		 621.466 , 23.5107
+ 
+
+
+
+Size of all the best clusters51 , 8436 , 156136 , 11
+ProtoVertex:
+		 60.691 , 30.2338
+		 176.856 , 31.5901
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters68 , 105189 , 105141 , 150
+ This is the angle of the transfer cluster : -29.5173
+ This is the angle of the inspecting cluster : -4.48728
+ This is the angle of the looping cluster : -29.8131
+ SWITCH RESTART
+ProtoVertex:
+		 632.797 , 81.008
+		 564.222 , 90.0166
+		 990.02 , 89.7707
+ 
+
+
+
+Size of all the best clusters71 , 7765 , 5799 , 40
+ProtoVertex:
+		 -999 , -999
+		 -999 , -999
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters188 , 3166 , 21178 , 39
+ProtoVertex:
+		 227.149 , 84.7191
+		 205.887 , 82.7051
+		 234.318 , 81.7127
+ 
+
+
+
+Size of all the best clusters371 , 211339 , 140432 , 98
+ProtoVertex:
+		 517.556 , 67.0368
+		 -999 , -999
+		 745.085 , 116.537
+ 
+
+
+
+Size of all the best clusters129 , 141102 , 23169 , 338
+ProtoVertex:
+		 -999 , -999
+		 850.437 , 208.705
+		 767.166 , 68.3606
+ 
+
+
+
+Size of all the best clusters135 , 72200 , 90197 , 76
+ProtoVertex:
+		 310.594 , 177.049
+		 331.808 , 101.218
+		 447.032 , 116.82
+ 
+
+
+
+Size of all the best clusters91 , 9187 , 114111 , 126
+ProtoVertex:
+		 -999 , -999
+		 294.364 , 147.526
+		 269.895 , 150.381
+ 
+
+
+
+Size of all the best clusters231 , 289277 , 162160 , 136
+ This is the angle of the transfer cluster : -15.714
+ This is the angle of the inspecting cluster : -18.5811
+ This is the angle of the looping cluster : -12.7966
+ This is the angle of the transfer cluster : -59.0592
+ This is the angle of the inspecting cluster : -53.6553
+ This is the angle of the looping cluster : 2.35589
+ProtoVertex:
+		 -999 , -999
+		 193.041 , 175.039
+		 314.616 , 164.404
+ 
+
+
+
+Size of all the best clusters86 , 4855 , 3579 , 52
+ProtoVertex:
+		 159.135 , 97.4534
+		 195.21 , 51.6698
+		 136.081 , 94.2104
+ 
+
+
+
+Size of all the best clusters108 , 89121 , 18181 , 304
+ProtoVertex:
+		 266.269 , 223.229
+		 216.907 , 224.094
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters68 , 15076 , 152150 , 194
+ProtoVertex:
+		 -999 , -999
+		 -999 , -999
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters87 , 6054 , 6810 , 45
+ProtoVertex:
+		 35.1792 , 67.821
+		 184.383 , 68.4292
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters349 , 161332 , 30111 , 510
+ProtoVertex:
+		 -999 , -999
+		 363.804 , 227.527
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters121 , 107170 , 14989 , 107
+ProtoVertex:
+		 452.058 , 183.305
+		 381.844 , 197.102
+		 608.658 , 200.499
+ 
+
+
+
+Size of all the best clusters274 , 9124 , 54238 , 37
+ProtoVertex:
+		 -999 , -999
+		 -999 , -999
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters191 , 3694 , 37148 , 26
+ProtoVertex:
+		 -999 , -999
+		 -999 , -999
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters83 , 2087 , 2363 , 79
+ProtoVertex:
+		 134.848 , 91.2902
+		 145.757 , 81.3903
+		 19.9766 , 103.738
+ 
+
+
+
+Size of all the best clusters111 , 4535 , 147158 , 66
+ This is the angle of the transfer cluster : 29.3282
+ This is the angle of the inspecting cluster : 16.1388
+ This is the angle of the looping cluster : 16.3113
+ SWITCH RESTART
+ This is the angle of the transfer cluster : 32.8211
+ This is the angle of the inspecting cluster : 9.58715
+ This is the angle of the looping cluster : 27.7875
+ SWITCH RESTART
+ProtoVertex:
+		 603.871 , 207.489
+		 534.19 , 225.572
+		 1155.29 , 354.294
+ 
+
+
+
+Size of all the best clusters112 , 179187 , 72115 , 259
+ProtoVertex:
+		 -999 , -999
+		 -999 , -999
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters11 , 163148 , 171138 , 183
+ProtoVertex:
+		 137.225 , 115.126
+		 64.0978 , 105.06
+		 26.9845 , 106.342
+ 
+
+
+
+Size of all the best clusters293 , 33658 , 191262 , 295
+ProtoVertex:
+		 -999 , -999
+		 -999 , -999
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters56 , 6431 , 4956 , 74
+ProtoVertex:
+		 -999 , -999
+		 -999 , -999
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters99 , 112126 , 31211 , 27
+ProtoVertex:
+		 -999 , -999
+		 249.157 , 104.364
+		 149.213 , 105.345
+ 
+
+
+
+Size of all the best clusters73 , 6534 , 5160 , 41
+ProtoVertex:
+		 174.466 , 235.211
+		 51.8084 , 235.686
+		 24.7518 , 235.372
+ 
+
+
+
+Size of all the best clusters49 , 196183 , 35110 , 60
+ This is the angle of the transfer cluster : -75.9121
+ This is the angle of the inspecting cluster : 12.8755
+ This is the angle of the looping cluster : -33.0565
+ SWITCH RESTART
+ProtoVertex:
+		 392.401 , 71.9676
+		 276.506 , 67.7797
+		 447.524 , 129.793
+ 
+
+
+
+Size of all the best clusters149 , 436240 , 298152 , 277
+ProtoVertex:
+		 -999 , -999
+		 -999 , -999
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters52 , 2924 , 5530 , 34
+ProtoVertex:
+		 877.956 , -101.506
+		 442.01 , 205.635
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters54 , 10459 , 14164 , 139
+ This is the angle of the transfer cluster : 40.0526
+ This is the angle of the inspecting cluster : 46.8136
+ This is the angle of the looping cluster : 40.2104
+ SWITCH RESTART
+ProtoVertex:
+		 -999 , -999
+		 324.22 , 224.42
+		 368.328 , 219.941
+ 
+
+
+
+Size of all the best clusters110 , 2882 , 17119 , 34
+ProtoVertex:
+		 -999 , -999
+		 -999 , -999
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters14 , 9895 , 4298 , 47
+ProtoVertex:
+		 -999 , -999
+		 434.43 , 205.545
+		 789.942 , 202.597
+ 
+
+
+
+Size of all the best clusters223 , 176116 , 102262 , 174
+ This is the angle of the transfer cluster : -7.93834
+ This is the angle of the inspecting cluster : -21.258
+ This is the angle of the looping cluster : -13.8702
+ SWITCH RESTART
+ProtoVertex:
+		 303.261 , 74.6554
+		 526.486 , 61.7848
+		 671.893 , 65.7572
+ 
+
+
+
+Size of all the best clusters9 , 5519 , 4351 , 31
+ProtoVertex:
+		 -999 , -999
+		 -999 , -999
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters28 , 2847 , 2935 , 26
+ProtoVertex:
+		 -999 , -999
+		 -999 , -999
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters88 , 299164 , 54106 , 200
+ProtoVertex:
+		 -999 , -999
+		 -999 , -999
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters36 , 240121 , 19463 , 254
+ProtoVertex:
+		 -999 , -999
+		 -999 , -999
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters75 , 12292 , 6072 , 63
+ProtoVertex:
+		 190.663 , 122.109
+		 120.097 , 120.389
+		 100.608 , 147.132
+ 
+
+
+
+Size of all the best clusters225 , 223133 , 109133 , 202
+ This is the angle of the transfer cluster : -6.57821
+ This is the angle of the inspecting cluster : 3.39878
+ This is the angle of the looping cluster : -19.0962
+ProtoVertex:
+		 185.398 , 56.7554
+		 396.57 , 56.7798
+		 368.045 , 55.4169
+ 
+
+
+
+Size of all the best clusters80 , 13398 , 65106 , 102
+ProtoVertex:
+		 -999 , -999
+		 498.031 , 142.989
+		 753.726 , 165.34
+ 
+
+
+
+Size of all the best clusters173 , 100148 , 295209 , 328
+ProtoVertex:
+		 -999 , -999
+		 170.568 , 31.0889
+		 87.2219 , 32.5224
+ 
+
+
+
+Size of all the best clusters91 , 5832 , 4190 , 30
+ProtoVertex:
+		 -999 , -999
+		 -999 , -999
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters229 , 175327 , 8999 , 344
+ This is the angle of the transfer cluster : 55.8164
+ This is the angle of the inspecting cluster : -17.7276
+ This is the angle of the looping cluster : 11.3207
+ SWITCH RESTART
+ This is the angle of the transfer cluster : 56.3451
+ This is the angle of the inspecting cluster : 45.4886
+ This is the angle of the looping cluster : 53.1697
+ SWITCH RESTART
+ProtoVertex:
+		 418.937 , 177.512
+		 -999 , -999
+		 642.313 , 124.576
+ 
+
+
+
+Size of all the best clusters141 , 4450 , 37121 , 65
+ProtoVertex:
+		 -999 , -999
+		 -999 , -999
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters51 , 2730 , 6285 , 20
+ProtoVertex:
+		 305.064 , 231.237
+		 -999 , -999
+		 461.771 , 233.593
+ 
+
+
+
+Size of all the best clusters47 , 3539 , 5242 , 25
+ProtoVertex:
+		 183.07 , 219.806
+		 298.761 , 220.199
+		 278.793 , 217.885
+ 
+
+
+
+Size of all the best clusters301 , 12738 , 212139 , 165
+ This is the angle of the transfer cluster : 26.0337
+ This is the angle of the inspecting cluster : 16.2566
+ This is the angle of the looping cluster : 30.6993
+ SWITCH RESTART
+ProtoVertex:
+		 262.026 , 165.981
+		 250.335 , 173.57
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters144 , 4461 , 6488 , 60
+ProtoVertex:
+		 463.988 , 200.066
+		 465.442 , 198.336
+		 746.783 , 187.139
+ 
+
+
+
+Size of all the best clusters167 , 223117 , 150122 , 305
+ProtoVertex:
+		 -999 , -999
+		 -999 , -999
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters44 , 3034 , 5546 , 61
+ProtoVertex:
+		 -999 , -999
+		 -999 , -999
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters357 , 3162 , 524517 , 122
+ProtoVertex:
+		 -999 , -999
+		 -999 , -999
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters36 , 5824 , 6830 , 76
+ProtoVertex:
+		 -999 , -999
+		 140.902 , 151.968
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters68 , 90100 , 48125 , 85
+ProtoVertex:
+		 463.168 , 184.187
+		 605.556 , 185.697
+		 867.403 , 185.261
+ 
+
+
+
+Size of all the best clusters69 , 114213 , 36203 , 89
+ This is the angle of the transfer cluster : -14.1437
+ This is the angle of the inspecting cluster : -5.64959
+ This is the angle of the looping cluster : -15.0783
+ SWITCH RESTART
+ProtoVertex:
+		 481.391 , 132.235
+		 378.411 , 138.745
+		 756.448 , 115.33
+ 
+
+
+
+Size of all the best clusters129 , 14271 , 15330 , 105
+ This is the angle of the transfer cluster : -11.3801
+ This is the angle of the inspecting cluster : -8.48414
+ This is the angle of the looping cluster : -27.6181
+ This is the angle of the transfer cluster : 17.0685
+ This is the angle of the inspecting cluster : 15.2058
+ This is the angle of the looping cluster : 25.5847
+ProtoVertex:
+		 514.221 , 236.562
+		 496.657 , 223.21
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters49 , 130189 , 34219 , 45
+ProtoVertex:
+		 -999 , -999
+		 -999 , -999
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters94 , 24369 , 14460 , 231
+ProtoVertex:
+		 -999 , -999
+		 -999 , -999
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters262 , 5292 , 373324 , 229
+ProtoVertex:
+		 285.125 , 112.024
+		 -999 , -999
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters134 , 268154 , 466275 , 479
+ProtoVertex:
+		 -999 , -999
+		 -999 , -999
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters308 , 139192 , 97123 , 154
+ This is the angle of the transfer cluster : -15.7285
+ This is the angle of the inspecting cluster : -24.5284
+ This is the angle of the looping cluster : -42.3772
+ This is the angle of the transfer cluster : 19.7704
+ This is the angle of the inspecting cluster : 36.2131
+ This is the angle of the looping cluster : 27.1022
+ SWITCH RESTART
+ProtoVertex:
+		 372.405 , 133.904
+		 334.766 , 134.402
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters68 , 6796 , 4799 , 49
+ProtoVertex:
+		 -999 , -999
+		 273.482 , -28.4799
+		 158.31 , 951.264
+ 
+
+
+
+Size of all the best clusters178 , 216386 , 15349 , 105
+ProtoVertex:
+		 190.276 , 121.295
+		 -999 , -999
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters37 , 223199 , 7639 , 362
+ This is the angle of the transfer cluster : -26.6932
+ This is the angle of the inspecting cluster : -53.1018
+ This is the angle of the looping cluster : -12.2954
+ SWITCH RESTART
+ProtoVertex:
+		 113.658 , 31.1953
+		 -999 , -999
+		 70.6286 , 32.3304
+ 
+
+
+
+Size of all the best clusters103 , 4741 , 6272 , 75
+ProtoVertex:
+		 -999 , -999
+		 -999 , -999
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters9 , 205187 , 833 , 98
+ProtoVertex:
+		 -999 , -999
+		 -999 , -999
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters98 , 148103 , 180133 , 283
+ProtoVertex:
+		 478.295 , 100.616
+		 414.973 , 102.886
+		 689.449 , 98.2254
+ 
+
+
+
+Size of all the best clusters103 , 208172 , 113116 , 95
+ProtoVertex:
+		 482.586 , 168.065
+		 -999 , -999
+		 766.425 , 334.132
+ 
+
+
+
+Size of all the best clusters7 , 218119 , 17377 , 153
+ProtoVertex:
+		 338.5 , 118.962
+		 265.424 , 149.26
+		 302.28 , 94.8645
+ 
+
+
+
+Size of all the best clusters239 , 30065 , 219181 , 356
+ProtoVertex:
+		 -999 , -999
+		 -999 , -999
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters25 , 21178 , 66111 , 128
+ This is the angle of the transfer cluster : 38.6487
+ This is the angle of the inspecting cluster : 48.0966
+ This is the angle of the looping cluster : -20.3309
+ProtoVertex:
+		 -999 , -999
+		 413.628 , 222.285
+		 832.221 , 181.127
+ 
+
+
+
+Size of all the best clusters86 , 7359 , 4999 , 94
+ProtoVertex:
+		 -999 , -999
+		 252.324 , 145.341
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters48 , 3121 , 1838 , 34
+ProtoVertex:
+		 245.769 , 53.724
+		 390.709 , 59.0251
+		 447.64 , 55.7794
+ 
+
+
+
+Size of all the best clusters66 , 11651 , 5960 , 74
+ProtoVertex:
+		 440.218 , 32.1705
+		 344.224 , 26.6019
+		 581.548 , 27.1716
+ 
+
+
+
+Size of all the best clusters64 , 29737 , 20051 , 327
+ This is the angle of the transfer cluster : 47.6153
+ This is the angle of the inspecting cluster : 47.8294
+ This is the angle of the looping cluster : 33.4686
+ProtoVertex:
+		 539.669 , 123.148
+		 415.142 , 95.5855
+		 696.159 , 105.512
+ 
+
+
+
+Size of all the best clusters157 , 176103 , 9141 , 288
+ProtoVertex:
+		 -999 , -999
+		 -999 , -999
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters111 , 14141 , 174227 , 141
+ This is the angle of the transfer cluster : 34.6019
+ This is the angle of the inspecting cluster : 37.4799
+ This is the angle of the looping cluster : -89.9426
+ProtoVertex:
+		 -999 , -999
+		 267.043 , 232.387
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters0 , 15251 , 5415 , 159
+ProtoVertex:
+		 -999 , -999
+		 -999 , -999
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters117 , 11353 , 19578 , 221
+ This is the angle of the transfer cluster : 31.9852
+ This is the angle of the inspecting cluster : 30.9245
+ This is the angle of the looping cluster : 14.943
+ProtoVertex:
+		 420.172 , 215.504
+		 530.457 , 183.584
+		 787.265 , 216.136
+ 
+
+
+
+Size of all the best clusters57 , 57110 , 9386 , 84
+ProtoVertex:
+		 -999 , -999
+		 -999 , -999
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters84 , 23683 , 125126 , 281
+ This is the angle of the transfer cluster : -22.8575
+ This is the angle of the inspecting cluster : -22.3643
+ This is the angle of the looping cluster : -1.53383
+ This is the angle of the transfer cluster : -6.86501
+ This is the angle of the inspecting cluster : -6.21642
+ This is the angle of the looping cluster : -4.32087
+ProtoVertex:
+		 -999 , -999
+		 501.959 , 10.6727
+		 935.619 , -3.14341
+ 
+
+
+
+Size of all the best clusters45 , 191247 , 37135 , 164
+ This is the angle of the transfer cluster : -28.3825
+ This is the angle of the inspecting cluster : 62.9979
+ This is the angle of the looping cluster : -38.2668
+ SWITCH RESTART
+ProtoVertex:
+		 385.917 , 136.028
+		 361.129 , 148.469
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters47 , 173161 , 30107 , 196
+ProtoVertex:
+		 -999 , -999
+		 -999 , -999
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters157 , 287491 , 37244 , 127
+ This is the angle of the transfer cluster : -60.1968
+ This is the angle of the inspecting cluster : -50.3159
+ This is the angle of the looping cluster : -55.9352
+ SWITCH RESTART
+ This is the angle of the transfer cluster : 47.4651
+ This is the angle of the inspecting cluster : 48.3932
+ This is the angle of the looping cluster : 75.208
+ProtoVertex:
+		 285.297 , 43.6162
+		 -999 , -999
+		 293.24 , 117.063
+ 
+
+
+
+Size of all the best clusters252 , 17816 , 191223 , 162
+ProtoVertex:
+		 82.7943 , 130.598
+		 -999 , -999
+		 77.9687 , 129.013
+ 
+
+
+
+Size of all the best clusters111 , 00 , 80101 , 0
+ProtoVertex:
+		 -999 , -999
+		 -999 , -999
+		 403.879 , 225.922
+ 
+
+
+
+Size of all the best clusters84 , 65153 , 18168 , 17
+ProtoVertex:
+		 -999 , -999
+		 668.011 , 223.409
+		 1004.83 , 220.498
+ 
+
+
+
+Size of all the best clusters245 , 219161 , 177328 , 278
+ProtoVertex:
+		 -999 , -999
+		 -999 , -999
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters184 , 142282 , 60119 , 368
+ProtoVertex:
+		 -999 , -999
+		 -999 , -999
+		 140.197 , 75.2216
+ 
+
+
+
+Size of all the best clusters198 , 7151 , 169194 , 115
+ProtoVertex:
+		 144.278 , 203.291
+		 204.515 , 180.253
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters132 , 145150 , 53153 , 30
+ProtoVertex:
+		 -999 , -999
+		 -999 , -999
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters330 , 8562 , 20741 , 267
+ This is the angle of the transfer cluster : -23.1637
+ This is the angle of the inspecting cluster : -19.5758
+ This is the angle of the looping cluster : -33.217
+ProtoVertex:
+		 643.611 , 132.319
+		 524.294 , 141.276
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters20 , 3627 , 5621 , 44
+ProtoVertex:
+		 -999 , -999
+		 -999 , -999
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters113 , 3619 , 117149 , 34
+ProtoVertex:
+		 586.403 , 152.248
+		 386.973 , 199.444
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters72 , 12630 , 24339 , 257
+ProtoVertex:
+		 -999 , -999
+		 -999 , -999
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters45 , 7155 , 7554 , 37
+ProtoVertex:
+		 478.953 , 151.664
+		 621.144 , 147.661
+		 900.006 , 151.855
+ 
+
+
+
+Size of all the best clusters63 , 24469 , 13781 , 271
+ This is the angle of the transfer cluster : 15.6878
+ This is the angle of the inspecting cluster : -40.8103
+ This is the angle of the looping cluster : 12.4835
+ SWITCH RESTART
+ProtoVertex:
+		 160.487 , 13.55
+		 314.153 , 52.2774
+		 100.51 , -6.50142
+ 
+
+
+
+Size of all the best clusters85 , 162107 , 88217 , 121
+ This is the angle of the transfer cluster : -3.98164
+ This is the angle of the inspecting cluster : -12.1137
+ This is the angle of the looping cluster : -2.43488
+ SWITCH RESTART
+ProtoVertex:
+		 -999 , -999
+		 281.12 , 26.5851
+		 222.103 , 25.5933
+ 
+
+
+
+Size of all the best clusters153 , 113211 , 79226 , 182
+ProtoVertex:
+		 -999 , -999
+		 -999 , -999
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters33 , 9239 , 2029 , 94
+ProtoVertex:
+		 -999 , -999
+		 -999 , -999
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters49 , 127182 , 67230 , 87
+ProtoVertex:
+		 -999 , -999
+		 -999 , -999
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters102 , 3728 , 82165 , 0
+ProtoVertex:
+		 -999 , -999
+		 -999 , -999
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters124 , 235428 , 7140 , 165
+ProtoVertex:
+		 313.266 , 127.876
+		 -999 , -999
+		 395.359 , 137.611
+ 
+
+
+
+Size of all the best clusters134 , 3599 , 44122 , 45
+ProtoVertex:
+		 -999 , -999
+		 -999 , -999
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters1 , 18556 , 11048 , 122
+ProtoVertex:
+		 -999 , -999
+		 158.944 , 178.189
+		 155.732 , 194.075
+ 
+
+
+
+[93m   [WARNING]  [0m[95m<analyze> [0mEvent 202 has no DBCluster...
+Size of all the best clusters51 , 66113 , 29131 , 41
+ProtoVertex:
+		 -999 , -999
+		 328.287 , 68.8199
+		 433.984 , 69.8939
+ 
+
+
+
+Size of all the best clusters100 , 3970 , 40116 , 32
+ProtoVertex:
+		 -999 , -999
+		 -999 , -999
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters42 , 102143 , 2445 , 145
+ProtoVertex:
+		 232.604 , 180.237
+		 160.641 , 174.28
+		 186.275 , 181.62
+ 
+
+
+
+Size of all the best clusters326 , 38395 , 119521 , 109
+ This is the angle of the transfer cluster : 35.8217
+ This is the angle of the inspecting cluster : 43.769
+ This is the angle of the looping cluster : 25.6036
+ This is the angle of the transfer cluster : 28.3209
+ This is the angle of the inspecting cluster : 38.1446
+ This is the angle of the looping cluster : 20.3513
+ SWITCH RESTART
+ProtoVertex:
+		 -999 , -999
+		 292.99 , 209.468
+		 481.058 , 217.857
+ 
+
+
+
+Size of all the best clusters527 , 1176 , 348366 , 131
+ This is the angle of the transfer cluster : -35.6349
+ This is the angle of the inspecting cluster : -53.5631
+ This is the angle of the looping cluster : -12.2
+ProtoVertex:
+		 337.339 , 31.0617
+		 -999 , -999
+		 333.62 , 70.2458
+ 
+
+
+
+Size of all the best clusters98 , 16392 , 142179 , 198
+ProtoVertex:
+		 319.994 , 216.726
+		 -999 , -999
+		 501.523 , 216.488
+ 
+
+
+
+Size of all the best clusters69 , 367201 , 9745 , 291
+ This is the angle of the transfer cluster : -44.3153
+ This is the angle of the inspecting cluster : -42.9087
+ This is the angle of the looping cluster : -30.9966
+ This is the angle of the transfer cluster : 70.673
+ This is the angle of the inspecting cluster : 70.1904
+ This is the angle of the looping cluster : 8.40294
+ProtoVertex:
+		 524.451 , 9.08568
+		 560.644 , 33.7273
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters59 , 331162 , 26166 , 150
+ This is the angle of the transfer cluster : -8.71704
+ This is the angle of the inspecting cluster : -4.8749
+ This is the angle of the looping cluster : -10.7113
+ SWITCH RESTART
+ProtoVertex:
+		 658.445 , 131.355
+		 556.33 , 135.636
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters41 , 82156 , 3092 , 39
+ProtoVertex:
+		 -999 , -999
+		 -95.8766 , -375.22
+		 979.614 , 115.868
+ 
+
+
+
+Size of all the best clusters163 , 5446 , 70103 , 73
+ProtoVertex:
+		 -999 , -999
+		 -999 , -999
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters52 , 97138 , 41128 , 66
+ProtoVertex:
+		 426.446 , 158.889
+		 360.497 , 116.176
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters127 , 3758 , 5554 , 97
+ProtoVertex:
+		 406.724 , 235.851
+		 393.088 , 234.712
+		 598.127 , 238.1
+ 
+
+
+
+Size of all the best clusters143 , 40111 , 2153 , 27
+ProtoVertex:
+		 -999 , -999
+		 -999 , -999
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters201 , 12058 , 207162 , 195
+ProtoVertex:
+		 399.929 , 2.0241
+		 -999 , -999
+		 772.259 , 37.1168
+ 
+
+
+
+Size of all the best clusters61 , 16543 , 8865 , 159
+ This is the angle of the transfer cluster : -29.3473
+ This is the angle of the inspecting cluster : -30.2153
+ This is the angle of the looping cluster : -15.2033
+ProtoVertex:
+		 540.213 , 221.853
+		 -999 , -999
+		 911.348 , 239.008
+ 
+
+
+
+Size of all the best clusters74 , 18168 , 11775 , 154
+ProtoVertex:
+		 -999 , -999
+		 532.861 , 158.651
+		 722.49 , 196.063
+ 
+
+
+
+Size of all the best clusters96 , 74144 , 9159 , 59
+ This is the angle of the transfer cluster : 29.4192
+ This is the angle of the inspecting cluster : -17.4299
+ This is the angle of the looping cluster : 19.2508
+ SWITCH RESTART
+ProtoVertex:
+		 556.486 , 224.512
+		 -999 , -999
+		 933.84 , 229.668
+ 
+
+
+
+Size of all the best clusters113 , 141146 , 32137 , 177
+ProtoVertex:
+		 -999 , -999
+		 -999 , -999
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters2 , 9498 , 2890 , 38
+ProtoVertex:
+		 205.901 , 200.891
+		 60.1897 , 222.272
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters126 , 65115 , 145131 , 184
+ProtoVertex:
+		 -999 , -999
+		 -999 , -999
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters102 , 32769 , 265114 , 439
+ This is the angle of the transfer cluster : -13.956
+ This is the angle of the inspecting cluster : 1.71332
+ This is the angle of the looping cluster : -13.7021
+ SWITCH RESTART
+ProtoVertex:
+		 -999 , -999
+		 454.139 , 116.547
+		 586.387 , 115.276
+ 
+
+
+
+Size of all the best clusters41 , 69107 , 3679 , 44
+ProtoVertex:
+		 -999 , -999
+		 -999 , -999
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters22 , 4859 , 3839 , 41
+ProtoVertex:
+		 -999 , -999
+		 -999 , -999
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters46 , 149107 , 62126 , 99
+ProtoVertex:
+		 -999 , -999
+		 -999 , -999
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters175 , 5177 , 79215 , 59
+ This is the angle of the transfer cluster : 14.1571
+ This is the angle of the inspecting cluster : 7.09716
+ This is the angle of the looping cluster : 16.0916
+ SWITCH RESTART
+ProtoVertex:
+		 -999 , -999
+		 509.988 , 111.914
+		 738.211 , 116.344
+ 
+
+
+
+Size of all the best clusters223 , 117102 , 163178 , 133
+ProtoVertex:
+		 -999 , -999
+		 -999 , -999
+		 481.204 , 110.219
+ 
+
+
+
+Size of all the best clusters34 , 98124 , 159 , 93
+ProtoVertex:
+		 270.046 , 147.009
+		 431.396 , 133.123
+		 534.031 , 140.452
+ 
+
+
+
+Size of all the best clusters53 , 5573 , 57107 , 55
+ProtoVertex:
+		 412.455 , 249.628
+		 -999 , -999
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters81 , 6092 , 3356 , 116
+ProtoVertex:
+		 -999 , -999
+		 -999 , -999
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters112 , 1972 , 31453 , 165
+ProtoVertex:
+		 -999 , -999
+		 -999 , -999
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters85 , 7583 , 10957 , 139
+ProtoVertex:
+		 634.422 , 267.634
+		 -999 , -999
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters78 , 9225 , 9352 , 115
+ProtoVertex:
+		 -999 , -999
+		 -999 , -999
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters72 , 826 , 6761 , 81
+ProtoVertex:
+		 -999 , -999
+		 515.875 , 57.1769
+		 872.73 , 30.0108
+ 
+
+
+
+Size of all the best clusters183 , 270105 , 69213 , 220
+ProtoVertex:
+		 -999 , -999
+		 -999 , -999
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters59 , 6150 , 112107 , 121
+ProtoVertex:
+		 -999 , -999
+		 -999 , -999
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters23 , 5621 , 469 , 17
+ This is the angle of the transfer cluster : -4.82091
+ This is the angle of the inspecting cluster : -7.0775
+ This is the angle of the looping cluster : -89.9426
+ProtoVertex:
+		 -999 , -999
+		 -999 , -999
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters108 , 74176 , 40181 , 55
+ProtoVertex:
+		 317.869 , 65.6494
+		 -999 , -999
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters389 , 12593 , 354199 , 503
+ProtoVertex:
+		 -999 , -999
+		 481.664 , 106.777
+		 626.735 , 111.619
+ 
+
+
+
+Size of all the best clusters57 , 154106 , 19518 , 351
+ProtoVertex:
+		 -999 , -999
+		 218.399 , 220.798
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters17 , 25462 , 2947 , 197
+ProtoVertex:
+		 -999 , -999
+		 152.318 , 77.8482
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters136 , 120199 , 10199 , 109
+ProtoVertex:
+		 460.089 , 191.832
+		 -999 , -999
+		 792.62 , 188.391
+ 
+
+
+
+Size of all the best clusters98 , 7198 , 5468 , 88
+ProtoVertex:
+		 129.703 , 172.116
+		 219.983 , 180.502
+		 158.426 , 196.414
+ 
+
+
+
+Size of all the best clusters258 , 109361 , 149561 , 121
+ProtoVertex:
+		 161.797 , 136.516
+		 -56.1231 , 142.971
+		 -19.0866 , 150.364
+ 
+
+
+
+Size of all the best clusters25 , 8936 , 10171 , 77
+ProtoVertex:
+		 -999 , -999
+		 -999 , -999
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters395 , 96120 , 102359 , 88
+ This is the angle of the transfer cluster : -10.4354
+ This is the angle of the inspecting cluster : -9.77845
+ This is the angle of the looping cluster : -22.8765
+ This is the angle of the transfer cluster : -9.89071
+ This is the angle of the inspecting cluster : -9.26086
+ This is the angle of the looping cluster : -20.8632
+ProtoVertex:
+		 298.099 , 34.5838
+		 -999 , -999
+		 182.847 , 36.608
+ 
+
+
+
+Size of all the best clusters101 , 7085 , 5742 , 114
+ProtoVertex:
+		 68.31 , 132.964
+		 -999 , -999
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters262 , 130267 , 86103 , 392
+ This is the angle of the transfer cluster : -26.8852
+ This is the angle of the inspecting cluster : -41.8594
+ This is the angle of the looping cluster : -4.06551
+ProtoVertex:
+		 364.383 , 156.813
+		 389.274 , 199.245
+		 750.366 , 88.2568
+ 
+
+
+
+Size of all the best clusters139 , 86112 , 117150 , 124
+ProtoVertex:
+		 -999 , -999
+		 -999 , -999
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters127 , 216108 , 77118 , 217
+ProtoVertex:
+		 375.866 , 26.5282
+		 523.053 , 91.7737
+		 711.421 , 45.3724
+ 
+
+
+
+Size of all the best clusters188 , 7162 , 17032 , 249
+ProtoVertex:
+		 -999 , -999
+		 -999 , -999
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters19 , 10964 , 6916 , 71
+ProtoVertex:
+		 258.951 , 87.9561
+		 -999 , -999
+		 134.825 , 18.0792
+ 
+
+
+
+Size of all the best clusters77 , 24746 , 485113 , 370
+ This is the angle of the transfer cluster : 37.1004
+ This is the angle of the inspecting cluster : 8.69596
+ This is the angle of the looping cluster : 50.1375
+ SWITCH RESTART
+ProtoVertex:
+		 362.342 , 99.689
+		 -999 , -999
+		 435.494 , 85.2484
+ 
+
+
+
+Size of all the best clusters33 , 13328 , 78114 , 86
+ProtoVertex:
+		 -999 , -999
+		 -999 , -999
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters57 , 6965 , 21124 , 28
+ProtoVertex:
+		 -999 , -999
+		 -999 , -999
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters91 , 6044 , 54105 , 54
+ProtoVertex:
+		 349.872 , 175.667
+		 399.056 , 192.29
+		 579.094 , 194.116
+ 
+
+
+
+Size of all the best clusters104 , 12152 , 188174 , 160
+ProtoVertex:
+		 120.098 , 181.591
+		 -999 , -999
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters62 , 3564 , 92147 , 0
+ProtoVertex:
+		 -999 , -999
+		 -999 , -999
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters50 , 33487 , 130228 , 148
+ProtoVertex:
+		 -999 , -999
+		 -999 , -999
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters90 , 8822 , 5582 , 80
+ This is the angle of the transfer cluster : 8.22561
+ This is the angle of the inspecting cluster : 20.1306
+ This is the angle of the looping cluster : -5.88743
+ProtoVertex:
+		 563.794 , 221.371
+		 -999 , -999
+		 836.638 , 219.912
+ 
+
+
+
+Size of all the best clusters161 , 15056 , 226117 , 121
+ProtoVertex:
+		 -999 , -999
+		 -999 , -999
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters192 , 26275 , 50235 , 50
+ProtoVertex:
+		 104.155 , 76.6496
+		 259.395 , 76.1493
+		 157.3 , 75.1772
+ 
+
+
+
+Size of all the best clusters156 , 64187 , 56108 , 70
+ This is the angle of the transfer cluster : -43.2186
+ This is the angle of the inspecting cluster : 62.9923
+ This is the angle of the looping cluster : -63.7589
+ SWITCH RESTART
+ProtoVertex:
+		 385.222 , 189.359
+		 431.444 , 182.751
+		 617.403 , 163.75
+ 
+
+
+
+Size of all the best clusters8 , 2718 , 3225 , 18
+ProtoVertex:
+		 -999 , -999
+		 -999 , -999
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters0 , 09 , 2110 , 13
+ProtoVertex:
+		 -999 , -999
+		 -999 , -999
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters58 , 74125 , 4466 , 106
+ProtoVertex:
+		 -999 , -999
+		 -999 , -999
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters144 , 211114 , 107250 , 201
+ This is the angle of the transfer cluster : -31.8584
+ This is the angle of the inspecting cluster : -28.9794
+ This is the angle of the looping cluster : -64.6801
+ This is the angle of the transfer cluster : -35.1103
+ This is the angle of the inspecting cluster : 19.0596
+ This is the angle of the looping cluster : -14.5831
+ SWITCH RESTART
+ This is the angle of the transfer cluster : -15.6613
+ This is the angle of the inspecting cluster : -21.8625
+ This is the angle of the looping cluster : 10.9965
+ProtoVertex:
+		 631.828 , 94.6936
+		 653.219 , 89.8512
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters228 , 82270 , 124371 , 86
+ This is the angle of the transfer cluster : -32.5069
+ This is the angle of the inspecting cluster : -33.3569
+ This is the angle of the looping cluster : -13.3572
+ProtoVertex:
+		 171.563 , -17.7135
+		 95.3294 , 115.74
+		 150.611 , 44.1389
+ 
+
+
+
+Size of all the best clusters203 , 10293 , 233139 , 65
+ProtoVertex:
+		 197.149 , 222.837
+		 99.2059 , 220.63
+		 86.9639 , 212.191
+ 
+
+
+
+Size of all the best clusters225 , 11845 , 208101 , 309
+ProtoVertex:
+		 -999 , -999
+		 -999 , -999
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters196 , 114179 , 73184 , 246
+ProtoVertex:
+		 -999 , -999
+		 -999 , -999
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters149 , 23977 , 168144 , 322
+ProtoVertex:
+		 -999 , -999
+		 -999 , -999
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters100 , 287186 , 444218 , 406
+ProtoVertex:
+		 -999 , -999
+		 -999 , -999
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters326 , 46286 , 76433 , 82
+ProtoVertex:
+		 66.5126 , 273.51
+		 343.506 , 120.228
+		 388.515 , 110.371
+ 
+
+
+
+Size of all the best clusters130 , 8165 , 20890 , 135
+ProtoVertex:
+		 -999 , -999
+		 -999 , -999
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters80 , 100107 , 5092 , 121
+ProtoVertex:
+		 489.916 , 244.046
+		 -999 , -999
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters44 , 11773 , 14493 , 78
+ This is the angle of the transfer cluster : 36.3292
+ This is the angle of the inspecting cluster : 27.3318
+ This is the angle of the looping cluster : 3.80644
+ProtoVertex:
+		 646.005 , 204.255
+		 -999 , -999
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters239 , 11191 , 120126 , 211
+ProtoVertex:
+		 -999 , -999
+		 194.165 , 134.952
+		 641.937 , 462.314
+ 
+
+
+
+Size of all the best clusters231 , 5885 , 81153 , 150
+ProtoVertex:
+		 -999 , -999
+		 -999 , -999
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters91 , 9855 , 149144 , 124
+ProtoVertex:
+		 120.456 , 81.0879
+		 242.986 , 72.7134
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters152 , 26169 , 25222 , 47
+ProtoVertex:
+		 -999 , -999
+		 -999 , -999
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters238 , 157198 , 112166 , 96
+ProtoVertex:
+		 111.561 , 29.9278
+		 129.158 , 15.3983
+		 -30.4874 , -141.629
+ 
+
+
+
+Size of all the best clusters60 , 7325 , 6623 , 96
+ProtoVertex:
+		 -999 , -999
+		 -999 , -999
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters130 , 81114 , 61174 , 84
+ProtoVertex:
+		 -999 , -999
+		 -999 , -999
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters92 , 2724 , 6849 , 38
+ This is the angle of the transfer cluster : 45.2169
+ This is the angle of the inspecting cluster : 44.9923
+ This is the angle of the looping cluster : -21.6677
+ This is the angle of the transfer cluster : -49.3654
+ This is the angle of the inspecting cluster : -49.1732
+ This is the angle of the looping cluster : 16.8773
+ProtoVertex:
+		 -999 , -999
+		 -999 , -999
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters342 , 91151 , 57428 , 18
+ProtoVertex:
+		 -999 , -999
+		 -999 , -999
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters131 , 2693 , 15174 , 25
+ProtoVertex:
+		 -999 , -999
+		 -999 , -999
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters43 , 16461 , 7475 , 138
+ProtoVertex:
+		 -999 , -999
+		 -999 , -999
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters21 , 9326 , 18035 , 151
+ProtoVertex:
+		 194.003 , 22.266
+		 303.586 , 23.9477
+		 282.718 , 34.0955
+ 
+
+
+
+Size of all the best clusters44 , 15323 , 107140 , 95
+ProtoVertex:
+		 410.915 , 218.795
+		 449.054 , 224.199
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters38 , 167147 , 87228 , 28
+ This is the angle of the transfer cluster : -34.9134
+ This is the angle of the inspecting cluster : -34.0639
+ This is the angle of the looping cluster : -43.7456
+ProtoVertex:
+		 172.52 , 159.714
+		 254.235 , 161.084
+		 184.011 , 190.953
+ 
+
+
+
+Size of all the best clusters163 , 35126 , 125136 , 120
+ProtoVertex:
+		 -999 , -999
+		 231.5 , 34.7034
+		 342.839 , 34.9268
+ 
+
+
+
+Size of all the best clusters139 , 81182 , 201145 , 299
+ This is the angle of the transfer cluster : 59.2608
+ This is the angle of the inspecting cluster : -23.0116
+ This is the angle of the looping cluster : 59.6538
+ SWITCH RESTART
+ProtoVertex:
+		 233.658 , 113.61
+		 327.709 , 185.69
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters240 , 3818 , 143209 , 36
+ProtoVertex:
+		 214.919 , 104.005
+		 115.836 , 94.7707
+		 129.204 , 105.277
+ 
+
+
+
+Size of all the best clusters177 , 17874 , 337182 , 367
+ProtoVertex:
+		 -999 , -999
+		 -999 , -999
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters58 , 15432 , 10283 , 154
+ This is the angle of the transfer cluster : 22.9026
+ This is the angle of the inspecting cluster : 15.3803
+ This is the angle of the looping cluster : 26.5879
+ SWITCH RESTART
+ This is the angle of the transfer cluster : -14.9044
+ This is the angle of the inspecting cluster : -14.7315
+ This is the angle of the looping cluster : 4.87988
+ProtoVertex:
+		 25.6938 , 169.719
+		 -999 , -999
+		 119.029 , 197.131
+ 
+
+
+
+Size of all the best clusters212 , 75140 , 194253 , 168
+ProtoVertex:
+		 -999 , -999
+		 -572.277 , -464.227
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters37 , 14550 , 12466 , 83
+ProtoVertex:
+		 269.128 , 217.1
+		 345.787 , 185.001
+		 388.936 , 184.229
+ 
+
+
+
+Size of all the best clusters178 , 2753 , 156194 , 96
+ProtoVertex:
+		 -999 , -999
+		 -999 , -999
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters88 , 19109 , 036 , 79
+ProtoVertex:
+		 193.303 , 54.4987
+		 -999 , -999
+		 347.768 , 52.8955
+ 
+
+
+
+Size of all the best clusters133 , 3150 , 60196 , 28
+ProtoVertex:
+		 -999 , -999
+		 -999 , -999
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters152 , 1871 , 10388 , 132
+ProtoVertex:
+		 -999 , -999
+		 395.505 , 65.6313
+		 687.314 , 60.0369
+ 
+
+
+
+Size of all the best clusters53 , 4533 , 1034 , 53
+ProtoVertex:
+		 -999 , -999
+		 -999 , -999
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters420 , 8025 , 534227 , 231
+ProtoVertex:
+		 -999 , -999
+		 -999 , -999
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters427 , 182117 , 277523 , 171
+ProtoVertex:
+		 838.454 , 566.609
+		 147.422 , 183.095
+		 150.225 , 172.597
+ 
+
+
+
+Size of all the best clusters162 , 3168 , 6319 , 211
+ProtoVertex:
+		 -999 , -999
+		 -999 , -999
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters163 , 4555 , 132224 , 10
+ProtoVertex:
+		 128.296 , 86.1039
+		 233.489 , 87.4239
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters117 , 249193 , 272143 , 390
+ProtoVertex:
+		 535.919 , 120.659
+		 378.297 , 129.261
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters181 , 12869 , 183136 , 88
+ This is the angle of the transfer cluster : -66.7133
+ This is the angle of the inspecting cluster : -62.8311
+ This is the angle of the looping cluster : 50.1943
+ProtoVertex:
+		 424.354 , 158.519
+		 -999 , -999
+		 604.821 , 136.664
+ 
+
+
+
+Size of all the best clusters172 , 10354 , 129167 , 79
+ProtoVertex:
+		 130.1 , 117.589
+		 109.377 , 87.641
+		 26.1401 , 123.105
+ 
+
+
+
+Size of all the best clusters134 , 6385 , 51169 , 44
+ProtoVertex:
+		 -999 , -999
+		 -999 , -999
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters27 , 5352 , 1781 , 22
+ProtoVertex:
+		 -999 , -999
+		 549.419 , 57.7341
+		 736.793 , 95.5051
+ 
+
+
+
+Size of all the best clusters213 , 4926 , 157185 , 157
+ This is the angle of the transfer cluster : -33.2319
+ This is the angle of the inspecting cluster : -33.7624
+ This is the angle of the looping cluster : 12.1413
+ProtoVertex:
+		 -999 , -999
+		 348.583 , 263.094
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters18 , 72151 , 0160 , 17
+ProtoVertex:
+		 275.622 , 135.514
+		 -999 , -999
+		 248.259 , 136.095
+ 
+
+
+
+Size of all the best clusters134 , 27122 , 34126 , 34
+ProtoVertex:
+		 488.087 , 187.885
+		 481.166 , 168.391
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters26 , 5134 , 4254 , 29
+ProtoVertex:
+		 250.183 , 233.777
+		 77.4166 , 239.514
+		 122.45 , 236.585
+ 
+
+
+
+Size of all the best clusters219 , 6115 , 196135 , 268
+ProtoVertex:
+		 -999 , -999
+		 -999 , -999
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters9 , 188149 , 77124 , 90
+ProtoVertex:
+		 -999 , -999
+		 -999 , -999
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters57 , 8071 , 7668 , 36
+ProtoVertex:
+		 -999 , -999
+		 -999 , -999
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters120 , 9972 , 51139 , 55
+ProtoVertex:
+		 -999 , -999
+		 491.804 , 202.891
+		 933.008 , 210.456
+ 
+
+
+
+Size of all the best clusters88 , 8189 , 3769 , 82
+ProtoVertex:
+		 -999 , -999
+		 -999 , -999
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters114 , 2967 , 83115 , 122
+ProtoVertex:
+		 -999 , -999
+		 -999 , -999
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters118 , 3299 , 54117 , 42
+ProtoVertex:
+		 495.416 , 164.073
+		 297.067 , 157.989
+		 823.057 , 130.312
+ 
+
+
+
+Size of all the best clusters130 , 13792 , 24179 , 201
+ This is the angle of the transfer cluster : 47.2628
+ This is the angle of the inspecting cluster : 50.4792
+ This is the angle of the looping cluster : 71.8355
+ This is the angle of the transfer cluster : 68.7956
+ This is the angle of the inspecting cluster : -31.2063
+ This is the angle of the looping cluster : -55.8999
+ProtoVertex:
+		 -999 , -999
+		 -999 , -999
+		 685.399 , 116.459
+ 
+
+
+
+Size of all the best clusters108 , 48129 , 82124 , 67
+ This is the angle of the transfer cluster : -35.9499
+ This is the angle of the inspecting cluster : 37.0878
+ This is the angle of the looping cluster : -58.4869
+ SWITCH RESTART
+ This is the angle of the transfer cluster : -43.8508
+ This is the angle of the inspecting cluster : 39.3928
+ This is the angle of the looping cluster : -63.7745
+ SWITCH RESTART
+ProtoVertex:
+		 358.385 , 12.272
+		 312.747 , 103.752
+		 447.372 , 104.434
+ 
+
+
+
+Size of all the best clusters34 , 1212 , 3220 , 26
+ProtoVertex:
+		 -999 , -999
+		 -999 , -999
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters59 , 81186 , 18215 , 3
+ProtoVertex:
+		 -999 , -999
+		 -999 , -999
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters282 , 111483 , 58496 , 185
+ This is the angle of the transfer cluster : -54.2667
+ This is the angle of the inspecting cluster : -61.8395
+ This is the angle of the looping cluster : -51.282
+ SWITCH RESTART
+ This is the angle of the transfer cluster : -25.8867
+ This is the angle of the inspecting cluster : -30.6929
+ This is the angle of the looping cluster : -26.395
+ SWITCH RESTART
+ProtoVertex:
+		 600.958 , 161.485
+		 -999 , -999
+		 1022.38 , 150.539
+ 
+
+
+
+Size of all the best clusters96 , 7039 , 131150 , 50
+ProtoVertex:
+		 -999 , -999
+		 -999 , -999
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters52 , 67108 , 0127 , 21
+ProtoVertex:
+		 -999 , -999
+		 -999 , -999
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters100 , 24542 , 234129 , 174
+ProtoVertex:
+		 -999 , -999
+		 -999 , -999
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters151 , 197105 , 97223 , 66
+ProtoVertex:
+		 -999 , -999
+		 -999 , -999
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters138 , 160118 , 69135 , 171
+ProtoVertex:
+		 -999 , -999
+		 -999 , -999
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters160 , 6791 , 27495 , 179
+ProtoVertex:
+		 -999 , -999
+		 -999 , -999
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters359 , 244110 , 52589 , 377
+ProtoVertex:
+		 -999 , -999
+		 -999 , -999
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters53 , 16739 , 14838 , 147
+ProtoVertex:
+		 -999 , -999
+		 -999 , -999
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters87 , 167113 , 321140 , 355
+ProtoVertex:
+		 -999 , -999
+		 -999 , -999
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters174 , 6284 , 59154 , 54
+ProtoVertex:
+		 197.466 , 53.8708
+		 358.353 , 99.4067
+		 352.768 , 51.2335
+ 
+
+
+
+Size of all the best clusters75 , 10871 , 119101 , 131
+ProtoVertex:
+		 106.95 , 118.815
+		 223.284 , 118.453
+		 127.872 , 120.144
+ 
+
+
+
+Size of all the best clusters334 , 7753 , 119346 , 108
+ProtoVertex:
+		 -999 , -999
+		 -999 , -999
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters208 , 0114 , 836 , 187
+ProtoVertex:
+		 -999 , -999
+		 -999 , -999
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters76 , 10342 , 11977 , 65
+ProtoVertex:
+		 -999 , -999
+		 -999 , -999
+		 39.1082 , 119.307
+ 
+
+
+
+Size of all the best clusters89 , 11371 , 4156 , 92
+ProtoVertex:
+		 350.408 , 141.178
+		 301.848 , 111.327
+		 412.425 , 140.953
+ 
+
+
+
+Size of all the best clusters87 , 57141 , 32195 , 20
+ProtoVertex:
+		 360.929 , 56.2067
+		 291.673 , 57.4581
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters180 , 114227 , 96168 , 235
+ProtoVertex:
+		 525.259 , 41.6367
+		 554.312 , 83.7764
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters108 , 22356 , 15184 , 294
+ This is the angle of the transfer cluster : 64.0753
+ This is the angle of the inspecting cluster : 63.0867
+ This is the angle of the looping cluster : 82.277
+ProtoVertex:
+		 380.135 , 147.299
+		 -999 , -999
+		 646.855 , 148.2
+ 
+
+
+
+Size of all the best clusters23 , 315299 , 242296 , 321
+ProtoVertex:
+		 -999 , -999
+		 -999 , -999
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters163 , 86194 , 85255 , 152
+ProtoVertex:
+		 -999 , -999
+		 283.157 , 239.639
+		 557.275 , 235.29
+ 
+
+
+
+Size of all the best clusters143 , 3585 , 41135 , 22
+ProtoVertex:
+		 -999 , -999
+		 -999 , -999
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters37 , 98155 , 068 , 41
+ProtoVertex:
+		 -999 , -999
+		 -999 , -999
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters31 , 73120 , 0122 , 0
+ProtoVertex:
+		 -999 , -999
+		 -999 , -999
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters98 , 6641 , 210201 , 31
+ProtoVertex:
+		 -999 , -999
+		 -999 , -999
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters154 , 456126 , 281163 , 418
+ This is the angle of the transfer cluster : 39.1256
+ This is the angle of the inspecting cluster : 42.2387
+ This is the angle of the looping cluster : 37.3199
+ SWITCH RESTART
+ This is the angle of the transfer cluster : 26.4353
+ This is the angle of the inspecting cluster : 20.702
+ This is the angle of the looping cluster : 30.8583
+ SWITCH RESTART
+ProtoVertex:
+		 383.592 , 211.061
+		 392.383 , 215.289
+		 883.818 , 421.577
+ 
+
+
+
+Size of all the best clusters100 , 12283 , 9474 , 164
+ProtoVertex:
+		 -999 , -999
+		 -999 , -999
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters85 , 13593 , 78128 , 34
+ This is the angle of the transfer cluster : 29.7372
+ This is the angle of the inspecting cluster : 52.8569
+ This is the angle of the looping cluster : 68.8846
+ This is the angle of the transfer cluster : -53.6215
+ This is the angle of the inspecting cluster : -60.6036
+ This is the angle of the looping cluster : -87.5486
+ProtoVertex:
+		 398.085 , 209.155
+		 -999 , -999
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters75 , 133109 , 3869 , 193
+ProtoVertex:
+		 -999 , -999
+		 -999 , -999
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters28 , 119 , 2117 , 18
+ProtoVertex:
+		 -999 , -999
+		 -999 , -999
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters86 , 67175 , 42182 , 71
+ This is the angle of the transfer cluster : -31.9475
+ This is the angle of the inspecting cluster : -48.4102
+ This is the angle of the looping cluster : 11.878
+ProtoVertex:
+		 395.98 , 98.6338
+		 552.197 , 77.8727
+		 755.549 , 80.4584
+ 
+
+
+
+Size of all the best clusters276 , 178102 , 161108 , 337
+ProtoVertex:
+		 -999 , -999
+		 -999 , -999
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters139 , 118102 , 71122 , 96
+ This is the angle of the transfer cluster : -74.3561
+ This is the angle of the inspecting cluster : -55.6365
+ This is the angle of the looping cluster : 71.9711
+ This is the angle of the transfer cluster : 53.5499
+ This is the angle of the inspecting cluster : 63.6393
+ This is the angle of the looping cluster : 42.2636
+ProtoVertex:
+		 -999 , -999
+		 504.015 , 232.528
+		 825.095 , 227.271
+ 
+
+
+
+Size of all the best clusters224 , 381 , 105142 , 142
+ProtoVertex:
+		 -999 , -999
+		 243.126 , 148.957
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters69 , 139147 , 111149 , 72
+ProtoVertex:
+		 -999 , -999
+		 -999 , -999
+		 252.591 , 301.65
+ 
+
+
+
+Size of all the best clusters132 , 30102 , 29178 , 4
+ProtoVertex:
+		 -999 , -999
+		 -999 , -999
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters43 , 2623 , 1837 , 46
+ProtoVertex:
+		 -999 , -999
+		 -999 , -999
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters113 , 351172 , 10188 , 282
+ This is the angle of the transfer cluster : 44.9175
+ This is the angle of the inspecting cluster : 47.4803
+ This is the angle of the looping cluster : 62.5722
+ProtoVertex:
+		 -981.445 , 698.771
+		 234.421 , 201.576
+		 122.1 , 235.308
+ 
+
+
+
+Size of all the best clusters67 , 1850 , 3776 , 39
+ProtoVertex:
+		 306.182 , 177.171
+		 453.155 , 194.335
+		 573.612 , 195.357
+ 
+
+
+
+Size of all the best clusters89 , 5745 , 5858 , 74
+ProtoVertex:
+		 135.82 , 37.5528
+		 98.7269 , 36.654
+		 34.2958 , 39.0264
+ 
+
+
+
+Size of all the best clusters76 , 10590 , 4767 , 77
+ProtoVertex:
+		 616.027 , 82.2607
+		 548.118 , 109.089
+		 926.469 , 49.8253
+ 
+
+
+
+Size of all the best clusters275 , 87315 , 60335 , 87
+ProtoVertex:
+		 -999 , -999
+		 -999 , -999
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters105 , 24499 , 156231 , 247
+ This is the angle of the transfer cluster : -19.2196
+ This is the angle of the inspecting cluster : 15.3521
+ This is the angle of the looping cluster : -14.2033
+ SWITCH RESTART
+ This is the angle of the transfer cluster : -4.13172
+ This is the angle of the inspecting cluster : 6.81829
+ This is the angle of the looping cluster : -15.2929
+ProtoVertex:
+		 498.091 , 72.6128
+		 514.884 , 75.3522
+		 796.451 , 75.67
+ 
+
+
+
+Size of all the best clusters164 , 1200 , 42174 , 93
+ProtoVertex:
+		 -999 , -999
+		 323.336 , 31.7197
+		 1679.51 , 630.423
+ 
+
+
+
+Size of all the best clusters267 , 54185 , 31303 , 0
+ProtoVertex:
+		 -999 , -999
+		 -999 , -999
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters155 , 15128 , 0194 , 1
+ProtoVertex:
+		 -999 , -999
+		 -999 , -999
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters120 , 7896 , 109145 , 122
+ This is the angle of the transfer cluster : -34.1888
+ This is the angle of the inspecting cluster : -40.9908
+ This is the angle of the looping cluster : -51.931
+ This is the angle of the transfer cluster : -22.6726
+ This is the angle of the inspecting cluster : -43.6799
+ This is the angle of the looping cluster : -52.4849
+ProtoVertex:
+		 -999 , -999
+		 242.758 , 249.66
+		 718.632 , 9.53702
+ 
+
+
+
+Size of all the best clusters96 , 48172 , 73180 , 58
+ProtoVertex:
+		 190.345 , 185.845
+		 49.1541 , 185.269
+		 34.0562 , 186.856
+ 
+
+
+
+Size of all the best clusters67 , 18081 , 10822 , 238
+ProtoVertex:
+		 -999 , -999
+		 -999 , -999
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters91 , 15762 , 7066 , 195
+ProtoVertex:
+		 84.6676 , 119.211
+		 219.668 , 119.687
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters82 , 8054 , 5864 , 75
+ This is the angle of the transfer cluster : -31.8351
+ This is the angle of the inspecting cluster : 26.4537
+ This is the angle of the looping cluster : -19.6083
+ SWITCH RESTART
+ProtoVertex:
+		 395.916 , 147.497
+		 -999 , -999
+		 616.493 , 150.504
+ 
+
+
+
+Size of all the best clusters261 , 147330 , 192200 , 133
+ This is the angle of the transfer cluster : -24.779
+ This is the angle of the inspecting cluster : -33.0998
+ This is the angle of the looping cluster : -5.47058
+ This is the angle of the transfer cluster : -58.5337
+ This is the angle of the inspecting cluster : -40.4866
+ This is the angle of the looping cluster : -14.5438
+ProtoVertex:
+		 -999 , -999
+		 558.571 , 117.43
+		 941.546 , 126.656
+ 
+
+
+
+Size of all the best clusters42 , 5466 , 4358 , 46
+ This is the angle of the transfer cluster : 44.4032
+ This is the angle of the inspecting cluster : 41.9091
+ This is the angle of the looping cluster : -89.9426
+ProtoVertex:
+		 -999 , -999
+		 -999 , -999
+		 643.953 , -60.5626
+ 
+
+
+
+Size of all the best clusters220 , 130128 , 105243 , 109
+ProtoVertex:
+		 -999 , -999
+		 -999 , -999
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters106 , 6763 , 37100 , 57
+ProtoVertex:
+		 497.26 , 141.079
+		 460.258 , 110.094
+		 766.011 , 145.047
+ 
+
+
+
+Size of all the best clusters161 , 148315 , 29102 , 395
+ProtoVertex:
+		 -999 , -999
+		 -999 , -999
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters51 , 16631 , 17559 , 202
+ProtoVertex:
+		 -999 , -999
+		 199.089 , 74.6022
+		 326.138 , 82.2003
+ 
+
+
+
+Size of all the best clusters112 , 35104 , 42170 , 30
+ProtoVertex:
+		 401.695 , 179.56
+		 493.432 , 179.282
+		 693.057 , 178.634
+ 
+
+
+
+Size of all the best clusters106 , 5193 , 7147 , 157
+ProtoVertex:
+		 624.496 , 58.8966
+		 562.028 , 64.5978
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters40 , 186104 , 154100 , 175
+ProtoVertex:
+		 -999 , -999
+		 492.972 , 111.65
+		 1112.09 , 149.82
+ 
+
+
+
+Size of all the best clusters86 , 14552 , 17667 , 240
+ProtoVertex:
+		 -999 , -999
+		 509.041 , 187.734
+		 821.227 , 187.174
+ 
+
+
+
+Size of all the best clusters40 , 3371 , 12089 , 105
+ProtoVertex:
+		 -999 , -999
+		 -999 , -999
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters179 , 309155 , 85108 , 249
+ProtoVertex:
+		 -999 , -999
+		 -999 , -999
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters116 , 1979 , 36166 , 0
+ProtoVertex:
+		 -999 , -999
+		 -999 , -999
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters26 , 241268 , 59107 , 287
+ProtoVertex:
+		 -999 , -999
+		 -999 , -999
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters233 , 7592 , 201258 , 181
+ProtoVertex:
+		 -999 , -999
+		 -999 , -999
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters17 , 3019 , 1633 , 14
+ProtoVertex:
+		 -999 , -999
+		 -999 , -999
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters55 , 4335 , 6176 , 53
+ProtoVertex:
+		 248.185 , 181.883
+		 263.763 , 145.076
+		 282.497 , 174.224
+ 
+
+
+
+Size of all the best clusters165 , 397183 , 122195 , 455
+ProtoVertex:
+		 -999 , -999
+		 -999 , -999
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters63 , 6727 , 9475 , 42
+ProtoVertex:
+		 545.01 , 222.408
+		 529.102 , 217.786
+		 878.271 , 213.027
+ 
+
+
+
+Size of all the best clusters69 , 7433 , 3364 , 80
+ProtoVertex:
+		 -999 , -999
+		 -999 , -999
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters30 , 239242 , 42104 , 203
+ProtoVertex:
+		 -999 , -999
+		 -999 , -999
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters64 , 249349 , 192324 , 149
+ProtoVertex:
+		 -999 , -999
+		 -999 , -999
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters132 , 177139 , 15296 , 337
+ProtoVertex:
+		 -999 , -999
+		 -999 , -999
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters155 , 98139 , 42152 , 175
+ProtoVertex:
+		 -999 , -999
+		 -999 , -999
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters161 , 134224 , 243167 , 246
+ This is the angle of the transfer cluster : -20.988
+ This is the angle of the inspecting cluster : -6.49509
+ This is the angle of the looping cluster : -15.2001
+ SWITCH RESTART
+ This is the angle of the transfer cluster : -31.1347
+ This is the angle of the inspecting cluster : -28.2409
+ This is the angle of the looping cluster : -18.177
+ProtoVertex:
+		 336.299 , 46.6848
+		 335.172 , 47.0715
+		 579.26 , -3.95916
+ 
+
+
+
+Size of all the best clusters24 , 4359 , 2046 , 13
+ProtoVertex:
+		 354.325 , 225.075
+		 196.977 , 228.349
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters197 , 174217 , 144338 , 150
+ This is the angle of the transfer cluster : -17.5302
+ This is the angle of the inspecting cluster : -13.028
+ This is the angle of the looping cluster : -19.1174
+ SWITCH RESTART
+ProtoVertex:
+		 485.931 , 98.9362
+		 -999 , -999
+		 782.622 , 133.401
+ 
+
+
+
+Size of all the best clusters75 , 13963 , 76100 , 56
+ProtoVertex:
+		 -999 , -999
+		 -999 , -999
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters154 , 198173 , 108111 , 90
+ProtoVertex:
+		 -999 , -999
+		 -999 , -999
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters26 , 3734 , 1115 , 27
+ProtoVertex:
+		 -999 , -999
+		 -999 , -999
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters26 , 4150 , 4057 , 42
+ProtoVertex:
+		 -999 , -999
+		 -999 , -999
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters32 , 7650 , 4432 , 32
+ProtoVertex:
+		 -999 , -999
+		 -999 , -999
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters27 , 4816 , 5120 , 60
+ProtoVertex:
+		 -999 , -999
+		 -999 , -999
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters101 , 12441 , 18555 , 253
+ProtoVertex:
+		 478.939 , 231.879
+		 343.589 , 231.402
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters112 , 114139 , 14220 , 202
+ProtoVertex:
+		 -999 , -999
+		 -999 , -999
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters63 , 12877 , 15235 , 174
+ProtoVertex:
+		 543.774 , 210.526
+		 610.875 , 210.026
+		 955.444 , 210.271
+ 
+
+
+
+Size of all the best clusters86 , 88147 , 39150 , 42
+ProtoVertex:
+		 -999 , -999
+		 -999 , -999
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters88 , 36243 , 22246 , 22
+ProtoVertex:
+		 -999 , -999
+		 377.072 , 109.916
+		 415.763 , 109.748
+ 
+
+
+
+Size of all the best clusters185 , 136126 , 144148 , 86
+ProtoVertex:
+		 285.268 , 53.7592
+		 329.496 , 57.6525
+		 411.062 , 80.8434
+ 
+
+
+
+Size of all the best clusters206 , 57271 , 105336 , 118
+ProtoVertex:
+		 476.538 , 160.479
+		 309.627 , 163.724
+		 587.296 , 163.763
+ 
+
+
+
+Size of all the best clusters160 , 2864 , 17133 , 23
+ProtoVertex:
+		 273.95 , 127.057
+		 269.38 , 125.475
+		 331.93 , 131.048
+ 
+
+
+
+Size of all the best clusters253 , 7773 , 210136 , 151
+ This is the angle of the transfer cluster : 50.6449
+ This is the angle of the inspecting cluster : 36.527
+ This is the angle of the looping cluster : 69.222
+ProtoVertex:
+		 674.881 , -185.216
+		 482.95 , 164.804
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters169 , 4140 , 8751 , 151
+ProtoVertex:
+		 -999 , -999
+		 -999 , -999
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters95 , 6429 , 7369 , 69
+ProtoVertex:
+		 473.941 , 147.872
+		 554.695 , 155.668
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters23 , 2619 , 1826 , 39
+ProtoVertex:
+		 -999 , -999
+		 -999 , -999
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters259 , 10156 , 263245 , 195
+ProtoVertex:
+		 -999 , -999
+		 -999 , -999
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters42 , 13097 , 86186 , 26
+ProtoVertex:
+		 -999 , -999
+		 -999 , -999
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters187 , 294279 , 98191 , 472
+ProtoVertex:
+		 -999 , -999
+		 -999 , -999
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters19 , 4547 , 6377 , 42
+ProtoVertex:
+		 -999 , -999
+		 -999 , -999
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters236 , 111416 , 74377 , 196
+ProtoVertex:
+		 -999 , -999
+		 -999 , -999
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters80 , 5270 , 2924 , 20
+ This is the angle of the transfer cluster : -20.6399
+ This is the angle of the inspecting cluster : -27.7389
+ This is the angle of the looping cluster : -89.9426
+ This is the angle of the transfer cluster : 19.6747
+ This is the angle of the inspecting cluster : 23.6852
+ This is the angle of the looping cluster : -89.9426
+ProtoVertex:
+		 -999 , -999
+		 -999 , -999
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters81 , 5458 , 6194 , 72
+ProtoVertex:
+		 487.154 , 189.071
+		 499.835 , 188.581
+		 786.598 , 191.396
+ 
+
+
+
+Size of all the best clusters84 , 12171 , 53108 , 152
+ This is the angle of the transfer cluster : 30.255
+ This is the angle of the inspecting cluster : 24.4856
+ This is the angle of the looping cluster : 39.0935
+ This is the angle of the transfer cluster : 21.3317
+ This is the angle of the inspecting cluster : 17.3183
+ This is the angle of the looping cluster : 45.9331
+ProtoVertex:
+		 403.755 , 82.6568
+		 -999 , -999
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters299 , 205230 , 192309 , 347
+ This is the angle of the transfer cluster : -61.3457
+ This is the angle of the inspecting cluster : -64.1953
+ This is the angle of the looping cluster : -32.1213
+ This is the angle of the transfer cluster : -37.2765
+ This is the angle of the inspecting cluster : -19.0778
+ This is the angle of the looping cluster : -21.5998
+ SWITCH RESTART
+ProtoVertex:
+		 -999 , -999
+		 326.091 , 70.1488
+		 299.057 , 72.3138
+ 
+
+
+
+Size of all the best clusters75 , 72108 , 2465 , 72
+ProtoVertex:
+		 -999 , -999
+		 -999 , -999
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters65 , 1334 , 5970 , 44
+ProtoVertex:
+		 -999 , -999
+		 620.882 , 227.895
+		 1008.67 , 227.519
+ 
+
+
+
+Size of all the best clusters137 , 03 , 142117 , 0
+ProtoVertex:
+		 -999 , -999
+		 -999 , -999
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters135 , 4279 , 65147 , 28
+ProtoVertex:
+		 167.479 , 212.139
+		 -999 , -999
+		 261.295 , 204.989
+ 
+
+
+
+Size of all the best clusters39 , 542 , 922 , 67
+ProtoVertex:
+		 -999 , -999
+		 -999 , -999
+		 466.665 , 208.576
+ 
+
+
+
+Size of all the best clusters86 , 11061 , 13167 , 97
+ProtoVertex:
+		 -999 , -999
+		 568.59 , 37.6224
+		 955.344 , 36.259
+ 
+
+
+
+Size of all the best clusters156 , 054 , 7285 , 65
+ProtoVertex:
+		 -999 , -999
+		 -999 , -999
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters51 , 128115 , 5257 , 90
+ProtoVertex:
+		 449.07 , 228.881
+		 436.126 , 221.969
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters144 , 337136 , 126210 , 283
+ This is the angle of the transfer cluster : 15.1697
+ This is the angle of the inspecting cluster : 16.233
+ This is the angle of the looping cluster : 14.8733
+ SWITCH RESTART
+ This is the angle of the transfer cluster : 16.0441
+ This is the angle of the inspecting cluster : -25.906
+ This is the angle of the looping cluster : -42.1525
+ProtoVertex:
+		 999.867 , 239.238
+		 359.073 , 1.15702
+		 350.736 , 40.4492
+ 
+
+
+
+Size of all the best clusters240 , 94143 , 195245 , 82
+ProtoVertex:
+		 -999 , -999
+		 -999 , -999
+		 602.26 , 212.12
+ 
+
+
+
+Size of all the best clusters76 , 4894 , 27100 , 15
+ProtoVertex:
+		 -999 , -999
+		 -999 , -999
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters188 , 219124 , 76219 , 216
+ProtoVertex:
+		 171.069 , 136.682
+		 -999 , -999
+		 355.945 , 104.146
+ 
+
+
+
+Size of all the best clusters178 , 1991 , 9945 , 90
+ProtoVertex:
+		 358.536 , 85.9879
+		 -999 , -999
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters143 , 13164 , 79138 , 109
+ This is the angle of the transfer cluster : -63.2191
+ This is the angle of the inspecting cluster : 71.7238
+ This is the angle of the looping cluster : 55.7832
+ SWITCH RESTART
+ProtoVertex:
+		 349.692 , 198.623
+		 -999 , -999
+		 405.206 , 194.73
+ 
+
+
+
+Size of all the best clusters45 , 11994 , 15889 , 148
+ProtoVertex:
+		 623.272 , 148.128
+		 512.483 , 156.315
+		 925.714 , 158.165
+ 
+
+
+
+Size of all the best clusters149 , 1943 , 9012 , 128
+ProtoVertex:
+		 -999 , -999
+		 -999 , -999
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters59 , 125124 , 65102 , 82
+ProtoVertex:
+		 501.679 , 85.351
+		 543.896 , 132.712
+		 773.68 , 143.086
+ 
+
+
+
+Size of all the best clusters36 , 11294 , 9972 , 67
+ This is the angle of the transfer cluster : 3.57858
+ This is the angle of the inspecting cluster : -24.0611
+ This is the angle of the looping cluster : -89.9426
+ProtoVertex:
+		 628.693 , 204.388
+		 -999 , -999
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters30 , 11651 , 66111 , 39
+ProtoVertex:
+		 482.202 , 104.634
+		 388.468 , 100.012
+		 697.19 , 86.0266
+ 
+
+
+
+Size of all the best clusters238 , 54208 , 100304 , 116
+ProtoVertex:
+		 443.19 , 68.289
+		 463.614 , 75.5179
+		 686.701 , 78.7267
+ 
+
+
+
+Size of all the best clusters109 , 64164 , 41145 , 103
+ProtoVertex:
+		 230.728 , 167.46
+		 427.449 , 69.5194
+		 610.468 , 69.4724
+ 
+
+
+
+Size of all the best clusters148 , 117192 , 200159 , 194
+ProtoVertex:
+		 -999 , -999
+		 -999 , -999
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters149 , 9794 , 46115 , 170
+ProtoVertex:
+		 -999 , -999
+		 -999 , -999
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters100 , 4939 , 6742 , 43
+ This is the angle of the transfer cluster : -50.8028
+ This is the angle of the inspecting cluster : -51.8247
+ This is the angle of the looping cluster : -89.9426
+ProtoVertex:
+		 -999 , -999
+		 -999 , -999
+		 470.331 , 252.229
+ 
+
+
+
+Size of all the best clusters39 , 370 , 045 , 33
+ProtoVertex:
+		 -999 , -999
+		 -999 , -999
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters179 , 44174 , 131177 , 188
+ProtoVertex:
+		 -999 , -999
+		 -999 , -999
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters138 , 10179 , 12889 , 86
+ProtoVertex:
+		 -999 , -999
+		 -999 , -999
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters92 , 78122 , 3199 , 65
+ProtoVertex:
+		 -999 , -999
+		 577.287 , 189.627
+		 944.463 , 384.295
+ 
+
+
+
+Size of all the best clusters193 , 122234 , 130331 , 179
+ This is the angle of the transfer cluster : -1.49893
+ This is the angle of the inspecting cluster : -17.6776
+ This is the angle of the looping cluster : 0.992432
+ SWITCH RESTART
+ProtoVertex:
+		 209.949 , 117.868
+		 190.751 , 118.652
+		 200.621 , 118.735
+ 
+
+
+
+Size of all the best clusters412 , 1278 , 376162 , 427
+ProtoVertex:
+		 -999 , -999
+		 -999 , -999
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters123 , 6388 , 43163 , 106
+ProtoVertex:
+		 240.977 , 20.0857
+		 103.719 , 19.3312
+		 149.836 , 22.44
+ 
+
+
+
+Size of all the best clusters121 , 84112 , 11182 , 197
+ This is the angle of the transfer cluster : 17.6344
+ This is the angle of the inspecting cluster : 32.6945
+ This is the angle of the looping cluster : 23.3823
+ SWITCH RESTART
+ProtoVertex:
+		 161.522 , 136.561
+		 171.856 , 141.43
+		 140.048 , 146.218
+ 
+
+
+
+Size of all the best clusters33 , 3221 , 1926 , 36
+ProtoVertex:
+		 -999 , -999
+		 -999 , -999
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters92 , 14465 , 12860 , 78
+ProtoVertex:
+		 117.03 , 136.838
+		 189.183 , 136.211
+		 102.407 , 140.176
+ 
+
+
+
+Size of all the best clusters68 , 606296 , 92242 , 343
+ProtoVertex:
+		 -999 , -999
+		 316.764 , 9.67563
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters95 , 11798 , 54147 , 47
+ProtoVertex:
+		 -999 , -999
+		 137.017 , -851.754
+		 628.7 , 73.2275
+ 
+
+
+
+Size of all the best clusters96 , 6238 , 11756 , 82
+ProtoVertex:
+		 -999 , -999
+		 -999 , -999
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters40 , 6299 , 62106 , 23
+ProtoVertex:
+		 316.353 , 222.591
+		 518.866 , 243.4
+		 571.867 , 223.126
+ 
+
+
+
+Size of all the best clusters314 , 144199 , 176332 , 71
+ProtoVertex:
+		 -999 , -999
+		 459.287 , 75.5951
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters74 , 2836 , 3873 , 35
+ProtoVertex:
+		 -999 , -999
+		 339.021 , 13.0222
+		 539.794 , 17.4217
+ 
+
+
+
+Size of all the best clusters240 , 237121 , 119246 , 183
+ This is the angle of the transfer cluster : -10.6995
+ This is the angle of the inspecting cluster : -3.4926
+ This is the angle of the looping cluster : -33.8821
+ProtoVertex:
+		 259.729 , 228.349
+		 309.288 , 206.145
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters300 , 61206 , 285320 , 358
+ This is the angle of the transfer cluster : -28.3001
+ This is the angle of the inspecting cluster : -12.7746
+ This is the angle of the looping cluster : -27.7953
+ SWITCH RESTART
+ This is the angle of the transfer cluster : -22.1367
+ This is the angle of the inspecting cluster : -13.7149
+ This is the angle of the looping cluster : -23.4013
+ SWITCH RESTART
+ProtoVertex:
+		 -999 , -999
+		 543.534 , 134.909
+		 755.646 , 135.165
+ 
+
+
+
+Size of all the best clusters80 , 10033 , 27036 , 268
+ This is the angle of the transfer cluster : 74.8087
+ This is the angle of the inspecting cluster : 76.9648
+ This is the angle of the looping cluster : 19.0765
+ This is the angle of the transfer cluster : 17.2782
+ This is the angle of the inspecting cluster : 17.6505
+ This is the angle of the looping cluster : 19.8443
+ This is the angle of the transfer cluster : 18.0274
+ This is the angle of the inspecting cluster : 18.0948
+ This is the angle of the looping cluster : 15.9513
+ProtoVertex:
+		 254.096 , 183.913
+		 542.556 , 293.171
+		 111.451 , 137.845
+ 
+
+
+
+Size of all the best clusters172 , 324136 , 28226 , 244
+ProtoVertex:
+		 -999 , -999
+		 -999 , -999
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters135 , 86129 , 9463 , 150
+ This is the angle of the transfer cluster : 72.4227
+ This is the angle of the inspecting cluster : 68.4806
+ This is the angle of the looping cluster : 66.2728
+ProtoVertex:
+		 322.376 , 70.9769
+		 154.692 , 58.2878
+		 329.523 , 193.269
+ 
+
+
+
+Size of all the best clusters117 , 186191 , 99324 , 51
+ProtoVertex:
+		 389.426 , 90.5216
+		 352.684 , 155.554
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters247 , 184407 , 177204 , 421
+ProtoVertex:
+		 391.638 , 90.6168
+		 -999 , -999
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters133 , 39746 , 487182 , 195
+ProtoVertex:
+		 -999 , -999
+		 -999 , -999
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters19 , 3327 , 335 , 27
+ProtoVertex:
+		 -999 , -999
+		 -999 , -999
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters116 , 5384 , 60156 , 68
+ProtoVertex:
+		 441.402 , 241.413
+		 406.734 , 237.275
+		 636.618 , 239.009
+ 
+
+
+
+Size of all the best clusters76 , 8384 , 77110 , 74
+ProtoVertex:
+		 -999 , -999
+		 -999 , -999
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters188 , 143138 , 121122 , 156
+ This is the angle of the transfer cluster : -75.2756
+ This is the angle of the inspecting cluster : -77.5435
+ This is the angle of the looping cluster : -66.3819
+ProtoVertex:
+		 342.159 , 212.892
+		 309.287 , 120.566
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters110 , 132138 , 149126 , 254
+ProtoVertex:
+		 386.746 , 219.346
+		 -999 , -999
+		 427.554 , 217.246
+ 
+
+
+
+Size of all the best clusters303 , 13698 , 262184 , 167
+ProtoVertex:
+		 -999 , -999
+		 -999 , -999
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters74 , 20971 , 9371 , 203
+ProtoVertex:
+		 249.496 , 135.353
+		 178.657 , 493.036
+		 424.708 , 112.717
+ 
+
+
+
+Size of all the best clusters290 , 2539 , 44241 , 310
+ProtoVertex:
+		 390.64 , 175.995
+		 562.101 , 164.171
+		 714.188 , 177.238
+ 
+
+
+
+Size of all the best clusters101 , 36103 , 4227 , 33
+ProtoVertex:
+		 -999 , -999
+		 -999 , -999
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters75 , 301232 , 26636 , 490
+ProtoVertex:
+		 -999 , -999
+		 -999 , -999
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters55 , 2955 , 3669 , 60
+ProtoVertex:
+		 -999 , -999
+		 -999 , -999
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters87 , 211172 , 225143 , 197
+ProtoVertex:
+		 -999 , -999
+		 -999 , -999
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters65 , 470420 , 12964 , 280
+ProtoVertex:
+		 -999 , -999
+		 -999 , -999
+		 445.582 , 49.3505
+ 
+
+
+
+Size of all the best clusters72 , 13791 , 15460 , 100
+ProtoVertex:
+		 213.252 , 129.368
+		 87.0013 , 134.475
+		 112.111 , 104.448
+ 
+
+
+
+Size of all the best clusters119 , 7097 , 42159 , 30
+ProtoVertex:
+		 523.446 , 97.6351
+		 -999 , -999
+		 699.909 , 98.9934
+ 
+
+
+
+Size of all the best clusters192 , 77201 , 51243 , 121
+ This is the angle of the transfer cluster : -21.0746
+ This is the angle of the inspecting cluster : 8.26667
+ This is the angle of the looping cluster : -19.2964
+ SWITCH RESTART
+ This is the angle of the transfer cluster : -11.2805
+ This is the angle of the inspecting cluster : 0.389832
+ This is the angle of the looping cluster : -16.3547
+ SWITCH RESTART
+ProtoVertex:
+		 -999 , -999
+		 384.183 , 246.956
+		 637.871 , 229.153
+ 
+
+
+
+Size of all the best clusters36 , 2724 , 6752 , 27
+ This is the angle of the transfer cluster : 19.3878
+ This is the angle of the inspecting cluster : 30.7893
+ This is the angle of the looping cluster : 42.4278
+ProtoVertex:
+		 -999 , -999
+		 -999 , -999
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters37 , 92101 , 5192 , 47
+ProtoVertex:
+		 214.96 , 206.37
+		 291.194 , 204.637
+		 310.949 , 204.789
+ 
+
+
+
+Size of all the best clusters75 , 9749 , 7734 , 141
+ProtoVertex:
+		 -999 , -999
+		 523.256 , 127.604
+		 923.493 , 131.348
+ 
+
+
+
+Size of all the best clusters190 , 382114 , 249154 , 537
+ProtoVertex:
+		 -999 , -999
+		 -999 , -999
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters154 , 28186 , 38276 , 23
+ProtoVertex:
+		 307.858 , 38.2499
+		 -999 , -999
+		 562.353 , 32.5058
+ 
+
+
+
+Size of all the best clusters87 , 3146 , 56121 , 37
+ProtoVertex:
+		 254.606 , 24.3275
+		 400.983 , 34.6611
+		 356.964 , 57.9039
+ 
+
+
+
+Size of all the best clusters109 , 16368 , 8793 , 85
+ This is the angle of the transfer cluster : -10.6255
+ This is the angle of the inspecting cluster : 37.8031
+ This is the angle of the looping cluster : -8.5381
+ SWITCH RESTART
+ This is the angle of the transfer cluster : -24.8563
+ This is the angle of the inspecting cluster : -21.8022
+ This is the angle of the looping cluster : -72.8963
+ProtoVertex:
+		 675.312 , 197.928
+		 544.761 , 192.388
+		 1036.72 , 188.575
+ 
+
+
+
+Size of all the best clusters112 , 10472 , 44104 , 101
+ProtoVertex:
+		 138.846 , 209.543
+		 -999 , -999
+		 219.454 , 196.167
+ 
+
+
+
+Size of all the best clusters161 , 268112 , 12574 , 348
+ProtoVertex:
+		 -999 , -999
+		 -999 , -999
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters124 , 12147 , 27180 , 276
+ProtoVertex:
+		 -999 , -999
+		 -999 , -999
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters72 , 16767 , 13692 , 240
+ProtoVertex:
+		 -999 , -999
+		 -999 , -999
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters149 , 7269 , 24855 , 206
+ProtoVertex:
+		 -999 , -999
+		 -999 , -999
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters59 , 1720 , 7217 , 37
+ProtoVertex:
+		 -999 , -999
+		 -999 , -999
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters23 , 16020 , 24384 , 121
+ProtoVertex:
+		 -999 , -999
+		 -999 , -999
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters243 , 156297 , 158311 , 45
+ This is the angle of the transfer cluster : -71.4971
+ This is the angle of the inspecting cluster : -71.443
+ This is the angle of the looping cluster : -37.4061
+ProtoVertex:
+		 407.956 , 170.509
+		 416.303 , 77.5591
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters78 , 3935 , 14681 , 90
+ProtoVertex:
+		 -999 , -999
+		 -999 , -999
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters294 , 54159 , 3924 , 240
+ProtoVertex:
+		 -999 , -999
+		 -999 , -999
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters259 , 5494 , 12465 , 258
+ProtoVertex:
+		 -999 , -999
+		 -999 , -999
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters84 , 6742 , 5270 , 54
+ProtoVertex:
+		 74.8915 , 227.922
+		 152.774 , 230.377
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters298 , 118258 , 93248 , 109
+ProtoVertex:
+		 -999 , -999
+		 63.7927 , 76.3193
+		 78.3696 , 91.4432
+ 
+
+
+
+Size of all the best clusters53 , 180144 , 122186 , 55
+ProtoVertex:
+		 -999 , -999
+		 -999 , -999
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters195 , 221132 , 103133 , 150
+ProtoVertex:
+		 245.401 , 39.9017
+		 -999 , -999
+		 352.72 , 39.15
+ 
+
+
+
+Size of all the best clusters92 , 15795 , 123163 , 84
+ This is the angle of the transfer cluster : 50.8365
+ This is the angle of the inspecting cluster : 48.2162
+ This is the angle of the looping cluster : 45.9914
+ProtoVertex:
+		 164.095 , -220.039
+		 344.714 , 66.4839
+		 564.718 , 70.4225
+ 
+
+
+
+Size of all the best clusters111 , 42135 , 51185 , 85
+ProtoVertex:
+		 -999 , -999
+		 -999 , -999
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters119 , 206168 , 234212 , 321
+ProtoVertex:
+		 -999 , -999
+		 -999 , -999
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters60 , 5248 , 12243 , 118
+ProtoVertex:
+		 538.057 , 153.199
+		 298.352 , 108.35
+		 575.057 , 114.578
+ 
+
+
+
+Size of all the best clusters244 , 2935 , 285131 , 263
+ProtoVertex:
+		 -999 , -999
+		 -999 , -999
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters51 , 20032 , 256101 , 196
+ProtoVertex:
+		 325.963 , 156.76
+		 -999 , -999
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters136 , 224127 , 13877 , 196
+ProtoVertex:
+		 -999 , -999
+		 -999 , -999
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters60 , 10646 , 20017 , 200
+ProtoVertex:
+		 -999 , -999
+		 626.333 , 131.015
+		 826.345 , 93.1354
+ 
+
+
+
+Size of all the best clusters111 , 239251 , 10664 , 126
+ProtoVertex:
+		 -999 , -999
+		 -999 , -999
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters101 , 445231 , 12186 , 618
+ProtoVertex:
+		 -999 , -999
+		 -999 , -999
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters148 , 152245 , 160172 , 238
+ProtoVertex:
+		 174.598 , 170.18
+		 57.0821 , 232.648
+		 73.2815 , 214.569
+ 
+
+
+
+Size of all the best clusters261 , 202300 , 60327 , 301
+ProtoVertex:
+		 -999 , -999
+		 -999 , -999
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters69 , 91117 , 98161 , 51
+ProtoVertex:
+		 164.565 , 99.9114
+		 52.237 , 100.529
+		 14.9289 , 99.0403
+ 
+
+
+
+Size of all the best clusters15 , 6789 , 4661 , 42
+ProtoVertex:
+		 -999 , -999
+		 -999 , -999
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters80 , 3958 , 5586 , 60
+ProtoVertex:
+		 460.959 , 35.7328
+		 464.097 , 49.1846
+		 728.978 , 51.9988
+ 
+
+
+
+Size of all the best clusters43 , 191147 , 4125 , 183
+ProtoVertex:
+		 256.78 , 102.648
+		 207.218 , 102.869
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters280 , 116117 , 42325 , 65
+ This is the angle of the transfer cluster : -17.6968
+ This is the angle of the inspecting cluster : -31.0401
+ This is the angle of the looping cluster : -12.0338
+ SWITCH RESTART
+ProtoVertex:
+		 204.612 , 200.287
+		 149.976 , 137.986
+		 78.5738 , 199.97
+ 
+
+
+
+Size of all the best clusters106 , 13459 , 8972 , 143
+ProtoVertex:
+		 -999 , -999
+		 -999 , -999
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters57 , 254190 , 34270 , 125
+ProtoVertex:
+		 -999 , -999
+		 -999 , -999
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters64 , 13184 , 5070 , 158
+ProtoVertex:
+		 -999 , -999
+		 -999 , -999
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters44 , 9632 , 7133 , 141
+ProtoVertex:
+		 671.051 , 260.052
+		 544.109 , 158.088
+		 841.802 , 157.308
+ 
+
+
+
+Size of all the best clusters363 , 45166 , 41181 , 138
+ This is the angle of the transfer cluster : -27.3946
+ This is the angle of the inspecting cluster : -34.5147
+ This is the angle of the looping cluster : 2.67268
+ProtoVertex:
+		 585.286 , 87.1655
+		 500.109 , 111.469
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters105 , 55106 , 31156 , 53
+ProtoVertex:
+		 342.945 , 195.906
+		 264.474 , 200.141
+		 414.5 , 202.179
+ 
+
+
+
+Size of all the best clusters129 , 56112 , 42176 , 61
+ This is the angle of the transfer cluster : 37.2277
+ This is the angle of the inspecting cluster : 72.8031
+ This is the angle of the looping cluster : 69.3233
+ SWITCH RESTART
+ProtoVertex:
+		 376.433 , 155.595
+		 382.471 , 139.052
+		 561.133 , 147.838
+ 
+
+
+
+Size of all the best clusters55 , 420263 , 98497 , 137
+ This is the angle of the transfer cluster : -26.4372
+ This is the angle of the inspecting cluster : -38.6613
+ This is the angle of the looping cluster : 6.80372
+ This is the angle of the transfer cluster : -9.36033
+ This is the angle of the inspecting cluster : -17.2423
+ This is the angle of the looping cluster : 2.17086
+ProtoVertex:
+		 -999 , -999
+		 152.238 , 110.263
+		 175.425 , 111.985
+ 
+
+
+
+Size of all the best clusters80 , 21368 , 179102 , 295
+ This is the angle of the transfer cluster : 2.14937
+ This is the angle of the inspecting cluster : -10.0565
+ This is the angle of the looping cluster : -89.9426
+ This is the angle of the transfer cluster : -6.52621
+ This is the angle of the inspecting cluster : -7.06653
+ This is the angle of the looping cluster : 12.63
+ProtoVertex:
+		 293.511 , 173.798
+		 -999 , -999
+		 399.59 , 177.604
+ 
+
+
+
+Size of all the best clusters135 , 11797 , 65150 , 149
+ProtoVertex:
+		 -999 , -999
+		 -999 , -999
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters87 , 2836 , 8363 , 24
+ProtoVertex:
+		 488.243 , 39.554
+		 457.403 , 37.9306
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters117 , 168182 , 1118 , 160
+ProtoVertex:
+		 530.595 , 107.706
+		 -999 , -999
+		 866.747 , 107.722
+ 
+
+
+
+Size of all the best clusters89 , 7335 , 188110 , 145
+ProtoVertex:
+		 -999 , -999
+		 -999 , -999
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters70 , 127130 , 183127 , 150
+ This is the angle of the transfer cluster : 62.0925
+ This is the angle of the inspecting cluster : -62.962
+ This is the angle of the looping cluster : -10.3265
+ SWITCH RESTART
+ This is the angle of the transfer cluster : -20.3121
+ This is the angle of the inspecting cluster : 23.3565
+ This is the angle of the looping cluster : -32.7401
+ SWITCH RESTART
+ProtoVertex:
+		 204.811 , 197.625
+		 112.676 , 195.974
+		 113.184 , 196
+ 
+
+
+
+Size of all the best clusters145 , 80113 , 6365 , 52
+ This is the angle of the transfer cluster : -3.57056
+ This is the angle of the inspecting cluster : -44.7487
+ This is the angle of the looping cluster : -22.7982
+ SWITCH RESTART
+ This is the angle of the transfer cluster : 11.6048
+ This is the angle of the inspecting cluster : 57.7166
+ This is the angle of the looping cluster : 32.7527
+ SWITCH RESTART
+ProtoVertex:
+		 351.339 , 86.6062
+		 288.053 , 88.6511
+		 451.902 , 91.5983
+ 
+
+
+
+Size of all the best clusters31 , 14699 , 1244 , 167
+ProtoVertex:
+		 133.909 , 163.65
+		 173.117 , 154.986
+		 105.605 , 155.023
+ 
+
+
+
+Size of all the best clusters149 , 3865 , 79116 , 60
+ProtoVertex:
+		 -999 , -999
+		 -999 , -999
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters21 , 1419 , 1526 , 12
+ProtoVertex:
+		 -999 , -999
+		 -999 , -999
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters122 , 95140 , 163105 , 188
+ProtoVertex:
+		 -999 , -999
+		 400.031 , 69.3303
+		 736.408 , 82.4094
+ 
+
+
+
+Size of all the best clusters147 , 5263 , 129209 , 66
+ProtoVertex:
+		 -999 , -999
+		 -999 , -999
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters380 , 52109 , 415311 , 136
+ProtoVertex:
+		 -999 , -999
+		 -999 , -999
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters31 , 9373 , 2435 , 97
+ProtoVertex:
+		 350.424 , 149.387
+		 -999 , -999
+		 685.622 , 151.149
+ 
+
+
+
+Size of all the best clusters107 , 9132 , 16325 , 164
+ProtoVertex:
+		 -999 , -999
+		 -999 , -999
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters83 , 183130 , 178142 , 130
+ This is the angle of the transfer cluster : 42.1752
+ This is the angle of the inspecting cluster : 7.44565
+ This is the angle of the looping cluster : 34.1947
+ SWITCH RESTART
+ This is the angle of the transfer cluster : -42.4392
+ This is the angle of the inspecting cluster : -33.0574
+ This is the angle of the looping cluster : -40.3729
+ SWITCH RESTART
+ProtoVertex:
+		 94.7052 , -20.1988
+		 261.931 , 105.139
+		 268.786 , 131.193
+ 
+
+
+
+Size of all the best clusters88 , 283124 , 112171 , 212
+ This is the angle of the transfer cluster : 25.5428
+ This is the angle of the inspecting cluster : 29.574
+ This is the angle of the looping cluster : 29.4545
+ SWITCH RESTART
+ProtoVertex:
+		 -999 , -999
+		 361.901 , 228.82
+		 580.468 , 233.801
+ 
+
+
+
+Size of all the best clusters36 , 78131 , 1994 , 25
+ This is the angle of the transfer cluster : 38.3902
+ This is the angle of the inspecting cluster : 30.9631
+ This is the angle of the looping cluster : -49.2559
+ProtoVertex:
+		 -999 , -999
+		 828.88 , 314.424
+		 668.498 , 235.246
+ 
+
+
+
+Size of all the best clusters219 , 119240 , 192134 , 440
+ProtoVertex:
+		 -999 , -999
+		 -999 , -999
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters52 , 4648 , 7348 , 79
+ProtoVertex:
+		 -999 , -999
+		 261.807 , 224.715
+		 253.705 , 231.022
+ 
+
+
+
+Size of all the best clusters59 , 518229 , 63173 , 348
+ProtoVertex:
+		 -999 , -999
+		 -999 , -999
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters200 , 90268 , 77201 , 35
+ProtoVertex:
+		 678.84 , 79.164
+		 485.235 , 131.873
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters34 , 6030 , 2634 , 50
+ProtoVertex:
+		 327.758 , 93.5943
+		 282.734 , 37.2413
+		 367.816 , 73.4478
+ 
+
+
+
+Size of all the best clusters93 , 131113 , 22597 , 253
+ProtoVertex:
+		 -999 , -999
+		 318.413 , 69.1309
+		 675.716 , 66.0492
+ 
+
+
+
+Size of all the best clusters76 , 6882 , 96106 , 116
+ProtoVertex:
+		 -999 , -999
+		 -999 , -999
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters79 , 18377 , 21255 , 351
+ProtoVertex:
+		 -999 , -999
+		 -999 , -999
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters73 , 7173 , 6857 , 116
+ProtoVertex:
+		 258.956 , 31.0716
+		 -999 , -999
+		 171.381 , 22.5899
+ 
+
+
+
+Size of all the best clusters146 , 2021 , 8266 , 35
+ProtoVertex:
+		 254.844 , 174.38
+		 286.392 , 174.92
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters99 , 3282 , 2695 , 24
+ProtoVertex:
+		 525.076 , 17.6761
+		 521.654 , 39.3071
+		 864.129 , 32.8822
+ 
+
+
+
+Size of all the best clusters43 , 12995 , 13694 , 193
+ This is the angle of the transfer cluster : -37.8389
+ This is the angle of the inspecting cluster : -8.25507
+ This is the angle of the looping cluster : -43.7371
+ SWITCH RESTART
+ProtoVertex:
+		 -999 , -999
+		 504.403 , 199.423
+		 741.551 , 200.899
+ 
+
+
+
+Size of all the best clusters71 , 178154 , 11697 , 87
+ProtoVertex:
+		 -999 , -999
+		 -999 , -999
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters155 , 5479 , 54175 , 56
+ProtoVertex:
+		 444.171 , 175.686
+		 326.255 , 136.402
+		 599.405 , 161.855
+ 
+
+
+
+Size of all the best clusters24 , 9989 , 31127 , 2
+ProtoVertex:
+		 233.816 , 188.969
+		 51.5359 , 188.425
+		 74.451 , 94.5028
+ 
+
+
+
+Size of all the best clusters36 , 12236 , 63158 , 9
+ProtoVertex:
+		 412.652 , 64.5948
+		 276.473 , 71.0913
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters80 , 3846 , 4816 , 125
+ProtoVertex:
+		 -999 , -999
+		 -999 , -999
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters44 , 166128 , 1649 , 163
+ProtoVertex:
+		 506.525 , 218.001
+		 -999 , -999
+		 966.359 , 218.189
+ 
+
+
+
+Size of all the best clusters74 , 28747 , 18273 , 162
+ This is the angle of the transfer cluster : 48.1179
+ This is the angle of the inspecting cluster : 58.1878
+ This is the angle of the looping cluster : 26.3635
+ProtoVertex:
+		 307.486 , 59.8934
+		 499.87 , 91.6371
+		 685.264 , 105.341
+ 
+
+
+
+Size of all the best clusters233 , 150216 , 208191 , 190
+ProtoVertex:
+		 195.194 , 187.764
+		 -999 , -999
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters48 , 8441 , 64140 , 38
+ This is the angle of the transfer cluster : -38.2403
+ This is the angle of the inspecting cluster : -52.6172
+ This is the angle of the looping cluster : -11.3694
+ProtoVertex:
+		 131.283 , 206.539
+		 163.984 , 218.57
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters346 , 107167 , 144335 , 87
+ProtoVertex:
+		 263.917 , 113.971
+		 248.315 , 122.762
+		 694.659 , -130.562
+ 
+
+
+
+Size of all the best clusters133 , 386143 , 159269 , 172
+ProtoVertex:
+		 -999 , -999
+		 -999 , -999
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters73 , 15247 , 20554 , 274
+ProtoVertex:
+		 -999 , -999
+		 -999 , -999
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters25 , 5820 , 4822 , 59
+ProtoVertex:
+		 -999 , -999
+		 -999 , -999
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters111 , 6680 , 6386 , 149
+ProtoVertex:
+		 -999 , -999
+		 -999 , -999
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters68 , 13469 , 16648 , 91
+ProtoVertex:
+		 296.958 , 116.583
+		 220.531 , 117.485
+		 316.458 , 120.485
+ 
+
+
+
+Size of all the best clusters120 , 3745 , 7186 , 36
+ProtoVertex:
+		 -999 , -999
+		 -999 , -999
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters61 , 201114 , 5959 , 204
+ProtoVertex:
+		 -999 , -999
+		 -999 , -999
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters73 , 29178 , 256103 , 121
+ This is the angle of the transfer cluster : -62.4779
+ This is the angle of the inspecting cluster : 66.7765
+ This is the angle of the looping cluster : -53.7285
+ SWITCH RESTART
+ProtoVertex:
+		 -157.726 , 190.119
+		 -299.348 , -120.893
+		 63.1165 , 94.0636
+ 
+
+
+
+Size of all the best clusters311 , 160273 , 92258 , 143
+ProtoVertex:
+		 318.513 , 67.4445
+		 -999 , -999
+		 524.35 , 129.955
+ 
+
+
+
+Size of all the best clusters125 , 2731 , 10866 , 91
+ProtoVertex:
+		 -999 , -999
+		 -999 , -999
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters175 , 2048 , 50146 , 27
+ProtoVertex:
+		 214.897 , 173.535
+		 82.0406 , 115.183
+		 -76.0605 , 224.369
+ 
+
+
+
+Size of all the best clusters166 , 161247 , 142276 , 145
+ This is the angle of the transfer cluster : -65.1852
+ This is the angle of the inspecting cluster : 22.623
+ This is the angle of the looping cluster : -61.6303
+ SWITCH RESTART
+ This is the angle of the transfer cluster : -43.8124
+ This is the angle of the inspecting cluster : -48.6548
+ This is the angle of the looping cluster : -52.0129
+ProtoVertex:
+		 291.992 , 189.695
+		 549.298 , 77.337
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters196 , 51125 , 27195 , 8
+ProtoVertex:
+		 600.833 , 117.692
+		 419.402 , 121.58
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters59 , 14451 , 10387 , 134
+ProtoVertex:
+		 371.159 , 74.5278
+		 308.375 , 58.8516
+		 493.573 , 76.636
+ 
+
+
+
+Size of all the best clusters75 , 11161 , 50164 , 3
+ProtoVertex:
+		 586.646 , 136.68
+		 669.109 , 163.689
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters164 , 128112 , 81218 , 69
+ProtoVertex:
+		 167.04 , 152.09
+		 -999 , -999
+		 209.426 , 137.131
+ 
+
+
+
+Size of all the best clusters61 , 174135 , 20168 , 117
+ProtoVertex:
+		 -999 , -999
+		 -999 , -999
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters112 , 26471 , 428139 , 447
+ProtoVertex:
+		 -999 , -999
+		 -999 , -999
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters138 , 3488 , 40157 , 37
+ProtoVertex:
+		 -999 , -999
+		 -999 , -999
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters98 , 9292 , 5575 , 180
+ProtoVertex:
+		 -999 , -999
+		 -999 , -999
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters206 , 61250 , 24361 , 25
+ProtoVertex:
+		 -999 , -999
+		 99.2025 , 121.633
+		 303.65 , 117.297
+ 
+
+
+
+Size of all the best clusters90 , 18094 , 5490 , 200
+ProtoVertex:
+		 -999 , -999
+		 -999 , -999
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters93 , 238108 , 137157 , 159
+ProtoVertex:
+		 -999 , -999
+		 -999 , -999
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters46 , 21958 , 10350 , 169
+ProtoVertex:
+		 275.718 , 64.3751
+		 156.05 , 77.5796
+		 345.041 , 93.2696
+ 
+
+
+
+Size of all the best clusters48 , 3942 , 6928 , 56
+ProtoVertex:
+		 -999 , -999
+		 -999 , -999
+		 624.455 , 45.9039
+ 
+
+
+
+Size of all the best clusters149 , 94298 , 146325 , 80
+ This is the angle of the transfer cluster : -38.0471
+ This is the angle of the inspecting cluster : 55.5748
+ This is the angle of the looping cluster : -15.8132
+ SWITCH RESTART
+ This is the angle of the transfer cluster : -17.6069
+ This is the angle of the inspecting cluster : -13.0956
+ This is the angle of the looping cluster : 7.03043
+ This is the angle of the transfer cluster : -23.2979
+ This is the angle of the inspecting cluster : -25.9913
+ This is the angle of the looping cluster : 0.20072
+ProtoVertex:
+		 319.198 , 26.5804
+		 308.326 , 22.8037
+		 468.257 , 26.4352
+ 
+
+
+
+Size of all the best clusters134 , 13097 , 65202 , 92
+ProtoVertex:
+		 129.108 , 152.415
+		 289.921 , 146.809
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters210 , 7588 , 112286 , 61
+ProtoVertex:
+		 -999 , -999
+		 -999 , -999
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters173 , 14138 , 4165 , 0
+ProtoVertex:
+		 -999 , -999
+		 204.231 , 159.305
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters86 , 6042 , 13368 , 47
+ This is the angle of the transfer cluster : 46.5294
+ This is the angle of the inspecting cluster : 40.266
+ This is the angle of the looping cluster : -89.9426
+ProtoVertex:
+		 -999 , -999
+		 214.345 , 219.741
+		 334.514 , 251.645
+ 
+
+
+
+Size of all the best clusters65 , 96105 , 69108 , 43
+ProtoVertex:
+		 -999 , -999
+		 -999 , -999
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters269 , 162152 , 157439 , 61
+ This is the angle of the transfer cluster : -8.35854
+ This is the angle of the inspecting cluster : -28.4564
+ This is the angle of the looping cluster : 44.3459
+ProtoVertex:
+		 350.258 , 220.541
+		 401.021 , 202.944
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters208 , 60126 , 195125 , 282
+ProtoVertex:
+		 596.121 , 137.271
+		 517.373 , 151.486
+		 913.928 , 153.562
+ 
+
+
+
+Size of all the best clusters191 , 127176 , 68123 , 102
+ProtoVertex:
+		 -999 , -999
+		 -999 , -999
+		 454.365 , 233.377
+ 
+
+
+
+Size of all the best clusters65 , 345219 , 78171 , 119
+ProtoVertex:
+		 -999 , -999
+		 188.195 , 200.429
+		 345.678 , 201.673
+ 
+
+
+
+Size of all the best clusters86 , 133113 , 5286 , 76
+ This is the angle of the transfer cluster : -33.751
+ This is the angle of the inspecting cluster : 34.5948
+ This is the angle of the looping cluster : -29.7029
+ SWITCH RESTART
+ProtoVertex:
+		 220.747 , 42.659
+		 267.675 , 38.2665
+		 270.245 , 55.75
+ 
+
+
+
+Size of all the best clusters179 , 247145 , 95169 , 167
+ This is the angle of the transfer cluster : 18.0292
+ This is the angle of the inspecting cluster : 41.3826
+ This is the angle of the looping cluster : 2.15237
+ SWITCH RESTART
+ This is the angle of the transfer cluster : 41.798
+ This is the angle of the inspecting cluster : 13.866
+ This is the angle of the looping cluster : 25.2573
+ SWITCH RESTART
+ProtoVertex:
+		 242.397 , 158.2
+		 -999 , -999
+		 349.105 , 158.393
+ 
+
+
+
+Size of all the best clusters166 , 18198 , 101166 , 91
+ProtoVertex:
+		 160.193 , 200.499
+		 89.2836 , 205.727
+		 96.4008 , 203.156
+ 
+
+
+
+Size of all the best clusters421 , 98205 , 179157 , 166
+ This is the angle of the transfer cluster : 42.4244
+ This is the angle of the inspecting cluster : 52.2937
+ This is the angle of the looping cluster : 38.0248
+ SWITCH RESTART
+ProtoVertex:
+		 214.624 , 141.066
+		 -999 , -999
+		 163.629 , 172.076
+ 
+
+
+
+Size of all the best clusters203 , 44243 , 424150 , 312
+ProtoVertex:
+		 -999 , -999
+		 -999 , -999
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters74 , 15337 , 10383 , 173
+ProtoVertex:
+		 548.638 , 158.419
+		 614.476 , 157.475
+		 975 , 156.934
+ 
+
+
+
+Size of all the best clusters75 , 5086 , 8126 , 13
+ProtoVertex:
+		 -370.411 , 328.617
+		 -999 , -999
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters97 , 80255 , 32284 , 34
+ProtoVertex:
+		 320.3 , 106.037
+		 184.46 , 91.2088
+		 301.516 , 96.1768
+ 
+
+
+
+Size of all the best clusters67 , 16891 , 1427 , 340
+ProtoVertex:
+		 -999 , -999
+		 -999 , -999
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters216 , 169117 , 149302 , 68
+ProtoVertex:
+		 -999 , -999
+		 137.899 , 111.693
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters50 , 4633 , 10854 , 65
+ProtoVertex:
+		 -999 , -999
+		 -999 , -999
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters100 , 9941 , 32141 , 241
+ This is the angle of the transfer cluster : 13.6888
+ This is the angle of the inspecting cluster : 74.0929
+ This is the angle of the looping cluster : 20.051
+ SWITCH RESTART
+ This is the angle of the transfer cluster : -0.725585
+ This is the angle of the inspecting cluster : 1.25239
+ This is the angle of the looping cluster : -35.3459
+ This is the angle of the transfer cluster : -3.87268
+ This is the angle of the inspecting cluster : -1.36101
+ This is the angle of the looping cluster : 23.8953
+ProtoVertex:
+		 425.058 , 161.275
+		 340.501 , 160.614
+		 702.655 , 158.331
+ 
+
+
+
+Size of all the best clusters160 , 39121 , 216173 , 191
+ProtoVertex:
+		 -999 , -999
+		 565.118 , 157.439
+		 909.066 , 159.432
+ 
+
+
+
+Size of all the best clusters125 , 6743 , 152219 , 73
+ProtoVertex:
+		 -999 , -999
+		 -999 , -999
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters152 , 2922 , 113113 , 113
+ProtoVertex:
+		 319.294 , 109.31
+		 418.792 , 106.022
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters69 , 10755 , 3679 , 121
+ This is the angle of the transfer cluster : 14.33
+ This is the angle of the inspecting cluster : 15.3423
+ This is the angle of the looping cluster : 0.511175
+ This is the angle of the transfer cluster : 13.7194
+ This is the angle of the inspecting cluster : 19.6451
+ This is the angle of the looping cluster : 0.830664
+ProtoVertex:
+		 559.89 , 98.815
+		 438.12 , 108.144
+		 805.952 , 98.9782
+ 
+
+
+
+Size of all the best clusters143 , 69182 , 91136 , 136
+ This is the angle of the transfer cluster : 47.1806
+ This is the angle of the inspecting cluster : 41.6885
+ This is the angle of the looping cluster : -5.47648
+ProtoVertex:
+		 159.056 , 174.588
+		 198.23 , 152.12
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters50 , 3774 , 5099 , 41
+ProtoVertex:
+		 -999 , -999
+		 -999 , -999
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters184 , 3777 , 23290 , 200
+ProtoVertex:
+		 365.7 , 71.7014
+		 261.387 , 79.2869
+		 421.212 , 76.4988
+ 
+
+
+
+Size of all the best clusters254 , 57217 , 32342 , 65
+ This is the angle of the transfer cluster : 12.3715
+ This is the angle of the inspecting cluster : 35.0753
+ This is the angle of the looping cluster : 11.5934
+ SWITCH RESTART
+ProtoVertex:
+		 103.765 , 21.0026
+		 184.686 , 17.581
+		 43.3263 , 16.4062
+ 
+
+
+
+Size of all the best clusters116 , 42123 , 38186 , 49
+ProtoVertex:
+		 189.208 , 190.003
+		 -999 , -999
+		 72.8832 , 205.005
+ 
+
+
+
+Size of all the best clusters123 , 68138 , 4030 , 133
+ProtoVertex:
+		 -999 , -999
+		 -999 , -999
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters26 , 14848 , 10856 , 131
+ProtoVertex:
+		 556.031 , 209.401
+		 538.623 , 204.34
+		 926.981 , 203.485
+ 
+
+
+
+Size of all the best clusters212 , 3197 , 3786 , 112
+ProtoVertex:
+		 243.207 , 129.892
+		 297.281 , 126.538
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters46 , 8260 , 8974 , 90
+ProtoVertex:
+		 -999 , -999
+		 572.985 , 151.186
+		 958.301 , 151.114
+ 
+
+
+
+Size of all the best clusters23 , 3515 , 1840 , 39
+ProtoVertex:
+		 -999 , -999
+		 -999 , -999
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters123 , 435110 , 276207 , 446
+ This is the angle of the transfer cluster : -32.4833
+ This is the angle of the inspecting cluster : -19.282
+ This is the angle of the looping cluster : -27.8589
+ SWITCH RESTART
+ This is the angle of the transfer cluster : -47.4685
+ This is the angle of the inspecting cluster : -2.0256
+ This is the angle of the looping cluster : -36.2859
+ SWITCH RESTART
+ This is the angle of the transfer cluster : -19.4931
+ This is the angle of the inspecting cluster : -7.06666
+ This is the angle of the looping cluster : -24.7072
+ SWITCH RESTART
+ProtoVertex:
+		 408.275 , 119.425
+		 570.693 , 186.173
+		 906.595 , 81.1779
+ 
+
+
+
+Size of all the best clusters176 , 201111 , 79150 , 183
+ This is the angle of the transfer cluster : 36.3552
+ This is the angle of the inspecting cluster : 28.2741
+ This is the angle of the looping cluster : 54.2177
+ This is the angle of the transfer cluster : 38.6583
+ This is the angle of the inspecting cluster : 22.4653
+ This is the angle of the looping cluster : 59.988
+ProtoVertex:
+		 572.006 , 239.312
+		 -999 , -999
+		 993.66 , 234.341
+ 
+
+
+
+Size of all the best clusters206 , 119131 , 71241 , 103
+ProtoVertex:
+		 471.214 , 202.295
+		 336.991 , 195.025
+		 624.711 , 203.053
+ 
+
+
+
+Size of all the best clusters61 , 48125 , 39145 , 57
+ProtoVertex:
+		 379.723 , 224.494
+		 -340.21 , 232.874
+		 636.219 , 225.967
+ 
+
+
+
+Size of all the best clusters51 , 16170 , 13274 , 237
+ProtoVertex:
+		 332.889 , 221.372
+		 481.952 , 221.527
+		 616.037 , 222.305
+ 
+
+
+
+Size of all the best clusters161 , 9276 , 45158 , 65
+ProtoVertex:
+		 212.433 , 136.523
+		 53.2227 , 137.524
+		 63.4981 , 136.53
+ 
+
+
+
+Size of all the best clusters77 , 89116 , 12480 , 222
+ProtoVertex:
+		 -999 , -999
+		 -999 , -999
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters157 , 314107 , 22293 , 442
+ This is the angle of the transfer cluster : 43.9201
+ This is the angle of the inspecting cluster : 25.6435
+ This is the angle of the looping cluster : 38.9952
+ SWITCH RESTART
+ProtoVertex:
+		 223.508 , 107.514
+		 -999 , -999
+		 318.93 , 114.325
+ 
+
+
+
+Size of all the best clusters47 , 111110 , 5758 , 157
+ProtoVertex:
+		 -999 , -999
+		 -999 , -999
+		 -999 , -999
+ 
+
+
+
+Size of all the best clusters0 , 00 , 00 , 0
+Trying Fuzzy
+Size of all the best clusters0 , 00 , 00 , 0
