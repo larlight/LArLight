@@ -58,7 +58,6 @@ namespace lar1{
       void setBuildCovarianceMatrix(bool b){fBuildCovarianceMatrix=b;}
       void setMakeRatioPlots(bool b){fMakeRatioPlots=b;}
       void setLoop(bool b){fLoop = b;}
-      void setMakePlots(bool b){fMakePlots = b;}
       void setMakeSimplePlot(bool b){fMakeSimplePlot = b;}
       void setMakeEventRatePlots(bool b){fMakeEventRatePlots = b;}
       void setMakeAltSensPlot(bool b){fMakeAltSensPlot = b;}
@@ -161,7 +160,6 @@ namespace lar1{
       bool fBuildCovarianceMatrix;
       bool fMakeRatioPlots;
       bool fLoop;
-      bool fMakePlots;
       bool fMakeSimplePlot;
       bool fMakeEventRatePlots;
       bool fMakeAltSensPlot;

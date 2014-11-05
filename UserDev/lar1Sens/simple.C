@@ -5,15 +5,14 @@
   gSystem->Load("lib/liblar1Sens.so");
 
   lar1::NueAppearanceFitter n;
-  // n.setFileSource("/Users/cja33/genie_RW/");
-  n.setFileSource("/Users/cja33/nominal_ntuples/");
+  n.setFileSource("/Users/cja33/genie_RW/");
+  // n.setFileSource("/Users/cja33/nominal_ntuples/");
   n.setVerbose(true);
   n.setDebug(false);
   n.setSpecialNameText("");
   n.setSpecialNameTextOsc("");
   n.setSpecialNameText_far("");
   n.setSpecialNameTextOsc_far("");
-  n.setFlatSystematicError(0.20);
   n.setMode("nu");
   n.setUse100m(false);
   n.setUse470m(true);
@@ -23,9 +22,7 @@
   n.setLAr1NDScale(1.0);
   n.setLAr1FDScale(1.0);
   n.setEnergyType("ecalo2");
-  n.setUseNearDetStats(false);
   n.setShapeOnlyFit(false);
-  n.setNearDetSystematicError(0.2);
   n.setForceRemake(false);
   n.setUseInfiniteStatistics(false);
   // n.setElectContainedDist(100);
@@ -120,10 +117,9 @@
   n.setCovMatListSource(covMatListSource);
 
 
-  n.setBuildCovarianceMatrix(false);
+  n.setBuildCovarianceMatrix(true);
   n.setMakeRatioPlots(false);
-  n.setLoop(true);
-  n.setMakePlots(false);
+  n.setLoop(false);
   n.setMakeSimplePlot(false);
   n.setMakeEventRatePlots(false);
   n.setMakeAltSensPlot(false);
