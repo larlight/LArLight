@@ -29,7 +29,6 @@ namespace lar1{
     useGlobBF=true;
     absolute_MWSource=false; 
 
-    flatSystematicError = 0.20;  // Only used if nearDetStats = false.
 
     mode = "nu";  //beam mode to run in
     use100m = true;      //Include the detector at 100m?
@@ -63,21 +62,17 @@ namespace lar1{
     //on the very first pass!  (subsequent runs are much faster)
     npoints = 250;
     // nWeights = 1000;
-    dm2FittingPoint = 0.9*npoints/2;
-    sin22thFittingPoint = 0.25*npoints/2;
 
     ElectContainedDist = -999;
     minDistanceToStart = -999;
     minShowerGap = 10000;
-    minVertexEnergy = 10000;
+    minVertexEnergyPhoton = 10000;
+    minVertexEnergySignal = 0;
 
     systematicInflationAmount = 0.0;
     inflateSystematics = false;
     
-    useNearDetStats = true;           // Only matters if the covariance matrix vector is empty.
     shapeOnlyFit = false;              // Only matters with near detd stats = true
-    nearDetSystematicError = 0.20;  // Only matters if userNearDetStats = true
-    std::vector<std::string>  cov_max_name;
 
     // set up the default bins
     for(int i = 0; i <= 14; i++){
@@ -87,6 +82,8 @@ namespace lar1{
     nbins_nue = nueBins.size()-1;
     nbins_numu = numuBins.size()-1;
     
+    covMatrixList.clear();
+    covMatrixListSource.clear();
 
   }
 
@@ -98,16 +95,21 @@ namespace lar1{
     // Do all of the checks to make sure the functions will run
     
     if (fLoop) includeFosc = true;
-    if ( fBuildCovarianceMatrix || fMakeRatioPlots ||
-         useFluxWeights         || useXSecWeights){
-      if (!useCovarianceMatrix){
-        std::cout << " WARNING: switch useCovarianceMatrix to true"
+    if ( fBuildCovarianceMatrix || fMakeRatioPlots){
+      if (!useMultiWeights){
+        std::cout << " WARNING: switch useMultiWeights to true"
                   << " since it's needed in a function you requested.\n";
-       useCovarianceMatrix = true;
+       useMultiWeights = true;
       }  
     }
 
-
+    if (fLoop){
+      if (fBuildCovarianceMatrix) {
+        std::cout << "Problem because covariance matrices need to be built before looping.\n";
+        exit(-1);
+      }
+      useMultiWeights =false;
+    }
 
     Prepare();
     ReadData();
@@ -132,10 +134,6 @@ namespace lar1{
     }
     if (fLoop) {
       int returnVal = Loop();
-      if (returnVal != 0) return returnVal;
-    }
-    if (fMakePlots) {
-      int returnVal = MakePlots();
       if (returnVal != 0) return returnVal;
     }
     if (fMakeSimplePlot) {
@@ -192,8 +190,8 @@ namespace lar1{
 
     // This variable gets used in writing output to file
     // notice that it goes to the same directory as the input files
-    fileNameRoot = fileSource;
-    fileNameRoot += "nue_appearance_";
+    // fileNameRoot = fileSource;
+    fileNameRoot = "nue_appearance_";
     fileNameRoot += energyType;
     fileNameRoot += "_";
 
@@ -281,12 +279,13 @@ namespace lar1{
 
       a.setContainedShowers(ElectContainedDist);
       a.setMinDistanceToStart(minDistanceToStart);
-      a.setTopologyCut(minVertexEnergy,minShowerGap);
+      a.setTopologyCut(minVertexEnergyPhoton,minShowerGap);
+      a.setMinVertexEnergySignal(minVertexEnergySignal);
       a.setSpecialNameText(specialNameText);
       a.setIncludeOsc(includeFosc);
       a.setSpecialNameTextOsc(specialNameTextOsc);
-      if (useCovarianceMatrix){
-        a.useMultiWeights(useCovarianceMatrix,multiWeightSource);
+      if (useMultiWeights){
+        a.useMultiWeights(useMultiWeights,multiWeightSource);
         a.setNWeights(nWeights);
         if (absolute_MWSource)
           a.setAbsolute_MWSource(absolute_MWSource);
@@ -300,147 +299,6 @@ namespace lar1{
     }
 
 
-    // // This section of code configures the worker class to read in the data
-    // if (use100m){
-    //   NtupleReader a("nue",fileSource, "100m", mode, energyType, npoints, forceRemake);
-    //   a.setContainedShowers(ElectContainedDist);
-    //   a.setMinDistanceToStart(minDistanceToStart);
-    //   a.setSpecialNameText(specialNameText);
-    //   a.setIncludeOsc(includeFosc);
-    //   a.setSpecialNameTextOsc(specialNameTextOsc);
-    //   if (useCovarianceMatrix){
-    //     a.useMultiWeights(useCovarianceMatrix,multiWeightSource);
-    //     a.setNWeights(nWeights);
-    //     if (absolute_MWSource)
-    //       a.setAbsolute_MWSource(absolute_MWSource);
-    //   }
-    //   readerNue.push_back(a);
-    //   if (includeNumus){
-    //     a.setSignal("numu");
-    //     a.setSpecialNameText(specialNameText);
-    //     readerNumu.push_back(a);
-    //   }
-    // }
-    // if (use150m){
-    //   NtupleReader a("nue",fileSource, "150m", mode, energyType, npoints, forceRemake);
-    //   a.setContainedShowers(ElectContainedDist);
-    //   a.setMinDistanceToStart(minDistanceToStart);
-    //   a.setSpecialNameText(specialNameText);
-    //   a.setIncludeOsc(includeFosc);
-    //   a.setSpecialNameTextOsc(specialNameTextOsc);
-    //   if (useCovarianceMatrix){
-    //     a.useMultiWeights(useCovarianceMatrix,multiWeightSource);
-    //     a.setNWeights(nWeights);
-    //     if (absolute_MWSource)
-    //       a.setAbsolute_MWSource(absolute_MWSource);
-    //   }
-    //   readerNue.push_back(a);
-    //   if (includeNumus){
-    //     a.setSignal("numu");
-    //     a.setSpecialNameText(specialNameText);
-    //     readerNumu.push_back(a);
-    //   }
-    // }
-    // if (use200m){
-    //   NtupleReader a("nue",fileSource, "200m", mode, energyType, npoints, forceRemake);
-    //   a.setContainedShowers(ElectContainedDist);
-    //   a.setMinDistanceToStart(minDistanceToStart);
-    //   a.setSpecialNameText(specialNameText);
-    //   a.setIncludeOsc(includeFosc);
-    //   a.setSpecialNameTextOsc(specialNameTextOsc);
-    //   if (useCovarianceMatrix){
-    //     a.useMultiWeights(useCovarianceMatrix,multiWeightSource);
-    //     a.setNWeights(nWeights);
-    //     if (absolute_MWSource)
-    //       a.setAbsolute_MWSource(absolute_MWSource);
-    //   }
-    //   readerNue.push_back(a);
-    //   if (includeNumus){
-    //     a.setSignal("numu");
-    //     a.setSpecialNameText(specialNameText);
-    //     readerNumu.push_back(a);
-    //   }
-    // }
-    // if (use100mLong){
-    //   NtupleReader a("nue",fileSource, "100m", mode, energyType, npoints, forceRemake);
-    //   a.setContainedShowers(ElectContainedDist);
-    //   a.setMinDistanceToStart(minDistanceToStart);
-    //   a.setSpecialNameText("long");
-    //   a.setIncludeOsc(includeFosc);
-    //   a.setSpecialNameTextOsc("long");
-    //   if (useCovarianceMatrix){
-    //     a.useMultiWeights(useCovarianceMatrix,multiWeightSource);
-    //     a.setNWeights(nWeights);
-    //     if (absolute_MWSource)
-    //       a.setAbsolute_MWSource(absolute_MWSource);
-    //   }
-    //   readerNue.push_back(a);
-    //   if (includeNumus){
-    //     a.setSignal("numu");
-    //     a.setSpecialNameText(specialNameText);
-    //     readerNumu.push_back(a);
-    //   }
-    // }
-    // if (use470m){
-    //   NtupleReader a("nue",fileSource, "470m", mode, energyType, npoints, forceRemake);
-    //   a.setContainedShowers(ElectContainedDist);
-    //   a.setMinDistanceToStart(minDistanceToStart);
-    //   // a.setSpecialNameText(specialNameText);
-    //   a.setIncludeOsc(includeFosc);
-    //   a.setSpecialNameTextOsc(specialNameTextOsc);
-    //   if (useCovarianceMatrix){
-    //     a.useMultiWeights(useCovarianceMatrix,multiWeightSource);
-    //     a.setNWeights(nWeights);
-    //     if (absolute_MWSource)
-    //       a.setAbsolute_MWSource(absolute_MWSource);
-    //   }
-    //   readerNue.push_back(a);
-    //   if (includeNumus){
-    //     a.setSignal("numu");
-    //     a.setSpecialNameText(specialNameText);
-    //     readerNumu.push_back(a);
-    //   }
-    // }
-    // if (useT600_onaxis) {
-    //   NtupleReader a("nue",fileSource, "600m_onaxis", mode, energyType, npoints, forceRemake);
-    //   a.setContainedShowers(ElectContainedDist);
-    //   a.setMinDistanceToStart(minDistanceToStart);
-    //   a.setSpecialNameText(specialNameText);
-    //   a.setIncludeOsc(includeFosc);
-    //   a.setSpecialNameTextOsc(specialNameTextOsc);
-    //   if (useCovarianceMatrix){
-    //     a.useMultiWeights(useCovarianceMatrix,multiWeightSource);
-    //     a.setNWeights(nWeights);
-    //     if (absolute_MWSource)
-    //       a.setAbsolute_MWSource(absolute_MWSource);
-    //   }
-    //   readerNue.push_back(a);
-    //   if (includeNumus){
-    //     a.setSignal("numu");
-    //     a.setSpecialNameText(specialNameText);
-    //     readerNumu.push_back(a);
-    //   }
-    // }
-    // if (useT600_offaxis) {
-    //   NtupleReader a("nue",fileSource,  "600m_offaxis", mode, energyType, npoints, forceRemake);
-    //   a.setContainedShowers(ElectContainedDist);
-    //   a.setMinDistanceToStart(minDistanceToStart);
-    //   a.setSpecialNameText(specialNameText);
-    //   a.setIncludeOsc(includeFosc);
-    //   a.setSpecialNameTextOsc(specialNameTextOsc);
-    //   if (useCovarianceMatrix){
-    //     a.useMultiWeights(useCovarianceMatrix,multiWeightSource);
-    //     a.setNWeights(nWeights);
-    //     if (absolute_MWSource)
-    //       a.setAbsolute_MWSource(absolute_MWSource);
-    //   }
-    //   readerNue.push_back(a);
-    //   if (includeNumus){
-    //     a.setSignal("numu");
-    //     a.setSpecialNameText(specialNameText);
-    //     readerNumu.push_back(a);
-    //   }
-    // }
 
     //This value is the number of baselines:
     nL = baselines.size();
@@ -455,37 +313,10 @@ namespace lar1{
     else {
       nbins_numu = 0;
     }
-    //just in case, if the number of baselines is 1 switch off nearDetStats:
+    //just in case, if the number of baselines is 1 switch off shapeOnlyFit:
     if (nL == 1) {
-        useNearDetStats=false;
         shapeOnlyFit = false;
         //flatSystematicError = nearDetSystematicError; 
-    }
-
-    // This block of code sets up where the chi2 data is going and what assumptions went
-    // into go into the file name.
-    chi2FileName = fileNameRoot+mode;
-    if(shapeOnlyFit){
-        if (useNearDetStats){
-            chi2FileName = chi2FileName+detNamesString+"_nearDetStats_shapeOnly_chi2.root";
-        }
-        else if (useCovarianceMatrix) {
-            chi2FileName = chi2FileName+detNamesString+"_covMat_shapeOnly_chi2.root";
-        }
-        else{
-            chi2FileName = chi2FileName+detNamesString+"_flatStats_shapeOnly_chi2.root";
-        }
-    }
-    else{
-        if (useNearDetStats){
-            chi2FileName = chi2FileName+detNamesString+"_nearDetStats_chi2.root";
-        }
-        else if (useCovarianceMatrix){
-            chi2FileName = chi2FileName+detNamesString+"_covMat_chi2.root";
-        }
-        else {
-          chi2FileName = chi2FileName+detNamesString+"_flatStats_chi2.root";
-        }
     }
 
 
@@ -558,7 +389,7 @@ namespace lar1{
     OtherVec.resize(nL);
     NueFromCosmicsVec.resize(nL);
 
-    if (useCovarianceMatrix){
+    if (useMultiWeights){
       eventsNullVecMultiWeight.resize(nWeights);
       for (int N_weight = 0; N_weight < nWeights; ++N_weight)
       {
@@ -598,22 +429,46 @@ namespace lar1{
       }
 
       // A lot of the items need to be grabbed a la carte:
-      if (useCovarianceMatrix){
-        eventsNueMCStats[b_line]         = utils.rebinVector(readerNue[b_line].GetVectorFromTree( (char*) "eventsNueMCVec"), nueBins);
-        if (includeNumus)
-          eventsNumuMCStats[b_line]      = utils.rebinVector(readerNumu[b_line].GetVectorFromTree((char*) "eventsNumuMC"),numuBins);
-      }
-      NueFromNueCC_muonVec[b_line]       = utils.rebinVector(readerNue[b_line].GetVectorFromTree( (char*) "NueFromNueCC_muonVec"),nueBins);
-      NueFromNueCC_chargeKaonVec[b_line] = utils.rebinVector(readerNue[b_line].GetVectorFromTree( (char*) "NueFromNueCC_chargeKaonVec"),nueBins);
-      NueFromNueCC_neutKaonVec[b_line]   = utils.rebinVector(readerNue[b_line].GetVectorFromTree( (char*) "NueFromNueCC_neutKaonVec"),nueBins);
-      NueFromEScatterVec[b_line]         = utils.rebinVector(readerNue[b_line].GetVectorFromTree( (char*) "NueFromEScatterVec"),nueBins);
-      NueFromNC_pi0Vec[b_line]           = utils.rebinVector(readerNue[b_line].GetVectorFromTree( (char*) "NueFromNC_pi0Vec"),nueBins);
-      NueFromNC_delta0Vec[b_line]        = utils.rebinVector(readerNue[b_line].GetVectorFromTree( (char*) "NueFromNC_delta0Vec"),nueBins);
-      NueFromNumuCCVec[b_line]           = utils.rebinVector(readerNue[b_line].GetVectorFromTree( (char*) "NueFromNumuCCVec"),nueBins);
-      DirtVec[b_line]                    = utils.rebinVector(readerNue[b_line].GetVectorFromTree( (char*) "DirtVec"),nueBins);
-      OtherVec[b_line]                   = utils.rebinVector(readerNue[b_line].GetVectorFromTree( (char*) "OtherVec"),nueBins);
+
+      eventsNueMCStats[b_line]           
+        = utils.rebinVector(readerNue[b_line].GetVectorFromTree(
+                 (char*) "eventsNueMCVec"), nueBins);
+      if (includeNumus)
+        eventsNumuMCStats[b_line]        
+          = utils.rebinVector(readerNumu[b_line].GetVectorFromTree(
+                              (char*) "eventsNumuMC"),
+                              numuBins);
+      NueFromNueCC_muonVec[b_line]       
+        = utils.rebinVector(readerNue[b_line].GetVectorFromTree(
+                 (char*) "NueFromNueCC_muonVec"),nueBins);
+      NueFromNueCC_chargeKaonVec[b_line] 
+        = utils.rebinVector(readerNue[b_line].GetVectorFromTree(
+                 (char*) "NueFromNueCC_chargeKaonVec"),nueBins);
+      NueFromNueCC_neutKaonVec[b_line]   
+        = utils.rebinVector(readerNue[b_line].GetVectorFromTree(
+                 (char*) "NueFromNueCC_neutKaonVec"),nueBins);
+      NueFromEScatterVec[b_line]         
+        = utils.rebinVector(readerNue[b_line].GetVectorFromTree(
+                 (char*) "NueFromEScatterVec"),nueBins);
+      NueFromNC_pi0Vec[b_line]           
+        = utils.rebinVector(readerNue[b_line].GetVectorFromTree(
+                 (char*) "NueFromNC_pi0Vec"),nueBins);
+      NueFromNC_delta0Vec[b_line]        
+        = utils.rebinVector(readerNue[b_line].GetVectorFromTree(
+                 (char*) "NueFromNC_delta0Vec"),nueBins);
+      NueFromNumuCCVec[b_line]           
+        = utils.rebinVector(readerNue[b_line].GetVectorFromTree(
+                 (char*) "NueFromNumuCCVec"),nueBins);
+      DirtVec[b_line]                    
+        = utils.rebinVector(readerNue[b_line].GetVectorFromTree(
+                 (char*) "DirtVec"),nueBins);
+      OtherVec[b_line]                   
+        = utils.rebinVector(readerNue[b_line].GetVectorFromTree(
+                 (char*) "OtherVec"),nueBins);
       // if (includeCosmics)
-      NueFromCosmicsVec[b_line]          = utils.rebinVector(readerNue[b_line].GetComptonBackgroundFromFile(cosmicsFile, minDistanceToStart),nueBins);
+      NueFromCosmicsVec[b_line]          
+        = utils.rebinVector(readerNue[b_line].GetComptonBackgroundFromFile(cosmicsFile,
+                 minDistanceToStart),nueBins);
       if (includeFosc){
         if (useHighDm){
           eventsSignalBestFitNuVec[b_line]    
@@ -647,7 +502,7 @@ namespace lar1{
         }
       }
       // now deal with the multiweight stuff:
-      if (useCovarianceMatrix){
+      if (useMultiWeights){
         auto tempMultiWeightInfoNue    = readerNue[b_line].GetMultiWeightData();
         std::vector<std::vector< float> > tempMultiWeightInfoNumu;
         if (includeNumus)
@@ -820,14 +675,14 @@ namespace lar1{
     if (verbose){
       std::cout << "\n------------------------\nPrinting out P=0.3% values and P=0.0% values:\n";
       std::cout << "\tP=0\t\tosc"<<npoints/2;
-      if (useCovarianceMatrix){
-        std::cout << "\t\tMWF\t\tMXB";
+      if (useMultiWeights){
+        std::cout << "\t\tMWF\t\tMWB";
       }
       std::cout<<"\n";
       for (unsigned int i = 0; i < nullBackgrounds.size(); i++){
         std::cout << "\t" << nullBackgrounds[i] << "\t\t";
         std::cout << oscVector[0][i];
-        if (useCovarianceMatrix){
+        if (useMultiWeights){
           std::cout << "\t\t" << eventsNullVecMultiWeight.front().at(i);
           std::cout << "\t\t" << eventsNullVecMultiWeight.back().at(i);
         }      
@@ -847,55 +702,6 @@ namespace lar1{
     //going to make an array nbins long and just leave the signal entries at zero
 
 
-    // For shape only fits, the near det stats get recalculated each time chi2 gets
-    // calculate.  But we do them once out here too, for the shape+rate fit.
-    if (!useCovarianceMatrix && nL > 1){
-      //by design, the nearest detector to the source is the first in the vector
-      //of baselines.
-      nearDetStats.resize(nbins);
-      for (unsigned int i = 0; i < nearDetStats.size(); i++){
-        //leaving the first nbinsE entries at 0 for the signal bins
-        //for bins nbinsE -> 2*nbinsE-1, use 1/sqrt(nue events in that bin)
-        if (i < nbins_nue)
-          continue;
-        if (i < 2*nbins_nue){
-          nearDetStats[i] = 1/sqrt(eventsnueVec[0][i-nbins_nue]);
-        }
-        else {
-          nearDetStats[i] = 1/sqrt(eventsnumuVec[0][i-2*nbins_nue]);
-        }
-      }
-      if(verbose){
-        std::cout << "\nNo covariance matrix entries, calculating near det errors.\n";
-        std::cout << "The fractional errors are: " << std::endl;
-        for (unsigned int i = 0; i < nearDetStats.size(); i++){
-          std::cout << "\tBin " << i << ":\t" << nearDetStats[i] << "\n";
-        }
-      }
-
-      // std::cout << "Testing whether the photons are in the sample:"<< std::endl;
-      // for (int i = 0; i < nbins_nue; i ++){
-      //   std::cout << "Comptons:\n";
-      //   for(int b_line = 0; b_line < nL; b_line ++){
-      //     std::cout << NueFromCosmicsVec[b_line][i]<<"\t";
-      //   }
-      //   std::cout << std::endl;
-      // }
-
-  // }
-
-
-    // std::cout << std::endl;
-    //now either the covariance matrix is set, or the frac entries is filled.
-    //nearDetStats is only nonezero size if the cov_max_name is empty
-    
-    //This vector holds the null oscillation collapsed signal (in other words,
-    //it's the nue and numu appended).  It's used in the chisq calc.
-    // nullVec.resize(nbins-nL*nbinsE);
-    // nullVec = utils.collapseVector(nullBackgrounds, nbinsE, nL);
-
-    
-    }
 
     return 0;
   }
@@ -927,7 +733,7 @@ namespace lar1{
                     nL*nbins_null,0,nL*nbins_null-1,
                     nL*nbins_null,0,nL*nbins_null-1);
     TH2D * fractionalMatrixHist 
-         = new TH2D("fracMatHist","Fractional Error Matrix",
+         = new TH2D("fracMatHist","Fractional Covariance Matrix",
                     nL*nbins_null,0,nL*nbins_null-1,
                     nL*nbins_null,0,nL*nbins_null-1);
     TH2D * correlationMatrixHist 
@@ -1155,7 +961,10 @@ namespace lar1{
     if (savePlots){
       // Need to get the name of the matrix right:
       
-      TString matrixFileName = utils.GetMatrixFileName( fileSource,
+      // save to the folder "matrices":
+      TString path = fileSource + "/matrices/";
+
+      TString matrixFileName = utils.GetMatrixFileName( path,
                                                         detNamesString,
                                                         includeNumus,
                                                         useXSecWeights,
@@ -1176,9 +985,9 @@ namespace lar1{
       //   std::cout << events_nominal_COPY.at(i) << "\n";
       // }
 
-      covarianceMatrix.Write();
-      fractionalErrorMatrix.Write();
-      correlationMatrix.Write();
+      covarianceMatrix.Write("covarianceMatrix");
+      fractionalErrorMatrix.Write("fractionalCovarianceMatrix");
+      correlationMatrix.Write("correlationMatrix");
 
       // Dig the event rates out of the vectors and put them in the file
       // just for a cross check and to be sure what the matrices are
@@ -1725,13 +1534,28 @@ namespace lar1{
     x3s = new double[npoints+1]; y3s = new double[npoints+1];
     x5s = new double[npoints+1]; y5s = new double[npoints+1];
 
-    // if (useCovarianceMatrix)
-      // utils.GetCovarianceMatrix(useFluxWeights,useXSecWeights);
 
-    fittingSignal.resize(nL);
-    fittingBackgr.resize(nL);
-    fittingErrors.resize(nL);
+    // First things first, get the complete, non scaled covariance matrix.
+    nullVec = utils.collapseVector(nullBackgrounds,
+                                   nbins_nue,
+                                   nbins_numu,
+                                   nL);
 
+    TString path = fileSource + "/matrices/";
+
+    std::cout << "covMatrixList.size() is " << covMatrixList.size() << std::endl;
+
+    TMatrix * fullCovarianceMatrix 
+      = utils.assembleCovarianceMatrix( path,
+                                        detNamesString,
+                                        includeNumus,
+                                        nullVec,
+                                        covMatrixList,
+                                        covMatrixListSource,
+                                        absolute_MWSource);
+
+    std::cout << "Covariance matrix (0,0) is " << (*fullCovarianceMatrix)[0][0] << std::endl;
+    return 1;
 
     //This loop is actually doing the chisq calculation
     //It loops over npoints twice.  First over dm2, and second over sin22th
@@ -1742,10 +1566,7 @@ namespace lar1{
       for (int sin22thpoint = 0; sin22thpoint <= npoints; sin22thpoint++){
         // std::cout << "sin22th: " << sin22thpoint << " of " << npoints << std::endl;      
         chisq = 0.0; //reset the chisq!
-        systematicErrors.clear();
-        statisticalErrors.clear();
-        systematicErrors.resize(nL);
-        statisticalErrors.resize(nL);
+
 
         //First, figure out what dm2 and sin22th are for this iteration:
         dm2 = pow(10.,(TMath::Log10(dm2min)+(dm2point*1./npoints)*TMath::Log10(dm2max/dm2min)));
@@ -1837,116 +1658,15 @@ namespace lar1{
         // 
 
         // Now make sure the statistical and systematic errors are correct:
-        // These aren't used in the covariance matrix analysis.
-        systematicErrors.clear();
-        statisticalErrors.clear();
-        systematicErrors.resize(nL);
-        statisticalErrors.resize(nL);       
+        // These aren't used in the covariance matrix analysis.       
 
-        for (int b_line = 0; b_line < nL; b_line++){
-          systematicErrors.at(b_line).clear();
-          statisticalErrors.at(b_line).clear();
-          systematicErrors.at(b_line).resize(nbins_nue);
-          statisticalErrors.at(b_line).resize(nbins_nue);
-          for ( int i = 0; i < nbins_nue; i++){
-            if (b_line == 0){
-              statisticalErrors[b_line][i] = 1/sqrt(nullVec.at(i));
-              if (useCovarianceMatrix){
-                if (shapeOnlyFit){
-                  systematicErrors[b_line][i] = sqrt(fractional_Shape_covarianceMatrix[nbins_nue+i][nbins_nue+i]);
-                }
-                else
-                  systematicErrors[b_line][i] = sqrt(fractionalErrorMatrix[nbins_nue+i][nbins_nue+i]);
-              }
-              else
-                systematicErrors[b_line][i] = nearDetSystematicError;
-            } 
-            else{
-              if (useNearDetStats){
-                statisticalErrors[b_line][i] = 1/sqrt(nullVec.at(i+b_line*(nbins_nue+nbins_numu)));
-                systematicErrors[b_line][i] = 1/sqrt(nullVec.at(i));
-              }
-              else if (useCovarianceMatrix){
-                statisticalErrors[b_line][i] = 1/sqrt(nullVec.at(i+b_line*(nbins_nue+nbins_numu)));
-                if (shapeOnlyFit)
-                  systematicErrors[b_line][i] = sqrt(fractional_Shape_covarianceMatrix[b_line*nbins+nbins_nue+i][b_line*nbins+nbins_nue+i]);
-                else
-                  systematicErrors[b_line][i] = sqrt(fractionalErrorMatrix[b_line*nbins+nbins_nue+i][b_line*nbins+nbins_nue+i]);
-              }
-              else{ // no near det stats
-                statisticalErrors[b_line][i] = 1/sqrt(nullVec.at(i+b_line*(nbins_numu+nbins_nue)));
-                systematicErrors[b_line][i] = flatSystematicError;
-              }
-              if (inflateSystematics){
-                // std::cout << "Testing inflateSystematics, before: " << statisticalErrors[b_line][i];
-                systematicErrors[b_line][i] = sqrt(pow(systematicErrors[b_line][i],2)
-                                                 + pow(systematicInflationAmount,2));
-                // std::cout << "After: " << statisticalErrors[b_line][i] << std::endl;
-              }
 
-              if (useInfiniteStatistics && b_line == nL - 1){
-                // zero out the statistical error:
-                statisticalErrors[b_line][i] = 0;
-              }
-
-            } // else on if (b_line == 0)          
-          }
-        }
-
-        if (dm2point == dm2FittingPoint && sin22thpoint == sin22thFittingPoint){
-          statisticalErrorsPlotting.resize(nL);
-          systematicErrorsPlotting.resize(nL);
-          for (int i = 0; i < nL; i++){
-            statisticalErrorsPlotting.at(i).resize(nbins_nue);
-            systematicErrorsPlotting.at(i).resize(nbins_nue);
-            for (int bin = 0; bin < nbins_nue; ++ bin)
-            {
-              fittingSignal[i].push_back(predictionVec.at(bin + i*(nbins_nue+nbins_numu)));
-              fittingBackgr[i].push_back(nullVec.at(bin + i*(nbins_nue+nbins_numu)));
-              double error = 0;
-              error += pow(nullVec.at(bin + i*(nbins_nue+nbins_numu))*statisticalErrors[i][bin],2);
-              error += pow(nullVec.at(bin + i*(nbins_nue+nbins_numu))*systematicErrors[i][bin],2);
-              fittingErrors[i].push_back(sqrt(error));
-              statisticalErrorsPlotting[i][bin] = statisticalErrors[i][bin];
-              systematicErrorsPlotting[i][bin]  = systematicErrors[i][bin];
-            }
-          }
-        }
         //initialize the covariance matrix:
-        // std::vector< std::vector<float> > entries( nbins, std::vector<float> ( nbins, 0.0 ) );
         TMatrix entries;
         entries.ResizeTo(nbins*nL,nbins*nL);
 
 
-        // Float_t * entriescollapsed;
-        
-        if (!useCovarianceMatrix){
-
-          for (int b_line = 0; b_line < nL; b_line ++){
-            for (int ibin = 0; ibin < nbins_numu+nbins_nue; ibin++){ // looping over the C.M.
-              // Really, this just goes down the diagonal since there's no covariance
-              // We don't use fractional errors here but full errors
-              // So, pick the central value (nullVec)
-              int thisBin = nbins*b_line + ibin + nbins_nue ; // + nbinsE is to skip signal sections
-              if (ibin < nbins_nue)
-                entries[thisBin][thisBin] 
-                    = pow(nullVec[(nbins_nue+nbins_numu)*b_line+ibin]*statisticalErrors[b_line][ibin],2)
-                    + pow(nullVec[(nbins_nue+nbins_numu)*b_line+ibin]*systematicErrors[b_line][ibin] ,2);
-              else
-                entries[thisBin][thisBin] = nullVec[(nbins_nue+nbins_numu)*b_line+ibin];
-
-              // std::cout << "On thisBin = " << thisBin << ", added " 
-              //           << entries[thisBin][thisBin] << ", nullVec is "
-              //           << nullVec[2*nbinsE*b_line+ibin]
-              //           << std::endl;
-
-            }
-          }
-          // entriescollapsed = (utils.CollapseMatrix(entries,nbinsE, nL));
-
-        } //end if on "!useCovarianceMatrix")     
-
-        else{
+        // else{
           // use the full blown covariance matrix.  Loop over every entry.
           //
           // But first, call the method to build the covariance matrix!
@@ -2012,7 +1732,7 @@ namespace lar1{
             } //end loop on jbin
           } //end loop on ibin
 
-        } //end section that is using full covariance matrix
+        // } //end section that is using full covariance matrix
 
 
         //At this point, the covariance matrix is built in full in "entries"
@@ -2037,15 +1757,15 @@ namespace lar1{
 
         if (debug){
           //the matrix should be nbins- nL*nbinsE on each side.  Print:
-          std::cout << "\nPrinting collapsed covariance matrix:\n";
-          // unsigned int side = nbins-nL*nbinsE;
-          for ( int i = 0; i < (nbins-nbins_nue)*nL; i ++){
-            std::cout << i << "\t";
-            for ( int j = 0; j < (nbins-nbins_nue)*nL; j++){
-              std::cout << entriescollapsed[i][j] << " ";
-            }
-            std::cout << std::endl;
-          }
+          // std::cout << "\nPrinting collapsed covariance matrix:\n";
+          // // unsigned int side = nbins-nL*nbinsE;
+          // for ( int i = 0; i < (nbins-nbins_nue)*nL; i ++){
+          //   std::cout << i << "\t";
+          //   for ( int j = 0; j < (nbins-nbins_nue)*nL; j++){
+          //     std::cout << entri[i][j] << " ";
+          //   }
+          //   std::cout << std::endl;
+          // }
         }
 
         
@@ -2061,7 +1781,7 @@ namespace lar1{
         // }
         //inverse cov matrix, M^{-1}, used in chi2 calculation
         // TMatrix *cov = new TMatrix(nbins-nL*nbinsE,nbins-nL*nbinsE);
-        TMatrix *cov = &(entriescollapsed.Invert()); //this is used in chi2 calculation
+        TMatrix *cov = &(entries.Invert()); //this is used in chi2 calculation
         // cov = &(M->Invert()); //this is used in chi2 calculation
 // return -1;
 
@@ -2097,25 +1817,25 @@ namespace lar1{
                         std::cout << " chi2: " << (predictioni-cvi)*(predictionj-cvj)* (*cov)(ibin,jbin) << std::endl;
                     }
                 }
-                if (sin22thpoint == sin22thFittingPoint && dm2point == dm2FittingPoint){
-                  if (jbin == ibin){
-                    std::cout << "On bin " << ibin 
-                              << ", adding chi2 = " 
-                              << (predictioni-cvi)*(predictionj-cvj)
-                                *(*cov)(ibin,jbin) << std::endl;
-                    if (useNearDetStats) 
-                      std::cout << "  nearDetStats error on this bin is "
-                                << nearDetStats[ibin%(nbins_nue+nbins_numu)] 
-                                << std::endl;
-                    std::cout << "  ibin: "<< ibin 
-                              << " Prediction: " << predictioni 
-                              << " cvi: " << cvi << std::endl;
-                    std::cout << "  jbin: "<< jbin 
-                              << " Prediction: " << predictionj 
-                              << " cvj: " << cvj;
-                    std::cout << "  M^-1: " << (*cov)(ibin,jbin) << std::endl;
-                  }
-                }
+                // if (sin22thpoint == sin22thFittingPoint && dm2point == dm2FittingPoint){
+                //   if (jbin == ibin){
+                //     std::cout << "On bin " << ibin 
+                //               << ", adding chi2 = " 
+                //               << (predictioni-cvi)*(predictionj-cvj)
+                //                 *(*cov)(ibin,jbin) << std::endl;
+                //     if (useNearDetStats) 
+                //       std::cout << "  nearDetStats error on this bin is "
+                //                 << nearDetStats[ibin%(nbins_nue+nbins_numu)] 
+                //                 << std::endl;
+                //     std::cout << "  ibin: "<< ibin 
+                //               << " Prediction: " << predictioni 
+                //               << " cvi: " << cvi << std::endl;
+                //     std::cout << "  jbin: "<< jbin 
+                //               << " Prediction: " << predictionj 
+                //               << " cvj: " << cvj;
+                //     std::cout << "  M^-1: " << (*cov)(ibin,jbin) << std::endl;
+                //   }
+                // }
                 chisq += (predictioni-cvi)*(predictionj-cvj)* (*cov)(ibin,jbin);
 
             }
@@ -2146,12 +1866,41 @@ namespace lar1{
         //     y99[dm2point] = dm2;
         // }
         
-          if (debug) std::cout << "dm2: " << dm2 << ",\tsin22th: " << sin22th << ",\tchisq: " << chisq << std::endl;    
-          if (debug) std::cout << "\n\n";
-          if (debug) std::cout << "---------------------------End dm2: " << dm2 << ",\tsin22th: " << sin22th << std::endl;
-          }// end loop over sin22thpoints
-      } // end loop over dm2points
+        if (debug) std::cout << "dm2: " << dm2 << ",\tsin22th: " << sin22th << ",\tchisq: " << chisq << std::endl;    
+        if (debug) std::cout << "\n\n";
+        if (debug) std::cout << "---------------------------End dm2: " << dm2 << ",\tsin22th: " << sin22th << std::endl;
+        }// end loop over sin22thpoints
+    } // end loop over dm2points
     
+/*
+
+    // This block of code sets up where the chi2 data is going and what assumptions went
+    // into go into the file name.
+    chi2FileName = fileSource + fileNameRoot+mode;
+    if(shapeOnlyFit){
+        if (useNearDetStats){
+            chi2FileName = chi2FileName+detNamesString+"_nearDetStats_shapeOnly_chi2.root";
+        }
+        else if (useCovarianceMatrix) {
+            chi2FileName = chi2FileName+detNamesString+"_covMat_shapeOnly_chi2.root";
+        }
+        else{
+            chi2FileName = chi2FileName+detNamesString+"_flatStats_shapeOnly_chi2.root";
+        }
+    }
+    else{
+        if (useNearDetStats){
+            chi2FileName = chi2FileName+detNamesString+"_nearDetStats_chi2.root";
+        }
+        else if (useCovarianceMatrix){
+            chi2FileName = chi2FileName+detNamesString+"_covMat_chi2.root";
+        }
+        else {
+          chi2FileName = chi2FileName+detNamesString+"_flatStats_chi2.root";
+        }
+    }
+*/
+
     std::cout << "Writing chi2 to " << chi2FileName << std::endl;
 
 
@@ -2175,384 +1924,6 @@ namespace lar1{
     return 0;
   }
 
-  int NueAppearanceFitter::MakePlots(){
-    gStyle->SetOptStat(0000);
-    gStyle->SetOptFit(0000);
-    gStyle->SetPadBorderMode(0);
-    gStyle->SetPadBottomMargin(0.15);
-    gStyle->SetPadLeftMargin(0.15);
-    gStyle->SetPadRightMargin(0.05);
-    gStyle->SetFrameBorderMode(0);
-    gStyle->SetCanvasBorderMode(0);
-    gStyle->SetPalette(0);
-    gStyle->SetCanvasColor(0);
-    gStyle->SetPadColor(0);
-    
-    TGraph *sens90 = new TGraph(npoints+1,x90,y90); 
-    TGraph *sens3s = new TGraph(npoints+1,x3s,y3s); 
-    TGraph *sens5s = new TGraph(npoints+1,x5s,y5s);
-
-    //Plot Results:
-    sens90->SetLineColor(1); sens90->SetLineWidth(2);
-    sens3s->SetLineColor(9); sens3s->SetLineWidth(2);
-    sens5s->SetLineColor(9); sens5s->SetLineStyle(2); sens5s->SetLineWidth(1);   
-
-
-    
-
-    //======================================================
-    printf("\nDrawing sensitivity curves...\n");
-
-    std::cout<<"Drawing LSND intervals...\n\n";
-
-    TCanvas* c3 = new TCanvas("c3","Sensitivity",900,700);
-    // c3->Divide(1,2);
-    TPad * pad1 = new TPad("pad1","pad1",0,0.25,0.6,1);
-    TPad * pad2 = new TPad("pad2","pad2",0,0,0.6,0.25);
-    TPad * pad3 = new TPad("pad3","pad3",0.6,0,1,1);
-
-    pad1 -> Draw();
-    pad2 -> Draw();
-    pad3 -> Draw();
-
-    pad1 -> cd();
-    // pad2 -> cd();
-
-    // pad1->cd(1);
-    pad1->SetLogx();
-    pad1->SetLogy();
-
-    TH2D* hr1=new TH2D("hr1","hr1",500,sin22thmin,sin22thmax,500,dm2min,dm2max);
-    hr1->Reset();
-    hr1->SetFillColor(0);
-    hr1->SetTitle(";sin^{2}2#theta_{#mue};#Deltam^{2} (eV^{2})");
-    hr1->GetXaxis()->SetTitleOffset(1.1);
-    hr1->GetYaxis()->SetTitleOffset(1.2);
-    hr1->GetXaxis()->SetTitleSize(0.05);
-    hr1->GetYaxis()->SetTitleSize(0.05);
-    hr1->SetStats(kFALSE);
-    hr1->Draw();
-    plotUtils.lsnd_plot(pad1);
-
-    // Draw the systematic and statistical errors
- 
-    // std::cout << "systematicErrorsPlotting  ... " << systematicErrorsPlotting [nL-1].at(0)  << std::endl;
-    // std::cout << "systematicErrorsPlotting  ... " << systematicErrorsPlotting [nL-1].at(1)  << std::endl;
-    // std::cout << "systematicErrorsPlotting  ... " << systematicErrorsPlotting [nL-1].at(2)  << std::endl;
-    // std::cout << "systematicErrorsPlotting  ... " << systematicErrorsPlotting [nL-1].at(3)  << std::endl;
-    // std::cout << "statisticalErrorsPlotting ... " << statisticalErrorsPlotting[nL-1].at(0) << std::endl;
-    // std::cout << "statisticalErrorsPlotting ... " << statisticalErrorsPlotting[nL-1].at(1) << std::endl;
-    // std::cout << "statisticalErrorsPlotting ... " << statisticalErrorsPlotting[nL-1].at(2) << std::endl;
-    // std::cout << "statisticalErrorsPlotting ... " << statisticalErrorsPlotting[nL-1].at(3) << std::endl;
-    std::vector<TH1F *> systematicHist;
-    std::vector<TH1F *> statisticalHist;
-
-    systematicHist.resize(nL);
-    statisticalHist.resize(nL);
-
-    for (int bin = 0; bin < nbins_nue; bin++){
-      std::cout << "fittingSignal(" << bin << ") ... " << fittingSignal[nL-1].at(bin) << std::endl;
-      std::cout << "fittingBackgr(" << bin << ")  ... " << fittingBackgr[nL-1].at(bin) << std::endl;
-      std::cout << "fittingErrors(" << bin << ")  ... " << fittingErrors[nL-1].at(bin) << std::endl;
-      std::cout << "bin width    (" << bin << ")  ... " << nueBins.at(bin+1) - nueBins.at(bin)  << std::endl;
-    }
-    std::vector<TH1F *> fittingSignalHist;
-    std::vector<TH1F *> fittingBackgrHist;
-
-    fittingSignalHist.resize(nL);
-    fittingBackgrHist.resize(nL);
-    // for (int i = 0; i < nL; i++){
-    //   systematicHist[i] = utils.makeHistogram(systematicErrors[i],0.2,3.0);
-    // }
-
-    // TH1F * dummy = new TH1F("dummy", "dummy", nbinsE,0.2, 3.0);
-
-
-
-    // for (int i = 0; i < nL; i++){
-    //   dummy -> GetXaxis()->SetBinLabel(i*nbinsE + 1, "0.2");
-    //   dummy -> GetXaxis()->SetBinLabel(i*nbinsE + 10, "3.0");
-    // }
-
-    // dummy->SetLabelSize(0.2);
-    // dummy->SetTitle("Fractional Errors");
-    // pad2->cd();
-    // dummy-> Draw();
-    for (int i = 0; i < nL; i++){
-      pad2 -> cd();
-      char name[100];
-      sprintf(name,"padtemp%d",i);
-      TPad * padtemp = new TPad(name,name,i*(1.0/nL)+0.01,0.05,(i+1)*(1.0/nL)-0.01,1);
-      std::cout << "1/nL is " << 1.0/nL << std::endl;
-      padtemp->Draw();
-      padtemp -> cd();
-      systematicHist[i]  = utils.makeHistogram(systematicErrorsPlotting[i],nueBins);
-      statisticalHist[i] = utils.makeHistogram(statisticalErrorsPlotting[i],nueBins);
-      systematicHist[i] -> SetTitle(Form("%s Fractional Errors",names[i].c_str()));
-      systematicHist[i] -> SetTitleSize(12);
-      // systematicHist[i] -> GetYaxis()->SetTitle("");
-      if (i == 0){
-        systematicHist[i] -> GetYaxis()->SetLabelSize(0.08);
-        systematicHist[i] -> GetYaxis()->SetTitle("Uncert. [\%]");
-      }
-      else{
-        systematicHist[i] -> GetYaxis()->SetLabelSize(0.0);
-      }
-      systematicHist[i] -> GetYaxis()->SetTitleSize(0.08);
-      systematicHist[i] -> GetXaxis()->SetTitleSize(0.08);
-      systematicHist[i] -> GetXaxis()->SetLabelSize(0.08);
-      systematicHist[i] -> GetXaxis()->SetTitleOffset(0.9);
-      systematicHist[i] -> GetXaxis()->SetTitle("Energy (GeV)");
-      systematicHist[i] -> SetMaximum(0.4);
-      systematicHist[i] -> SetMinimum(0);
-      systematicHist[i] -> SetLineColor(2);
-      statisticalHist[i]-> SetLineColor(1);
-      systematicHist[i] -> SetLineWidth(2);
-      statisticalHist[i]-> SetLineWidth(2);      
-      systematicHist[i] ->Draw("L");
-      statisticalHist[i] ->Draw("L same");
-
-    }
-
-     for (int i = 0; i < nL; i++){
-      pad3 -> cd();
-      char name[100];
-      sprintf(name,"pad3temp%d",i);
-      TPad * padtemp = new TPad(name,name,0,(i)*(1.0/nL),1,(i+1)*(1.0/nL));
-      std::cout << "1/nL is " << 1.0/nL << std::endl;
-      padtemp->Draw();
-      padtemp -> cd();
-      fittingSignalHist[i]  = utils.makeHistogram(fittingSignal[i],nueBins);
-      fittingBackgrHist[i] = utils.makeHistogram(fittingBackgr[i],nueBins);
-      fittingSignalHist[i] -> SetTitle(Form("%s Signal and Background",names[i].c_str()));
-      fittingSignalHist[i] -> SetTitleSize(12);
-      // fittingSignalHist[i] -> GetYaxis()->SetTitle("");
-      if (i == 0){
-        // fittingSignalHist[i] -> GetYaxis()->SetLabelSize(0.08);
-        // fittingSignalHist[i] -> GetYaxis()->SetTitle("Uncert. [\%]");
-      }
-      else{
-        // fittingSignalHist[i] -> GetYaxis()->SetLabelSize(0.0);
-      }
-      fittingSignalHist[i] -> GetYaxis()->SetTitle("Events");
-      // fittingSignalHist[i] -> GetXaxis()->SetTitleSize(0.08);
-      // fittingSignalHist[i] -> GetXaxis()->SetLabelSize(0.08);
-      // fittingSignalHist[i] -> GetXaxis()->SetTitleOffset(0.9);
-      fittingSignalHist[i] -> GetXaxis()->SetTitle("Energy (GeV)");
-      // fittingSignalHist[i] -> SetMaximum(0.4);
-      // fittingSignalHist[i] -> SetMinimum(0);
-      fittingSignalHist[i] -> SetLineColor(2);
-      fittingBackgrHist[i] -> SetLineColor(1);
-      fittingSignalHist[i] -> SetLineWidth(2);
-      fittingBackgrHist[i] -> SetLineWidth(2);
-      for (int bin = 0; bin < nbins_nue; bin++){
-        fittingBackgrHist[i]->SetBinError(bin+1,fittingErrors[i][bin]); 
-        fittingBackgrHist[i]->SetBinContent(bin+1,
-                                    fittingBackgrHist[i]->GetBinContent(bin+1)
-                                    /fittingBackgrHist[i]->GetBinWidth(bin+1));
-        fittingSignalHist[i]->SetBinContent(bin+1,
-                                    fittingSignalHist[i]->GetBinContent(bin+1)
-                                    /fittingSignalHist[i]->GetBinWidth(bin+1));
-
-      }
-      fittingSignalHist[i] -> Draw("hist");
-      fittingBackgrHist[i] -> Draw("E hist same");
-      if (i == nL-1){
-        TLegend * legSig = new TLegend(0.5,0.7,0.9,0.85);
-        legSig->SetFillColor(0);
-        legSig->SetFillStyle(0);
-        legSig->SetBorderSize(0);
-        legSig->AddEntry(fittingBackgrHist[i],"Background");
-        legSig->AddEntry(fittingSignalHist[i],"Signal");
-        dm2 = pow(10.,(TMath::Log10(dm2min)+(dm2FittingPoint*1./npoints)*
-                       TMath::Log10(dm2max/dm2min)));
-        sin22th = pow(10.,(TMath::Log10(sin22thmin)+(sin22thFittingPoint*1./npoints)*
-                           TMath::Log10(sin22thmax/sin22thmin)));        
-        plotUtils.add_plot_label(Form("(%.2geV^{2},%.1g)",dm2,sin22th),0.7,0.6);
-        legSig->Draw();
-        // fittingSignalHist[i] -> GetYaxis()->SetTitle("Uncert. [\%]");
-      }
-
-    }   
-
-    // systematicHist->Draw("same");
-    // statisticalHist->Draw("same");
-
-    pad1->cd();
-
-    //======================================================
-
-    TLegend* legt=new TLegend(0.68,0.50,0.86,0.62);
-    legt->SetFillStyle(0);
-    legt->SetFillColor(0);
-    legt->SetBorderSize(0);
-    legt->SetTextSize(0.025);
-    //     legt->AddEntry("",running,"");
-    //     legt->AddEntry("",datapot,"");
-    //     
-    //Determine the lines in the legend.  Print the detectors first:
-    // TString detectors.
-    // plotUtils.add_plot_label()
-    //if (mode == "nu") legt ->AddEntry("", "#nu mode", "");
-    //else if (mode == "nubar") legt ->AddEntry("", "#nubar mode", "");
-    
-    // char name[200];
-    // char name2[200];
-    // char name3[200];
-
-    char name[3][200];
-
-    for (int j=0; j<nL; j++) {
-        if (baselines[j] == "100m" || baselines[j] == "150m" || baselines[j] == "200m"){
-            if (use100m || use150m || use200m)
-                sprintf(name[j], "LAr1-ND (%s)", baselinesFancy[j].c_str());
-            else if (use100mLong)
-                sprintf(name[j], "2*LAr1-ND (%s)", baselinesFancy[j].c_str());
-        }
-        else if (baselines[j] == "470m"){
-            sprintf(name[j], "MicroBooNE (%s)", baselinesFancy[j].c_str());
-        }
-        else if (baselines[j] == "700m"){
-            if (use700m) sprintf(name[j], "LAr1-FD (%s)", baselinesFancy[j].c_str());
-        }
-        else if (baselines[j] == "600m_onaxis" || baselines[j] == "600m_offaxis"){
-            sprintf(name[j], "T600 (%s)", baselinesFancy[j].c_str());
-        }
-        // else if (baselines[j] == 800){
-        //     sprintf(name[j], "T600 (%sm)", baselines[j].c_str());
-        // }
-    }
-
-
-    //legt->AddEntry("",name,"");
-    
-    for (int i = 0; i < nL;i++){
-        std::cout << "Name is " << name[i] << std::endl;
-        plotUtils.add_plot_label(name[i],  0.77, 0.87-i*0.04, 0.026, 1, 62);
-    }  
-
-    plotUtils.add_plot_label(label2, 0.77, 0.76, 0.023, 1, 62);
-    plotUtils.add_plot_label(label1, 0.77, 0.73, 0.023, 1, 62);
-    // legt->AddEntry("",label,"");
-
-    sens90->Draw("l same");
-    legt->AddEntry(sens90,"90\% CL","l");
-    // sens99->Draw("l same");
-    // legt->AddEntry(sens99,"99\% CL","l");
-    sens3s->Draw("l same");
-    legt->AddEntry(sens3s,"3#sigma CL","l");
-    sens5s->Draw("l same");
-    legt->AddEntry(sens5s,"5#sigma CL","l");
-
-    legt->Draw();
-
-    // if (specialNameText != ""){
-    //     char tempChar[20];
-    //     sprintf(tempChar, "%s",specialNameText.c_str());
-    //     plotUtils.add_plot_label(tempChar, 0.75, 0.25);
-    // }
-    // if (specialNameTextOsc != "") {
-    //     char tempChar[20];
-    //     sprintf(tempChar, "%s",specialNameTextOsc.c_str());
-    //     plotUtils.add_plot_label(tempChar, 0.75, 0.3);
-    // }
-    //plotUtils.add_plot_label(label, label_x, label_y, 0.05, 1, 62, 22 );
-
-    TLegend* leg3=new TLegend(0.2,0.2,0.4,0.35);
-    leg3->SetFillStyle(0);
-    leg3->SetFillColor(0);
-    leg3->SetBorderSize(0);
-    leg3->SetTextSize(0.03);
-    TGraph *gdummy1 = new TGraph();
-    gdummy1->SetFillColor(29);
-    TGraph *gdummy2 = new TGraph();
-    gdummy2->SetFillColor(38);
-    TMarker *gdummy3 = new TMarker();
-    gdummy3 -> SetMarkerStyle(3);
-    gdummy3 -> SetMarkerColor(1);
-    TMarker *gdummy4 = new TMarker();
-    gdummy4 -> SetMarkerStyle(34);
-    gdummy4 -> SetMarkerColor(1);
-    TGraph *gdummy0 = new TGraph();
-    gdummy0 -> SetFillColor(1);
-    gdummy0 -> SetFillStyle(3254);
-    leg3->AddEntry(gdummy2,"LSND 90% CL","F");
-    leg3->AddEntry(gdummy1,"LSND 99% CL","F");
-    leg3->AddEntry(gdummy3,"LSND Best Fit","P*");
-    leg3->AddEntry(gdummy4,"Global Best Fit","P*");
-    leg3->AddEntry(gdummy0,"Global Fit 90% CL (arXiv:1303.3011)");   
-    leg3->Draw();
-    
-    TImage *img = TImage::Create();
-    img -> FromPad(c3);
-    // if (specialNameText_far != "") fileNameRoot = fileNameRoot + specialNameText_far + "_";
-    // if (specialNameTextOsc_far != "") fileNameRoot = fileNameRoot + specialNameTextOsc_far + "_";
-    if (savePlots){
-      if(shapeOnlyFit){
-          if (useNearDetStats){
-              c3 -> Print(fileNameRoot+mode+"_nearDetStats_shapeOnly_megaPlot.pdf", "pdf");
-              c3 -> Print(fileNameRoot+mode+"_nearDetStats_shapeOnly_megaPlot.eps", "eps");
-          }
-          else if (useCovarianceMatrix) {
-              c3 -> Print(fileNameRoot+mode+"_covMat_shapeOnly_megaPlot.pdf", "pdf");
-              c3 -> Print(fileNameRoot+mode+"_covMat_shapeOnly_megaPlot.eps", "eps");
-          }
-          else{
-              c3 -> Print(fileNameRoot+mode+"_flatStats_shapeOnly_megaPlot.pdf", "pdf");
-              c3 -> Print(fileNameRoot+mode+"_flatStats_shapeOnly_megaPlot.eps", "eps");
-          }
-      }
-      else{
-        if (useNearDetStats){
-              c3 -> Print(fileNameRoot+mode+"_nearDetStats_megaPlot.pdf", "pdf");
-              c3 -> Print(fileNameRoot+mode+"_nearDetStats_megaPlot.eps", "eps");
-          }
-          else if (useCovarianceMatrix){
-              c3 -> Print(fileNameRoot+mode+"_covMat_megaPlot.pdf", "pdf");
-              c3 -> Print(fileNameRoot+mode+"_covMat_megaPlot.eps", "eps");
-          }
-          else {
-              c3 -> Print(fileNameRoot+mode+"_flatStats_megaPlot.pdf", "pdf");
-              c3 -> Print(fileNameRoot+mode+"_flatStats_megaPlot.eps", "eps");
-          }
-      }
-    }
-
-    TCanvas * tempCanv = new TCanvas("tempCanv","temp canvas",650,650);
-    tempCanv -> cd();
-    TPad * padTemp = new TPad("padTemp","padTemp",0,0,1,1);
-    padTemp->Draw();
-
-    padTemp->cd();
-
-    padTemp->SetLogx();
-    padTemp->SetLogy();
-    hr1->Draw();
-    plotUtils.lsnd_plot(padTemp);
-    sens90->Draw("l same");
-    // legt->AddEntry(sens90,"90\% CL","l");
-    sens3s->Draw("l same");
-    // legt->AddEntry(sens3s,"3#sigma CL","l");
-    sens5s->Draw("l same");
-    // legt->AddEntry(sens5s,"5#sigma CL","l");
-    legt->Draw();
-    leg3->Draw();
-    for (int i = 0; i < nL;i++){
-        std::cout << "Name is " << name[i] << std::endl;
-        plotUtils.add_plot_label(name[i],  0.77, 0.87-i*0.04, 0.026, 1, 62);
-    }  
-    plotUtils.add_plot_label((char*)"PRELIMINARY",0.77,0.79,0.023,2,62);
-    plotUtils.add_plot_label(label1, 0.77, 0.76, 0.023, 1, 62);
-    plotUtils.add_plot_label(label2, 0.77, 0.73, 0.023, 1, 62);
-    plotUtils.add_plot_label((char*)"80\% #nu_{e} efficiency", 0.77, 0.70, 0.023, 1, 62);
-    plotUtils.add_plot_label((char*)"Statistical and flux uncert. only", 0.77, 0.67, 0.023, 1, 62);
-
-
-
-    std::cout<<"\nEnd of routine.\n";
-
-    return 0;
-  }
 
   int NueAppearanceFitter::MakeSimplePlot(){
 
@@ -2656,37 +2027,39 @@ namespace lar1{
     plotUtils.add_plot_label((char*)"80\% #nu_{e} Efficiency", 0.93, 0.63, 0.025, 1, 62,32);
     plotUtils.add_plot_label((char*)"Statistical and Flux Uncert. Only", 0.93, 0.60, 0.025, 1, 62,32);
 
-
+    TString basename = fileSource + fileNameRoot + mode;
+/*
     if (savePlots){
       if(shapeOnlyFit){
           if (useNearDetStats){
-              tempCanv -> Print(fileNameRoot+mode+"_nearDetStats_shapeOnly_megaPlot.pdf", "pdf");
-              tempCanv -> Print(fileNameRoot+mode+"_nearDetStats_shapeOnly_megaPlot.eps", "eps");
+              tempCanv -> Print(basename+"_nearDetStats_shapeOnly_megaPlot.pdf", "pdf");
+              tempCanv -> Print(basename+"_nearDetStats_shapeOnly_megaPlot.eps", "eps");
           }
-          else if (useCovarianceMatrix) {
-              tempCanv -> Print(fileNameRoot+mode+"_covMat_shapeOnly_megaPlot.pdf", "pdf");
-              tempCanv -> Print(fileNameRoot+mode+"_covMat_shapeOnly_megaPlot.eps", "eps");
-          }
+          // else if (useCovarianceMatrix) {
+              // tempCanv -> Print(basename+"_covMat_shapeOnly_megaPlot.pdf", "pdf");
+              // tempCanv -> Print(basename+"_covMat_shapeOnly_megaPlot.eps", "eps");
+          // }
           else{
-              tempCanv -> Print(fileNameRoot+mode+"_flatStats_shapeOnly_megaPlot.pdf", "pdf");
-              tempCanv -> Print(fileNameRoot+mode+"_flatStats_shapeOnly_megaPlot.eps", "eps");
+              tempCanv -> Print(basename+"_flatStats_shapeOnly_megaPlot.pdf", "pdf");
+              tempCanv -> Print(basename+"_flatStats_shapeOnly_megaPlot.eps", "eps");
           }
       }
       else{
         if (useNearDetStats){
-              tempCanv -> Print(fileNameRoot+mode+"_nearDetStats_megaPlot.pdf", "pdf");
-              tempCanv -> Print(fileNameRoot+mode+"_nearDetStats_megaPlot.eps", "eps");
+              tempCanv -> Print(basename+"_nearDetStats_megaPlot.pdf", "pdf");
+              tempCanv -> Print(basename+"_nearDetStats_megaPlot.eps", "eps");
           }
-          else if (useCovarianceMatrix){
-              tempCanv -> Print(fileNameRoot+mode+"_covMat_megaPlot.pdf", "pdf");
-              tempCanv -> Print(fileNameRoot+mode+"_covMat_megaPlot.eps", "eps");
-          }
+          // else if (useCovarianceMatrix){
+              // tempCanv -> Print(basename+"_covMat_megaPlot.pdf", "pdf");
+              // tempCanv -> Print(basename+"_covMat_megaPlot.eps", "eps");
+          // }
           else {
-              tempCanv -> Print(fileNameRoot+mode+"_flatStats_megaPlot.pdf", "pdf");
-              tempCanv -> Print(fileNameRoot+mode+"_flatStats_megaPlot.eps", "eps");
+              tempCanv -> Print(basename+"_flatStats_megaPlot.pdf", "pdf");
+              tempCanv -> Print(basename+"_flatStats_megaPlot.eps", "eps");
           }
       }
     }
+    */
 
 
    return 0;
@@ -2749,7 +2122,7 @@ namespace lar1{
       TH1F * NueFromCosmics = utils.makeHistogram(NueFromCosmicsVec[j],nueBins);
 
       // pi0 and gamma are combined:
-      NueFromNC_pi0 -> Add(NueFromNC_delta0);
+      // NueFromNC_pi0 -> Add(NueFromNC_delta0);
 
       TH1F * SignalNu;
       TH1F * SignalNubar;
@@ -2803,51 +2176,61 @@ namespace lar1{
       std::cout << "  SignalNu: ................." << SignalNu -> Integral() << "\n";
       }
 
-      // std::cout << "Backgrounds by type for first bins: " << std::endl;
-      // std::cout << "  NueFromNueCC_muon: ........[" 
-      //           << NueFromNueCC_muon->GetBinContent(1) << "]\t["
-      //           << NueFromNueCC_muon->GetBinContent(2) << "]\t[" 
-      //           << NueFromNueCC_muon->GetBinContent(3)<< "]\n";
-      // std::cout << "  NueFromNueCC_chargeKaon: ..[" 
-      //           << NueFromNueCC_chargeKaon->GetBinContent(1) << "]\t["
-      //           << NueFromNueCC_chargeKaon->GetBinContent(2) << "]\t[" 
-      //           << NueFromNueCC_chargeKaon->GetBinContent(3)<< "]\n";
-      // std::cout << "  NueFromNueCC_neutKaon: ....[" 
-      //           << NueFromNueCC_neutKaon->GetBinContent(1) << "]\t["
-      //           << NueFromNueCC_neutKaon->GetBinContent(2) << "]\t[" 
-      //           << NueFromNueCC_neutKaon->GetBinContent(3)<< "]\n";
-      // std::cout << "  NueFromEScatter: ..........[" 
-      //           << NueFromEScatter->GetBinContent(1) << "]\t["
-      //           << NueFromEScatter->GetBinContent(2) << "]\t[" 
-      //           << NueFromEScatter->GetBinContent(3)<< "]\n";
-      // std::cout << "  NueFromNC_pi0: ............[" 
-      //           << NueFromNC_pi0->GetBinContent(1) << "]\t["
-      //           << NueFromNC_pi0->GetBinContent(2) << "]\t[" 
-      //           << NueFromNC_pi0->GetBinContent(3)<< "]\n";
-      // std::cout << "  NueFromNC_delta0: .........[" 
-      //           << NueFromNC_delta0->GetBinContent(1) << "]\t["
-      //           << NueFromNC_delta0->GetBinContent(2) << "]\t[" 
-      //           << NueFromNC_delta0->GetBinContent(3)<< "]\n";
-      // std::cout << "  NueFromNumuCC: ............[" 
-      //           << NueFromNumuCC->GetBinContent(1) << "]\t["
-      //           << NueFromNumuCC->GetBinContent(2) << "]\t[" 
-      //           << NueFromNumuCC->GetBinContent(3)<< "]\n";
-      // std::cout << "  Dirt: .....................[" 
-      //           << Dirt->GetBinContent(1) << "]\t["
-      //           << Dirt->GetBinContent(2) << "]\t[" 
-      //           << Dirt->GetBinContent(3)<< "]\n";
-      // std::cout << "  Other: ....................[" 
-      //           << Other->GetBinContent(1) << "]\t["
-      //           << Other->GetBinContent(2) << "]\t[" 
-      //           << Other->GetBinContent(3)<< "]\n";
-      // std::cout << "  NueFromCosmics: ...........[" 
-      //           << NueFromCosmics->GetBinContent(1) << "]\t["
-      //           << NueFromCosmics->GetBinContent(2) << "]\t[" 
-      //           << NueFromCosmics->GetBinContent(3)<< "]\n";
-      // std::cout << "  SignalNu: .................[" 
-      //           << SignalNu->GetBinContent(1) << "]\t["
-      //           << SignalNu->GetBinContent(2) << "]\t[" 
-      //           << SignalNu->GetBinContent(3)<< "]\n";
+      // if needed, print out the backgrounds here:
+      bool printData = true;
+      if (printData){
+        TString fileNamePrint = fileSource;
+        fileNamePrint += "/text/";
+        fileNamePrint += fileNameRoot;
+
+        char tempstring[100];
+
+        if (minVertexEnergyPhoton != 10000 ) {
+          sprintf(tempstring, "vePhot%g_",minVertexEnergyPhoton );
+          fileNamePrint += tempstring;
+        }
+        if (minShowerGap != 10000 )  { 
+          sprintf(tempstring, "gap%g_",minShowerGap );
+          fileNamePrint += tempstring;
+        }
+        if (minVertexEnergySignal != 0 ) {
+          sprintf(tempstring, "veSig%g_",minVertexEnergySignal );
+          fileNamePrint += tempstring;
+        }
+
+        char fileName[200];
+        if (useHighDm) 
+          sprintf(fileName, "%s%s_%s_highdm2.txt", fileNamePrint.Data(), baselines[j].c_str(), mode.c_str());
+        else if (useGlobBF) 
+          sprintf(fileName, "%s%s_%s_globBF.txt", fileNamePrint.Data(), baselines[j].c_str(), mode.c_str());
+        else sprintf(fileName, "%s%s_%s.txt", fileNamePrint.Data(), baselines[j].c_str(), mode.c_str());
+        std::cout << "nueBins.size(): " << nueBins.size() << std::endl;
+        
+        std::ofstream dataFile;
+        dataFile.open(fileName);
+        dataFile << std::setprecision(5) << "low\thigh\tmu\tk+\tk0\tnuscat\tpi0\t1gam"
+                 << "\tnumucc\tdirt\tcosmic\tother\tsignal\n";
+        for (int bin = 1; bin <= nbins_nue; bin++){
+          dataFile  << std::setprecision(4)
+                    << nueBins.at(bin - 1) << "\t" << nueBins.at(bin) << "\t"
+                    << NueFromNueCC_muon       -> GetBinContent(bin) << "\t"
+                    << NueFromNueCC_chargeKaon -> GetBinContent(bin) << "\t"
+                    << NueFromNueCC_neutKaon   -> GetBinContent(bin) << "\t"
+                    << NueFromEScatter         -> GetBinContent(bin) << "\t"
+                    << NueFromNC_pi0           -> GetBinContent(bin) << "\t"
+                    << NueFromNC_delta0        -> GetBinContent(bin) << "\t"
+                    << NueFromNumuCC           -> GetBinContent(bin) << "\t"
+                    << Dirt                    -> GetBinContent(bin) << "\t"
+                    << NueFromCosmics          -> GetBinContent(bin) << "\t"
+                    << Other                   -> GetBinContent(bin) << "\t";
+          if (includeFosc)
+            dataFile << SignalNu               -> GetBinContent(bin) << "\n";
+          else
+            dataFile << "0.0\n";
+        }
+        std::cout << "nueBins.size(): " << nueBins.size() << std::endl;
+
+      }
 
 
       for(int bin = 0; bin < nbins_nue; bin++)
@@ -2891,6 +2274,8 @@ namespace lar1{
         }
       }
 
+
+
       // Set the bin errors to zero except for the very last bin:
       for (int i = 0; i < nbins_nue; ++i)
       {
@@ -2920,69 +2305,6 @@ namespace lar1{
           signalEvents[i]     = SignalNu -> GetBinContent(i+1);
       }
 
-      // std::cout << "Backgrounds by type for first bins AFTER scaling: " << std::endl;
-      // std::cout << "  NueFromNueCC_muon: ........[" 
-      //           << NueFromNueCC_muon->GetBinContent(1) << "]\t["
-      //           << NueFromNueCC_muon->GetBinContent(2) << "]\t[" 
-      //           << NueFromNueCC_muon->GetBinContent(3)<< "]\n";
-      // std::cout << "  NueFromNueCC_chargeKaon: ..[" 
-      //           << NueFromNueCC_chargeKaon->GetBinContent(1) << "]\t["
-      //           << NueFromNueCC_chargeKaon->GetBinContent(2) << "]\t[" 
-      //           << NueFromNueCC_chargeKaon->GetBinContent(3)<< "]\n";
-      // std::cout << "  NueFromNueCC_neutKaon: ....[" 
-      //           << NueFromNueCC_neutKaon->GetBinContent(1) << "]\t["
-      //           << NueFromNueCC_neutKaon->GetBinContent(2) << "]\t[" 
-      //           << NueFromNueCC_neutKaon->GetBinContent(3)<< "]\n";
-      // std::cout << "  NueFromEScatter: ..........[" 
-      //           << NueFromEScatter->GetBinContent(1) << "]\t["
-      //           << NueFromEScatter->GetBinContent(2) << "]\t[" 
-      //           << NueFromEScatter->GetBinContent(3)<< "]\n";
-      // std::cout << "  NueFromNC_pi0: ............[" 
-      //           << NueFromNC_pi0->GetBinContent(1) << "]\t["
-      //           << NueFromNC_pi0->GetBinContent(2) << "]\t[" 
-      //           << NueFromNC_pi0->GetBinContent(3)<< "]\n";
-      // std::cout << "  NueFromNC_delta0: .........[" 
-      //           << NueFromNC_delta0->GetBinContent(1) << "]\t["
-      //           << NueFromNC_delta0->GetBinContent(2) << "]\t[" 
-      //           << NueFromNC_delta0->GetBinContent(3)<< "]\n";
-      // std::cout << "  NueFromNumuCC: ............[" 
-      //           << NueFromNumuCC->GetBinContent(1) << "]\t["
-      //           << NueFromNumuCC->GetBinContent(2) << "]\t[" 
-      //           << NueFromNumuCC->GetBinContent(3)<< "]\n";
-      // std::cout << "  Dirt: .....................[" 
-      //           << Dirt->GetBinContent(1) << "]\t["
-      //           << Dirt->GetBinContent(2) << "]\t[" 
-      //           << Dirt->GetBinContent(3)<< "]\n";
-      // std::cout << "  Other: ....................[" 
-      //           << Other->GetBinContent(1) << "]\t["
-      //           << Other->GetBinContent(2) << "]\t[" 
-      //           << Other->GetBinContent(3)<< "]\n";
-      // std::cout << "  NueFromCosmics: ...........[" 
-      //           << NueFromCosmics->GetBinContent(1) << "]\t["
-      //           << NueFromCosmics->GetBinContent(2) << "]\t[" 
-      //           << NueFromCosmics->GetBinContent(3)<< "]\n";
-      // std::cout << "  SignalNu: .................[" 
-      //           << SignalNu->GetBinContent(1) << "]\t["
-      //           << SignalNu->GetBinContent(2) << "]\t[" 
-      //           << SignalNu->GetBinContent(3)<< "]\n";
-      // std::cout << "  Total Background: .........[" 
-      //           << totalEvents.at(0) << "]\t["
-      //           << totalEvents.at(1) << "]\t[" 
-      //           << totalEvents.at(2)<< "]\n";
-      // std::cout << "First bin: " << SignalNu->GetBinContent(1) <<std::endl;;
-      
-      // std::cout << "Integral backgrounds by type above 475 MeV: " << std::endl;
-      // std::cout << "  NueFromNueCC_muon: ........" << NueFromNueCC_muon -> Integral() << "\n";
-      // std::cout << "  NueFromNueCC_chargeKaon: .." << NueFromNueCC_chargeKaon -> Integral() << "\n";
-      // std::cout << "  NueFromNueCC_neutKaon: ...." << NueFromNueCC_neutKaon -> Integral() << "\n";
-      // std::cout << "  NueFromEScatter: .........." << NueFromEScatter -> Integral() << "\n";
-      // std::cout << "  NueFromNC_pi0: ............" << NueFromNC_pi0 -> Integral() << "\n";
-      // std::cout << "  NueFromNC_delta0: ........." << NueFromNC_delta0 -> Integral() << "\n";
-      // std::cout << "  NueFromNumuCC: ............" << NueFromNumuCC -> Integral() << "\n";
-      // std::cout << "  Dirt: ....................." << Dirt -> Integral() << "\n";
-      // std::cout << "  Other: ...................." << Other -> Integral() << "\n";
-      // std::cout << "  NueFromCosmics: ..........." << NueFromCosmics -> Integral() << "\n";
-      // std::cout << "  SignalNu: ................." << SignalNu -> Integral() << "\n";
 
 
       std::cout << "Number of bins is " << nbins_nue << std::endl;
@@ -3043,7 +2365,11 @@ namespace lar1{
       leg->AddEntry(NueFromNC_pi0, "NC Single  #gamma");
       // leg->AddEntry(NueFromNC_delta0, "#Delta #rightarrow N#gamma");
       leg->AddEntry(NueFromNumuCC, "#nu_{#mu} CC");
-      if (includeCosmics) leg->AddEntry(NueFromCosmics, "Cosmics");
+      if (includeCosmics) {
+        leg->AddEntry(NueFromCosmics, "Cosmics");
+        std::cout << "For some reason, include cosmics was true!  hard stop.\n";
+        exit(-1);
+      }
       // leg->AddEntry(Dirt, "Dirt");
       // leg->AddEntry(Other, "Other");
       if (includeFosc)
@@ -3091,7 +2417,8 @@ namespace lar1{
 
       TH1F *chr = stackedCanvas[j]->DrawFrame(emin-0.01,
                                   0.0,emax,1.4*max);
-                                  // 0.0,emax,1500);
+                                  // 0.0,emax,1200);
+                                  // 0.0,emax,25000);
       
       //chr->GetYaxis()->SetLabelOffset(999);
 
@@ -3141,48 +2468,75 @@ namespace lar1{
       plotUtils.add_plot_label( name , 0.2, 0.87, 0.05, 1,62,12);
       if(includeFosc){
         if (useHighDm) 
-          plotUtils.add_plot_label( (char*)"Signal: (#Deltam^{2} = 50 eV^{2}, sin^{2}2#theta_{#mue} = 0.003)", 0.2, 0.81, 0.04, 1,62,12);
+          plotUtils.add_plot_label( (char*)"Signal: ( #Deltam^{2} = 50 eV^{  2}, sin^{2} 2#theta_{#mue} = 0.003)", 0.2, 0.81, 0.04, 1,62,12);
         else if (useGlobBF)
-          plotUtils.add_plot_label( (char*)"Signal: (#Deltam^{2} = 0.43 eV^{2}, sin^{2}2#theta_{#mue} = 0.013)", 0.2, 0.81, 0.04, 1,62,12);
+          plotUtils.add_plot_label( (char*)"Signal: ( #Deltam^{2} = 0.43 eV^{  2}, sin^{2} 2#theta_{#mue} = 0.013)", 0.2, 0.81, 0.04, 1,62,12);
           // plotUtils.add_plot_label( (char*)"Signal: MiniBooNE Excess", 0.2, 0.81, 0.04, 1,62,12);
-        else  plotUtils.add_plot_label( (char*)"Signal: (#Deltam^{2} = 1.2 eV^{2}, sin^{2}2#theta_{#mue} = 0.003)", 0.2, 0.81, 0.04, 1,62,12);
+        else  plotUtils.add_plot_label( (char*)"Signal: ( #Deltam^{2} = 1.2 eV^{  2}, sin^{2} 2#theta_{#mue} = 0.003)", 0.2, 0.81, 0.04, 1,62,12);
       }
       plotUtils.add_plot_label((char*)"Statistical Uncertainty Only",0.2,0.76, 0.04,1,62,12);
       plotUtils.add_plot_label((char*)"PRELIMINARY",0.2,0.71, 0.04, kRed-3,62,12);
 
+
+      // this is temporary:
+      char temp[100];
+      sprintf(temp,"Vertex Activity: %g MeV",1000*minVertexEnergyPhoton);
+      plotUtils.add_plot_label(temp,.65,0.45,0.04,1,62,12);
+      sprintf(temp,"Shower Gap: %g cm",minShowerGap);
+      plotUtils.add_plot_label(temp,.65,0.4,0.04,1,62,12);
+
       stack -> Draw("E0 hist same");
       if (includeFosc){
         SignalNu -> Draw("E0 hist same");
-        SignalNu -> Draw("E0 same");
+        // SignalNu -> Draw("E0 same");
       }
-      stack -> Draw("E0 hist  same");
       stack -> Draw("E0 same ");
-      chr   -> Draw("same");
+
+
+
 
       // stack -> Draw(" same ");
       leg->Draw();
 
     }
     
+    TString plotName = fileSource;
+    plotName += "/event_rates/";
+    plotName += fileNameRoot;
+
+    char tempstring[100];
+
+    if (specialNameText != "") plotName = plotName + specialNameText + "_";
+    if (specialNameTextOsc != "") plotName = plotName + specialNameTextOsc + "_";
 
 
-    if (specialNameText != "") fileNameRoot = fileNameRoot + specialNameText + "_";
-    if (specialNameTextOsc != "") fileNameRoot = fileNameRoot + specialNameTextOsc + "_";
+    if (minVertexEnergyPhoton != 10000 ) {
+      sprintf(tempstring, "vePhot%g_",minVertexEnergyPhoton );
+      plotName += tempstring;
+    }
+    if (minShowerGap != 10000 )  { 
+      sprintf(tempstring, "gap%g_",minShowerGap );
+      plotName += tempstring;
+    }
+    if (minVertexEnergySignal != 0 ) {
+      sprintf(tempstring, "veSig%g_",minVertexEnergySignal );
+      plotName += tempstring;
+    }
 
     for (int i = 0; i < nL; i++)
     {
       char fileName[200];
       if (useHighDm) 
-        sprintf(fileName, "%s%s_%s_highdm2.pdf", fileNameRoot.Data(), baselines[i].c_str(), mode.c_str());
+        sprintf(fileName, "%s%s_%s_highdm2.pdf", plotName.Data(), baselines[i].c_str(), mode.c_str());
       else if (useGlobBF) 
-        sprintf(fileName, "%s%s_%s_globBF.pdf", fileNameRoot.Data(), baselines[i].c_str(), mode.c_str());
-      else sprintf(fileName, "%s%s_%s.pdf", fileNameRoot.Data(), baselines[i].c_str(), mode.c_str());
+        sprintf(fileName, "%s%s_%s_globBF.pdf", plotName.Data(), baselines[i].c_str(), mode.c_str());
+      else sprintf(fileName, "%s%s_%s.pdf", plotName.Data(), baselines[i].c_str(), mode.c_str());
       if (savePlots) stackedCanvas[i] -> Print(fileName, "pdf");
       if (useHighDm) 
-        sprintf(fileName, "%s%s_%s_highdm2.png", fileNameRoot.Data(), baselines[i].c_str(), mode.c_str());
+        sprintf(fileName, "%s%s_%s_highdm2.png", plotName.Data(), baselines[i].c_str(), mode.c_str());
       else if (useGlobBF) 
-        sprintf(fileName, "%s%s_%s_globBF.png", fileNameRoot.Data(), baselines[i].c_str(), mode.c_str());
-      else sprintf(fileName, "%s%s_%s.png", fileNameRoot.Data(), baselines[i].c_str(), mode.c_str());
+        sprintf(fileName, "%s%s_%s_globBF.png", plotName.Data(), baselines[i].c_str(), mode.c_str());
+      else sprintf(fileName, "%s%s_%s.png", plotName.Data(), baselines[i].c_str(), mode.c_str());
       if (savePlots) stackedCanvas[i] -> Print(fileName, "png");
       // stackedCanvas[i] -> Print(fileName, "eps");
     }
@@ -3191,7 +2545,8 @@ namespace lar1{
 
   }
 
-  int NueAppearanceFitter::MakeAltSensPlot(){
+  int NueAppearanceFitter::MakeAltSensPlot()
+  {
 
     // contains the points at which chi2 is calc'd
     std::vector<float>  dm2Vec;

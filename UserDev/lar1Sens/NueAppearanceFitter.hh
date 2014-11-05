@@ -29,6 +29,8 @@
 
 #include <vector>
 #include <iostream>
+#include <iomanip>
+#include <ostream>
 
 #include "NtupleReader.hh"
 #include "SensUtils.hh"
@@ -97,9 +99,12 @@ namespace lar1{
       void setElectContainedDist(double d){ElectContainedDist = d;}
       void setMinDistanceToStart(double d){minDistanceToStart = d;}
       void setShapeOnlyFit(bool b){shapeOnlyFit = b;}
-      void setTopologyCut(double MinVertexEnergy= 0.05, double MinShowerGap=1.5){
-            minVertexEnergy = MinVertexEnergy;
+      void setTopologyCut(double MinVertexEnergyPhoton= 0.05, double MinShowerGap=1.5){
+            minVertexEnergyPhoton = MinVertexEnergyPhoton;
             minShowerGap = MinShowerGap;
+      }
+      void setMinVertexEnergySignal(double MinVertexEnergySignal){
+            minVertexEnergySignal = MinVertexEnergySignal;
       }
 
       // Runtime switches
@@ -111,22 +116,19 @@ namespace lar1{
       {
             npoints = n;
             // for LSND BF:
-            dm2FittingPoint = 0.52*npoints;
-            sin22thFittingPoint = 0.375*npoints;
-            // // for Kopp BF:
-            // dm2FittingPoint = 0.41*npoints;
-            // sin22thFittingPoint = 0.53*npoints;
-            // for high dm2 point:
-            // dm2FittingPoint = 0.9*npoints;
+            // dm2FittingPoint = 0.52*npoints;
             // sin22thFittingPoint = 0.375*npoints;
+            // // // for Kopp BF:
+            // // dm2FittingPoint = 0.41*npoints;
+            // // sin22thFittingPoint = 0.53*npoints;
+            // // for high dm2 point:
+            // // dm2FittingPoint = 0.9*npoints;
+            // // sin22thFittingPoint = 0.375*npoints;
 
       }
 
       // Ways to configure the errors used
-      void setUseNearDetStats(bool b){useNearDetStats = b;}
-      void setUseCovarianceMatrix(bool b){useCovarianceMatrix = b;}
-      void setFlatSystematicError(double d){flatSystematicError = d;}
-      void setNearDetSystematicError(double d){nearDetSystematicError = d;}
+      void setUseMultiWeights(bool b){useMultiWeights = b;}
       void setUseInfiniteStatistics(bool b){useInfiniteStatistics = b;}
       void setSystematicInflationAmount(double d){systematicInflationAmount =d;}
       void setInflateSystematics(bool b){inflateSystematics = b;}
@@ -141,7 +143,8 @@ namespace lar1{
       void setIncludeNumus(bool b){includeNumus = b;}
       void setIncludeFosc(bool b){includeFosc = b;}
 
-
+      void setCovMatList(std::vector<std::string> s){covMatrixList = s;}
+      void setCovMatListSource(std::vector<int> s){covMatrixListSource = s;}
 
     private:
 
@@ -170,7 +173,6 @@ namespace lar1{
       int BuildCovarianceMatrix();
       int MakeRatioPlots();
       int Loop();
-      int MakePlots();
       int MakeSimplePlot();
       int MakeEventRatePlots();
       int MakeAltSensPlot();
@@ -202,7 +204,6 @@ namespace lar1{
       bool useXSecWeights;
       bool useFluxWeights;
       
-      double flatSystematicError;  // Only used if nearDetStats = false.
 
       std::string mode;  //beam mode to run in
       bool use100m;      //Include the detector at 100m?
@@ -246,11 +247,9 @@ namespace lar1{
       
       bool   savePlots;
 
-      bool   useNearDetStats;           // Only matters if the covariance matrix vector is empty.
-      bool   useCovarianceMatrix;       // Use the multiweight samples to build the covariance matrix
-      bool   shapeOnlyFit;              // Only matters with near detd stats = true
-      double nearDetSystematicError;  // Only matters if useNearDetStats = true
-      std::vector<std::string>  cov_max_name;
+      bool   useMultiWeights;           // Use the multiweight samples to build the covariance matrix
+      bool   shapeOnlyFit;              // Perform the fit with shape analysis
+
       
       // The rest of the variables are not settable
       std::vector<std::string> baselines;
@@ -307,22 +306,11 @@ namespace lar1{
 
       std::vector< std::vector <float> >    shapeCorrection;
 
-      std::vector< std::vector <float> >    fittingSignal;
-      std::vector< std::vector <float> >    fittingBackgr;
-      std::vector< std::vector <float> >    fittingErrors;
-      int dm2FittingPoint;
-      int sin22thFittingPoint;
-
       // //Input fractional systematics covariance matrix
       // //This is going to come from a txt file, from Georgia
       // std::vector<std::vector<float> > fracentries;
-      std::vector<float> nearDetStats;
       std::vector<float> nullVec;
 
-      std::vector<std::vector<float> > systematicErrors;
-      std::vector<std::vector<float> > statisticalErrors;
-      std::vector<std::vector<float> > systematicErrorsPlotting;
-      std::vector<std::vector<float> > statisticalErrorsPlotting;
 
       // output ntuple with chi2 values and sensitivity contour
       TNtuple * chi2;
@@ -334,6 +322,11 @@ namespace lar1{
       double * x5s;
       double * y5s;
 
+
+      // This vector controls which covariance matrices get used in
+      // the raster scan.
+      std::vector<std::string> covMatrixList;
+      std::vector<    int    > covMatrixListSource;
 
       // For making event rate plots:
       // Vectors for reading in the backgrounds
@@ -368,7 +361,8 @@ namespace lar1{
       double ElectContainedDist;
       double minDistanceToStart;
       double minShowerGap;
-      double minVertexEnergy;
+      double minVertexEnergyPhoton;
+      double minVertexEnergySignal;
 
   };
 

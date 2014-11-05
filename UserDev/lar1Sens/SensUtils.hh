@@ -16,6 +16,7 @@
 #include "TLatex.h"
 #include <algorithm>
 #include "TMatrix.h"
+#include "TFile.h"
 
 namespace lar1{
   class SensUtils
@@ -44,9 +45,29 @@ namespace lar1{
     std::vector<float> appendVectors(std::vector<float> , std::vector<float> ,
                                      std::vector<float>);
     
-    TString GetMatrixFileName(TString, TString, bool,bool,bool,int,bool);
-
+    TString GetMatrixFileName(TString fileSource,
+                              TString detNamesString,
+                              bool includeNumus,
+                              bool useXSecWeights,
+                              bool useFluxWeights,
+                              int  multiWeightSource,
+                              bool absolute_MWSource);
+  
+    TString GetMatrixFileName( TString fileSource,
+                               TString detNamesString,
+                               bool includeNumus,
+                               std::string uncert,
+                               int  multiWeightSource,
+                               bool absolute_MWSource);
     
+    TMatrix * assembleCovarianceMatrix( TString fileSource,
+                                        TString detNamesString,
+                                        bool includeNumus,
+                                        const std::vector<float> & nullVector,
+                                        std::vector<std::string> covMatrixList,
+                                        std::vector<int> covMatrixListSource,
+                                        bool absolute_MWSource);
+
     TH1F* makeHistogram(std::vector<float> & input, 
                         double lowbin, double highbin);
     TH1F* makeHistogram(std::vector<float> & input, std::vector<float> & bins);

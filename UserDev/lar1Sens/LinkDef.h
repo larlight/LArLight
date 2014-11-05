@@ -14,6 +14,7 @@
 #pragma link C++ class lar1::PlotUtils+;
 #pragma link C++ class lar1::NtupleReader+;
 #pragma link C++ class lar1::NueAppearanceFitter+;
+#pragma link C++ class lar1::EffCalc+;
 
 //ADD_NEW_CLASS ... do not change this line
 #endif

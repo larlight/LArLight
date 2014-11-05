@@ -65,7 +65,8 @@ namespace lar1
 
 
   std::vector<float> SensUtils::rebinVector(std::vector<float> inputVector,
-                                            std::vector<float> bins){
+                                            std::vector<float> bins)
+  {
 
     if (bins.size() < 2 || inputVector.size()+1 != default_bins.size()){
       std::cerr << "Error in the input bins for rebinVector!" << std::endl;
@@ -131,7 +132,8 @@ namespace lar1
 
 
   
-  TH1F* SensUtils::AppendHistograms(TH1F * hist1, TH1F* hist2, TH1F* hist3){
+  TH1F* SensUtils::AppendHistograms(TH1F * hist1, TH1F* hist2, TH1F* hist3)
+  {
     //First, how many bins do we need?
     int nbins1 = hist1->GetNbinsX();
     int nbins2 = hist2->GetNbinsX();
@@ -157,7 +159,8 @@ namespace lar1
     return ret;
   }
   
-  TH1F* SensUtils::AppendHistograms(TH1F * hist1, TH1F* hist2){
+  TH1F* SensUtils::AppendHistograms(TH1F * hist1, TH1F* hist2)
+  {
     //First, how many bins do we need?
     int nbins1 = hist1->GetNbinsX();
     int nbins2 = hist2->GetNbinsX();
@@ -301,7 +304,8 @@ namespace lar1
 
 
   std::vector<float> SensUtils::appendVectors(std::vector<float> vec1,
-                                              std::vector<float> vec2){        
+                                              std::vector<float> vec2)
+  {        
     std::vector<float> result;
     unsigned int size1 = vec1.size();
     unsigned int size2 = vec2.size();
@@ -314,8 +318,9 @@ namespace lar1
   }
 
   std::vector<float> SensUtils::appendVectors(std::vector<float> vec1,
-                                              std::vector<float>  vec2,
-                                              std::vector<float>  vec3){
+                                              std::vector<float> vec2,
+                                              std::vector<float> vec3)
+  {
     std::vector<float> result;
     unsigned int size1 = vec1.size();
     unsigned int size2 = vec2.size();
@@ -330,7 +335,8 @@ namespace lar1
   }
 
   TH1F* SensUtils::makeHistogram(std::vector<float> & input,
-                                 double lowbin, double highbin){
+                                 double lowbin, double highbin)
+  {
     static int i = 0;
     char name[200];
     sprintf(name, "result_%i", i);
@@ -343,7 +349,8 @@ namespace lar1
   }
 
   TH1F* SensUtils::makeHistogram(std::vector<float> & input,
-                                 std::vector<float> & bins){
+                                 std::vector<float> & bins)
+  {
     if (bins.size() != input.size()+1){
       std::cerr << "Error in make histogram, number of bins doesn't match input size.\n";
       std::cerr << "  bins: " << bins.size() << "\n";
@@ -360,8 +367,10 @@ namespace lar1
     i++;
     return result;
   }
+  
   std::vector<float> SensUtils::collapseVector(std::vector<float> input,
-                                               int nbins_nue, int nbins_numu, int nL){
+                                               int nbins_nue, int nbins_numu, int nL)
+  {
     //this function takes a vector and collapses the fullosc block onto the nue background
     //make a vector to store the output:
 
@@ -402,13 +411,13 @@ namespace lar1
   }
 
   // This function puts together the name of the matrix requested
-  TString SensUtils::GetMatrixFileName(TString fileSource,
-                            TString detNamesString,
-                            bool includeNumus,
-                            bool useXSecWeights,
-                            bool useFluxWeights,
-                            int multiWeightSource,
-                            bool absolute_MWSource){
+  TString SensUtils::GetMatrixFileName( TString fileSource,
+                                        TString detNamesString,
+                                        bool includeNumus,
+                                        bool useXSecWeights,
+                                        bool useFluxWeights,
+                                        int  multiWeightSource,
+                                        bool absolute_MWSource){
       TString matrixFileName = fileSource;
       matrixFileName += "matrixFile_nue_";
       if (includeNumus) matrixFileName += "numu_";
@@ -420,6 +429,90 @@ namespace lar1
       return matrixFileName;
   }
 
+  // This function puts together the name of the matrix requested
+  TString SensUtils::GetMatrixFileName( TString fileSource,
+                                        TString detNamesString,
+                                        bool includeNumus,
+                                        std::string uncert,
+                                        int  multiWeightSource,
+                                        bool absolute_MWSource){
+      TString matrixFileName = fileSource;
+      matrixFileName += "matrixFile_nue_";
+      if (includeNumus) matrixFileName += "numu_";
+      matrixFileName += detNamesString;
+      matrixFileName += uncert;
+      matrixFileName += "_";
+      if (absolute_MWSource) matrixFileName += "abs_";
+      matrixFileName += std::to_string(multiWeightSource) + ".root";
+      return matrixFileName;
+  }
+
+
+
+  TMatrix * SensUtils::assembleCovarianceMatrix( TString fileSource,
+                                               TString detNamesString,
+                                               bool includeNumus,
+                                               const std::vector<float> & nullVector,
+                                               std::vector<std::string> covMatrixList,
+                                               std::vector<int> covMatrixListSource,
+                                               bool absolute_MWSource)
+  {
+    // This function needs to grab all of the individual covariance matrices 
+    // (including being responsible for file I/O) and assemble it into a final 
+    // non fractional covariance matrix.
+    // Scaling the matrix can be done by something else.
+    
+    TMatrix * finalCovarianceMatrix = new TMatrix;
+
+    finalCovarianceMatrix->ResizeTo(nullVector.size(), nullVector.size());
+
+
+    // First, make sure the lists of sources are the same length:
+    if (covMatrixList.size() != covMatrixListSource.size()){
+      std::cerr << "Error: In assemble Covariance matrix, the list of sources isn't right.\n";
+      exit(-1);
+    }
+
+    // next, start looping over the lists and getting the fractional uncertainty matrices.
+    for (unsigned int item = 0; item < covMatrixList.size(); item ++){
+      // Before anything can happen, gotta get the name of the matrix file:
+      TString name = GetMatrixFileName(fileSource, detNamesString, 
+                                       includeNumus, covMatrixList.at(item),
+                                       covMatrixListSource.at(item),
+                                       absolute_MWSource);
+      // check that the file exists:
+      if (!(fileExists(name))){
+        std::cerr <<"Error: Assemble covariance matrix tried to access file "
+                  << name << ".\n";
+        exit(-1);
+      }
+
+      // Next, open the file and get the matrix in fractional form:
+      TFile  f(name);
+      TMatrix * matrix = (TMatrix*) f.Get("fractionalCovarianceMatrix");
+
+      // Check that the matrix size is OK:
+      if (matrix -> GetNcols() != nullVector.size() ||
+          matrix -> GetNrows() != nullVector.size())
+      { 
+        std::cerr << "Fractional matrix from file " << name << " doesn't match"
+                  << "the size of the null vector provided.\n";
+        exit(-1);
+      } 
+
+      // std::cout << "Got the matrix from file, first entry is " << (*matrix)[1][1] << std::endl;
+
+      // If it's ok, start scaling it back up to the full non-fractional matrix:
+      for (unsigned int i = 0; i < nullVector.size(); i++){
+        for (unsigned int j = 0; j < nullVector.size(); j++){
+          (*finalCovarianceMatrix)[i][j] += (*matrix)[i][j]*nullVector[i]*nullVector[j];
+        }
+      }
+
+    }
+
+    return finalCovarianceMatrix;
+  }
 
 
 }

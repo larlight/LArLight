@@ -20,6 +20,7 @@ class SensUtils;
 class PlotUtils;
 class NueAppearanceFitter;
 class NtupleReader;
+class EffCalc;
 }
 //ADD_EMPTY_CLASS ... do not change this comment line
 

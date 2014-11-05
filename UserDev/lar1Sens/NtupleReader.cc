@@ -25,7 +25,8 @@ namespace lar1{
 
     showerContainmentDist = -999;
     minDistanceToStart = 0;
-    minVertexEnergy=10000;
+    minVertexEnergySignal=0;
+    minVertexEnergyPhoton=10000;
     minShowerGap=10000;
 
     std::vector<float> defaultBins;
@@ -74,7 +75,8 @@ namespace lar1{
 
     showerContainmentDist = -999;
     minDistanceToStart = 0;
-    minVertexEnergy=10000;
+    minVertexEnergySignal=0;
+    minVertexEnergyPhoton=10000;
     minShowerGap=10000;
 
     std::vector<float> defaultBins;
@@ -122,8 +124,12 @@ namespace lar1{
   }
 
   void NtupleReader::setTopologyCut(double MinVertexEnergy, double MinShowerGap){
-    minVertexEnergy = MinVertexEnergy;
+    minVertexEnergyPhoton = MinVertexEnergy;
     minShowerGap = MinShowerGap;
+  }
+
+  void NtupleReader::setMinVertexEnergySignal(double MinVertexEnergySignal){
+    minVertexEnergySignal = MinVertexEnergySignal;
   }
 
   //Not passing references here, since it's small and called infrequently
@@ -203,8 +209,10 @@ namespace lar1{
     // int nbins = bins.size() - 1;
     char tempstring[100];
     //path to the file that holds histos:
-    fileNameHists = fileNameSource;
-    fileNameHistsOsc = fileNameSourceOsc;
+    fileNameHists = "hists/";
+    fileNameHists += fileNameSource;
+    fileNameHistsOsc = "hists_osc/";
+    fileNameHistsOsc += fileNameSourceOsc;
     fileNameHists += "_";
     if(showerContainmentDist != -999){
       sprintf(tempstring, "cont%g",showerContainmentDist );
@@ -220,15 +228,22 @@ namespace lar1{
       fileNameHistsOsc += "_";
       fileNameHistsOsc += tempstring;
     }
-    if (minVertexEnergy != 10000){
-      sprintf(tempstring, "ve%g",minVertexEnergy );
+    if (minVertexEnergyPhoton != 10000){
+      sprintf(tempstring, "vePhot%g",minVertexEnergyPhoton );
       fileNameHists += tempstring;
       fileNameHists += "_";
-      fileNameHistsOsc += "_";
-      fileNameHistsOsc += tempstring;
+      // fileNameHistsOsc += "_";
+      // fileNameHistsOsc += tempstring;
     }
     if (minShowerGap != 10000){
       sprintf(tempstring, "sg%g",minShowerGap );
+      fileNameHists += tempstring;
+      fileNameHists += "_";
+      // fileNameHistsOsc += "_";
+      // fileNameHistsOsc += tempstring;
+    }
+    if (minVertexEnergySignal != 0){
+      sprintf(tempstring, "veSig%g",minVertexEnergySignal );
       fileNameHists += tempstring;
       fileNameHists += "_";
       fileNameHistsOsc += "_";
@@ -677,9 +692,14 @@ namespace lar1{
       if(ShowerDistToStart < minDistanceToStart){
           continue;
       }  
-      if(showerGap > minShowerGap && vertexEnergy > minVertexEnergy){
+      if (vertexEnergy < minVertexEnergySignal){
         continue;
       }
+      if( showerGap    > minShowerGap && 
+          vertexEnergy > minVertexEnergyPhoton){
+        continue;
+      }
+
 
       // // Reject all events with less than a certain amount of vertex activity:
       // if (vertexEnergy < minVertexEnergy){
@@ -882,6 +902,7 @@ namespace lar1{
     Double_t ecalo1, ecalo2;
     Double_t ElectContainedDist;
     Double_t ElectDistToStart;
+    double vertexEnergy;
     int nuchan;
 
     Int_t nbytes = 0,nb = 0;
@@ -924,8 +945,9 @@ namespace lar1{
     c->SetBranchAddress("Eccqe", &Eccqe);
     c->SetBranchAddress("Ecalo1", &ecalo1);
     c->SetBranchAddress("Ecalo2", &ecalo2);
-    c->SetBranchAddress("ElectContainedDist",&ElectContainedDist);
-    c->SetBranchAddress("ElectDistToStart"  ,&ElectDistToStart);
+    c->SetBranchAddress("ShowerContainedDistance",&ElectContainedDist);
+    c->SetBranchAddress("ShowerDistanceToStart"  ,&ElectDistToStart);
+    c->SetBranchAddress("VertexEnergy"  ,&vertexEnergy);
 
     std::vector<std::vector<float> > *MultiWeight;
     MultiWeight = 0;
@@ -1025,7 +1047,7 @@ namespace lar1{
     evtcounter = 0;
     for (ievt=0; ievt<nentries2; ievt++)
     {
-      if ( (ievt%10000) == 0) {
+      if ( (ievt%100000) == 0) {
         std::cout << "On event " << ievt << " of " << nentries2 << std::endl;
       }
 
@@ -1056,6 +1078,10 @@ namespace lar1{
         continue;
       }
       if(ElectDistToStart < minDistanceToStart){
+        continue;
+      }
+
+      if (vertexEnergy < minVertexEnergySignal){
         continue;
       }
 

@@ -79,6 +79,7 @@ namespace lar1{
     void setContainedShowers(double d = 150);
     void setMinDistanceToStart(double d = 0.0);
     void setTopologyCut(double MinVertexEnergy= 0.05, double MinShowerGap=1.5);
+    void setMinVertexEnergySignal(double MinVertexEnergySignal= 0.0);
     void useMultiWeights(bool b = true, int multiWeightSource = 6);
     void setAbsolute_MWSource(bool b){absolute_MWSource = b;}
 
@@ -122,7 +123,8 @@ namespace lar1{
     double showerContainmentDist;
     double minDistanceToStart;
 
-    double minVertexEnergy;
+    double minVertexEnergySignal;
+    double minVertexEnergyPhoton;
     double minShowerGap;
 
     TString fileNameHists;

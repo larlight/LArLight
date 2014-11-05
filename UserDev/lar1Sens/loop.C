@@ -1,8 +1,7 @@
 // #include <vector>
 // #include <iostream>
 
-{
-  gSystem->Load("lib/liblar1Sens.so");
+void loop(double vertexActivity, double showerGap){
 
   lar1::NueAppearanceFitter n;
   // n.setFileSource("/Users/cja33/genie_RW/");
@@ -15,8 +14,8 @@
   n.setSpecialNameTextOsc_far("");
   n.setFlatSystematicError(0.20);
   n.setMode("nu");
-  n.setUse100m(false);
-  n.setUse470m(true);
+  n.setUse100m(true);
+  n.setUse470m(false);
   n.setUseT600_onaxis(false);
   n.setUbooneScale(1.0);
   // n.setLAr1NDScale(1.0);
@@ -30,8 +29,8 @@
   n.setUseInfiniteStatistics(false);
   // n.setElectContainedDist(100);
 
-  // n.setTopologyCut(0.05,3);
-  // n.setMinVertexEnergySignal(0.05);
+  n.setTopologyCut(vertexActivity,showerGap);
+  n.setMinVertexEnergySignal(vertexActivity);
 
   n.setIncludeCosmics(false);
   // n.setCosmicsFile("output/no_cut/histos_for_corey.root");
@@ -85,11 +84,10 @@
   n.setIncludeFosc(false);
   n.setIncludeNumus(false);
 
-
   n.setInflateSystematics(false);
   n.setSystematicInflationAmount(0.00);
 
-
+  n.setUseCovarianceMatrix(false);
   // Gotta define the backgrounds:
   int kUnisim(0), kPiMinus(1), kPiPlus(2), kKaon0(3), kKMinus(4), kKPlus(5), kTotal_flux(6);
   int kTotal_xsec(0);
@@ -100,10 +98,10 @@
   // n.setMultiWeightSource(kKMinus);
   // n.setMultiWeightSource(kKPlus);  
   n.setMultiWeightSource(kTotal_xsec);
+
   n.setAbsolute_MWSource(false);
 
-  n.setUseMultiWeights(true);
-  n.setUseXSecWeights(true);
+  n.setUseXSecWeights(false);
   n.setUseFluxWeights(false);
 
   n.setNpoints(500);
@@ -111,21 +109,12 @@
 
   n.setSavePlots(true);
 
-  std::vector<std::string> covMatList;
-  std::vector<int> covMatListSource;
-  covMatList.push_back("xsec");
-  covMatListSource.push_back(kTotal_xsec);
-
-  n.setCovMatList(covMatList);
-  n.setCovMatListSource(covMatListSource);
-
-
   n.setBuildCovarianceMatrix(false);
   n.setMakeRatioPlots(false);
-  n.setLoop(true);
+  n.setLoop(false);
   n.setMakePlots(false);
   n.setMakeSimplePlot(false);
-  n.setMakeEventRatePlots(false);
+  n.setMakeEventRatePlots(true);
   n.setMakeAltSensPlot(false);
 
   n.Run();
@@ -135,7 +124,22 @@
   return;
 }
 
-
+int main(){
+  gSystem->Load("lib/liblar1Sens.so");
+  double vertexActivity = 0.5;
+  double showerGap = 3;
+  while (vertexActivity > 0.01){
+    // while (showerGap > 0.3)
+    // { 
+  
+      loop(vertexActivity, showerGap);     
+      // showerGap -= 0.5;
+    // }
+    vertexActivity -= 0.025;
+    // showerGap = 10.0;
+  }
+  return 0;
+}
 
 
 
