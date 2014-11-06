@@ -45,6 +45,13 @@ namespace lar1{
     std::vector<float> appendVectors(std::vector<float> , std::vector<float> ,
                                      std::vector<float>);
     
+    TString GetChi2FileName  (TString fileSource,
+                              TString fileNameRoot,
+                              bool includeNumus,
+                              std::vector<std::string> covMatrixList,
+                              std::vector<int> covMatrixListSource,
+                              bool absolute_MWSource);
+
     TString GetMatrixFileName(TString fileSource,
                               TString detNamesString,
                               bool includeNumus,
@@ -52,7 +59,16 @@ namespace lar1{
                               bool useFluxWeights,
                               int  multiWeightSource,
                               bool absolute_MWSource);
-  
+    
+    TString GetMatrixFileName(TString fileSource,
+                              TString detNamesString,
+                              TString fileNameRoot,
+                              bool includeNumus,
+                              bool useXSecWeights,
+                              bool useFluxWeights,
+                              int  multiWeightSource,
+                              bool absolute_MWSource);  
+    
     TString GetMatrixFileName( TString fileSource,
                                TString detNamesString,
                                bool includeNumus,

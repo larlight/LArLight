@@ -56,10 +56,10 @@ namespace lar1{
 
   }
 
-  int EffCalc::readData(  std::vector<std::vector<float> > & data,
-                          double photonGap, 
-                          double minVertexEnergyPhoton, 
-                          double minVertexEnergySignal)
+  unsigned int EffCalc::readData( std::vector<std::vector<float> > & data,
+                                  double photonGap, 
+                                  double minVertexEnergyPhoton, 
+                                  double minVertexEnergySignal)
   {
    
     TString fileName = path;
@@ -91,12 +91,12 @@ namespace lar1{
 
   }
 
-  int EffCalc::parseData(TString fileName, std::vector<std::vector<float> > & data)
+  unsigned int EffCalc::parseData(TString fileName, std::vector<std::vector<float> > & data)
   {
     // open the file:
     ifstream myfile (fileName.Data());
     std::string line;
-    int nBins = -1;
+    unsigned int nBins = 0;
 
     // properly format the output:
     data.clear();
@@ -104,12 +104,14 @@ namespace lar1{
     templateRow.resize(legend.size());
     data.reserve(20);
 
+    bool isFirst = true;
+
     if (myfile.is_open())
     {
       while ( getline (myfile,line) )
       {
-        if (nBins == -1){
-          nBins ++;
+        if (isFirst){
+          isFirst = false;
           continue;
         }
         else nBins ++;
@@ -140,7 +142,7 @@ namespace lar1{
 
     // get a vector to hold the data that's coming:
     std::vector<std::vector<float> > data;
-    int nbins = readData(data,photonGap,minVertexEnergyPhoton,minVertexEnergySignal);
+    unsigned int nbins = readData(data,photonGap,minVertexEnergyPhoton,minVertexEnergySignal);
 
     if (nbins != data.size() && nominalData.size() != data.size()){
       std::cerr << "error, the bins are mismatched.  jgkldhfajkdsf\n";

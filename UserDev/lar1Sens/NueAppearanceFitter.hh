@@ -286,7 +286,6 @@ namespace lar1{
       double systematicInflationAmount;
       bool inflateSystematics;
       
-      TString chi2FileName;
 
       //except for oscVev, its name[b_line][energy_bin]
       std::vector< std::vector <float> >    eventsnumuVec;
@@ -344,14 +343,7 @@ namespace lar1{
       // but the fosc sample is empty.      
       std::vector<std::vector<float> >  eventsNullVecMultiWeight;
 
-      TMatrix covarianceMatrix;
-      TMatrix fractionalErrorMatrix;
-      TMatrix correlationMatrix;
 
-      TMatrix Shape_covarianceMatrix;
-      TMatrix fractional_Shape_covarianceMatrix;
-      TMatrix Mixed_covarianceMatrix;
-      TMatrix Norm_covarianceMatrix;
 
       bool includeCosmics;
       std::string cosmicsFile;

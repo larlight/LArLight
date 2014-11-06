@@ -22,10 +22,10 @@ namespace lar1{
   
     void getNominalData();
 
-    int readData(std::vector<std::vector<float> > & data,
-                  double photonGap = 10000, 
-                  double minVertexEnergyPhoton = 10000, 
-                  double minVertexEnergySignal = 0);
+    unsigned int readData(std::vector<std::vector<float> > & data,
+                          double photonGap = 10000, 
+                          double minVertexEnergyPhoton = 10000, 
+                          double minVertexEnergySignal = 0);
 
     void setPath(TString Path){path=Path;}
 
@@ -42,7 +42,7 @@ namespace lar1{
     // It checks that the file has the correct number of entries, 
     // and the return value is the number of bins used (though
     // some of the entries of "result" are the bin values)
-    int parseData(TString fileName, std::vector<std::vector<float> > & results);
+    unsigned int parseData(TString fileName, std::vector<std::vector<float> > & results);
 
 
     TString path;

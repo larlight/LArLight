@@ -1739,7 +1739,7 @@ namespace lar1{
     TH1F * photons200_at100 = (TH1F*)file -> Get("photons200_at100");
     
     // It's nasty but here is the spot to apply efficiency:
-    for (int i = 4; i < bins.size()-1; i ++){
+    for (unsigned int i = 4; i < bins.size()-1; i ++){
       photons200_nocutVec[i] = (0.8) * photons200_nocut -> GetBinContent(i+1);
       photons200_at50Vec[i]  = (0.8) * photons200_at50  -> GetBinContent(i+1);
       photons200_at100Vec[i] = (0.8) * photons200_at100 -> GetBinContent(i+1);

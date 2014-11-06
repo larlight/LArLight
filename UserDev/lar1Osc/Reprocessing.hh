@@ -37,6 +37,9 @@ class Reprocessing {
 
     // Declaration of leaf types
     Double_t        POT;
+    Int_t           run;
+    Int_t           subrun;
+    Int_t           event;
     Int_t           iflux;
     Int_t           nuchan;
     Int_t           inno;
@@ -106,6 +109,9 @@ class Reprocessing {
 
     // List of branches
     TBranch        *b_POT;   //!
+    TBranch        *b_run;   //!
+    TBranch        *b_subrun;   //!
+    TBranch        *b_event;   //!
     TBranch        *b_iflux;   //!
     TBranch        *b_nuchan;   //!
     TBranch        *b_inno;   //!
@@ -462,8 +468,10 @@ void Reprocessing::Init(TTree *tree)
    fChain = tree;
    fCurrent = -1;
    fChain->SetMakeClass(1);
-
    fChain->SetBranchAddress("POT", &POT, &b_POT);
+   fChain->SetBranchAddress("run", &run, &b_run);
+   fChain->SetBranchAddress("subrun", &subrun, &b_subrun);
+   fChain->SetBranchAddress("event", &event, &b_event);
    fChain->SetBranchAddress("iflux", &iflux, &b_iflux);
    fChain->SetBranchAddress("nuchan", &nuchan, &b_nuchan);
    fChain->SetBranchAddress("inno", &inno, &b_inno);

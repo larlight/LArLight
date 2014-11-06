@@ -432,6 +432,42 @@ namespace lar1
   // This function puts together the name of the matrix requested
   TString SensUtils::GetMatrixFileName( TString fileSource,
                                         TString detNamesString,
+                                        TString fileNameRoot,
+                                        bool includeNumus,
+                                        bool useXSecWeights,
+                                        bool useFluxWeights,
+                                        int  multiWeightSource,
+                                        bool absolute_MWSource){
+      TString matrixFileName = fileSource;
+      matrixFileName += "matrixFile_nue_";
+      if (includeNumus) matrixFileName += "numu_";
+      matrixFileName += detNamesString;
+      if (useXSecWeights) matrixFileName += "xsec_";
+      if (useFluxWeights) matrixFileName += "flux_";
+      if (absolute_MWSource) matrixFileName += "abs_";
+      matrixFileName += std::to_string(multiWeightSource);
+
+      if (fileNameRoot.BeginsWith("nue_appearance"))
+        fileNameRoot.Remove(0,14);
+      else{
+        std::cerr << "Theres some thing strange about the fileNameRoot that was supplied!";
+      }
+      // filenameroot has a trailing "_", trim it off:
+      fileNameRoot.Remove(fileNameRoot.Sizeof()-2,1);
+
+      std::cout << "File name root is added as: " << fileNameRoot << std::endl;
+      matrixFileName += fileNameRoot;
+
+
+      matrixFileName += ".root";
+      return matrixFileName;
+  }
+
+
+
+  // This function puts together the name of the matrix requested
+  TString SensUtils::GetMatrixFileName( TString fileSource,
+                                        TString detNamesString,
                                         bool includeNumus,
                                         std::string uncert,
                                         int  multiWeightSource,
@@ -443,19 +479,61 @@ namespace lar1
       matrixFileName += uncert;
       matrixFileName += "_";
       if (absolute_MWSource) matrixFileName += "abs_";
-      matrixFileName += std::to_string(multiWeightSource) + ".root";
+      matrixFileName += std::to_string(multiWeightSource);
+      matrixFileName += ".root";
       return matrixFileName;
   }
 
 
+  TString SensUtils::GetChi2FileName(TString fileSource,
+                                     TString fileNameRoot,
+                                     bool includeNumus,
+                                     std::vector<std::string> covMatrixList,
+                                     std::vector<int> covMatrixListSource,
+                                     bool absolute_MWSource)
+  {
 
-  TMatrix * SensUtils::assembleCovarianceMatrix( TString fileSource,
-                                               TString detNamesString,
-                                               bool includeNumus,
-                                               const std::vector<float> & nullVector,
-                                               std::vector<std::string> covMatrixList,
-                                               std::vector<int> covMatrixListSource,
-                                               bool absolute_MWSource)
+    // This block of code sets up where the chi2 data is going and what assumptions went
+    // into go into the file name.
+    TString chi2FileName = fileSource;
+
+    chi2FileName += "chi2_nue_";
+    if (includeNumus)
+      chi2FileName += "numu_";
+
+    if (fileNameRoot.BeginsWith("nue_appearance_"))
+      fileNameRoot.Remove(0,15);
+    else{
+      std::cerr << "There is some thing strange about the fileNameRoot that was supplied!";
+    }
+
+    for (unsigned int i = 0; i < covMatrixList.size(); i ++){
+      chi2FileName += covMatrixList.at(i);
+      chi2FileName += "_";
+      chi2FileName += covMatrixListSource.at(i);
+      chi2FileName += "_";
+    }
+
+    if (absolute_MWSource){
+      chi2FileName += "abs_";
+    }
+
+    chi2FileName += fileNameRoot;
+    
+    chi2FileName = chi2FileName+"chi2.root";
+
+
+    return chi2FileName;
+
+  }
+
+  TMatrix * SensUtils::assembleCovarianceMatrix(TString fileSource,
+                                                TString detNamesString,
+                                                bool includeNumus,
+                                                const std::vector<float> & nullVector,
+                                                std::vector<std::string> covMatrixList,
+                                                std::vector<int> covMatrixListSource,
+                                                bool absolute_MWSource)
   {
     // This function needs to grab all of the individual covariance matrices 
     // (including being responsible for file I/O) and assemble it into a final 
@@ -492,8 +570,8 @@ namespace lar1
       TMatrix * matrix = (TMatrix*) f.Get("fractionalCovarianceMatrix");
 
       // Check that the matrix size is OK:
-      if (matrix -> GetNcols() != nullVector.size() ||
-          matrix -> GetNrows() != nullVector.size())
+      if ((unsigned int) matrix -> GetNcols() != nullVector.size() ||
+          (unsigned int) matrix -> GetNrows() != nullVector.size())
       { 
         std::cerr << "Fractional matrix from file " << name << " doesn't match"
                   << "the size of the null vector provided.\n";

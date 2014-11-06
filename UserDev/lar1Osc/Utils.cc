@@ -50,7 +50,7 @@ namespace lar1{
     nd_ymin = -242.0;
     nd_ymax =  158.0;
     nd_zmin =  0.0;
-    nd_zmax =  365.0;
+    nd_zmax =  500.0;
 
     // iDet = ?
     nd_long_xmin = -200.0;
@@ -156,6 +156,8 @@ namespace lar1{
     // Putting in values of 1 right now but that'll update with the final POT Numbers:
     // 
 
+    std::cout << "Iflux is : " << iflux << std::endl;
+
     Double_t POT_Sim = 1;
     Double_t POTnorm = 1;
 
@@ -176,7 +178,7 @@ namespace lar1{
             if (mc_generation == 2) POT_Sim = 1.74e20;
             break;
           case kNu_Fosc:
-            if (mc_generation == 5) POT_Sim = 0.0;
+            if (mc_generation == 5) POT_Sim = 7.637E+19;
             if (mc_generation == 4) POT_Sim = 7.637E+19;
             if (mc_generation == 3) POT_Sim = 7.637E+19;
             if (mc_generation == 2) POT_Sim = 1.79e20;
@@ -257,7 +259,7 @@ namespace lar1{
             if (mc_generation == 2) POT_Sim = 5.57E+21;
             break;
           case kNu_Fosc:
-            if (mc_generation == 5) POT_Sim = 0.0;
+            if (mc_generation == 5) POT_Sim = 1.57E+21;
             if (mc_generation == 4) POT_Sim = 2.592E+21;
             if (mc_generation == 3) POT_Sim = 2.592E+21;
             if (mc_generation == 2) POT_Sim = 5.37E+21;
@@ -284,7 +286,7 @@ namespace lar1{
             if (mc_generation == 3) POT_Sim = 5.434E+20;
             break;
           case kNu_Fosc:
-            if (mc_generation == 5) POT_Sim = 0.0;
+            if (mc_generation == 5) POT_Sim = 6.507E+20;
             if (mc_generation == 4) POT_Sim = 6.507E+20;
             if (mc_generation == 3) POT_Sim = 6.507E+20;
             // POT_Sim = 2.766e20;

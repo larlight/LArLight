@@ -194,7 +194,8 @@ namespace lar1{
     fileNameRoot = "nue_appearance_";
     fileNameRoot += energyType;
     fileNameRoot += "_";
-
+    fileNameRoot += mode;
+    fileNameRoot += "_";
 
     if (!includeCosmics) cosmicsFile = "";
 
@@ -254,15 +255,26 @@ namespace lar1{
       detNamesString += "T600_offaxis_";
     }
 
+    char tempstring[100];
     if (ElectContainedDist != -999) {
-        char tempstring[100];
-        sprintf(tempstring,"cont%g_",ElectContainedDist);
-        fileNameRoot += tempstring;
+      sprintf(tempstring,"cont%g_",ElectContainedDist);
+      fileNameRoot += tempstring;
     }
     if (minDistanceToStart != -999) {
-        char tempstring[100];
-        sprintf(tempstring,"dist%g_",minDistanceToStart);
-        fileNameRoot += tempstring;
+      sprintf(tempstring,"dist%g_",minDistanceToStart);
+      fileNameRoot += tempstring;
+    }
+    if (minVertexEnergyPhoton != 10000 ) {
+      sprintf(tempstring, "vePhot%g_",minVertexEnergyPhoton );
+      fileNameRoot += tempstring;
+    }
+    if (minShowerGap != 10000 )  { 
+      sprintf(tempstring, "gap%g_",minShowerGap );
+      fileNameRoot += tempstring;
+    }
+    if (minVertexEnergySignal != 0 ) {
+      sprintf(tempstring, "veSig%g_",minVertexEnergySignal );
+      fileNameRoot += tempstring;
     }
 
     if ( (use100m && use150m) ||
@@ -707,6 +719,16 @@ namespace lar1{
   }
 
   int NueAppearanceFitter::BuildCovarianceMatrix(){
+    
+    TMatrix covarianceMatrix;
+    TMatrix fractionalErrorMatrix;
+    TMatrix correlationMatrix;
+
+    TMatrix Shape_covarianceMatrix;
+    TMatrix fractional_Shape_covarianceMatrix;
+    TMatrix Mixed_covarianceMatrix;
+    TMatrix Norm_covarianceMatrix;
+
     // if means to compute the matrix for no signal.
     fractionalErrorMatrix.Clear();
     fractionalErrorMatrix.ResizeTo(nL*nbins_null,nL*nbins_null);
@@ -911,9 +933,9 @@ namespace lar1{
     // normalization matrix
     // 
     // Need to compute a few sums first:
-    for (int ibin = 0; ibin < events_nominal_COPY.size(); ++ibin)
+    for (unsigned int ibin = 0; ibin < events_nominal_COPY.size(); ++ibin)
     {
-      for (int jbin = 0; jbin < events_nominal_COPY.size(); ++jbin)
+      for (unsigned int jbin = 0; jbin < events_nominal_COPY.size(); ++jbin)
       {
         Shape_covarianceMatrix[ibin][jbin] = covarianceMatrix[ibin][jbin];
         // std::cout << "Shape matrix entry is: " << Shape_covarianceMatrix[ibin][jbin] << "\n";
@@ -966,6 +988,7 @@ namespace lar1{
 
       TString matrixFileName = utils.GetMatrixFileName( path,
                                                         detNamesString,
+                                                        fileNameRoot,
                                                         includeNumus,
                                                         useXSecWeights,
                                                         useFluxWeights,
@@ -1100,7 +1123,7 @@ namespace lar1{
       for (int b_line = 0; b_line < nL; b_line ++){
         std::cout << "  Baseline: " << baselinesFancy[b_line] << std::endl;
         std::cout << "    nue   \tnumu" << std::endl;
-        for (int entry = 0; entry < events_numu_nominal_COPY.at(b_line).size(); entry ++)
+        for (unsigned int entry = 0; entry < events_numu_nominal_COPY.at(b_line).size(); entry ++)
         {
           if (entry < events_nue_nominal_COPY.at(b_line).size()){
             std::cout << "    " << events_nue_nominal_COPY.at(b_line).at(entry);
@@ -1555,13 +1578,32 @@ namespace lar1{
                                         absolute_MWSource);
 
     std::cout << "Covariance matrix (0,0) is " << (*fullCovarianceMatrix)[0][0] << std::endl;
-    return 1;
+    // return 1;
 
-    //This loop is actually doing the chisq calculation
-    //It loops over npoints twice.  First over dm2, and second over sin22th
+
+    // We now have the full covariance matrix for the background!  
+    // We can add the statistics and any inflation amount along the diagonal, then 
+    // invert it and do the raster scan.
+    // 
+    // Since shape only fit is complicated, I have not really supported it yet.
+
+    for (unsigned int bin = 0; bin < nullVec.size(); bin++)
+    {
+      // add the statistical uncertainty:
+      (*fullCovarianceMatrix)[bin][bin] += nullVec.at(bin);
+      if (inflateSystematics)
+        (*fullCovarianceMatrix)[bin][bin] += nullVec.at(bin)*systematicInflationAmount;
+    }
+
+    // Now invert the matrix
+    TMatrix invertedMatrix = fullCovarianceMatrix -> Invert();
+
+    // This loop is actually doing the chisq calculation
+    // It loops over npoints twice.  First over dm2, and second over sin22th
     // for (int dm2point = 450; dm2point <= npoints; dm2point ++){
     for (int dm2point = 0; dm2point <= npoints; dm2point ++){
-      std::cout << "dm^2: " << dm2point << " of " << npoints << std::endl;      
+      if (dm2point % 25 == 0) 
+        std::cout << "dm^2: " << dm2point << " of " << npoints << std::endl;      
       // for (int sin22thpoint = 250; sin22thpoint <= npoints; sin22thpoint++){
       for (int sin22thpoint = 0; sin22thpoint <= npoints; sin22thpoint++){
         // std::cout << "sin22th: " << sin22thpoint << " of " << npoints << std::endl;      
@@ -1620,13 +1662,7 @@ namespace lar1{
         // In the case of the shape only fit,
         // Copy the unscaled vector that will be used to build error matrix
         // Probably need to scale it as well
-        // std::vector< float > oscVectorTemp = oscVector[dm2point];
-
-        nullVec = utils.collapseVector(nullBackgrounds,
-                                       nbins_nue,
-                                       nbins_numu,
-                                       nL);
-
+/*
         // Here's where the shape only stuff comes into play
         double intSignalND = 0.;    double intNooscND = 0.;
         std::vector<double> scalefac;
@@ -1652,7 +1688,7 @@ namespace lar1{
             }
           }
         }
-
+*/
         // Ok, prediction vec and null vec are now the correct vectors
         // with scaling if necessary
         // 
@@ -1661,129 +1697,12 @@ namespace lar1{
         // These aren't used in the covariance matrix analysis.       
 
 
-        //initialize the covariance matrix:
-        TMatrix entries;
-        entries.ResizeTo(nbins*nL,nbins*nL);
 
 
-        // else{
-          // use the full blown covariance matrix.  Loop over every entry.
-          //
-          // But first, call the method to build the covariance matrix!
-          // Build each time if using signal in covariance matrix
-          // Only once if otherwise
-
-          // if (dm2point == 0 && sin22thpoint == 0) BuildCovarianceMatrix();
-
-          // else if (sin22thpoint == 0 && dm2point == 0)
-          
-          if (shapeOnlyFit)
-            entries = fractional_Shape_covarianceMatrix;
-          else
-            entries = fractionalErrorMatrix;
-          
-          // just for debugging at the moment, printing out the 
-          // errors in a few spots for debugging:
-          // std::cout << "error at (1,1): " << entries[1][1] <<"\n"; 
-          // std::cout << "error at (1,2): " << entries[1][2] <<"\n"; 
-          // std::cout << "error at (2,1): " << entries[2][1] <<"\n"; 
-          // std::cout << "error at (2,2): " << entries[2][1] <<"\n"; 
-          // std::cout << "error at (2,4): " << entries[2][1] <<"\n"; 
-          // std::cout << "error at (4,2): " << entries[2][1] <<"\n"; 
-          
-          if (nL > 1){
-            // std::cout << "error at (1+nbins,1+nbins): " << entries[1+nbins][1+nbins] <<"\n"; 
-            // std::cout << "error at (1+nbins,2+nbins): " << entries[1+nbins][2+nbins] <<"\n"; 
-            // std::cout << "error at (2+nbins,1+nbins): " << entries[2+nbins][1+nbins] <<"\n"; 
-            // std::cout << "error at (2+nbins,2+nbins): " << entries[2+nbins][2+nbins] <<"\n"; 
-            // std::cout << "error at (2+nbins,4+nbins): " << entries[2+nbins][4+nbins] <<"\n"; 
-            // std::cout << "error at (4+nbins,2+nbins): " << entries[4+nbins][2+nbins] <<"\n"; 
-
-          }
-
-          //Can't forget to add in the statistical errors on the diagonal!
-          for (int ibin = 0; ibin < nbins*nL; ibin++){
-            for (int jbin = 0; jbin < nbins*nL; jbin ++){
-              double cvi(0.0);
-              if (ibin % nbins >= nbins_nue ) {
-                int bin = (ibin/nbins)*(nbins_nue+nbins_numu);
-                bin += (ibin % nbins) - nbins_nue;
-                cvi = nullVec[bin];
-                // if (jbin == 0){
-                //   std::cout << "Setting cvi to " << cvi << ", ibin is " << ibin
-                //             << ", bin is " << bin << std::endl;
-                // }
-              }
-              double cvj(0.0);
-              if (jbin % nbins >= nbins_nue ){
-                int bin = (jbin/nbins)*(nbins_nue+nbins_numu);
-                bin += (jbin % nbins) - nbins_nue;
-                cvj = nullVec[bin];
-                // if (ibin == 0){
-                //   std::cout << "Setting cvj to " << cvj << ", jbin is " << jbin
-                //             << ", bin is " << bin << std::endl;
-                // }
-              }
-
-              entries[ibin][jbin] *= cvi*cvj;
-              if (ibin == jbin){
-                if (ibin > nbins) entries[ibin][jbin] += cvi; //cvi should equal cvj here
-              }
-            } //end loop on jbin
-          } //end loop on ibin
-
-        // } //end section that is using full covariance matrix
 
 
-        //At this point, the covariance matrix is built in full in "entries"
-        //We need to collapse everything, though.
-        
-
-        //for debugging, can print out covariance matrix:
-        //
-        if (debug){
-          for ( int i = 0; i < nbins*nL; i ++){
-            std::cout << i << "\t";
-            for ( int j = 0; j < nbins*nL; j++){
-              std::cout << entries[i][j] << " ";
-            }
-            std::cout << std::endl;
-          }
-        }
-
-        TMatrix entriescollapsed = utils.CollapseMatrix(entries,nbins_nue,nbins_numu, nL);
-        //collapsed!
-        //if debug is on, print out the collapsed matrix:
-
-        if (debug){
-          //the matrix should be nbins- nL*nbinsE on each side.  Print:
-          // std::cout << "\nPrinting collapsed covariance matrix:\n";
-          // // unsigned int side = nbins-nL*nbinsE;
-          // for ( int i = 0; i < (nbins-nbins_nue)*nL; i ++){
-          //   std::cout << i << "\t";
-          //   for ( int j = 0; j < (nbins-nbins_nue)*nL; j++){
-          //     std::cout << entri[i][j] << " ";
-          //   }
-          //   std::cout << std::endl;
-          // }
-        }
 
         
-
-
-        //Now create the inverse covariance matrix.  Root can invert for us:
-        // TMatrix *M = new TMatrix(nbins-nL*nbinsE,nbins-nL*nbinsE,entriescollapsed);
-        // if (dm2point == npoints/2 && sin22thpoint == npoints/2){
-          // TCanvas * collapsedCanvas = new TCanvas("cc","cc",700,700);
-          // entries.Draw("surf");
-          // TCanvas * uncollapsedCanvas = new TCanvas("cc2","cc2",700,700);
-          // entriescollapsed.Draw("surf");
-        // }
-        //inverse cov matrix, M^{-1}, used in chi2 calculation
-        // TMatrix *cov = new TMatrix(nbins-nL*nbinsE,nbins-nL*nbinsE);
-        TMatrix *cov = &(entries.Invert()); //this is used in chi2 calculation
-        // cov = &(M->Invert()); //this is used in chi2 calculation
-// return -1;
 
 
         //Checking collapsing:
@@ -1813,8 +1732,8 @@ namespace lar1{
                 if (debug){
                     if (ibin == jbin){
                         std::cout << "ibin: "<< ibin << " Prediction: " << predictioni << " cvi: " << cvi;
-                        std::cout << " M^-1: " << (*cov)(ibin,jbin);
-                        std::cout << " chi2: " << (predictioni-cvi)*(predictionj-cvj)* (*cov)(ibin,jbin) << std::endl;
+                        std::cout << " M^-1: " << (invertedMatrix)(ibin,jbin);
+                        std::cout << " chi2: " << (predictioni-cvi)*(predictionj-cvj)* (invertedMatrix)(ibin,jbin) << std::endl;
                     }
                 }
                 // if (sin22thpoint == sin22thFittingPoint && dm2point == dm2FittingPoint){
@@ -1822,7 +1741,7 @@ namespace lar1{
                 //     std::cout << "On bin " << ibin 
                 //               << ", adding chi2 = " 
                 //               << (predictioni-cvi)*(predictionj-cvj)
-                //                 *(*cov)(ibin,jbin) << std::endl;
+                //                 *(invertedMatrix)(ibin,jbin) << std::endl;
                 //     if (useNearDetStats) 
                 //       std::cout << "  nearDetStats error on this bin is "
                 //                 << nearDetStats[ibin%(nbins_nue+nbins_numu)] 
@@ -1836,7 +1755,7 @@ namespace lar1{
                 //     std::cout << "  M^-1: " << (*cov)(ibin,jbin) << std::endl;
                 //   }
                 // }
-                chisq += (predictioni-cvi)*(predictionj-cvj)* (*cov)(ibin,jbin);
+                chisq += (predictioni-cvi)*(predictionj-cvj)* (invertedMatrix)(ibin,jbin);
 
             }
         }
@@ -1872,34 +1791,14 @@ namespace lar1{
         }// end loop over sin22thpoints
     } // end loop over dm2points
     
-/*
 
-    // This block of code sets up where the chi2 data is going and what assumptions went
-    // into go into the file name.
-    chi2FileName = fileSource + fileNameRoot+mode;
-    if(shapeOnlyFit){
-        if (useNearDetStats){
-            chi2FileName = chi2FileName+detNamesString+"_nearDetStats_shapeOnly_chi2.root";
-        }
-        else if (useCovarianceMatrix) {
-            chi2FileName = chi2FileName+detNamesString+"_covMat_shapeOnly_chi2.root";
-        }
-        else{
-            chi2FileName = chi2FileName+detNamesString+"_flatStats_shapeOnly_chi2.root";
-        }
-    }
-    else{
-        if (useNearDetStats){
-            chi2FileName = chi2FileName+detNamesString+"_nearDetStats_chi2.root";
-        }
-        else if (useCovarianceMatrix){
-            chi2FileName = chi2FileName+detNamesString+"_covMat_chi2.root";
-        }
-        else {
-          chi2FileName = chi2FileName+detNamesString+"_flatStats_chi2.root";
-        }
-    }
-*/
+    path = fileSource + "/chi2/";
+    TString chi2FileName = utils.GetChi2FileName( path,
+                                                  fileNameRoot,
+                                                  includeNumus,
+                                                  covMatrixList,
+                                                  covMatrixListSource,
+                                                  absolute_MWSource);
 
     std::cout << "Writing chi2 to " << chi2FileName << std::endl;
 
@@ -1927,17 +1826,17 @@ namespace lar1{
 
   int NueAppearanceFitter::MakeSimplePlot(){
 
-    gStyle->SetOptStat(0000);
-    gStyle->SetOptFit(0000);
-    gStyle->SetPadBorderMode(0);
-    gStyle->SetPadBottomMargin(0.15);
-    gStyle->SetPadLeftMargin(0.15);
-    gStyle->SetPadRightMargin(0.05);
-    gStyle->SetFrameBorderMode(0);
-    gStyle->SetCanvasBorderMode(0);
-    gStyle->SetPalette(0);
-    gStyle->SetCanvasColor(0);
-    gStyle->SetPadColor(0);
+    // gStyle->SetOptStat(0000);
+    // gStyle->SetOptFit(0000);
+    // gStyle->SetPadBorderMode(0);
+    // gStyle->SetPadBottomMargin(0.15);
+    // gStyle->SetPadLeftMargin(0.15);
+    // gStyle->SetPadRightMargin(0.05);
+    // gStyle->SetFrameBorderMode(0);
+    // gStyle->SetCanvasBorderMode(0);
+    // gStyle->SetPalette(0);
+    // gStyle->SetCanvasColor(0);
+    // gStyle->SetPadColor(0);
     
     TGraph *sens90 = new TGraph(npoints+1,x90,y90); 
     TGraph *sens3s = new TGraph(npoints+1,x3s,y3s); 
@@ -1950,18 +1849,21 @@ namespace lar1{
 
 
 
-    TH2D* hr1=new TH2D("hr1","hr1",500,sin22thmin,sin22thmax,500,dm2min,dm2max);
-    hr1->Reset();
-    hr1->SetFillColor(0);
-    hr1->SetTitle(";sin^{2}2#theta_{#mue};#Deltam^{2}_{41} (eV^{2})");
-    hr1->GetXaxis()->SetTitleOffset(1.1);
-    hr1->GetYaxis()->SetTitleOffset(1.2);
-    hr1->GetXaxis()->SetTitleSize(0.05);
-    hr1->GetYaxis()->SetTitleSize(0.05);
-    hr1->GetXaxis()->CenterTitle();
-    hr1->GetYaxis()->CenterTitle();
-    hr1->SetStats(kFALSE);
+    // TH2D* hr1=new TH2D("hr1","hr1",500,sin22thmin,sin22thmax,500,dm2min,dm2max);
+    // hr1->Reset();
+    // hr1->SetFillColor(0);
+    // hr1->SetTitle(";sin^{2}2#theta_{#mue};#Deltam^{2}_{41} (eV^{2})");
+    // hr1->GetXaxis()->SetTitleOffset(1.1);
+    // hr1->GetYaxis()->SetTitleOffset(1.2);
+    // hr1->GetXaxis()->SetTitleSize(0.05);
+    // hr1->GetYaxis()->SetTitleSize(0.05);
+    // hr1->GetXaxis()->CenterTitle();
+    // hr1->GetYaxis()->CenterTitle();
+    // hr1->SetStats(kFALSE);
     // hr1->Draw();
+
+
+    TH2D * hr1 = plotUtils.getEmptySensPlot();
 
 
     TLegend* legt=new TLegend(0.8,0.45,0.93,0.57);
@@ -1999,6 +1901,7 @@ namespace lar1{
     // leg3->Draw();
 
     TCanvas * tempCanv = new TCanvas("tempCanv","temp canvas",650,650);
+    tempCanv->cd();
     TPad * padTemp = new TPad("padTemp","padTemp",0,0,1,1);
     padTemp->Draw();
 
@@ -2027,7 +1930,7 @@ namespace lar1{
     plotUtils.add_plot_label((char*)"80\% #nu_{e} Efficiency", 0.93, 0.63, 0.025, 1, 62,32);
     plotUtils.add_plot_label((char*)"Statistical and Flux Uncert. Only", 0.93, 0.60, 0.025, 1, 62,32);
 
-    TString basename = fileSource + fileNameRoot + mode;
+    TString basename = fileSource + fileNameRoot;
 /*
     if (savePlots){
       if(shapeOnlyFit){
@@ -2182,21 +2085,6 @@ namespace lar1{
         TString fileNamePrint = fileSource;
         fileNamePrint += "/text/";
         fileNamePrint += fileNameRoot;
-
-        char tempstring[100];
-
-        if (minVertexEnergyPhoton != 10000 ) {
-          sprintf(tempstring, "vePhot%g_",minVertexEnergyPhoton );
-          fileNamePrint += tempstring;
-        }
-        if (minShowerGap != 10000 )  { 
-          sprintf(tempstring, "gap%g_",minShowerGap );
-          fileNamePrint += tempstring;
-        }
-        if (minVertexEnergySignal != 0 ) {
-          sprintf(tempstring, "veSig%g_",minVertexEnergySignal );
-          fileNamePrint += tempstring;
-        }
 
         char fileName[200];
         if (useHighDm) 
@@ -2504,24 +2392,10 @@ namespace lar1{
     plotName += "/event_rates/";
     plotName += fileNameRoot;
 
-    char tempstring[100];
 
     if (specialNameText != "") plotName = plotName + specialNameText + "_";
     if (specialNameTextOsc != "") plotName = plotName + specialNameTextOsc + "_";
 
-
-    if (minVertexEnergyPhoton != 10000 ) {
-      sprintf(tempstring, "vePhot%g_",minVertexEnergyPhoton );
-      plotName += tempstring;
-    }
-    if (minShowerGap != 10000 )  { 
-      sprintf(tempstring, "gap%g_",minShowerGap );
-      plotName += tempstring;
-    }
-    if (minVertexEnergySignal != 0 ) {
-      sprintf(tempstring, "veSig%g_",minVertexEnergySignal );
-      plotName += tempstring;
-    }
 
     for (int i = 0; i < nL; i++)
     {
@@ -2565,7 +2439,13 @@ namespace lar1{
     Float_t sin22th_temp;
     Float_t chi2_temp;
 
-    // TString chi2FileName;
+    TString path = fileSource + "/chi2/";
+    TString chi2FileName = utils.GetChi2FileName( path,
+                                                  detNamesString,
+                                                  includeNumus,
+                                                  covMatrixList,
+                                                  covMatrixListSource,
+                                                  absolute_MWSource);
 
     TFile f(chi2FileName, "READ");
 

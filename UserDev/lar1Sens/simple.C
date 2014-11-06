@@ -14,8 +14,8 @@
   n.setSpecialNameText_far("");
   n.setSpecialNameTextOsc_far("");
   n.setMode("nu");
-  n.setUse100m(false);
-  n.setUse470m(true);
+  n.setUse100m(true);
+  n.setUse470m(false);
   n.setUseT600_onaxis(false);
   n.setUbooneScale(1.0);
   // n.setLAr1NDScale(1.0);
@@ -27,8 +27,8 @@
   n.setUseInfiniteStatistics(false);
   // n.setElectContainedDist(100);
 
-  // n.setTopologyCut(0.05,3);
-  // n.setMinVertexEnergySignal(0.05);
+  n.setTopologyCut(0.05,3);
+  n.setMinVertexEnergySignal(0.05);
 
   n.setIncludeCosmics(false);
   // n.setCosmicsFile("output/no_cut/histos_for_corey.root");
@@ -83,8 +83,8 @@
   n.setIncludeNumus(false);
 
 
-  n.setInflateSystematics(false);
-  n.setSystematicInflationAmount(0.00);
+  n.setInflateSystematics(true);
+  n.setSystematicInflationAmount(0.50);
 
 
   // Gotta define the backgrounds:
@@ -110,8 +110,10 @@
 
   std::vector<std::string> covMatList;
   std::vector<int> covMatListSource;
-  covMatList.push_back("xsec");
-  covMatListSource.push_back(kTotal_xsec);
+  // covMatList.push_back("xsec");
+  // covMatListSource.push_back(kTotal_xsec);
+  // covMatList.push_back("flux");
+  // covMatListSource.push_back(kUnisim);
 
   n.setCovMatList(covMatList);
   n.setCovMatListSource(covMatListSource);

@@ -214,6 +214,7 @@ void lar1::Reprocessing::Loop(std::string signal,
     //Get the POT weight.  Need to get iflux
     b_iflux->GetEntry(0); //iflux should now be filled
     double potweight = 1.0;
+    if (signal == "fosc") iflux ++;
     if (signal != "numi"){
       potweight = utils.GetPOTNorm( iflux, iLoc );
       std::cout << "POT weight = " << potweight << std::endl;
@@ -624,6 +625,7 @@ void lar1::Reprocessing::Loop(std::string signal,
 
 
 
+
       // Get the entry
       Long64_t ientry = LoadTree(jentry);
       if (ientry < 0) break;
@@ -633,8 +635,8 @@ void lar1::Reprocessing::Loop(std::string signal,
       NChargedKaon = 0;
       NNeutralKaon = 0;
 
-      // verbose = false;
-      // if (!isCC && NPi0FinalState != 0) verbose = true;
+      verbose = false;
+      if ( NPi0FinalState != 0) verbose = true;
 
 
       if (verbose || jentry % 50000 == 0) 
@@ -677,7 +679,7 @@ void lar1::Reprocessing::Loop(std::string signal,
       if( isFid && verbose) std::cout << "Fiducial event!" << std::endl;
 
 
-      if (NPi0FinalState != p1PhotonConversionMom->size()){
+      if (signal != "fosc" && NPi0FinalState != p1PhotonConversionMom->size()){
         std::cout << "Found a case when they are not equal: \n"
                   << "NPi0FinalState: " << NPi0FinalState << "\n"
                   << "p1PhotonConversionMom->size(): " << p1PhotonConversionMom->size()
@@ -1013,6 +1015,13 @@ void lar1::Reprocessing::Loop(std::string signal,
       double muon_ContainedLength = 0;
       if (isCC && abs(inno) == 14) 
         muon_ContainedLength = (*vertex - MuonExitPos).Mag();
+
+
+      if (totalGammas == 1){
+        std::cout << "\n\nConversion Distance is: " << showerGap
+                  << " and energy is " << vertexEnergy << "\n" 
+                  << " Run is " << run << " and event is " << event << std::endl;
+      }
 
 
       // Now actually start sorting out events
@@ -1351,7 +1360,53 @@ void lar1::Reprocessing::Loop(std::string signal,
         }
       }
       if (signal == "fosc"){
+        if ( isFid && isCC && abs(inno) == 12 && Elep > egammaThreshold ){
 
+          if (smearing) 
+            ElepSmeared = utils.GetLeptonEnergy(Elep,true,11);
+          else 
+            ElepSmeared = Elep;
+
+          efficiency = electronIDeff;
+          wgt = fluxweight*efficiency;
+
+          ShowerContainedDistance = utils.GetContainedLength(*vertex, lepDir, iDet);
+          ShowerDistanceToStart   = utils.GetLengthToStart(*vertex, lepDir, iDet);
+          ShowerDistanceToStartYZ = utils.GetYZLengthToStart(*vertex, lepDir, iDet);
+          electron_cand_energy    = ElepSmeared;
+
+          nueTotal->Fill(enugen,wgt);
+    
+         
+          electron_cand_angle = ThetaLep;
+          
+          enuccqe = utils.NuEnergyCCQE( 1000*electron_cand_energy,
+                                        sqrt(pow(1000*electron_cand_energy,2)
+                                           - pow(105.7,2)),
+                                        electron_cand_angle,
+                                        105.7,
+                                        iflux )/1000.0;
+          enucalo1 = utils.NuEnergyCalo( GeniePDG,
+                                         GenieMomentum,
+                                         Elep,
+                                         smearing,
+                                         true,
+                                         true )
+                                       + vertexEnergy;
+          enucalo2 = utils.NuEnergyCalo( GeniePDG,
+                                         GenieMomentum,
+                                         Elep,
+                                         smearing,
+                                         false,
+                                         false,
+                                         prot_thresh ) + photon_energy
+                                       + vertexEnergy;
+
+
+          CcqeVsTrueE->Fill( enugen, enuccqe, wgt );
+          Calo1VsTrueE->Fill( enugen, enucalo1, wgt );
+          Calo2VsTrueE->Fill( enugen, enucalo2, wgt );
+        }
       }
 
       if (signal == "phot"){
