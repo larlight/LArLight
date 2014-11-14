@@ -13,6 +13,7 @@
 #include "HitMaker.hh"
 #include "HitViewer.hh"
 #include "WFViewer.hh"
+#include "CompressionAlgosncompress.hh"
 //ADD_NEW_HEADER ... do not change this comment line
 
 // Class forward declaration here
@@ -38,4 +39,5 @@ class CompressionAlgoThresh;
 
 //ADD_EMPTY_CLASS ... do not change this comment line
 #endif
+
 
