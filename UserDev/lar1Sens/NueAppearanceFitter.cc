@@ -242,7 +242,7 @@ namespace lar1{
     }
     if (useT600_onaxis){
       baselines.push_back("600m_onaxis");
-      baselinesFancy.push_back("600m, on axis");
+      baselinesFancy.push_back("600m");
       scales.push_back(LAr1FDScale);
       names.push_back("T600");
       detNamesString += "T600_onaxis_";
@@ -1571,6 +1571,7 @@ namespace lar1{
     TMatrix * fullCovarianceMatrix 
       = utils.assembleCovarianceMatrix( path,
                                         detNamesString,
+                                        fileNameRoot,
                                         includeNumus,
                                         nullVec,
                                         covMatrixList,
@@ -1795,6 +1796,7 @@ namespace lar1{
     path = fileSource + "/chi2/";
     TString chi2FileName = utils.GetChi2FileName( path,
                                                   fileNameRoot,
+                                                  detNamesString,
                                                   includeNumus,
                                                   covMatrixList,
                                                   covMatrixListSource,
@@ -1826,17 +1828,7 @@ namespace lar1{
 
   int NueAppearanceFitter::MakeSimplePlot(){
 
-    // gStyle->SetOptStat(0000);
-    // gStyle->SetOptFit(0000);
-    // gStyle->SetPadBorderMode(0);
-    // gStyle->SetPadBottomMargin(0.15);
-    // gStyle->SetPadLeftMargin(0.15);
-    // gStyle->SetPadRightMargin(0.05);
-    // gStyle->SetFrameBorderMode(0);
-    // gStyle->SetCanvasBorderMode(0);
-    // gStyle->SetPalette(0);
-    // gStyle->SetCanvasColor(0);
-    // gStyle->SetPadColor(0);
+
     
     TGraph *sens90 = new TGraph(npoints+1,x90,y90); 
     TGraph *sens3s = new TGraph(npoints+1,x3s,y3s); 
@@ -1849,28 +1841,9 @@ namespace lar1{
 
 
 
-    // TH2D* hr1=new TH2D("hr1","hr1",500,sin22thmin,sin22thmax,500,dm2min,dm2max);
-    // hr1->Reset();
-    // hr1->SetFillColor(0);
-    // hr1->SetTitle(";sin^{2}2#theta_{#mue};#Deltam^{2}_{41} (eV^{2})");
-    // hr1->GetXaxis()->SetTitleOffset(1.1);
-    // hr1->GetYaxis()->SetTitleOffset(1.2);
-    // hr1->GetXaxis()->SetTitleSize(0.05);
-    // hr1->GetYaxis()->SetTitleSize(0.05);
-    // hr1->GetXaxis()->CenterTitle();
-    // hr1->GetYaxis()->CenterTitle();
-    // hr1->SetStats(kFALSE);
-    // hr1->Draw();
-
-
     TH2D * hr1 = plotUtils.getEmptySensPlot();
 
 
-    TLegend* legt=new TLegend(0.8,0.45,0.93,0.57);
-    legt->SetFillStyle(0);
-    legt->SetFillColor(0);
-    legt->SetBorderSize(0);
-    legt->SetTextSize(0.025);
 
     char name[3][200];
 
@@ -1912,57 +1885,70 @@ namespace lar1{
     hr1->Draw();
     plotUtils.lsnd_plot(padTemp);
     sens90->Draw("l same");
+   
+
+    TLegend* legt=new TLegend(0.8,0.42,0.93,0.53);
+    legt->SetFillStyle(0);
+    legt->SetFillColor(0);
+    legt->SetBorderSize(0);
+    legt->SetTextSize(0.025);
     legt->AddEntry(sens90,"90\% CL","l");
     sens3s->Draw("l same");
     legt->AddEntry(sens3s,"3#sigma CL","l");
     sens5s->Draw("l same");
     legt->AddEntry(sens5s,"5#sigma CL","l");
     legt->Draw();
+    
+
     leg3->Draw();
+
     // TLegend * FinalLegend()
     for (int i = 0; i < nL;i++){
         std::cout << "Name is " << name[nL-i-1] << std::endl;
         plotUtils.add_plot_label(name[nL-i-1],  0.93, 0.78+i*0.04, 0.025, 1, 62,32);
     }  
-    plotUtils.add_plot_label((char*)"PRELIMINARY",0.93,0.72,0.025,kRed-3,62,32);
+    plotUtils.add_plot_label((char*)"INTERNAL",0.93,0.72,0.025,kRed-3,62,32);
     plotUtils.add_plot_label(label1, 0.93, 0.69, 0.025, 1, 62,32);
     plotUtils.add_plot_label(label2, 0.93, 0.66, 0.025, 1, 62,32);
     plotUtils.add_plot_label((char*)"80\% #nu_{e} Efficiency", 0.93, 0.63, 0.025, 1, 62,32);
-    plotUtils.add_plot_label((char*)"Statistical and Flux Uncert. Only", 0.93, 0.60, 0.025, 1, 62,32);
+    
 
-    TString basename = fileSource + fileNameRoot;
-/*
-    if (savePlots){
-      if(shapeOnlyFit){
-          if (useNearDetStats){
-              tempCanv -> Print(basename+"_nearDetStats_shapeOnly_megaPlot.pdf", "pdf");
-              tempCanv -> Print(basename+"_nearDetStats_shapeOnly_megaPlot.eps", "eps");
-          }
-          // else if (useCovarianceMatrix) {
-              // tempCanv -> Print(basename+"_covMat_shapeOnly_megaPlot.pdf", "pdf");
-              // tempCanv -> Print(basename+"_covMat_shapeOnly_megaPlot.eps", "eps");
-          // }
-          else{
-              tempCanv -> Print(basename+"_flatStats_shapeOnly_megaPlot.pdf", "pdf");
-              tempCanv -> Print(basename+"_flatStats_shapeOnly_megaPlot.eps", "eps");
-          }
-      }
-      else{
-        if (useNearDetStats){
-              tempCanv -> Print(basename+"_nearDetStats_megaPlot.pdf", "pdf");
-              tempCanv -> Print(basename+"_nearDetStats_megaPlot.eps", "eps");
-          }
-          // else if (useCovarianceMatrix){
-              // tempCanv -> Print(basename+"_covMat_megaPlot.pdf", "pdf");
-              // tempCanv -> Print(basename+"_covMat_megaPlot.eps", "eps");
-          // }
-          else {
-              tempCanv -> Print(basename+"_flatStats_megaPlot.pdf", "pdf");
-              tempCanv -> Print(basename+"_flatStats_megaPlot.eps", "eps");
-          }
-      }
+    TString uncertNames = "Stat.";
+    for (auto s : covMatrixList){
+      if (s == "xsec") uncertNames += ", X-Sec.";
+      if (s == "flux") uncertNames += ", Flux";
     }
-    */
+
+    plotUtils.add_plot_label((char*)uncertNames.Data(), 0.93, 0.60, 0.025, 1, 62,32);
+
+    if (includeNumus)
+      plotUtils.add_plot_label((char*)"#nu_{e} + #nu_{#mu} Comb. Fit",0.93,0.57, 0.025, 1, 62, 32);
+    else
+      plotUtils.add_plot_label((char*)"#nu_{e} Only Fit",0.93,0.57, 0.025, 1, 62, 32);
+
+
+
+    TString basename = fileSource + "/sens_plots/";
+    basename += detNamesString;
+    basename += fileNameRoot;
+    if (includeNumus) basename += "numu_";
+    
+    for (unsigned int i = 0; i < covMatrixList.size(); i ++){
+      basename += covMatrixList.at(i);
+      basename += "_";
+      basename += covMatrixListSource.at(i);
+      basename += "_";
+    }
+
+    if (inflateSystematics){
+      basename += Form("infl_%g",systematicInflationAmount);
+    }
+
+    if (savePlots){
+      tempCanv -> Print(basename+"sensPlot.pdf", "pdf");
+      tempCanv -> Print(basename+"sensPlot.png", "png");
+    }
+
 
 
    return 0;
@@ -2092,7 +2078,6 @@ namespace lar1{
         else if (useGlobBF) 
           sprintf(fileName, "%s%s_%s_globBF.txt", fileNamePrint.Data(), baselines[j].c_str(), mode.c_str());
         else sprintf(fileName, "%s%s_%s.txt", fileNamePrint.Data(), baselines[j].c_str(), mode.c_str());
-        std::cout << "nueBins.size(): " << nueBins.size() << std::endl;
         
         std::ofstream dataFile;
         dataFile.open(fileName);
@@ -2116,7 +2101,9 @@ namespace lar1{
           else
             dataFile << "0.0\n";
         }
-        std::cout << "nueBins.size(): " << nueBins.size() << std::endl;
+
+        dataFile.close();
+        std::cout << "Saved text version of event rates to " << fileName << std::endl;
 
       }
 
@@ -2363,15 +2350,17 @@ namespace lar1{
         else  plotUtils.add_plot_label( (char*)"Signal: ( #Deltam^{2} = 1.2 eV^{  2}, sin^{2} 2#theta_{#mue} = 0.003)", 0.2, 0.81, 0.04, 1,62,12);
       }
       plotUtils.add_plot_label((char*)"Statistical Uncertainty Only",0.2,0.76, 0.04,1,62,12);
-      plotUtils.add_plot_label((char*)"PRELIMINARY",0.2,0.71, 0.04, kRed-3,62,12);
+      plotUtils.add_plot_label((char*)"INTERNAL",0.2,0.71, 0.04, kRed-3,62,12);
 
 
-      // this is temporary:
-      char temp[100];
-      sprintf(temp,"Vertex Activity: %g MeV",1000*minVertexEnergyPhoton);
-      plotUtils.add_plot_label(temp,.65,0.45,0.04,1,62,12);
-      sprintf(temp,"Shower Gap: %g cm",minShowerGap);
-      plotUtils.add_plot_label(temp,.65,0.4,0.04,1,62,12);
+      // // this is temporary:
+      // if (minVertexEnergyPhoton != 10000 && minShowerGap != 10000){
+      //   char temp[100];
+      //   sprintf(temp,"Vertex Activity: %g MeV",1000*minVertexEnergyPhoton);
+      //   plotUtils.add_plot_label(temp,.65,0.45,0.04,1,62,12);
+      //   sprintf(temp,"Shower Gap: %g cm",minShowerGap);
+      //   plotUtils.add_plot_label(temp,.65,0.4,0.04,1,62,12);
+      // }
 
       stack -> Draw("E0 hist same");
       if (includeFosc){
@@ -2440,17 +2429,20 @@ namespace lar1{
     Float_t chi2_temp;
 
     TString path = fileSource + "/chi2/";
+
     TString chi2FileName = utils.GetChi2FileName( path,
+                                                  fileNameRoot,
                                                   detNamesString,
                                                   includeNumus,
                                                   covMatrixList,
                                                   covMatrixListSource,
                                                   absolute_MWSource);
 
-    TFile f(chi2FileName, "READ");
+
+    TFile * f = new TFile(chi2FileName, "READ");
 
     TNtuple * thisNtuple;
-    f.GetObject("chi2", thisNtuple);
+    f->GetObject("chi2", thisNtuple);
 
     thisNtuple->SetBranchAddress("chisq", &chi2_temp);
     thisNtuple->SetBranchAddress("dm2", &dm2_temp);
@@ -2475,59 +2467,129 @@ namespace lar1{
     std::cout << "Finished reading chi2 from: " << std::endl;
     std::cout << "  " << chi2FileName << std::endl;
   
-    std::vector<float> lsnd_bottom_edge = plotUtils.Bin_LSND_Data(npoints, dm2Vec, sin22thVec);
+    std::vector<int> lsnd_bottom_edge = plotUtils.Bin_LSND_Data(npoints, dm2Vec, sin22thVec);
+
+
 
     // Now make a plot of chi2 along that line lsnd_bins
-    float chi2_at_bottom_edge[npoints+1];
-    float dm2_points[npoints+1];
+    // std::vector<float> chi2_at_bottom_edge;
+    // double dm2_points[npoints+1];
+    std::vector<std::vector<float> > chi2_at_bottom_edge;
+    std::vector<std::vector<float> > dm2_points;
+    // chi2_at_bottom_edge.resize(npoints+1);
+    float all_dm2_points[npoints+1];
+
+    float maxChi = 0;
+
+
+    // int ngraphs = 0;
+    bool prevPointZero = true;
 
     for (int i = 0; i <= npoints; i++)
     {
-      dm2_points[i] = dm2Vec.at(i);
-      chi2_at_bottom_edge[i] = sqrt(thisChi2[i][lsnd_bottom_edge.at(i)]);
-    }
-    TGraph * lsnd_bottom_edge_graph = new TGraph(npoints+1, dm2_points, chi2_at_bottom_edge);
+      all_dm2_points[i] = dm2Vec.at(i);
+      // first check that this point has a value:
+      if (lsnd_bottom_edge.at(i) == 0){
+        std::cout << "this point is zero! dm2 = " << dm2Vec.at(i) << "\n";
+        prevPointZero = true;  
+      }
+      else{
+        if (prevPointZero) {
+          std::cout << "Need a new graph!\n";
+          chi2_at_bottom_edge.push_back(std::vector<float>(0,0));
+          dm2_points.push_back(std::vector<float>(0,0));
+          prevPointZero = false;
+        }
 
-    lsnd_bottom_edge_graph -> GetHistogram()->SetMinimum(0.0);
-    // lsnd_bottom_edge_graph -> GetHistogram()->SetMaximum(20);
+        dm2_points.back().push_back(dm2Vec.at(i));
+        chi2_at_bottom_edge.back().push_back(sqrt(thisChi2[i][lsnd_bottom_edge.at(i)]));
+        if (chi2_at_bottom_edge.back().back() > maxChi ) 
+          maxChi = chi2_at_bottom_edge.back().back();
+      }
+    }
+
+
+
+    for (unsigned int i_graph = 0; i_graph < chi2_at_bottom_edge.size(); ++i_graph)
+      chi2_at_bottom_edge.at(i_graph) 
+        = utils.smoothVector(chi2_at_bottom_edge.at(i_graph));
+
+    std::vector<TGraph*> lsnd_bottom_edge_graphs;
+
+    for (unsigned int i_graph = 0; i_graph < chi2_at_bottom_edge.size(); ++i_graph)
+    {
+      lsnd_bottom_edge_graphs.push_back(new TGraph(chi2_at_bottom_edge.at(i_graph).size(),
+                                                   &(dm2_points.at(i_graph)[0]),
+                                                   &(chi2_at_bottom_edge.at(i_graph)[0]) ));
+      lsnd_bottom_edge_graphs.back() -> SetLineWidth(2);
+      lsnd_bottom_edge_graphs.back() -> SetLineColor(4);
+    }
+
+    // TGraph * lsnd_bottom_edge_graph = new TGraph(npoints+1, dm2_points, &(chi2_at_bottom_edge[0]));
+
+    std::vector<float> fiveSigma(npoints+1,sqrt(deltachisq5s));
+
+
+    TGraph * fiveSigmaLine = new TGraph(npoints+1, all_dm2_points, &(fiveSigma[0]));
+    fiveSigmaLine -> SetLineStyle(2);
+
+    fiveSigmaLine->SetMinimum(0.0);
+    fiveSigmaLine->SetMaximum(1.4*maxChi);
 
     TCanvas * canv2 = new TCanvas("c2","Sensitivity along bottom of LSND region",1000,500);
     if (mode == "nu")
-      lsnd_bottom_edge_graph -> SetTitle("Sensitivity to 3+1 #nu signal along the LSND edge.");
+      fiveSigmaLine -> SetTitle("Sensitivity to 3+1 #nu signal along the LSND edge.");
     else 
-      lsnd_bottom_edge_graph -> SetTitle("Sensitivity to 3+1 #bar{#nu} signal along the LSND edge.");
-    lsnd_bottom_edge_graph -> GetXaxis() -> SetTitle("#Delta m^{2} (eV^{2})");
-    lsnd_bottom_edge_graph -> GetYaxis() -> SetTitle("Sensitivity (#sigma)");
-    lsnd_bottom_edge_graph -> GetXaxis() -> SetTitleSize(.06);
-    lsnd_bottom_edge_graph -> GetYaxis() -> SetTitleSize(.06);
-    lsnd_bottom_edge_graph -> GetXaxis() -> CenterTitle();
-    lsnd_bottom_edge_graph -> GetYaxis() -> CenterTitle();
+      fiveSigmaLine -> SetTitle("Sensitivity to 3+1 #bar{#nu} signal along the LSND edge.");
+    fiveSigmaLine -> GetXaxis() -> SetTitle("#Delta m^{2} (eV^{2})");
+    fiveSigmaLine -> GetYaxis() -> SetTitle("Sensitivity (#chi)");
+    fiveSigmaLine -> GetXaxis() -> SetTitleSize(.06);
+    fiveSigmaLine -> GetYaxis() -> SetTitleSize(.06);
+    fiveSigmaLine -> GetXaxis() -> CenterTitle();
+    fiveSigmaLine -> GetYaxis() -> CenterTitle();
 
 
-    lsnd_bottom_edge_graph -> GetXaxis() -> SetTitleOffset(0.85);
-    lsnd_bottom_edge_graph -> GetYaxis() -> SetTitleOffset(0.35);
+    fiveSigmaLine -> GetXaxis() -> SetTitleOffset(0.85);
+    fiveSigmaLine -> GetYaxis() -> SetTitleOffset(0.35);
 
-    // Drawing attributes:
-    lsnd_bottom_edge_graph -> SetLineWidth(2);
-    lsnd_bottom_edge_graph -> SetLineColor(4);
+
     canv2 -> SetGrid();
     canv2 -> SetLogx();
 
-      // sprintf(label,"Detector Mass (ton): %.0f", farDetMassVec[mass_i]);
-    lsnd_bottom_edge_graph -> Draw("AC");
+    fiveSigmaLine -> Draw();
+
+    std::cout << "number of grapsh: " << lsnd_bottom_edge_graphs.size() << std::endl;
+    // lsnd_bottom_edge_graphs.at(0) -> Draw("same");
+
+
+    for (unsigned int i = 0; i < lsnd_bottom_edge_graphs.size(); i++)
+      lsnd_bottom_edge_graphs.at(i) -> Draw("same");
+
+    // grayEntries -> Draw("B same");
 
     // Make a plot to validate the LSND edge finding?
-    if (false){
+    if (true){
 
       // First, make an empty LSND plot:
-      TH2D * hist = plotUtils.getEmptySensPlot();
-      TCanvas * c = new TCanvas("canv","canv",800,800);
-      c->SetLogy();
-      c->SetLogx();
-      hist->Draw();
-      plotUtils.lsnd_plot(c);
-      c->Update();
+      TLegend * leg3 = plotUtils.getLSNDLegend();
+      TCanvas * tempCanv = new TCanvas("tempCanv","temp canvas",650,650);
+      TH2D * hr1 = plotUtils.getEmptySensPlot();
+      tempCanv->cd();
+      TPad * padTemp = new TPad("padTemp","padTemp",0,0,1,1);
+      padTemp->Draw();
+      padTemp->cd();
+      padTemp->SetLogx();
+      padTemp->SetLogy();
+      padTemp -> Update();
 
+      hr1->Draw();
+      plotUtils.lsnd_plot(padTemp);
+      leg3->Draw("same");
+
+
+
+
+      // Make a tgraph of the line used in calculating sens:
       float xpoints[npoints+1];
       float ypoints[npoints+1];
       for (int i = 0; i <= npoints; i++)

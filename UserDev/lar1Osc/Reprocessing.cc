@@ -532,9 +532,9 @@ void lar1::Reprocessing::Loop(std::string signal,
     TH2D * beamSpot = new TH2D("BeamSpot","Event vertex Distribution",250,xmin,xmax,250,ymin,ymax);
 
     // vertex energy in NC pizero single photon events
-    TH1D *NCpizeroVtxKE = new TH1D("NCpizeroVtxKE","NCpizeroVtxKE;Vtx Kinetic Energy (GeV)",50,0,500);
+    TH1D *NCpizeroVtxKE = new TH1D("NCpizeroVtxKE","NCpizeroVtxKE;Vtx Kinetic Energy (GeV)",50,0,5);
     TH1D *NCpizeroConvD = new TH1D("NCpizeroConvD","NCpizeroConvD;Photon Conversion Distance (cm)",100,0,100);
-    TH2D *NCpizeroVtxKEConvD = new TH2D("NCpizeroVtxKEConvD","NCpizeroVtxKEConvD;Vtx Kinetic Energy (GeV);Photon Conv. Dist. (cm)",50,0,500,100,0,100);
+    TH2D *NCpizeroVtxKEConvD = new TH2D("NCpizeroVtxKEConvD","NCpizeroVtxKEConvD;Vtx Kinetic Energy (GeV);Photon Conv. Dist. (cm)",50,0,5,100,0,100);
 
     // True Pion, Muon energy
     TH1D *ChargedPionEnergy = new TH1D("ChargedPionEnergy", "ChargedPionEnergy; Pion Energy (GeV);Events", 180, 0.0, 1.5);
@@ -550,9 +550,9 @@ void lar1::Reprocessing::Loop(std::string signal,
     TH1D  * ElectDistToStartYZHist =new TH1D("ShowerDistanceToStartYZ","ShowerDistanceToStartYZ",150,0,1100);
     
     TH2D *photonCCQE             = new TH2D("PhotonCCQE","PhotonCCQE;CCQE Energy (GeV);Photon Energy (GeV)",ebins,emin,emax,20*ebins,emin,emax);
-    TH2D *CcqeVsTrueE            = new TH2D("CcqeVsTrueE","CcqeVsTrueE;Generated Neutrino Energy (GeV);CCQE Energy (GeV)",30,0,3,30,0,3);
-    TH2D *Calo1VsTrueE           = new TH2D("Calo1VsTrueE","Calo1VsTrueE;Generated Neutrino Energy (GeV);Calorimetric Energy - all (GeV)",30,0,3,30,0,3);
-    TH2D *Calo2VsTrueE           = new TH2D("Calo2VsTrueE","Calo2VsTrueE;Generated Neutrino Energy (GeV);Calorimetric Energy - no neutrals (GeV)",30,0,3,30,0,3);
+    TH2D *CcqeVsTrueE            = new TH2D("CcqeVsTrueE","CcqeVsTrueE;Generated Neutrino Energy (GeV);CCQE Energy (GeV)",150,0,3,150,0,3);
+    TH2D *Calo1VsTrueE           = new TH2D("Calo1VsTrueE","Calo1VsTrueE;Generated Neutrino Energy (GeV);Calorimetric Energy - all (GeV)",150,0,3,150,0,3);
+    TH2D *Calo2VsTrueE           = new TH2D("Calo2VsTrueE","Calo2VsTrueE;Generated Neutrino Energy (GeV);Calorimetric Energy - no neutrals (GeV)",150,0,3,150,0,3);
     TH3D *photonConv             = new TH3D("PhotonConv","PhotonConv;X;Y;Z",50,xmin,xmax,50,ymin,ymax,100,zmin,zmax);
     TH1D *photonConvX            = new TH1D("PhotonConvX","PhotonConvX;X",50,xmin, xmax);
     TH1D *photonConvY            = new TH1D("PhotonConvY","PhotonConvY;Y",50,ymin, ymax);
@@ -592,8 +592,8 @@ void lar1::Reprocessing::Loop(std::string signal,
                  50,0,50);
 
     TH2D *LeptonSmearing 
-      = new TH2D("LeptonSmearing","Lepton Energy (GeV);Smeared Lepton Energy (GeV)",
-                 100,0,3,100,0,3);
+      = new TH2D("LeptonSmearing","Shower Resolution;Shower Energy (GeV);Smeared Shower Energy (GeV)",
+                 150,0,3,150,0,3);
 
     TH1D * vertexX               = new TH1D("vertexX","vertexX",100, xmin*1.5,xmax*1.5);
     TH1D * vertexY               = new TH1D("vertexY","vertexY",100, ymin*1.5,ymax*1.5);
@@ -611,6 +611,8 @@ void lar1::Reprocessing::Loop(std::string signal,
     int N_continue_Pi0mismatch    = 0;
     int N_continue_Gamma_mismatch = 0;
     int N_continue_foundPhotons   = 0;
+
+    double totalSkipped = 0;
 
 
     //====================================================
@@ -635,8 +637,8 @@ void lar1::Reprocessing::Loop(std::string signal,
       NChargedKaon = 0;
       NNeutralKaon = 0;
 
-      verbose = false;
-      if ( NPi0FinalState != 0) verbose = true;
+      // verbose = false;
+      // if ( NPi0FinalState != 0) verbose = true;
 
 
       if (verbose || jentry % 50000 == 0) 
@@ -1017,11 +1019,11 @@ void lar1::Reprocessing::Loop(std::string signal,
         muon_ContainedLength = (*vertex - MuonExitPos).Mag();
 
 
-      if (totalGammas == 1){
-        std::cout << "\n\nConversion Distance is: " << showerGap
-                  << " and energy is " << vertexEnergy << "\n" 
-                  << " Run is " << run << " and event is " << event << std::endl;
-      }
+      // if (totalGammas == 1){
+      //   std::cout << "\n\nConversion Distance is: " << showerGap
+      //             << " and energy is " << vertexEnergy << "\n" 
+      //             << " Run is " << run << " and event is " << event << std::endl;
+      // }
 
 
       // Now actually start sorting out events
@@ -1034,15 +1036,28 @@ void lar1::Reprocessing::Loop(std::string signal,
         // #############################
         // Look at intrinsic nues first:
         // #############################
+        
+
+
         if (isCC && abs(inno) == 12 && isFid && Elep > egammaThreshold){
-          
+
+          efficiency = electronIDeff;
+          wgt = fluxweight*efficiency;
+        
+          // if (totalGammas > 0) {
+          //   // Then this event already has a shower in the event.
+          //   std::cout << "Skipping another event for having a photon "
+          //             << "and electron. Total: " << totalSkipped << "\n";
+          //   totalSkipped += wgt;
+          //   continue;
+          // }
+
           if (smearing) 
             ElepSmeared = utils.GetLeptonEnergy(Elep,true,11);
           else 
             ElepSmeared = Elep;
 
-          efficiency = electronIDeff;
-          wgt = fluxweight*efficiency;
+
           electron_cand_energy = ElepSmeared;
           electron_cand_angle = ThetaLep;
           enuccqe = utils.NuEnergyCCQE( 1000*electron_cand_energy, 
@@ -1286,7 +1301,7 @@ void lar1::Reprocessing::Loop(std::string signal,
 
 
         if (wgt != 0.0){
-          elecAngleVsEnergy      -> Fill( Elep, ThetaLep, wgt);
+          elecAngleVsEnergy      -> Fill( Elep, ThetaLep*(180.0/3.14159), wgt);
           ElectDistToStartHist   -> Fill( ShowerDistanceToStart,wgt);
           ElectDistToStartYZHist -> Fill( ShowerDistanceToStartYZ,wgt);
           CcqeVsTrueE            -> Fill( enugen, enuccqe, wgt );
@@ -1309,7 +1324,7 @@ void lar1::Reprocessing::Loop(std::string signal,
           // else
           //   std::cout << "non-contained length is " << muon_ContainedLength << std::endl;
 
-          if (!contained && muon_ContainedLength < 100) {
+          if (!contained || muon_ContainedLength < 100) {
             // std::cout << "continuing!" << std::endl;
             continue;
           }
@@ -1568,7 +1583,7 @@ void lar1::Reprocessing::Loop(std::string signal,
       } 
 
 
-      newt->Fill();
+      if (wgt != 0) newt->Fill();
 
     } // end loop over entries
 
@@ -1620,7 +1635,6 @@ void lar1::Reprocessing::Loop(std::string signal,
               << "N_continue_Gamma_mismatch : " << N_continue_Gamma_mismatch << "\n"
               << "N_continue_foundPhotons   : " << N_continue_foundPhotons << "\n"
               << "N_continue_CC_muon        : " << N_continue_CC_muon << "\n";
-
 
 
 }

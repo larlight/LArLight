@@ -455,7 +455,7 @@ namespace lar1
       // filenameroot has a trailing "_", trim it off:
       fileNameRoot.Remove(fileNameRoot.Sizeof()-2,1);
 
-      std::cout << "File name root is added as: " << fileNameRoot << std::endl;
+      // std::cout << "File name root is added as: " << fileNameRoot << std::endl;
       matrixFileName += fileNameRoot;
 
 
@@ -468,6 +468,7 @@ namespace lar1
   // This function puts together the name of the matrix requested
   TString SensUtils::GetMatrixFileName( TString fileSource,
                                         TString detNamesString,
+                                        TString fileNameRoot,
                                         bool includeNumus,
                                         std::string uncert,
                                         int  multiWeightSource,
@@ -480,6 +481,17 @@ namespace lar1
       matrixFileName += "_";
       if (absolute_MWSource) matrixFileName += "abs_";
       matrixFileName += std::to_string(multiWeightSource);
+      
+      if (fileNameRoot.BeginsWith("nue_appearance"))
+        fileNameRoot.Remove(0,14);
+      else{
+        std::cerr << "Theres some thing strange about the fileNameRoot that was supplied!";
+      }
+      // filenameroot has a trailing "_", trim it off:
+      fileNameRoot.Remove(fileNameRoot.Sizeof()-2,1);
+
+      // std::cout << "File name root is added as: " << fileNameRoot << std::endl;
+      matrixFileName += fileNameRoot;
       matrixFileName += ".root";
       return matrixFileName;
   }
@@ -487,6 +499,7 @@ namespace lar1
 
   TString SensUtils::GetChi2FileName(TString fileSource,
                                      TString fileNameRoot,
+                                     TString detNamesString,
                                      bool includeNumus,
                                      std::vector<std::string> covMatrixList,
                                      std::vector<int> covMatrixListSource,
@@ -519,6 +532,7 @@ namespace lar1
     }
 
     chi2FileName += fileNameRoot;
+    chi2FileName += detNamesString;
     
     chi2FileName = chi2FileName+"chi2.root";
 
@@ -529,6 +543,7 @@ namespace lar1
 
   TMatrix * SensUtils::assembleCovarianceMatrix(TString fileSource,
                                                 TString detNamesString,
+                                                TString fileNameRoot,
                                                 bool includeNumus,
                                                 const std::vector<float> & nullVector,
                                                 std::vector<std::string> covMatrixList,
@@ -554,7 +569,7 @@ namespace lar1
     // next, start looping over the lists and getting the fractional uncertainty matrices.
     for (unsigned int item = 0; item < covMatrixList.size(); item ++){
       // Before anything can happen, gotta get the name of the matrix file:
-      TString name = GetMatrixFileName(fileSource, detNamesString, 
+      TString name = GetMatrixFileName(fileSource, detNamesString, fileNameRoot,
                                        includeNumus, covMatrixList.at(item),
                                        covMatrixListSource.at(item),
                                        absolute_MWSource);
@@ -592,5 +607,42 @@ namespace lar1
     return finalCovarianceMatrix;
   }
 
+  float SensUtils::getMaximum (const std::vector<float> & vals){
+    float max = vals.front();
+    for (auto & val : vals)
+      if (max < val) max = val;
+    return max;
+  }
+
+
+  std::vector<float> SensUtils::smoothVector(const std::vector<float> & data,
+                                             unsigned int range)
+  {
+  
+    std::vector<float> output(data.size(), 0.0);
+    for (unsigned int i = 0; i < data.size(); ++i)
+    {
+      if (i < range){
+        for (unsigned int val = 0; val <= 2*i; val ++){
+          output[i] += data[val];
+        }
+        output[i] /= 2*i+1;      
+      }
+      else if (i >= data.size() - range){
+        double temp_range= data.size() - i - 1;
+        for (int val = i - temp_range; val <= i + temp_range; val ++){
+          output[i] += data[val];
+        }
+        output[i] /= 2*temp_range+1;     
+      }
+      else{
+        for (unsigned int val = i - range; val <= i + range; val ++){
+          output[i] += data[val];
+        }
+        output[i] /= 2*range+1;
+      }
+    }
+    return output;
+  }
 
 }

@@ -505,7 +505,7 @@ namespace lar1{
       if( abs(pdg->at(i)) == 211 ) continue;  // skip pions because they're accounted for
       if( abs(pdg->at(i)) == 321 ) continue;  // skip kaons because they're accounted for
 
-      total_energy += momentum->at(i).E();
+      total_energy += randService.Gaus(momentum->at(i).E(), 0.05*momentum->at(i).E());
       if (abs(pdg->at(i)) == 2112) total_energy -= M_n;
 
     }
@@ -530,9 +530,12 @@ namespace lar1{
         return randService.Gaus(energy, res*energy);
       }
       else{
-        res = -0.102*log(0.000612*containedLength);
+        if (containedLength > 100)
+          res = -0.102*log(0.000612*containedLength);
+        else
+          return 0;
         // std::cout << "  Resolution is: " << res << std::endl;
-        return randService.Gaus(energy, 5*res*energy);
+        return randService.Gaus(energy, res*energy);
       }
     }
     else if (abs(PDG) == 11){ // electron

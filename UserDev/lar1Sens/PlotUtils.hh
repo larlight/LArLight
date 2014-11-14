@@ -68,7 +68,7 @@ namespace lar1{
     //  of dm2 points and sin22th points.  It then finds the
     //  minimum point in sin22th for each dm2 point, and returns 
     //  that point as a vector (function of dm2)
-    std::vector<float> Bin_LSND_Data(int npoints,
+    std::vector<int> Bin_LSND_Data(int npoints,
                                      std::vector<float> dm2points,
                                      std::vector<float> sin22thpoints);
 

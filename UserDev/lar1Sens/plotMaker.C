@@ -1,4 +1,4 @@
-//Written by Corey Adams, based off of code from Georgia
+
 
 
 plotMaker(){

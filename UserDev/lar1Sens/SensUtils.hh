@@ -47,6 +47,7 @@ namespace lar1{
     
     TString GetChi2FileName  (TString fileSource,
                               TString fileNameRoot,
+                              TString detNamesString,
                               bool includeNumus,
                               std::vector<std::string> covMatrixList,
                               std::vector<int> covMatrixListSource,
@@ -71,6 +72,7 @@ namespace lar1{
     
     TString GetMatrixFileName( TString fileSource,
                                TString detNamesString,
+                               TString fileNameRoot,
                                bool includeNumus,
                                std::string uncert,
                                int  multiWeightSource,
@@ -78,6 +80,7 @@ namespace lar1{
     
     TMatrix * assembleCovarianceMatrix( TString fileSource,
                                         TString detNamesString,
+                                        TString fileNameRoot,
                                         bool includeNumus,
                                         const std::vector<float> & nullVector,
                                         std::vector<std::string> covMatrixList,
@@ -91,6 +94,9 @@ namespace lar1{
     std::vector<float> collapseVector(std::vector<float> input,
                                       int nbins_nue, int nbins_numu, int nL);
 
+    std::vector<float> smoothVector(const std::vector<float> & data, unsigned int range = 3);
+
+    float getMaximum (const std::vector<float> &);
 
   private:
 

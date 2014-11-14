@@ -7,6 +7,8 @@
 #include <sstream>
 
 #include "TString.h"
+#include "THStack.h"
+#include "TPad.h"
 
 #include "PlotUtils.hh"
 #include "SensUtils.hh"
@@ -27,12 +29,27 @@ namespace lar1{
                           double minVertexEnergyPhoton = 10000, 
                           double minVertexEnergySignal = 0);
 
+    void setDetector(TString d){detector = d;}
+
     void setPath(TString Path){path=Path;}
 
     TH1F * makeEfficiency( int channel,
                            double photonGap = 10000, 
                            double minVertexEnergyPhoton = 10000, 
                            double minVertexEnergySignal = 0);
+
+    TH1F* makeNueEfficiency(double photonGap = 10000, 
+                            double minVertexEnergyPhoton = 10000, 
+                            double minVertexEnergySignal = 0);
+
+    TH1F* makePhotonEfficiency( double photonGap = 10000, 
+                                double minVertexEnergyPhoton = 10000, 
+                                double minVertexEnergySignal = 0);
+
+    TCanvas * createBackground( double photonGap = 10000, 
+                                double minVertexEnergyPhoton = 10000, 
+                                double minVertexEnergySignal = 0,
+                                bool normToNominal = true);
 
     /* data */
 
@@ -47,7 +64,7 @@ namespace lar1{
 
     TString path;
     TString fileEnd, fileStart;
-
+    TString detector;
 
     std::vector<float> bins;
 
@@ -57,6 +74,8 @@ namespace lar1{
     std::vector<TString> legend;
     std::vector<std::vector<float> > nominalData;
 
+    std::vector<float> nominalBinIntegral;
+    std::vector<float> nominalBkgIntegral;
 
   };
 

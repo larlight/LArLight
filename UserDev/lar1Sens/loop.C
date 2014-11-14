@@ -3,6 +3,8 @@
 
 void loop(double vertexActivity, double showerGap){
 
+  gSystem->Load("lib/liblar1Sens.so");
+
   lar1::NueAppearanceFitter n;
   // n.setFileSource("/Users/cja33/genie_RW/");
   n.setFileSource("/Users/cja33/nominal_ntuples/");
@@ -12,25 +14,24 @@ void loop(double vertexActivity, double showerGap){
   n.setSpecialNameTextOsc("");
   n.setSpecialNameText_far("");
   n.setSpecialNameTextOsc_far("");
-  n.setFlatSystematicError(0.20);
   n.setMode("nu");
-  n.setUse100m(true);
-  n.setUse470m(false);
+
+  n.setUse100m(       false);
+  n.setUse470m(       true);
   n.setUseT600_onaxis(false);
+
   n.setUbooneScale(1.0);
   // n.setLAr1NDScale(1.0);
   n.setLAr1NDScale(1.0);
   n.setLAr1FDScale(1.0);
   n.setEnergyType("ecalo2");
-  n.setUseNearDetStats(false);
   n.setShapeOnlyFit(false);
-  n.setNearDetSystematicError(0.2);
   n.setForceRemake(false);
   n.setUseInfiniteStatistics(false);
   // n.setElectContainedDist(100);
 
   n.setTopologyCut(vertexActivity,showerGap);
-  n.setMinVertexEnergySignal(vertexActivity);
+  n.setMinVertexEnergySignal(vertexActivity); 
 
   n.setIncludeCosmics(false);
   // n.setCosmicsFile("output/no_cut/histos_for_corey.root");
@@ -81,13 +82,14 @@ void loop(double vertexActivity, double showerGap){
   n.setNueBins(nue_bins);
   n.setNumuBins(numu_bins);
 
-  n.setIncludeFosc(false);
+  n.setIncludeFosc(true);
   n.setIncludeNumus(false);
+
 
   n.setInflateSystematics(false);
   n.setSystematicInflationAmount(0.00);
 
-  n.setUseCovarianceMatrix(false);
+
   // Gotta define the backgrounds:
   int kUnisim(0), kPiMinus(1), kPiPlus(2), kKaon0(3), kKMinus(4), kKPlus(5), kTotal_flux(6);
   int kTotal_xsec(0);
@@ -98,9 +100,9 @@ void loop(double vertexActivity, double showerGap){
   // n.setMultiWeightSource(kKMinus);
   // n.setMultiWeightSource(kKPlus);  
   n.setMultiWeightSource(kTotal_xsec);
-
   n.setAbsolute_MWSource(false);
 
+  n.setUseMultiWeights(false);
   n.setUseXSecWeights(false);
   n.setUseFluxWeights(false);
 
@@ -109,15 +111,26 @@ void loop(double vertexActivity, double showerGap){
 
   n.setSavePlots(true);
 
+  std::vector<std::string> covMatList;
+  std::vector<int> covMatListSource;
+  covMatList.push_back("xsec");
+  covMatListSource.push_back(kTotal_xsec);
+  covMatList.push_back("flux");
+  covMatListSource.push_back(kTotal_flux);
+
+  n.setCovMatList(covMatList);
+  n.setCovMatListSource(covMatListSource);
+
+
   n.setBuildCovarianceMatrix(false);
   n.setMakeRatioPlots(false);
   n.setLoop(false);
-  n.setMakePlots(false);
   n.setMakeSimplePlot(false);
   n.setMakeEventRatePlots(true);
   n.setMakeAltSensPlot(false);
 
   n.Run();
+
 
 
 
@@ -135,7 +148,7 @@ int main(){
       loop(vertexActivity, showerGap);     
       // showerGap -= 0.5;
     // }
-    vertexActivity -= 0.025;
+    vertexActivity -= 0.005;
     // showerGap = 10.0;
   }
   return 0;

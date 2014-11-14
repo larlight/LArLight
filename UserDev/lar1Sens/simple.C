@@ -5,8 +5,9 @@
   gSystem->Load("lib/liblar1Sens.so");
 
   lar1::NueAppearanceFitter n;
-  n.setFileSource("/Users/cja33/genie_RW/");
-  // n.setFileSource("/Users/cja33/nominal_ntuples/");
+  // n.setFileSource("/Users/cja33/genie_RW/");
+  n.setFileSource("/Users/cja33/nominal_ntuples/");
+  // n.setFileSource("/Users/cja33/lar1_data/");
   n.setVerbose(true);
   n.setDebug(false);
   n.setSpecialNameText("");
@@ -14,12 +15,13 @@
   n.setSpecialNameText_far("");
   n.setSpecialNameTextOsc_far("");
   n.setMode("nu");
-  n.setUse100m(true);
-  n.setUse470m(false);
-  n.setUseT600_onaxis(false);
-  n.setUbooneScale(1.0);
-  // n.setLAr1NDScale(1.0);
+
+  n.setUse100m(       true);
+  n.setUse470m(       true);
+  n.setUseT600_onaxis(true);
+
   n.setLAr1NDScale(1.0);
+  n.setUbooneScale(2.0);
   n.setLAr1FDScale(1.0);
   n.setEnergyType("ecalo2");
   n.setShapeOnlyFit(false);
@@ -28,7 +30,7 @@
   // n.setElectContainedDist(100);
 
   n.setTopologyCut(0.05,3);
-  n.setMinVertexEnergySignal(0.05);
+  // n.setMinVertexEnergySignal(0.05); 
 
   n.setIncludeCosmics(false);
   // n.setCosmicsFile("output/no_cut/histos_for_corey.root");
@@ -83,8 +85,8 @@
   n.setIncludeNumus(false);
 
 
-  n.setInflateSystematics(true);
-  n.setSystematicInflationAmount(0.50);
+  n.setInflateSystematics(false);
+  n.setSystematicInflationAmount(0.00);
 
 
   // Gotta define the backgrounds:
@@ -99,8 +101,8 @@
   n.setMultiWeightSource(kTotal_xsec);
   n.setAbsolute_MWSource(false);
 
-  n.setUseMultiWeights(true);
-  n.setUseXSecWeights(true);
+  n.setUseMultiWeights(false);
+  n.setUseXSecWeights(false);
   n.setUseFluxWeights(false);
 
   n.setNpoints(500);
@@ -110,20 +112,20 @@
 
   std::vector<std::string> covMatList;
   std::vector<int> covMatListSource;
-  // covMatList.push_back("xsec");
-  // covMatListSource.push_back(kTotal_xsec);
-  // covMatList.push_back("flux");
-  // covMatListSource.push_back(kUnisim);
+  covMatList.push_back("xsec");
+  covMatListSource.push_back(kTotal_xsec);
+  covMatList.push_back("flux");
+  covMatListSource.push_back(kTotal_flux);
 
   n.setCovMatList(covMatList);
   n.setCovMatListSource(covMatListSource);
 
 
-  n.setBuildCovarianceMatrix(true);
+  n.setBuildCovarianceMatrix(false);
   n.setMakeRatioPlots(false);
-  n.setLoop(false);
-  n.setMakeSimplePlot(false);
-  n.setMakeEventRatePlots(false);
+  n.setLoop(true);
+  n.setMakeSimplePlot(true);
+  n.setMakeEventRatePlots(true);
   n.setMakeAltSensPlot(false);
 
   n.Run();

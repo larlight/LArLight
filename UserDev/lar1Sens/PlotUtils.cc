@@ -143,7 +143,10 @@ namespace lar1{
     gStyle->SetCanvasColor(0);
     gStyle->SetPadColor(0);
 
-    TH2D* hr1=new TH2D("hr1","hr1",500,sin22thmin,sin22thmax,500,dm2min,dm2max);
+    static int stupidEffingRoot = 0;
+    stupidEffingRoot ++;
+
+    TH2D* hr1=new TH2D(Form("emptyPlot_%d",stupidEffingRoot),"hr1",500,sin22thmin,sin22thmax,500,dm2min,dm2max);
     hr1->Reset();
     hr1->SetFillColor(0);
     hr1->SetTitle(";sin^{2}2 #theta_{#mue};#Deltam^{2}_{41} (eV^{2})");
@@ -509,7 +512,7 @@ namespace lar1{
     }
   }
 
-std::vector<float> PlotUtils::Bin_LSND_Data( int npoints,
+std::vector<int> PlotUtils::Bin_LSND_Data( int npoints,
                     std::vector<float> dm2points,
                     std::vector<float> sin22thpoints){
 
@@ -566,81 +569,38 @@ std::vector<float> PlotUtils::Bin_LSND_Data( int npoints,
     datafile.close();
   }
 
-  // TStyle * style = new TStyle(*gStyle);
+  std::vector<int> sin22thresult(npoints+1, 0.0);
 
-  // gStyle->SetOptStat(0000);
-  // gStyle->SetOptFit(0000);
-  // gStyle->SetPadBorderMode(0);
-  // gStyle->SetPadBottomMargin(0.15);
-  // gStyle->SetPadLeftMargin(0.15);
-  // gStyle->SetPadRightMargin(0.05);
-  // gStyle->SetFrameBorderMode(0);
-  // gStyle->SetCanvasBorderMode(0);
-  // gStyle->SetPalette(0);
-  // gStyle->SetCanvasColor(0);
-  // gStyle->SetPadColor(0);
-
-
-  // TCanvas * d = new TCanvas("LSND Region", "LSND Region", 700, 700);
-  // d->SetLogx();
-  // d->SetLogy();  
-
-  // TH2D* hr1=new TH2D("hr1","hr1",500,0.0001,1.0,500,0.01,100.0);
-  // hr1->Reset();
-  // hr1->SetFillColor(0);
-  // hr1->SetTitle(";sin^{2}2#theta_{#mue};#Deltam^{2} (eV^{2})");
-  // hr1->GetXaxis()->SetTitleOffset(1.1);
-  // hr1->GetYaxis()->SetTitleOffset(1.2);
-  // hr1->GetXaxis()->SetTitleSize(0.05);
-  // hr1->GetYaxis()->SetTitleSize(0.05);
-  // hr1->SetStats(kFALSE);
-  // hr1->Draw();
-  // lsnd_plot(d);
-  // // gROOT->ProcessLine(".x ./lsnd_plot.c+(d)");
-  // // LSND_Data ->Draw("LF");
-
-  // TLegend* leg3=new TLegend(0.2,0.2,0.4,0.35);
-  // leg3->SetFillStyle(0);
-  // leg3->SetFillColor(0);
-  // leg3->SetBorderSize(0);
-  // leg3->SetTextSize(0.03);
-  // TGraph *gdummy1 = new TGraph();
-  // gdummy1->SetFillColor(29);
-  // TGraph *gdummy2 = new TGraph();
-  // gdummy2->SetFillColor(38);
-  // TMarker *gdummy3 = new TMarker();
-  // gdummy3 -> SetMarkerStyle(3);
-  // gdummy3 -> SetMarkerColor(1);
-  // TGraph *gdummy0 = new TGraph();
-  // gdummy0 -> SetFillColor(4);
-  // gdummy0 -> SetFillStyle(3004);
-  // leg3->AddEntry(gdummy2,"LSND 90% CL","F");
-  // leg3->AddEntry(gdummy1,"LSND 99% CL","F");
-  // leg3->AddEntry(gdummy3,"LSND Best Fit","P*");
-  // leg3->AddEntry(gdummy0,"Global Fit 90% CL (J. Kopp et al. arXiv:1303.3011)");   
-  // leg3->Draw("same");
-
-  // gStyle -> cd();
-
-  std::vector<float> sin22thresult(npoints+1, 0.0);
-  std::cout << "Result size: " << sin22thresult.size() << std::endl;
   // Now loop over the hist in y points and find the first point where the bins are filled:
-  for (int i_dm2 = 1; i_dm2 <= npoints+1; i_dm2++)
+  for (int i_dm2 = npoints+1; i_dm2 >= 1; i_dm2--)
+  // for (int i_dm2 = 1; i_dm2 <= npoints+1; i_dm2++)
   {
     for (int i_sin22th = npoints+1; i_sin22th > 0; i_sin22th--)
     {
-      if (LSND_Data -> GetBinContent(i_sin22th,i_dm2) > 0) sin22thresult.at(i_dm2-1) = i_sin22th;
+      if (LSND_Data -> GetBinContent(i_sin22th,i_dm2) > 0) 
+        sin22thresult.at(i_dm2-1) = i_sin22th;
     }
-    if (sin22thresult.at(i_dm2 -1) == 0) {
-      if (i_dm2 != 1 ) sin22thresult.at(i_dm2 - 1) = sin22thresult.at(i_dm2-2);
-      else sin22thresult.at(i_dm2 -1) = npoints;
+    // if (sin22thresult.at(i_dm2-1) == 0) {
+    //   if (i_dm2 != 1 ) sin22thresult.at(i_dm2-1) = sin22thresult.at(i_dm2);
+    //   else sin22thresult.at(i_dm2-1) = npoints;
+    // }
+  }
+
+  // Loop over the result once and fill in any gaps where there is just one
+  // point that came out to be 0:
+  for (int i = 1; i < npoints+1; ++i)
+  {
+    if (sin22thresult.at(i) == 0){
+      if (sin22thresult.at(i-1) != 0 &&
+          sin22thresult.at(i+1) != 0 )
+      {
+        sin22thresult.at(i) = (int) ((sin22thresult.at(i-1) + sin22thresult.at(i+1))/2.0);
+      }
     }
   }
 
   // Refine the line to extrapolate between the points that have no fit
   // refine(sin22thresult);
-
-
 
   // Need to validate that this works:
   // float xpoints[npoints+1];
@@ -658,7 +618,9 @@ std::vector<float> PlotUtils::Bin_LSND_Data( int npoints,
 
 
   // for (int i = 0; i <= npoints; i++)
-  //   std::cout << "Line along dm2 = " << ypoints[i] << ",\tsin22th = " << xpoints[i] << std::endl;
+  //   std::cout << "Line along dm2 = " << dm2points[i] 
+  //             << ",\tsin22th = " << sin22thpoints[sin22thresult[i]] 
+  //             << std::endl;
 
 
 

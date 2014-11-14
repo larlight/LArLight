@@ -267,7 +267,7 @@ namespace lar1{
       double dm2,sin22th;
       //const double dm2BF=1.2, sin22thBF=0.003; //The LSND best fit values of the parameters
       double chisq;
-      const double deltachisq90=1.64, deltachisq3s=9.00, deltachisq5s=25.00;
+      const double deltachisq90=1.64, deltachisq3s=7.74, deltachisq5s=23.40; //deltachisq99=5.41;
 
       // These vectors hold the bin scheme for the nue and numu samples.
       // The default is going to be 200 MeV wide bins from 200 MeV to 3 GeV

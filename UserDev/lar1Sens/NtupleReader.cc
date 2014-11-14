@@ -214,33 +214,35 @@ namespace lar1{
     fileNameHistsOsc = "hists_osc/";
     fileNameHistsOsc += fileNameSourceOsc;
     fileNameHists += "_";
-    if(showerContainmentDist != -999){
-      sprintf(tempstring, "cont%g",showerContainmentDist );
-      fileNameHists += tempstring;
-      fileNameHists += "_";
-      fileNameHistsOsc += "_";
-      fileNameHistsOsc += tempstring;
-    }
-    if(minDistanceToStart != -999){
-      sprintf(tempstring, "dist%g",minDistanceToStart );
-      fileNameHists += tempstring;
-      fileNameHists += "_";
-      fileNameHistsOsc += "_";
-      fileNameHistsOsc += tempstring;
-    }
-    if (minVertexEnergyPhoton != 10000){
-      sprintf(tempstring, "vePhot%g",minVertexEnergyPhoton );
-      fileNameHists += tempstring;
-      fileNameHists += "_";
-      // fileNameHistsOsc += "_";
-      // fileNameHistsOsc += tempstring;
-    }
-    if (minShowerGap != 10000){
-      sprintf(tempstring, "sg%g",minShowerGap );
-      fileNameHists += tempstring;
-      fileNameHists += "_";
-      // fileNameHistsOsc += "_";
-      // fileNameHistsOsc += tempstring;
+    if (signal == "nue"){
+      if(showerContainmentDist != -999){
+        sprintf(tempstring, "cont%g",showerContainmentDist );
+        fileNameHists += tempstring;
+        fileNameHists += "_";
+        fileNameHistsOsc += "_";
+        fileNameHistsOsc += tempstring;
+      }
+      if(minDistanceToStart != -999){
+        sprintf(tempstring, "dist%g",minDistanceToStart );
+        fileNameHists += tempstring;
+        fileNameHists += "_";
+        fileNameHistsOsc += "_";
+        fileNameHistsOsc += tempstring;
+      }
+      if (minVertexEnergyPhoton != 10000){
+        sprintf(tempstring, "vePhot%g",minVertexEnergyPhoton );
+        fileNameHists += tempstring;
+        fileNameHists += "_";
+        // fileNameHistsOsc += "_";
+        // fileNameHistsOsc += tempstring;
+      }
+      if (minShowerGap != 10000){
+        sprintf(tempstring, "sg%g",minShowerGap );
+        fileNameHists += tempstring;
+        fileNameHists += "_";
+        // fileNameHistsOsc += "_";
+        // fileNameHistsOsc += tempstring;
+      }
     }
     if (minVertexEnergySignal != 0){
       sprintf(tempstring, "veSig%g",minVertexEnergySignal );
@@ -949,8 +951,8 @@ namespace lar1{
     c->SetBranchAddress("ShowerDistanceToStart"  ,&ElectDistToStart);
     c->SetBranchAddress("VertexEnergy"  ,&vertexEnergy);
 
-    std::vector<std::vector<float> > *MultiWeight;
-    MultiWeight = 0;
+    // std::vector<std::vector<float> > *MultiWeight;
+    // MultiWeight = 0;
 
 
     d->SetBranchAddress("wgt",&checking_wgt);
