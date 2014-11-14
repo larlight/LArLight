@@ -39,7 +39,7 @@ source /grid/fermiapp/products/uboone/setup_uboone.sh
 # Set nightly build LArSoft
 #setup uboonecode nightly -q e4:prof
 #setup larsoft nightly -q e5:prof
-setup larsoft v02_05_01 -q e5:prof
+setup larsoft v03_02_00 -q e6:prof
 
 # Set jobsub available (generic, not specific to uboone)
 setup jobsub_tools

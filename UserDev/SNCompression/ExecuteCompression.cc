@@ -6,7 +6,7 @@
 namespace larlight {
 
   bool ExecuteCompression::initialize() {
-
+    /// currently nothing is done in the initialize function
     return true;
   }
   
@@ -20,16 +20,16 @@ namespace larlight {
 
     // Otherwise Get RawDigits and execute compression
     larlight::event_tpcfifo *event_wf = (event_tpcfifo*)(storage->get_data(DATA::TPCFIFO));
-
+    // If raw_digits object is empty -> exit
     if(!event_wf) {
       print(MSG::ERROR,__FUNCTION__,"Data storage did not find associated waveforms!");
       return false;
     }
 
-    // clear holder for new, compressed, waveforms
+    // clear place-holder for new, compressed, waveforms
     _out_event_wf.clear();
     
-    //Loop over all waveforms
+    // Loop over all waveforms
     for (size_t i=0; i<event_wf->size(); i++){
       
       //get tpc_data
@@ -41,16 +41,22 @@ namespace larlight {
 	continue;
       }//if wf size < 1
 	  
-      //finally, apply compression..
+      // finally, apply compression:
+      // *-------------------------*
+      // 1) Convert tpc_data object to just the vector of shorts which make up the ADC ticks
       std::vector<unsigned short> ADCwaveform = getADCs(tpc_data);
+      // 2) Now apply the compression algorithm. _compress_algo is an instance of CompressionAlgoBase
       _compress_algo->ApplyCompression(ADCwaveform);
+      // 3) Retrieve the output waveforms (vectors of vectors of shorts) produced during the compression
       std::vector<std::vector<unsigned short> > compressOutput = _compress_algo->GetOutputWFs();
-      //Calculate compression factor [ for now Ticks After / Ticks Before ]
+      // 4) Retrieve the time-ticks at which each output waveform saved starts
+      std::vector<int> outTimes = _compress_algo->GetOutputWFTimes();
+      // 5) Calculate compression factor [ for now Ticks After / Ticks Before ]
       CalculateCompression(ADCwaveform, compressOutput);
-      //clear _InWF and _OutWF from compression algo object
+      // 6) clear _InWF and _OutWF from compression algo object -> resetting algorithm for next time it is called
       _compress_algo->Reset();
-      // Replace .root data file *event_wf* with new waveforms
-      SwapData(tpc_data, compressOutput);
+      // 7) Replace .root data file *event_wf* with new waveforms
+      SwapData(tpc_data, compressOutput, outTimes);
 	
     }//for all waveforms
 
@@ -81,16 +87,22 @@ namespace larlight {
 
   }
 
-  void ExecuteCompression::SwapData(larlight::tpcfifo* tpc_data, std::vector<std::vector<unsigned short> > outputWFs){
+  void ExecuteCompression::SwapData(larlight::tpcfifo* tpc_data, std::vector<std::vector<unsigned short> > outputWFs,
+				    std::vector<int> outTimes){
 
-    UInt_t wf_time = tpc_data->readout_sample_number_2MHz();
+    // In this function we are taking the old larlight::tpcfifo object and replacing it with
+    // new larlight::tpcfifo objects, one per output waveform coming from compression
+    // Most of the information for this object (channel number, wire plane, etc) stays the same
+    // What changes is the actual list of ADC counts, and the start time of the vector.
+
+    UInt_t wf_time = tpc_data->readout_sample_number_RAW();
     UInt_t chan = tpc_data->channel_number();
 
 
     //loop over new waveforms created
     for (size_t n=0; n < outputWFs.size(); n++){
       larlight::tpcfifo new_tpc_data( chan, tpc_data->readout_frame_number(),
-				      wf_time, tpc_data->module_address(),
+				      wf_time+outTimes.at(n), tpc_data->module_address(),
 				      tpc_data->module_id(), larutil::Geometry::GetME()->View(chan),
 				      larutil::Geometry::GetME()->SignalType(chan),
 				      DATA::TPCFIFO, outputWFs.at(n));

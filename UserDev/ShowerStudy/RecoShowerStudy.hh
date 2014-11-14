@@ -16,7 +16,7 @@
 #define RECOSHOWERSTUDY_HH
 
 #include "ana_base.hh"
-#include "ShowerContainmentCut.hh"
+#include "DistToBoxWall.hh"
 #include <vector>
 
 namespace larlight {
@@ -60,7 +60,7 @@ namespace larlight {
 	double _dist_to_wall ;
 	double _dist_along_traj ;
 
-	double _dist_backwards_to_wall ; 
+	double _dist_back_along_traj ;
 	
   };
 }

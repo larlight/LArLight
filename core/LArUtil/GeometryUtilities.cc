@@ -93,13 +93,15 @@ namespace larutil{
     //////insert check for existence of planes.
  
     //check if backwards going track
-    Double_t backwards=0;
+    //Double_t backwards=0;
     Double_t alt_backwards=0;
     
     ///// or?
+    /*
     if(fabs(omega0)>(TMath::Pi()/2.0) && fabs(omega1)>(TMath::Pi()/2.0) ) {
       backwards=1;
     }
+    */
     
     if(fabs(omega0)>(TMath::Pi()/2.0) || fabs(omega1)>(TMath::Pi()/2.0) ) {
       alt_backwards=1;
@@ -872,7 +874,7 @@ namespace larutil{
 		<< "\033[93mWarning ends...\033[00m"<<std::endl;
       z0 = 0;
     }
-    else if(z0 >= geom->Nwires(p0->plane)){
+    else if(z0 >= (int)(geom->Nwires(p0->plane))){
       std::cout << "\033[93mWarning\033[00m \033[95m<<GeometryUtilities::GetYZ>>\033[00m" << std::endl
 		<< " 2D wire position " << p0->w << " [cm] exceeds max wire number " << (geom->Nwires(p0->plane)-1) <<std::endl
 		<< " Forcing it to the max wire number..." << std::endl
@@ -886,7 +888,7 @@ namespace larutil{
 		<< "\033[93mWarning ends...\033[00m"<<std::endl;
       z1 = 0;
     }
-    if(z1 >= geom->Nwires(p1->plane)){
+    if(z1 >= (int)(geom->Nwires(p1->plane))){
       std::cout << "\033[93mWarning\033[00m \033[95m<<GeometryUtilities::GetYZ>>\033[00m" << std::endl
 		<< " 2D wire position " << p1->w << " [cm] exceeds max wire number " << (geom->Nwires(p0->plane)-1) <<std::endl
 		<< " Forcing it to the max wire number..." << std::endl

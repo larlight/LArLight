@@ -2,7 +2,6 @@
 #define RADIATION_TEST_CC
 
 #include "radiation_test.hh"
-#include "radiation_information.hh"
 #include "math.h"
 #include <random>
 
@@ -38,7 +37,7 @@ namespace larlight {
     auto _daugh1_Px = my_mcshower->at(0).DaughterMomentum().at(0);
     auto _daugh1_Py = my_mcshower->at(0).DaughterMomentum().at(1);
     auto _daugh1_Pz = my_mcshower->at(0).DaughterMomentum().at(2);
-	auto _daugh1_E = my_mcshower->at(0).DaughterMomentum().at(3);
+     _daugh1_E = my_mcshower->at(0).DaughterMomentum().at(3);
 
 	//4 momentum of second daughter gamma
     auto _daugh2_Px = my_mcshower->at(1).DaughterMomentum().at(0);
@@ -231,6 +230,8 @@ void radiation_test::PrepareTTree() {
 	  _ana_tree->Branch("_Econ5","std::vector<double>",&_Econ5);
 	  _ana_tree->Branch("_Econ_more","std::vector<double>",&_Econ_more);
 
+	  _ana_tree->Branch("_daugh1_E",&_daugh1_E,"_daugh1_E/D");
+	
 	  _ana_tree->Branch("_pi0_mass_wo_cut","std::vector<double>",&_pi0_mass_wo_cut);
 	  _ana_tree->Branch("_pi0_mass_1length","std::vector<double>",&_pi0_mass_1length);
 	  _ana_tree->Branch("_pi0_mass_2lengths","std::vector<double>",&_pi0_mass_2lengths);

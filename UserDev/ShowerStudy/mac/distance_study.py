@@ -34,7 +34,7 @@ my_proc.set_ana_output_file("distance.root");
 # Attach a template process
 ana_unit_1 = fmwk.PDGSelection()
 ana_unit_0 = fmwk.ShowerDistanceStudy()
-ana_unit_1.Select(111,ana_unit_1.kGENERATOR,1)
+ana_unit_1.Select(11,ana_unit_1.kGENERATOR,1)
 my_proc.enable_filter(True)
 my_proc.add_process(ana_unit_1)
 my_proc.add_process(ana_unit_0)

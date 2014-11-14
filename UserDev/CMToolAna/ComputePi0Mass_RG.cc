@@ -38,6 +38,10 @@ namespace larlight {
 
     hElectronCorr_DepToDet = new TH1D("hElectronCorr_DepToDet","Correction: hElectronCorr_DepToDet",100,0,4);
 
+	// make a tree 
+    _ana_tree=0;
+    MakeTTree();
+	
     return true;
   }
   
@@ -90,8 +94,8 @@ namespace larlight {
     fElectronCorr_DepToDet.resize(ev_shower->size(),1);
     fChargeCorr_DetToPeak.resize(ev_shower->size(),1);
 
-    if(_applyEnergyCorrection)
-      ComputeEnergyCorrection(storage);
+    //if(_applyEnergyCorrection)
+      //ComputeEnergyCorrection(storage);
     /*
     std::cout 
       << std::endl
@@ -149,56 +153,17 @@ namespace larlight {
 
     
     std::cout<<"in compute thing, mass is "<<_mass<<std::endl;
-	//double phi = -999;
-//	mc_shower->at(0).MotherAngle3D(phi,theta);
-	//double theta = -999;
-	//mc_shower->at(0).MotherAngle3D(phi,theta);
-	//double_t E1 = mc_shower->at(0).MotherMomentum();
-	//double_t E2 = mc_shower->at(1).MotherMomentum();
-	//std::cout<<" Something from MC shower \n\t E1: "<<E1<<"\n\t E2: "<<E2<<std::endl;
-	//std::cout<<" Something from MC shower \n\t Phi: "<<phi<<"\n\t Theta: "<<theta<<std::endl;
-	
-  //  hPi0MassPeak->Fill(_mass);
-    hPi0MassPeak->Fill(3.6*_mass);
-    hPi0MassPeakPull->Fill(3.6*_mass -135);
+    hPi0MassPeak->Fill(_dorient_EE_calb*_mass);
+    hPi0MassPeakPull->Fill(_dorient_EE_calb*_mass -135);
     for(int i = 0; i<2; ++i){
       hEnergyCorr_MomToDaughter->Fill(fEnergyCorr_MomToDaughter.at(i));
       hElectronCorr_DepToDet->Fill(fElectronCorr_DepToDet.at(i));
     }
 
-
-	// look at how showers reconstruct based on using energy or using angular reco
-
-/*
-std::vector<float> mcs_mother_energy(mc_shower->size(),0);
-    std::vector<TVector3> mcs_mother_direction(mc_shower->size());
-	
-    for(size_t i=0; i<mc_shower->size(); ++i) {
-      mcs_mother_energy.at(i) = mc_shower->at(i).MotherMomentum().at(3);
-		//make a tvector to fit into the mass
-      TVector3 v1;	
-      v1.SetX(mc_shower->at(i).MotherMomentum().at(0)/mc_shower->at(i).MotherMomentum().at(3));       
-      v1.SetY(mc_shower->at(i).MotherMomentum().at(1)/mc_shower->at(i).MotherMomentum().at(3));       
-      v1.SetZ(mc_shower->at(i).MotherMomentum().at(2)/mc_shower->at(i).MotherMomentum().at(3));       
-      mcs_mother_direction.at(i) = v1;
-
-	}// loop over the mc_shower
-
-	if(mcs_mother_energy.size()==2){
-	// looking at how well we do just on getting the angle correct. 
-	// here I will just use the corected values of E1 and E2
-	    _mass_goodEnergy = Pi0MassFormula3D( mcs_mother_energy[0],
-    			      mcs_mother_energy[1],
-    			      ev_shower->at(0).Direction(),
-    			      ev_shower->at(1).Direction());
-	
-        _mass_goodAngle = Pi0MassFormula3D(ev_shower->at(0).MIPEnergy().at(0),
-    			      ev_shower->at(1).MIPEnergy().at(0),
-    			      mcs_mother_direction[0],
-    			      mcs_mother_direction[1]);
- */   
     std::vector<float> mcs_Daughter_energy(mc_shower->size(),0);
     std::vector<TVector3> mcs_Daughter_direction(mc_shower->size());
+    std::vector<float> mcs_Mother_energy(mc_shower->size(),0);
+    std::vector<TVector3> mcs_Mother_direction(mc_shower->size());
 	
     for(size_t i=0; i<mc_shower->size(); ++i) {
       mcs_Daughter_energy.at(i) = mc_shower->at(i).DaughterMomentum().at(3);
@@ -237,7 +202,6 @@ std::vector<float> mcs_mother_energy(mc_shower->size(),0);
         _photon_dosTrue = Pi0CosCM(ev_shower->at(0).MIPEnergy().at(0),ev_shower->at(1).MIPEnergy().at(0));
 	// fill the hist with the good energy one	
     	hPi0MassPeak_GoodEnergy->Fill(_mass_goodEnergy);
-    	//hPi0MassPeak_GoodAngle->Fill(_mass_goodAngle);
     	hPi0MassPeak_GoodAngle->Fill(_dorient_EE_calb*_mass_goodAngle);
     	hPi0MassPeak_GoodAnglePull->Fill(_dorient_EE_calb*_mass_goodAngle-_Pi0mass);
     	hPi0MassPeak_TrueDetector->Fill(_mass_detectorTrue);
@@ -247,11 +211,60 @@ std::vector<float> mcs_mother_energy(mc_shower->size(),0);
 	float recoangle  = acos(ev_shower->at(0).Direction()*ev_shower->at(1).Direction());
     	hOpeningAngle->Fill(recoangle,truthangle);
 
-	if(_photon_dosReco>0.3 && _photon_dosReco<0.8) hPi0MassPeakdoscut->Fill(3.6*_mass);
-	if(recoangle>0 && recoangle<1.4) hPi0MassPeakanglecut->Fill(3.6*_mass);
-	if(recoangle>0 && recoangle<1.4&&_photon_dosReco>0.3 && _photon_dosReco<0.8) hPi0MassPeakdosanglecut->Fill(3.6*_mass);
+	if(_photon_dosReco>0 && _photon_dosReco<0.8) hPi0MassPeakdoscut->Fill(_dorient_EE_calb*_mass);
+	if(recoangle>0.4 && recoangle<1.0) hPi0MassPeakanglecut->Fill(_dorient_EE_calb*_mass);
+	if(recoangle>0.4 && recoangle<1.0&&_photon_dosReco>0 && _photon_dosReco<0.8) hPi0MassPeakdosanglecut->Fill(_dorient_EE_calb*_mass);
 	}
 
+	// Filling of the tree variables 
+	// Reco Variables
+	
+	E_1 = ev_shower->at(0).MIPEnergy().at(0);	
+	E_2 = ev_shower->at(1).MIPEnergy().at(0);	
+	E1E2DotProd  = acos(ev_shower->at(0).Direction()*ev_shower->at(1).Direction());
+	
+
+	// Truth Variables
+	if( mc_shower->size() ==2 ){
+
+
+     for(size_t i=0; i<mc_shower->size(); ++i) {
+      mcs_Daughter_energy.at(i) = mc_shower->at(i).DaughterMomentum().at(3);
+      mcs_Mother_energy.at(i) = mc_shower->at(i).MotherMomentum().at(3);
+		//make a tvector to fit into the mass
+      TVector3 v1;	
+      TVector3 m1;	
+      v1.SetX(mc_shower->at(i).DaughterMomentum().at(0)/mc_shower->at(i).DaughterMomentum().at(3));       
+      v1.SetY(mc_shower->at(i).DaughterMomentum().at(1)/mc_shower->at(i).DaughterMomentum().at(3));       
+      v1.SetZ(mc_shower->at(i).DaughterMomentum().at(2)/mc_shower->at(i).DaughterMomentum().at(3));       
+      m1.SetX(mc_shower->at(i).MotherMomentum().at(0)/mc_shower->at(i).MotherMomentum().at(3));       
+      m1.SetY(mc_shower->at(i).MotherMomentum().at(1)/mc_shower->at(i).MotherMomentum().at(3));       
+      m1.SetZ(mc_shower->at(i).MotherMomentum().at(2)/mc_shower->at(i).MotherMomentum().at(3));       
+      mcs_Daughter_direction.at(i) = v1;
+      mcs_Mother_direction.at(i) = m1;
+
+	}// loop over the mc_shower
+
+	MC_E1E2DotProd  = acos(mcs_Daughter_direction.at(0)*mcs_Daughter_direction.at(1));
+	MC_Mother_E1E2DotProd  = acos(mcs_Mother_direction.at(0)*mcs_Mother_direction.at(1));
+        //Calculate theta and phi from directionality of momenta
+        theta_d1 = asin( mcs_Daughter_direction.at(0).Y()  );
+        phi_d1 = asin( mcs_Daughter_direction.at(0).X() / cos (theta_d1) ) ;
+
+        theta_d2 = asin( mcs_Daughter_direction.at(1).Y()  );
+        phi_d2 = asin( mcs_Daughter_direction.at(1).X() / cos (theta_d2) ) ;
+
+	MC_E_1 = mc_shower->at(0).DaughterMomentum().at(3);
+	MC_E_2 = mc_shower->at(1).DaughterMomentum().at(3);
+	MC_Mother_E_1 = mc_shower->at(0).MotherMomentum().at(3);
+	MC_Mother_E_2 = mc_shower->at(1).MotherMomentum().at(3);
+
+
+
+	}// 
+		
+     if(_ana_tree) _ana_tree->Fill();
+       
  
 
 
@@ -260,116 +273,6 @@ std::vector<float> mcs_mother_energy(mc_shower->size(),0);
     return true;
   }
 
-  void ComputePi0Mass_RG::ComputeEnergyCorrection(storage_manager* storage)
-  {
-    
-    auto geo  = ::larutil::Geometry::GetME();
-    auto detp = ::larutil::DetectorProperties::GetME();
-
-    // Get data products from storage
-    auto mcshower_v = (event_mcshower* )( storage->get_data(DATA::MCShower) );
-    auto shower_v   = (event_shower*   )( storage->get_data(DATA::Shower)   );
-    auto cluster_v  = (event_cluster*  )( storage->get_data(DATA::Cluster)  );
-    auto hit_v      = (event_hit*      )( storage->get_data(DATA::GausHit)  );
-    
-    // Check data exists
-    if( !mcshower_v || !shower_v || !cluster_v || !hit_v) {
-      std::cerr<<"Missing some data! not doing anything..."<<std::endl;
-      return;
-    }
-
-    // Here, we assume there is only 1 MCShower exists in an event
-    // because otherwise we have to think about which MCShower possibly corresponds to 
-    // a given reconstructed shower.
-    //if( mcshower_v->size() != 1) {
-    //std::cerr<<Form("Found %zu MCShower! (>1) Ignore this event... ",mcshower_v->size())<<std::endl;
-    //return;
-    //}
-
-    //
-    // Use LArLight's version of BackTracker
-    //
-    if(!fBTAlg.Prepare(storage)) return;
-
-    std::vector<double> mcs_mother_energy(mcshower_v->size(),0);
-    std::vector<double> mcs_daughter_energy(mcshower_v->size(),0);
-    std::vector<double> mcs_deposit_charge(mcshower_v->size(),0);
-    std::vector<double> mcs_detected_charge(mcshower_v->size(),0);
-    for(size_t i=0; i<mcshower_v->size(); ++i) {
-      
-      mcs_mother_energy.at(i) = mcshower_v->at(i).MotherMomentum().at(3)*1.e3;
-      mcs_daughter_energy.at(i) = mcshower_v->at(i).DaughterMomentum().at(3);
-      mcs_deposit_charge.at(i)  = mcshower_v->at(i).Charge(GEO::View_t(2));
-      
-    }
-
-    std::vector<std::vector<double> > shower_mcq_per_mcs;
-    shower_mcq_per_mcs.reserve(shower_v->size());
-    std::vector<double> shower_mcq_total;
-    shower_mcq_total.reserve(shower_v->size());
-
-    for(auto const& reco_shower : *shower_v) {
-      
-      auto& cluster_index = reco_shower.association(DATA::Cluster);
-
-      std::vector<double> cluster_mcq_per_mcs(mcshower_v->size(),0);
-
-      // Loop over associated clusters to fill mc/reco charge info 
-      for(auto const& c_index : cluster_index) {
-
-	auto& hit_index = cluster_v->at(c_index).association(DATA::GausHit);
-	UChar_t plane = geo->ChannelToPlane(hit_v->at(hit_index.at(0)).Channel());
-	if(plane != 2) continue;
-
-	std::vector<const larlight::hit*> hits;
-	hits.reserve(hit_index.size());
-	for(auto const& h_index : hit_index)
-	  hits.push_back(&(hit_v->at(h_index)));
-	//recoq.at(plane) += hit_v->at(h_index).Charge(true);
-
-	auto const& recoq_per_mcs = fBTAlg.MCShowerQ(hits);
-	double mcq_sum = 0;
-	for(size_t i=0; i<recoq_per_mcs.size(); ++i) {
-	  mcs_detected_charge.at(i) += recoq_per_mcs.at(i) * detp->ElectronsToADC();
-	  cluster_mcq_per_mcs.at(i)     = recoq_per_mcs.at(i) * detp->ElectronsToADC();
-	  mcq_sum += recoq_per_mcs.at(i) * detp->ElectronsToADC();
-	}
-	shower_mcq_total.push_back(mcq_sum);
-	shower_mcq_per_mcs.push_back(cluster_mcq_per_mcs);
-      }
-    }
-
-    std::vector<double> fQCorrPerMCS(mcshower_v->size(),0);
-    for(size_t i=0; i<fQCorrPerMCS.size(); ++i) 
-
-      fQCorrPerMCS.at(i) = mcs_deposit_charge.at(i) / mcs_detected_charge.at(i);
-
-    fEnergyCorr_MomToDaughter.resize(shower_v->size(),1);
-    fElectronCorr_DepToDet.resize(shower_v->size(),1);
-    //fChargeCorr_DetToPeak.resize(ev_shower->size(),1);
-
-    // Loop over shower
-    for(size_t i=0; i<shower_mcq_per_mcs.size(); ++i) {
-
-      double electron_factor = 0;
-      double energy_factor   = 0;
-      // Loop over MCShower
-      for(size_t j=0; j<shower_mcq_per_mcs.at(i).size(); ++j) {
-	
-	electron_factor += shower_mcq_per_mcs.at(i).at(j) / shower_mcq_total.at(i) * fQCorrPerMCS.at(j);
-	energy_factor += shower_mcq_per_mcs.at(i).at(j) / shower_mcq_total.at(i) * mcs_mother_energy.at(j) / mcs_daughter_energy.at(j);
-	
-      }
-      /*
-      std::cout<<electron_factor<<std::endl;
-      std::cout<<energy_factor<<std::endl;
-      */
-      fElectronCorr_DepToDet.at(i) = electron_factor;
-      fEnergyCorr_MomToDaughter.at(i) = energy_factor;
-    }
-    
-    
-  }
 
   bool ComputePi0Mass_RG::finalize() {
 
@@ -389,10 +292,12 @@ std::vector<float> mcs_mother_energy(mc_shower->size(),0);
       hPi0MassPeakdosanglecut->Write();
 
 
-
-
       hEnergyCorr_MomToDaughter->Write();
       hElectronCorr_DepToDet->Write();
+
+	//Write the tree
+    _ana_tree->Write();
+
 
       delete hPi0MassPeak;
       delete hEnergyCorr_MomToDaughter;
@@ -404,6 +309,28 @@ std::vector<float> mcs_mother_energy(mc_shower->size(),0);
   
     return true;
   }
+
+void ComputePi0Mass_RG::MakeTTree() {
+
+    if(!_ana_tree) {
+      _ana_tree = new TTree("ana_tree","");
+
+          _ana_tree->Branch("E1",&E_1,"E_1/D");
+          _ana_tree->Branch("E2",&E_2,"E_2/D");
+          _ana_tree->Branch("DotProd",&E1E2DotProd,"E1E2DotProd/D");
+          _ana_tree->Branch("theta_d1",&theta_d1,"theta_d1/D");
+          _ana_tree->Branch("phi_d1",&phi_d1,"phi_d1/D");
+          _ana_tree->Branch("theta_d2",&theta_d2,"theta_d2/D");
+          _ana_tree->Branch("phi_d2",&phi_d2,"phi_d2/D");
+          _ana_tree->Branch("MC_E_1",&MC_E_1,"MC_E_1/D");
+          _ana_tree->Branch("MC_E_2",&MC_E_2,"MC_E_2/D");
+          _ana_tree->Branch("MC_Mother_E_1",&MC_Mother_E_1,"MC_Mother_E_1/D");
+          _ana_tree->Branch("MC_Mother_E_2",&MC_Mother_E_2,"MC_Mother_E_2/D");
+          _ana_tree->Branch("MCDotProd",&MC_E1E2DotProd,"MC_E1E2DotProd/D");
+          _ana_tree->Branch("MCMotherDotProd",&MC_Mother_E1E2DotProd,"MC_Mother_E1E2DotProd/D");
+}
+
+}// make the TTree
 
 
   //Get PI0 Mass from photon directions and energy
@@ -424,6 +351,8 @@ std::vector<float> mcs_mother_energy(mc_shower->size(),0);
 	
 	return dos;
 	}// end of function for Pi0CosCM
+
  
 }
 #endif
+

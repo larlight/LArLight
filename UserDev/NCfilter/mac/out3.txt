@@ -1,0 +1,43 @@
+
+Finished configuring ana_processor. Start event loop!
+
+[95m    [NORMAL]  [0m[95m<open> [0mOpening a file in READ mode: ../../../MCFiles/pdg_111/MCData/all_Cluster.root
+[95m    [NORMAL]  [0m[95m<open> [0mOpening a file in WRITE mode: out.root
+[95m    [NORMAL]  [0m[95m<run> [0mProcessing 10000 events from entry 0...
+[95m    [NORMAL]  [0m[95m<LoadData> [0mLoading data for Geometry...
+     file=/home/ryan/LArLight/core/LArUtil/dat/larutil_microboone.root 
+[93m   [WARNING]  [0m[95m<get_data> [0mRequested tree ryancluster_tree which does not exists yet. Created a new one.
+[95m    [NORMAL]  [0m[95m<LoadData> [0mLoading data for DetectorProperties...
+     file=/home/ryan/LArLight/core/LArUtil/dat/larutil_microboone.root 
+[95m    [NORMAL]  [0m[95m<LoadData> [0mLoading data for LArProperties...
+     file=/home/ryan/LArLight/core/LArUtil/dat/larutil_microboone.root 
+Size of all the best clusters49 , 12618 , 13329 , 151
+ProtoVertex:
+		 -999 , -999
+		 555.97 , 231.683
+		 989.892 , 67.319
+ 
+
+
+
+Size of all the best clusters119 , 4872 , 42166 , 22
+ProtoVertex:
+		 486.908 , 212.615
+		 335.633 , 173.667
+		 671.281 , 222.803
+ 
+
+
+
+Size of all the best clusters42 , 4427 , 8937 , 57
+ProtoVertex:
+		 -999 , -999
+		 646.585 , 200.566
+		 936.248 , 198.028
+ 
+
+
+
+Size of all the best clusters151 , 114180 , 66236 , 109
+Trying Fuzzy
+Reseting hits

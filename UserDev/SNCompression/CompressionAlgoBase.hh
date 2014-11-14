@@ -19,9 +19,7 @@ namespace compress {
 
   /**
      \class CMAlgoBase
-     An abstract base class for merging/mathcing algorithm. Having this base class helps
-     to have a better overall design of various merging for iterative approach.
-     The algorithms are run through CMergeManager.
+     ...
   */
   class CompressionAlgoBase {
     
@@ -64,6 +62,7 @@ namespace compress {
 
     /// Vector of output waveforms to be returned
     std::vector<std::vector<unsigned short> > _OutWF;
+    /// Vector of start-tick values for the output waveforms -> allows to get timing information when saving a new waveform
     std::vector<int> _OutWFStartTick;
 
   };

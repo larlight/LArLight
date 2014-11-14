@@ -1,0 +1,506 @@
+#ifndef NCFILTER_CC
+#define NCFILTER_CC
+
+#include "NCfilter.hh"
+#include "ClusterParamsAlg.hh"
+#include "LArUtilBase.hh"
+
+
+namespace larlight {
+
+  bool NCfilter::initialize() {
+
+    //
+    // This function is called in the beggining of event loop
+    // Do all variable initialization you wish to do here.
+    // If you have a histogram to fill in the event loop, for example,
+    // here is a good place to create one on the heap (i.e. "new TH1D"). 
+    //
+    return true;
+  }
+  
+  bool NCfilter::analyze(storage_manager* storage) {
+        
+    // grab the incoming clusters. 
+    auto Incoming_cluster = (const event_cluster*)(storage->get_data(DATA::DBCluster));
+    //auto Incoming_cluster = (const event_cluster*)(storage->get_data(DATA::FuzzyCluster));
+    //auto Incoming_cluster = (const event_cluster*)(storage->get_data(DATA::CrawlerCluster));
+    auto const& hit_type = Incoming_cluster->get_hit_type();
+    auto hits = (const event_hit*)(storage->get_data(hit_type));
+    
+    if(!hits || !Incoming_cluster) {
+      print(MSG::ERROR,__FUNCTION__,"No DBCluster or associated hits found!");
+      throw std::exception();
+      return false;}
+
+    // First of all create an output
+    auto Output_cluster = (event_cluster*)(storage->get_data(DATA::RyanCluster));
+    
+    // set event variables
+    if(Output_cluster->size())
+    		print(MSG::WARNING,__FUNCTION__,"DATA::RyanCluster is not empty. Clearing it...");
+    Output_cluster->clear_data();
+    Output_cluster->set_event_id(Incoming_cluster->event_id());
+    Output_cluster->set_run(Incoming_cluster->run());
+    Output_cluster->set_subrun(Incoming_cluster->subrun());
+
+    if(!(Incoming_cluster->size())){
+      print(MSG::WARNING,__FUNCTION__,Form("Event %d has no DBCluster...",Incoming_cluster->event_id()));
+      return true;}
+
+    else if(!(hits->size())){
+      print(MSG::ERROR,__FUNCTION__,Form("Event %d has no hits (but there's DBCluster!!!)",Incoming_cluster->event_id()));
+      return false;}
+
+    // Need some bool to check about the quality of the protoclusters
+    unsigned int nplanes = larutil::Geometry::GetME()->Nplanes();
+    // This is what the final clusters will be 
+    std::vector<std::pair<std::vector<unsigned int>,std::vector<unsigned int>>> BestClusters(nplanes);
+    // These bools are used to stop when we have a good match and good cluster
+    std::vector<bool> FlagGoodPlanes(nplanes,false);
+    
+
+//============Starting with  first pass alg============
+	// make a vector of clusters
+	std::vector<std::pair<double,double>> AvgPairSI(nplanes);	
+	std::vector<larlight::cluster> clustervect;
+	std::vector<larlight::hit> hitsvect;
+	for(auto const& c : *Incoming_cluster) clustervect.push_back(c);
+	for(auto const& h : *hits) hitsvect.push_back(h);
+	AvgPairSI = fDivReg.SplitLineC(clustervect, hitsvect);
+//====================Ending with alg===================
+
+	
+
+//=======================
+//=== make the regions===
+//=======================
+	// This is making the first set of regions that will be tested
+   std::vector<std::pair<std::vector<unsigned int>,std::vector<unsigned int>>> FirstRegions = fForceRegions.ForceTwoRegions(hitsvect,AvgPairSI);
+//=======================
+
+//=======================
+//=== Check Bools========
+//=======================
+	// do the time prof test...
+	std::vector<bool> QualFirst = fPlaneCheckMatch.PlaneCheck( FirstRegions, hits);
+	//~~~~~~~~~~~^^~~~~~~~~~~~~~ The output is a vector with relations Q01,Q02,Q12
+		std::vector<bool> flip(3,false);
+		if(QualFirst[0]) {FlagGoodPlanes[0] = true; FlagGoodPlanes[1] = true;}
+		if(QualFirst[1]) {FlagGoodPlanes[0] = true; FlagGoodPlanes[2] = true;}
+		if(QualFirst[2]) {FlagGoodPlanes[1] = true; FlagGoodPlanes[2] = true;}
+	// also fill in a check for the protovertex
+
+//==============================================
+// Check to see what we need to do next.
+// Should we try another alg or keep theses? 
+//==============================================
+		for(unsigned int a = 0 ;a < nplanes;a++){
+			 if(!FlagGoodPlanes[a]) flip[a]= true;
+ 			 // If the plane bools are NOT TRUE  Then turn on the flip bool for that plane
+			 if(FlagGoodPlanes[a]) BestClusters[a]= FirstRegions[a];
+ 			 // If the plane bools are true then fill into the final cluster.. BestClusters[a]
+		}// for loop over all the planes
+
+
+// check the rough vertex
+	std::vector<std::pair<double,double>> RoughVertex =fQuality.ProtoVertexCW(FirstRegions,hits);
+	
+//-----------------------------------------------------------------------------------------------------------------------------------
+//-------------- DONE WITH ALG PASS... MOVING ON-------------------------------------------------------------------------------------
+//-----------------------------------------------------------------------------------------------------------------------------------
+
+//====================================================
+//@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+//============Starting with  flip pass alg============
+//@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+//====================================================
+// if not all the plane bools are true then do some more work
+for( unsigned int i = 0 ; i<flip.size();i++)
+{
+	if(flip[i]){
+		std::vector<std::pair<double, double> > FlipAvgPairSI = fDivReg.FlipLineC(clustervect, hitsvect);
+   		std::vector<std::pair<std::vector<unsigned int>,std::vector<unsigned int>>> FlipRegions = fForceRegions.ForceTwoFlipRegions(hitsvect, FlipAvgPairSI);
+	// This being in the if will prevent overwriting the stuff that is already good.
+		BestClusters[i] = FlipRegions[i];
+	}// end of if flip[i]
+}// for loop over all the flip stuff
+//=======================
+//=== Check Bools========
+//=======================
+	// do the time prof test...
+	std::vector<bool> QualFlip = fPlaneCheckMatch.PlaneCheck(BestClusters, hits);
+///---------------------------------------------------------------------------------
+// Check to see what we need to do next after the Rotate. Should we try another alg or keep theses? 
+//---------------------------------------------------------------------------------
+		std::vector<bool> RotateAlg(3,false);
+                if(QualFlip[0]) {FlagGoodPlanes[0] = true; FlagGoodPlanes[1] = true;}
+                if(QualFlip[1]) {FlagGoodPlanes[0] = true; FlagGoodPlanes[2] = true;}
+                if(QualFlip[2]) {FlagGoodPlanes[1] = true; FlagGoodPlanes[2] = true;}
+        	for(unsigned int a = 0 ;a < nplanes;a++){
+			 if(!FlagGoodPlanes[a]) RotateAlg[a]= true;
+		}// loop over the planes	
+
+	std::vector<std::pair<double,double>> RoughFlipVertex =fQuality.ProtoVertexCW(BestClusters,hits);
+
+
+
+
+
+
+//-----------------------------------------------------------------------------------------------------------------------------------
+//-------------- DONE WITH ALG PASS... MOVING ON-------------------------------------------------------------------------------------
+//-----------------------------------------------------------------------------------------------------------------------------------
+
+
+
+
+
+//====================================================
+//@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+//============Starting with  Rotate alg===============
+//@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+//====================================================
+for( unsigned int angle = 0 ; angle < 360; angle+=20){
+// if not all the plane bools are true then do some more work
+for( unsigned int i = 0 ; i<RotateAlg.size();i++)
+{
+	// This is not that efficient... I am doing the loop a few time... RG Come back and clean up
+	if(RotateAlg[i]){
+	std::vector<std::pair<double, double> > RotateAvgPairSI = fDivReg.RotateLineC(clustervect, hitsvect);
+   	std::vector<std::pair<std::vector<unsigned int>,std::vector<unsigned int>>>  RotateRegions = fForceRegions.ForceTwoRotateRegions(hitsvect, RotateAvgPairSI, angle);
+	// This being in the if will prevent overwriting the stuff that is already good.
+		BestClusters[i] = RotateRegions[i];
+	}// end of if Rotate[i]
+}// for loop over all the Rotate stuff
+//====================Ending with alg===================
+
+//=======================
+//=== Check Bools========
+//=== for Rotation ======
+//=======================
+	// do the time prof test...
+	std::vector<bool> QualRot = fPlaneCheckMatch.PlaneCheck(BestClusters, hits);
+///---------------------------------------------------------------------------------
+// Check to see what we need to do next after the Rotate. Should we try another alg or keep theses? 
+//---------------------------------------------------------------------------------
+		std::vector<bool> RotateAlg(3,false);
+                if(QualRot[0]) {FlagGoodPlanes[0] = true; FlagGoodPlanes[1] = true;}
+                if(QualRot[1]) {FlagGoodPlanes[0] = true; FlagGoodPlanes[2] = true;}
+                if(QualRot[2]) {FlagGoodPlanes[1] = true; FlagGoodPlanes[2] = true;}
+        	for(unsigned int a = 0 ;a < nplanes;a++) if(!FlagGoodPlanes[a]) RotateAlg[a]= true;
+
+	std::vector<std::pair<double,double>> RoughRotVertex =fQuality.ProtoVertexCW(BestClusters,hits);
+
+	if(FlagGoodPlanes[0] && FlagGoodPlanes[1] && FlagGoodPlanes[2]) break;
+}// For loop over the angle 
+
+
+
+
+
+
+
+
+
+//===================================================================
+//====== THIS IS THE END OF ALL THE ALGS ============================
+//===================================================================
+//---------------------------------------------------------------------------------
+//		std::cout<<"\t Status of Good Planes at End : "<<FlagGoodPlanes[0]<<FlagGoodPlanes[1]<<FlagGoodPlanes[2]<<std::endl;
+	// if we just have one plane..... take the next best thing... This will have to be the last step
+//---------------------------------------------------------------------------------
+
+//$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+	// Starting to do some unmerging
+//==================================
+//=== Try to unmerge some things ===
+//==================================
+	
+    double T2CM = larutil::GeometryUtilities::GetME()->TimeToCm();
+    double W2CM = larutil::GeometryUtilities::GetME()->WireToCm();
+
+//    std::vector<std::pair<double,double>> PVertex =fQuality.ProtoVertexCW(BestClusters,hits);
+	for(unsigned int a = 0 ; a< 3 ; a++){
+		// if this is a good plane there are clusters in it
+		if(FlagGoodPlanes[a]){
+		// now we need to sort these vectors and only look at some hits that are closest to the protovertex
+		std::vector<std::pair<unsigned int,double>> hits_distance;
+		std::vector<unsigned int> inspecting_cluster;
+		std::vector<unsigned int> looping_cluster;
+		std::vector<unsigned int> transfer_hits_cluster;
+		bool switchstartbool = false;
+		// making the looping cluster be the larger cluster
+		// the inspecting clutser is going to be the smaller one to start
+		if(switchstartbool ==false){		
+		if(BestClusters[a].first.size()<BestClusters[a].second.size()){ 
+			inspecting_cluster = BestClusters[a].first;
+			looping_cluster = BestClusters[a].second;}
+		if(BestClusters[a].first.size()>BestClusters[a].second.size()){
+			inspecting_cluster = BestClusters[a].second; 
+			looping_cluster = BestClusters[a].first;}
+		}
+	
+	// start the switch loop here
+		trans_restart:
+		if(switchstartbool ==true){		
+	std::cout<<" SWITCH RESTART"<<std::endl;
+		hits_distance.clear();
+		inspecting_cluster.clear();
+		looping_cluster.clear();
+		transfer_hits_cluster.clear();
+		if(BestClusters[a].first.size()<BestClusters[a].second.size()){ 
+			inspecting_cluster = BestClusters[a].second;
+			looping_cluster = BestClusters[a].first;}
+		if(BestClusters[a].first.size()>BestClusters[a].second.size()){
+			inspecting_cluster = BestClusters[a].first; 
+			looping_cluster = BestClusters[a].second;}
+		}
+
+	// make a the vector for the inspecting cluster
+	// This will need to be sorted and starting with hits closest to the PV
+     std::vector<std::pair<double,double>> PVertex = fQuality.ProtoVertexCW(BestClusters,hits);
+      for(unsigned int i = 0 ; i<inspecting_cluster.size(); i++){
+	double wire = hitsvect[inspecting_cluster[i]].Wire()*W2CM -PVertex[a].first*W2CM;	
+	double time = hitsvect[inspecting_cluster[i]].PeakTime()*T2CM-PVertex[a].second*T2CM;
+	double tempdist = sqrt(wire*wire + time*time);
+	std::pair<unsigned int,double> temppair(inspecting_cluster[i],tempdist);
+	 hits_distance.push_back(temppair);
+	}// closing the for loop over inspecting_cluster
+	// now sort the list based on distance
+		sort(hits_distance.begin(),hits_distance.end(),
+		[]( const std::pair<unsigned int, double> &p1, const std::pair<unsigned int, double> &p2 )
+		{
+                   return ( p1.second < p2.second || 
+                          ( !( p2.second < p1.second ) && p1.first < p2.first ) );
+		});
+
+	// doing this the slow way for now
+	startloop:
+	for(unsigned int b =0 ; b<hits_distance.size(); b++){
+		// 
+		for(unsigned int j =0 ; j<looping_cluster.size(); j++){
+		// calculate the distance between the two hits
+		double deltawire = hitsvect[hits_distance[b].first].Wire()*W2CM - hitsvect[looping_cluster[j]].Wire()*W2CM;
+		double deltatime = hitsvect[hits_distance[b].first].PeakTime()*T2CM - hitsvect[looping_cluster[j]].PeakTime()*T2CM;
+		double prox = sqrt( deltawire*deltawire + deltatime*deltatime );
+		// needs to be globally defined _
+			if(prox<radius_of_interest)
+			{
+			// this means that the hit in the looping cluster is close to the hit that we are inspecting	
+			// now we need to add this to the inspecting cluster and remove it from the looping cluster
+			// the question will be where to insert it into the the hits_distance list. 
+			// this should also preserve the hit to being close to the protovertex
+			double loop_hit_dist = sqrt( pow( hitsvect[looping_cluster[j]].Wire()*W2CM-PVertex[a].first*W2CM,2) +pow( hitsvect[looping_cluster[j]].PeakTime()*T2CM-PVertex[a].second*T2CM,2));
+
+				if(loop_hit_dist<hits_distance[b].second){ 
+					std::pair<unsigned int, double> insertingpair(looping_cluster[j],loop_hit_dist);
+					hits_distance.insert(hits_distance.begin()+b,insertingpair);
+					// this can be a push_back because order is not important at point because we are moving it for sure
+					// RG is this true ? 
+					inspecting_cluster.push_back(looping_cluster[j]);
+					transfer_hits_cluster.push_back(looping_cluster[j]);
+					// need to add it to inspecting cluster too
+					// remove it from looping cluster
+					looping_cluster.erase(looping_cluster.begin()+j);
+					goto startloop;}
+
+				else if(loop_hit_dist>hits_distance[b].second){
+					std::pair<unsigned int, double> insertingpair(looping_cluster[j],loop_hit_dist);
+					hits_distance.insert(hits_distance.begin()+b+1,insertingpair);
+					// this can be a push_back because order is not important at point because we are moving it for sure
+					// RG is this true ? 
+					inspecting_cluster.push_back(looping_cluster[j]);
+					transfer_hits_cluster.push_back(looping_cluster[j]);
+					// need to add it to inspecting cluster too
+					// remove it from looping cluster
+					looping_cluster.erase(looping_cluster.begin()+j);
+					goto startloop;}
+			// the distances are double so they should not really ever get the same value	
+			
+			}// if prox < radius
+		
+		}// for loop over loopingcluster
+
+	}
+
+	std::cout<< " Current plane :" << a <<std::endl;
+	std::cout<< "Transfer Hits cluster size() "<< transfer_hits_cluster.size()<<std::endl;
+//============================
+	// now lets see what we can do before we fill this... 
+	
+	// first address the case of if the cluster size() is pretty big ~ >25  
+	// see if slope/angle is closer to inspecting or looping 
+	// we want it to be closer to inspecting. 
+	// if it is closer to looping then we might want to do things the other way 
+
+	// what are we going to need
+	// get the value of angle the transfer cluster
+	
+	// This needs to be algo-abstract
+	if(switchstartbool==false)	
+	{
+	double transfer_check_size = 50;
+	if(transfer_hits_cluster.size()>=transfer_check_size){
+	// find the angle of the cluster
+        std::pair<double,double> transfer_slope_cept = fLookBack.CWAngle(transfer_hits_cluster,hitsvect);
+        double transfer_slope = transfer_slope_cept.first;
+        std::pair<double,double> inspecting_slope_cept = fLookBack.CWAngle(inspecting_cluster,hitsvect);
+        double inspecting_slope = inspecting_slope_cept.first;
+        std::pair<double,double> looping_slope_cept = fLookBack.CWAngle(looping_cluster,hitsvect);
+        double looping_slope = looping_slope_cept.first;
+
+	std::cout<<" This is the angle of the transfer cluster : " << atan(transfer_slope) * 180/ PI<< std::endl;
+	std::cout<<" This is the angle of the inspecting cluster : " << atan(inspecting_slope) * 180/ PI<< std::endl;
+	std::cout<<" This is the angle of the looping cluster : " << atan(looping_slope) * 180/ PI<< std::endl;
+	
+	double delta_trans_loop = fabs(atan(transfer_slope) - atan(looping_slope));
+	double delta_trans_inspect = fabs(atan(transfer_slope) - atan(inspecting_slope));
+	
+	if( delta_trans_loop < delta_trans_inspect) 
+	{
+	// this means that the transfered hits slope are more similar to the loop cluster
+	// so we would not want to tranfer these to the inspecting cluster 
+	// so go back and try again starting with the opposite conditions 
+	switchstartbool= true;
+	goto trans_restart;
+	}// if tranfer hits.size > check size
+
+	}// if hits are big enough
+	}// if the switch bool is false
+
+
+//================================
+
+	BestClusters[a].first = looping_cluster;
+	BestClusters[a].second = inspecting_cluster;
+
+			
+		}// if flag good planes
+
+	}// for loop over all the planes
+
+//$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+std::cout<< " \n\n\n"<<std::endl;
+//===================================================================
+//=======Lets fill these hits out into clusters.===================== 
+//===================================================================
+    for( unsigned int a=0 ; a<BestClusters.size();a++){
+	// need a check to see if we did well or not
+	if(FlagGoodPlanes[a]){
+      ::larlight::cluster lite_cluster;
+      std::vector<unsigned int> hit_ass;
+      // Skip if there's no hit
+      if(!(BestClusters[a].first.size()) || !(BestClusters[a].second.size())) continue;
+
+      //
+      // Save clusters
+      //
+
+      // Clear data products
+      hit_ass.clear();
+      hit_ass.reserve(BestClusters[a].first.size());
+      lite_cluster.clear_data();
+
+      // Make association
+      for( auto const& hit : BestClusters[a].first) hit_ass.push_back(hit);
+
+      // Add association
+      lite_cluster.add_association(hit_type,hit_ass);
+
+      // Set cluster ID
+      lite_cluster.set_id(Output_cluster->size());
+
+      // Set cluster view
+      lite_cluster.set_view(hits->at(hit_ass.at(0)).View());
+
+      // Add a cluster to the output
+      Output_cluster->push_back(lite_cluster);
+
+      // Clear data products
+      hit_ass.clear();
+      hit_ass.reserve(BestClusters[a].second.size());
+      lite_cluster.clear_data();
+
+      // Make association
+      for( auto const& hit : BestClusters[a].second) hit_ass.push_back(hit);
+
+      // Add association
+      lite_cluster.add_association(hit_type,hit_ass);
+
+      // Set cluster ID
+      lite_cluster.set_id(Output_cluster->size());
+
+      // Set cluster view
+      lite_cluster.set_view(hits->at(hit_ass.at(0)).View());
+
+      // Add a cluster to the output
+      Output_cluster->push_back(lite_cluster);
+
+	}// if FLagGoodPlanes[a]
+    }// loop over Best Clusters
+
+    return true;
+  }
+
+  bool NCfilter::finalize() {
+
+    // This function is called at the end of event loop.
+    // Do all variable finalization you wish to do here.
+    // If you need, you can store your ROOT class instance in the output
+    // file. You have an access to the output file through "_fout" pointer.
+    //
+    // Say you made a histogram pointer h1 to store. You can do this:
+    //
+    // if(_fout) { _fout->cd(); h1->Write(); }
+    //
+    // else 
+    //   print(MSG::ERROR,__FUNCTION__,"Did not find an output file pointer!!! File not opened?");
+    //
+  
+    return true;
+  }
+
+//---------------------
+// Adding some fuctions 
+//---------------------
+
+  //---------------------------------------------------------------------------------------------
+
+/*
+std::vector<std::pair<std::vector<unsigned int>,std::vector<unsigned int>>>  NCfilter::CheckQuality(larlight::event_hit *const hits,std::vector<std::pair<std::vector<unsigned int>,std::vector<unsigned int>>> protocluster, std::vector<bool> Flags){
+
+
+        // First Check based on bool.... if there is already a bool? Might not need this in here... Should do it in the code to fill clusters
+	fucnflag0= false;
+	fucnflag1= false;
+	fucnflag2= false;
+	
+	
+
+        // Checking the time profile
+        for( unsigned int a=0 ; a<protocluster.size();a++){
+
+
+                for(unsigned int k =0 ; k<protocluster[a].first.size(); k++){
+
+
+                                }// protocluster for loop over a first cluster  
+
+                }// for loop over protocluster
+
+
+	}// End of Check Quality Func
+
+*/
+
+
+
+
+
+
+
+
+
+}
+#endif

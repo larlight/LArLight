@@ -75,12 +75,12 @@ for x in xrange(len(length_cuts)):
 
         hEC_Fid_vs_Length.SetBinContent(y,x,my_ec*my_eff)
 
-for x in xrange(len(fid_cuts)):
-
-    print fid_cuts[x], fid_eff[x], fid_ec[x],'...',fid_eff[x]*fid_ec[x]
-    print fid_eff_error[x]
-
-print
+#for x in xrange(len(fid_cuts)):
+#
+#    print fid_cuts[x], fid_eff[x], fid_ec[x],'...',fid_eff[x]*fid_ec[x]
+#    print fid_eff_error[x]
+#
+#print
 
 fid_ec_xvalues = array.array('d', fid_cuts)
 fid_ec_yvalues = array.array('d', fid_ec)

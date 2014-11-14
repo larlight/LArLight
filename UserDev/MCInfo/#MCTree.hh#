@@ -1,0 +1,38 @@
+/**
+ * \file MCTree.hh
+ *
+ * \ingroup MCInfo
+ * 
+ * \brief Class def header for a class MCTree
+ *
+ * @author David Caratelli
+ */
+
+/** \addtogroup MCInfo
+
+    @{*/
+#ifndef MCTREE_HH
+#define MCTREE_HH
+
+#include <iostream>
+
+/**
+   \class MCTree
+   User defined class MCTree ... these comments are used to generate
+   doxygen documentation!
+ */
+class MCTree{
+
+public:
+
+  /// Default constructor
+  MCTree(){};
+
+  /// Default destructor
+  virtual ~MCTree(){};
+
+};
+
+#endif
+/** @} */ // end of doxygen group 
+

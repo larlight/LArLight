@@ -84,6 +84,8 @@ namespace larlight {
 	double mother1_E ;
 	double mother2_E ;
 
+	double _daugh1_E ;
+
 	double _vertex_X ;
 	double _vertex_Y ;
 	double _vertex_Z ;

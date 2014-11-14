@@ -76,8 +76,7 @@ namespace larlight{
       FeatureEndPoint2D,  ///< EndPoint2D from Feature Vertex Finder
       HarrisEndPoint2D,   ///< EndPoint2D from Harris Vertex Finder 
       Calorimetry,        ///< Calorimetry
-      UserInfo,           ///< dynamic data container ... this must be the last valid enum element
-
+      UserInfo,           ///< dynamic data container 
       /*
 	Following enums are LArLight original except FIFOChannel which
 	is meant to be compatible with LArSoft FIFOChannel
@@ -91,6 +90,10 @@ namespace larlight{
       TPCPulse_ThresWin,  ///< reconstructed event_pulse for TPC waveform
       TPCPulse_FixedWin,  ///< reconstructed event_pulse for TPC waveform
       Trigger,            ///< Trigger data
+
+      CosmicTag,          ///< anab::CosmicTag 
+      OpHit,              ///< opdet::OpHit
+      OpFlash,            ///< opdet::OpFlash
 
       DATA_TYPE_MAX
     };
@@ -144,7 +147,10 @@ namespace larlight{
       "pmt_fixedwin",
       "tpc_threswin",
       "tpc_fixedwin",
-      "trigger"
+      "trigger",
+      "cosmictag",
+      "ophit",
+      "opflash"
     };
     
   }

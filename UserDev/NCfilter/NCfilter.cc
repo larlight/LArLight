@@ -16,27 +16,64 @@ namespace larlight {
     // If you have a histogram to fill in the event loop, for example,
     // here is a good place to create one on the heap (i.e. "new TH1D"). 
     //
-
-
     return true;
   }
   
   bool NCfilter::analyze(storage_manager* storage) {
+// This can go in the header when cleaning up;
+    // Need some bool to check about the quality of the protoclusters
+    unsigned int nplanes = larutil::Geometry::GetME()->Nplanes();
         
+	bool TryFuzzyCluster = false;	
+    // This is what the final clusters will be 
+    std::vector<std::pair<std::vector<unsigned int>,std::vector<unsigned int>>> BestClusters(nplanes);
+    // These bools are used to stop when we have a good match and good cluster
+    std::vector<bool> FlagGoodPlanes(nplanes,false);
+	std::vector<std::pair<double,double>> AvgPairSI(nplanes);	
+	std::vector<larlight::cluster> clustervect;
+	std::vector<larlight::hit> hitsvect;
+	std::vector<bool> QualFlip;
+
+
+
+
+
+
     // grab the incoming clusters. 
-    auto Incoming_cluster = (const event_cluster*)(storage->get_data(DATA::DBCluster));
+    //auto Incoming_cluster = (const event_cluster*)(storage->get_data(DATA::DBCluster));
+    auto Incoming_cluster = ( event_cluster*)(storage->get_data(DATA::DBCluster));
     //auto Incoming_cluster = (const event_cluster*)(storage->get_data(DATA::FuzzyCluster));
     //auto Incoming_cluster = (const event_cluster*)(storage->get_data(DATA::CrawlerCluster));
     auto const& hit_type = Incoming_cluster->get_hit_type();
     auto hits = (const event_hit*)(storage->get_data(hit_type));
-    
+    // First of all create an output
+    auto Output_cluster = (event_cluster*)(storage->get_data(DATA::RyanCluster));
+
+	TryFuzzy:
+	if(TryFuzzyCluster){
+	// This is fine... really....
+	Incoming_cluster = (event_cluster*)(storage->get_data(DATA::FuzzyCluster));
+	// Need to Reset everything
+	BestClusters.clear();
+	BestClusters.resize(3);
+	FlagGoodPlanes.clear();
+	FlagGoodPlanes.resize(3);
+	AvgPairSI.clear();	
+	AvgPairSI.resize(3);	
+	clustervect.clear();
+	hitsvect.clear();
+	QualFlip.clear();
+	std::cout<<"Trying Fuzzy"<<std::endl;
+	}
+
+
     if(!hits || !Incoming_cluster) {
       print(MSG::ERROR,__FUNCTION__,"No DBCluster or associated hits found!");
       throw std::exception();
       return false;}
 
-    // First of all create an output
-    auto Output_cluster = (event_cluster*)(storage->get_data(DATA::RyanCluster));
+ //  std::cout<<"Making it here ?" <<std::endl;
+//std::cout<< " Output_cluster->size() "<<Output_cluster->size()<<std::endl;
     
     // set event variables
     if(Output_cluster->size())
@@ -49,45 +86,26 @@ namespace larlight {
     if(!(Incoming_cluster->size())){
       print(MSG::WARNING,__FUNCTION__,Form("Event %d has no DBCluster...",Incoming_cluster->event_id()));
       return true;}
-
     else if(!(hits->size())){
       print(MSG::ERROR,__FUNCTION__,Form("Event %d has no hits (but there's DBCluster!!!)",Incoming_cluster->event_id()));
       return false;}
 
-    // Need some bool to check about the quality of the protoclusters
-    unsigned int nplanes = larutil::Geometry::GetME()->Nplanes();
-    // This is what the final clusters will be 
-    std::vector<std::pair<std::vector<unsigned int>,std::vector<unsigned int>>> BestClusters(nplanes);
-    // These bools are used to stop when we have a good match and good cluster
-    std::vector<bool> FlagGoodPlanes(nplanes,false);
     
 
 //============Starting with  first pass alg============
 	// make a vector of clusters
-	std::vector<std::pair<double,double>> AvgPairSI(nplanes);	
-	std::vector<larlight::cluster> clustervect;
-	std::vector<larlight::hit> hitsvect;
 	for(auto const& c : *Incoming_cluster) clustervect.push_back(c);
 	for(auto const& h : *hits) hitsvect.push_back(h);
 	AvgPairSI = fDivReg.SplitLineC(clustervect, hitsvect);
 //====================Ending with alg===================
 
 	
-
 //=======================
 //=== make the regions===
 //=======================
 	// This is making the first set of regions that will be tested
    std::vector<std::pair<std::vector<unsigned int>,std::vector<unsigned int>>> FirstRegions = fForceRegions.ForceTwoRegions(hitsvect,AvgPairSI);
-//    std::cout<< "\033[94m lets see what things do  "<< FirstRegions[0].first.size()<<"  , \033[00m"<<FirstRegions[0].second.size()<<std::endl;
-//    std::cout<< "\033[95m lets see what things do  "<< FirstRegions[1].first.size()<<"  , \033[00m"<<FirstRegions[1].second.size()<<std::endl;
-//    std::cout<< "\033[96m lets see what things do  "<< FirstRegions[2].first.size()<<"  , \033[00m"<<FirstRegions[2].second.size()<<std::endl;
 //=======================
-
-//=============================
-//=== Try to clean up region===
-//=============================
-	// There is nothing here yet. This will be used for something like look back or quality checks
 
 //=======================
 //=== Check Bools========
@@ -111,16 +129,10 @@ namespace larlight {
 			 if(FlagGoodPlanes[a]) BestClusters[a]= FirstRegions[a];
  			 // If the plane bools are true then fill into the final cluster.. BestClusters[a]
 		}// for loop over all the planes
-//	std::cout<<"\t Status of Plane Bools after first pass : "<<FlagGoodPlanes[0]<<FlagGoodPlanes[1]<<FlagGoodPlanes[2]<<std::endl;
-//	std::cout<<"\t Status of Flip Bools after first pass : "<<flip[0]<<flip[1]<<flip[2]<<std::endl;
-
-	
-
 
 
 // check the rough vertex
 	std::vector<std::pair<double,double>> RoughVertex =fQuality.ProtoVertexCW(FirstRegions,hits);
-//	for(unsigned int k = 0 ; k<nplanes;k++)std::cout<< "This is the Protovertex0 :\t " <<RoughVertex[k].first<<" , "<<RoughVertex[k].second<<std::endl;
 	
 //-----------------------------------------------------------------------------------------------------------------------------------
 //-------------- DONE WITH ALG PASS... MOVING ON-------------------------------------------------------------------------------------
@@ -138,6 +150,8 @@ for( unsigned int i = 0 ; i<flip.size();i++)
 		std::vector<std::pair<double, double> > FlipAvgPairSI = fDivReg.FlipLineC(clustervect, hitsvect);
    		std::vector<std::pair<std::vector<unsigned int>,std::vector<unsigned int>>> FlipRegions = fForceRegions.ForceTwoFlipRegions(hitsvect, FlipAvgPairSI);
 	// This being in the if will prevent overwriting the stuff that is already good.
+//		if(FlipRegions[i].first.size()>0 && FlipRegions[i].second.size()>0){
+		//BestClusters[i] = FlipRegions[i];}
 		BestClusters[i] = FlipRegions[i];
 	}// end of if flip[i]
 }// for loop over all the flip stuff
@@ -145,7 +159,9 @@ for( unsigned int i = 0 ; i<flip.size();i++)
 //=== Check Bools========
 //=======================
 	// do the time prof test...
-	std::vector<bool> QualFlip = fPlaneCheckMatch.PlaneCheck(BestClusters, hits);
+//	std::cout<<"Size of all the best clusters"<<BestClusters[0].first.size()<<" , "<<BestClusters[0].second.size()<<std::endl<<BestClusters[1].first.size()<<" , "<<BestClusters[1].second.size()<<std::endl<<BestClusters[2].first.size()<<" , "<<BestClusters[2].second.size()<<std::endl;
+
+	QualFlip = fPlaneCheckMatch.PlaneCheck(BestClusters, hits);
 ///---------------------------------------------------------------------------------
 // Check to see what we need to do next after the Rotate. Should we try another alg or keep theses? 
 //---------------------------------------------------------------------------------
@@ -156,14 +172,8 @@ for( unsigned int i = 0 ; i<flip.size();i++)
         	for(unsigned int a = 0 ;a < nplanes;a++){
 			 if(!FlagGoodPlanes[a]) RotateAlg[a]= true;
 		}// loop over the planes	
-//	std::cout<<"Status: Go to Rotate alg? : "<<RotateAlg[0]<<RotateAlg[1]<<RotateAlg[2]<<std::endl;
-//	if(FlagGoodPlanes[b]) BestClusters[b]= FirstRegions[b];
 
 	std::vector<std::pair<double,double>> RoughFlipVertex =fQuality.ProtoVertexCW(BestClusters,hits);
-	//for(unsigned int k = 0 ; k<nplanes;k++)std::cout<< "This is the ProtoFlipVertex :\t " <<RoughFlipVertex[k].first<<" , "<<RoughFlipVertex[k].second<<std::endl;
-
-
-
 
 
 
@@ -213,7 +223,6 @@ for( unsigned int i = 0 ; i<RotateAlg.size();i++)
         	for(unsigned int a = 0 ;a < nplanes;a++) if(!FlagGoodPlanes[a]) RotateAlg[a]= true;
 
 	std::vector<std::pair<double,double>> RoughRotVertex =fQuality.ProtoVertexCW(BestClusters,hits);
-//	for(unsigned int k = 0 ; k<nplanes;k++)std::cout<< "This is the ProtoRotVertex :\t " <<RoughRotVertex[k].first<<" , "<<RoughRotVertex[k].second<<std::endl;
 
 	if(FlagGoodPlanes[0] && FlagGoodPlanes[1] && FlagGoodPlanes[2]) break;
 }// For loop over the angle 
@@ -229,12 +238,68 @@ for( unsigned int i = 0 ; i<RotateAlg.size();i++)
 //===================================================================
 //====== THIS IS THE END OF ALL THE ALGS ============================
 //===================================================================
-//---------------------------------------------------------------------------------
-		std::cout<<"\t Status of Good Planes at End : "<<FlagGoodPlanes[0]<<FlagGoodPlanes[1]<<FlagGoodPlanes[2]<<std::endl;
-	// if we just have one plane..... take the next best thing... This will have to be the last step
-	//if
-//---------------------------------------------------------------------------------
 
+
+
+// Look back trying a different cluster
+	
+
+/*	
+	if(FlagGoodPlanes[0]==false && FlagGoodPlanes[1]==false && FlagGoodPlanes[2]==false 
+	   &&BestClusters[0].first.size()==0 && BestClusters[0].second.size()==0
+	   && BestClusters[1].first.size()==0 && BestClusters[1].second.size()==0
+	   && BestClusters[2].first.size()==0 && BestClusters[2].second.size()==0 && TryFuzzyCluster==false ){TryFuzzyCluster = true; goto TryFuzzy;} 
+*/ 
+
+	if(FlagGoodPlanes[0]==false && FlagGoodPlanes[1]==false && FlagGoodPlanes[2]==false && TryFuzzyCluster==false){TryFuzzyCluster = true; goto TryFuzzy;} 
+ 
+
+
+
+
+//==================================
+//=== Try to unmerge some things ===
+//==================================
+	for(unsigned int a = 0 ; a< 3 ; a++){
+		// if this is a good plane there are clusters in it
+		if(FlagGoodPlanes[a]){
+	std::pair<std::vector<unsigned int>,std::vector<unsigned int>> Nicer_Clusters = fLookBack.ClusterRefine(BestClusters[a],hitsvect);
+	// reseting the clusters
+	BestClusters[a].first = Nicer_Clusters.first;
+	BestClusters[a].second = Nicer_Clusters.second;
+		}// if the plane can be looped
+	}// for loop over all the planes
+
+
+// RG Can do another time prof or time overlap check here!
+
+
+
+//==================================
+//====== Try Refining the Angle ====
+//==================================
+
+
+
+	// First sort out the Crawler Clusters based on which which hits belong to which cluster. 
+
+	
+
+
+
+
+
+
+
+/*
+	std::cout<<"protovertex:"<<std::endl;
+     std::vector<std::pair<double,double>> pv = fquality.protovertexcw(bestclusters,hits);
+	for( int i =0 ;i<3;i++){
+	std::cout<< "\t\t "<< pv[i].first<<" , "<<pv[i].second<<std::endl;}
+*/	
+	
+//$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+std::cout<< " \n\n\n"<<std::endl;
 //===================================================================
 //=======Lets fill these hits out into clusters.===================== 
 //===================================================================
@@ -261,6 +326,12 @@ for( unsigned int i = 0 ; i<RotateAlg.size();i++)
       // Add association
       lite_cluster.add_association(hit_type,hit_ass);
 
+      // Set cluster ID
+      lite_cluster.set_id(Output_cluster->size());
+
+      // Set cluster view
+      lite_cluster.set_view(hits->at(hit_ass.at(0)).View());
+
       // Add a cluster to the output
       Output_cluster->push_back(lite_cluster);
 
@@ -274,6 +345,12 @@ for( unsigned int i = 0 ; i<RotateAlg.size();i++)
 
       // Add association
       lite_cluster.add_association(hit_type,hit_ass);
+
+      // Set cluster ID
+      lite_cluster.set_id(Output_cluster->size());
+
+      // Set cluster view
+      lite_cluster.set_view(hits->at(hit_ass.at(0)).View());
 
       // Add a cluster to the output
       Output_cluster->push_back(lite_cluster);
@@ -306,34 +383,6 @@ for( unsigned int i = 0 ; i<RotateAlg.size();i++)
 // Adding some fuctions 
 //---------------------
 
-  //---------------------------------------------------------------------------------------------
-
-/*
-std::vector<std::pair<std::vector<unsigned int>,std::vector<unsigned int>>>  NCfilter::CheckQuality(larlight::event_hit *const hits,std::vector<std::pair<std::vector<unsigned int>,std::vector<unsigned int>>> protocluster, std::vector<bool> Flags){
-
-
-        // First Check based on bool.... if there is already a bool? Might not need this in here... Should do it in the code to fill clusters
-	fucnflag0= false;
-	fucnflag1= false;
-	fucnflag2= false;
-	
-	
-
-        // Checking the time profile
-        for( unsigned int a=0 ; a<protocluster.size();a++){
-
-
-                for(unsigned int k =0 ; k<protocluster[a].first.size(); k++){
-
-
-                                }// protocluster for loop over a first cluster  
-
-                }// for loop over protocluster
-
-
-	}// End of Check Quality Func
-
-*/
 
 
 
