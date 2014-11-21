@@ -34,6 +34,7 @@ namespace compression {
 
 class CompressionAlgoBase;
 class CompressionAlgoThresh;
+class CompressionAlgosncompress;
 
 }
 
