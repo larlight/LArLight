@@ -5,7 +5,7 @@
 
 namespace compress {
   
-  void CompressionAlgosncompress::ApplyCompression(const std::vector<unsigned short> &waveform, bool mode){
+  void CompressionAlgosncompress::ApplyCompression(const std::vector<unsigned short> &waveform, int mode){
 
     int baseline = 0;
     int buffer = 0;
@@ -15,9 +15,13 @@ namespace compress {
       baseline = 400;
       buffer = 3;
     }
-    else{
+    else if(mode == 1){
       baseline = 2048;
       buffer = 5;
+    }
+    else{
+      baseline = 2048;
+      buffer = 10;
     }
 
     std::vector<unsigned short> outputwf;
