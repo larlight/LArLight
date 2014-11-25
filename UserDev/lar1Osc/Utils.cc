@@ -28,7 +28,7 @@ namespace lar1{
 
     nue_fidCut_x = 25.0;
     nue_fidCut_y = 25.0;
-    nue_fidCut_zUp = 5.0;
+    nue_fidCut_zUp = 30.0;
     nue_fidCut_zDown = 100.0;
 
     numu_fidCut_x = 15.0;

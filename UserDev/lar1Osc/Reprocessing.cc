@@ -1044,13 +1044,13 @@ void lar1::Reprocessing::Loop(std::string signal,
           efficiency = electronIDeff;
           wgt = fluxweight*efficiency;
         
-          // if (totalGammas > 0) {
-          //   // Then this event already has a shower in the event.
-          //   std::cout << "Skipping another event for having a photon "
-          //             << "and electron. Total: " << totalSkipped << "\n";
-          //   totalSkipped += wgt;
-          //   continue;
-          // }
+          if (totalGammas > 0) {
+            // Then this event already has a shower in the event.
+            // std::cout << "Skipping another event for having a photon "
+                      // << "and electron. Total: " << totalSkipped << "\n";
+            totalSkipped += wgt;
+            continue;
+          }
 
           if (smearing) 
             ElepSmeared = utils.GetLeptonEnergy(Elep,true,11);
