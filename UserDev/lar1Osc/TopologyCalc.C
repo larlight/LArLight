@@ -27,9 +27,10 @@ void TopologyCalc(TString target){
   Int_t iChan = 0;
   Int_t nuchan = 0;
   bool isFid= false;
+  bool isAct= false;
   Int_t NPi0;
 
-  bool useMultiWeights = true;
+  bool useMultiWeights = false;
 
 
   c->Reset();
@@ -54,6 +55,7 @@ void TopologyCalc(TString target){
   c->SetBranchAddress("Channel", &iChan);
   c->SetBranchAddress("nuchan", &nuchan);
   c->SetBranchAddress("IsFiducial", &isFid);
+  c->SetBranchAddress("IsActive", &isAct);
   c->SetBranchAddress("NPi0FinalState", &NPi0);
 
   std::vector<std::vector<float> > *MultiWeight=0;
@@ -104,7 +106,6 @@ void TopologyCalc(TString target){
   legendMap[130] = "CC with 0 pions, 3+ protons, 0 neutrons";
   legendMap[131] = "CC with 0 pions, 3+ protons, 1+ neutrons ";
 
-  legendMap[10000] = "NC with 0 pions, any number of protons";
   legendMap[10001] = "CC Inclusive";
   legendMap[10002] = "NC Inclusive";
   legendMap[10003] = "CC 0 pi inclusive";
@@ -124,6 +125,7 @@ void TopologyCalc(TString target){
   legendMap[10017] = "CCRes";
   legendMap[10018] = "CCDIS";
   legendMap[10019] = "CCCoh";
+  legendMap[10020] = "NC with 0 pions, any number of protons";
 
 
   legendMap[1000] = "CC with 0 charged pions, 0 protons, 0 neutrons";
@@ -266,7 +268,7 @@ void TopologyCalc(TString target){
 
 
     //Really simple to do this with maps
-    if (isFid){
+    if (isAct){
       // if (useMultiWeights){
       //   std::cout << "  Printing out the multiweights for this event ...\n";
       //   for (unsigned i = 0; i < MultiWeight->back().size();i++){
@@ -281,7 +283,7 @@ void TopologyCalc(TString target){
           multiWeight = fluxweight*MultiWeight->back().at(N_weight);
         } 
 
-        //get the numu cc events:
+        //get the numu events:
         if (abs(inno) == 14 ) {
           if (N_weight==0){ 
             eventRatesNumuMap[iChan] += fluxweight;
@@ -453,15 +455,15 @@ void TopologyCalc(TString target){
            //have NC with no pions of anytype:
            if (abs(inno) == 14){
              if (N_weight == 0){
-               eventRatesNumuMap[10000] += fluxweight;
+               eventRatesNumuMap[10020] += fluxweight;
              }
-             eventRatesNumuMapMultiWeight[N_weight][10000] += multiWeight;
+             eventRatesNumuMapMultiWeight[N_weight][10020] += multiWeight;
            }
            if (abs(inno) == 12){
              if (N_weight == 0){
-               eventRatesNueMap[10000] += fluxweight;
+               eventRatesNueMap[10020] += fluxweight;
              }
-             eventRatesNueMapMultiWeight[N_weight][10000] += multiWeight;
+             eventRatesNueMapMultiWeight[N_weight][10020] += multiWeight;
            }
          }
         // Fill out the rest of the CC entries

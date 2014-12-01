@@ -84,8 +84,12 @@ namespace lar1{
     void setAbsolute_MWSource(bool b){absolute_MWSource = b;}
 
     void setIncludeOsc(bool b){includeOsc = b;}
+    void setIncludeCosmics(bool b){includeCosmics = b;}
+    void setIncludeDirt(bool b){includeDirt = b;}
 
-    std::vector<float> GetComptonBackgroundFromFile(std::string file, int cut = 0);
+
+    std::vector<float> GetCosmicsFromFile();
+    std::vector<float> GetDirtFromFile();
 
     int LoopNue();
     int LoopNumu();
@@ -114,6 +118,9 @@ namespace lar1{
     bool usingMultiWeights;
 
     bool includeOsc;
+    bool includeCosmics;
+    bool includeDirt;
+
 
     std::string specialNameText;
     std::string specialNameTextOsc;

@@ -87,6 +87,12 @@ namespace lar1{
                                         std::vector<int> covMatrixListSource,
                                         bool absolute_MWSource);
 
+    TMatrix getDirtMatrix(const std::vector<float> & nullVector,
+                            const std::vector<std::vector<float> > & Dirt);
+
+    TMatrix getCosmicMatrix(const std::vector<float> & nullVector,
+                              const std::vector<std::vector<float> > & Cosmics);
+
     TH1F* makeHistogram(std::vector<float> & input, 
                         double lowbin, double highbin);
     TH1F* makeHistogram(std::vector<float> & input, std::vector<float> & bins);

@@ -32,7 +32,6 @@
   n.setTopologyCut(0.05,3);
   // n.setMinVertexEnergySignal(0.05); 
 
-  n.setIncludeCosmics(false);
   // n.setCosmicsFile("output/no_cut/histos_for_corey.root");
   // n.setMinDistanceToStart(0);
 
@@ -83,6 +82,8 @@
 
   n.setIncludeFosc(false);
   n.setIncludeNumus(false);
+  n.setIncludeCosmics(true);
+  n.setIncludeDirt(true);
 
 
   n.setInflateSystematics(false);
@@ -125,7 +126,7 @@
   n.setMakeRatioPlots(false);
   n.setLoop(true);
   n.setMakeSimplePlot(true);
-  n.setMakeEventRatePlots(true);
+  n.setMakeEventRatePlots(false);
   n.setMakeAltSensPlot(false);
 
   n.Run();

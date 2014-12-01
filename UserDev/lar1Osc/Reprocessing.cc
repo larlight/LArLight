@@ -614,6 +614,7 @@ void lar1::Reprocessing::Loop(std::string signal,
 
     double totalSkipped = 0;
 
+    double nNumuMisID_total = 0;
 
     //====================================================
     // Loop over entries in incoming ntuple
@@ -1111,7 +1112,7 @@ void lar1::Reprocessing::Loop(std::string signal,
         // #############################
         // Look at misID from numu CC:
         // #############################
-        if (isCC && abs(inno) == 14){
+        if (isFid && isCC && abs(inno) == 14){
 
           if (leptonMom->at(0).E() < egammaThreshold ){
             continue;
@@ -1155,6 +1156,7 @@ void lar1::Reprocessing::Loop(std::string signal,
           numuCCCalo->Fill( enucalo2, wgt );
           if( enucalo2 > 0.2 && enucalo2 < 0.475 ) NnumuCC_LE += wgt;
 
+          nNumuMisID_total += wgt;
 
         } // end of numu CC misid as nue CC
 
@@ -1583,7 +1585,7 @@ void lar1::Reprocessing::Loop(std::string signal,
       } 
 
 
-      if (wgt != 0) newt->Fill();
+      if (isActive) newt->Fill();
 
     } // end loop over entries
 
@@ -1628,6 +1630,9 @@ void lar1::Reprocessing::Loop(std::string signal,
     // for( unsigned long i = 0; i < singlePhotonE.size(); i++ ){
     // std::cout << " sinlgle photon: " << 1000*singlePhotonE[i] << " MeV, " << singlePhotonTheta[i] << " rad" << std::endl;
     //}
+    
+    std::cout << "Total (integral) numu events as nue misID: " << nNumuMisID_total << std::endl;
+    
     std::cout << "==================================================" << std::endl;
     std::cout << "Output in " << outfile << std::endl;
     std::cout << "Had to bail on : " << "\n"

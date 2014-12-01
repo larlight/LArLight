@@ -607,6 +607,60 @@ namespace lar1
     return finalCovarianceMatrix;
   }
 
+    TMatrix  SensUtils::getDirtMatrix(const std::vector<float> & nullVector,
+                                       const std::vector<std::vector<float> > & Dirt)
+    {
+      TMatrix dirtMatrix;
+
+      dirtMatrix.ResizeTo(nullVector.size(), nullVector.size());
+
+      int nbinsNull = nullVector.size() / 3;
+
+
+      for (unsigned int b_line = 0; b_line < Dirt.size(); ++b_line)
+      {
+        for (unsigned int bin = 0; bin < Dirt.front().size(); ++bin)
+        {
+          dirtMatrix[b_line*nbinsNull + bin][b_line*nbinsNull + bin] = Dirt.at(b_line).at(bin);
+        }
+      }
+      // The dirt matrix gets a 15% normalization uncertainty
+      // It's applied fully correlated within each detector:
+      double fracError = 0.15;
+      for (unsigned int b_line = 0; b_line < Dirt.size(); ++b_line)
+      {
+        for (unsigned int x_bin = 0; x_bin < Dirt.front().size(); ++x_bin)
+        {
+          for (unsigned int y_bin = 0; y_bin < Dirt.front().size(); ++y_bin)
+          {
+            dirtMatrix[b_line*nbinsNull + x_bin][b_line*nbinsNull + y_bin] 
+              = fracError*fracError*Dirt.at(b_line).at(x_bin)*Dirt.at(b_line).at(y_bin);
+          }
+        }
+      }
+      return dirtMatrix;
+
+    }
+
+    TMatrix SensUtils::getCosmicMatrix(const std::vector<float> & nullVector,
+                                         const std::vector<std::vector<float> > & Cosmics)
+    {
+
+      TMatrix cosmicMatrix;
+      cosmicMatrix.ResizeTo(nullVector.size(), nullVector.size());
+
+      int nbinsNull = nullVector.size() / 3;
+      for (unsigned int b_line = 0; b_line < Cosmics.size(); ++b_line)
+      {
+        for (unsigned int bin = 0; bin < Cosmics.front().size(); ++bin)
+        {
+          cosmicMatrix[b_line*nbinsNull + bin][b_line*nbinsNull + bin] = Cosmics.at(b_line).at(bin);
+        }
+      }
+      return cosmicMatrix;    
+    }
+
+
   float SensUtils::getMaximum (const std::vector<float> & vals){
     float max = vals.front();
     for (auto & val : vals)

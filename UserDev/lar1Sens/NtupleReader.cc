@@ -23,6 +23,9 @@ namespace lar1{
     nWeights = 1000;
     includeOsc=true;
 
+    includeCosmics = false;
+    includeDirt = false;
+
     showerContainmentDist = -999;
     minDistanceToStart = 0;
     minVertexEnergySignal=0;
@@ -72,6 +75,9 @@ namespace lar1{
     absolute_MWSource = false;
     nWeights = 1000;
     includeOsc=true;
+
+    includeCosmics = false;
+    includeDirt = false;
 
     showerContainmentDist = -999;
     minDistanceToStart = 0;
@@ -142,6 +148,7 @@ namespace lar1{
     }
 
   }
+
   std::vector<std::vector<float> > NtupleReader::GetDataOsc() const{
 
     if ( dataOsc.size() != 0 ) return dataOsc;
@@ -780,6 +787,15 @@ namespace lar1{
         }
       }
     }
+
+    // Get the cosmic and dirt stuff:
+    // 
+    // Get the cosmics data:
+    
+    // Get the dirt data:
+    // 
+
+
 
     //Write these histograms to a file!
     
@@ -1720,49 +1736,93 @@ namespace lar1{
     return *(readInVector);
   }
 
-  std::vector<float> NtupleReader::GetComptonBackgroundFromFile(std::string fileName, int cut){
+  std::vector<float> NtupleReader::GetDirtFromFile(){
 
-    std::vector<float> photons200_nocutVec;
-    std::vector<float> photons200_at50Vec;
-    std::vector<float> photons200_at100Vec;
-    photons200_nocutVec.resize(bins.size()-1);
-    photons200_at50Vec.resize(bins.size()-1);
-    photons200_at100Vec.resize(bins.size()-1);
+    std::vector<float> result;
+    result.resize(bins.size() - 1);
 
-    if (!fileExists(fileName.c_str())){
-      std::cout << "WARNING: cosmics file "  << fileName << " does not exist,"
-                << " returning an empty vector instead." << std::endl;
-      return photons200_nocutVec;
+    // Just hardcoding the names because they suck:
+    TString fileName;
+    TString histName;
+    if (baseline == "100m"){
+      fileName = path + "LAr1ND_dirt.root";
+      histName = "LAr1ND_dirt";
     }
+    if (baseline == "470m"){
+      fileName = path + "MicroBooNE_dirt.root";
+      histName = "MicroBooNE_dirt";
+    }
+    if (baseline == "600m_onaxis"){
+      fileName = path + "ICARUS_dirt.root";
+      histName = "ICARUS_dirt";
+    }
+
+    // Verfiy the file exists:
+    if (!fileExists(fileName)){
+      std::cerr << "\n\nThe dirt file (" << fileName
+                << ") requested does not exist, returning an"
+                << " empty vector instead.\n\n";
+      return result;
+    }
+
+    // otherwise, get the histogram from the file and read it into the vector:
 
     TFile * file = new TFile((TString)fileName, "READ");
-    TH1F * photons200_nocut = (TH1F*)file -> Get("photons200_nocut");
-    TH1F * photons200_at50  = (TH1F*)file -> Get("photons200_at50");
-    TH1F * photons200_at100 = (TH1F*)file -> Get("photons200_at100");
-    
+    TH1F * histogram = (TH1F*)file -> Get(histName.Data());
+
     // It's nasty but here is the spot to apply efficiency:
-    for (unsigned int i = 4; i < bins.size()-1; i ++){
-      photons200_nocutVec[i] = (0.8) * photons200_nocut -> GetBinContent(i+1);
-      photons200_at50Vec[i]  = (0.8) * photons200_at50  -> GetBinContent(i+1);
-      photons200_at100Vec[i] = (0.8) * photons200_at100 -> GetBinContent(i+1);
+    for (unsigned int i = 0; i < bins.size()-1; i ++){
+      result[i] = histogram -> GetBinContent(i+1);
     }
-    file->Close();
-
-    // std::cout << "bin\tElow\tNull\t50\t100\n";
-    // for (int i = 0; i < bins.size()-1; i ++){
-    //   std::cout << i << "\t" << bins[i] << "\t"
-    //             << photons200_nocutVec[i] << "\t"
-    //             << photons200_at50Vec[i]  << "\t"
-    //             << photons200_at100Vec[i] << "\n";
-    // }
-    std::cout << std::endl;
-
-    if (cut == 50) return photons200_at50Vec;
-    if (cut == 100) return photons200_at100Vec;
-    else return photons200_nocutVec;
-
+    return result;
 
   }
+  
+  std::vector<float> NtupleReader::GetCosmicsFromFile(){
+
+    std::vector<float> result;
+    result.resize(bins.size() - 1);
+
+    // Just hardcoding the names because they suck:
+    TString fileName;
+    TString histName;
+    if (baseline == "100m"){
+      fileName = path + "LAr1ND_cosmics.root";
+      histName = "LAr1ND_cosmics";
+    }
+    if (baseline == "470m"){
+      fileName = path + "MicroBooNE_cosmics.root";
+      histName = "MicroBooNE_cosmics";
+    }
+    if (baseline == "600m_onaxis"){
+      fileName = path + "ICARUS_cosmics.root";
+      histName = "ICARUS_cosmics";
+    }
+
+
+
+    // Verfiy the file exists:
+    if (!fileExists(fileName)){
+      std::cerr << "\n\nThe cosmics file (" << fileName
+                << ") requested does not exist, returning an"
+                << " empty vector instead.\n\n";
+      return result;
+    }
+
+    // otherwise, get the histogram from the file and read it into the vector:
+
+    TFile * file = new TFile((TString)fileName, "READ");
+    TH1F * histogram = (TH1F*)file -> Get(histName.Data());
+
+    // It's nasty but here is the spot to apply efficiency:
+    for (unsigned int i = 0; i < bins.size()-1; i ++){
+      result[i] = histogram -> GetBinContent(i+1);
+    }
+
+    return result;
+
+  }
+
 
 }
 
