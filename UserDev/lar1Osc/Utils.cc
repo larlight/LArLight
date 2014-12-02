@@ -29,7 +29,9 @@ namespace lar1{
     nue_fidCut_x = 25.0;
     nue_fidCut_y = 25.0;
     nue_fidCut_zUp = 30.0;
-    nue_fidCut_zDown = 100.0;
+    nue_fidCut_zDown = 50.0;
+
+    cathode_cut = 1.5;
 
     numu_fidCut_x = 15.0;
     numu_fidCut_y = 15.0;
@@ -761,18 +763,33 @@ namespace lar1{
        
       // gets the center.  If the cuts above on x aren't symmetric, this is wrong.
       Double_t xcenter = (ic_xmax + ic_xmin)/2; 
-      if ( vtx.X() < (xcenter + 50 + fidCut_x) && vtx.X() > (xcenter - 50 -fidCut_x) ) return false; //cut around the center APA
+      // Cut out the dead region in between the two TPCS:
+      if ( vtx.X() < (xcenter + 50 + fidCut_x) && vtx.X() > (xcenter - 50 -fidCut_x) ) return false;
+      // cut around the center APA
+      double tpc_center1 = (50 + ic_xmax)/2.0;
+      double tpc_center2 = (-50 + ic_xmin)/2.0;
+
+      if ( fabs(vtx.X() - tpc_center1) < cathode_cut ) return false;
+      if ( fabs(vtx.X() - tpc_center2) < cathode_cut ) return false;
 
     }
-
-    if( vtx.X() > xmin && vtx.X() < xmax && vtx.Y() > ymin && vtx.Y() < ymax && vtx.Z() > zmin && vtx.Z() < zmax )
-      return true;
+    if (idet == kND){
+      // For ND, the cathode is assumed to be in the middle of the detector:
+      double cathodePoint = (nd_xmax + nd_xmin)/2.0;
+      if ( fabs(vtx.X() - cathodePoint) < cathode_cut ) return false;
+    } 
+    if( vtx.X() > xmin && vtx.X() < xmax && 
+        vtx.Y() > ymin && vtx.Y() < ymax && 
+        vtx.Z() > zmin && vtx.Z() < zmax )
+    {
+      return true;      
+    }
     else
       return false;
 
   }
 
-  Bool_t Utils::IsFiducialMB(Int_t idet, TVector3 vtx, double fidCut) const
+  Bool_t Utils::IsFiducialMB(Int_t idet, TVector3 vtx) const
   {
     if (idet != kMB) return false;
 
@@ -787,7 +804,7 @@ namespace lar1{
   //==========================================================================================
   Bool_t Utils::IsActive( Int_t idet, TVector3 vtx, double cut ) const{
 
-    if (idet == kMB) return IsFiducialMB(idet,vtx,0.0);
+    if (idet == kMB) return IsFiducialMB(idet,vtx);
     
     Double_t xmin(0.0), xmax(0.0), ymin(0.0), ymax(0.0), zmin(0.0), zmax(0.0);
 

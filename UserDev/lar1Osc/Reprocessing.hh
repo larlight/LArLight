@@ -164,8 +164,7 @@ class Reprocessing {
                            int iLoc = 4,
                            Long64_t max_entry = -1,
                            bool skipMultiWeights = true,
-                           bool verbose = false, 
-                           double scale = 1);
+                           bool verbose = false);
     virtual Bool_t   Notify();
     virtual void     Show(Long64_t entry = -1);
     virtual TString  InFile();

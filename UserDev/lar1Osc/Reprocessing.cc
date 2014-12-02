@@ -9,8 +9,7 @@ void lar1::Reprocessing::Loop(std::string signal,
                               int iLoc,
                               Long64_t max_entry,
                               bool skipMultiWeights,
-                              bool verbose,
-                              double scale ){
+                              bool verbose){
 
     // Signal options are:
     // nue  - electron neutrino appearance backgrounds

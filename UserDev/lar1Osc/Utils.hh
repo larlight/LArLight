@@ -79,8 +79,7 @@ namespace lar1{
     Bool_t   IsFiducial(     Int_t idet, const TVector3 & vtx,
                              std::string signal = "" ) const;
     Bool_t   IsActive(       Int_t idet, TVector3 vtx, double cut = 0 ) const;
-    Bool_t   IsFiducialMB(   Int_t idet, TVector3 vtx, 
-                             Double_t fidCut = 17.0 ) const;
+    Bool_t   IsFiducialMB(   Int_t idet, TVector3 vtx) const;
     Double_t GetFidMass(     Int_t idet, std::string signal = "" ) const;
     Double_t GetActiveMass(  Int_t idet ) const;
     void     GetDetBoundary( Int_t idet, Double_t &xmin, Double_t &xmax, 
@@ -142,6 +141,7 @@ namespace lar1{
 
     double nue_fidCut_x,  nue_fidCut_y,  nue_fidCut_zUp,  nue_fidCut_zDown;
     double numu_fidCut_x, numu_fidCut_y, numu_fidCut_zUp, numu_fidCut_zDown;
+    double cathode_cut;
     double nd_xmin, nd_xmax, nd_ymin, nd_ymax, nd_zmin, nd_zmax;
     double nd_long_xmin, nd_long_xmax, nd_long_ymin, 
            nd_long_ymax, nd_long_zmin, nd_long_zmax;
