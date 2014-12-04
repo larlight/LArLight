@@ -87,13 +87,21 @@ namespace lar1{
       // Can scale the event rates up or down
       void setUbooneScale(double d){ubooneScale = d;}
       void setLAr1NDScale(double d){LAr1NDScale = d;}
-      void setLAr1FDScale(double d){LAr1FDScale = d;}
+      void setIcarusScale(double d){icarusScale = d;}
+      void setUboonePOT(double d){uboonePOT = d;}
+      void setLAr1NDPOT(double d){LAr1NDPOT = d;}
+      void setIcarusPOT(double d){icarusPOT = d;}
 
+      // Can scale the cosmic rates up or down independantly:
+      void setUbooneCosmicScale(double d){ubooneCosmicScale = d;}
+      void setLAr1NDCosmicScale(double d){LAr1NDCosmicScale = d;}
+      void setIcarusCosmicScale(double d){icarusCosmicScale = d;}
       // Physics switches
       void setEnergyType(std::string s){energyType = s;}
       void setNueBins (std::vector<float> bins){nueBins  = bins; nbins_nue = nueBins.size()-1;}
       void setNumuBins(std::vector<float> bins){numuBins = bins; nbins_numu = numuBins.size()-1;}
       void setIncludeCosmics(bool b = false){includeCosmics = b;}
+      void setIncludeDirt(bool b = false){includeDirt = b;}
       void setCosmicsFile(std::string s){cosmicsFile = s;}
       void setElectContainedDist(double d){ElectContainedDist = d;}
       void setMinDistanceToStart(double d){minDistanceToStart = d;}
@@ -218,9 +226,17 @@ namespace lar1{
       //Note: there is no infrastructure to handle more than 3 baselines.
       //So, try at your own risk!
       
-      double ubooneScale;       //Scale the event rates (uniformly across all events), uboone
-      double LAr1NDScale; //Scale the event rates (uniformly across all events), near det
-      double LAr1FDScale;     //Scale the event rates (uniformly across all events), far det
+      double ubooneScale;     //Scale the event rates (uniformly across all events), uboone
+      double LAr1NDScale;     //Scale the event rates (uniformly across all events), near det
+      double icarusScale;     //Scale the event rates (uniformly across all events), far det
+
+      double ubooneCosmicScale;     //Scale the event rates (uniformly across all events), uboone
+      double LAr1NDCosmicScale;     //Scale the event rates (uniformly across all events), near det
+      double icarusCosmicScale;     //Scale the event rates (uniformly across all events), far det
+
+      double uboonePOT;     //Scale the event rates (uniformly across all events), uboone
+      double LAr1NDPOT;     //Scale the event rates (uniformly across all events), near det
+      double icarusPOT;     //Scale the event rates (uniformly across all events), far det
 
       //Histogram definitions
       double emin;        //GeV
@@ -252,6 +268,8 @@ namespace lar1{
       // The rest of the variables are not settable
       std::vector<std::string> baselines;
       std::vector<double> scales;
+      std::vector<double> POT;
+      std::vector<double> cosmicScales;
       std::vector<std::string> names;
       std::vector<std::string> baselinesFancy;
       std::vector<double> volume;
@@ -312,12 +330,12 @@ namespace lar1{
       // output ntuple with chi2 values and sensitivity contour
       TNtuple * chi2;
       //sensitivity contours
-      double * x90;
-      double * y90;
-      double * x3s;
-      double * y3s;
-      double * x5s;
-      double * y5s;
+      std::vector<float> x90;
+      std::vector<float> y90;
+      std::vector<float> x3s;
+      std::vector<float> y3s;
+      std::vector<float> x5s;
+      std::vector<float> y5s;
 
 
       // This vector controls which covariance matrices get used in
@@ -346,6 +364,7 @@ namespace lar1{
 
 
       bool includeCosmics;
+      bool includeDirt;
       std::string cosmicsFile;
 
       double ElectContainedDist;

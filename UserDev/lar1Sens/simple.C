@@ -7,7 +7,9 @@
   lar1::NueAppearanceFitter n;
   // n.setFileSource("/Users/cja33/genie_RW/");
   n.setFileSource("/Users/cja33/nominal_ntuples/");
-  // n.setFileSource("/Users/cja33/lar1_data/");
+  // n.setFileSource("/Users/cja33/5cm_cut/");
+  // n.setFileSource("/Users/cja33/30cm_cut/");
+  // n.setFileSource("/Users/cja33/twoHorn/");
   n.setVerbose(true);
   n.setDebug(false);
   n.setSpecialNameText("");
@@ -20,16 +22,27 @@
   n.setUse470m(       true);
   n.setUseT600_onaxis(true);
 
+
+  n.setLAr1NDPOT(6.6e20);
+  n.setUboonePOT(2*6.6e20);
+  n.setIcarusPOT(6.6e20);
   n.setLAr1NDScale(1.0);
-  n.setUbooneScale(2.0);
-  n.setLAr1FDScale(1.0);
+  n.setUbooneScale(1.0);
+  n.setIcarusScale(1.0);
+  // n.setLAr1NDScale(1.0*(1.0-0.025));
+  // n.setUbooneScale(2.0*(1.0-0.03 ));
+  // n.setIcarusScale(1.0*(1.0-0.05 ));
+  // n.setLAr1NDCosmicScale(1-0.95);
+  // n.setUbooneCosmicScale(1-0.95);
+  // n.setIcarusCosmicScale(1-0.95);
+
   n.setEnergyType("ecalo2");
   n.setShapeOnlyFit(false);
   n.setForceRemake(false);
   n.setUseInfiniteStatistics(false);
   // n.setElectContainedDist(100);
 
-  n.setTopologyCut(0.05,3);
+  n.setTopologyCut(0.05,3.0);
   // n.setMinVertexEnergySignal(0.05); 
 
   // n.setCosmicsFile("output/no_cut/histos_for_corey.root");
@@ -82,8 +95,8 @@
 
   n.setIncludeFosc(false);
   n.setIncludeNumus(false);
-  n.setIncludeCosmics(true);
-  n.setIncludeDirt(true);
+  n.setIncludeCosmics(false);
+  n.setIncludeDirt(false);
 
 
   n.setInflateSystematics(false);
@@ -124,9 +137,9 @@
 
   n.setBuildCovarianceMatrix(false);
   n.setMakeRatioPlots(false);
-  n.setLoop(true);
-  n.setMakeSimplePlot(true);
-  n.setMakeEventRatePlots(false);
+  n.setLoop(false);
+  n.setMakeSimplePlot(false);
+  n.setMakeEventRatePlots(true);
   n.setMakeAltSensPlot(false);
 
   n.Run();
