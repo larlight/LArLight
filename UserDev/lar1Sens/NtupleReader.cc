@@ -687,6 +687,8 @@ namespace lar1{
           continue;
       }
 
+      if (Elep < 0.200) continue;
+
       if (ibkg == kNueFromNueCC_muon       || 
           ibkg == kNueFromNueCC_chargeKaon || 
           ibkg == kNueFromNueCC_neutKaon   || 
@@ -918,6 +920,7 @@ namespace lar1{
     Double_t ElecCandEnergy;
     Double_t Eccqe;
     Double_t ecalo1, ecalo2;
+    Double_t Elep;
     Double_t ElectContainedDist;
     Double_t ElectDistToStart;
     double vertexEnergy;
@@ -949,6 +952,7 @@ namespace lar1{
     const Int_t nentries2 = Int_t(c->GetEntries());
     // const Int_t nentries2 = 50000;
 
+
     std::cout<<"Fosc Input filename:\t" << dummytarget << std::endl;
     std::cout<<"Number of entries L="<<baseline<<"m: "<< nentries2<< std::endl;
     c->SetBranchAddress("enugen",&fill_energy);
@@ -963,6 +967,7 @@ namespace lar1{
     c->SetBranchAddress("Eccqe", &Eccqe);
     c->SetBranchAddress("Ecalo1", &ecalo1);
     c->SetBranchAddress("Ecalo2", &ecalo2);
+    c->SetBranchAddress("LepE", &Elep);
     c->SetBranchAddress("ShowerContainedDistance",&ElectContainedDist);
     c->SetBranchAddress("ShowerDistanceToStart"  ,&ElectDistToStart);
     c->SetBranchAddress("VertexEnergy"  ,&vertexEnergy);
@@ -1090,6 +1095,8 @@ namespace lar1{
         if (inno == 12 || inno == -12)
           continue;
       }
+
+      if (Elep < 0.200) continue;
 
       if(ElectContainedDist < showerContainmentDist){
         // std::cout << "Skipping this fosc event in the containment cut.\n";
