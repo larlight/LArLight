@@ -75,6 +75,10 @@ namespace lar1{
 
     systematicInflationAmount = 0.0;
     inflateSystematics = false;
+
+    includeCosmics = false;
+    includeDirt = false;
+    includeFosc = false;
     
     shapeOnlyFit = false;              // Only matters with near detd stats = true
 
@@ -2204,39 +2208,39 @@ namespace lar1{
       {
         NueFromNueCC_muon       -> SetBinContent(bin+1,
                                       NueFromNueCC_muon->GetBinContent(bin+1)
-                                    /(NueFromNueCC_muon->GetBinWidth(bin+1) / 0.150));
+                                    / NueFromNueCC_muon->GetBinWidth(bin+1));
         NueFromNueCC_chargeKaon -> SetBinContent(bin+1,
                                       NueFromNueCC_chargeKaon->GetBinContent(bin+1)
-                                    /(NueFromNueCC_chargeKaon->GetBinWidth(bin+1) / 0.150));
+                                    / NueFromNueCC_chargeKaon->GetBinWidth(bin+1));
         NueFromNueCC_neutKaon   -> SetBinContent(bin+1,
                                       NueFromNueCC_neutKaon->GetBinContent(bin+1)
-                                    /(NueFromNueCC_neutKaon->GetBinWidth(bin+1) / 0.150));
+                                    / NueFromNueCC_neutKaon->GetBinWidth(bin+1));
         NueFromEScatter         -> SetBinContent(bin+1,
                                       NueFromEScatter->GetBinContent(bin+1)
-                                    /(NueFromEScatter->GetBinWidth(bin+1) / 0.150));
+                                    / NueFromEScatter->GetBinWidth(bin+1));
         NueFromNC_pi0           -> SetBinContent(bin+1,
                                       NueFromNC_pi0->GetBinContent(bin+1)
-                                    /(NueFromNC_pi0->GetBinWidth(bin+1) / 0.150));
+                                    / NueFromNC_pi0->GetBinWidth(bin+1));
         NueFromNC_delta0        -> SetBinContent(bin+1,
                                       NueFromNC_delta0->GetBinContent(bin+1)
-                                    /(NueFromNC_delta0->GetBinWidth(bin+1) / 0.150));
+                                    / NueFromNC_delta0->GetBinWidth(bin+1));
         NueFromNumuCC           -> SetBinContent(bin+1,
                                       NueFromNumuCC->GetBinContent(bin+1)
-                                    /(NueFromNumuCC->GetBinWidth(bin+1) / 0.150));
+                                    / NueFromNumuCC->GetBinWidth(bin+1));
         Dirt                    -> SetBinContent(bin+1,
                                       Dirt->GetBinContent(bin+1)
-                                    /(Dirt->GetBinWidth(bin+1) / 0.150));
+                                    / Dirt->GetBinWidth(bin+1));
         Other                   -> SetBinContent(bin+1,
                                       Other->GetBinContent(bin+1)
-                                    /(Other->GetBinWidth(bin+1) / 0.150));
+                                    / Other->GetBinWidth(bin+1));
         if (includeFosc){
           SignalNu              -> SetBinContent(bin+1,
                                       SignalNu->GetBinContent(bin+1)
-                                    /(SignalNu->GetBinWidth(bin+1) / 0.150));
+                                    / SignalNu->GetBinWidth(bin+1));
         }
         NueFromCosmics          -> SetBinContent(bin+1,
                                       NueFromCosmics->GetBinContent(bin+1)
-                                    /(NueFromCosmics->GetBinWidth(bin+1) / 0.150));
+                                    / NueFromCosmics->GetBinWidth(bin+1));
       }
 
 
@@ -2260,11 +2264,13 @@ namespace lar1{
         NueFromNumuCC       -> SetBinError(i+1, 0.0);
         totalEvents[i]      += NueFromNumuCC -> GetBinContent(i+1);
         Dirt                -> SetBinError(i+1, 0.0);
-        totalEvents[i]      += Dirt -> GetBinContent(i+1);
+        if (includeDirt)
+          totalEvents[i]      += Dirt -> GetBinContent(i+1);
         Other               -> SetBinError(i+1, 0.0);
         totalEvents[i]      += Other -> GetBinContent(i+1);
         NueFromCosmics      -> SetBinError(i+1, 0.0);
-        totalEvents[i]      += NueFromCosmics -> GetBinContent(i+1);
+        if (includeCosmics)
+          totalEvents[i]      += NueFromCosmics -> GetBinContent(i+1);
         if (includeFosc)
           signalEvents[i]     = SignalNu -> GetBinContent(i+1);
       }
@@ -2276,7 +2282,7 @@ namespace lar1{
       for (int i = 0; i < nbins_nue; ++i)
       {
         // double error = sqrt(totalEvents[i]);
-        double error = sqrt(totalEvents[i] / ((nueBins[i+1] - nueBins[i])/0.150));
+        double error = sqrt(totalEvents[i] / (nueBins[i+1] - nueBins[i]));
         // std::cout << "error " << i << " is " << error << std::endl;
         if (includeCosmics) NueFromCosmics -> SetBinError(i+1,error);
         else if (includeDirt) Dirt -> SetBinError(i+1, error);
@@ -2284,7 +2290,7 @@ namespace lar1{
           NueFromNumuCC -> SetBinError(i+1, error);
         if (includeFosc){
           SignalNu->SetBinContent(i+1, totalEvents[i]+signalEvents[i]);
-          SignalNu->SetBinError(i+1, sqrt(signalEvents[i]/ ((nueBins[i+1] - nueBins[i])/0.15) ));
+          SignalNu->SetBinError(i+1, sqrt(signalEvents[i]/ (nueBins[i+1] - nueBins[i]) ));
         }
       }
 
@@ -2414,7 +2420,7 @@ namespace lar1{
       //   sprintf(name, "T600 (%sm)", baselines[j].c_str());
       // }
       */
-      chr->GetYaxis()->SetTitle("Events / 150 MeV");
+      chr->GetYaxis()->SetTitle("Events / GeV");
       chr->GetYaxis()->SetTitleSize(0.06);
       chr->GetYaxis()->SetTitleOffset(0.9);
       chr->GetYaxis()->CenterTitle();
