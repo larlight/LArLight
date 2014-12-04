@@ -10,7 +10,7 @@
 namespace lar1{
   FluxRW::FluxRW()
   {
-    std::cout <<"Initializing FluxRW"<<std::endl;
+    // std::cout <<"Initializing FluxRW"<<std::endl;
 
     Int_t nbins=0;
     fBinSize=0.05; // using histograms with 50MeV bins
@@ -21,7 +21,7 @@ namespace lar1{
     path.append("/UserDev/lar1Osc/");
     std::string mbhistfile= path;
     mbhistfile.append("FluxRW/hist/april07_baseline_rgen610.6_flux.root");
-    std::cout <<"Loading BNB flux histograms from "<<mbhistfile<<std::endl;
+    // std::cout <<"Loading BNB flux histograms from "<<mbhistfile<<std::endl;
     TFile f1(mbhistfile.c_str());
     if ( !f1.IsOpen() ) {
       std::cout <<"Can't find BNB histogram file. Aborting!"<<std::endl;
@@ -52,7 +52,7 @@ namespace lar1{
     for (Int_t intype=1;intype<=4;intype++) {
       std::string gshistfile = path;
       gshistfile.append(Form("/FluxRW/hist/%s_rawntp.root",nu[intype-1].c_str()));
-      std::cout <<"Loading gsimple like flux histograms from "<<gshistfile<<std::endl;
+      // std::cout <<"Loading gsimple like flux histograms from "<<gshistfile<<std::endl;
       TFile f2(gshistfile.c_str());
 
       if ( !f2.IsOpen() ) {
@@ -90,12 +90,12 @@ namespace lar1{
 
       f2.Close();
     }
-    std::cout <<std::endl;
-    std::cout <<"***************************************************"<<std::endl;
-    std::cout <<"* Conventions used when calling member functions:"  <<std::endl;
-    std::cout <<"* ntype = 1, 2, 3 or 4 (nue, nuebar, numu, numubar)"<<std::endl;
-    std::cout <<"* ptype = 1, 2, 3 or 4 (mu+-, pi+-, K0L, K+-)"      <<std::endl;
-    std::cout <<"***************************************************"<<std::endl;
+    // std::cout <<std::endl;
+    // std::cout <<"***************************************************"<<std::endl;
+    // std::cout <<"* Conventions used when calling member functions:"  <<std::endl;
+    // std::cout <<"* ntype = 1, 2, 3 or 4 (nue, nuebar, numu, numubar)"<<std::endl;
+    // std::cout <<"* ptype = 1, 2, 3 or 4 (mu+-, pi+-, K0L, K+-)"      <<std::endl;
+    // std::cout <<"***************************************************"<<std::endl;
   }
 
   FluxRW::~FluxRW()

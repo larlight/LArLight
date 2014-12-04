@@ -10,7 +10,7 @@
 namespace lar1{
   Utils::Utils(){
     mc_generation = 5;
-    randService.SetSeed(time(0));
+    randService.SetSeed(1);
     reconfigure();
   }
 
@@ -370,8 +370,8 @@ namespace lar1{
     else if (ndecay == 13 || ndecay == 14){ ptype = 2; ptypestr = "pion"; }
     
     if( ntype == 0 || ptype == 0) {
-      std::cout << "Wrong type neutrino or parent is present. Returning weight = 0." << std::endl;
-      std::cout << "ntype = " << ntype << ",  ptype = " << ptype << std::endl;
+      // std::cout << "Wrong type neutrino or parent is present. Returning weight = 0." << std::endl;
+      // std::cout << "ntype = " << ntype << ",  ptype = " << ptype << std::endl;
       return 0;
     }
 
@@ -389,6 +389,57 @@ namespace lar1{
 
   }
 
+//=======================================================================================
+  // Reweight the flux using histograms in FluxRW tools
+  //=======================================================================================
+  Double_t Utils::GetTwoHornWeight( Double_t energy, Int_t iflux, 
+                                    Int_t inno, Int_t ndecay, 
+                                    Int_t iLoc )
+  {
+
+    Double_t wgt = 0;
+    Int_t ntype = 0;
+    Int_t ptype = 0;
+    // string ntypestr[4] = { "nue", "nuebar", "numu", "numubar" };
+    std::string ptypestr = "";
+
+    // normal samples
+    if( iflux == kNu || iflux == kNubar ){  
+      if      (inno == 12)  ntype = 1;
+      else if (inno == -12) ntype = 2;
+      else if (inno == 14)  ntype = 3;
+      else if (inno == -14) ntype = 4;
+    }
+    // full osc samples
+    else if( iflux == kNu_Fosc || iflux == kNubar_Fosc ){  
+      if      (inno == 12)  ntype = 3;
+      else if (inno == -12) ntype = 4;
+      else if (inno == 14)  ntype = 3;
+      else if (inno == -14) ntype = 4;
+    }
+
+    // Determine ptype using that list described in NtupleReprocessing.C
+    if (ndecay > 0 && ndecay < 5){ ptype = 3; ptypestr = "K0L"; }
+    else if (ndecay > 4 && ndecay < 11){ ptype = 4; ptypestr = "K+"; }
+    else if (ndecay == 11 || ndecay == 12){ ptype = 1; ptypestr = "muon"; }
+    else if (ndecay == 13 || ndecay == 14){ ptype = 2; ptypestr = "pion"; }
+    
+    if( ntype == 0 || ptype == 0) {
+      // std::cout << "Wrong type neutrino or parent is present. Returning weight = 0." << std::endl;
+      // std::cout << "ntype = " << ntype << ",  ptype = " << ptype << std::endl;
+      return 0;
+    }
+
+    // neutrino mode
+    wgt = fluxrw_nu.GetWeight( energy, ntype, ptype );
+
+
+    // if ( verbose ) std::cout << std::setprecision(3) << "neutrino = " << ntypestr[ntype-1] << " (" << energy << " GeV), parent = " 
+        // << ptypestr << ", flux weight = " << wgt << std::endl;
+    
+    return wgt;
+
+  }
 
   //=========================================================================================
   // Polar angle Theta - angle between momentum vector and z-axis

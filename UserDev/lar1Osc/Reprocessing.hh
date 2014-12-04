@@ -170,6 +170,9 @@ class Reprocessing {
     virtual TString  InFile();
     virtual void     CalcLepton( TVector3& );
 
+    void     UseTwoHornConfig(){useTwoHornConfig=true;}
+    bool useTwoHornConfig;
+
     Utils utils;
     
   };
@@ -232,6 +235,8 @@ namespace lar1{
     PionMom                 = new std::vector<TLorentzVector>;
     ChargedPionPos          = new std::vector< std::vector<TLorentzVector> >;
     ChargedPionMom          = new std::vector< std::vector<TLorentzVector> >;
+
+    useTwoHornConfig = false;
 
   }
 

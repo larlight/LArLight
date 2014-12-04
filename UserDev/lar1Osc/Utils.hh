@@ -1,14 +1,15 @@
 #ifndef UTILS_HH
 #define UTILS_HH
 
-#include "FluxRW/FluxRW.hh"
-#include "FluxRWnubar/FluxRWnubar.hh"
+#include "FluxRW.hh"
+#include "FluxRWnubar.hh"
 #include "Rtypes.h"
 #include "TVector3.h"
 #include "TLorentzVector.h"
 #include <vector>
 #include "TDecompLU.h"
 #include "TRandom.h"
+#include "horn2boost.hh"
 
 class TH1D;
 
@@ -30,6 +31,8 @@ namespace lar1{
     void reconfigure();
     
     Double_t GetFluxWeight( Double_t energy, Int_t iflux, Int_t inno, Int_t ndecay );
+
+    Double_t GetTwoHornWeight( Double_t energy, Int_t iflux, Int_t inno, Int_t ndecay, Int_t iLoc );
 
     Double_t GetTheta( const TVector3 & mom, 
                        const TVector3 & ref = TVector3(0,0,1) ) const;
@@ -112,6 +115,8 @@ namespace lar1{
 
     FluxRW      fluxrw_nu;
     FluxRWnubar fluxrw_nubar;
+
+    horn2boost  fHorn2Boost;
 
     double PotNormNubar;
     double PotNormNu;

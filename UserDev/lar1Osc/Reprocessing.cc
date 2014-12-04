@@ -56,9 +56,9 @@ void lar1::Reprocessing::Loop(std::string signal,
     double vtxEcut = 99999;     // 0.025;   // GeV
     double convDistCut = 99999; // 5.0;     // cm
 
-    double egammaThreshold = 0.0; // 0.140 // GeV
+    double egammaThreshold = 0.1; // 0.140 // GeV
 
-    bool smearing = true;
+    bool smearing = false;
 
     Double_t prot_thresh = 0.02;
 
@@ -598,6 +598,10 @@ void lar1::Reprocessing::Loop(std::string signal,
     TH1D * vertexY               = new TH1D("vertexY","vertexY",100, ymin*1.5,ymax*1.5);
     TH1D * vertexZ               = new TH1D("vertexZ","vertexZ",100, zmin*1.5,zmax*1.5);
     
+    TH1D * convPointX    = new TH1D("convPointX","convPointX;X",50,xmin, xmax);
+    TH2D * convPointXVsE = new TH2D("convPointXVsE","convPointXVsE",50,xmin,xmax,150,0,0.4);
+
+
     // These are commented out but please don't delete them.
     // Theyre very useful for debugging numi files.
     // TH1D * neutVertexInWindowX   = new TH1D("neutVertexInWindowX","neutVertexInWindowX",100, -5,5);
@@ -708,8 +712,11 @@ void lar1::Reprocessing::Loop(std::string signal,
       // nuleng = CalcLepton( detect_dist );
 
       // Get flux weight from FluxRW utilities
-      if ( signal != "numi" ) {
-        fluxweight = utils.GetFluxWeight(enugen, iflux, inno, ndecay );
+      if ( signal != "numi") {
+        if (useTwoHornConfig)
+          fluxweight = utils.GetTwoHornWeight(enugen, iflux, inno, ndecay,iLoc);
+        else
+          fluxweight = utils.GetFluxWeight(enugen, iflux, inno, ndecay );
       }
       else{ 
         fluxweight = 1.0;
@@ -841,6 +848,7 @@ void lar1::Reprocessing::Loop(std::string signal,
       // Require that the event went through larg4, so fosc and numi skipped
       //----------------------------------------------
       int totalGammas = 0;
+      int totalActiveGammas = 0;
       double photonE = 0;
       double photonTheta = 0;
       double photonConvDist = 0;
@@ -890,6 +898,11 @@ void lar1::Reprocessing::Loop(std::string signal,
 
           TVector3 photon2Pos( p2PhotonConversionPos->at(i).Vect() );
           TVector3 photon2Mom( p2PhotonConversionMom->at(i).Vect() );
+
+          convPointX -> Fill(photon1Pos.X());
+          convPointXVsE -> Fill(photon1Pos.X(),p1PhotonConversionMom->at(i).E());
+          convPointX -> Fill(photon2Pos.X());
+          convPointXVsE -> Fill(photon2Pos.X(),p2PhotonConversionMom->at(i).E());
             
           TVector3 dist2 = photon2Pos - (*vertex);
 
@@ -921,6 +934,11 @@ void lar1::Reprocessing::Loop(std::string signal,
             nfound ++;
             allPhotonGapVsVertexE -> Fill(showerGap,vertexEnergy);
           }
+          else if (utils.IsActive(iDet,photon1Pos,5) &&
+                   p1PhotonConversionMom->at(i).E() > egammaThreshold )
+          {
+            totalActiveGammas ++;
+          }
           if(   utils.IsFiducial( iDet, photon2Pos, signal ) 
              && p2PhotonConversionMom->at(i).E() > egammaThreshold )
           {  
@@ -934,7 +952,11 @@ void lar1::Reprocessing::Loop(std::string signal,
             nfound++;
             allPhotonGapVsVertexE -> Fill(showerGap,vertexEnergy);
           }
-              
+          else if (utils.IsActive(iDet,photon1Pos,5) &&
+                   p1PhotonConversionMom->at(i).E() > egammaThreshold )
+          {
+            totalActiveGammas ++;
+          }              
           if( !isCC ){
             if( nfound == 2 ) foundBothPhotons++;
             if( nfound == 1 ) foundOnePhoton++;
@@ -980,6 +1002,11 @@ void lar1::Reprocessing::Loop(std::string signal,
             showerGap = dist1.Mag();
             allPhotonGapVsVertexE -> Fill(showerGap,vertexEnergy);
           }
+          else if (utils.IsActive(iDet,photon1Pos,5) &&
+                   miscPhotonConversionMom->at(i_gamma).E() > egammaThreshold )
+          {
+            totalActiveGammas ++;
+          }        
         }
       }
       if(totalGammas == 1 && !isCC){
@@ -1163,7 +1190,14 @@ void lar1::Reprocessing::Loop(std::string signal,
         // #############################
         // Look at misID from NC:
         // #############################
-        if (!isCC && totalGammas == 1 && photonE > egammaThreshold){
+        if (!isCC && totalGammas == 1 && 
+             photonE > egammaThreshold)
+        {
+
+          if (totalActiveGammas != 0 ){
+            // std::cout << "Skipping this event because there is another active volume.\n";
+            continue;
+          }
 
           if (smearing){
             ElepSmeared = utils.GetLeptonEnergy(photonE,true,11);
@@ -1242,11 +1276,13 @@ void lar1::Reprocessing::Loop(std::string signal,
             if( enucalo2 > 0.2 && enucalo2 < 0.475 ) NsinglePhotonNC_LE += wgt;
           }
 
-          photonConv->Fill( photonPos.X(), photonPos.Y(), photonPos.Z() );
-          photonConvX->Fill( photonPos.X() );
-          photonConvY->Fill( photonPos.Y() );
-          photonConvZ->Fill( photonPos.Z() );
-          photonCCQE->Fill( enuccqe, photonE, wgt );
+          if (photonE > 0.200){
+            photonConv->Fill( photonPos.X(), photonPos.Y(), photonPos.Z() );
+            photonConvX->Fill( photonPos.X() );
+            photonConvY->Fill( photonPos.Y() );
+            photonConvZ->Fill( photonPos.Z() );
+            photonCCQE->Fill( enuccqe, photonE, wgt );
+          }
 
           // NCsinglePhoton += wgt;
           // singlePhotonE.push_back( photonE );
