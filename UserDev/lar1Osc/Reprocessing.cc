@@ -1138,44 +1138,84 @@ void lar1::Reprocessing::Loop(std::string signal,
         // #############################
         // Look at misID from numu CC:
         // #############################
-        if (isFid && isCC && abs(inno) == 14){
+        if (isCC && abs(inno) == 14){
 
-          if (leptonMom->at(0).E() < egammaThreshold ){
+          // In this case, looking for single photons again
+          // but making sure we don't see the muon.
+          
+          if (muon_ContainedLength > 100) continue;
+
+          if (contained) continue;
+
+          // are there photons?
+          // if there is not exactly one single fiducial photon, continue
+          if (totalGammas != 1 ) continue;
+
+          // looking for active photons that can be rejected
+          if (totalActiveGammas != 0 ){
+            // std::cout << "Skipping this event because there is another active volume.\n";
             continue;
           }
-          if (smearing) 
-            ElepSmeared = utils.GetLeptonEnergy(Elep,true,11);
-          else
-            ElepSmeared = Elep;
 
-          ShowerContainedDistance = utils.GetContainedLength(*vertex, lepDir, iDet);
-          ShowerDistanceToStart   = utils.GetLengthToStart(  *vertex, lepDir, iDet);
-          ShowerDistanceToStartYZ = utils.GetYZLengthToStart(*vertex, lepDir, iDet);
-          showerGap = 0.0;
-
-          ibkg = 7;
-          efficiency = muonCCMisID;
-          wgt = fluxweight*efficiency;
+          // At this point, there is a muon that was missed and exactly one fiducial photon
+          // that was found without any active volume friends.
+          // from here, continue like in the NC photon case
           
+          if (photonE < egammaThreshold ){
+            continue;
+          }
+
+          if (smearing){
+            ElepSmeared = utils.GetLeptonEnergy(photonE,true,11);
+            Elep = photonE;
+          }
+          else {
+            ElepSmeared = photonE;
+            Elep = photonE;
+          }
+
+          ShowerContainedDistance = utils.GetContainedLength(photonPos, photonMom, iDet);
+          ShowerDistanceToStart   = utils.GetLengthToStart(  photonPos, photonMom, iDet);
+          ShowerDistanceToStartYZ = utils.GetYZLengthToStart(photonPos, photonMom, iDet);
           electron_cand_energy = ElepSmeared;
-          electron_cand_angle = ThetaLep;
+          electron_cand_angle = photonTheta;
+          
 
 
           enuccqe = utils.NuEnergyCCQE( 1000*electron_cand_energy, 
                                         sqrt(pow(1000*electron_cand_energy,2) 
                                       - pow(0.511,2)), 
                                         electron_cand_angle, 0.511, iflux )/1000.0;
-          enucalo1 = utils.NuEnergyCalo(GeniePDG, GenieMomentum, 
-                                        electron_cand_energy, smearing, 
-                                        true, true )
-                                      + vertexEnergy;
-          enucalo2 = utils.NuEnergyCalo(GeniePDG, GenieMomentum, 
-                                        electron_cand_energy, smearing,
-                                        false, false, prot_thresh)
-                                      + photon_energy
-                                      + vertexEnergy;
+          enucalo1 = utils.NuEnergyCalo( GeniePDG, GenieMomentum, 
+                                       electron_cand_energy, smearing,
+                                       true, true ) + vertexEnergy;
+          // Since in this case, the photon energy is the electron
+          // candidate energy, *don't* add back on the photon energy
+          // Further, 
+          enucalo2 = utils.NuEnergyCalo( GeniePDG, GenieMomentum, 
+                                         electron_cand_energy, smearing,
+                                         false, false, 
+                                         prot_thresh ) + vertexEnergy;
+          
 
+          efficiency = photonMisID;
+          wgt = fluxweight*efficiency;
+         
 
+          // In principle, can reject photons with a gap.
+          // So, reject photons with vertex energy above the cut
+          // AND a gap longer than the cut
+          // Really this happens at the next stage/
+          if ( photonConvDist > convDistCut && vertexEnergy > vtxEcut){
+            std::cout << "Continuing because of cuts.....\n\n\n";
+            std::cout << "  photonConvDist is " << photonConvDist << "\n"
+                      << "  vertexEnergy is " << vertexEnergy << "\n";
+            continue;
+
+          }
+
+          ibkg = 7;
+          
           numuCC->Fill( enugen, wgt );
           numuCCLepE->Fill( electron_cand_energy, wgt );
           numuCCCCQE->Fill( enuccqe, wgt );
