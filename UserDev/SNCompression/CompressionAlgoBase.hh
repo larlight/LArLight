@@ -13,6 +13,7 @@
 #define COMPRESSIONALGOBASE_HH
 
 #include <iostream>
+#include "Geometry.hh"
 #include <vector>
 
 namespace compress {

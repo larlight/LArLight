@@ -39,9 +39,9 @@ namespace larlight {
   {
 
     //clean up histograms if they already exist (from previous event)
-    if (_hHits_U) {delete _hHits_U; _hHits_U = 0;};  
-    if (_hHits_V) {delete _hHits_V; _hHits_V = 0;};  
-    if (_hHits_Y) {delete _hHits_Y; _hHits_Y = 0;};  
+    if (_hHits_U) {delete _hHits_U; };  
+    if (_hHits_V) {delete _hHits_V; };  
+    if (_hHits_Y) {delete _hHits_Y; };  
 
 
     //if all ok, plot wire vs. time for hits
@@ -105,16 +105,16 @@ namespace larlight {
   }
 
   //****************************************************************
-  TH2I* WFViewer::Prepare2DHisto(std::string name, 
+  TH2S* WFViewer::Prepare2DHisto(std::string name, 
 				      double wiremin, double wiremax,
 				      double timemin, double timemax)
   //****************************************************************
   {
     
-    TH2I* h=0;
+    TH2S* h=0;
     if(h) delete h;
     
-    h = new TH2I("2DViewer",name.c_str(),
+    h = new TH2S("2DViewer",name.c_str(),
 		 int(wiremax/2),  wiremin, wiremax,
 		 int(timemax/2),  timemin, timemax);
 
