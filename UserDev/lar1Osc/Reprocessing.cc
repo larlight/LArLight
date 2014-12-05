@@ -58,7 +58,7 @@ void lar1::Reprocessing::Loop(std::string signal,
 
     double egammaThreshold = 0.1; // 0.140 // GeV
 
-    bool smearing = false;
+    bool smearing = true;
 
     Double_t prot_thresh = 0.02;
 

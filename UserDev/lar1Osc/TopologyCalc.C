@@ -559,7 +559,7 @@ void TopologyCalc(TString target){
 
 
 
-    } // end (isFid)
+    } // end (isAct)
 
   }
 
