@@ -1188,7 +1188,7 @@ void lar1::Reprocessing::Loop(std::string signal,
           
           if (muon_ContainedLength > 100) continue;
 
-          if (contained) continue;
+          // if (contained) continue;
 
           // are there photons?
           // if there is not exactly one single fiducial photon, continue
