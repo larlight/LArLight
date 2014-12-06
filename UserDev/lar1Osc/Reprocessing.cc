@@ -1140,6 +1140,49 @@ void lar1::Reprocessing::Loop(std::string signal,
         // #############################
         if (isCC && abs(inno) == 14){
 
+          // continue;
+
+/*
+          // ############################################################
+          // Start of block of old code:
+          // ############################################################
+          if (!isFid) continue;
+
+
+          if (leptonMom->at(0).E() < egammaThreshold ) continue;
+
+          if (smearing) 
+            ElepSmeared = utils.GetLeptonEnergy(Elep,true,11);
+          else
+            ElepSmeared = Elep;
+
+          ShowerContainedDistance = utils.GetContainedLength(*vertex, lepDir, iDet);
+          ShowerDistanceToStart   = utils.GetLengthToStart(  *vertex, lepDir, iDet);
+          ShowerDistanceToStartYZ = utils.GetYZLengthToStart(*vertex, lepDir, iDet);
+          showerGap = 0.0;
+          ibkg = 7;
+          efficiency = muonCCMisID;
+          wgt = fluxweight*efficiency;
+          electron_cand_energy = ElepSmeared;
+          electron_cand_angle = ThetaLep;
+           enuccqe = utils.NuEnergyCCQE( 1000*electron_cand_energy, 
+                                         sqrt(pow(1000*electron_cand_energy,2) 
+                                       - pow(0.511,2)), 
+                                         electron_cand_angle, 0.511, iflux )/1000.0;
+           enucalo1 = utils.NuEnergyCalo(GeniePDG, GenieMomentum, 
+                                         electron_cand_energy, smearing, 
+                                         true, true )
+                                       + vertexEnergy;
+           enucalo2 = utils.NuEnergyCalo(GeniePDG, GenieMomentum, 
+                                         electron_cand_energy, smearing,
+                                         false, false, prot_thresh)
+                                       + photon_energy
+                                       + vertexEnergy;
+          // ############################################################
+          // End of block of old code.
+          // ############################################################
+*/
+
           // In this case, looking for single photons again
           // but making sure we don't see the muon.
           
@@ -1214,6 +1257,9 @@ void lar1::Reprocessing::Loop(std::string signal,
 
           }
 
+          //end of new code
+
+
           ibkg = 7;
           
           numuCC->Fill( enugen, wgt );
@@ -1233,6 +1279,7 @@ void lar1::Reprocessing::Loop(std::string signal,
         if (!isCC && totalGammas == 1 && 
              photonE > egammaThreshold)
         {
+
 
           if (totalActiveGammas != 0 ){
             // std::cout << "Skipping this event because there is another active volume.\n";

@@ -10,7 +10,7 @@
 namespace lar1{
   Utils::Utils(){
     mc_generation = 5;
-    randService.SetSeed(1);
+    randService.SetSeed(0);
     reconfigure();
   }
 
@@ -558,7 +558,8 @@ namespace lar1{
       if( abs(pdg->at(i)) == 211 ) continue;  // skip pions because they're accounted for
       if( abs(pdg->at(i)) == 321 ) continue;  // skip kaons because they're accounted for
 
-      total_energy += randService.Gaus(momentum->at(i).E(), 0.05*momentum->at(i).E());
+      if (smearing) total_energy += randService.Gaus(momentum->at(i).E(), 0.05*momentum->at(i).E());
+      else total_energy += momentum->at(i).E();
       if (abs(pdg->at(i)) == 2112) total_energy -= M_n;
 
     }
@@ -576,11 +577,16 @@ namespace lar1{
   {
     double res;
 
+    randService.SetSeed(0);
+    
     if (abs(PDG) == 13 ){ // muon
       if (contained){
         res = 0.02;
         // std::cout << "  Resolution is: " << res << std::endl;
-        return randService.Gaus(energy, res*energy);
+        if (smearing) 
+          return randService.Gaus(energy, res*energy);
+        else
+          return energy;
       }
       else{
         if (containedLength > 100)
@@ -588,14 +594,20 @@ namespace lar1{
         else
           return 0;
         // std::cout << "  Resolution is: " << res << std::endl;
-        return randService.Gaus(energy, res*energy);
+        if (smearing)
+          return randService.Gaus(energy, res*energy);
+        else
+          return energy;
       }
     }
     else if (abs(PDG) == 11){ // electron
       // electrons have 15%sqrt(e/1Gev) resolution.  Maybe.
       res = 0.15 / sqrt(energy);
       // std::cout << "  Resolution is: " << res << std::endl;
-      return randService.Gaus(energy, res*energy);
+      if (smearing)
+        return randService.Gaus(energy, res*energy);
+      else
+        return energy;
     }
     else
       return 0.0;
