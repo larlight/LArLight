@@ -47,13 +47,15 @@ namespace larlight {
   
   
   void ViewCompression::processWF(){
+
     
     //get tpc_data
     larlight::tpcfifo* tpc_data = (&(_current_event_wf->at(_currentWF)));      
     
     //finally, apply compression..
     std::vector<unsigned short> ADCwaveform = getADCs(tpc_data);
-    _compress_algo->ApplyCompression(ADCwaveform);
+    std::cout << "Calling compression algorithm." << std::endl;
+    _compress_algo->ApplyCompression(ADCwaveform,0);
     std::vector<std::vector<unsigned short> > compressOutput = _compress_algo->GetOutputWFs();
     std::vector<int> outTimes = _compress_algo->GetOutputWFTimes();
     

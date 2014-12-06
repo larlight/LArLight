@@ -46,7 +46,7 @@ namespace larlight {
       // 1) Convert tpc_data object to just the vector of shorts which make up the ADC ticks
       std::vector<unsigned short> ADCwaveform = getADCs(tpc_data);
       // 2) Now apply the compression algorithm. _compress_algo is an instance of CompressionAlgoBase
-      _compress_algo->ApplyCompression(ADCwaveform);
+      _compress_algo->ApplyCompression(ADCwaveform,0);
       // 3) Retrieve the output waveforms (vectors of vectors of shorts) produced during the compression
       std::vector<std::vector<unsigned short> > compressOutput = _compress_algo->GetOutputWFs();
       // 4) Retrieve the time-ticks at which each output waveform saved starts

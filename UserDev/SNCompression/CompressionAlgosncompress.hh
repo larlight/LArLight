@@ -28,7 +28,13 @@ namespace compress {
     /// Function where compression is performed
     void ApplyCompression(const std::vector<unsigned short> &waveform, int mode);
 
+    void SetBlockSize(int b) { _block = b; }
+
+    void Debug(bool a) {debug = a;}
+
   protected:
+    int _block;
+    bool debug;
 
   };
 
