@@ -51,7 +51,8 @@ while my_proc.process_event():
     for pad in xrange(1,4,1):
         
         c.cd(pad)
-        my_ana.GetHisto_Hits(int(currentview)).Draw("COLZ")
+        histo = my_ana.GetHisto_Hits(int(currentview))
+        histo.Draw("COLZ")
     
         currentview = currentview + 1
         c.Update()
@@ -59,7 +60,7 @@ while my_proc.process_event():
 
     usrinput = raw_input("Hit Enter: next evt  ||  q: exit viewer\n")
     if ( usrinput == "q" ):
-        break
+        sys.exit(0)
     
 
 # done!
