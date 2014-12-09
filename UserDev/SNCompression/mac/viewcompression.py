@@ -29,10 +29,12 @@ my_proc.set_ana_output_file("")
 compAna=fmwk.ViewCompression()
 
 #add Compression Algorithm
-compAlgo = compress.CompressionAlgoThresh()
+compAlgo = compress.CompressionAlgosncompress()
 compAlgo.SetVerbose(False)
 compAlgo.SetDebug(False)
-compAlgo.SetThreshold(15)
+compAlgo.SetBlockSize(64)
+compAlgo.Debug(False);
+#compAlgo.SetThreshold(15)
 compAna.SetCompressAlgo(compAlgo)
 
 my_proc.add_process(compAna)
@@ -61,7 +63,7 @@ while my_proc.process_event():
 
             usrinput = raw_input("Hit Enter: next evt  ||  q: exit viewer\n")
             if ( usrinput == "q" ):
-                break
+                sys.exit(0)
 
 
     

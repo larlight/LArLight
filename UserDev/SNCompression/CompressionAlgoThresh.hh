@@ -28,7 +28,7 @@ namespace compress {
   public:
     
     /// Function where compression is performed
-    void ApplyCompression(const std::vector<unsigned short> &waveform);
+    void ApplyCompression(const std::vector<unsigned short> &waveform, int mode);
     
     /// Function to set input waveform to be compressed
     void SetInWF(std::vector<unsigned short> waveform) { _InWF = waveform; }

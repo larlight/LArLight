@@ -5,7 +5,9 @@
 
 namespace compress {
   
-  void CompressionAlgoThresh::ApplyCompression(const std::vector<unsigned short> &waveform){
+  void CompressionAlgoThresh::ApplyCompression(const std::vector<unsigned short> &waveform, int mode){
+
+    std::cout << "called algo." << std::endl;
 
     //Algorithm Computation starts here!
     PrepareAlgo();

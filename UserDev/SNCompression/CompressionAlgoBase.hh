@@ -13,6 +13,7 @@
 #define COMPRESSIONALGOBASE_HH
 
 #include <iostream>
+#include "Geometry.hh"
 #include <vector>
 
 namespace compress {
@@ -35,7 +36,7 @@ namespace compress {
     virtual void Reset() { _InWF.clear(); _OutWF.clear(); _OutWFStartTick.clear(); }
 
     /// Function where compression is performed
-    virtual void ApplyCompression(const std::vector<unsigned short> &waveform);
+    virtual void ApplyCompression(const std::vector<unsigned short> &waveform, int mode);
 
     /// Get Compression Output Vector
     virtual std::vector<std::vector<unsigned short> > GetOutputWFs() { return _OutWF; }

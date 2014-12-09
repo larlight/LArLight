@@ -5,10 +5,10 @@
 
 namespace compress {
   
-  void CompressionAlgoBase::ApplyCompression(const std::vector<unsigned short> &waveform){
+  void CompressionAlgoBase::ApplyCompression(const std::vector<unsigned short> &waveform, int mode){
 
     /// This algorithm simply returns the original waveform as the compressed one! Not very useful!
-    
+    std::cout << "Defaut Base Compression Algo called..." << std::endl;
     //Set the Output waveform to be identical to the input waveform
     _OutWF.push_back(waveform);
     // Set the start tick for the output waveform to be 0
