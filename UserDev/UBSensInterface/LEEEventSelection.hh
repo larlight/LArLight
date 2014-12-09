@@ -35,7 +35,7 @@ namespace larlight {
     /// Default constructor
     LEEEventSelection(){ 
       _name="LEEEventSelection"; 
-      _fid_cut_dist = 17.;
+      //      _fid_cut_dist = 17.;
       _fout=0;
     };
 
@@ -48,14 +48,25 @@ namespace larlight {
 
     virtual bool finalize();
 
-    void SetFiducialCutDistance(double kaleko){ _fid_cut_dist = kaleko; }
+    bool isInFidVol(const std::vector<double> &vertex_in_cm);
+    //    void SetFiducialCutDistance(double kaleko){ _fid_cut_dist = kaleko; }
 
   protected:
 
-    double _fid_cut_dist;
+    //    double _fid_cut_dist;
 
     geoalgo::DistToBoxWall _dtbw;
 
+    int total_event_counter;
+    int passed_event_counter;
+
+    TH1F* generated_x;
+    TH1F* generated_y;
+    TH1F* generated_z;
+    TH1F* selected_x;
+    TH1F* selected_y;
+    TH1F* selected_z;
+    
   };
 }
 #endif
