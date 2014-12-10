@@ -32,9 +32,18 @@ namespace compress {
 
     void Debug(bool a) {debug = a;}
 
+    void SetBaselineThresh(int b) { _deltaB = b; }
+    void SetVarianceThresh(int v) { _deltaV = v; }
+    void SetCompressThresh(int c) { _c = c; }
+
   protected:
     int _block;
     bool debug;
+
+    // Value of Baseline Threshold for initial stage of compression
+    int _deltaB;
+    int _deltaV;
+    int _c;
 
   };
 

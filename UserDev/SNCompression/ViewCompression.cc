@@ -55,7 +55,9 @@ namespace larlight {
     // Figure out channel's plane:
     // used because different planes will have different "buffers"
     int pl = larutil::Geometry::GetME()->ChannelToPlane(tpc_data->channel_number());
-    
+
+    // reset compression
+    _compress_algo->Reset();
     //finally, apply compression..
     std::vector<unsigned short> ADCwaveform = getADCs(tpc_data);
     std::cout << "Calling compression algorithm." << std::endl;
