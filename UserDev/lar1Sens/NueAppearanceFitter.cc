@@ -1967,9 +1967,14 @@ namespace lar1{
     padTemp->SetLogx();
     padTemp->SetLogy();
     hr1->Draw();
+
+    std::cout << "Got to here at least ... 1\n";
+
     plotUtils.lsnd_plot(padTemp);
     sens90->Draw("l same");
    
+    std::cout << "Got to here at least ... 2\n";
+
 
     TLegend* legt=new TLegend(0.8,0.42,0.93,0.53);
     legt->SetFillStyle(0);
@@ -1983,6 +1988,7 @@ namespace lar1{
     legt->AddEntry(sens5s,"5#sigma CL","l");
     legt->Draw();
     
+    std::cout << "Got to here at least ... 3\n";
 
     leg3->Draw();
 
@@ -2067,9 +2073,9 @@ namespace lar1{
     for (int j = 0; j <nL; j++){
       // root makes me want to be eaten by a grue,  sometimes.
       // why do i have to do this stupid naming shit to keep track of my histograms?
-      if (j == 0)     stackedCanvas[j] = new TCanvas("sc0", "Stacked event rates", 700, 500);
-      else if (j == 1)  stackedCanvas[j] = new TCanvas("sc1", "Stacked event rates", 700, 500);
-      else if (j == 2)  stackedCanvas[j] = new TCanvas("sc2", "Stacked event rates", 700, 500);
+      if (j == 0)     stackedCanvas[j] = new TCanvas("sc0", "Stacked event rates", 2*700, 2*500);
+      else if (j == 1)  stackedCanvas[j] = new TCanvas("sc1", "Stacked event rates", 2*700, 2*500);
+      else if (j == 2)  stackedCanvas[j] = new TCanvas("sc2", "Stacked event rates", 2*700, 2*500);
       else return -1;
       
       TString nueTitle = "Nue Events at L = ";
@@ -2333,7 +2339,7 @@ namespace lar1{
       leg->AddEntry(NueFromNueCC_chargeKaon, "K^{+} #rightarrow #nu_{e}");
       leg->AddEntry(NueFromNueCC_neutKaon, "K^{0} #rightarrow #nu_{e}");
       // leg->AddEntry(NueFromEScatter, "#nu - e^{-}");
-      leg->AddEntry(NueFromNC_pi0, "NC Single  #gamma");
+      leg->AddEntry(NueFromNC_pi0, "NC Single #gamma");
       // leg->AddEntry(NueFromNC_delta0, "#Delta #rightarrow N#gamma");
       leg->AddEntry(NueFromNumuCC, "#nu_{#mu} CC");
       if (includeDirt)
@@ -2470,7 +2476,7 @@ namespace lar1{
       }
       stack -> Draw("E0 same ");
 
-
+      gPad->RedrawAxis("same");
 
 
       // stack -> Draw(" same ");

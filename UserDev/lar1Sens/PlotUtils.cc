@@ -36,7 +36,7 @@ namespace lar1{
 
     Int_t    nlines;
     Double_t x[500],y[500];
-    Double_t dummy, dummy_old;
+    Double_t dummy(0), dummy_old(0);
     TGraph* gr[NDATAFILES];
     for (Int_t ifile = 0; ifile<NDATAFILES; ifile++) {
       nlines = 0;
@@ -76,8 +76,11 @@ namespace lar1{
     bfPoint -> SetMarkerStyle(3);
     bfPoint -> SetMarkerColor(1);
     bfPoint -> Draw("LP");
+    std::cout << "Got to here at least ... 1a\n";
 
     plotGFData(c);
+    std::cout << "Got to here at least ... 1b\n";
+
 
     return;
   }
@@ -149,7 +152,7 @@ namespace lar1{
     TH2D* hr1=new TH2D(Form("emptyPlot_%d",stupidEffingRoot),"hr1",500,sin22thmin,sin22thmax,500,dm2min,dm2max);
     hr1->Reset();
     hr1->SetFillColor(0);
-    hr1->SetTitle(";sin^{2}2 #theta_{#mue};#Deltam^{2}_{41} (eV^{2})");
+    hr1->SetTitle(";sin^{2}2 #theta_{#mue};#Deltam^{2} (eV^{2})");
     hr1->GetXaxis()->SetTitleOffset(1.1);
     hr1->GetYaxis()->SetTitleOffset(1.2);
     hr1->GetXaxis()->SetTitleSize(0.05);
@@ -161,8 +164,11 @@ namespace lar1{
   }
 
   int PlotUtils::plotGFData(TPad * c ){
-    std::vector<std::vector<double> > data = readGFData();
 
+    std::vector<std::vector<double> > data;
+    readGFData(data);
+    
+    /*
     // std::cout << "Printing out the chi2 map:\n";
     // for (int dm2point = 0; dm2point < data.size(); dm2point ++){
     //   for (int sin22thpoint = 0; sin22thpoint < data[0].size(); sin22thpoint ++){
@@ -170,26 +176,13 @@ namespace lar1{
     //               << data[dm2point][sin22thpoint] << "\n";
     //   }
     //   std::cout << std::endl;
-    // }
+    // } */
 
-    int npoints = 250;
+
 
     double min = getMinimum2D(data);
     double bound90 = min + 4.605;
-    double xbins[npoints+1], ybins[npoints+1];
 
-    for (int x_index = 0; x_index <= npoints; x_index ++ )
-    {
-      xbins[x_index] = pow(10.0,(x_index*0.016 - 4.01));
-      // std::cout << xbins[x_index] << "\n";
-    }
-    std::cout << "\n" << std::endl;
-    for (int y_index = 0; y_index <= npoints; y_index ++ )
-    {
-      ybins[y_index] = pow(10.0,(y_index*0.0112 - 1.4));
-      // std::cout << ybins[y_index] << "\n";
-
-    }
 
     // Want to find the bottom and top edge of these regions.
     std::vector<double> bottomEdge;
@@ -198,10 +191,10 @@ namespace lar1{
     // Want to loop over dm2 points and get the edge points there
     // that's the first index in the data
     std::cout << "Looking for bound90 = " << bound90 << " and min = " << min << std::endl;
+    std::cout << "data.size() is " << data.size() << std::endl;
     for (unsigned int dm2index = 0; dm2index < data.size() ; dm2index ++){
       bottomEdge.push_back(0.0);
       topEdge.push_back(0.0);    
-      
       // now loop over the data inside this row of dm2 data
       for (unsigned int sin22thindex = 1;
            sin22thindex < data[dm2index].size() -1;
@@ -241,8 +234,9 @@ namespace lar1{
           break;
         }
       }
-
     }
+
+
 
     double xpoints[2*bottomEdge.size()], ypoints[2*bottomEdge.size()];
     // double xpoints_top[bottomEdge.size()], ypoints_top[bottomEdge.size()];
@@ -266,7 +260,6 @@ namespace lar1{
         counter ++;
       }
     }
-
     // Smooth out the y variations in the plot.
     // Only change values if they are above or below both of their neighbors
     // Alost add a point at the end, in the next dm2 spot, to help the smoothness
@@ -308,7 +301,6 @@ namespace lar1{
 
     // bottom -> Merge(top);
 
-    TH2D * chi2hist = new TH2D("chi2","chi2", 250, xbins, 250,ybins);
 
 
     // for (int i = 0; i <= 40; i++){
@@ -318,39 +310,40 @@ namespace lar1{
 
 
 
-    // std::cout << "\t";
-    // for (int j = 0; j <= 41; ++j) std::cout << std::fixed << (j*0.1 - 4.01) << " \t";
-    // std::cout << "\n";
-    for (int i = 0; i <= 56; i++){
-      // std::cout << std::fixed << (i*0.05 - 1.4);
-      for (int j = 0; j <= 40; ++j){
-        // if (data[i][j] >= min && data[i][j] < bound90)
-        // {
-          double sin22th = pow(10.0,(j*0.1 - 4.01));
-          double dm2 = pow(10.0,(i*0.05 - 1.4));
-          chi2hist -> Fill(sin22th,dm2,data[i][j]);
-          // std::cout << "Filling " << data[i][j] << " at x = " << sin22th 
-          // << ", y = " << dm2 << std::endl;
-        // }
-      }
-      // std::cout << "\n";
-    }
+    // // std::cout << "\t";
+    // // for (int j = 0; j <= 41; ++j) std::cout << std::fixed << (j*0.1 - 4.01) << " \t";
+    // // std::cout << "\n";
+    // for (int i = 0; i <= 56; i++){
+    //   // std::cout << std::fixed << (i*0.05 - 1.4);
+    //   for (int j = 0; j <= 40; ++j){
+    //     // if (data[i][j] >= min && data[i][j] < bound90)
+    //     // {
+    //       double sin22th = pow(10.0,(j*0.1 - 4.01));
+    //       double dm2 = pow(10.0,(i*0.05 - 1.4));
+    //       chi2hist -> Fill(sin22th,dm2,data[i][j]);
+    //       std::cout << "Filling " << data[i][j] << " at x = " << sin22th 
+    //       << ", y = " << dm2 << std::endl;
+    //     // }
+    //   }
+    //   // std::cout << "\n";
+    // }
 
-    std::cout << "Max of plot: " << chi2hist -> GetMaximum() << std::endl;
-    std::cout << "Min of plot: " << chi2hist -> GetMinimum() << std::endl;
 
     // TCanvas * d = new TCanvas("dumb","dumber", 500, 500);
 
-    bottom -> SetFillColor(1);
-    bottom -> SetFillStyle(3254);
+    c -> cd();
+
+    bottom->SetFillColor(1);
+    bottom->SetFillStyle(3254);
     // bottom -> SetLineColor(46);
     // bottom -> GetFillColor() -> SetAlpha(0.5);
+    std::cout << "Got to here at least ... 1aa\n";
 
     // auto arr = chi2hist -> GetArray();
     // chi2hist -> Smooth();
     // chi2hist -> Smooth();
     // chi2hist -> Draw("cont list same");
-    bottom -> Draw("CF same");
+    bottom->Draw("CF same");
     double sin22thBF[1] = {0.013};
     double dm2BF[1] = {0.42};
     TGraph * bfPoint = new TGraph(1, sin22thBF, dm2BF);
@@ -359,13 +352,13 @@ namespace lar1{
     bfPoint -> SetMarkerColor(1);
     bfPoint -> Draw("LP");
     // top -> Draw("L same");
+    std::cout << "Got to here at least ... 1ab\n";
 
     return 0;
 
   }
 
-  std::vector<std::vector<double > >  PlotUtils::readGFData(){
-    std::vector<std::vector<double> > nullData;
+  void PlotUtils::readGFData(std::vector<std::vector<double > > & result){
     std::string path = GetEnv("MAKE_TOP_DIR");
     path.append("/UserDev/lar1Sens/");
     std::string data_file= path;
@@ -376,10 +369,11 @@ namespace lar1{
               << "  " << data_file << std::endl;
     datafile.open(data_file.c_str(), std::ios_base::in);
     //check if the file is open: 
-    if (!datafile.is_open() ) {std::cerr << "readGFData.C: file not opened" <<std::endl; return nullData;}
+    if (!datafile.is_open() ) {std::cerr << "readGFData.C: file not opened" <<std::endl; return;}
     //else {std::cout << "Successfully opened " << filename << std::endl;}
 
     int i = 0;
+
 
     std::vector<std::string> legend;
     legend.push_back("DM41");
@@ -388,12 +382,13 @@ namespace lar1{
     legend.push_back("chi2_NH");
     legend.push_back("chi2_IH");
 
-    // Setting up a container to hold the chi2 values.
-    // There are 57 dm14 points, from -1.4 to 1.4 in steps of 0.05 inclusive;
-    // There are 41 sin22th points from -4.01 to -0.01 in steps of 0.1 inclusive;
-    // at each point, we marginalize over any Um4 or chi2_IH/chi2_NH
-    std::vector< std::vector<double > > chi2map(57, std::vector<double>(41, 0.0) );
-    // to get indices correct, the index of dm14 is (dm14 + 1.4)/0.05
+    // // Setting up a container to hold the chi2 values.
+    // // There are 57 dm14 points, from -1.4 to 1.4 in steps of 0.05 inclusive;
+    // // There are 41 sin22th points from -4.01 to -0.01 in steps of 0.1 inclusive;
+    // // at each point, we marginalize over any Um4 or chi2_IH/chi2_NH
+    result.resize(57);
+    for (auto & vec : result ) vec.resize(41);
+    // // to get indices correct, the index of dm14 is (dm14 + 1.4)/0.05
 
     std::string line;
     while (std::getline(datafile, line))
@@ -418,24 +413,30 @@ namespace lar1{
         // std::cout << "pushing back " << temp << std::endl;
         data.push_back(temp);
       }
-      // Now do the actual processing.
+    //   // Now do the actual processing.
       
 
       unsigned int dm14index = ceil(((data[0]+ 1.4)/0.05));
       unsigned int sin22thindex = ceil(((data[1] + 4.01)/0.1));
 
+      // std::cout << "data is " << data.size() << std::endl;
+
+
+      if (dm14index > 56) exit(-1);
+      if (sin22thindex > 40) continue;
+
       double chi2 = fmin(data[3], data[4]);
-      if (chi2map[dm14index][sin22thindex] == 0.0) 
-        chi2map[dm14index][sin22thindex] = chi2;
-      else if (chi2map[dm14index][sin22thindex] > chi2) 
-        chi2map[dm14index][sin22thindex] = chi2;
+      if (result[dm14index][sin22thindex] == 0.0) 
+        result[dm14index][sin22thindex] = chi2;
+      else if (result[dm14index][sin22thindex] > chi2) 
+        result[dm14index][sin22thindex] = chi2;
 
       i ++;
 
     }
+    datafile.close();
 
-
-    return chi2map;
+    return;
   }
 
 
@@ -1019,11 +1020,11 @@ TCanvas *  PlotUtils::plot_Matrix(TH2D * matrix, TString matrixName,
   matrix -> GetYaxis() -> SetLabelSize(0.055);
   matrix -> GetXaxis() -> SetLabelSize(0.055);
 
-  // Remove the tick marks:
-  matrix -> GetXaxis() -> SetTickSize(0);
-  matrix -> GetYaxis() -> SetTickSize(0);
-  blankHist -> GetXaxis() -> SetTickSize(0);
-  blankHist -> GetYaxis() -> SetTickSize(0);
+  // // Remove the tick marks:
+  // matrix -> GetXaxis() -> SetTickSize(0);
+  // matrix -> GetYaxis() -> SetTickSize(0);
+  // blankHist -> GetXaxis() -> SetTickSize(0);
+  // blankHist -> GetYaxis() -> SetTickSize(0);
 
 
 

@@ -18,6 +18,7 @@
 #include "TColor.h"
 #include "TFile.h"
 #include "TGaxis.h"
+#include "TAxis.h"
 
 namespace lar1{
 
@@ -58,7 +59,7 @@ namespace lar1{
     double getMinimum2D(std::vector<std::vector<double> > &s);
     
     // reads in the Global Fit data from the file is lsnd_data/
-    std::vector<std::vector<double > >  readGFData();
+    void  readGFData(std::vector<std::vector<double > > &);
 
     // Plots the GF data on the Canvas given, like the lsnd_plot function above
     int plotGFData(TPad * c);
