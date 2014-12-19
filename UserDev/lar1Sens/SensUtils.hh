@@ -48,7 +48,9 @@ namespace lar1{
     TString GetChi2FileName  (TString fileSource,
                               TString fileNameRoot,
                               TString detNamesString,
+                              TString fileNameExtenstion,
                               bool includeNumus,
+                              bool includeDetSyst,
                               std::vector<std::string> covMatrixList,
                               std::vector<int> covMatrixListSource,
                               bool absolute_MWSource);
@@ -89,6 +91,7 @@ namespace lar1{
 
     TMatrix getDirtMatrix(const std::vector<float> & nullVector,
                             const std::vector<std::vector<float> > & Dirt);
+    TMatrix getDetMatrix(const std::vector<float> & nullVec, int nL, int nbins_nue);
 
     TMatrix getCosmicMatrix(const std::vector<float> & nullVector,
                               const std::vector<std::vector<float> > & Cosmics);

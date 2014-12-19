@@ -76,13 +76,8 @@ namespace lar1{
       // Configure beam and detectors:
       void setMode(std::string s){mode = s;}
       void setUse100m(bool b){use100m = b;}
-      void setUse150m(bool b){use150m = b;}
-      void setUse200m(bool b){use200m = b;}
-      void setUse100mLong(bool b){use100mLong = b;}
       void setUse470m(bool b){use470m = b;}
-      void setUse700m(bool b){use700m = b;}
       void setUseT600_onaxis(bool b){useT600_onaxis = b;}
-      void setUseT600_offaxis(bool b){useT600_offaxis = b;}
 
       // Can scale the event rates up or down
       void setUbooneScale(double d){ubooneScale = d;}
@@ -102,6 +97,7 @@ namespace lar1{
       void setNumuBins(std::vector<float> bins){numuBins = bins; nbins_numu = numuBins.size()-1;}
       void setIncludeCosmics(bool b = false){includeCosmics = b;}
       void setIncludeDirt(bool b = false){includeDirt = b;}
+      void setIncludeDetSys(bool b = false){includeDetSyst = b;}
       void setCosmicsFile(std::string s){cosmicsFile = s;}
       void setElectContainedDist(double d){ElectContainedDist = d;}
       void setMinDistanceToStart(double d){minDistanceToStart = d;}
@@ -118,6 +114,8 @@ namespace lar1{
       void setForceRemake(bool b){forceRemake = b;}
       void setSavePlots(bool b){savePlots=b;}
 
+
+      void extendFileName(std::string s){fileNameExtenstion = s;}
 
       void setNpoints(int n)
       {
@@ -188,6 +186,7 @@ namespace lar1{
       //Self explanatory, this is where the ntuples you want to use are located:
       std::string fileSource;
       TString fileNameRoot;
+      TString fileNameExtenstion;
       TString detNamesString;
       //Note: parts of this routine will write to that same folder, make sure its writable!
 
@@ -365,6 +364,7 @@ namespace lar1{
 
       bool includeCosmics;
       bool includeDirt;
+      bool includeDetSyst;
       std::string cosmicsFile;
 
       double ElectContainedDist;

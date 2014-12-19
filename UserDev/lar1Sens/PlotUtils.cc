@@ -13,24 +13,24 @@ namespace lar1{
     std::string path = GetEnv("MAKE_TOP_DIR");
     path.append("/UserDev/lar1Sens/");
     std::string data_dir= path;
-    data_dir.append("lsnd_data/");
+    data_dir.append("osc_data/");
 
-    // const char* data_dir = "lsnd_data/";
+    // const char* data_dir = "osc_data/";
     Double_t  dm2BF[] = {1.2};
     Double_t sin22thBF[] = {0.003};
 
     const Int_t NDATAFILES = 11;
     const char * file_list[NDATAFILES] = {"llreg_608_1.vec",
-                 "llreg_608_2.vec",
-                 "llreg_608_3.vec",
-                 "llreg_607_1.vec",
-                 "llreg_607_2.vec",
-                 "llreg_607_3.vec",
-                 "llreg_607_4.vec",
-                 "llreg_607_5.vec",
-                 "llreg_607_6.vec",
-                 "llreg_607_7.vec",
-                 "llreg_607_8.vec"};
+                                          "llreg_608_2.vec",
+                                          "llreg_608_3.vec",
+                                          "llreg_607_1.vec",
+                                          "llreg_607_2.vec",
+                                          "llreg_607_3.vec",
+                                          "llreg_607_4.vec",
+                                          "llreg_607_5.vec",
+                                          "llreg_607_6.vec",
+                                          "llreg_607_7.vec",
+                                          "llreg_607_8.vec"};
 
     Int_t graph_color[NDATAFILES] = {29, 29, 29, 38, 38, 38, 38, 38, 38, 38, 38};
 
@@ -49,7 +49,7 @@ namespace lar1{
       ifstream datafile;
       datafile.open(filename, std::ios_base::in);
       //check if the file is open: 
-      if (!datafile.is_open() ) {std::cerr << "lsnd_plot.C: file not opened" <<std::endl; return;}
+      if (!datafile.is_open() ) {std::cerr << "lsnd_plot.C: file " << filename << " not opened" <<std::endl; return;}
       //else {std::cout << "Successfully opened " << filename << std::endl;}
       while (!datafile.eof()) {
         datafile >> dummy; 
@@ -78,8 +78,76 @@ namespace lar1{
     bfPoint -> Draw("LP");
 
     plotGFData(c);
+    giunti_plot(c);
 
     return;
+  }
+
+  void PlotUtils::miniBoone_plot(TPad* c)
+  {
+    std::string path = GetEnv("MAKE_TOP_DIR");
+    path.append("/UserDev/lar1Sens/");
+    std::string data_dir= path;
+    data_dir.append("osc_data/");
+
+    std::vector<TString> file_list;
+    file_list.push_back(data_dir + "fit200_cont_90_0.txt");
+    file_list.push_back(data_dir + "fit200_cont_90_1.txt");
+    file_list.push_back(data_dir + "fit200_cont_90_2.txt");
+    // file_list.push_back(data_dir + "fit200_cont_1s.txt");
+    // file_list.push_back(data_dir + "fit200_cont_90.txt");
+    // file_list.push_back(data_dir + "fit200_cont_99.txt");
+    // file_list.push_back(data_dir + "fit200_sens_90.txt");
+
+    // Now read in the plots
+    //
+    c -> cd();
+    
+    std::vector<TGraph *> graphs; 
+    for (auto & file : file_list){
+      graphs.push_back(new TGraph(file.Data()));
+      graphs.back() -> SetFillStyle(0);
+      graphs.back() -> SetMarkerColor(4);
+      graphs.back() -> SetMarkerSize(2);
+      graphs.back() -> Draw("P");
+    }    
+
+    // graphs.at(1) -> SetFillStyle(0);
+    // graphs.at(1) -> SetFillStyle(0);
+    // graphs.at(1) -> Draw("P");
+
+    return;                                                                                                                                                                                                                                                         
+  }
+
+  void PlotUtils::giunti_plot(TPad* c)
+  {
+
+    std::string path = GetEnv("MAKE_TOP_DIR");
+    path.append("/UserDev/lar1Sens/");
+    std::string data_dir= path;
+    data_dir.append("osc_data/");
+
+    TString file=data_dir + "giunti_con-lev-sem-9000.dat";
+
+    // Now read in the plot
+    TGraph * graph = new TGraph(file.Data()); 
+
+    graph -> SetFillColor(kPink);
+    graph -> SetFillStyle(3001);
+
+
+    double x[1] = {0.0015};
+    double y[1] = {1.5};
+
+    TGraph * bestFit = new TGraph(1,x,y);
+    bestFit -> SetMarkerStyle(33);
+
+
+    c -> cd();
+    graph -> Draw("CF");
+    bestFit -> Draw("P");
+
+    return;                      
   }
 
   // adds a plot label to the current canvas
@@ -102,7 +170,7 @@ namespace lar1{
     leg3->SetFillStyle(0);
     leg3->SetFillColor(0);
     leg3->SetBorderSize(0);
-    leg3->SetTextSize(0.03);
+    leg3->SetTextSize(0.02);
     TGraph *gdummy1 = new TGraph();
     gdummy1->SetFillColor(29);
     TGraph *gdummy2 = new TGraph();
@@ -116,11 +184,19 @@ namespace lar1{
     TGraph *gdummy0 = new TGraph();
     gdummy0 -> SetFillColor(1);
     gdummy0 -> SetFillStyle(3254);
+    TGraph *gdummy5 = new TGraph();
+    gdummy5 -> SetFillColor(kPink);
+    gdummy5 -> SetFillStyle(3001);
+    TGraph *gdummy6 = new TGraph();
+    gdummy6 -> SetMarkerStyle(33);
+
     leg3->AddEntry(gdummy2,"LSND 90% CL","F");
     leg3->AddEntry(gdummy1,"LSND 99% CL","F");
     leg3->AddEntry(gdummy3,"LSND Best Fit","P*");
-    leg3->AddEntry(gdummy4,"Global Best Fit","P*");
+    leg3->AddEntry(gdummy4,"Global Best Fit (arXiv:1303.3011)","P*");
     leg3->AddEntry(gdummy0,"Global Fit 90% CL (arXiv:1303.3011)");
+    leg3->AddEntry(gdummy6,"Global Best Fit (arXiv:1308.5288)","P*");
+    leg3->AddEntry(gdummy5,"Global Fit 90% CL (arXiv:1308.5288)");
 
     return leg3;
 
@@ -175,7 +251,7 @@ namespace lar1{
     int npoints = 250;
 
     double min = getMinimum2D(data);
-    double bound90 = min + 4.605;
+    double bound90 = min + 4.6051;
     double xbins[npoints+1], ybins[npoints+1];
 
     for (int x_index = 0; x_index <= npoints; x_index ++ )
@@ -369,8 +445,8 @@ namespace lar1{
     std::string path = GetEnv("MAKE_TOP_DIR");
     path.append("/UserDev/lar1Sens/");
     std::string data_file= path;
-    data_file.append("lsnd_data/dm41th14th24-app.dat");
-    // const char* data_file = "lsnd_data/dm41th14th24-app.dat";
+    data_file.append("osc_data/dm41th14th24-app.dat");
+    // const char* data_file = "osc_data/dm41th14th24-app.dat";
     ifstream datafile;
     std::cout << "Trying to open Global Best Fit data from: \n"
               << "  " << data_file << std::endl;
@@ -524,7 +600,7 @@ std::vector<int> PlotUtils::Bin_LSND_Data( int npoints,
   std::string path = GetEnv("MAKE_TOP_DIR");
   path.append("/UserDev/lar1Sens/");
   std::string data_dir= path;
-  data_dir.append("lsnd_data/");
+  data_dir.append("osc_data/");
 
   TH2D * LSND_Data = new TH2D("data","data", npoints,xbins, npoints, ybins);
 

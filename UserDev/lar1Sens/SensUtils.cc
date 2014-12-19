@@ -500,7 +500,9 @@ namespace lar1
   TString SensUtils::GetChi2FileName(TString fileSource,
                                      TString fileNameRoot,
                                      TString detNamesString,
+                                     TString fileNameExtenstion,
                                      bool includeNumus,
+                                     bool includeDetSyst,
                                      std::vector<std::string> covMatrixList,
                                      std::vector<int> covMatrixListSource,
                                      bool absolute_MWSource)
@@ -520,11 +522,20 @@ namespace lar1
       std::cerr << "There is some thing strange about the fileNameRoot that was supplied!";
     }
 
+    if (fileNameExtenstion != ""){
+      chi2FileName += fileNameExtenstion;
+      chi2FileName += "_";
+    }
+
     for (unsigned int i = 0; i < covMatrixList.size(); i ++){
       chi2FileName += covMatrixList.at(i);
       chi2FileName += "_";
       chi2FileName += covMatrixListSource.at(i);
       chi2FileName += "_";
+    }
+
+    if (includeDetSyst){
+      chi2FileName += "detSys_";
     }
 
     if (absolute_MWSource){
@@ -640,6 +651,29 @@ namespace lar1
       }
       return dirtMatrix;
 
+    }
+
+    TMatrix SensUtils::getDetMatrix(const std::vector<float> & nullVec, int nL, int nbins_nue){
+      TMatrix detMatrix;
+
+      detMatrix.ResizeTo(nullVec.size(), nullVec.size());
+
+      // The det matrix gets a 15% normalization uncertainty
+      // It's applied fully correlated within each detector:
+      double fracError = 0.015;
+      for ( int b_line = 0; b_line < nL; ++b_line)
+      {
+        for ( int x_bin = 0; x_bin < nbins_nue; ++x_bin)
+        {
+          for ( int y_bin = 0; y_bin < nbins_nue; ++y_bin)
+          {
+            detMatrix[b_line*nbins_nue + x_bin][b_line*nbins_nue + y_bin] 
+              = fracError*fracError*nullVec.at(b_line*nbins_nue + x_bin)
+                                   *nullVec.at(b_line*nbins_nue + y_bin);
+          }
+        }
+      }
+      return detMatrix;
     }
 
     TMatrix SensUtils::getCosmicMatrix(const std::vector<float> & nullVector,
