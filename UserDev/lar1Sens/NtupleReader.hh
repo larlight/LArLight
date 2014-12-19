@@ -8,6 +8,8 @@
 #include "TTree.h"
 #include "TString.h"
 #include "TMath.h"
+#include "TRandom.h"
+#include "TCanvas.h"
 
 //File work includes:
 #include <iostream>

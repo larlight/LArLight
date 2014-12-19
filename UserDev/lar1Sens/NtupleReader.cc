@@ -1776,10 +1776,38 @@ namespace lar1{
 
     TFile * file = new TFile((TString)fileName, "READ");
     TH1F * histogram = (TH1F*)file -> Get(histName.Data());
+    TH1F * smeared_hist = (TH1F*) histogram -> Clone();
+    smeared_hist -> Reset();
+
+    double boost = 1000;
+    double wgt = 1.0/boost;
+    double center = 0;
+    double entries = 0;
+
+    TRandom smear(0);
+
+    double wgt_prime = 0;
+
+    for(int bin = 1; bin <= histogram->GetNbinsX(); bin ++){
+
+      center =  histogram->GetBinCenter(bin);
+      entries = boost*(histogram->GetBinContent(bin));
+      if(entries != 0){
+        wgt_prime = wgt*(boost*(histogram->GetBinContent(bin)))/(entries);
+      }
+      else{ wgt_prime = 0; }
+
+      for(int i = 0; i < entries; i++){
+
+        smeared_hist->Fill(smear.Gaus(center, center*0.15/sqrt(center)), wgt);
+
+      }
+
+    }
 
     // It's nasty but here is the spot to apply efficiency:
     for (unsigned int i = 0; i < bins.size()-1; i ++){
-      result[i] = histogram -> GetBinContent(i+1);
+      result[i] = smeared_hist -> GetBinContent(i+1);
     }
     return result;
 
@@ -1820,15 +1848,45 @@ namespace lar1{
 
     TFile * file = new TFile((TString)fileName, "READ");
     TH1F * histogram = (TH1F*)file -> Get(histName.Data());
+    TH1F * smeared_hist = (TH1F*) histogram -> Clone();
+    smeared_hist -> Reset();
+
+    double boost = 1000;
+    double wgt = 1.0/boost;
+    double center = 0;
+    double entries = 0;
+
+    TRandom smear(0);
+
+    double wgt_prime = 0;
+
+    for(int bin = 1; bin <= histogram->GetNbinsX(); bin ++){
+
+      center =  histogram->GetBinCenter(bin);
+      entries = boost*(histogram->GetBinContent(bin));
+      if(entries != 0){
+        wgt_prime = (histogram->GetBinContent(bin))/(entries);
+      }
+      else{ wgt_prime = 0; }
+
+      for(int i = 0; i < entries; i++){
+
+        smeared_hist->Fill(smear.Gaus(center, center*0.15/sqrt(center)), wgt_prime);
+
+      }
+
+    }
 
     // It's nasty but here is the spot to apply efficiency:
     for (unsigned int i = 0; i < bins.size()-1; i ++){
-      result[i] = histogram -> GetBinContent(i+1);
+      result[i] = smeared_hist -> GetBinContent(i+1);
     }
 
     return result;
 
   }
+
+
 
 
 }

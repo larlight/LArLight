@@ -42,6 +42,11 @@ namespace lar1{
     void lsnd_plot (TPad* c);
     // void lsnd_plot (TCanvas* c);
 
+    void miniBoone_plot(TPad* c);
+
+    // Add the region from Giuni et al
+    void giunti_plot(TPad* c);
+
     void add_plot_label(char* label, double x, double y,
                         double size = 0.05, int color = 1,
                         int font = 72, int align = 22 );
