@@ -256,7 +256,7 @@ namespace lar1{
 
     double min = getMinimum2D(data);
     double bound90 = min + 4.6051;
-    double xbins[npoints+1], ybins[npoints+1];
+    // double xbins[npoints+1], ybins[npoints+1];
 
 
     // Want to find the bottom and top edge of these regions.

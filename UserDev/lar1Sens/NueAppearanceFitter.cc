@@ -2122,9 +2122,9 @@ namespace lar1{
     for (int j = 0; j <nL; j++){
       // root makes me want to be eaten by a grue,  sometimes.
       // why do i have to do this stupid naming shit to keep track of my histograms?
-      if (j == 0)     stackedCanvas[j] = new TCanvas("sc0", "Stacked event rates", 2*700, 2*500);
-      else if (j == 1)  stackedCanvas[j] = new TCanvas("sc1", "Stacked event rates", 2*700, 2*500);
-      else if (j == 2)  stackedCanvas[j] = new TCanvas("sc2", "Stacked event rates", 2*700, 2*500);
+      if (j == 0)     stackedCanvas[j] = new TCanvas("sc0", "Stacked event rates", 700, 500);
+      else if (j == 1)  stackedCanvas[j] = new TCanvas("sc1", "Stacked event rates", 700, 500);
+      else if (j == 2)  stackedCanvas[j] = new TCanvas("sc2", "Stacked event rates", 700, 500);
       else return -1;
       
       TString nueTitle = "Nue Events at L = ";
@@ -2156,16 +2156,8 @@ namespace lar1{
       // TH1F* SignalNu = new TH1F("signal","signal",nbins_nue,&(nueBins[0]));
         SignalNu -> Add(SignalNubar);
       }
-      // SignalNu->SetBinContent(1,77.47);
-      // SignalNu->SetBinContent(2,22.65);
-      // SignalNu->SetBinContent(3,3.57);
-      // SignalNu->SetBinContent(4,1.37);
-      // SignalNu->SetBinContent(5,0.54);
-      // SignalNu->SetBinContent(6,0.13);
-      // SignalNu->SetBinContent(7,0.1);
-      // SignalNu->SetBinContent(8,0.07);
-      // SignalNu->SetBinContent(9,0.07);
-      // SignalNu->SetBinContent(10,0.0);
+
+      SignalNu -> Scale(0.1);
 
 
 
@@ -2444,7 +2436,7 @@ namespace lar1{
       
       if (baselines[j] == "100m") max = 20000;
       if (baselines[j] == "470m") max = 2500;
-      if (baselines[j] == "600m_onaxis") max = 3900;
+      if (baselines[j] == "600m_onaxis") max = 4100;
       
 
       std::cout << "Max val (scaled): " << max << "\n";
