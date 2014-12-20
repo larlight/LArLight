@@ -406,6 +406,8 @@ void lar1::Reprocessing::Loop(std::string signal,
     // These histograms contain the background plots for all of the analysis produced
     // but in particular nue.
 
+    TH1D *totalEventsFosc = new TH1D("totalEventsFosc","totalEventsFosc",ebins, emin, emax);
+    TH1D *totalEventsNumu = new TH1D("totalEventsNumu","totalEventsNumu",ebins, emin, emax);
 
     // true neutrino energy
     TH1D *nueFromMuonDecay = new TH1D("NueFromMuonDecay","NueFromMuonDecay;Generated Neutrino Energy (GeV);Events",ebins,emin,emax);
@@ -619,6 +621,9 @@ void lar1::Reprocessing::Loop(std::string signal,
 
     double nNumuMisID_total = 0;
 
+    double nNumuCCEvents = 0;
+    double nFoscEvents = 0;
+
     //====================================================
     // Loop over entries in incoming ntuple
     //====================================================
@@ -721,6 +726,8 @@ void lar1::Reprocessing::Loop(std::string signal,
       else{ 
         fluxweight = 1.0;
       }
+
+      // only keep active detector events
       if( !isActive ) continue;
 
 
@@ -738,7 +745,14 @@ void lar1::Reprocessing::Loop(std::string signal,
       TVector3 lepDir(1,1,1);
       CalcLepton(lepDir);
 
+      if (isCC){
+        totalEventsNumu->Fill(enugen, fluxweight);
+        totalEventsFosc->Fill(enugen, fluxweight);
 
+        if (signal == "fosc") nFoscEvents += fluxweight;
+        if (signal == "numu") nNumuCCEvents += fluxweight;
+
+      }
 
       beamSpot -> Fill(vertex->X(),vertex->Y(),fluxweight);
 
@@ -1448,6 +1462,7 @@ void lar1::Reprocessing::Loop(std::string signal,
           // else
           //   std::cout << "non-contained length is " << muon_ContainedLength << std::endl;
 
+
           if (!contained || muon_ContainedLength < 100) {
             // std::cout << "continuing!" << std::endl;
             continue;
@@ -1469,6 +1484,7 @@ void lar1::Reprocessing::Loop(std::string signal,
 
           efficiency = muonIDeff;
           wgt = fluxweight*efficiency;
+
 
           electron_cand_energy = ElepSmeared;
           electron_cand_angle = ThetaLep;
@@ -1496,7 +1512,10 @@ void lar1::Reprocessing::Loop(std::string signal,
                                        + vertexEnergy;
           numuCC->Fill(enugen, wgt);
           numuCCLepE->Fill( leptonMom->at(0).E(), wgt );
+        
         }
+
+
       }
       if (signal == "fosc"){
         if ( isFid && isCC && abs(inno) == 12 && Elep > egammaThreshold ){
@@ -1545,6 +1564,7 @@ void lar1::Reprocessing::Loop(std::string signal,
           CcqeVsTrueE->Fill( enugen, enuccqe, wgt );
           Calo1VsTrueE->Fill( enugen, enucalo1, wgt );
           Calo2VsTrueE->Fill( enugen, enucalo2, wgt );
+
         }
       }
 
@@ -1763,6 +1783,9 @@ void lar1::Reprocessing::Loop(std::string signal,
               << "N_continue_foundPhotons   : " << N_continue_foundPhotons << "\n"
               << "N_continue_CC_muon        : " << N_continue_CC_muon << "\n";
 
+
+    std::cout << "nFoscEvents: " << nFoscEvents << std::endl;
+    std::cout << "nNumuCCEvents: " << nNumuCCEvents << std::endl;
 
 }
 
