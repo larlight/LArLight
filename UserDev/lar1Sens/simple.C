@@ -6,7 +6,7 @@
 
   lar1::NueAppearanceFitter n;
   // n.setFileSource("/Users/cja33/genie_RW/");
-  n.setFileSource("/Users/cja33/nominal_ntuples/");
+  n.setFileSource("/home/cadams/nominal_ntuples/");
   // n.setFileSource("/Users/cja33/numuCC_test/");
   // n.setFileSource("/Users/cja33/5cm_cut/");
   // n.setFileSource("/Users/cja33/30cm_cut/");
@@ -24,7 +24,7 @@
   n.setUse470m(       true);
   n.setUseT600_onaxis(true);
 
-  n.setLAr1NDPOT(6.6e20);
+  n.setLAr1NDPOT(2.2e20);
   n.setUboonePOT(2*6.6e20);
   n.setIcarusPOT(6.6e20);
   // n.setLAr1NDScale(1.0);
@@ -40,9 +40,9 @@
   // n.setIcarusCosmicScale((1-0.95));
   // n.extendFileName("lessCosmics");
 
-  // n.setEnergyType("elep");
+  n.setEnergyType("elep");
   // n.setEnergyType("eccqe");
-  n.setEnergyType("ecalo2");
+  // n.setEnergyType("ecalo2");
   n.setShapeOnlyFit(false);
   n.setForceRemake(false);
   n.setUseInfiniteStatistics(false);
@@ -108,7 +108,7 @@
   n.setNueBins(nue_bins);
   n.setNumuBins(numu_bins);
 
-  n.setIncludeFosc(true);
+  n.setIncludeFosc(false);
   n.setIncludeNumus(false);
   n.setIncludeCosmics(true);
   n.setIncludeDirt(true);
@@ -154,9 +154,9 @@
 
   n.setBuildCovarianceMatrix(false);
   n.setMakeRatioPlots(false);
-  n.setLoop(true);
-  n.setMakeSimplePlot(true);
-  n.setMakeEventRatePlots(false);
+  n.setLoop(false);
+  n.setMakeSimplePlot(false);
+  n.setMakeEventRatePlots(true);
   n.setMakeAltSensPlot(false);
 
   n.Run();

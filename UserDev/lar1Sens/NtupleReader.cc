@@ -1751,9 +1751,11 @@ namespace lar1{
     // Just hardcoding the names because they suck:
     TString fileName;
     TString histName;
+    double scale = 1.0;
     if (baseline == "100m"){
       fileName = path + "LAr1ND_dirt.root";
       histName = "LAr1ND_dirt";
+      // scale = 1.118;
     }
     if (baseline == "470m"){
       fileName = path + "MicroBooNE_dirt.root";
@@ -1807,7 +1809,7 @@ namespace lar1{
 
     // It's nasty but here is the spot to apply efficiency:
     for (unsigned int i = 0; i < bins.size()-1; i ++){
-      result[i] = smeared_hist -> GetBinContent(i+1);
+      result[i] = scale * smeared_hist -> GetBinContent(i+1);
     }
     return result;
 
@@ -1821,17 +1823,21 @@ namespace lar1{
     // Just hardcoding the names because they suck:
     TString fileName;
     TString histName;
+    double scale = 1.0;
     if (baseline == "100m"){
       fileName = path + "LAr1ND_cosmics.root";
       histName = "LAr1ND_cosmics";
+      // scale = 1.118;
     }
     if (baseline == "470m"){
       fileName = path + "MicroBooNE_cosmics.root";
       histName = "MicroBooNE_cosmics";
+      // scale = 1.22;
     }
     if (baseline == "600m_onaxis"){
       fileName = path + "ICARUS_cosmics.root";
       histName = "ICARUS_cosmics";
+      // scale = 1.16;
     }
 
 
@@ -1879,7 +1885,7 @@ namespace lar1{
 
     // It's nasty but here is the spot to apply efficiency:
     for (unsigned int i = 0; i < bins.size()-1; i ++){
-      result[i] = smeared_hist -> GetBinContent(i+1);
+      result[i] = scale * smeared_hist -> GetBinContent(i+1);
     }
 
     return result;

@@ -26,8 +26,8 @@ namespace lar1{
     PotNormNubar  = 10e20;
     PotNormNu     = 6.6e20;
 
-    nue_fidCut_x = 15.0;
-    nue_fidCut_y = 15.0;
+    nue_fidCut_x = 25.0;
+    nue_fidCut_y = 25.0;
     nue_fidCut_zUp = 30.0;
     nue_fidCut_zDown = 50.0;
 

@@ -2122,9 +2122,9 @@ namespace lar1{
     for (int j = 0; j <nL; j++){
       // root makes me want to be eaten by a grue,  sometimes.
       // why do i have to do this stupid naming shit to keep track of my histograms?
-      if (j == 0)     stackedCanvas[j] = new TCanvas("sc0", "Stacked event rates", 700, 500);
-      else if (j == 1)  stackedCanvas[j] = new TCanvas("sc1", "Stacked event rates", 700, 500);
-      else if (j == 2)  stackedCanvas[j] = new TCanvas("sc2", "Stacked event rates", 700, 500);
+      if (j == 0)     stackedCanvas[j] = new TCanvas("sc0", "Stacked event rates", 2*700, 2*500);
+      else if (j == 1)  stackedCanvas[j] = new TCanvas("sc1", "Stacked event rates", 2*700, 2*500);
+      else if (j == 2)  stackedCanvas[j] = new TCanvas("sc2", "Stacked event rates", 2*700, 2*500);
       else return -1;
       
       TString nueTitle = "Nue Events at L = ";
@@ -2157,7 +2157,6 @@ namespace lar1{
         SignalNu -> Add(SignalNubar);
       }
 
-      SignalNu -> Scale(0.1);
 
 
 
@@ -2309,11 +2308,11 @@ namespace lar1{
         NueFromNueCC_neutKaon -> SetBinError(i+1, 0.0);
         totalEvents[i]      += NueFromNueCC_neutKaon -> GetBinContent(i+1);
         NueFromEScatter     -> SetBinError(i+1, 0.0);
-        totalEvents[i]      += NueFromEScatter -> GetBinContent(i+1);
+        // totalEvents[i]      += NueFromEScatter -> GetBinContent(i+1);
         NueFromNC_pi0       -> SetBinError(i+1, 0.0);
         totalEvents[i]      += NueFromNC_pi0 -> GetBinContent(i+1);
         NueFromNC_delta0    -> SetBinError(i+1, 0.0);
-        totalEvents[i]      += NueFromNC_delta0 -> GetBinContent(i+1);
+        // totalEvents[i]      += NueFromNC_delta0 -> GetBinContent(i+1);
         NueFromNumuCC       -> SetBinError(i+1, 0.0);
         totalEvents[i]      += NueFromNumuCC -> GetBinContent(i+1);
         Dirt                -> SetBinError(i+1, 0.0);
@@ -2429,14 +2428,14 @@ namespace lar1{
       }
 
 
-      // if (baselines[j] == "100m") max *= 1.75;
-      // if (baselines[j] == "470m") max *= 1.75;
-      // if (baselines[j] == "600m_onaxis") max *= 1.75;
+      if (baselines[j] == "100m") max *= 1.75;
+      if (baselines[j] == "470m") max *= 1.75;
+      if (baselines[j] == "600m_onaxis") max *= 1.75;
       
       
-      if (baselines[j] == "100m") max = 20000;
-      if (baselines[j] == "470m") max = 2500;
-      if (baselines[j] == "600m_onaxis") max = 4100;
+      // if (baselines[j] == "100m") max = 24000;
+      // if (baselines[j] == "470m") max = 3500;
+      // if (baselines[j] == "600m_onaxis") max = 5300;
       
 
       std::cout << "Max val (scaled): " << max << "\n";
@@ -2802,7 +2801,7 @@ namespace lar1{
 
     // First, make an empty LSND plot:
     TLegend * leg3 = plotUtils.getLSNDLegend();
-    TCanvas * tempCanv = new TCanvas("tempCanv","temp canvas",650,650);
+    TCanvas * tempCanv = new TCanvas("tempCanv2","temp canvas",650,650);
     TH2D * hr1 = plotUtils.getEmptySensPlot();
     tempCanv->cd();
     TPad * padTemp = new TPad("padTemp","padTemp",0,0,1,1);

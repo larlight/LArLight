@@ -581,7 +581,7 @@ void TopologyCalc(TString target){
   // Compute the errors on the rates
   if (useMultiWeights){
     // Total event rates:
-    for ( auto centralValuePair = eventRatesNumuMap.begin();
+    for ( std::map<int,double> centralValuePair = eventRatesNumuMap.begin();
           centralValuePair != eventRatesNumuMap.end(); centralValuePair ++)
     {
       int key = centralValuePair->first;
@@ -599,7 +599,7 @@ void TopologyCalc(TString target){
       eventRatesNumuMapSystematicUncert[key] = tempRMS;
       eventRatesNumuMapStatisticalUncert[key] = sqrt(centralValuePair->second);
     }
-    for ( auto centralValuePair = eventRatesNueMap.begin();
+    for ( std::map<int,double> centralValuePair = eventRatesNueMap.begin();
           centralValuePair != eventRatesNueMap.end(); centralValuePair ++)
     {
       int key = centralValuePair->first;
@@ -611,7 +611,7 @@ void TopologyCalc(TString target){
       eventRatesNueMapSystematicUncert[key] = tempRMS;
       eventRatesNueMapStatisticalUncert[key] = sqrt(centralValuePair->second);
     }
-    for ( auto centralValuePair = showerMap.begin();
+    for ( std::map<int,double> centralValuePair = showerMap.begin();
           centralValuePair != showerMap.end(); centralValuePair ++)
     {
       int key = centralValuePair->first;
@@ -623,7 +623,7 @@ void TopologyCalc(TString target){
       showerMapSystematicUncert[key] = tempRMS;
       showerMapStatisticalUncert[key] = sqrt(centralValuePair->second);
     }
-    for ( auto centralValuePair = nuchanNumuMap.begin();
+    for ( std::map<int,double> centralValuePair = nuchanNumuMap.begin();
           centralValuePair != nuchanNumuMap.end(); centralValuePair ++)
     {
       int key = centralValuePair->first;
@@ -635,7 +635,7 @@ void TopologyCalc(TString target){
       nuchanMapNumuSystematicUncert[key] = tempRMS;
       nuchanMapNumuStatisticalUncert[key] = sqrt(centralValuePair->second);
     }
-    for ( auto centralValuePair = nuchanNueMap.begin();
+    for ( std::map<int,double> centralValuePair = nuchanNueMap.begin();
           centralValuePair != nuchanNueMap.end(); centralValuePair ++)
     {
       int key = centralValuePair->first;
@@ -647,7 +647,7 @@ void TopologyCalc(TString target){
       nuchanMapNueSystematicUncert[key] = tempRMS;
       nuchanMapNueStatisticalUncert[key] = sqrt(centralValuePair->second);
     }
-    for ( auto centralValuePair = pi0Map.begin();
+    for ( std::map<int,double> centralValuePair = pi0Map.begin();
           centralValuePair != pi0Map.end(); centralValuePair ++)
     {
       int key = centralValuePair->first;

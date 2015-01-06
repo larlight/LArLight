@@ -1,0 +1,50 @@
+
+# DO NOT DELETE
+
+./TopologyCalc_C.so: /home/cadams/ROOT/root5/include/TChain.h
+./TopologyCalc_C.so: /home/cadams/ROOT/root5/include/TTree.h
+./TopologyCalc_C.so: /home/cadams/ROOT/root5/include/TBranch.h
+./TopologyCalc_C.so: /home/cadams/ROOT/root5/include/TNamed.h
+./TopologyCalc_C.so: /home/cadams/ROOT/root5/include/TObject.h
+./TopologyCalc_C.so: /home/cadams/ROOT/root5/include/Rtypes.h
+./TopologyCalc_C.so: /home/cadams/ROOT/root5/include/RConfig.h
+./TopologyCalc_C.so: /home/cadams/ROOT/root5/include/RVersion.h
+./TopologyCalc_C.so: /home/cadams/ROOT/root5/include/DllImport.h
+./TopologyCalc_C.so: /home/cadams/ROOT/root5/include/Rtypeinfo.h
+./TopologyCalc_C.so: /home/cadams/ROOT/root5/include/snprintf.h
+./TopologyCalc_C.so: /home/cadams/ROOT/root5/include/strlcpy.h
+./TopologyCalc_C.so: /home/cadams/ROOT/root5/include/TGenericClassInfo.h
+./TopologyCalc_C.so: /home/cadams/ROOT/root5/include/TSchemaHelper.h
+./TopologyCalc_C.so: /home/cadams/ROOT/root5/include/TStorage.h
+./TopologyCalc_C.so: /home/cadams/ROOT/root5/include/TVersionCheck.h
+./TopologyCalc_C.so: /home/cadams/ROOT/root5/include/Riosfwd.h
+./TopologyCalc_C.so: /home/cadams/ROOT/root5/include/TBuffer.h
+./TopologyCalc_C.so: /home/cadams/ROOT/root5/include/TString.h
+./TopologyCalc_C.so: /home/cadams/ROOT/root5/include/TMathBase.h
+./TopologyCalc_C.so: /home/cadams/ROOT/root5/include/TObjArray.h
+./TopologyCalc_C.so: /home/cadams/ROOT/root5/include/TSeqCollection.h
+./TopologyCalc_C.so: /home/cadams/ROOT/root5/include/TCollection.h
+./TopologyCalc_C.so: /home/cadams/ROOT/root5/include/TIterator.h
+./TopologyCalc_C.so: /home/cadams/ROOT/root5/include/TAttFill.h
+./TopologyCalc_C.so: /home/cadams/ROOT/root5/include/TDataType.h
+./TopologyCalc_C.so: /home/cadams/ROOT/root5/include/TDictionary.h
+./TopologyCalc_C.so: /home/cadams/ROOT/root5/include/Property.h
+./TopologyCalc_C.so: /home/cadams/ROOT/root5/include/ESTLType.h
+./TopologyCalc_C.so: /home/cadams/ROOT/root5/include/TAttLine.h
+./TopologyCalc_C.so: /home/cadams/ROOT/root5/include/TAttMarker.h
+./TopologyCalc_C.so: /home/cadams/ROOT/root5/include/TArrayD.h
+./TopologyCalc_C.so: /home/cadams/ROOT/root5/include/TArray.h
+./TopologyCalc_C.so: /home/cadams/ROOT/root5/include/TArrayI.h
+./TopologyCalc_C.so: /home/cadams/ROOT/root5/include/TClass.h
+./TopologyCalc_C.so: /home/cadams/ROOT/root5/include/TObjString.h
+./TopologyCalc_C.so: /home/cadams/ROOT/root5/include/ThreadLocalStorage.h
+./TopologyCalc_C.so: /home/cadams/ROOT/root5/include/RConfigure.h
+./TopologyCalc_C.so: /home/cadams/ROOT/root5/include/TVirtualTreePlayer.h
+./TopologyCalc_C.so: /home/cadams/ROOT/root5/include/TSystem.h
+./TopologyCalc_C.so: /home/cadams/ROOT/root5/include/TInetAddress.h
+./TopologyCalc_C.so: /home/cadams/ROOT/root5/include/TTimer.h
+./TopologyCalc_C.so: /home/cadams/ROOT/root5/include/TSysEvtHandler.h
+./TopologyCalc_C.so: /home/cadams/ROOT/root5/include/TQObject.h
+./TopologyCalc_C.so: /home/cadams/ROOT/root5/include/TTime.h
+./TopologyCalc_C.so: /home/cadams/ROOT/root5/include/cintdictversion.h /home/cadams/ROOT/root5/include/RVersion.h
+TopologyCalc_C__ROOTBUILDVERSION= 5.34/24

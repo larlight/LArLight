@@ -52,6 +52,8 @@ void lar1::Reprocessing::Loop(std::string signal,
     double photonMisID   = 0.06;
     double muonCCMisID   = 0.001;
 
+    double smearingStats = 20.0;
+
     // NC photon vertex energy cuts
     double vtxEcut = 99999;     // 0.025;   // GeV
     double convDistCut = 99999; // 5.0;     // cm
@@ -631,6 +633,8 @@ void lar1::Reprocessing::Loop(std::string signal,
     Long64_t nbytes = 0, nb = 0;
     if( max_entry == -1 ) max_entry = nentries;
 
+    int smearingStatsIndex = smearingStats;
+
     for( Long64_t jentry=0; jentry<nentries && jentry<max_entry; jentry++ ){
     // for( Long64_t jentry=430000; jentry<nentries && jentry<max_entry; jentry++ ){
 
@@ -1145,7 +1149,20 @@ void lar1::Reprocessing::Loop(std::string signal,
           ShowerDistanceToStart   = utils.GetLengthToStart(  *vertex, lepDir, iDet);
           ShowerDistanceToStartYZ = utils.GetYZLengthToStart(*vertex, lepDir, iDet);
 
+        // check on the smearing stats - if the signal is nue intrisic, repeat this 
+        // calculation to improve the stats.
+        if (smearingStats != 1.0){
+          if (smearingStatsIndex == 0){ // if the index is maxed out, keep going
+            smearingStatsIndex = smearingStats;
+            continue;
+          }
+          else{
+            jentry --;  // decrement the index to repeat this event.
+            wgt *= (1.0/smearingStats);
+            smearingStatsIndex --;
+          }
 
+        }
 
         } // end of intrinsic electrons
 
