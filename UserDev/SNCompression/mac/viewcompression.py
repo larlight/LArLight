@@ -29,15 +29,15 @@ my_proc.set_ana_output_file("")
 compAna=fmwk.ViewCompression()
 
 #add Compression Algorithm
-compAlgo = compress.CompressionAlgosncompress()
+compAlgo = compress.CompressionAlgoThresh()
 compAlgo.SetVerbose(False)
 compAlgo.SetDebug(False)
-compAlgo.SetBlockSize(64)
-compAlgo.SetBaselineThresh(1)
-compAlgo.SetVarianceThresh(5)
-compAlgo.SetCompressThresh(5)
-compAlgo.Debug(False);
-#compAlgo.SetThreshold(15)
+#compAlgo.SetBlockSize(64)
+#compAlgo.SetBaselineThresh(1)
+#compAlgo.SetVarianceThresh(5)
+#compAlgo.SetCompressThresh(5)
+#compAlgo.Debug(False);
+compAlgo.SetThreshold(15)
 compAna.SetCompressAlgo(compAlgo)
 
 my_proc.add_process(compAna)

@@ -33,22 +33,22 @@ my_proc.add_process(my_ana)
 
 gStyle.SetOptStat(0)
 gStyle.SetTitleFontSize(0.1)
-gStyle.SetTitleOffset(0.4,"X")
-gStyle.SetTitleSize(0.08,"X")
-gStyle.SetTitleOffset(0.4,"Y")
-gStyle.SetTitleSize(0.08,"Y")
-gStyle.SetLabelSize(0.08,"X")
-gStyle.SetLabelSize(0.08,"Y")
-gStyle.SetLabelSize(0.08,"Z")
-gStyle.SetOptLogz(1)
+gStyle.SetTitleOffset(1,"X")
+gStyle.SetTitleSize(0.04,"X")
+gStyle.SetTitleOffset(1,"Y")
+gStyle.SetTitleSize(0.04,"Y")
+gStyle.SetLabelSize(0.04,"X")
+gStyle.SetLabelSize(0.04,"Y")
+gStyle.SetLabelSize(0.04,"Z")
+gStyle.SetOptLogz(0)
 
 c=TCanvas("c","Wire v. Time Hit Viewer",900,700)
-c.Divide(1,3)
+c.Divide(1,1)
 while my_proc.process_event():
 
     currentview = 0;
     #First fill the 6 pads on the main canvas with stuff
-    for pad in xrange(1,4,1):
+    for pad in xrange(1,2,1):
         
         c.cd(pad)
         histo = my_ana.GetHisto_Hits(int(currentview))

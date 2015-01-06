@@ -56,7 +56,7 @@ namespace larlight {
     /// A utility function to (re)create Th3D histogram of a specified boundary & name
     TH2S* Prepare2DHisto(std::string name, 
 			 double wiremin, double wiremax,
-			 double timemin, double timemax);
+			 double timemin, double timemax, int pl);
     
     /// Getter for hit TH2D histo, weighted by charge
     const TH2S*  GetHisto_Hits (int view) const {
