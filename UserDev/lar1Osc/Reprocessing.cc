@@ -50,9 +50,9 @@ void lar1::Reprocessing::Loop(std::string signal,
     double electronIDeff = 0.8;
     double muonIDeff     = 0.8;
     double photonMisID   = 0.06;
-    double muonCCMisID   = 0.001;
+    // double muonCCMisID   = 0.001;
 
-    double smearingStats = 20.0;
+    double smearingStats = 25.0;
 
     // NC photon vertex energy cuts
     double vtxEcut = 99999;     // 0.025;   // GeV
@@ -63,35 +63,6 @@ void lar1::Reprocessing::Loop(std::string signal,
     bool smearing = true;
 
     Double_t prot_thresh = 0.02;
-
-    Double_t detect_dist = 0;   // 10000=ND, 47000=MicroBooNE, 70000=FD
-
-    switch (iLoc)
-    {
-      case k100m:
-        detect_dist = 10000;
-        break;
-      case k150m:
-        detect_dist = 15000;
-        break;
-      case k175m:
-        detect_dist = 17500;
-        break;
-      case k200m:
-        detect_dist = 20000;
-        break;
-      case k470m:
-        detect_dist = 47000;
-        break;
-      case k600m_onaxis:
-        detect_dist = 60000;
-        break;
-      case k600m_offaxis:
-        detect_dist = 60000;
-        break;
-      default: 
-        detect_dist = -1;
-    }
 
 
     //---------------------------------------------
@@ -673,7 +644,7 @@ void lar1::Reprocessing::Loop(std::string signal,
       }
       if (verbose){
         std::cout << "Genie PDG and 4 vector: \n";
-        for (int i = 0; i < GeniePDG->size(); i ++){
+        for (unsigned int i = 0; i < GeniePDG->size(); i ++){
           std::cout << "\tPDG : " << GeniePDG->at(i)<< ", ("
                     << GenieMomentum->at(i).E() << ", "
                     << GenieMomentum->at(i).X() << ", "
@@ -717,8 +688,6 @@ void lar1::Reprocessing::Loop(std::string signal,
 
 
 
-      // Calculate the FS lepton's 4-vector and return neutrino path length
-      // nuleng = CalcLepton( detect_dist );
 
       // Get flux weight from FluxRW utilities
       if ( signal != "numi") {
@@ -809,9 +778,9 @@ void lar1::Reprocessing::Loop(std::string signal,
       for (unsigned int i = 0; i < GeniePDG->size(); ++i)
       {
         double e = GenieMomentum->at(i).E();
-        double p = sqrt(GenieMomentum->at(i).X()*GenieMomentum->at(i).X() 
-                      + GenieMomentum->at(i).Y()*GenieMomentum->at(i).Y()
-                      + GenieMomentum->at(i).Z()*GenieMomentum->at(i).Z() );
+        // double p = sqrt(GenieMomentum->at(i).X()*GenieMomentum->at(i).X() 
+        //               + GenieMomentum->at(i).Y()*GenieMomentum->at(i).Y()
+        //               + GenieMomentum->at(i).Z()*GenieMomentum->at(i).Z() );
                  
         if (GeniePDG->at(i) == 211 || GeniePDG->at(i) == -211){
           if (!isCC) ChargedPionEnergy -> Fill(e-pionMass, fluxweight);

@@ -22,7 +22,7 @@ namespace lar1{
 
     nominalData.resize(legend.size());
 
-    fileStart = "nue_appearance_ecalo2_nu_";
+    fileStart = "nue_appearance_ecalo2_nu_vePhot0.05_gap3_lessCosmics_";
     detector  = "100m";
     fileEnd   = "_nu_globBF.txt";
 
@@ -121,6 +121,18 @@ namespace lar1{
 
   }
 
+  unsigned int EffCalc::readData(std::vector<std::vector<float> > & data, TString filename){
+
+    if (!sensUtils.fileExists(filename)){
+      std::cerr << "File " <<filename<< " doesn't exist!\n";
+      exit(-1);
+    }
+
+    return parseData(filename, data);
+
+
+  }
+
   unsigned int EffCalc::parseData(TString fileName, std::vector<std::vector<float> > & data)
   {
     // open the file:
@@ -162,19 +174,83 @@ namespace lar1{
     }
     else std::cout << "Unable to open file"; 
   
+
     // tempData is right now tempData[bin][background]
     // I want to transpose it:
     data.resize(tempData.front().size());
     for (unsigned int temp_y = 0; temp_y < tempData.front().size(); temp_y++){
+      // data.at(temp_y).resize(tempData.front().size());
       for (unsigned int temp_x = 0; temp_x < tempData.size(); temp_x ++){
         data.at(temp_y).push_back(tempData.at(temp_x).at(temp_y));
       }
     }
 
 
+    // Check out the bins ... 
+    if (bins.size() == 0){
+      bins.resize(nBins-1);
+      for (unsigned int j = 0; j < data.front().size()-1;j++){
+        bins.at(j) = data.front().at(j);
+      }
 
-    return nBins;
+
+      bins.push_back(data.at(1).at(data.at(1).size()-2)); //append the last bin
+
+      for (auto bin : bins)
+        std::cout << "bin boundary is " << bin << std::endl;
+    }
+
+    return nBins -1;
   }
+
+  TH1F * EffCalc::makeNueRatio( TString file_denominator, TString file_numerator){
+    
+
+    std::vector<std::vector<float> > data_denom;
+    std::vector<std::vector<float> > data_num;
+
+    unsigned int nbins = readData(data_denom,file_denominator);
+    nbins = readData(data_num,file_numerator);
+
+
+    static int fuckRoot = 0;
+    fuckRoot ++;
+    char temp[20];
+    sprintf(temp,"eff_%d",fuckRoot);
+    TH1F * eff = new TH1F(temp,"",nbins,&(bins[0]));
+
+    // std::cout << data_num.at(12).at(12) << std::endl;
+
+    for (unsigned int i = 0; i < data_denom.front().size() -1; i++){
+      // for (unsigned int channel = 0; channel < data_denom.size(); channel ++){
+        // std::cout << "This number is (" << data_denom.at(channel).at(i) << ", "
+                  // << data_num.at(channel).at(i) << ")" << std::endl; 
+
+        // std::cout << "Trying to divide the numbers"
+      // }
+      double num = data_num.at(2).at(i)
+                 + data_num.at(3).at(i)
+                 + data_num.at(4).at(i);
+      double denom = data_denom.at(2).at(i)
+                   + data_denom.at(3).at(i)
+                   + data_denom.at(4).at(i);
+      std::cout << "This bin is " << num << " / " << denom << " = " << num/denom << std::endl;
+      eff -> SetBinContent(i+1, num/denom);
+    }
+
+
+    eff -> SetTitle("#nu_{e} Efficiency Reduction from 200 MeV Shower Energy Cut");
+    eff -> GetYaxis() -> SetTitle("Efficiency");
+    eff -> GetXaxis() -> SetTitle("Energy (GeV)");
+
+    eff -> SetMaximum(1.1);
+    eff -> SetMinimum(0);
+
+    return eff;
+
+
+  }
+
 
 
   TH1F * EffCalc::makeEfficiency( int channel,

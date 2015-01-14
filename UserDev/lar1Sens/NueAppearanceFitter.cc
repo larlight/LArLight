@@ -2122,9 +2122,9 @@ namespace lar1{
     for (int j = 0; j <nL; j++){
       // root makes me want to be eaten by a grue,  sometimes.
       // why do i have to do this stupid naming shit to keep track of my histograms?
-      if (j == 0)     stackedCanvas[j] = new TCanvas("sc0", "Stacked event rates", 2*700, 2*500);
-      else if (j == 1)  stackedCanvas[j] = new TCanvas("sc1", "Stacked event rates", 2*700, 2*500);
-      else if (j == 2)  stackedCanvas[j] = new TCanvas("sc2", "Stacked event rates", 2*700, 2*500);
+      if (j == 0)     stackedCanvas[j] = new TCanvas("sc0", "Stacked event rates", 1.5*700, 1.5*500);
+      else if (j == 1)  stackedCanvas[j] = new TCanvas("sc1", "Stacked event rates", 1.5*700, 1.5*500);
+      else if (j == 2)  stackedCanvas[j] = new TCanvas("sc2", "Stacked event rates", 1.5*700, 1.5*500);
       else return -1;
       
       TString nueTitle = "Nue Events at L = ";

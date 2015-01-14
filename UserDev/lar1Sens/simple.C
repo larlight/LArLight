@@ -5,12 +5,11 @@
   gSystem->Load("lib/liblar1Sens.so");
 
   lar1::NueAppearanceFitter n;
-  // n.setFileSource("/Users/cja33/genie_RW/");
-  n.setFileSource("/home/cadams/nominal_ntuples/");
-  // n.setFileSource("/Users/cja33/numuCC_test/");
-  // n.setFileSource("/Users/cja33/5cm_cut/");
-  // n.setFileSource("/Users/cja33/30cm_cut/");
-  // n.setFileSource("/Users/cja33/twoHorn/");
+  n.setFileSource("/media/cadams/data_linux/nominal_ntuples/");
+  // n.setFileSource("/media/cadams/data_linux/eff_70/");
+  // n.setFileSource("/media/cadams/data_linux/eff_60/");
+  // n.setFileSource("/media/cadams/data_linux/eff_50/");
+
   n.setVerbose(true);
   n.setDebug(false);
   n.setSpecialNameText("");
@@ -24,25 +23,23 @@
   n.setUse470m(       true);
   n.setUseT600_onaxis(true);
 
-  n.setLAr1NDPOT(2.2e20);
-  n.setUboonePOT(2*6.6e20);
-  n.setIcarusPOT(6.6e20);
-  // n.setLAr1NDScale(1.0);
-  // n.setUbooneScale(1.0);
-  // n.setIcarusScale(1.0);
-  n.extendFileName("fullCosmics");
-  
-  // n.setLAr1NDScale(1.0*(1.0-0.015));
-  // n.setUbooneScale(1.0*(1.0-0.02 ));
-  // n.setIcarusScale(1.0*(1.0-0.03 ));
-  // n.setLAr1NDCosmicScale(1-0.95);
-  // n.setUbooneCosmicScale(1-0.95);
-  // n.setIcarusCosmicScale((1-0.95));
-  // n.extendFileName("lessCosmics");
+  n.setLAr1NDPOT((1+1.0)*6.6e20);
+  n.setUboonePOT((2+1.0)*6.6e20);
+  n.setIcarusPOT((1+1.0)*6.6e20);
 
-  n.setEnergyType("elep");
+  // n.extendFileName("fullCosmics");
+  
+  n.setLAr1NDScale(1.0*(1.0-0.015));
+  n.setUbooneScale(1.0*(1.0-0.02 ));
+  n.setIcarusScale(1.0*(1.0-0.03 ));
+  n.setLAr1NDCosmicScale(1-0.95);
+  n.setUbooneCosmicScale(1-0.95);
+  n.setIcarusCosmicScale((1-0.95));
+  n.extendFileName("lessCosmics");
+
+  // n.setEnergyType("elep");
   // n.setEnergyType("eccqe");
-  // n.setEnergyType("ecalo2");
+  n.setEnergyType("ecalo2");
   n.setShapeOnlyFit(false);
   n.setForceRemake(false);
   n.setUseInfiniteStatistics(false);
@@ -108,7 +105,7 @@
   n.setNueBins(nue_bins);
   n.setNumuBins(numu_bins);
 
-  n.setIncludeFosc(false);
+  n.setIncludeFosc(true);
   n.setIncludeNumus(false);
   n.setIncludeCosmics(true);
   n.setIncludeDirt(true);
@@ -154,8 +151,8 @@
 
   n.setBuildCovarianceMatrix(false);
   n.setMakeRatioPlots(false);
-  n.setLoop(false);
-  n.setMakeSimplePlot(false);
+  n.setLoop(true);
+  n.setMakeSimplePlot(true);
   n.setMakeEventRatePlots(true);
   n.setMakeAltSensPlot(false);
 

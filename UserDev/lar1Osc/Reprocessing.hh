@@ -170,7 +170,7 @@ class Reprocessing {
     virtual TString  InFile();
     virtual void     CalcLepton( TVector3& );
 
-    void     UseTwoHornConfig(){useTwoHornConfig=true;}
+    void UseTwoHornConfig(){useTwoHornConfig=true;}
     bool useTwoHornConfig;
 
     Utils utils;
