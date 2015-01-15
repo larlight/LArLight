@@ -53,10 +53,10 @@ my_proc.set_output_file("compressedWFs.root")
 compAna=fmwk.ExecuteCompression()
 
 #add Compression Algorithm
-compAlgo = compress.CompressionAlgosncompress()
-#compAlgo.SetVerbose(False)
-#compAlgo.SetDebug(False)
-#compAlgo.SetThreshold(15)
+compAlgo = compress.CompressionAlgoThresh()
+compAlgo.SetVerbose(False)
+compAlgo.SetDebug(False)
+compAlgo.SetThreshold(15)
 compAna.SetCompressAlgo(compAlgo)
 
 # Add analysis modules to the processor
@@ -65,6 +65,6 @@ my_proc.add_process(compAna)
 
 # Let's run it.
 
-my_proc.run(0,50)
+my_proc.run(0,2)
 
 # done!
