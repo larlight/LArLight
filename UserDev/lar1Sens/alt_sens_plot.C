@@ -16,18 +16,30 @@ void alt_sens_plot(){
   gSystem -> Load("lib/liblar1Sens.so");
 
 
-  TString fileSource = "/home/cadams/nominal_ntuples/sens_plots/";
+  // TString fileSource = "/home/cadams/nominal_ntuples/sens_plots/";
+  // TString fileSource = "/media/cadams/data_linux/stats_comp/";
+  TString fileSource = "/media/cadams/data_linux/";
 
   std::vector<TString> names;
 
-  names.push_back(fileSource+"altSensPlot_ND_100m_uB_T600_onaxis_nue_appearance_ecalo2_nu_vePhot0.05_gap3_lessCosmics_xsec_0_flux_6_dirt_cos_.root");
-  names.push_back(fileSource+"altSensPlot_ND_100m_T600_onaxis_nue_appearance_ecalo2_nu_vePhot0.05_gap3_lessCosmics_xsec_0_flux_6_dirt_cos_.root");
-  names.push_back(fileSource+"altSensPlot_ND_100m_uB_nue_appearance_ecalo2_nu_vePhot0.05_gap3_lessCosmics_xsec_0_flux_6_dirt_cos_.root");
+  names.push_back(fileSource+"nominal_ntuples/sens_plots/altSensPlot_ND_100m_uB_T600_onaxis_nue_appearance_ecalo2_nu_vePhot0.05_gap3_lessCosmics_xsec_0_flux_6_dirt_cos_.root");
+  // names.push_back(fileSource+"altSensPlot_ND_100m_T600_onaxis_nue_appearance_ecalo2_nu_vePhot0.05_gap3_lessCosmics_xsec_0_flux_6_dirt_cos_.root");
+  // names.push_back(fileSource+"altSensPlot_ND_100m_uB_nue_appearance_ecalo2_nu_vePhot0.05_gap3_lessCosmics_xsec_0_flux_6_dirt_cos_.root");
 
 
-  names.push_back(fileSource+"altSensPlot_ND_100m_uB_T600_onaxis_nue_appearance_ecalo2_nu_vePhot0.05_gap3_fullCosmics_xsec_0_flux_6_dirt_cos_.root");
+  // names.push_back(fileSource+"altSensPlot_ND_100m_uB_T600_onaxis_nue_appearance_ecalo2_nu_vePhot0.05_gap3_fullCosmics_xsec_0_flux_6_dirt_cos_.root");
   // names.push_back(fileSource+"altSensPlot_ND_100m_T600_onaxis_nue_appearance_ecalo2_nu_vePhot0.05_gap3_fullCosmics_xsec_0_flux_6_dirt_cos_.root");
   // names.push_back(fileSource+"altSensPlot_ND_100m_uB_nue_appearance_ecalo2_nu_vePhot0.05_gap3_fullCosmics_xsec_0_flux_6_dirt_cos_.root");
+
+  // names.push_back(fileSource+"altSensPlot_ND_100m_T600_onaxis_nue_appearance_ecalo2_nu_vePhot0.05_gap3_fullCosmics_xsec_0_flux_6_dirt_cos_.root");
+  names.push_back(fileSource+"eff_70/sens_plots/altSensPlot_ND_100m_uB_T600_onaxis_nue_appearance_ecalo2_nu_vePhot0.05_gap3_lessCosmics_xsec_0_flux_6_dirt_cos_.root");
+  names.push_back(fileSource+"eff_60/sens_plots/altSensPlot_ND_100m_uB_T600_onaxis_nue_appearance_ecalo2_nu_vePhot0.05_gap3_lessCosmics_xsec_0_flux_6_dirt_cos_.root");
+  // names.push_back(fileSource+"eff_50/sens_plots/altSensPlot_ND_100m_uB_T600_onaxis_nue_appearance_ecalo2_nu_vePhot0.05_gap3_lessCosmics_xsec_0_flux_6_dirt_cos_.root");
+
+  // names.push_back(fileSource+"nominal_stats.root");
+  // names.push_back(fileSource+"double_stats.root");
+  // names.push_back(fileSource+"half_extra_stats.root");
+  // names.push_back(fileSource+"half_stats.root");
 
 
   std::vector<int> colors;
@@ -37,11 +49,19 @@ void alt_sens_plot(){
   colors.push_back(kGreen-3);
 
   std::vector<TString> legEntry;
-  legEntry.push_back("Full SBN Program");
-  legEntry.push_back("LAr1-ND, T600");
-  legEntry.push_back("LAr1-ND, MicroBooNE");
+  // legEntry.push_back("Full SBN Program");
+  // legEntry.push_back("LAr1-ND, T600");
+  // legEntry.push_back("LAr1-ND, MicroBooNE");
 
-  legEntry.push_back("SBN, Topological Cosmic ID Only");
+  // legEntry.push_back("SBN, Topological Cosmic ID Only");
+  legEntry.push_back("80% Efficiency (Nominal)");
+  legEntry.push_back("70% Efficiency");
+  legEntry.push_back("60% Efficiency");
+  // legEntry.push_back("50% Efficiency");
+  // legEntry.push_back("Nominal SBN Statistics");
+  // legEntry.push_back("2.0x SBN Statistics");
+  // legEntry.push_back("1.5x SBN Statistics");
+  // legEntry.push_back("0.5x SBN Statistics");
 
 
   std::vector <int> index;
@@ -75,9 +95,8 @@ void alt_sens_plot(){
   fiveSigmaLine->SetMaximum(20);
   gStyle->SetPadBottomMargin(0.16);
 
-  TCanvas * canv2 = new TCanvas("c2","Sensitivity along bottom of LSND region",1500,750);
+  TCanvas * canv2 = new TCanvas("c2","Sensitivity along bottom of LSND region",2*600,600);
   fiveSigmaLine -> SetTitle("");
-  utils.add_plot_label()
   fiveSigmaLine -> GetXaxis() -> SetTitle("#Delta m^{2} (eV^{2})");
   fiveSigmaLine -> GetYaxis() -> SetTitle("Significance #sqrt{ #Delta #chi^{2}} ");
   fiveSigmaLine -> GetXaxis() -> SetTitleSize(.06);
@@ -120,6 +139,7 @@ void alt_sens_plot(){
 
   for ( auto i = index.rbegin(); i != index.rend(); i++){
     std::cout << "\nIndex is  " << *i << std::endl;
+    std::cout << "\nName is  " << names[*i] << std::endl;
     TFile * temp = new TFile(names[*i],"OPEN");
     TGraph * graph1 = (TGraph*) temp -> Get("graph_0");
     TGraph * graph2 = (TGraph*) temp -> Get("graph_1");
@@ -128,6 +148,15 @@ void alt_sens_plot(){
     graph1 -> SetLineWidth(3);
     graph2 -> SetLineWidth(3);
     graph3 -> SetLineWidth(3);
+
+    if (*i != 0){
+      graph1 -> SetLineStyle(2);
+      graph2 -> SetLineStyle(2);
+      graph3 -> SetLineStyle(2);
+      graph1 -> SetLineWidth(2);
+      graph2 -> SetLineWidth(2);
+      graph3 -> SetLineWidth(2);
+    }
 
 
     graph1 -> SetLineColor(colors[*i]);
@@ -145,6 +174,10 @@ void alt_sens_plot(){
     TGraph * graph1 = (TGraph*) temp -> Get("graph_0");
     graph1 -> SetLineWidth(3);
     graph1 -> SetLineColor(colors[*j]);
+    if(*j != 0){
+      graph1 -> SetLineWidth(2);
+      graph1 -> SetLineStyle(2);
+    }
 
     legend -> AddEntry(graph1,legEntry[*j],"l");
   }

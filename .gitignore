@@ -14,3 +14,4 @@
 *.cmake
 *~
 /GNUmakefile
+AutoDict*
