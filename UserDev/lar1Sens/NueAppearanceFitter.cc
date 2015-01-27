@@ -2007,7 +2007,7 @@ namespace lar1{
 
 
     plotUtils.lsnd_plot(padTemp);
-    // plotUtils.miniBoone_plot(padTemp);
+    plotUtils.miniBoone_plot(padTemp);
     // plotUtils.plotGFData(padTemp);
     // plotUtils.giunti_plot(padTemp);
 

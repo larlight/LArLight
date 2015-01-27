@@ -44,6 +44,9 @@ void lar1::Reprocessing::Loop(std::string signal,
       utils.setMC_Generation(2);
     }
 
+    bool isFosc = false;
+    if (signal == "fosc") isFosc = true;
+
     //---------------------------------------------
     // some things to be configured by the user:
     // 
@@ -692,7 +695,7 @@ void lar1::Reprocessing::Loop(std::string signal,
       // Get flux weight from FluxRW utilities
       if ( signal != "numi") {
         if (useTwoHornConfig)
-          fluxweight = utils.GetTwoHornWeight(enugen, iflux, inno, ndecay,iLoc);
+          fluxweight = utils.GetTwoHornWeight(enugen, isFosc, inno, ndecay,iLoc);
         else
           fluxweight = utils.GetFluxWeight(enugen, iflux, inno, ndecay );
       }

@@ -11,19 +11,26 @@ void effPlotter(){
   // a.getNominalData();
 
   TString path = "/media/cadams/data_linux/";
-  TString file1 = "nominal_text/";
-  TString file2 = "no_200mev_cut_text/";
+  TString file2 = "nominal_ntuples/text/";
+  TString file1 = "two_horns/text/";
 
-  TString fileName="nue_appearance_ecalo2_nu_vePhot0.05_gap3_lessCosmics_100m_nu_globBF.txt";
+  TString fileName="nue_appearance_ecalo2_nu_vePhot0.05_gap3_lessCosmics_600m_onaxis_nu_globBF.txt";
 
   utils.set_plot_style();
 
+  std::vector<int> types;
+  // types.push_back(2);
+  // types.push_back(3);
+  // types.push_back(4);
+  types.push_back(12);
+
+  TString title = "Ratio of #nu_{e} from #mu, Two Horns / One Horn";
 
   // TCanvas * events;
   TCanvas * c1 = new TCanvas("stupidNue","stupidNue",800,800);
   // c1->Divide(2);
 
-  TH1F * eff = a.makeNueRatio(path+file2+fileName, path+file1+fileName);
+  TH1F * eff = a.makeNueRatio(path+file2+fileName, path+file1+fileName, types, title, 7.5);
   eff -> SetLineWidth(3);
   eff -> Draw();
 

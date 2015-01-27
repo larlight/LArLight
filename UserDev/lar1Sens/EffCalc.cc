@@ -203,8 +203,10 @@ namespace lar1{
     return nBins -1;
   }
 
-  TH1F * EffCalc::makeNueRatio( TString file_denominator, TString file_numerator){
+  TH1F * EffCalc::makeNueRatio( TString file_denominator, TString file_numerator,
+                                std::vector<int> types, TString title, double max){
     
+    if (title == "") title = "Ratio Plot";
 
     std::vector<std::vector<float> > data_denom;
     std::vector<std::vector<float> > data_num;
@@ -228,22 +230,23 @@ namespace lar1{
 
         // std::cout << "Trying to divide the numbers"
       // }
-      double num = data_num.at(2).at(i)
-                 + data_num.at(3).at(i)
-                 + data_num.at(4).at(i);
-      double denom = data_denom.at(2).at(i)
-                   + data_denom.at(3).at(i)
-                   + data_denom.at(4).at(i);
+      double num(0), denom(0);
+      for (auto index : types){
+
+       num += data_num.at(index).at(i);
+       denom += data_denom.at(index).at(i);
+                 
+      }
       std::cout << "This bin is " << num << " / " << denom << " = " << num/denom << std::endl;
       eff -> SetBinContent(i+1, num/denom);
     }
 
 
-    eff -> SetTitle("#nu_{e} Efficiency Reduction from 200 MeV Shower Energy Cut");
+    eff -> SetTitle(title);
     eff -> GetYaxis() -> SetTitle("Efficiency");
     eff -> GetXaxis() -> SetTitle("Energy (GeV)");
 
-    eff -> SetMaximum(1.1);
+    eff -> SetMaximum(max);
     eff -> SetMinimum(0);
 
     return eff;

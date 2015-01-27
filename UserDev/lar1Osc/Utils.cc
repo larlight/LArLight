@@ -340,27 +340,27 @@ namespace lar1{
   //=======================================================================================
   // Reweight the flux using histograms in FluxRW tools
   //=======================================================================================
-  Double_t Utils::GetFluxWeight( Double_t energy, Int_t iflux, Int_t inno, Int_t ndecay ){
+  Double_t Utils::GetFluxWeight( Double_t energy, bool isFosc, Int_t inno, Int_t ndecay ){
 
     Double_t wgt = 0;
     Int_t ntype = 0;
     Int_t ptype = 0;
-    // string ntypestr[4] = { "nue", "nuebar", "numu", "numubar" };
+    std::string ntypestr = "";
     std::string ptypestr = "";
 
     // normal samples
-    if( iflux == kNu || iflux == kNubar ){  
-      if      (inno == 12)  ntype = 1;
-      else if (inno == -12) ntype = 2;
-      else if (inno == 14)  ntype = 3;
-      else if (inno == -14) ntype = 4;
+    if( ! isFosc ){  
+      if      (inno == 12)  {ntype = 1; ntypestr = "nue";}
+      else if (inno == -12) {ntype = 2; ntypestr = "nuebar";}
+      else if (inno == 14)  {ntype = 3; ntypestr = "numu";}
+      else if (inno == -14) {ntype = 4; ntypestr = "numubar";}
     }
     // full osc samples
-    else if( iflux == kNu_Fosc || iflux == kNubar_Fosc ){  
-      if      (inno == 12)  ntype = 3;
-      else if (inno == -12) ntype = 4;
-      else if (inno == 14)  ntype = 3;
-      else if (inno == -14) ntype = 4;
+    else if( isFosc ){  
+      if      (inno == 12)  {ntype = 3; ntypestr = "numu";}
+      else if (inno == -12) {ntype = 4; ntypestr = "numubar";}
+      else if (inno == 14)  {ntype = 3; ntypestr = "numu";}
+      else if (inno == -14) {ntype = 4; ntypestr = "numubar";}
     }
 
     // Determine ptype using that list described in NtupleReprocessing.C
@@ -376,14 +376,15 @@ namespace lar1{
     }
 
     // neutrino mode
-    if( iflux == kNu || iflux == kNu_Fosc ) 
+    // if( iflux == kNu || iflux == kNu_Fosc ) 
       wgt = fluxrw_nu.GetWeight( energy, ntype, ptype );
     // antineutrino mode
-    else if( iflux == kNubar || iflux == kNubar_Fosc )
-      wgt = fluxrw_nubar.GetWeight( energy, ntype, ptype );
+    // else if( iflux == kNubar || iflux == kNubar_Fosc )
+      // wgt = fluxrw_nubar.GetWeight( energy, ntype, ptype );
 
-    // if ( verbose ) std::cout << std::setprecision(3) << "neutrino = " << ntypestr[ntype-1] << " (" << energy << " GeV), parent = " 
-   	    // << ptypestr << ", flux weight = " << wgt << std::endl;
+    // if ( verbose )
+     // std::cout << std::setprecision(3) << "neutrino = " << ntypestr << " (" << energy << " GeV), parent = " 
+        // << ptypestr << ", flux weight = " << wgt << std::endl;
     
     return wgt;
 
@@ -392,7 +393,7 @@ namespace lar1{
 //=======================================================================================
   // Reweight the flux using histograms in FluxRW tools
   //=======================================================================================
-  Double_t Utils::GetTwoHornWeight( Double_t energy, Int_t iflux, 
+  Double_t Utils::GetTwoHornWeight( Double_t energy, bool isFosc, 
                                     Int_t inno, Int_t ndecay, 
                                     Int_t iLoc )
   {
@@ -400,22 +401,22 @@ namespace lar1{
     Double_t wgt = 0;
     Int_t ntype = 0;
     Int_t ptype = 0;
-    // string ntypestr[4] = { "nue", "nuebar", "numu", "numubar" };
+    std::string ntypestr = "";
     std::string ptypestr = "";
 
     // normal samples
-    if( iflux == kNu || iflux == kNubar ){  
-      if      (inno == 12)  ntype = 1;
-      else if (inno == -12) ntype = 2;
-      else if (inno == 14)  ntype = 3;
-      else if (inno == -14) ntype = 4;
+    if( ! isFosc ){  
+      if      (inno == 12)  {ntype = 1; ntypestr = "nue";}
+      else if (inno == -12) {ntype = 2; ntypestr = "nuebar";}
+      else if (inno == 14)  {ntype = 3; ntypestr = "numu";}
+      else if (inno == -14) {ntype = 4; ntypestr = "numubar";}
     }
     // full osc samples
-    else if( iflux == kNu_Fosc || iflux == kNubar_Fosc ){  
-      if      (inno == 12)  ntype = 3;
-      else if (inno == -12) ntype = 4;
-      else if (inno == 14)  ntype = 3;
-      else if (inno == -14) ntype = 4;
+    else if( isFosc ){  
+      if      (inno == 12)  {ntype = 3; ntypestr = "numu";}
+      else if (inno == -12) {ntype = 4; ntypestr = "numubar";}
+      else if (inno == 14)  {ntype = 3; ntypestr = "numu";}
+      else if (inno == -14) {ntype = 4; ntypestr = "numubar";}
     }
 
     // Determine ptype using that list described in NtupleReprocessing.C
@@ -430,11 +431,18 @@ namespace lar1{
       return 0;
     }
 
+    // Following conventions from Zarko's reweight class.
+    int det_loc = -1;
+    if (iLoc == k100m) det_loc = 1;
+    if (iLoc == k470m) det_loc = 2;
+    if (iLoc == k600m_onaxis) det_loc = 3;
+
     // neutrino mode
-    wgt = fluxrw_nu.GetWeight( energy, ntype, ptype );
+    wgt = fHorn2Boost.GetWeight(det_loc, ntype, ptype, energy );
 
 
-    // if ( verbose ) std::cout << std::setprecision(3) << "neutrino = " << ntypestr[ntype-1] << " (" << energy << " GeV), parent = " 
+    // if ( verbose )
+     // std::cout << std::setprecision(3) << "neutrino = " << ntypestr << " (" << energy << " GeV), parent = " 
         // << ptypestr << ", flux weight = " << wgt << std::endl;
     
     return wgt;

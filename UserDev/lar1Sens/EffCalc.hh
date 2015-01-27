@@ -36,7 +36,8 @@ namespace lar1{
 
     void setPath(TString Path){path=Path;}
 
-    TH1F * makeNueRatio( TString file_denominator, TString file_numerator);
+    TH1F * makeNueRatio( TString file_denominator, TString file_numerator,
+                         std::vector<int>, TString title = "", double max = 1.1);
 
 
     TH1F * makeEfficiency( int channel,

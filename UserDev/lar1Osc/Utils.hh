@@ -30,9 +30,9 @@ namespace lar1{
     void setMC_Generation(int g);
     void reconfigure();
     
-    Double_t GetFluxWeight( Double_t energy, Int_t iflux, Int_t inno, Int_t ndecay );
+    Double_t GetFluxWeight( Double_t energy, bool isFosc, Int_t inno, Int_t ndecay );
 
-    Double_t GetTwoHornWeight( Double_t energy, Int_t iflux, Int_t inno, Int_t ndecay, Int_t iLoc );
+    Double_t GetTwoHornWeight( Double_t energy, bool isFosc, Int_t inno, Int_t ndecay, Int_t iLoc );
 
     Double_t GetTheta( const TVector3 & mom, 
                        const TVector3 & ref = TVector3(0,0,1) ) const;
