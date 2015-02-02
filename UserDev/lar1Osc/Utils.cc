@@ -441,7 +441,7 @@ namespace lar1{
     wgt = fHorn2Boost.GetWeight(det_loc, ntype, ptype, energy );
 
 
-    // if ( verbose )
+    // if ( abs(inno) == 12 )
      // std::cout << std::setprecision(3) << "neutrino = " << ntypestr << " (" << energy << " GeV), parent = " 
         // << ptypestr << ", flux weight = " << wgt << std::endl;
     

@@ -581,7 +581,7 @@ void TopologyCalc(TString target){
   // Compute the errors on the rates
   if (useMultiWeights){
     // Total event rates:
-    for ( std::map<int,double> centralValuePair = eventRatesNumuMap.begin();
+    for ( std::map<int,double>::iterator centralValuePair = eventRatesNumuMap.begin();
           centralValuePair != eventRatesNumuMap.end(); centralValuePair ++)
     {
       int key = centralValuePair->first;
@@ -599,7 +599,7 @@ void TopologyCalc(TString target){
       eventRatesNumuMapSystematicUncert[key] = tempRMS;
       eventRatesNumuMapStatisticalUncert[key] = sqrt(centralValuePair->second);
     }
-    for ( std::map<int,double> centralValuePair = eventRatesNueMap.begin();
+    for ( std::map<int,double>::iterator centralValuePair = eventRatesNueMap.begin();
           centralValuePair != eventRatesNueMap.end(); centralValuePair ++)
     {
       int key = centralValuePair->first;
@@ -611,7 +611,7 @@ void TopologyCalc(TString target){
       eventRatesNueMapSystematicUncert[key] = tempRMS;
       eventRatesNueMapStatisticalUncert[key] = sqrt(centralValuePair->second);
     }
-    for ( std::map<int,double> centralValuePair = showerMap.begin();
+    for ( std::map<int,double>::iterator centralValuePair = showerMap.begin();
           centralValuePair != showerMap.end(); centralValuePair ++)
     {
       int key = centralValuePair->first;
@@ -623,7 +623,7 @@ void TopologyCalc(TString target){
       showerMapSystematicUncert[key] = tempRMS;
       showerMapStatisticalUncert[key] = sqrt(centralValuePair->second);
     }
-    for ( std::map<int,double> centralValuePair = nuchanNumuMap.begin();
+    for ( std::map<int,double>::iterator centralValuePair = nuchanNumuMap.begin();
           centralValuePair != nuchanNumuMap.end(); centralValuePair ++)
     {
       int key = centralValuePair->first;
@@ -635,7 +635,7 @@ void TopologyCalc(TString target){
       nuchanMapNumuSystematicUncert[key] = tempRMS;
       nuchanMapNumuStatisticalUncert[key] = sqrt(centralValuePair->second);
     }
-    for ( std::map<int,double> centralValuePair = nuchanNueMap.begin();
+    for ( std::map<int,double>::iterator centralValuePair = nuchanNueMap.begin();
           centralValuePair != nuchanNueMap.end(); centralValuePair ++)
     {
       int key = centralValuePair->first;
@@ -647,7 +647,7 @@ void TopologyCalc(TString target){
       nuchanMapNueSystematicUncert[key] = tempRMS;
       nuchanMapNueStatisticalUncert[key] = sqrt(centralValuePair->second);
     }
-    for ( std::map<int,double> centralValuePair = pi0Map.begin();
+    for ( std::map<int,double>::iterator centralValuePair = pi0Map.begin();
           centralValuePair != pi0Map.end(); centralValuePair ++)
     {
       int key = centralValuePair->first;
@@ -668,6 +668,7 @@ void TopologyCalc(TString target){
   for (std::map<int, double>::iterator i = eventRatesNumuMap.begin(); i != eventRatesNumuMap.end(); ++i)
   {
     int key = i->first;
+    if (key < 10000) continue;
     std::cout << legendMap[key] << ": \t" << i->second 
               << "\t" << eventRatesNumuMapSystematicUncert[key]
               << "\t" << eventRatesNumuMapStatisticalUncert[key]
@@ -686,6 +687,7 @@ void TopologyCalc(TString target){
   for (std::map<int, double>::iterator i = eventRatesNueMap.begin(); i != eventRatesNueMap.end(); ++i)
   {
     int key = i->first;
+    if (key < 10000) continue;
     std::cout << legendMap[key] << ": \t" << i->second 
               << "\t" << eventRatesNueMapSystematicUncert[key]
               << "\t" << eventRatesNueMapStatisticalUncert[key]
@@ -699,26 +701,26 @@ void TopologyCalc(TString target){
               << std::endl;
   }  
 
-  std::cout << "\nNumber of Showers Results:\n\n";
-  for (std::map<int, double>::iterator i = showerMap.begin(); i != showerMap.end(); ++i)
-  {
-    std::cout << legendMap[i->first] << ": \t" << i->second 
-              << "\t" << showerMapSystematicUncert[i->first]
-              << "\t" << showerMapStatisticalUncert[i->first]
-              << std::endl;
-  }
+  // std::cout << "\nNumber of Showers Results:\n\n";
+  // for (std::map<int, double>::iterator i = showerMap.begin(); i != showerMap.end(); ++i)
+  // {
+  //   std::cout << legendMap[i->first] << ": \t" << i->second 
+  //             << "\t" << showerMapSystematicUncert[i->first]
+  //             << "\t" << showerMapStatisticalUncert[i->first]
+  //             << std::endl;
+  // }
 
 
 
   
-  std::cout << "\nNumber of pi0 Results:\n\n";
-  for (std::map<int, double>::iterator i = pi0Map.begin(); i != pi0Map.end(); ++i)
-  {
-    std::cout << pi0LegendMap[i->first] << ": \t" << i->second 
-              << "\t" << pi0MapSystematicUncert[i->first]
-              << "\t" << pi0MapStatisticalUncert[i->first]
-              << std::endl;
-  }  
+  // std::cout << "\nNumber of pi0 Results:\n\n";
+  // for (std::map<int, double>::iterator i = pi0Map.begin(); i != pi0Map.end(); ++i)
+  // {
+  //   std::cout << pi0LegendMap[i->first] << ": \t" << i->second 
+  //             << "\t" << pi0MapSystematicUncert[i->first]
+  //             << "\t" << pi0MapStatisticalUncert[i->first]
+  //             << std::endl;
+  // }  
 
 }
 

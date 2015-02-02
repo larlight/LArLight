@@ -34,9 +34,10 @@ void lar1::Reprocessing::Loop(std::string signal,
         signal != "fosc"  &&
         signal != "phot"  &&
         signal != "ncpi0" &&
+        signal != "rates" &&
         signal != "numi"  ){
       std::cout << "Error: incorrect signal \"" << signal << "\"  used." << std::endl;
-      std::cout << "Please see NtupleReprocessing.C for a list of available signals." << std::endl;
+      std::cout << "Please see Reprocessing.C for a list of available signals." << std::endl;
       return;
     }
 
@@ -64,6 +65,7 @@ void lar1::Reprocessing::Loop(std::string signal,
     double egammaThreshold = 0.1; // 0.140 // GeV
 
     bool smearing = true;
+    if (signal == "rates") smearing = false;
 
     Double_t prot_thresh = 0.02;
 
@@ -694,10 +696,10 @@ void lar1::Reprocessing::Loop(std::string signal,
 
       // Get flux weight from FluxRW utilities
       if ( signal != "numi") {
-        if (useTwoHornConfig)
-          fluxweight = utils.GetTwoHornWeight(enugen, isFosc, inno, ndecay,iLoc);
-        else
-          fluxweight = utils.GetFluxWeight(enugen, iflux, inno, ndecay );
+        fluxweight = utils.GetFluxWeight(enugen, iflux, inno, ndecay );
+        if (useTwoHornConfig){
+          fluxweight *= utils.GetTwoHornWeight(enugen, isFosc, inno, ndecay,iLoc);
+        }
       }
       else{ 
         fluxweight = 1.0;
@@ -831,6 +833,41 @@ void lar1::Reprocessing::Loop(std::string signal,
       //Lastly, account for the neutrons:
       if (neutron == 0) {}// Do nothing
       else if (neutron >= 1) iChan += 1;
+/*
+      switch (nuchan){
+        case 53:
+          std::cout << "Got nuchan 53\n";
+          break;
+        case 54:
+          std::cout << "Got nuchan 54\n";
+          break;
+        case 55:
+          std::cout << "Got nuchan 55\n";
+          break;
+        case 73:
+          std::cout << "Got nuchan 73\n";
+          break;
+        case 95:
+          std::cout << "Got nuchan 95 - cabibo surpressed hyperon\n";
+          break;
+        // case 97:
+        //   std::cout << "Got nuchan 97 - coherent\n";
+        //   break;
+        case 98:
+          std::cout << "Got nuchan 98 - nu-e scattering\n";
+          break;
+        case 99:
+          std::cout << "Got nuchan 99 - inverse mu decay\n";
+          break;
+        default:
+          break;
+      }
+*/
+
+      if (signal == "rates"){
+        if (isActive) newt->Fill();
+        continue;
+      }
 
 
       //----------------------------------------------
@@ -1123,7 +1160,7 @@ void lar1::Reprocessing::Loop(std::string signal,
 
         // check on the smearing stats - if the signal is nue intrisic, repeat this 
         // calculation to improve the stats.
-        if (smearingStats != 1.0){
+        if (smearingStats != 1.0  && smearing == true){
           if (smearingStatsIndex == 0){ // if the index is maxed out, keep going
             smearingStatsIndex = smearingStats;
             continue;

@@ -11,6 +11,7 @@
 #include "Utils.hh"
 #include "FluxRW.hh"
 #include "FluxRWnubar.hh"
+#include "horn2boost.hh"
 
 // Class forward declaration here
 class lar1Osc;
@@ -20,6 +21,7 @@ namespace lar1{
   class FluxRWnubar;
   class Reprocessing;
 }
+  class horn2boost;
   class testphots;
 //ADD_EMPTY_CLASS ... do not change this comment line
 

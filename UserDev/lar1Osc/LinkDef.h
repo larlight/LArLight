@@ -11,6 +11,7 @@
 
 #pragma link C++ class lar1::FluxRW+;
 #pragma link C++ class lar1::FluxRWnubar+;
+#pragma link C++ class horn2boost+;
 #pragma link C++ class lar1::Utils+;
 #pragma link C++ class lar1::Reprocessing+;
 #pragma link C++ class lar1Osc+;
