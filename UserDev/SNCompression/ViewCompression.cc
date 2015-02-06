@@ -54,14 +54,14 @@ namespace larlight {
 
     // Figure out channel's plane:
     // used because different planes will have different "buffers"
-    int pl = larutil::Geometry::GetME()->ChannelToPlane(tpc_data->channel_number());
+    UInt_t ch = tpc_data->channel_number();
+    int pl = larutil::Geometry::GetME()->ChannelToPlane(ch);
 
     // reset compression
     _compress_algo->Reset();
     //finally, apply compression..
     std::vector<unsigned short> ADCwaveform = getADCs(tpc_data);
-    std::cout << "Calling compression algorithm." << std::endl;
-    _compress_algo->ApplyCompression(ADCwaveform,pl);
+    _compress_algo->ApplyCompression(ADCwaveform,pl,ch);
     std::vector<std::vector<unsigned short> > compressOutput = _compress_algo->GetOutputWFs();
     std::vector<int> outTimes = _compress_algo->GetOutputWFTimes();
     
@@ -70,7 +70,6 @@ namespace larlight {
     //clear histograms
     ClearHistograms();
     //now fill histograms
-    UShort_t ch = tpc_data->channel_number();
     FillHistograms(ADCwaveform, compressOutput, outTimes, ch, pl);
 
     _currentWF += 1;

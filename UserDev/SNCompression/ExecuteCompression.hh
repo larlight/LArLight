@@ -18,6 +18,7 @@
 #include "ana_base.hh"
 #include "CompressionAlgoBase.hh"
 #include "Geometry.hh"
+#include "TH1D.h"
 
 namespace larlight {
   /**
@@ -74,6 +75,11 @@ namespace larlight {
     double _inTicks;
     /// holder for the # of ticks in the compressed waveforms
     double _outTicks;
+
+    // Histogram for per-event compression factor
+    TTree *_compress_tree;
+    double _compression;
+    int    _evt;
 
 
   };

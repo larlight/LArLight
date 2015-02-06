@@ -6,7 +6,14 @@
 namespace larlight {
 
   bool ExecuteCompression::initialize() {
-    /// currently nothing is done in the initialize function
+    
+    // Initalize Histogram that tracks compression factor
+    if (!_compress_tree) { _compress_tree = new TTree("_compress_tree","Compression Info Tree"); }
+    _compress_tree->Branch("_evt",&_evt,"evt/I");
+    _compress_tree->Branch("_compression",&_compression,"compression/D");
+
+    _evt = 0;
+
     return true;
   }
   
@@ -28,6 +35,10 @@ namespace larlight {
 
     // clear place-holder for new, compressed, waveforms
     _out_event_wf.clear();
+
+    // reset variables that hold compression factor
+    _inTicks  = 0;
+    _outTicks = 0;
     
     // Loop over all waveforms
     for (size_t i=0; i<event_wf->size(); i++){
@@ -43,14 +54,15 @@ namespace larlight {
 
       // Figure out channel's plane:
       // used because different planes will have different "buffers"
-      int pl = larutil::Geometry::GetME()->ChannelToPlane(tpc_data->channel_number());
-	  
+      UInt_t ch = tpc_data->channel_number();
+      int pl = larutil::Geometry::GetME()->ChannelToPlane(ch);
+
       // finally, apply compression:
       // *-------------------------*
       // 1) Convert tpc_data object to just the vector of shorts which make up the ADC ticks
       std::vector<unsigned short> ADCwaveform = getADCs(tpc_data);
       // 2) Now apply the compression algorithm. _compress_algo is an instance of CompressionAlgoBase
-      _compress_algo->ApplyCompression(ADCwaveform,pl);
+      _compress_algo->ApplyCompression(ADCwaveform,pl,ch);
       // 3) Retrieve the output waveforms (vectors of vectors of shorts) produced during the compression
       std::vector<std::vector<unsigned short> > compressOutput = _compress_algo->GetOutputWFs();
       // 4) Retrieve the time-ticks at which each output waveform saved starts
@@ -64,19 +76,23 @@ namespace larlight {
 	
     }//for all waveforms
 
+    // store compression factor for this event
+    _compression = _outTicks/_inTicks;
+    _compress_tree->Fill();
+    _evt += 1;
+    
     //now take new WFs and place in event_wf vector
     event_wf->clear();
     for (size_t m=0; m < _out_event_wf.size(); m++)
       event_wf->push_back(_out_event_wf.at(m));
-
     return true;
   }
 
   bool ExecuteCompression::finalize() {
 
-    // Print out compression factor
-    std::cout << "Compression Factor is: " << _inTicks/_outTicks << std::endl;
-  
+    _compress_algo->EndProcess(_fout);
+    _compress_tree->Write();
+
     return true;
   }
 

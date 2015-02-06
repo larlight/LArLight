@@ -27,6 +27,7 @@ larlight.storage_manager.get().set_data_to_read(larlight.DATA.UserInfo,False)
 my_proc.set_ana_output_file("")
 
 my_ana = larlight.WFViewer()
+my_ana.setCoordinatesInCm(False)
 
 my_proc.add_process(my_ana)
 
@@ -42,11 +43,14 @@ gStyle.SetLabelSize(0.04,"Y")
 gStyle.SetLabelSize(0.04,"Z")
 gStyle.SetOptLogz(0)
 
+
+
 c=TCanvas("c","Wire v. Time Hit Viewer",900,700)
 c.Divide(1,1)
+gPad.SetLogz()
 while my_proc.process_event():
 
-    currentview = 0;
+    currentview = 2;
     #First fill the 6 pads on the main canvas with stuff
     for pad in xrange(1,2,1):
         

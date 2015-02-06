@@ -27,7 +27,7 @@ namespace compress {
   public:
     
     /// Default constructor
-    CompressionAlgoBase(){ _verbose = false; _InWF.clear(); _OutWF.clear(); _OutWFStartTick.clear(); _OutWFStartTick.clear(); }
+    CompressionAlgoBase();
     
     /// Default destructor
     virtual ~CompressionAlgoBase(){}
@@ -36,13 +36,16 @@ namespace compress {
     virtual void Reset() { _InWF.clear(); _OutWF.clear(); _OutWFStartTick.clear(); }
 
     /// Function where compression is performed
-    virtual void ApplyCompression(const std::vector<unsigned short> &waveform, int mode);
+    virtual void ApplyCompression(const std::vector<unsigned short> &waveform, const int mode, const UInt_t ch);
 
     /// Get Compression Output Vector
     virtual std::vector<std::vector<unsigned short> > GetOutputWFs() { return _OutWF; }
 
     /// Get Compression Output Times Vector
     virtual std::vector<int> GetOutputWFTimes() { return _OutWFStartTick; }
+
+    /// Close Algorithm (maybe to write trees & such)
+    virtual void EndProcess(TFile* fout=nullptr) {}
  
     /// Setter function for verbosity
     virtual void SetVerbose(bool doit=true) { _verbose = doit; }
