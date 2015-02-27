@@ -83,6 +83,11 @@ namespace larlight {
 			UShort_t ch,
 			UChar_t pl);
 
+    /// Fill Histograms with new and old waveforms
+    void FillHistogram(std::vector<unsigned short> ADCwaveform,
+		       UShort_t ch,
+		       UChar_t pl);
+
     /// Get Histograms for python script
     const TH1I* GetHistos(int which) const {
       if (which == 1)
@@ -124,6 +129,8 @@ namespace larlight {
 
     /// Number of output waveforms from original input waveform
     int _NumOutWFs;
+
+    TH1S *_hMaxADC;
 
   };
 }

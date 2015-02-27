@@ -57,7 +57,7 @@ while my_proc.process_event():
 
     for x in range(compAna.GetNumWFs()):
         compAna.processWF()
-        if (compAna.GetNumOutWFs() > 0):
+        if (compAna.GetNumOutWFs() >= 0):
             for pad in xrange(1,3,1):
                 c1.cd(pad)
                 compAna.GetHistos(pad).Draw()

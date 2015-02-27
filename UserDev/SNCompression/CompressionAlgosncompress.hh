@@ -30,26 +30,32 @@ namespace compress {
     /// Function where compression is performed
     void ApplyCompression(const std::vector<unsigned short> &waveform, const int mode, const UInt_t ch);
 
+    /// Function that determines if we passed the threshold. Per plane
+    bool PassThreshold(double thisADC, double base);
+
     void EndProcess(TFile* fout);
 
     void SetBlockSize(int b) { _block = b; }
-
     void SetBaselineThresh(double b) { _deltaB = b*b; }
     void SetVarianceThresh(double v) { _deltaV = v*v; }
-    void SetCompressThresh(double t) { _thresh = t*t; }
+    void SetCompressThresh(double tU, double tV, double tY) { _thresh[0] = tV; _thresh[1] = tV; _thresh[2] = tY; }
     void SetMaxADC(int ADC) { _maxADC = ADC; }
     void SetUplaneBuffer(int pre, int post) { _buffer[0][0] = pre; _buffer[0][1] = post; }
     void SetVplaneBuffer(int pre, int post) { _buffer[1][0] = pre; _buffer[1][1] = post; }
     void SetYplaneBuffer(int pre, int post) { _buffer[2][0] = pre; _buffer[2][1] = post; }
     void SetUVYplaneBuffer(int upre, int upost, int vpre, int vpost, int ypre, int ypost);
 
+    // Decide if to fill tree with info or not
+    void SetFillTree(bool on) { _fillTree = on; }
+
   protected:
+
     int _block;
 
     // Value of Baseline Threshold for initial stage of compression
     double _deltaB; // max difference for Baseline tolerared
     double _deltaV; // max difference for Variance tolerated
-    double _thresh; // threshold to trigger waveform readout
+    std::vector<double> _thresh; // threshold to trigger waveform readout (per plane)
     
     // Buffer Tick number for various planes
     // structure: [ [Upre, Upost], [Vpre, Vpost], [Ypre, Ypost] ]
@@ -66,6 +72,8 @@ namespace compress {
 
     //TTree where to store stuff
     TTree *_algo_tree;
+    // boolean to decide if to fill tree
+    bool _fillTree;
     int _pl;
     double _v1, _v2, _v3;
     double _b1, _b2, _b3;

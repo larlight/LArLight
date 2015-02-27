@@ -5,7 +5,7 @@
 
 namespace compress {
   
-  void CompTmp::ApplyCompression(const std::vector<unsigned short> &waveform){
+  void CompTmp::ApplyCompression(const std::vector<unsigned short> &waveform, int mode){
 
     /// This algorithm simply returns the original waveform as the compressed one! Not very useful!
 

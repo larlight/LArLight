@@ -43,8 +43,8 @@ gStyle.SetLabelSize(0.04,"Y")
 gStyle.SetLabelSize(0.04,"Z")
 gStyle.SetOptLogz(0)
 
-
-
+my_proc.run(0)
+'''
 c=TCanvas("c","Wire v. Time Hit Viewer",900,700)
 c.Divide(1,1)
 gPad.SetLogz()
@@ -65,6 +65,6 @@ while my_proc.process_event():
     usrinput = raw_input("Hit Enter: next evt  ||  q: exit viewer\n")
     if ( usrinput == "q" ):
         sys.exit(0)
-    
+'''
 
 # done!

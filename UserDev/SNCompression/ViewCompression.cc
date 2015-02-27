@@ -128,6 +128,31 @@ namespace larlight {
     
     return;
   }
+
+  void ViewCompression::FillHistogram(std::vector<unsigned short> ADCwaveform,
+				      UShort_t ch,
+				      UChar_t pl){
+    
+    _hInWF = new TH1I("hInWF", Form("Event %i - Pl %i - Ch %i - Input WF; Time Tick; ADCs",_evtNum, pl, ch),
+		      ADCwaveform.size(), 0, ADCwaveform.size());
+
+    _hInWF->SetTitleOffset(0.8,"X");
+    
+    for (size_t n=0; n < ADCwaveform.size(); n++)
+      _hInWF->SetBinContent(n+1, ADCwaveform.at(n));
+
+    //measure a baseline to place a temporary holder in output histogram
+    double baseline = 0.;
+    for (int tick=0; tick < 10; tick++)
+      baseline += ADCwaveform.at(tick);
+    baseline /= 10.;
+    int base = int(baseline);
+
+    _hInWF->SetAxisRange(_hInWF->GetMinimum(), _hInWF->GetMaximum(), "Y");
+    
+    return;
+  }
+
   
 }
 #endif

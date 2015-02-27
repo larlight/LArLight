@@ -15,8 +15,11 @@ namespace compress {
     _buffer[0].reserve(2);
     _buffer[1].reserve(2);
     _buffer[2].reserve(2);
+    _thresh.reserve(3);
     std::vector<std::vector<int> > tmp(3,std::vector<int>(2,0));
     _buffer = tmp;
+
+    _fillTree = false;
 
     //Setup tree
     if (_algo_tree) { delete _algo_tree; }
@@ -174,7 +177,7 @@ namespace compress {
 	  double thisADC = waveform[thistick+j];
 	  if (thisADC-base > _max) { _max = thisADC-base; }
 
-	  if (waveform[thistick+j] > base + _thresh){
+	  if ( PassThreshold(thisADC, base) ){
 	    _save = 1;
 	    // yay -> active
 	    // if save == 0 it means it's a new pulse! (previous tick was quiet)
@@ -216,22 +219,40 @@ namespace compress {
 	}
 
       }//if interesting!
-
-      _algo_tree->Fill();
+      
+      if (_fillTree)
+	_algo_tree->Fill();
 
     }//for all 3-block segments
     
     return;
   }
+
+
+  bool CompressionAlgosncompress::PassThreshold(double thisADC, double base){
+
+    // if positive threshold
+    if (_thresh[_pl] >= 0){
+      if (thisADC > base + _thresh[_pl])
+	return true;
+    }
+    // if negative threshold
+    else{
+      if (thisADC < base + _thresh[_pl])
+	return true;
+    }
+    
+    return false;
+  }
   
   void CompressionAlgosncompress::EndProcess(TFile* fout){
     
-    std::cout << "End process" << std::endl;
     if (fout){
-      std::cout << "here we go!" << std::endl;
       if (_algo_tree)
 	_algo_tree->Write();
     }
+
+    return;
   }
 
 }

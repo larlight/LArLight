@@ -11,6 +11,15 @@ namespace larlight {
     if (!_compress_tree) { _compress_tree = new TTree("_compress_tree","Compression Info Tree"); }
     _compress_tree->Branch("_evt",&_evt,"evt/I");
     _compress_tree->Branch("_compression",&_compression,"compression/D");
+    _compress_tree->Branch("_compressionU",&_compressionU,"compressionU/D");
+    _compress_tree->Branch("_compressionV",&_compressionV,"compressionV/D");
+    _compress_tree->Branch("_compressionY",&_compressionY,"compressionY/D");
+
+    _compressionU = 0;
+    _compressionV = 0;
+    _compressionY = 0;
+    _compression  = 0;
+    _NplU = _NplV = _NplY = 0;
 
     _evt = 0;
 
@@ -67,30 +76,41 @@ namespace larlight {
       std::vector<std::vector<unsigned short> > compressOutput = _compress_algo->GetOutputWFs();
       // 4) Retrieve the time-ticks at which each output waveform saved starts
       std::vector<int> outTimes = _compress_algo->GetOutputWFTimes();
-      // 5) Calculate compression factor [ for now Ticks After / Ticks Before ]
-      CalculateCompression(ADCwaveform, compressOutput);
-      // 6) clear _InWF and _OutWF from compression algo object -> resetting algorithm for next time it is called
+      // 5) Study the Compression results for this channel
+      _compress_study->StudyCompression(ADCwaveform, compressOutput, outTimes,pl);
+      // 6) Calculate compression factor [ for now Ticks After / Ticks Before ]
+      CalculateCompression(ADCwaveform, compressOutput, pl);
+      // 7) clear _InWF and _OutWF from compression algo object -> resetting algorithm for next time it is called
       _compress_algo->Reset();
-      // 7) Replace .root data file *event_wf* with new waveforms
-      SwapData(tpc_data, compressOutput, outTimes);
+      if (_saveOutput){
+	// 8) Replace .root data file *event_wf* with new waveforms
+	SwapData(tpc_data, compressOutput, outTimes);
+      }
 	
     }//for all waveforms
 
-    // store compression factor for this event
-    _compression = _outTicks/_inTicks;
+    _compressionU /= _NplU;
+    _compressionV /= _NplV;
+    _compressionY /= _NplY;
+    _compression  /= (_NplU+_NplV+_NplY);
     _compress_tree->Fill();
+    _NplU = _NplV = _NplY = 0;
+    _compressionU = _compressionV = _compressionY = 0;
     _evt += 1;
     
     //now take new WFs and place in event_wf vector
-    event_wf->clear();
-    for (size_t m=0; m < _out_event_wf.size(); m++)
-      event_wf->push_back(_out_event_wf.at(m));
+    if (_saveOutput){
+      event_wf->clear();
+      for (size_t m=0; m < _out_event_wf.size(); m++)
+	event_wf->push_back(_out_event_wf.at(m));
+    }
     return true;
   }
 
   bool ExecuteCompression::finalize() {
 
     _compress_algo->EndProcess(_fout);
+    _compress_study->EndProcess(_fout);
     _compress_tree->Write();
 
     return true;
@@ -134,12 +154,32 @@ namespace larlight {
   }
 
 
-  void ExecuteCompression::CalculateCompression(std::vector<unsigned short> beforeADCs, std::vector<std::vector<unsigned short> > afterADCs){
+  void ExecuteCompression::CalculateCompression(const std::vector<unsigned short> &beforeADCs,
+						const std::vector<std::vector<unsigned short> > &afterADCs,
+						int pl){
     
-    _inTicks += beforeADCs.size();
-
+    double inTicks = beforeADCs.size();
+    double outTicks = 0;
+    
     for (size_t n=0; n < afterADCs.size(); n++)
-      _outTicks += afterADCs.at(n).size();
+      outTicks += afterADCs.at(n).size();
+    
+    if (pl==0){
+      _compressionU += outTicks/inTicks;
+      _NplU += 1;
+    }
+    else if (pl==1){
+      _compressionV += outTicks/inTicks;
+      _NplV += 1;
+    }
+    else if (pl==2){
+      _compressionY += outTicks/inTicks;
+      _NplY += 1;
+    }
+    else
+      std::cout << "What plane? Error?" << std::endl;
+    
+    _compression += outTicks/inTicks;
 
     return;
   }
