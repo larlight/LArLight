@@ -50,7 +50,9 @@ namespace larlight{
       CHANNEL_WORD,       ///< Channel word such as ADC sample
       CHANNEL_LAST_WORD,  ///< Last word per channel-wise readout
       FEM_LAST_WORD,      ///< Last word per fem
-      EVENT_LAST_WORD     ///< Last word in the event
+      EVENT_LAST_WORD,    ///< Last word in the event
+      CHANNEL_TIME,       ///< Channel time word
+      CHANNEL_PACKET_LAST_WORD  ///< Channel: last word of the packet
     };
 
   }
