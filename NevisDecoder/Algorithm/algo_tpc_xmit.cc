@@ -187,9 +187,10 @@ namespace larlight {
 
     bool status = true;
 
+    Message::send( MSG::INFO,__FUNCTION__, "algo_tpc_xmit" );
     // Check if _checksum and _nwords agrees with that of event header.
-    //if(_nwords != _header_info.nwords) {
-    _nwords-=1;
+    // Yun-Tse 2014/11/19: Perhaps this _nwords-=1; was for some old data format?
+    // _nwords-=1;
     if(_nwords!=_header_info.nwords){
 
       Message::send(MSG::ERROR,__FUNCTION__,
@@ -199,7 +200,7 @@ namespace larlight {
 
     }
 
-    //if(_checksum != _header_info.checksum) {
+    //if(_checksum != _header_info.checksum)
     if((_checksum & 0xffffff) !=_header_info.checksum){
 
       Message::send(MSG::ERROR,__FUNCTION__,
@@ -302,13 +303,13 @@ namespace larlight {
     // Store if condition is satisfied
     if(status) {
 
-      if(_verbosity[MSG::INFO]){
+      // if(_verbosity[MSG::INFO]){
 
 	Message::send(MSG::INFO,__FUNCTION__,
 		      Form("Storing event %u with %zu channel entries...",
-			   _event_data->event_number(), _event_data->size()));
+			   _header_info.event_number-1, _event_data->size()));
 
-      }
+      // }
 
       _event_data->set_module_address         ( _header_info.module_address         );
       _event_data->set_module_id              ( _header_info.module_id              );
@@ -434,7 +435,7 @@ namespace larlight {
 	}
       }
 
-      if(zero_count && status){
+      if( status && ( zero_count || (data>>14 & 0x1) ) ){
 
 	status = add_huffman_adc(_ch_data,zero_count);
 

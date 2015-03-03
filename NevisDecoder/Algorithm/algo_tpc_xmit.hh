@@ -79,7 +79,7 @@ namespace larlight {
 
     virtual void reset();
 
-    virtual inline bool is_compressed(const UInt_t word){ return ( word & 0xf000 ); };
+    virtual inline bool is_compressed(const UInt_t word){ return ( word & 0x8000 ); };
 
     /**
        A method to process 32-bit event header word

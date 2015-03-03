@@ -15,6 +15,7 @@
 #include "algo_pmt_xmit.hh"
 #include "algo_tpc_xmit.hh"
 #include "algo_tpc_huffman.hh"
+#include "algo_sn_tpc_huffman.hh"
 
 // Class forward declaration here
 namespace larlight{
@@ -26,6 +27,7 @@ namespace larlight{
   class algo_pmt_xmit;
   class algo_tpc_xmit;
   class algo_tpc_huffman;
+  class algo_sn_tpc_huffman;
 }
 
 #endif

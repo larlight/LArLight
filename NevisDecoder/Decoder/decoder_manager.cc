@@ -19,6 +19,8 @@ namespace larlight {
     _storage=storage_manager::get();
     _storage->set_io_mode(storage_manager::WRITE);
 
+    std::cout << "storage manage: set_io_mode: " << storage_manager::WRITE << std::endl;
+
     //if((_storage->input_filename()).size()==0)
     //  _storage->set_in_filename("out.root");
 

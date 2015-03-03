@@ -300,8 +300,8 @@ namespace larlight {
     // (2) get module address ... lowest 5 of 12 bits
     _header_info.module_address = ( (event_header[0]>>16 & 0xfff)    & 0x1f);
 
-    // (3) get module ID number ... upper 7 bit of 12 bits
-    _header_info.module_id      = ( (event_header[0]>>16 & 0xfff)>>5 & 0x7f);
+    // (3) get module ID number ... 8:5 bit of 12 bits
+    _header_info.module_id      = ( (event_header[0]>>16 & 0xfff)>>5 & 0xf);
 
     // (4) get number of 16-bit words to be read in this event.
     // Lower 12 bits of two 16-bit words.
@@ -337,20 +337,20 @@ namespace larlight {
   #endif
 
     // Report if verbosity is set.
-    if(_verbosity[MSG::INFO])
-      {
+    // if(_verbosity[MSG::INFO])
+    //   {
 	std::string msg;
 	for(size_t i=0; i<FEM_HEADER_COUNT; ++i)
 	  msg += Form("%x ", event_header[i]);
-	Message::send(MSG::INFO,Form("Decoded Header: %s",msg.c_str()));
-	Message::send(MSG::INFO,Form("Module %d (ID=%d)", _header_info.module_address, _header_info.module_id));
-	Message::send(MSG::INFO,Form("Event ID %d",_header_info.event_number));
-	Message::send(MSG::INFO,Form("Frame ID %d",_header_info.event_frame_number));
-	Message::send(MSG::INFO,Form("Number of Words = %d",_header_info.nwords));
-	Message::send(MSG::INFO,Form("Checksum = %x", _header_info.checksum));
-	Message::send(MSG::INFO,Form("Trigger Frame %d",_header_info.fem_trig_frame_number));
-	Message::send(MSG::INFO,Form("Trigger Sample %d",_header_info.fem_trig_sample_number));
-      }
+	Message::send(MSG::INFO, __FUNCTION__, Form("Decoded Header: %s",msg.c_str()));
+	Message::send(MSG::INFO, __FUNCTION__, Form("Module %d (ID=%d)", _header_info.module_address, _header_info.module_id));
+	Message::send(MSG::INFO, __FUNCTION__, Form("Event ID %d",_header_info.event_number));
+	Message::send(MSG::INFO, __FUNCTION__, Form("Frame ID %d",_header_info.event_frame_number));
+	Message::send(MSG::INFO, __FUNCTION__, Form("Number of Words = %d",_header_info.nwords));
+	Message::send(MSG::INFO, __FUNCTION__, Form("Checksum = %x", _header_info.checksum));
+	Message::send(MSG::INFO, __FUNCTION__, Form("Trigger Frame %d",_header_info.fem_trig_frame_number));
+	Message::send(MSG::INFO, __FUNCTION__, Form("Trigger Sample %d",_header_info.fem_trig_sample_number));
+    //  }
 
     _checksum=0;
 
