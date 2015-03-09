@@ -32,7 +32,7 @@ namespace larlight {
   public:
 
     /// Default constructor
-    ViewCompression(){ _name="ViewCompression"; _fout=0; _compress_algo=0; };
+    ViewCompression(){ _name="ViewCompression"; _fout=0; _compress_algo=0; _c1 = nullptr; _p1 = nullptr; _hInWF = nullptr; _hOutWF = nullptr; };
 
     /// Default destructor
     virtual ~ViewCompression(){};

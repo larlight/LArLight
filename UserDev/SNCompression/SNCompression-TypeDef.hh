@@ -14,6 +14,8 @@
 #include "HitViewer.hh"
 #include "WFViewer.hh"
 #include "CompressionAlgosncompress.hh"
+#include "CompressionAlgoTwoThresh.hh"
+#include "CompressionAlgoOneThresh.hh"
 //ADD_NEW_HEADER ... do not change this comment line
 
 // Class forward declaration here
@@ -34,11 +36,16 @@ namespace compression {
 
 class CompressionAlgoBase;
 class CompressionAlgoThresh;
+class CompressionAlgoTwoThresh;
+class CompressionAlgoOneThresh;
 class CompressionAlgosncompress;
 
 }
 
 //ADD_EMPTY_CLASS ... do not change this comment line
 #endif
+
+
+
 
 

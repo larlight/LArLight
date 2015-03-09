@@ -20,8 +20,13 @@
 
 #pragma link C++ class compress::CompressionAlgoBase+;
 #pragma link C++ class compress::CompressionAlgoThresh+;
+#pragma link C++ class compress::CompressionAlgoTwoThresh+;
+#pragma link C++ class compress::CompressionAlgoOneThresh+;
 #pragma link C++ class compress::CompressionAlgosncompress+;
 
 #endif
+
+
+
 
 
