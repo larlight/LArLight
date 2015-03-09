@@ -329,6 +329,7 @@ namespace larlight {
 
 	return status;
       }
+
     }
 
     switch(word_class){
@@ -441,6 +442,10 @@ namespace larlight {
 
       break;
     }
+
+    case FEM::UNDEFINED_WORD:
+      Message::send( MSG::WARNING, __FUNCTION__, Form("Expected 16-bit zero-padding, last word 0x%x.", last_word) );
+      break;
 
     default:
 
