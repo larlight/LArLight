@@ -43,11 +43,11 @@ namespace larlight {
     {}
 
     /// Fast vector copy constructor
-    fifo(UShort_t ch,
-	 UInt_t   frame,
-	 UInt_t   sample,
-	 UChar_t  module_address,
-	 UChar_t  module_id,
+    fifo(UInt_t  ch,
+	 UInt_t  frame,
+	 UInt_t  sample,
+	 UChar_t module_address,
+	 UChar_t module_id,
 	 DATA::DATA_TYPE type,
 	 std::vector<UShort_t> wf) : std::vector<UShort_t>(wf),
 				     data_base(type),
@@ -60,7 +60,7 @@ namespace larlight {
     
 
     /// Setter for the channel number
-    void set_channel_number (UShort_t ch)     {_channel_number=ch;}
+    void set_channel_number (UInt_t ch)     {_channel_number=ch;}
 
     /// Setter for the channel frame ID number
     void set_readout_frame_number (UInt_t id) {_readout_frame_number=id;}
@@ -93,8 +93,8 @@ namespace larlight {
     {return (_type==DATA::PMTFIFO ? _readout_sample_number    : _readout_sample_number*32 ); }
     
     /// Getter for the channel number
-    UShort_t channel_number() const {return _channel_number;}
-
+    UInt_t channel_number() const {return _channel_number;}
+    
     /// Getter for the module address
     UChar_t module_address() const { return _module_address; }
     
@@ -113,14 +113,14 @@ namespace larlight {
     /// Internal function to reset variables.
     virtual void init_vars();
 
-    UShort_t _channel_number;            ///< Channel number
-    UChar_t  _module_address;            ///< Module number
-    UChar_t  _module_id;                 ///< Module ID
-    UInt_t   _readout_frame_number;      ///< Frame number
-    UInt_t   _readout_sample_number;     ///< Sample number
+    UInt_t  _channel_number;            ///< Channel number
+    UChar_t _module_address;            ///< Module number
+    UChar_t _module_id;                 ///< Module ID
+    UInt_t  _readout_frame_number;      ///< Frame number
+    UInt_t  _readout_sample_number;     ///< Sample number
     
     ////////////////////////
-    ClassDef(fifo,5)
+    ClassDef(fifo,6)
     ////////////////////////
   };
   
@@ -230,7 +230,7 @@ namespace larlight {
     UInt_t _nwords;                    ///< # of event words readout
     
     ///////////////////////////
-    ClassDef(event_fifo,6)
+    ClassDef(event_fifo,7)
     //////////////////////////
   };
 }

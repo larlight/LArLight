@@ -83,7 +83,7 @@ namespace larlight {
     larlight::GEO::SigType_t   _signal;   ///< Signal Type
     
     ////////////////////////
-    ClassDef(tpcfifo,5)
+    ClassDef(tpcfifo,6)
     ////////////////////////
   };
   
@@ -193,7 +193,7 @@ namespace larlight {
     UInt_t _nwords;                    ///< # of event words readout
     
     ///////////////////////////
-    ClassDef(event_tpcfifo,6)
+    ClassDef(event_tpcfifo,7)
     //////////////////////////
   };
 }
