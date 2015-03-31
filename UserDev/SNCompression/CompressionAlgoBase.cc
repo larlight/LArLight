@@ -4,8 +4,17 @@
 #include "CompressionAlgoBase.hh"
 
 namespace compress {
+
+  CompressionAlgoBase::CompressionAlgoBase(){
+
+    _verbose = false; 
+    _InWF.clear();
+    _OutWF.clear();
+    _OutWFStartTick.clear();
+    _OutWFStartTick.clear();
+  }
   
-  void CompressionAlgoBase::ApplyCompression(const std::vector<unsigned short> &waveform, int mode){
+  void CompressionAlgoBase::ApplyCompression(const std::vector<unsigned short> &waveform, int mode, const UInt_t ch){
 
     /// This algorithm simply returns the original waveform as the compressed one! Not very useful!
     std::cout << "Defaut Base Compression Algo called..." << std::endl;

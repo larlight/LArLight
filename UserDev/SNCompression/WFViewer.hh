@@ -57,6 +57,9 @@ namespace larlight {
     TH2S* Prepare2DHisto(std::string name, 
 			 double wiremin, double wiremax,
 			 double timemin, double timemax, int pl);
+
+    /// decide what units to use for plot coordinates
+    void setCoordinatesInCm(bool on) { _useCmCm = on; }
     
     /// Getter for hit TH2D histo, weighted by charge
     const TH2S*  GetHisto_Hits (int view) const {
@@ -77,6 +80,9 @@ std::cout<<"*******************you screwed something up. view should be 0 1 or 2
 
     /// Event Number
     int _evtNum;
+
+    /// Boolean to decide coordinates (cm x cm) or ( w x T)
+    bool _useCmCm;
 
     /// Main canvas
     TCanvas* _c1;

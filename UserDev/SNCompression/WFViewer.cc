@@ -7,19 +7,17 @@ namespace larlight {
 
 
   //********************************
-  WFViewer::WFViewer(): ana_base(), _hHits_U(), _hHits_V(), _hHits_Y()
+  WFViewer::WFViewer(): ana_base(), _hHits_U(nullptr), _hHits_V(nullptr), _hHits_Y(nullptr)
   //********************************
   {
     //Class Name
     _name = "WFViewer";
-    //set initialization for pointers
-    _hHits_U = 0;
-    _hHits_V = 0;
-    _hHits_Y = 0;
 
     _w2cm = larutil::GeometryUtilities::GetME()->WireToCm();
     _t2cm = larutil::GeometryUtilities::GetME()->TimeToCm();
-
+    
+    _useCmCm = true;
+    
     _evtNum = 0;
     
   }
@@ -28,6 +26,11 @@ namespace larlight {
   bool WFViewer::initialize()
   //********************************
   {
+
+    if (!_useCmCm){
+      _w2cm = 1;
+      _t2cm = 1;
+    }
 
     return true;
   }
@@ -85,16 +88,23 @@ namespace larlight {
 	_baseline = 2048;
 
       if ( larlight::GEO::kU == tpc_data->plane() ){
-	for (size_t u=0; u < tpc_data->size(); u++)
+	for (size_t u=0; u < tpc_data->size(); u++){
+	  std::cout << "Size: " << tpc_data->size() << std::endl;
+	  //if (tpc_data->at(u) <= _baseline) continue;
 	  _hHits_U->Fill( larutil::Geometry::GetME()->ChannelToWire(chan)*_w2cm, (time+u)*_t2cm, tpc_data->at(u)-_baseline );
+	}
       }
       if ( larlight::GEO::kV == tpc_data->plane() ){
-	for (size_t v=0; v < tpc_data->size(); v++)
+	for (size_t v=0; v < tpc_data->size(); v++){
+	  //if (tpc_data->at(v) <= _baseline) continue;
 	  _hHits_V->Fill( larutil::Geometry::GetME()->ChannelToWire(chan)*_w2cm, (time+v)*_t2cm, tpc_data->at(v)-_baseline );
+	}
       }
       if ( larlight::GEO::kZ == tpc_data->plane() ){
-	for (size_t y=0; y < tpc_data->size(); y++)
+	for (size_t y=0; y < tpc_data->size(); y++){
+	  //if (tpc_data->at(y) <= _baseline) continue;
 	  _hHits_Y->Fill( larutil::Geometry::GetME()->ChannelToWire(chan)*_w2cm, (time+y)*_t2cm, tpc_data->at(y)-_baseline );
+	}
       }
 
     }//loop over all waveforms
@@ -111,10 +121,7 @@ namespace larlight {
   //****************************************************************
   {
     
-    TH2S* h=0;
-    if(h) delete h;
-    
-    h = new TH2S("2DViewer",name.c_str(),
+    TH2S* h = new TH2S(name.c_str(),name.c_str(),
 		 larutil::Geometry::GetME()->Nwires(pl),  wiremin, wiremax,
 		 9600,  timemin, timemax);
 

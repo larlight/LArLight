@@ -21,9 +21,9 @@ infilename = sys.argv[1]
 my_proc=fmwk.ana_processor()
 
 # Specify IO mode
-my_proc.set_io_mode(fmwk.storage_manager.BOTH)
+#my_proc.set_io_mode(fmwk.storage_manager.BOTH)
 #my_proc.set_io_mode(storage_manager.WRITE)
-#my_proc.set_io_mode(fmwk.storage_manager.READ)
+my_proc.set_io_mode(fmwk.storage_manager.READ)
 
 # Specify what data to read
 my_proc.set_data_to_read(fmwk.DATA.TPCFIFO)
@@ -42,7 +42,7 @@ my_proc.set_output_rootdir("scanner")
 
 # Set output root file: this is a separate root file in which your
 # analysis module can store anything such as histograms, your own TTree, etc.
-my_proc.set_ana_output_file("")
+my_proc.set_ana_output_file(sys.argv[2])
 my_proc.set_output_file("compressedWFs.root")
 
 #my_proc.set_output_rootdir("scanner")
@@ -50,19 +50,21 @@ my_proc.set_output_file("compressedWFs.root")
 # To show how one can run multiple analysis modules at once,
 # we make multiple ana_base instance.
 
-compAna=fmwk.ExecuteCompression()
+compAna=fmwk.StudyCompressionBufferSize()
 
 #add Compression Algorithm
-# compAlgo = compress.CompressionAlgoThresh()
-compAlgo = compress.CompressionAlgoTwoThresh()
-compAlgo.SetVerbose(False)
+compAlgo = compress.CompressionAlgosncompress()
 compAlgo.SetDebug(False)
-# compAlgo.SetThreshold(15)
-compAlgo.SetThreshold( 15, 15, 5 )
-# compAlgo = compress.CompressionAlgoAAA()
-#compAlgo.SetVerbose(False)
-#compAlgo.SetDebug(False)
-#compAlgo.SetThreshold(15)
+compAlgo.SetBlockSize(64)
+compAlgo.SetBaselineThresh(0.75)
+compAlgo.SetVarianceThresh(1.00)
+compAlgo.SetCompressThresh(3)
+compAlgo.SetMaxADC(4095)
+ticks = int(sys.argv[3])
+compAlgo.SetUVYplaneBuffer(ticks,ticks,ticks,ticks,ticks,ticks);
+compAna.SetCompressAlgo(compAlgo)
+
+
 compAna.SetCompressAlgo(compAlgo)
 
 # Add analysis modules to the processor
@@ -71,6 +73,6 @@ my_proc.add_process(compAna)
 
 # Let's run it.
 
-my_proc.run(0,2)
+my_proc.run()
 
 # done!
