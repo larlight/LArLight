@@ -76,7 +76,7 @@ namespace larlight {
     FEM::DISCRIMINATOR _disc_id; ///< Discriminator ID 
     
     ////////////////////////
-    ClassDef(pmtfifo,5)
+    ClassDef(pmtfifo,6)
     ////////////////////////
   };
   
@@ -186,7 +186,7 @@ namespace larlight {
     UInt_t _nwords;                    ///< # of event words readout
     
     ///////////////////////////
-    ClassDef(event_pmtfifo,6)
+    ClassDef(event_pmtfifo,7)
     //////////////////////////
   };
 }
