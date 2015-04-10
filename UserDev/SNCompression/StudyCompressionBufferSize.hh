@@ -20,6 +20,7 @@
 #include "Geometry.hh"
 #include "TH1D.h"
 #include "TF1.h"
+#include "TTree.h"
 #include "TGraph.h"
 
 namespace larlight {

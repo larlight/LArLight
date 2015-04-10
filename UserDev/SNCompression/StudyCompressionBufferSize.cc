@@ -20,7 +20,7 @@ namespace larlight {
   bool StudyCompressionBufferSize::initialize() {
     
 
-    if (_base_tree)
+    if (!_base_tree)
       _base_tree = new TTree("_base_tree","Baseline Tree");
     _base_tree->Branch("_base_pre",&_base_pre,"base_pre/D");
     _base_tree->Branch("_base_post",&_base_post,"base_post/D");
@@ -34,7 +34,7 @@ namespace larlight {
 
 
     // Initalize Histogram that tracks compression factor
-    if (_compress_tree)
+    if (!_compress_tree)
       _compress_tree = new TTree("_compress_tree","Compression Info Tree");
     _compress_tree->Branch("_evt",&_evt,"evt/I");
     _compress_tree->Branch("_compression",&_compression,"compression/D");
