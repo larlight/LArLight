@@ -63,7 +63,7 @@ namespace larlight {
       print(MSG::ERROR,__FUNCTION__,"Data storage did not find associated waveforms!");
       return false;
     }
-    
+    std::cout << "N waveforms: " << event_wf->size() << std::endl;
     //Loop over all waveforms
     for (size_t i=0; i<event_wf->size(); i++){
       
@@ -80,7 +80,9 @@ namespace larlight {
 
       //get WF plane to determine baseline
       UInt_t chan = tpc_data->channel_number();		
-      int time = tpc_data->readout_sample_number_RAW()+1;
+      if (chan >= 8254)
+	continue;
+      int time = 0;//tpc_data->readout_sample_number_RAW()+1;
       //determine baseline based on plane-type
       if ( larutil::Geometry::GetME()->SignalType(chan) == larlight::GEO::kCollection )
 	_baseline = 400;
@@ -89,21 +91,23 @@ namespace larlight {
 
       if ( larlight::GEO::kU == tpc_data->plane() ){
 	for (size_t u=0; u < tpc_data->size(); u++){
-	  std::cout << "Size: " << tpc_data->size() << std::endl;
+	  std::cout << "Ticks: " << tpc_data->size() << std::endl;
 	  //if (tpc_data->at(u) <= _baseline) continue;
-	  _hHits_U->Fill( larutil::Geometry::GetME()->ChannelToWire(chan)*_w2cm, (time+u)*_t2cm, tpc_data->at(u)-_baseline );
+	  _hHits_U->Fill( larutil::Geometry::GetME()->ChannelToWire(chan)*_w2cm, (time+u)*_t2cm, tpc_data->at(u) );
 	}
       }
       if ( larlight::GEO::kV == tpc_data->plane() ){
 	for (size_t v=0; v < tpc_data->size(); v++){
+	  std::cout << "Ticks: " << tpc_data->size() << std::endl;
 	  //if (tpc_data->at(v) <= _baseline) continue;
-	  _hHits_V->Fill( larutil::Geometry::GetME()->ChannelToWire(chan)*_w2cm, (time+v)*_t2cm, tpc_data->at(v)-_baseline );
+	  _hHits_V->Fill( larutil::Geometry::GetME()->ChannelToWire(chan)*_w2cm, (time+v)*_t2cm, tpc_data->at(v) );
 	}
       }
       if ( larlight::GEO::kZ == tpc_data->plane() ){
 	for (size_t y=0; y < tpc_data->size(); y++){
+	  std::cout << "Ticks: " << tpc_data->size() << std::endl;
 	  //if (tpc_data->at(y) <= _baseline) continue;
-	  _hHits_Y->Fill( larutil::Geometry::GetME()->ChannelToWire(chan)*_w2cm, (time+y)*_t2cm, tpc_data->at(y)-_baseline );
+	  _hHits_Y->Fill( larutil::Geometry::GetME()->ChannelToWire(chan)*_w2cm, (time+y)*_t2cm, tpc_data->at(y) );
 	}
       }
 

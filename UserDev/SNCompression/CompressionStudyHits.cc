@@ -66,10 +66,19 @@ namespace compress {
 	if ( PassThreshold(adcs,baseline) ) {
 	  active = true;
 	  Nabove += 1;
-	  Qarea   += (adcs-baseline);
-	  //find if pulse peak
-	  if ( (adcs-baseline) > Qpeak )
-	    Qpeak = (adcs-baseline);
+	  // if U plane -> filp
+	  if ( _pl == 0){
+	    Qarea   += -(adcs-baseline);
+	    //find if pulse peak
+	    if ( -(adcs-baseline) > Qpeak )
+	      Qpeak = -(adcs-baseline);
+	  }// if U plane
+	  else{
+	    Qarea   += (adcs-baseline);
+	    //find if pulse peak
+	    if ( (adcs-baseline) > Qpeak )
+	      Qpeak = (adcs-baseline);
+	  }// if V,Y planes
 	}
 	else {//below threshold
 	  if ( active && (Nabove > 1) ){//if we were in the middle of a hit
@@ -98,14 +107,14 @@ namespace compress {
 
   bool CompressionStudyHits::PassThreshold(double thisADC, double base){
 
-    // if positive threshold
+    // if V & Y plane
     if (_pl != 0){
-      if (thisADC > base + _threshold)
+      if (thisADC > (base + _threshold) )
 	return true;
     }
-    // if negative threshold
+    // if U plane
     else{
-      if (thisADC < base + _threshold)
+      if (thisADC < (base - _threshold) )
 	return true;
     }
     

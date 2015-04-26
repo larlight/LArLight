@@ -53,6 +53,12 @@ namespace compress {
     /// Setter function for debug mode
     virtual void SetDebug(bool doit=true) { _debug = doit; }
 
+    /// Get Baselines vector
+    virtual const std::vector<double> GetBaselines() { return _baselines; }
+
+    /// Get Variances vector
+    virtual const std::vector<double> GetVariances() { return _variances; }
+
   protected:
 
     /// Boolean to choose verbose mode.
@@ -68,6 +74,11 @@ namespace compress {
     std::vector<std::vector<unsigned short> > _OutWF;
     /// Vector of start-tick values for the output waveforms -> allows to get timing information when saving a new waveform
     std::vector<int> _OutWFStartTick;
+
+    /// Vector where to hold the various baselines for the various blocks
+    std::vector<double> _baselines;
+    /// Vector where to hold the variance measured per block
+    std::vector<double> _variances;
 
   };
 

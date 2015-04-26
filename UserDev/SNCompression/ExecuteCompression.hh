@@ -73,6 +73,8 @@ namespace larlight {
     /// Now filll output WFs information into larlight data product so that we can write to output
     void SwapData(larlight::tpcfifo* tpc_data, std::vector<std::vector<unsigned short> > outputWFs,
 		  std::vector<int> outTimes);
+
+
     
     /// Compression Algorithm Object...performs compression
     compress::CompressionAlgoBase* _compress_algo;
