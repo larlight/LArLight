@@ -201,12 +201,16 @@ namespace larlight {
 
     //if(_checksum != _header_info.checksum) {
     if((_checksum & 0xffffff) !=_header_info.checksum){
+      
+      if( ((_checksum + 0x503f) & 0xffffff) == _header_info.checksum)
+	Message::send(MSG::WARNING,__FUNCTION__,
+		      Form("Disagreement on checksum: summed=%x, expected=%x ... BUT can be fixed...",_checksum,_header_info.checksum));
 
-      Message::send(MSG::ERROR,__FUNCTION__,
-		    Form("Disagreement on checksum: summed=%x, expected=%x",_checksum,_header_info.checksum));
-
-      status = false;
-
+      else {
+	Message::send(MSG::ERROR,__FUNCTION__,
+		      Form("Disagreement on checksum: summed=%x, expected=%x",_checksum,_header_info.checksum));
+	status = false;
+      }
     }
 
     return status;
@@ -360,7 +364,7 @@ namespace larlight {
     else{
 
       // Compresed data is in last 15 bit of this word.
-      UInt_t data = (word & 0x7fff);
+      UInt_t data = (word & 0x3fff);
 
       // The compression is based on an extremely simple Huffman encoding.
       // The Huffman tree used here assigns the following values:
@@ -418,28 +422,31 @@ namespace larlight {
 
       size_t zero_count = 0;
       bool   non_zero_found = false;
-      for(size_t index=0; index<15 && status; ++index){
+      for(short index=13; index>=0 && status; --index){
 
 	if( !((data >> index) & 0x1) )
 
-	  zero_count += ( non_zero_found ? 1 : 0 );
+	  zero_count += 1;
 
-	else{
+	else {
 
-	  if(!non_zero_found) non_zero_found=true;
-
-	  else status = add_huffman_adc(_ch_data,zero_count);
-
-	  if(status) zero_count=0;
+	  status = add_huffman_adc(_ch_data,zero_count);
+	  
+	  zero_count = 0;
+	  if(!status) {
+	    Message::send(MSG::ERROR,__FUNCTION__,
+			  Form("Error in decoding huffman data word: 0x%x",data));
+	    break;
+	  }
 	}
       }
-
+      /*
       if(zero_count && status){
 
 	status = add_huffman_adc(_ch_data,zero_count);
 
       }    
-
+      */
       if(!status)
 
 	Message::send(MSG::ERROR,__FUNCTION__,

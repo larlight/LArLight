@@ -137,10 +137,24 @@ namespace larlight {
       UInt_t first_word  = (word & 0xffff);
       UInt_t second_word = (word >> 16);
 
+      //size_t current_index=_ch_data.size();
       status = process_ch_word(first_word,_last_word);
-
+      /*
+      printf("%x => ",first_word);
+      for(size_t i=current_index; i<_ch_data.size(); ++i) {
+	std::cout<<_ch_data[i]<< " ";
+      }
+      std::cout<<std::endl;
+      */
+      //current_index=_ch_data.size();
       if(status) status = process_ch_word(second_word,_last_word);
-
+      /*
+      printf("%x => ",second_word);
+      for(size_t i=current_index; i<_ch_data.size(); ++i) {
+	std::cout<<_ch_data[i]<< " ";
+      }
+      std::cout<<std::endl;
+      */
     }
 
     if(!status){
@@ -347,12 +361,22 @@ namespace larlight {
       UShort_t ch( (word & 0xfff) );
       if(ch == _ch_data.channel_number()) {
 
-	if(_verbosity[MSG::DEBUG])
+	if(_verbosity[MSG::DEBUG]) {
 
 	  Message::send(MSG::DEBUG,__FUNCTION__,
 			Form("Finished reading %zu samples for Ch %d",
 			     _ch_data.size(),_ch_data.channel_number()));
-
+	  /*
+	  if(!(_ch_data.channel_number())) {
+	    int local_ctr=0;
+	    for(auto const& v : _ch_data) {
+	      std::cout<< v << " " <<std::flush;
+	      if(local_ctr && local_ctr%8==0) std::cout<<std::endl;
+	      local_ctr++;
+	    }
+	  }
+	  */
+	}
 	// Store
 	_ch_data.set_module_id(_header_info.module_id);
 	_ch_data.set_module_address(_header_info.module_address);
