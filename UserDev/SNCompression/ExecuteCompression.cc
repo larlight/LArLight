@@ -76,14 +76,16 @@ namespace larlight {
       std::vector<std::vector<unsigned short> > compressOutput = _compress_algo->GetOutputWFs();
       // 4) Retrieve the time-ticks at which each output waveform saved starts
       std::vector<int> outTimes = _compress_algo->GetOutputWFTimes();
-      // 5) Study the Compression results for this channel
+
+      //MergeOverlaps(compressOutput,outTimes);
+      // 6) Study the Compression results for this channel
       _compress_study->StudyCompression(ADCwaveform, compressOutput, outTimes,pl);
-      // 6) Calculate compression factor [ for now Ticks After / Ticks Before ]
+      // 7) Calculate compression factor [ for now Ticks After / Ticks Before ]
       CalculateCompression(ADCwaveform, compressOutput, pl);
-      // 7) clear _InWF and _OutWF from compression algo object -> resetting algorithm for next time it is called
+      // 8) clear _InWF and _OutWF from compression algo object -> resetting algorithm for next time it is called
       _compress_algo->Reset();
       if (_saveOutput){
-	// 8) Replace .root data file *event_wf* with new waveforms
+	// 9) Replace .root data file *event_wf* with new waveforms
 	SwapData(tpc_data, compressOutput, outTimes);
       }
 	
@@ -183,6 +185,9 @@ namespace larlight {
 
     return;
   }
+
+  
+
 
 }
 #endif

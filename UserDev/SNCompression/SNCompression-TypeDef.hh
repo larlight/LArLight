@@ -16,6 +16,8 @@
 #include "WFViewer.hh"
 #include "WFSaver.hh"
 #include "CompressionAlgosncompress.hh"
+#include "CompressionAlgoTwoThresh.hh"
+#include "CompressionAlgoOneThresh.hh"
 #include "CompressionStudyBase.hh"
 #include "CompressionStudyHits.hh"
 //ADD_NEW_HEADER ... do not change this comment line
@@ -39,8 +41,9 @@ namespace compression {
 
   class CompressionAlgoBase;
   class CompressionAlgoThresh;
+  class CompressionAlgoTwoThresh;
+  class CompressionAlgoOneThresh;
   class CompressionAlgosncompress;
-  
   class CompressionStudyBase;
   class CompressionStudyHits;
   //ADD_COMP_CLASS ... do not change this comment line

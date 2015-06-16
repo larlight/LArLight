@@ -38,7 +38,7 @@ namespace compress {
     void SetBlockSize(int b) { _block = b; }
     void SetBaselineThresh(double b) { _deltaB = b*b; }
     void SetVarianceThresh(double v) { _deltaV = v*v; }
-    void SetCompressThresh(double tU, double tV, double tY) { _thresh[0] = tV; _thresh[1] = tV; _thresh[2] = tY; }
+    void SetCompressThresh(double tU, double tV, double tY) { _thresh[0] = tU; _thresh[1] = tV; _thresh[2] = tY; }
     void SetMaxADC(int ADC) { _maxADC = ADC; }
     void SetUplaneBuffer(int pre, int post) { _buffer[0][0] = pre; _buffer[0][1] = post; }
     void SetVplaneBuffer(int pre, int post) { _buffer[1][0] = pre; _buffer[1][1] = post; }
@@ -49,6 +49,9 @@ namespace compress {
     void SetFillTree(bool on) { _fillTree = on; }
 
   protected:
+
+    /// Merge overlapping regions - return is whether anything was merged
+    bool MergeOverlaps();
 
     int _block;
 

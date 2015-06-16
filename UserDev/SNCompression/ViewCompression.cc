@@ -66,11 +66,20 @@ namespace larlight {
     std::vector<int> outTimes = _compress_algo->GetOutputWFTimes();
     
     _NumOutWFs = compressOutput.size();
-    
+
+    // calculate an approximate baseline
+    _base = 0;
+    if (_baseline){
+      for (size_t i=0; i < 200; i++)
+	_base += ADCwaveform[i];
+      _base /= 200.;
+    }
     //clear histograms
     ClearHistograms();
     //now fill histograms
     FillHistograms(ADCwaveform, compressOutput, outTimes, ch, pl);
+    //fill baseline & variance histograms
+    FillBaseVarHistos(_compress_algo->GetBaselines(),_compress_algo->GetVariances(),ch,pl);
 
     _currentWF += 1;
     
@@ -96,17 +105,17 @@ namespace larlight {
 				       UShort_t ch,
 				       UChar_t pl){
     
-    _hInWF = new TH1I("hInWF", Form("Event %i - Pl %i - Ch %i - Input WF; Time Tick; ADCs",_evtNum, pl, ch),
+    _hInWF = new TH1D("hInWF", Form("Event %i - Pl %i - Ch %i - Input WF; Time Tick; ADCs",_evtNum, pl, ch),
 		      ADCwaveform.size(), 0, ADCwaveform.size());
 
-    _hOutWF = new TH1I("hOutWF", Form("Event %i - Pl %i - Ch %i - Output WF; Time Tick; ADCs",_evtNum, pl, ch),
+    _hOutWF = new TH1D("hOutWF", Form("Event %i - Pl %i - Ch %i - Output WF; Time Tick; ADCs",_evtNum, pl, ch),
 		       ADCwaveform.size(), 0, ADCwaveform.size());
 
     _hInWF->SetTitleOffset(0.8,"X");
     _hOutWF->SetTitleOffset(0.8,"X");
     
     for (size_t n=0; n < ADCwaveform.size(); n++)
-      _hInWF->SetBinContent(n+1, ADCwaveform.at(n));
+      _hInWF->SetBinContent(n+1, ADCwaveform.at(n)-_base);
 
     //measure a baseline to place a temporary holder in output histogram
     double baseline = 0.;
@@ -115,11 +124,14 @@ namespace larlight {
     baseline /= 10.;
     int base = int(baseline);
     for (size_t m=0; m < ADCwaveform.size(); m++)
-      _hOutWF->SetBinContent(m+1, base);
+      _hOutWF->SetBinContent(m+1, base-_base);
     
     for (size_t j=0; j < compressOutput.size(); j++){
+      std::cout << "Range: [" <<  outputTimes.at(j)+1 << ", "
+		<< outputTimes.at(j)+1+compressOutput.at(j).size()
+		<< "]" << std::endl;
       for (size_t k=0; k < compressOutput.at(j).size(); k++){
-	_hOutWF->SetBinContent( outputTimes.at(j)+k+1, compressOutput.at(j).at(k));
+	_hOutWF->SetBinContent( outputTimes.at(j)+k+1, compressOutput.at(j).at(k)-_base);
       }
     }
 
@@ -129,30 +141,34 @@ namespace larlight {
     return;
   }
 
-  void ViewCompression::FillHistogram(std::vector<unsigned short> ADCwaveform,
-				      UShort_t ch,
-				      UChar_t pl){
+
+  void ViewCompression::FillBaseVarHistos(std::vector<double> base,
+					  std::vector<double> var,
+					  UShort_t ch,
+					  UChar_t pl){
     
-    _hInWF = new TH1I("hInWF", Form("Event %i - Pl %i - Ch %i - Input WF; Time Tick; ADCs",_evtNum, pl, ch),
-		      ADCwaveform.size(), 0, ADCwaveform.size());
+    // block size is 64
+    int block = 64;
+    int nblocks = base.size();
+
+    _hInBase = new TH1D("hInBase", Form("Event %i - Pl %i - Ch %i - Input WF; Time Tick; Baseline",_evtNum, pl, ch),
+		      block*nblocks, 0, block*nblocks);
+
+    _hInVar = new TH1D("hOutVar", Form("Event %i - Pl %i - Ch %i - Output WF; Time Tick; Variance",_evtNum, pl, ch),
+		       block*nblocks, 0, block*nblocks);
 
     _hInWF->SetTitleOffset(0.8,"X");
+    _hOutWF->SetTitleOffset(0.8,"X");
     
-    for (size_t n=0; n < ADCwaveform.size(); n++)
-      _hInWF->SetBinContent(n+1, ADCwaveform.at(n));
+    for (size_t n=0; n < nblocks; n++){
+      for (size_t i=0; i < block; i++){
+	_hInBase->SetBinContent(n*block+i, base[n]-_base);
+	_hInVar->SetBinContent(n*block+i, var[n]);
+      }
+    }
 
-    //measure a baseline to place a temporary holder in output histogram
-    double baseline = 0.;
-    for (int tick=0; tick < 10; tick++)
-      baseline += ADCwaveform.at(tick);
-    baseline /= 10.;
-    int base = int(baseline);
-
-    _hInWF->SetAxisRange(_hInWF->GetMinimum(), _hInWF->GetMaximum(), "Y");
-    
     return;
   }
-
   
 }
 #endif

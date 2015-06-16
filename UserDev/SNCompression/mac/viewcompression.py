@@ -29,7 +29,8 @@ my_proc.set_ana_output_file("")
 compAna=fmwk.ViewCompression()
 
 #add Compression Algorithm
-compAlgo = compress.CompressionAlgoThresh()
+# compAlgo = compress.CompressionAlgoThresh()
+compAlgo = compress.CompressionAlgoOneThresh()
 compAlgo.SetVerbose(False)
 compAlgo.SetDebug(False)
 #compAlgo.SetBlockSize(64)
@@ -37,7 +38,7 @@ compAlgo.SetDebug(False)
 #compAlgo.SetVarianceThresh(5)
 #compAlgo.SetCompressThresh(5)
 #compAlgo.Debug(False);
-compAlgo.SetThreshold(15)
+compAlgo.SetThreshold( 15, 15, 15 )
 compAna.SetCompressAlgo(compAlgo)
 
 my_proc.add_process(compAna)
@@ -58,7 +59,7 @@ while my_proc.process_event():
 
     for x in range(compAna.GetNumWFs()):
         compAna.processWF()
-        if (compAna.GetNumOutWFs() > 0):
+        if (compAna.GetNumOutWFs() > 0 ):
             for pad in xrange(1,3,1):
                 c1.cd(pad)
                 compAna.GetHistos(pad).Draw()

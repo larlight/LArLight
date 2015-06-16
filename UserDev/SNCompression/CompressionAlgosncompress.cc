@@ -58,6 +58,8 @@ namespace compress {
     int nTicks = waveform.size();
     
     std::vector<unsigned short> outputwf;
+    _baselines.clear();
+    _variances.clear();
     
     int diff = 0;
     // keep track of bin position for baseline calculation:
@@ -69,7 +71,8 @@ namespace compress {
     
     double baseline[3];
     double variance[3];
-    int save = 0;
+    // Tick @ which waveform starts
+    int start = 0;
     
     _pl = mode;
 
@@ -79,7 +82,6 @@ namespace compress {
 
       if (_debug)
 	std::cout << "position is: " << pos << std::endl;
-      save = 0;
       for(int j = 0; j<3; j++){
 	variance[j] = 0;
 	baseline[j] = 0;
@@ -115,8 +117,11 @@ namespace compress {
 	else{ variance[2] += 4095;}
       }
 
-      for(int j = 0; j<3; j++)
+      for(int j = 0; j<3; j++){
 	variance[j] = variance[j]/_block;
+	_baselines.push_back(baseline[j]);
+	_variances.push_back(variance[j]);
+      }
       
       _v1 = variance[0];
       _v2 = variance[1];
@@ -149,12 +154,15 @@ namespace compress {
 	// yes! interesting
 	interesting = true;
       }
+      
+      if (_verbose && interesting)
+	std::cout << "Interesting @ tick " << thistick << std::endl;
 
       _interesting = 0;
       if (interesting) { _interesting = 1; }
       
-      if (interesting && (_baselineMap.find(ch) == _baselineMap.end()) )
-	std::cout << "WARNING: interesting stuff but baseline has not yet been set" << std::endl;
+      if (_verbose && interesting && (_baselineMap.find(ch) == _baselineMap.end()) )
+	std::cout << "WARNING: interesting stuff but baseline has not yet been set for ch " << ch << std::endl;
       if (interesting && (_baselineMap.find(ch) != _baselineMap.end()) ){
 
 	double base = _baselineMap[ch];
@@ -166,7 +174,6 @@ namespace compress {
 	
 	// save will keep track of tick at which waveform goes above threshold
 	// == 0 if not -> use as logic method to decide if to push back or not
-	save = 0;
 	_save = 0;
 	// also keep track of each new sub-waveform to push back to output waveform
 	outputwf.clear();
@@ -178,12 +185,13 @@ namespace compress {
 	  if (thisADC-base > _max) { _max = thisADC-base; }
 
 	  if ( PassThreshold(thisADC, base) ){
+	    if (_verbose) { std::cout << "+ "; }
 	    _save = 1;
 	    // yay -> active
-	    // if save == 0 it means it's a new pulse! (previous tick was quiet)
+	    // if start == 0 it means it's a new pulse! (previous tick was quiet)
 	    // keep track of maxima
-	    if ( save == 0){
-	      save = thistick+j;
+	    if ( start == 0 ){
+	      start = thistick+j;
 	      // also, since we just started...add "backwards ticks" to account for padding
 	      for (int back=_buffer[mode][0]; back > 0; back--){
 		//make sure bin number exists
@@ -200,31 +208,46 @@ namespace compress {
 	    // 1) we were in a sub-threshold region at the previous tick -> then just carry on
 	    // 2) we were in an active region in the previous tick -> we just "finished" this mini-waveform.
 	    //    then Complete padding and save to output
-	    if ( save > 0 ){
+	    if ( start > 0 ){
 	      // finish padding
 	      for (int forward=1; forward < _buffer[mode][1]; forward++){
 		//make sure bin number exists
 		if ( (thistick+j+forward) < nTicks ) { outputwf.push_back(waveform[thistick+j+forward]); }
 	      }
 	      // push back waveform and time-tick
+	      if (_verbose) {
+		std::cout << std::endl;
+		std::cout << "saving [" << start-buffer << ", " << start-buffer+outputwf.size() << "]" << std::endl;
+	      }
 	      _OutWF.push_back(outputwf);
-	      _OutWFStartTick.push_back(save-buffer);
+	      _OutWFStartTick.push_back(start-buffer);
 	      // finally clear outputwf for next round
 	      outputwf.clear();
 	      // turn off save mode
-	      save = 0;
+	      _save = 0;
+	      start = 0;
 	    }
 	  }
 	  
 	}
-
+	if (_verbose) { std::cout << std::endl; }
       }//if interesting!
-      
       if (_fillTree)
 	_algo_tree->Fill();
 
     }//for all 3-block segments
-    
+
+    if (_verbose) { std::cout << "Waveforms in event: " << _OutWF.size() << std::endl; }
+
+    // if overlap between save regions, fix here
+    // Merge compressed regions (to remove overlaps and double-counting
+    int merges = 0;
+    while (MergeOverlaps())
+      merges += 1;    
+    if (merges > 0 && _verbose)
+      std::cout << "Merges: " << merges << "\t Out WFs: " << _OutWF.size() << std::endl;
+
+
     return;
   }
 
@@ -253,6 +276,82 @@ namespace compress {
     }
 
     return;
+  }
+
+
+  bool CompressionAlgosncompress::MergeOverlaps()
+  {
+    
+    // make sure the two vectors have the same size!
+    if (_OutWF.size() != _OutWFStartTick.size()){
+      std::cout << "FAILFAILFAIL..not equal size!!!" << std::endl;
+      return false;
+    }
+
+    // if both 0-length, return true
+    if ( _OutWF.size() == 0 )
+      return false;
+
+    // keep track of wether anything was merged
+    bool merged = false;
+    // have the last two segments been overlapped?
+    bool overlap = false;
+    // has the last segment been considered?
+    bool last = false;
+    // vectors where to store merged regions
+    std::vector<std::vector<unsigned short> > mergedADCs;
+    mergedADCs.clear();
+    std::vector<int> mergedTimes;
+    mergedTimes.clear();
+
+    // check if there are any overlaps in the times
+    for (size_t n=0; n < _OutWF.size()-1; n++){
+      // if the end time of segment n is equal or larger than end time of segment n+1
+      if (_OutWFStartTick[n]+_OutWF[n].size() >= _OutWFStartTick[n+1]){
+	if (_verbose) { 
+	  std::cout << "Overlap between [" << _OutWFStartTick[n] << ", "
+		    << _OutWFStartTick[n]+_OutWF[n].size() << "] and ["
+		    << _OutWFStartTick[n+1] << ", " << _OutWFStartTick[n+1]+_OutWF[n+1].size()
+		    << "]" << std::endl;
+	}
+	merged = true;
+	overlap = true;
+	if (n+2 == _OutWF.size())
+	  last = true; // last wf was considered
+	// then merge the two
+	std::vector<unsigned short> thisregion = _OutWF[n];
+	// how many ticks do we need to add?
+	size_t diff = (_OutWFStartTick[n] + _OutWF[n].size() - _OutWFStartTick[n+1]);
+	for (size_t i= diff; i < _OutWF[n+1].size(); i++)
+	  thisregion.push_back(_OutWF[n+1][i]);
+	// push back the new output waveforms
+	if (_verbose)
+	  std::cout << "Resulting in: [" << _OutWFStartTick[n] << ", " << _OutWFStartTick[n] + thisregion.size() << "]" << std::endl;
+	mergedADCs.push_back(thisregion);
+	mergedTimes.push_back(_OutWFStartTick[n]);
+	// skip the next one -> n -> n+1
+	n = n+1;
+      }// if there is an overlap
+      // otherwise save the waveform
+      else{
+	overlap = false;
+	mergedADCs.push_back(_OutWF[n]);
+	mergedTimes.push_back(_OutWFStartTick[n]);
+      }// if no overlap
+    }// for all output waveforms found
+
+    // if overlap is false, the last segment was not added
+    if (last == false){
+      mergedADCs.push_back(_OutWF.back());
+      mergedTimes.push_back(_OutWFStartTick.back());
+    }
+
+    if (_verbose) { std::cout << "Number of Resulting WFs: " << mergedTimes.size() << std::endl; }
+
+    _OutWF = mergedADCs;
+    _OutWFStartTick = mergedTimes;
+
+    return merged;
   }
 
 }

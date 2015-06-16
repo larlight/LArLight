@@ -81,6 +81,8 @@ namespace larlight {
 
     virtual inline bool is_compressed(const UInt_t word){ return ( (word>>14) == 0x2 ); };
 
+    //virtual inline bool is_compressed(const UInt_t word){ return ( word & 0x8000 ); };
+
     /**
        A method to process 32-bit event header word
      */

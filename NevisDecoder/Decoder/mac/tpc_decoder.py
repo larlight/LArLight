@@ -88,15 +88,14 @@ decoder.set_output_filename(outname)
 # in the decoding event loop. When turned off, the program exits as
 # soon as it encounters any issue.
 decoder.debug_mode(False)
-#decoder.debug_mode(True)
 
 # Finish configuration. Now run it.
 status=decoder.run()
-
 # Reset properly before exits.
 decoder.reset()
 
 print status
+
 
     
 

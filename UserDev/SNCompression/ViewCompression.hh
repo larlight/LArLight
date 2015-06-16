@@ -18,7 +18,8 @@
 #include "ana_base.hh"
 #include "CompressionAlgoBase.hh"
 #include "Geometry.hh"
-#include <TH1I.h>
+#include <TH1D.h>
+#include <TH1D.h>
 #include <TCanvas.h>
 #include <TPad.h>
 
@@ -32,7 +33,7 @@ namespace larlight {
   public:
 
     /// Default constructor
-    ViewCompression(){ _name="ViewCompression"; _fout=0; _compress_algo=0; };
+    ViewCompression(){ _name="ViewCompression"; _fout=0; _compress_algo=0; _c1 = nullptr; _p1 = nullptr; _hInWF = nullptr; _hOutWF = nullptr; _hInBase = nullptr; _hInVar = nullptr; _baseline = false; };
 
     /// Default destructor
     virtual ~ViewCompression(){};
@@ -60,6 +61,9 @@ namespace larlight {
     /// Set Compression Algorithm
     void SetCompressAlgo(compress::CompressionAlgoBase* algo) { _compress_algo = algo; }
 
+    /// Set boolean whether to use baseline or not
+    void suppressBaseline(bool on) { _baseline = on; }
+
     /// Function to extract ADC vector of shorts from tpcfifo data-type
     std::vector<unsigned short> getADCs(larlight::tpcfifo* tpc_data);
 
@@ -74,7 +78,7 @@ namespace larlight {
 
     //// Clear Histograms
     //    void ClearHistograms() { _hInWF=0; _hOutWF=0; }
-    void ClearHistograms() { delete _hInWF; delete _hOutWF; }
+    void ClearHistograms() { delete _hInWF; delete _hOutWF; delete _hInBase; delete _hInVar; }
 
     /// Fill Histograms with new and old waveforms
     void FillHistograms(std::vector<unsigned short> ADCwaveform,
@@ -83,13 +87,13 @@ namespace larlight {
 			UShort_t ch,
 			UChar_t pl);
 
-    /// Fill Histograms with new and old waveforms
-    void FillHistogram(std::vector<unsigned short> ADCwaveform,
-		       UShort_t ch,
-		       UChar_t pl);
+  void FillBaseVarHistos(std::vector<double> base,
+			 std::vector<double> var,
+			 UShort_t ch,
+			 UChar_t pl);
 
     /// Get Histograms for python script
-    const TH1I* GetHistos(int which) const {
+    const TH1D* GetHistos(int which) const {
       if (which == 1)
 	return _hInWF;
       else if (which == 2)
@@ -101,10 +105,21 @@ namespace larlight {
 
     }
 
+    /// Get baseline histo
+    const TH1D* GetBaseHisto() const { return _hInBase; }
+
+    /// Get variance histo
+    const TH1D* GetVarHisto() const { return _hInVar; }
+
     protected:
 
     /// Event Number
     int _evtNum;
+
+    /// bool to suppress baseline or not
+    bool _baseline;
+    /// approximate baseline value
+    double _base;
 
     /// Compression Algorithm Object...performs compression
     compress::CompressionAlgoBase* _compress_algo;
@@ -117,9 +132,13 @@ namespace larlight {
     /// Main Pad
     TPad* _p1;
     /// Original WF Histo
-    TH1I* _hInWF;
+    TH1D* _hInWF;
+    /// Original Baseline Histo (in blocks of 64)
+    TH1D* _hInBase;
+    /// Original Variance Histo (in blocks of 64)
+    TH1D* _hInVar;
     /// Output WF Histo
-    TH1I* _hOutWF;
+    TH1D* _hOutWF;
 
     /// Keep track of which waveform we are looking at
     int _currentWF;

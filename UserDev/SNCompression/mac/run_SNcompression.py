@@ -32,7 +32,10 @@ my_proc.set_data_to_read(fmwk.DATA.TPCFIFO)
 # Set input root file: this is decoder output root file.
 # This time, we use a sample file prepared.
 #my_proc.add_input_file("./../../../NevisDecoder/Decoder/mac/xmit_subrun_2014_01_13_1_trigger.root")
-my_proc.add_input_file(infilename)
+# Set input root file
+for x in xrange(len(sys.argv)-1):
+    my_proc.add_input_file(sys.argv[x+1])
+
 #set output data file
 #my_proc.set_output_file(outfilename)
 
@@ -60,9 +63,10 @@ compAlgo.SetFillTree(False)
 compAlgo.SetBlockSize(64)
 compAlgo.SetBaselineThresh(0.75)
 compAlgo.SetVarianceThresh(1.00)
-compAlgo.SetCompressThresh(-2,2,3)
+f = 3./4
+compAlgo.SetCompressThresh(-5,5,f*5)
 compAlgo.SetMaxADC(4095)
-compAlgo.SetUVYplaneBuffer(15,20,15,15,15,15);
+compAlgo.SetUVYplaneBuffer(30,55,15,20,15,10);
 compAna.SetCompressAlgo(compAlgo)
 
 #add study Algorithm
@@ -77,6 +81,6 @@ my_proc.add_process(compAna)
 
 # Let's run it.
 
-my_proc.run()
+my_proc.run(0,2)
 
 # done!

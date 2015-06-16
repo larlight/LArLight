@@ -27,20 +27,17 @@ my_proc.set_input_rootdir("scanner")
 my_proc.set_ana_output_file("")
 
 compAna=fmwk.ViewCompression()
-compAna.suppressBaseline(True)
+
 #add Compression Algorithm
-compAlgo = compress.CompressionAlgosncompress()
+compAlgo = compress.CompressionAlgoTwoThresh()
+compAlgo.SetVerbose(False)
 compAlgo.SetDebug(False)
-compAlgo.SetVerbose(True)
-compAlgo.SetFillTree(False)
-compAlgo.SetBlockSize(64)
-compAlgo.SetBaselineThresh(0.75)
-compAlgo.SetVarianceThresh(1)
-f = 3./4
-compAlgo.SetCompressThresh(-5,5,f*5)
-compAlgo.SetMaxADC(4095)
-compAlgo.SetUVYplaneBuffer(30,55,15,20,15,10);
-#compAlgo.SetUVYplaneBuffer(15,20,15,15,15,15);
+#compAlgo.SetBlockSize(64)
+#compAlgo.SetBaselineThresh(1)
+#compAlgo.SetVarianceThresh(5)
+#compAlgo.SetCompressThresh(5)
+#compAlgo.Debug(False);
+compAlgo.SetThreshold(15, 5, 15, 5, 15, 5, 0)
 compAna.SetCompressAlgo(compAlgo)
 
 my_proc.add_process(compAna)
@@ -61,17 +58,10 @@ while my_proc.process_event():
 
     for x in range(compAna.GetNumWFs()):
         compAna.processWF()
-        if (compAna.GetNumOutWFs() >= 1):
-            print "%i Waveforms found"%compAna.GetNumOutWFs()
+        if (compAna.GetNumOutWFs() > 0 ):
             for pad in xrange(1,3,1):
                 c1.cd(pad)
                 compAna.GetHistos(pad).Draw()
-                basehisto = compAna.GetBaseHisto()
-                basehisto.SetLineColor(2)
-                basehisto.Draw("same")
-                varhisto = compAna.GetVarHisto()
-                varhisto.SetLineColor(3)
-                varhisto.Draw("same")
             c1.Update()
 
             usrinput = raw_input("Hit Enter: next evt  ||  q: exit viewer\n")
