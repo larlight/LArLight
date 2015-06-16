@@ -46,8 +46,10 @@ outname = fname[0:fname.rfind('.')] + ".root"
 #algo=fmwk.algo_trig_decoder()
 algo=fmwk.algo_tpc_huffman()
 
+algo.set_verbosity(fmwk.MSG.NORMAL)
+
 # Set algorithm's back-trace mode with positive int argument (=# words to be backtraced)
-algo.set_backtrace_mode(200)
+algo.set_backtrace_mode(1000)
 
 # Create the decoder instance
 decoder=fmwk.decoder_manager()

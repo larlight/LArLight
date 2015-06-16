@@ -187,7 +187,7 @@ namespace larlight {
 
     bool status = true;
 
-    Message::send( MSG::INFO,__FUNCTION__, "algo_tpc_xmit" );
+    if(_verbosity[MSG::INFO]) Message::send( MSG::INFO,__FUNCTION__, "algo_tpc_xmit" );
     // Check if _checksum and _nwords agrees with that of event header.
     // Yun-Tse 2014/11/19: Perhaps this _nwords-=1; was for some old data format?
     // _nwords-=1;
@@ -202,16 +202,9 @@ namespace larlight {
 
     //if(_checksum != _header_info.checksum)
     if((_checksum & 0xffffff) !=_header_info.checksum){
-      
-      if( ((_checksum + 0x503f) & 0xffffff) == _header_info.checksum)
-	Message::send(MSG::WARNING,__FUNCTION__,
-		      Form("Disagreement on checksum: summed=%x, expected=%x ... BUT can be fixed...",_checksum,_header_info.checksum));
-
-      else {
 	Message::send(MSG::ERROR,__FUNCTION__,
 		      Form("Disagreement on checksum: summed=%x, expected=%x",_checksum,_header_info.checksum));
 	status = false;
-      }
     }
 
     return status;
@@ -306,18 +299,18 @@ namespace larlight {
 
     // Store if condition is satisfied
     if(status) {
+      
+      if(_verbosity[MSG::INFO]){
 
-      // if(_verbosity[MSG::INFO]){
+	print(MSG::INFO,__FUNCTION__,
+	      Form("Storing event %u with %zu channel entries...",
+		   _header_info.event_number, _event_data->size()));
 
-	Message::send(MSG::INFO,__FUNCTION__,
-		      Form("Storing event %u with %zu channel entries...",
-			   _header_info.event_number-1, _event_data->size()));
-
-      // }
-
+      }
+      
       _event_data->set_module_address         ( _header_info.module_address         );
       _event_data->set_module_id              ( _header_info.module_id              );
-      _event_data->set_event_number           ( _header_info.event_number-1         );
+      _event_data->set_event_number           ( _header_info.event_number           );
       _event_data->set_event_frame_number     ( _header_info.event_frame_number     );
       _event_data->set_fem_trig_frame_number  ( _header_info.fem_trig_frame_number  );
       _event_data->set_fem_trig_sample_number ( _header_info.fem_trig_sample_number );

@@ -14,7 +14,7 @@ namespace larlight {
   void algo_tpc_huffman::reset() {
 
     algo_tpc_xmit::reset();
-
+    _ch_last_word_allow=false;
   }
 
   void algo_tpc_huffman::clear_event() {
@@ -99,7 +99,13 @@ namespace larlight {
 
       if(_nwords && _nwords == _header_info.nwords){
 
-	_nwords++;
+	//_nwords++;
+	if(_ch_data.size()) {
+	  _ch_data.set_module_id(_header_info.module_id);
+	  _ch_data.set_module_address(_header_info.module_address);
+	  _event_data->push_back(_ch_data);
+	  _ch_data.clear_data();
+	}
 	status = store_event();
 
       }
@@ -127,6 +133,19 @@ namespace larlight {
     case FEM::EVENT_LAST_WORD:
 
       //if(last_word_class == FEM::CHANNEL_LAST_WORD){
+
+      // Attempt to store data if nwords matches with the expected number
+      if(status && _nwords == _header_info.nwords){
+	//_nwords++;
+	_checksum += word;
+	if(_ch_data.size()) {
+	  _ch_data.set_module_id(_header_info.module_id);
+	  _ch_data.set_module_address(_header_info.module_address);
+	  _event_data->push_back(_ch_data);
+	  _ch_data.clear_data();
+	}
+	status = store_event();
+      }
 
       status = process_event_last_word(word,_last_word);
       break;
@@ -200,6 +219,50 @@ namespace larlight {
     return status;
   }
 
+  //#########################################################
+  bool algo_tpc_huffman::check_event_quality(){
+  //#########################################################
+
+    bool status = true;
+
+    if(_verbosity[MSG::INFO]) Message::send( MSG::INFO,__FUNCTION__, "algo_tpc_xmit" );
+    // Check if _checksum and _nwords agrees with that of event header.
+    // Yun-Tse 2014/11/19: Perhaps this _nwords-=1; was for some old data format?
+    // _nwords-=1;
+    if(_nwords!=_header_info.nwords){
+
+      Message::send(MSG::ERROR,__FUNCTION__,
+		    Form("Disagreement on nwords: counted=%u, expected=%u",_nwords,_header_info.nwords));
+
+      status = false;
+
+    }
+
+    //if(_checksum != _header_info.checksum)
+    if((_checksum & 0xffffff) !=_header_info.checksum){
+      
+      if( ((_checksum + 0x503f) & 0xffffff) == _header_info.checksum) {
+	Message::send(MSG::WARNING,__FUNCTION__,
+		      Form("Fix-able checksum disagreement: summed=%x, expected=%x (Event=%d,FEM=%d), w/ word count=%d (#ch = %zu)",
+			   _checksum,
+			   _header_info.checksum,
+			   _header_info.event_number,
+			   _header_info.module_address,
+			   _nwords,
+			   _event_data->size()));
+	_ch_last_word_allow = true;
+      }
+      else {
+	Message::send(MSG::ERROR,__FUNCTION__,
+		      Form("Disagreement on checksum: summed=%x, expected=%x",_checksum,_header_info.checksum));
+	status = false;
+      }
+    }
+
+    return status;
+
+  }
+
   bool algo_tpc_huffman::process_fem_header(const UInt_t word,
 					    UInt_t &last_word) 
   {
@@ -210,9 +273,14 @@ namespace larlight {
     //
     UInt_t last_word_class = get_word_class(last_word);
 
+    if(_ch_last_word_allow)
+      Message::send(MSG::WARNING,__FUNCTION__,
+		    "Detected last-ch-last-word-missing issue in the previous event FYI...");
+
     if(last_word_class != FEM::EVENT_HEADER &&
        last_word_class != FEM::FEM_HEADER &&
-       last_word_class != FEM::CHANNEL_LAST_WORD) {
+       last_word_class != FEM::CHANNEL_LAST_WORD &&
+       !_ch_last_word_allow) {
 
       Message::send(MSG::ERROR,__FUNCTION__,
 		    Form("Unexpected FEM header (%x) with the previous word %x!",word,last_word));
@@ -237,7 +305,7 @@ namespace larlight {
 	status = decode_fem_header(_event_header_words);
 
     }
-
+    _ch_last_word_allow = false;
     last_word = word;
 
     return status;
@@ -257,10 +325,16 @@ namespace larlight {
 
     if(last_word_class != FEM::CHANNEL_LAST_WORD) {
 
-      Message::send(MSG::ERROR,__FUNCTION__,
-		    Form("Unexpected event last word (%x) with the previous word %x!",word,last_word));
-
-      status = false;
+      if(_ch_last_word_allow) {
+	Message::send(MSG::WARNING,__FUNCTION__,
+		      "Detected last-ch-last-word-missing issue in the previous event FYI...");
+	_ch_last_word_allow = false;
+      }else {
+	Message::send(MSG::ERROR,__FUNCTION__,
+		      Form("Unexpected event last word (%x) with the previous word %x!",word,last_word));
+	
+	status = false;
+      }
 
     }else if(_header_info.event_number!=FEM::INVALID_WORD){
 
@@ -316,8 +390,9 @@ namespace larlight {
       */
       if(get_word_class(last_word)==FEM::CHANNEL_LAST_WORD) {
 
-	Message::send(MSG::INFO,__FUNCTION__,
-		      Form("Zero-padding found after %x",last_word));
+	if(_verbosity[MSG::INFO])
+	  Message::send(MSG::INFO,__FUNCTION__,
+			Form("Zero-padding found after %x",last_word));
 
 	return status;
       }
@@ -395,8 +470,14 @@ namespace larlight {
 
       // Attempt to store data if nwords matches with the expected number
       if(status && _nwords == _header_info.nwords){
-	_nwords++;
+	//_nwords++;
 	_checksum += word;
+	if(_ch_data.size()) {
+	  _ch_data.set_module_id(_header_info.module_id);
+	  _ch_data.set_module_address(_header_info.module_address);
+	  _event_data->push_back(_ch_data);
+	  _ch_data.clear_data();
+	}
 	status = store_event();
       }
 
@@ -413,7 +494,7 @@ namespace larlight {
       break;
 
     default:
-
+      
       status = decode_ch_word(word,last_word);
     }
 

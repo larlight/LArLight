@@ -337,8 +337,8 @@ namespace larlight {
   #endif
 
     // Report if verbosity is set.
-    // if(_verbosity[MSG::INFO])
-    //   {
+    if(_verbosity[MSG::INFO])
+      {
 	std::string msg;
 	for(size_t i=0; i<FEM_HEADER_COUNT; ++i)
 	  msg += Form("%x ", event_header[i]);
@@ -350,7 +350,7 @@ namespace larlight {
 	Message::send(MSG::INFO, __FUNCTION__, Form("Checksum = %x", _header_info.checksum));
 	Message::send(MSG::INFO, __FUNCTION__, Form("Trigger Frame %d",_header_info.fem_trig_frame_number));
 	Message::send(MSG::INFO, __FUNCTION__, Form("Trigger Sample %d",_header_info.fem_trig_sample_number));
-    //  }
+      }
 
     _checksum=0;
 

@@ -57,6 +57,8 @@ namespace larlight {
     virtual void reset();
 
   protected:  
+    
+    virtual bool check_event_quality();
 
     virtual void clear_event();
 
@@ -78,7 +80,7 @@ namespace larlight {
   protected:
 
     bool _search_header;
-
+    bool _ch_last_word_allow;
   };
 
 }

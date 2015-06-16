@@ -96,7 +96,7 @@ namespace larlight {
     UInt_t channel_number() const {return _channel_number;}
     
     /// Getter for the module address
-    UChar_t module_address() const { return _module_address; }
+    UShort_t module_address() const { return (UShort_t)_module_address; }
     
     /// Getter for the module id
     UChar_t module_id() const {return _module_id;}
