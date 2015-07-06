@@ -65,6 +65,9 @@ namespace larlight {
 
     if(status){
       _nwords++;
+      //if(get_word_class(word) == FEM::CHANNEL_WORD) 
+      //_checksum += (word & 0xfff + 0xa000);
+      //else
       _checksum+=word;
     }
 
@@ -272,7 +275,7 @@ namespace larlight {
       // Channel header ... read in channel info from this word
       if(last_word_class!=FEM::FEM_FIRST_WORD && 
 	 last_word_class!=FEM::CHANNEL_LAST_WORD &&
-	 !( (((*_event_data->rbegin()).size()) & 0x1) && _last_word==0x8000)) {
+	 !( (_event_data->size() && (_event_data->back().size() & 0x1)) && _last_word==0x8000)) {
 	Message::send(MSG::ERROR,__FUNCTION__,
 		      Form("Found channel header (%x) in an unexpected place (previous=%x)!",word,last_word));
 	status=false;
