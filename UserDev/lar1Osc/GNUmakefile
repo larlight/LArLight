@@ -11,8 +11,8 @@ OBJECTS = $(SOURCES:.cc=.o)
 
 # include options for this package
 INCFLAGS = -I.                       #Include itself
-INCFLAGS += -IFluxRW
-INCFLAGS += -IFluxRWnubar
+# INCFLAGS += -IFluxRW
+# INCFLAGS += -IFluxRWnubar
 
 # platform-specific options
 OSNAME          = $(shell uname -s)
