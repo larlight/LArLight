@@ -6,11 +6,16 @@
 #include <iostream>
 #include <string>
 
-using namespace std;
 
-horn2boost::horn2boost()
+lar1::horn2boost::horn2boost(std::string horn2conf)
 {
-  // cout <<"Initializing horn2boost"<<endl;
+  std::cout <<"Initializing horn2boost";
+  if (horn2conf!="") {
+    std::cout <<" with "<<horn2conf<<" configuration";
+  } else {
+    std::cout <<" with default configuration";
+  }
+  std::cout <<std::endl;
   fBinSize=0.05;
   kMaxWeight=30;
   kDet.push_back("lar1nd");   
@@ -33,16 +38,26 @@ horn2boost::horn2boost()
   for (uint iConf=0;iConf<kConf.size();iConf++) {
     for (uint iDet=0;iDet<kDet.size();iDet++) {
       for (uint iNu=0;iNu<kNu.size();iNu++) {
-        std::string histfile(Form("%s/twoHornHist/%s_rw_%s_%s.root",
-                                  path.c_str(),
-                                  kNu[iNu].c_str(),
-                                  kConf[iConf].c_str(),
-                                  kDet[iDet].c_str()));
-        // cout <<"Loading flux histograms from "<<histfile<<endl;
+        std::string histfile;
+        if (horn2conf=="" || iConf==0)
+          histfile=Form("%s/twoHornHist/%s_rw_%s_%s.root",
+                        path.c_str(),
+                        kNu[iNu].c_str(),
+                        kConf[iConf].c_str(),
+                        kDet[iDet].c_str());
+        else
+          histfile=Form("%s/twoHornHist/%s_rw_%s_%s_%s.root",
+                        path.c_str(),
+                        kNu[iNu].c_str(),
+                        kConf[iConf].c_str(),
+                        horn2conf.c_str(),
+                        kDet[iDet].c_str());
+        // std::cout <<"Loading flux histograms from "<<histfile<<std::endl;
+        
         TFile fin(histfile.c_str());
         
         if ( !fin.IsOpen() ) {
-          cout <<"Can't find histogram file. Aborting!"<<endl;
+          std::cout <<"Can't find histogram file. Aborting!"<<std::endl;
           exit(0);
         }
 
@@ -89,34 +104,34 @@ horn2boost::horn2boost()
     }
   }
 
-  // cout <<endl;
-  // cout <<"***************************************************"<<endl;
-  // cout <<"* Conventions used when calling member functions:"  <<endl;
-  // cout <<"* idet  = 1, 2, or 3 (LAr1ND, uboone, T600)"<<endl;
-  // cout <<"* ntype = 1, 2, 3 or 4 (nue, nuebar, numu, numubar)"<<endl;
-  // cout <<"* ptype = 1, 2, 3 or 4 (mu+-, pi+-, K0L, K+-)"      <<endl;
-  // cout <<"***************************************************"<<endl;
+  // std::cout <<std::endl;
+  // std::cout <<"***************************************************"<<std::endl;
+  // std::cout <<"* Conventions used when calling member functions:"  <<std::endl;
+  // std::cout <<"* idet  = 1, 2, or 3 (LAr1ND, uboone, T600)"<<std::endl;
+  // std::cout <<"* ntype = 1, 2, 3 or 4 (nue, nuebar, numu, numubar)"<<std::endl;
+  // std::cout <<"* ptype = 1, 2, 3 or 4 (mu+-, pi+-, K0L, K+-)"      <<std::endl;
+  // std::cout <<"***************************************************"<<std::endl;
 
 
 }
 
-horn2boost::~horn2boost()
+lar1::horn2boost::~horn2boost()
 {
 }
 
-Double_t horn2boost::GetWeight(Int_t idet, Int_t ntype, Int_t ptype, Double_t energy)
+Double_t lar1::horn2boost::GetWeight(Int_t idet, Int_t ntype, Int_t ptype, Double_t energy)
 {
   Double_t wgh=1;
 
   if (ntype>4 || ntype<1) {
-    cout <<"Invalid neutrino type ntype="<<ntype<<" ! Expected 1,2,3 or 4 (nue, nuebar, numu or numubar)"<<endl;
-    cout <<"Returning weight=1"<<endl;
+    std::cout <<"Invalid neutrino type ntype="<<ntype<<" ! Expected 1,2,3 or 4 (nue, nuebar, numu or numubar)"<<std::endl;
+    std::cout <<"Returning weight=1"<<std::endl;
   } else if (ptype>4 || ptype<1) {
-    cout <<"Invalid neutrino parent type ptype="<<ptype<<" ! Expected 1,2,3 or 4 (mu+-, pi+-, K0 or K+-)"<<endl;
-    cout <<"Returning weight=1"<<endl;
+    std::cout <<"Invalid neutrino parent type ptype="<<ptype<<" ! Expected 1,2,3 or 4 (mu+-, pi+-, K0 or K+-)"<<std::endl;
+    std::cout <<"Returning weight=1"<<std::endl;
   } else if (idet>3 || idet<0) {
-    cout <<"Invalid detector type idet="<<idet<<endl;
-    cout <<"Returning weight=1"<<endl;
+    std::cout <<"Invalid detector type idet="<<idet<<std::endl;
+    std::cout <<"Returning weight=1"<<std::endl;
   } else {
 
     Int_t bin=Int_t(energy/fBinSize);
@@ -124,13 +139,13 @@ Double_t horn2boost::GetWeight(Int_t idet, Int_t ntype, Int_t ptype, Double_t en
     Double_t num = fGS[1][idet-1][ntype-1][ptype-1][bin];
     
     if ( denom != 0 && num != 0 ) 
-      wgh=min(num/denom,kMaxWeight);
+      wgh=std::min(num/denom,kMaxWeight);
   }
 
   return wgh;
 }
 
-TH1D* horn2boost::GetWeightHist(Int_t idet, Int_t ntype, Int_t ptype) 
+TH1D* lar1::horn2boost::GetWeightHist(Int_t idet, Int_t ntype, Int_t ptype) 
 {
   Int_t nbins=fGS[0][idet-1][ntype-1][ptype-1].size();
   Float_t low=0;
@@ -144,7 +159,7 @@ TH1D* horn2boost::GetWeightHist(Int_t idet, Int_t ntype, Int_t ptype)
   return h;
 }
 
-std::string horn2boost::GetEnv( const std::string & var ){
+std::string lar1::horn2boost::GetEnv( const std::string & var ){
   const char * val = std::getenv( var.c_str() );
   if ( val == 0 ) {
       return "";

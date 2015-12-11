@@ -45,6 +45,10 @@ void lar1::Reprocessing::Loop(std::string signal,
       utils.setMC_Generation(2);
     }
 
+    if (useTwoHornConfig){
+        utils.reconfigureTwoHorn(twoHornConfig);
+    }
+
     bool isFosc = false;
     if (signal == "fosc") isFosc = true;
 
@@ -56,7 +60,7 @@ void lar1::Reprocessing::Loop(std::string signal,
     double photonMisID   = 0.06;
     // double muonCCMisID   = 0.001;
 
-    double smearingStats = 25.0;
+    double smearingStats = 20.0;
 
     // NC photon vertex energy cuts
     double vtxEcut = 99999;     // 0.025;   // GeV
@@ -117,25 +121,24 @@ void lar1::Reprocessing::Loop(std::string signal,
        based up the following lists.  So if an event fits these backgrounds, set it's variable ibkg accordingly
        
        (you can add more to these and refine them as you please.  But let me (corey) know so I can update the code downstream)
+      **/     
+       // Nu_e background
        
-       Nu_e background
+       int kNueFromNueCC_muon       = 1;
+       int kNueFromNueCC_chargeKaon = 2;
+       int kNueFromNueCC_neutKaon   = 3;
+       int kNueFromEScatter         = 4;
+       int kNueFromNC_pi0           = 5;
+       int kNueFromNC_singlePhot    = 6;
+       int kNueFromNumuCC           = 7;
+       int kDirt                    = 8;
+       int kOther                   = 9;
        
-       kNueFromNueCC_muon:        ibkg == 1
-       kNueFromNueCC_chargeKaon:  ibkg == 2
-       kNueFromNueCC_neutKaon:    ibkg == 3
-       kNueFromEScatter:          ibkg == 4
-       kNueFromNC_pi0:            ibkg == 5
-       kNueFromNC_delta0:         ibkg == 6
-       kNueFromNumuCC:            ibkg == 7
-       kDirt:                     ibkg == 8
-       kOther:                    ibkg == 9
+       // Nu_mu background
        
-       Nu_mu background
-       
-       kNumuFromNumuCC:   ibkg == 1
-       kNumuFromNueCC:    ibkg == 2
-       kNumuFromNC:       ibkg == 3
-    **/
+       int kNumuFromNumuCC          = 0;
+       int kNumuFromNCPi            = 1;
+
 
     if (fChain == 0) return;
 
@@ -196,6 +199,14 @@ void lar1::Reprocessing::Loop(std::string signal,
       potweight = utils.GetPOTNorm( iflux, iLoc );
       std::cout << "POT weight = " << potweight << std::endl;
     }
+
+    std::cout << "Horn configuration is: ";
+    if (useTwoHornConfig){
+        std::cout << "two horns";
+        if (twoHornConfig != "") std::cout << " with " << twoHornConfig << std::endl;
+    }
+    else
+        std::cout << "One horn, nominal configuration." << std::endl;
 
     // Create the output TTree
     TTree *newt = new TTree("EventsTot", "Event info for ALL types");
@@ -582,6 +593,10 @@ void lar1::Reprocessing::Loop(std::string signal,
     TH2D * convPointXVsE = new TH2D("convPointXVsE","convPointXVsE",50,xmin,xmax,150,0,0.4);
 
 
+    // Histograms that are useful for Lariat, request of Flavio:
+    // TH1D * protonP = new TH1D("protonP",protonP,50,0,2000);
+
+
     // These are commented out but please don't delete them.
     // Theyre very useful for debugging numi files.
     // TH1D * neutVertexInWindowX   = new TH1D("neutVertexInWindowX","neutVertexInWindowX",100, -5,5);
@@ -601,6 +616,21 @@ void lar1::Reprocessing::Loop(std::string signal,
 
     double nNumuCCEvents = 0;
     double nFoscEvents = 0;
+
+    // trying angle dependant flux:
+    // double X_center = 0;
+    // double Y_center = -34;
+
+    // TH1F * rates_0 = new TH1F("rates_0","rates_0",ebins,emin,emax);
+    // TH1F * rates_1 = new TH1F("rates_1","rates_1",ebins,emin,emax);
+    // TH1F * rates_2 = new TH1F("rates_2","rates_2",ebins,emin,emax);
+    // TH1F * rates_3 = new TH1F("rates_3","rates_3",ebins,emin,emax);
+    // TH1F * rates_4 = new TH1F("rates_4","rates_4",ebins,emin,emax);
+    // TH1F * rates_5 = new TH1F("rates_5","rates_5",ebins,emin,emax);
+    // TH1F * rates_6 = new TH1F("rates_6","rates_6",ebins,emin,emax);
+    // TH1F * rates_7 = new TH1F("rates_7","rates_7",ebins,emin,emax);
+    // TH1F * rates_8 = new TH1F("rates_8","rates_8",ebins,emin,emax);
+    // TH1F * rates_9 = new TH1F("rates_9","rates_9",ebins,emin,emax);
 
     //====================================================
     // Loop over entries in incoming ntuple
@@ -708,6 +738,22 @@ void lar1::Reprocessing::Loop(std::string signal,
       // only keep active detector events
       if( !isActive ) continue;
 
+
+      // // Calculate the distance from beam center in lar1nd:
+      // double r = 0.0;
+      // r += (vertex->X() - X_center)*(vertex->X() - X_center);
+      // r += (vertex->Y() - Y_center)*(vertex->Y() - Y_center);
+      // r = sqrt(r);
+      // if (r < 025) rates_0 -> Fill(enugen, fluxweight);
+      // else if (r < 1.25*050) rates_1 -> Fill(enugen, fluxweight);
+      // else if (r < 1.25*075) rates_2 -> Fill(enugen, fluxweight);
+      // else if (r < 1.25*100) rates_3 -> Fill(enugen, fluxweight);
+      // else if (r < 1.25*125) rates_4 -> Fill(enugen, fluxweight);
+      // else if (r < 1.25*150) rates_5 -> Fill(enugen, fluxweight);
+      // else if (r < 1.25*175) rates_6 -> Fill(enugen, fluxweight);
+      // else if (r < 1.25*200) rates_7 -> Fill(enugen, fluxweight);
+      // else if (r < 1.25*225) rates_8 -> Fill(enugen, fluxweight);
+      // else if (r < 1.25*250) rates_9 -> Fill(enugen, fluxweight);
 
 
       // if (!(neutVertexInWindow->Y() > -2.001 && neutVertexInWindow->Y() < -1.999)) continue;
@@ -1128,10 +1174,25 @@ void lar1::Reprocessing::Loop(std::string signal,
                                       + photon_energy 
                                       + vertexEnergy;
 
+            // check on the smearing stats - if the signal is nue intrisic, repeat this 
+            // calculation to improve the stats.
+            if (smearingStats != 1.0  && smearing == true){
+              if (smearingStatsIndex == 0){ // if the index is maxed out, keep going
+                smearingStatsIndex = smearingStats;
+                continue;
+              }
+              else{
+                jentry --;  // decrement the index to repeat this event.
+                wgt *= (1.0/smearingStats);
+                smearingStatsIndex --;
+              }
+
+            }
+
           showerGap = 0.0;
 
           if (ndecay < 5 && ndecay > 0){  // K0
-            ibkg = 3;
+            ibkg = kNueFromNueCC_neutKaon;
             nueFromK0Decay->Fill( enugen, wgt );
             nueFromK0DecayLepE->Fill( electron_cand_energy, wgt );
             nueFromK0DecayCCQE->Fill( enuccqe, wgt );
@@ -1139,7 +1200,7 @@ void lar1::Reprocessing::Loop(std::string signal,
             if( enucalo2 > 0.2 && enucalo2 < 0.475 ) NnueFromK0Decay_LE += wgt;
           }
           else if (ndecay > 4 && ndecay < 11){  // K+
-            ibkg = 2;
+            ibkg = kNueFromNueCC_chargeKaon;
             nueFromKPlusDecay->Fill( enugen, wgt );
             nueFromKPlusDecayLepE->Fill( electron_cand_energy, wgt );
             nueFromKPlusDecayCCQE->Fill( enuccqe, wgt );
@@ -1147,7 +1208,7 @@ void lar1::Reprocessing::Loop(std::string signal,
             if( enucalo2 > 0.2 && enucalo2 < 0.475 ) NnueFromKPlusDecay_LE += wgt;
           }
           else if (ndecay == 11 || ndecay == 12){  // mu
-            ibkg = 1;
+            ibkg = kNueFromNueCC_muon;
             nueFromMuonDecay->Fill( enugen, wgt ); 
             nueFromMuonDecayLepE->Fill( electron_cand_energy, wgt ); 
             nueFromMuonDecayCCQE->Fill( enuccqe, wgt );
@@ -1158,20 +1219,7 @@ void lar1::Reprocessing::Loop(std::string signal,
           ShowerDistanceToStart   = utils.GetLengthToStart(  *vertex, lepDir, iDet);
           ShowerDistanceToStartYZ = utils.GetYZLengthToStart(*vertex, lepDir, iDet);
 
-        // check on the smearing stats - if the signal is nue intrisic, repeat this 
-        // calculation to improve the stats.
-        if (smearingStats != 1.0  && smearing == true){
-          if (smearingStatsIndex == 0){ // if the index is maxed out, keep going
-            smearingStatsIndex = smearingStats;
-            continue;
-          }
-          else{
-            jentry --;  // decrement the index to repeat this event.
-            wgt *= (1.0/smearingStats);
-            smearingStatsIndex --;
-          }
 
-        }
 
         } // end of intrinsic electrons
 
@@ -1283,7 +1331,20 @@ void lar1::Reprocessing::Loop(std::string signal,
 
           efficiency = photonMisID;
           wgt = fluxweight*efficiency;
-         
+          // check on the smearing stats - if the signal is nue intrisic or a photon bkg, repeat this 
+          // calculation to improve the stats.
+          if (smearingStats != 1.0  && smearing == true){
+            if (smearingStatsIndex == 0){ // if the index is maxed out, keep going
+              smearingStatsIndex = smearingStats;
+              continue;
+            }
+            else{
+              jentry --;  // decrement the index to repeat this event.
+              wgt *= (1.0/smearingStats);
+              smearingStatsIndex --;
+            }
+  
+          }
 
           // In principle, can reject photons with a gap.
           // So, reject photons with vertex energy above the cut
@@ -1300,7 +1361,7 @@ void lar1::Reprocessing::Loop(std::string signal,
           //end of new code
 
 
-          ibkg = 7;
+          ibkg = kNueFromNumuCC;
           
           numuCC->Fill( enugen, wgt );
           numuCCLepE->Fill( electron_cand_energy, wgt );
@@ -1309,6 +1370,9 @@ void lar1::Reprocessing::Loop(std::string signal,
           if( enucalo2 > 0.2 && enucalo2 < 0.475 ) NnumuCC_LE += wgt;
 
           nNumuMisID_total += wgt;
+
+
+
 
         } // end of numu CC misid as nue CC
 
@@ -1374,8 +1438,23 @@ void lar1::Reprocessing::Loop(std::string signal,
           efficiency = photonMisID;
           wgt = fluxweight*efficiency;
 
+          // check on the smearing stats - if the signal is nue intrisic or a photon bkg, repeat this 
+          // calculation to improve the stats.
+          if (smearingStats != 1.0  && smearing == true){
+            if (smearingStatsIndex == 0){ // if the index is maxed out, keep going
+              smearingStatsIndex = smearingStats;
+              continue;
+            }
+            else{
+              jentry --;  // decrement the index to repeat this event.
+              wgt *= (1.0/smearingStats);
+              smearingStatsIndex --;
+            }
+  
+          }
+
           if(NPi0FinalState > 0 ){
-            ibkg = 5;
+            ibkg = kNueFromNC_pi0;
             if (isFid){
               NCpizeroVtxKE->Fill( vertexEnergy, wgt );
               NCpizeroConvD->Fill( photonConvDist, wgt );
@@ -1393,7 +1472,7 @@ void lar1::Reprocessing::Loop(std::string signal,
             }
           }
           else if (NGamma > 0){
-            ibkg = 6;
+            ibkg = kNueFromNC_singlePhot;
             
             singlePhotonNC -> Fill(enugen, wgt);
             singlePhotonNCPhoE -> Fill(photonE, wgt);
@@ -1415,6 +1494,7 @@ void lar1::Reprocessing::Loop(std::string signal,
           // singlePhotonE.push_back( photonE );
           // singlePhotonTheta.push_back( photonTheta );
 
+
         }
         // #############################
         // Add misID from nu - e scattering:
@@ -1423,7 +1503,7 @@ void lar1::Reprocessing::Loop(std::string signal,
           iTop ++;  //Should be an electron in these events
           iChan = 2000; //This is an other case!
 
-          ibkg = 4;
+          ibkg = kNueFromEScatter;
           efficiency = electronIDeff;
           wgt = fluxweight*efficiency;
           showerGap = 0.0;
@@ -1511,6 +1591,7 @@ void lar1::Reprocessing::Loop(std::string signal,
           efficiency = muonIDeff;
           wgt = fluxweight*efficiency;
 
+          ibkg = kNumuFromNumuCC;
 
           electron_cand_energy = ElepSmeared;
           electron_cand_angle = ThetaLep;
@@ -1541,6 +1622,7 @@ void lar1::Reprocessing::Loop(std::string signal,
         
         }
 
+        // Here is where to implement numu background from pi+/-
 
       }
       if (signal == "fosc"){

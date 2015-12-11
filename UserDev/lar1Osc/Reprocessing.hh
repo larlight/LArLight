@@ -170,9 +170,9 @@ class Reprocessing {
     virtual TString  InFile();
     virtual void     CalcLepton( TVector3& );
 
-    void UseTwoHornConfig(){useTwoHornConfig=true;}
+    void UseTwoHornConfig(std::string config="");
     bool useTwoHornConfig;
-
+    std::string twoHornConfig;
     Utils utils;
     
   };
@@ -430,6 +430,13 @@ Long64_t Reprocessing::LoadTree(Long64_t entry)
    }
 
    return centry;
+}
+
+void Reprocessing::UseTwoHornConfig(std::string config)
+{
+  useTwoHornConfig=true;
+  twoHornConfig = config;
+  return;
 }
 
 void Reprocessing::Init(TTree *tree)

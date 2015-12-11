@@ -7,20 +7,27 @@
 #include <iomanip>
 #include <string>
 
-namespace lar1{
-  Utils::Utils(){
+  lar1::Utils::Utils(){
     mc_generation = 5;
     randService.SetSeed(0);
     reconfigure();
+    fHorn2Boost = 0;
   }
 
-  void Utils::setMC_Generation(int g){
+  void lar1::Utils::setMC_Generation(int g, std::string twoHornConfig){
     mc_generation = g; 
-    reconfigure();
+    reconfigure(twoHornConfig);
     return;
   }
 
-  void Utils::reconfigure(){
+  void lar1::Utils::reconfigureTwoHorn(std::string twoHornConfig){
+    if (fHorn2Boost != 0){
+      delete fHorn2Boost;
+    }
+    fHorn2Boost = new horn2boost(twoHornConfig);
+  }
+
+  void lar1::Utils::reconfigure(std::string twoHornConfig){
     std::cout <<"Reconfiguring Utils with mc_generation =" << mc_generation<<std::endl;
 
     PotNormNubar  = 10e20;
@@ -112,12 +119,14 @@ namespace lar1{
     return;
   }
 
-  Utils::~Utils(){
+  lar1::Utils::~Utils(){
+    if (fHorn2Boost)
+      delete fHorn2Boost;
   }
 
 
 
-  Double_t Utils::GetPOTNormNuMI( Int_t iflux, Int_t iLoc) const{
+  Double_t lar1::Utils::GetPOTNormNuMI( Int_t iflux, Int_t iLoc) const{
 
     Double_t POT_Sim = 1;
     Double_t POTnorm = 1;
@@ -150,7 +159,7 @@ namespace lar1{
    return 1;
   }
 
-  Double_t Utils::GetPOTNorm( Int_t iflux, Int_t iLoc) const{
+  Double_t lar1::Utils::GetPOTNorm( Int_t iflux, Int_t iLoc) const{
 
     // Simple function, really, but put into utils to abstract it out of reprocessing.
     // 
@@ -340,7 +349,7 @@ namespace lar1{
   //=======================================================================================
   // Reweight the flux using histograms in FluxRW tools
   //=======================================================================================
-  Double_t Utils::GetFluxWeight( Double_t energy, bool isFosc, Int_t inno, Int_t ndecay ){
+  Double_t lar1::Utils::GetFluxWeight( Double_t energy, bool isFosc, Int_t inno, Int_t ndecay ){
 
     Double_t wgt = 0;
     Int_t ntype = 0;
@@ -393,7 +402,7 @@ namespace lar1{
 //=======================================================================================
   // Reweight the flux using histograms in FluxRW tools
   //=======================================================================================
-  Double_t Utils::GetTwoHornWeight( Double_t energy, bool isFosc, 
+  Double_t lar1::Utils::GetTwoHornWeight( Double_t energy, bool isFosc, 
                                     Int_t inno, Int_t ndecay, 
                                     Int_t iLoc )
   {
@@ -438,7 +447,7 @@ namespace lar1{
     if (iLoc == k600m_onaxis) det_loc = 3;
 
     // neutrino mode
-    wgt = fHorn2Boost.GetWeight(det_loc, ntype, ptype, energy );
+    wgt = fHorn2Boost->GetWeight(det_loc, ntype, ptype, energy );
 
 
     // if ( abs(inno) == 12 )
@@ -452,13 +461,13 @@ namespace lar1{
   //=========================================================================================
   // Polar angle Theta - angle between momentum vector and z-axis
   //=========================================================================================
-  Double_t Utils::GetTheta( const TVector3 & mom, const TVector3 & ref ) const{
+  Double_t lar1::Utils::GetTheta( const TVector3 & mom, const TVector3 & ref ) const{
 
     return GetTheta( mom.X(), mom.Y(), mom.Z(), ref );
     
   }
 
-  Double_t Utils::GetTheta( Double_t px, Double_t py, Double_t pz, const TVector3 & ref ) const{
+  Double_t lar1::Utils::GetTheta( Double_t px, Double_t py, Double_t pz, const TVector3 & ref ) const{
 
     // a.b = |a| |b| cos(theta)
     Double_t cosTheta = (ref.X()*px + ref.Y()*py + ref.Z()*pz) / (sqrt(px*px + py*py + pz*pz) * ref.Mag());
@@ -470,14 +479,14 @@ namespace lar1{
   //=================================================================================
   // Polar angle Phi - angle in the x-y plane, x-axis = 0
   //=================================================================================
-  Double_t Utils::GetPhi( TVector3 mom, TVector3 ref ) const{
+  Double_t lar1::Utils::GetPhi( TVector3 mom, TVector3 ref ) const{
 
     mom.RotateUz(ref.Unit());
     return GetPhi( mom.X(), mom.Y() );
     
   }
 
-  Double_t Utils::GetPhi( Double_t px, Double_t py ) const{
+  Double_t lar1::Utils::GetPhi( Double_t px, Double_t py ) const{
 
     return atan2( py, px );
 
@@ -486,7 +495,7 @@ namespace lar1{
   //=================================================================================
   // CCQE neutrino energy
   //=================================================================================
-  Double_t Utils::NuEnergyCCQE( Double_t lep_energy, Double_t lep_p, Double_t lep_theta,
+  Double_t lar1::Utils::NuEnergyCCQE( Double_t lep_energy, Double_t lep_p, Double_t lep_theta,
                                 Double_t mass, Int_t mode, bool verbose ) const
   {
     
@@ -526,7 +535,7 @@ namespace lar1{
 
 
 
-  Double_t Utils::NuEnergyCalo(std::vector<Int_t> *pdg, 
+  Double_t lar1::Utils::NuEnergyCalo(std::vector<Int_t> *pdg, 
                                std::vector<TLorentzVector> *momentum,
                                double lepEnergy,
                                bool smearing,
@@ -578,7 +587,7 @@ namespace lar1{
     
   }
 
-  Double_t Utils::GetLeptonEnergy(Double_t energy,
+  Double_t lar1::Utils::GetLeptonEnergy(Double_t energy,
                                   bool smearing,
                                   int PDG, bool contained,
                                   double containedLength) 
@@ -624,7 +633,7 @@ namespace lar1{
   //=================================================================================
   // Get the visible energy near the interaction vertex
   //=================================================================================
-  Double_t Utils::VertexEnergy( std::vector<Int_t> *pdg, 
+  Double_t lar1::Utils::VertexEnergy( std::vector<Int_t> *pdg, 
                                 std::vector<TLorentzVector> *momentum,
                                 bool smearing,
                                 Double_t prot_thresh, 
@@ -676,7 +685,7 @@ namespace lar1{
   }
 
 
-  Double_t Utils::TotalPhotonEnergy(Int_t idet, 
+  Double_t lar1::Utils::TotalPhotonEnergy(Int_t idet, 
                                     std::vector<TLorentzVector> *p1pos,
                                     std::vector<TLorentzVector> *p1mom,
                                     std::vector<TLorentzVector> *p2pos,
@@ -723,7 +732,7 @@ namespace lar1{
   //==========================================================================
   // Check if point is in some fiducial volume definition
   //==========================================================================
-  void Utils::GetDetBoundary(Int_t idet, 
+  void lar1::Utils::GetDetBoundary(Int_t idet, 
                              Double_t &xmin, Double_t &xmax, 
   			                     Double_t &ymin, Double_t &ymax,
                              Double_t &zmin, Double_t &zmax ) const{
@@ -790,7 +799,7 @@ namespace lar1{
   //=========================================================================================
   // Check if point is in some fiducial volume definition
   //==========================================================================================
-  Bool_t Utils::IsFiducial( Int_t idet, const TVector3 & vtx, std::string signal) const{
+  Bool_t lar1::Utils::IsFiducial( Int_t idet, const TVector3 & vtx, std::string signal) const{
     
 
     Double_t xmin(0.0), xmax(0.0), ymin(0.0), ymax(0.0), zmin(0.0), zmax(0.0);
@@ -860,7 +869,7 @@ namespace lar1{
 
   }
 
-  Bool_t Utils::IsFiducialMB(Int_t idet, TVector3 vtx) const
+  Bool_t lar1::Utils::IsFiducialMB(Int_t idet, TVector3 vtx) const
   {
     if (idet != kMB) return false;
 
@@ -873,7 +882,7 @@ namespace lar1{
   //=========================================================================================
   // Check if point is in some active volume definition
   //==========================================================================================
-  Bool_t Utils::IsActive( Int_t idet, TVector3 vtx, double cut ) const{
+  Bool_t lar1::Utils::IsActive( Int_t idet, TVector3 vtx, double cut ) const{
 
     if (idet == kMB) return IsFiducialMB(idet,vtx);
     
@@ -900,7 +909,7 @@ namespace lar1{
   //=========================================================================================
   // Calculate fiducial mass
   //=========================================================================================
-  Double_t Utils::GetFidMass( Int_t idet, std::string signal ) const{
+  Double_t lar1::Utils::GetFidMass( Int_t idet, std::string signal ) const{
     
     Double_t xmin(0.0), xmax(0.0), ymin(0.0), ymax(0.0), zmin(0.0), zmax(0.0);
 
@@ -953,7 +962,7 @@ namespace lar1{
   //=========================================================================================
   // Calculate fiducial mass
   //=========================================================================================
-  Double_t Utils::GetActiveMass( Int_t idet ) const{
+  Double_t lar1::Utils::GetActiveMass( Int_t idet ) const{
     
     Double_t xmin(0.0), xmax(0.0), ymin(0.0), ymax(0.0), zmin(0.0), zmax(0.0);
 
@@ -972,7 +981,7 @@ namespace lar1{
   // 
   //Find out if line intersects the plane
   // 
-  Bool_t Utils::IntersectsPlane(const TVector3 & startPos, const TVector3 & startDir,
+  Bool_t lar1::Utils::IntersectsPlane(const TVector3 & startPos, const TVector3 & startDir,
                                 const TVector3 & planeCorner1,
                                 const TVector3 & planeCorner2,
                                 const TVector3 & planeCorner3,
@@ -1058,7 +1067,7 @@ namespace lar1{
 
   }
 
-  double  Utils::GetContainedLength(const TVector3 & startPoint, 
+  double  lar1::Utils::GetContainedLength(const TVector3 & startPoint, 
                                     const TVector3 & startDir, 
                                     int idet,
                                     double precision) const{
@@ -1127,7 +1136,7 @@ namespace lar1{
   }
 
 
-  double  Utils::GetLengthToStart(const TVector3 & startPoint, 
+  double  lar1::Utils::GetLengthToStart(const TVector3 & startPoint, 
                                   const TVector3 & startDir, 
                                   int idet)  const{
 
@@ -1140,7 +1149,7 @@ namespace lar1{
   }
   
   
-  double  Utils::GetYZLengthToStart(const TVector3 & startPoint,
+  double  lar1::Utils::GetYZLengthToStart(const TVector3 & startPoint,
                                     const TVector3 & startDir,
                                     int idet) const{
 
@@ -1167,6 +1176,5 @@ namespace lar1{
 
   //###########################################################################################
 
-}
 
 

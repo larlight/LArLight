@@ -27,9 +27,10 @@ namespace lar1{
     Utils();
     ~Utils();
 
-    void setMC_Generation(int g);
-    void reconfigure();
-    
+    void setMC_Generation(int g, std::string twoHornConfig="");
+    void reconfigure(std::string twoHornConfig="");
+    void reconfigureTwoHorn(std::string twoHornConfig="");
+
     Double_t GetFluxWeight( Double_t energy, bool isFosc, Int_t inno, Int_t ndecay );
 
     Double_t GetTwoHornWeight( Double_t energy, bool isFosc, Int_t inno, Int_t ndecay, Int_t iLoc );
@@ -116,7 +117,7 @@ namespace lar1{
     FluxRW      fluxrw_nu;
     FluxRWnubar fluxrw_nubar;
 
-    horn2boost  fHorn2Boost;
+    horn2boost * fHorn2Boost;
 
     double PotNormNubar;
     double PotNormNu;

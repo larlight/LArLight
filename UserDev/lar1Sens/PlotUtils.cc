@@ -84,12 +84,12 @@ namespace lar1{
     return;
   }
 
-  void PlotUtils::miniBoone_plot(TPad* c)
+  void PlotUtils::miniBoone_plot_nu(TPad* c)
   {
     std::string path = GetEnv("MAKE_TOP_DIR");
     path.append("/UserDev/lar1Sens/");
     std::string data_dir= path;
-    data_dir.append("osc_data/");
+    data_dir.append("osc_data/mb_nu/");
 
     std::vector<TString> file_list;
     file_list.push_back(data_dir + "fit200_cont_90_0.txt");
@@ -108,8 +108,8 @@ namespace lar1{
     for (auto & file : file_list){
       graphs.push_back(new TGraph(file.Data()));
       graphs.back() -> SetFillStyle(0);
-      graphs.back() -> SetMarkerColor(4);
-      graphs.back() -> SetMarkerSize(2);
+      graphs.back() -> SetMarkerColor(kRed+1);
+      graphs.back() -> SetMarkerSize(5);
       graphs.back() -> Draw("P");
     }    
 
@@ -119,7 +119,42 @@ namespace lar1{
 
     return;                                                                                                                                                                                                                                                         
   }
+ 
+  void PlotUtils::miniBoone_plot_anu(TPad* c)
+  {
+    std::string path = GetEnv("MAKE_TOP_DIR");
+    path.append("/UserDev/lar1Sens/");
+    std::string data_dir= path;
+    data_dir.append("osc_data/mb_anu/");
 
+    std::vector<TString> file_list;
+    file_list.push_back(data_dir + "fit200_cont_90.txt");
+    // file_list.push_back(data_dir + "fit200_cont_90_1.txt");
+    // file_list.push_back(data_dir + "fit200_cont_90_2.txt");
+    // file_list.push_back(data_dir + "fit200_cont_1s.txt");
+    // file_list.push_back(data_dir + "fit200_cont_90.txt");
+    // file_list.push_back(data_dir + "fit200_cont_99.txt");
+    // file_list.push_back(data_dir + "fit200_sens_90.txt");
+
+    // Now read in the plots
+    //
+    c -> cd();
+    
+    std::vector<TGraph *> graphs; 
+    for (auto & file : file_list){
+      graphs.push_back(new TGraph(file.Data()));
+      graphs.back() -> SetFillStyle(0);
+      graphs.back() -> SetMarkerColor(kViolet-6);
+      graphs.back() -> SetMarkerSize(3);
+      graphs.back() -> Draw("P");
+    }    
+
+    // graphs.at(1) -> SetFillStyle(0);
+    // graphs.at(1) -> SetFillStyle(0);
+    // graphs.at(1) -> Draw("P");
+
+    return;                                                                                                                                                                                                                                                         
+  }
   void PlotUtils::giunti_plot(TPad* c)
   {
 

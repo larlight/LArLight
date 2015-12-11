@@ -20,8 +20,8 @@ namespace lar1{
   class FluxRW;
   class FluxRWnubar;
   class Reprocessing;
-}
   class horn2boost;
+}
   class testphots;
 //ADD_EMPTY_CLASS ... do not change this comment line
 
