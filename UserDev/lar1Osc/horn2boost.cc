@@ -27,8 +27,8 @@ lar1::horn2boost::horn2boost(std::string horn2conf)
   kNu.push_back("numu");
   kNu.push_back("numubar");
 
+  kConf.push_back("bnb1horn");
   kConf.push_back("bnb1horn_3.5m_210kA");
-  kConf.push_back("bnb2horn");
 
 
   // Get the path to the files using the larlight env variable:
